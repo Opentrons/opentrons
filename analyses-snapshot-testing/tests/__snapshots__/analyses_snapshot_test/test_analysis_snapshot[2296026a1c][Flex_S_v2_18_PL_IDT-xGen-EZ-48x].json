@@ -58280,15 +58280,8 @@
       "result": {
         "eventualDestinationLocationSequence": [
           {
-            "addressableAreaName": "gripperWasteChute",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
-            ]
+            "kind": "notOnDeck",
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -58422,26 +58415,9 @@
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Arc out of bounds in the Z-axis",
-        "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "FailedToPlanMoveError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
       "id": "UUID",
       "key": "1b0ddb704a438cd49e4224edbb883811",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
+      "notes": [],
       "params": {
         "flowRate": 25.0,
         "labwareId": "UUID",
@@ -58458,8 +58434,4126 @@
         },
         "wellName": "A2"
       },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
       "startedAt": "TIMESTAMP",
-      "status": "failed"
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1128153c81066439f7682f37153eacd5",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "91a23d2b4b7ca359dfa4e347462dbd4e",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "19c63d312f8f4cf91ed452fc9c3ba2c6",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8382df1f0627bb938fa7ee8a46c7f3f0",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "79619d8c6874aa3b593197979d6405b5",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "910521e17e066998042e6184e43f4af4",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6850a4b46601db66f466fcd076a5b7de",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8dcd7f6e7f3b458cced67505636dc532",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1ecc4dd085e6c705f1e4837c77e0f865",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 351.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.849999999999994,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "83ebc38d78c55e62f443447d7c772ad9",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "aac6165f6221306172a3f226e5bf984d",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8792ed71ed82ef0af95c05bc086fc8ae",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "31b85a2142fe01a5d09f9886240b99b5",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b63f9fc38c40450127888864a1da692d",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a059ada38f53da00b70aeda4ebba9fc1",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c05900d63b6c926f4fca9d207c580942",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7657ff07d802ca2cbab7c6c613989fb6",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f8310f8de8390c345ed56d54e29b4d2b",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 351.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6f30cb6eae9bce06d0027d89ab5a5fc8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 360.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.849999999999994,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fc01a403b80b108a546e200d30444290",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "901431cb81ea130893ff1a1151b579d6",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "462884167e1b72aa9923a3804fa6e5f6",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6ccfe68b45c8f3e465e95ee1c4030250",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a9c4ce8088adf26f5ead23d89019f242",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5b518f0155faeaf8e836b08c37d3fae4",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2bab78435037c62866783699c9181300",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cea692fbb46cb08712118d3e94b81b7d",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0067a257ebe235d4c378c3f3921b4275",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 360.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4149fb6771a431d709b61cb3ec750028",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID",
+        "rpm": 2000.0
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "631a37a779850c400bcfa4d9591b28bf",
+      "notes": [],
+      "params": {
+        "seconds": 300.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "42181b00c0bfa244047739477c7e1f17",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "256721bb824798d0a4b045e84dcb4641",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "96d583c59fa0392b8266b1caf8a6cbf0",
+      "notes": [],
+      "params": {
+        "dropOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "labwareId": "UUID",
+        "newLocation": {
+          "moduleId": "UUID"
+        },
+        "pickUpOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "strategy": "usingGripper"
+      },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1D2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1D2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "addressableAreaName": "heaterShakerV1D1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "heaterShakerModuleV1"
+            ]
+          }
+        ]
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "25d465a41f3454b2d0bbeaa3372b3e05",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1260a4cf17dc5e35cd497992c8f7865a",
+      "notes": [],
+      "params": {
+        "seconds": 180.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ed1c1be524db0fe16fc7dbcbe60cf273",
+      "notes": [],
+      "params": {
+        "message": "--> Transferring Supernatant"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f58e0b11a038b3612eca46dd9197e346",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 369.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.849999999999994,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "987656a7b1f70eb828f19504c3a88e8d",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c52eb15bf66b7f045492be7461935795",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "23cdc08a07c18d091ffc92e3f6965129",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1425717f430dc1071cc897d6f2e94566",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cf8be8522b72355e3d1d987e205e4fac",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "443ec531b7a3555e29df080738e219b1",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 66.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d993b2a67f05369194c97b8bafde561f",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 369.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "41a3608492a1381b6e0eedb8873df675",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 378.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.849999999999994,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9fc9dc7301c08240c950dc0db6f29867",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dd838c0c431410f66ccf9389c7003ffb",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4482ceea19c4515c144e26fec3d9654c",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "871503c9b42da80e3f797a99dca6a4e6",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b92f831af05199591d444f881a585961",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ffd71407fd0d0a46af2284a225c84b69",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 75.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9b5aeb614d5ec399bd9773d6cf9e2bca",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 378.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "09c375c808e3e459406d9eed49013f50",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 387.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 47.849999999999994,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "76a81ffb9ce209a8bd9d27a2de500b46",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9ea6a9e7230c0e2c56c23b405949d402",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a64274b1c26de50ee3ac76a6ffb5fb6f",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "86dd9dee387a8d838b86a1856228eb8e",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9eb195cbcb32ac49db90242dd23515d4",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bb5d27309a519d0047cbdcf68a3cefe4",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 84.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9f3bb0a822c725d7cf604ac73171eb16",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 387.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "thermocycler/deactivateBlock",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "734f938d16bb215c2ab9e6db9958ba76",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "thermocycler/deactivateLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f321a33d1b98a3e2cd3f530951379c0d",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "temperatureModule/deactivate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c18b0376fa8b8b6b855266d16200ccd5",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2d1e96fd0df73260c16e62d86fed7735",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8228f03f36033bf4291bec995e132e77",
+      "notes": [],
+      "params": {
+        "message": "=============================================="
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "25244bd5241cb6891dca361812210ef6",
+      "notes": [],
+      "params": {
+        "message": "--> Report"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f3e4ffa4c8a0816727034d17dad17bea",
+      "notes": [],
+      "params": {
+        "message": "=============================================="
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "24f4bcc998010e07593e293df4b200f3",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0c8151e73aee31fddf176f590e346893",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "20f5a42ac9e640dd77aeae8da0030003",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0becfe3ebe7063f73731cbb0cd80ec86",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bd4cc7795f4691d372dd523c3fe44b55",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fbb658268e7f1c053564cf4c14e95da6",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "73476883d18380dfa9ac7d78f07c61b8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fd755d616d1076eb42749dd8e72b8734",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ed3fbb34bdb1c56258f1ea4ded454f81",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5756b64f450d47f22588fae2f972b487",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dd743f5f70fa2ea214e7f90637260515",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "701fca447b26c0941ef339ac3b4bd0ca",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fe1ac50a6d2a2bf9ddc41dbe0dcc4383",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "61e3005d456e48c76ba1f177754f4cd9",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "de83beb8529ca77fcd692c17609b922f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a3785c2c0da931f0cb27582c3b120ab6",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6aabc06dc839e4d7fd341b954d3d1556",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8925dd881b90d2a97bfa826a15fe692c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "375761ff857e3cbefdfb9740bcdb1944",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3214c44cb9103fef91077d761d85be34",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "13ec67cf1e05e87dd3b728469d3e4b44",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8980a9e8c25802461a1e34893e55939a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5d32908b46a3f815711c9fa5f0266ede",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "304a010296251c39a4b5ee63b0d7f82c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c8102733b576b39005eff03d119a10c5",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "64ccef35e185229a9778ff93119ac7b7",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "63894779a59333426151938fe91d9e28",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7abf10155dd34141553773b2d8ebf758",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "46564b3614168fcad7631c34a3ed7165",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H1": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b9fdb890f3d2f93dc190371d22ce9741",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H5": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fdd6bbfa116aceeaf2edcb85121fbdf1",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H9": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d037b08568cbdcbabd2d7d3c61e17927",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H7": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2095d899e63dfc9881d2ab0721471102",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a5a354c414a35551e8650780a125c17f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6ea24206050577b6bd097f01dec77975",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "726a02ff6aa5fc13fcd9a7d43bfc17ba",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0f0e40d8d82af22b7d6abfd4118e7a64",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1a7ca7f92cec81dd5d4a77187aa77dbb",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "351116c453ea621d2ee67b3af04253c0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c5598b682d462ce5cc2c0c42bd1bbf59",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "da20de5e47072a92581d01a2f898415e",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b2097202ebcf34ce4526f817d23a92fd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "afbaa5017c39ff43d37dac2ac7fce11e",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "04af66c3f35ae53c69da2f26f3fc338c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "834e8c133a6824af29a00c9ecf0ae9fd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c7d892c67936679ad95086608b25f13c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e7f20d8a3d673406d1b5e267af1fb1de",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "47140c257dbf7e56329f3b88e7c02ac8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ae85bd0598f80496af213d0c5a5df8f0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e98037fc372eb461aa46aa08ac2152df",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "24ba7e70c696af1847eb4477c7d56b93",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3587ea885594969f20e899ebbfcd11dc",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "97cd2224c0b0e9d082bc3ad26afcbb80",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "51805a749041d669a1b9d065a1be84e8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9a835e48697d25a782586d0bb9411a8a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1efd9414ae75fc89994bec11945f4a0e",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1c23f4a8c7906a2241305d0e3db7fcfe",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "87738b7718d508054c11d53bbf17866f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b7b62c88c0773bc78095e88cbe6debf2",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d073220bb1a0350a9365fc3c9dcbbaa3",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "324239ae6d479cd51ef19249c08989c2",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H2": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a185958934863417ba02f32b0b7243c6",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H6": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cb5348e6cdf8963936a48462caff31c8",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H10": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "720f91731e8713216bc5fd4d05a8a38c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H8": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1478f99f7221cf449b405f32ac02587e",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f209b1e5f59815f2769ab715587f7148",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "64fa6ce9e065f7529c0acf496cb4fed0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dfe912b89c315581dfe4e06fa74a74e4",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "842cb553099c75f708d32f9f6f82dd1d",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c142dbece521462c0019fa95bd224392",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cd966459337d3d044f82bbb50b531e70",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "650a0797894e850b33e48d6bf4700a21",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cc1a5e9b2b184188332764467dabcaa3",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "37db9cb91efb87c59f46444614e4f699",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "38cce818feea720d03d4b32272bc4fcc",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4362022824480884188f47c80fe0261a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "aa2f991cf60695e1413765a99358738a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "809ba315197757cf14d3dcefbe8c0abd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "206a4356e55cc04d6235d009e09a4c85",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "184b934de6297a6a6aae9f5573aa4b0c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b32af5666762fd07f3191c41dd5aecf7",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9fc9ffcd6ae111efb053b0537070a601",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d4e52e82c45570b2cdae73fbd53d66ec",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "997a5d789c02c42998a3ee57c09eaefd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "43caa0baf49d9b5e7fb476897bb51d16",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0b281d59db07f962e4ab16938c115dcd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "88a4ebbfdb141200e45bc2e292c31640",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "99fad80eebdd574c46a32cf494e4a4fe",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ab47c4a6a8b67061ac5219034b9e67d0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "69ca49d6144eec7fe3cba4ea2ff6394a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f2ee55f1f1939f2cbd954d1911709b8b",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fd74cc4db07317ba1397b1272e9bf5fd",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b42d3e1f35415e5d157d81ee290ebf1b",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H3": 9.8
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ffdf73e96e8c67feb9180bda495805b5",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H7": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ad1328ce7c58c2366fa1880650f64ecc",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H11": 0.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "613a489654d34d466093321622a502c1",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H9": 5.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3b612bea94673f081d2cc2d57397f8f1",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "04cc1aacdce9341b5dd735277c88577c",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "46beb82ff6ac0f305ef59a4a7b9a1ffe",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "A3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ed3be7d19564a6f21a611463c8fd3519",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6e0c670433f628398aa99c6e60ae3ac3",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "047c07759fe53cd97deb91f553619f17",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "B3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "724bf3afbced8ca7260a3197e8681d4f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4726bfa2f743279da0418e11e7401b0f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e80a19f3f83cc7e478007feff03988bc",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "C3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a0a65194ca01928676581478e3195503",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6a7a60136e6e8f8f534452ef58c96ae0",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a74b90805d3f888af75168fb6db0fb71",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "D3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dd8b6670bdd0a334ad6b509ed943ae9a",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "61fb3d22a8cd275f684d563727e48f38",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d7567b9130cb70b8a99fdc28f7d0d521",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "E3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c3b9ba20dd10f5df2ac7dff05229a4d2",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "341545cceb9cd84752f3a1efdd42b8f9",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "238ec9841ba14e7ff3744a575456682b",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "F3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0498ec6237f5653bf9147ce8b1dda887",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a2195a89c678a1c2b81cc818b03c9ed3",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3b8a3d83f2f25fe05b5d5aa950a73be5",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "G3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ff34d24ce5cf0a90e8c46160979fb3f9",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H1": 31.5
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9c7b9575402703c59433e08d7f5cf388",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H2": 90.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLiquid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "56954b9b01c84c1195cf67794f208641",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "liquidId": "UUID",
+        "volumeByWell": {
+          "H3": 75.0
+        }
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -58470,40 +62564,7 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 1508]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): FailedToPlanMoveError: Arc out of bounds in the Z-axis",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "FailedToPlanMoveError: Arc out of bounds in the Z-axis",
-          "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "ProtocolCommandFailedError",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": [
-            {
-              "createdAt": "TIMESTAMP",
-              "detail": "Arc out of bounds in the Z-axis",
-              "errorCode": "4000",
-              "errorInfo": {},
-              "errorType": "FailedToPlanMoveError",
-              "id": "UUID",
-              "isDefined": false,
-              "wrappedErrors": []
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [],
   "labware": [
     {
@@ -58563,9 +62624,7 @@
       "displayName": "tiprack_200_1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
-      "location": {
-        "addressableAreaName": "gripperWasteChute"
-      }
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
@@ -58605,7 +62664,80 @@
     }
   ],
   "liquidClasses": [],
-  "liquids": [],
+  "liquids": [
+    {
+      "description": "CleanupBead Beads",
+      "displayColor": "#704848",
+      "displayName": "EtOH",
+      "id": "UUID"
+    },
+    {
+      "description": "80% Ethanol",
+      "displayColor": "#9ACECB",
+      "displayName": "EtOH",
+      "id": "UUID"
+    },
+    {
+      "description": "Resuspension Buffer",
+      "displayColor": "#00FFF2",
+      "displayName": "RSB",
+      "id": "UUID"
+    },
+    {
+      "description": "Liquid Trash",
+      "displayColor": "#9B9B9B",
+      "displayName": "Liquid_trash_well",
+      "id": "UUID"
+    },
+    {
+      "description": "Sample",
+      "displayColor": "#52AAFF",
+      "displayName": "Sample",
+      "id": "UUID"
+    },
+    {
+      "description": "Excess Sample",
+      "displayColor": "#82A9CF",
+      "displayName": "Placeholder_Sample",
+      "id": "UUID"
+    },
+    {
+      "description": "PCR Mix",
+      "displayColor": "#FF0000",
+      "displayName": "PCR",
+      "id": "UUID"
+    },
+    {
+      "description": "Frag Enzyme",
+      "displayColor": "#FFA000",
+      "displayName": "FRERAT",
+      "id": "UUID"
+    },
+    {
+      "description": "Ligation Mix",
+      "displayColor": "#0EFF00",
+      "displayName": "LIG",
+      "id": "UUID"
+    },
+    {
+      "description": "Barcodes",
+      "displayColor": "#7DFFC4",
+      "displayName": "Barcodes",
+      "id": "UUID"
+    },
+    {
+      "description": "H20",
+      "displayColor": "#AABFBF",
+      "displayName": "H20",
+      "id": "UUID"
+    },
+    {
+      "description": "Final Sample",
+      "displayColor": "#82A9CF",
+      "displayName": "Final_Sample",
+      "id": "UUID"
+    }
+  ],
   "metadata": {
     "author": "Opentrons <protocols@opentrons.com>",
     "protocolName": "IDT xGen EZ 48x v8",
@@ -58656,7 +62788,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {
