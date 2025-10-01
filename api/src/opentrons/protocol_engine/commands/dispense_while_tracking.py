@@ -19,7 +19,7 @@ from .pipetting_common import (
     dispense_while_tracking,
 )
 from .movement_common import (
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
     DestinationPositionResult,
     StallOrCollisionError,
     move_to_well,
@@ -49,7 +49,7 @@ class DispenseWhileTrackingParams(
     PipetteIdMixin,
     DispenseVolumeMixin,
     FlowRateMixin,
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
 ):
     """Payload required to dispense to a specific well."""
 
@@ -106,7 +106,7 @@ class DispenseWhileTrackingImplementation(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.wellLocation,
+            well_location=params.trackFromLocation,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):

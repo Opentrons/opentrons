@@ -104,7 +104,7 @@ async def test_aspirate_while_tracking_implementation(
         pipetteId="pipette-id-abc",
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=123,
         flowRate=1.234,
     )
@@ -220,7 +220,7 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
         pipetteId="pipette-id-abc",
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=123,
         flowRate=1.234,
     )
@@ -261,7 +261,7 @@ async def test_aspirate_raises_volume_error(
         pipetteId="pipette-id-abc",
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=50,
         flowRate=1.23,
     )
@@ -364,7 +364,7 @@ async def test_overpressure_error(
         pipetteId=pipette_id,
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=50,
         flowRate=1.23,
     )

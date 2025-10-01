@@ -92,7 +92,7 @@ async def test_dispense_while_tracking_implementation(
         pipetteId="pipette-id-abc",
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=123,
         flowRate=456,
     )
@@ -244,7 +244,7 @@ async def test_overpressure_error(
         pipetteId=pipette_id,
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
         volume=50,
         flowRate=1.23,
         pushOut=10,

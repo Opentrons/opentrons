@@ -13,7 +13,7 @@ from .pipetting_common import (
     aspirate_while_tracking,
 )
 from .movement_common import (
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
     DestinationPositionResult,
     StallOrCollisionError,
     move_to_well,
@@ -45,7 +45,7 @@ class AspirateWhileTrackingParams(
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
 ):
     """Parameters required to aspirate from a specific well."""
 
@@ -113,7 +113,7 @@ class AspirateWhileTrackingImplementation(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.wellLocation,
+            well_location=params.trackFromLocation,
             operation_volume=-params.volume,
         )
         state_update.append(move_result.state_update)
