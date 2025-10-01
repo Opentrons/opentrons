@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-12);
+}
+
+.manual_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.options_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.radio_buttons_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
