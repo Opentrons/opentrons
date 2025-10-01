@@ -177,7 +177,7 @@ def _get_stackup_origin_to_lw_origin(
         )
     elif location == WASTE_CHUTE_LOCATION:
         raise LabwareNotOnDeckError(
-            f"Cannot access {definition.metadata.displayName} because it is the waste chute."
+            f"Cannot access {definition.metadata.displayName} because it is in the waste chute."
         )
     else:
         raise LabwareNotOnDeckError(

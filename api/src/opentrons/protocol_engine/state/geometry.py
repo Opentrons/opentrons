@@ -200,6 +200,7 @@ class GeometryView:
             if isinstance(loc, InStackerHopperLocation) or isinstance(
                 loc, NotOnDeckLocationSequenceComponent
             ):
+
                 return False
         return True
 
@@ -692,6 +693,8 @@ class GeometryView:
         return well_def.depth
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        if lw_data.location == WASTE_CHUTE_LOCATION:
+            return 0
         labware_pos = self.get_labware_position(lw_data.id)
         z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
         height_over_labware: float = 0
@@ -1719,6 +1722,12 @@ class GeometryView:
             return self._recurse_labware_location_from_stacker_hopper(
                 labware_location, building
             )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return [
+                NotOnDeckLocationSequenceComponent(
+                    logicalLocationName=WASTE_CHUTE_LOCATION
+                )
+            ]
         else:
             _LOG.warn(f"Unhandled labware location kind: {labware_location}")
             return building
