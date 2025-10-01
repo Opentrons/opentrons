@@ -31,7 +31,10 @@ from opentrons.types import (
     StagingSlotName,
     MeniscusTrackingTarget,
 )
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
 from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
     InnerWellGeometry,
@@ -1201,6 +1204,9 @@ def test_get_highest_z_in_slot_with_single_module(
             addressable_areas=mock_addressable_area_view,
         )
     ).then_return(12345)
+    decoy.when(mock_module_view.is_column_4_module(module_in_slot.model)).then_return(
+        False
+    )
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1358,6 +1364,9 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
             "magneticModuleV2Slot3"
         )
     ).then_return(Point(11, 22, 33))
+    decoy.when(mock_module_view.is_column_4_module(module_on_slot.model)).then_return(
+        False
+    )
 
     expected_highest_z = 33 + 1000 + 3 + _PARENT_ORIGIN_TO_LABWARE_ORIGIN.z
 
@@ -3474,6 +3483,7 @@ def test_get_next_drop_tip_location(
             },
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
+            volume_mode=VolumeModes.default,
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

@@ -10,7 +10,7 @@
   color: var(--grey-50);
 }
 
-@media (min-width: 600px) and (max-height: 1024px) {
+@media (width: 1024px) and (height: 600px) {
   .exit_button {
     margin-right: 1.75rem;
     font-size: var(--font-size-22);
@@ -30,7 +30,7 @@
   background-color: var(--white);
 }
 
-@media (min-width: 600px) and (max-height: 1024px) {
+@media (width: 1024px) and (height: 600px) {
   .box {
     border-radius: var(--border-radius-16);
   }
@@ -43,7 +43,7 @@
   padding: var(--spacing-16) var(--spacing-32);
 }
 
-@media (min-width: 600px) and (max-height: 1024px) {
+@media (width: 1024px) and (height: 600px) {
   .header_container {
     padding: 1.75rem var(--spacing-32);
     border-radius: var(--border-radius-16);
@@ -55,7 +55,7 @@
   font-weight: var(--font-weight-semi-bold);
 }
 
-@media (min-width: 600px) and (max-height: 1024px) {
+@media (width: 1024px) and (height: 600px) {
   .step_text {
     margin-left: var(--spacing-16);
     font-size: var(--font-size-22);

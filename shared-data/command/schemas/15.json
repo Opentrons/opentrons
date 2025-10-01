@@ -4215,6 +4215,11 @@
           "description": "Time to hold target temperature in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4741,6 +4746,11 @@
           "description": "Time to hold target temperature at in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4948,6 +4958,64 @@
       "title": "SetRailLightsParams",
       "type": "object"
     },
+    "SetShakeSpeedCreate": {
+      "description": "A request to create a Heater-Shaker's set shake speed command.",
+      "properties": {
+        "commandType": {
+          "const": "heaterShaker/setShakeSpeed",
+          "default": "heaterShaker/setShakeSpeed",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SetShakeSpeedParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SetShakeSpeedCreate",
+      "type": "object"
+    },
+    "SetShakeSpeedParams": {
+      "description": "Input parameters to set a shake speed for a Heater-Shaker Module.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Heater-Shaker Module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "rpm": {
+          "description": "Target speed in rotations per minute.",
+          "title": "Rpm",
+          "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "rpm"],
+      "title": "SetShakeSpeedParams",
+      "type": "object"
+    },
     "SetStatusBarCreate": {
       "description": "setStatusBar command request model.",
       "properties": {
@@ -5140,6 +5208,11 @@
           "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
           "title": "Ramp Rate",
           "type": "number"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5185,10 +5258,67 @@
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
       "title": "SetTargetLidTemperatureParams",
+      "type": "object"
+    },
+    "SetTipStateCreate": {
+      "description": "Set tip state command creation request model.",
+      "properties": {
+        "commandType": {
+          "const": "setTipState",
+          "default": "setTipState",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SetTipStateParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SetTipStateCreate",
+      "type": "object"
+    },
+    "SetTipStateParams": {
+      "description": "Payload needed to set tip wells of a tip rack to the requested state.",
+      "properties": {
+        "labwareId": {
+          "description": "Identifier of tip rack labware to set tip wells in.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "tipWellState": {
+          "$ref": "#/$defs/TipRackWellState",
+          "description": "State to set tip wells to."
+        },
+        "wellNames": {
+          "description": "Names of the well to set tip well state for.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Wellnames",
+          "type": "array"
+        }
+      },
+      "required": ["labwareId", "wellNames", "tipWellState"],
+      "title": "SetTipStateParams",
       "type": "object"
     },
     "SingleDispenseProperties": {
@@ -5412,6 +5542,79 @@
       "title": "StackerStoredLabwareGroup",
       "type": "object"
     },
+    "StartRunExtendedProfileCreate": {
+      "description": "A request to execute a Thermocycler profile run.",
+      "properties": {
+        "commandType": {
+          "const": "thermocycler/startRunExtendedProfile",
+          "default": "thermocycler/startRunExtendedProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartRunExtendedProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartRunExtendedProfileCreate",
+      "type": "object"
+    },
+    "StartRunExtendedProfileParams": {
+      "description": "Input parameters to run a Thermocycler profile.",
+      "properties": {
+        "blockMaxVolumeUl": {
+          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "title": "Blockmaxvolumeul",
+          "type": "number"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Thermocycler.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profileElements": {
+          "description": "Elements of the profile. Each can be either a step or a cycle.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProfileStep"
+              },
+              {
+                "$ref": "#/$defs/ProfileCycle"
+              }
+            ]
+          },
+          "title": "Profileelements",
+          "type": "array"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the profile task",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "profileElements"],
+      "title": "StartRunExtendedProfileParams",
+      "type": "object"
+    },
     "StatusBarAnimation": {
       "description": "Status Bar animation options.",
       "enum": ["idle", "confirm", "updating", "disco", "off"],
@@ -5539,6 +5742,12 @@
       "description": "Tip presence status reported by a pipette.",
       "enum": ["present", "absent", "unknown"],
       "title": "TipPresenceStatus",
+      "type": "string"
+    },
+    "TipRackWellState": {
+      "description": "The state of a single tip in a tip rack's well.",
+      "enum": ["clean", "used", "empty"],
+      "title": "TipRackWellState",
       "type": "string"
     },
     "TouchTipCreate": {
@@ -6635,6 +6844,11 @@
           "description": "Unique ID of the Heater-Shaker Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -6724,6 +6938,11 @@
         "moduleId": {
           "description": "Unique ID of the Temperature Module.",
           "title": "Moduleid",
+          "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
           "type": "string"
         }
       },
@@ -6897,6 +7116,7 @@
       "heaterShaker/deactivateShaker": "#/$defs/DeactivateShakerCreate",
       "heaterShaker/openLabwareLatch": "#/$defs/OpenLabwareLatchCreate",
       "heaterShaker/setAndWaitForShakeSpeed": "#/$defs/SetAndWaitForShakeSpeedCreate",
+      "heaterShaker/setShakeSpeed": "#/$defs/SetShakeSpeedCreate",
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "home": "#/$defs/HomeCreate",
@@ -6932,6 +7152,7 @@
       "sealPipetteToTip": "#/$defs/SealPipetteToTipCreate",
       "setRailLights": "#/$defs/SetRailLightsCreate",
       "setStatusBar": "#/$defs/SetStatusBarCreate",
+      "setTipState": "#/$defs/SetTipStateCreate",
       "temperatureModule/deactivate": "#/$defs/DeactivateTemperatureCreate",
       "temperatureModule/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate",
       "temperatureModule/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate",
@@ -6943,6 +7164,7 @@
       "thermocycler/runProfile": "#/$defs/RunProfileCreate",
       "thermocycler/setTargetBlockTemperature": "#/$defs/SetTargetBlockTemperatureCreate",
       "thermocycler/setTargetLidTemperature": "#/$defs/SetTargetLidTemperatureCreate",
+      "thermocycler/startRunExtendedProfile": "#/$defs/StartRunExtendedProfileCreate",
       "thermocycler/waitForBlockTemperature": "#/$defs/WaitForBlockTemperatureCreate",
       "thermocycler/waitForLidTemperature": "#/$defs/WaitForLidTemperatureCreate",
       "touchTip": "#/$defs/TouchTipCreate",
@@ -7102,6 +7324,9 @@
       "$ref": "#/$defs/GetNextTipCreate"
     },
     {
+      "$ref": "#/$defs/SetTipStateCreate"
+    },
+    {
       "$ref": "#/$defs/LiquidProbeCreate"
     },
     {
@@ -7127,6 +7352,9 @@
     },
     {
       "$ref": "#/$defs/SetAndWaitForShakeSpeedCreate"
+    },
+    {
+      "$ref": "#/$defs/SetShakeSpeedCreate"
     },
     {
       "$ref": "#/$defs/DeactivateShakerCreate"
@@ -7178,6 +7406,9 @@
     },
     {
       "$ref": "#/$defs/RunProfileCreate"
+    },
+    {
+      "$ref": "#/$defs/StartRunExtendedProfileCreate"
     },
     {
       "$ref": "#/$defs/RunExtendedProfileCreate"

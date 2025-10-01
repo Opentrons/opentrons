@@ -55,7 +55,7 @@ dev:
 # production assets server
 .PHONY: serve
 serve: all
-	node ../scripts/serve-static dist
+	vite preview
 
 # end to end tests
 .PHONY: test-e2e

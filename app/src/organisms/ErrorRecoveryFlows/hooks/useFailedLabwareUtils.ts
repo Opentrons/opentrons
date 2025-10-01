@@ -116,6 +116,7 @@ export function useFailedLabwareUtils({
       }),
     [failedCommand, runCommands]
   )
+
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
     runCommands
@@ -230,6 +231,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
     case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
     case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+    case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -378,6 +380,7 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerHopperLabwareFailed',
       'flexStackerLabwareRetrieveFailed',
       'flexStackerShuttleOccupied',
+      'flexStackerLabwareStoreFailed',
     ].includes(error.errorType)
   if (recentRelevantFailedLabwareCmd == null) {
     return null

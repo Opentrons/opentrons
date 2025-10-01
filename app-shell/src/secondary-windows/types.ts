@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 
-type SecondaryWindowType = 'camera-stream'
+type SecondaryWindowType = 'camera-stream' | 'camera-photo'
 
 export interface SecondaryWindowDetails {
   type: SecondaryWindowType

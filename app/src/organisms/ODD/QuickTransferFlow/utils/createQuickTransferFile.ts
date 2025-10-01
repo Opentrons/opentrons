@@ -39,7 +39,8 @@ const uuid: () => string = uuidv1
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const {
     stepArgs,
@@ -154,7 +155,6 @@ export function createQuickTransferFile(
     robotStateTimeline.timeline,
     timelineFrame => timelineFrame.commands
   )
-
   const commands: CreateCommand[] = [
     loadPipetteCommand,
     ...loadAdapterCommands,
@@ -181,7 +181,7 @@ export function createQuickTransferFile(
     // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.1.0',
+      version: '2.0.0',
       data: quickTransferState,
     },
   }
@@ -226,6 +226,38 @@ export function createQuickTransferFile(
     ...commandAnnotionaV1Mixin,
   })
 
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    const protocolObject = {
+      ...protocolBase,
+      ...flexDeckSpec,
+      ...labwareV2Mixin,
+      ...liquidV1Mixin,
+      ...commandv8Mixin,
+      ...commandAnnotionaV1Mixin,
+    }
+
+    console.group('🧪 Quick Transfer Protocol Contents')
+    console.log(JSON.stringify(protocolObject, null, 2))
+    const downloadProtocolObject = (): void => {
+      const jsonString = JSON.stringify(protocolObject, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `debug-${protocolObject.metadata.protocolName
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()}-${Date.now()}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadjson = downloadProtocolObject
+    console.log('💾 Or copy/paste: downloadjson()')
+    console.groupEnd()
+  }
+
   return new File(
     [protocolContents],
     `${protocolBase.metadata.protocolName}.json`
@@ -235,7 +267,8 @@ export function createQuickTransferFile(
 export function createQuickTransferPythonFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
-  protocolName?: string
+  protocolName?: string,
+  enableQuickTransferProtocolContentsLog?: boolean
 ): File {
   const sourceLabwareName = quickTransferState.source.metadata.displayName
   let destinationLabwareName = sourceLabwareName
@@ -247,13 +280,20 @@ export function createQuickTransferPythonFile(
       protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
     description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
     source: 'Quick Transfer',
-    //  TODO: increase version for when we export python
     //  see QuickTransferFlow/README.md for versioning details
-    version: '1.1.0',
+    version: '2.0.0',
     category: null,
     subcategory: null,
     tags: [],
   }
+
+  const designerApplication = {
+    name: 'opentrons/quick-transfer',
+    version: '2.0.0',
+    data: quickTransferState,
+  }
+  const stringifiedDesignerApplication = JSON.stringify(designerApplication)
+  const designerApplicationBlob = `\nDESIGNER_APPLICATION = """${stringifiedDesignerApplication}"""\n`
 
   const protocolContents =
     [
@@ -261,12 +301,34 @@ export function createQuickTransferPythonFile(
       pythonMetadata(fileMetadata),
       pythonRequirements(FLEX_ROBOT_TYPE),
       pythonDef(quickTransferState, deckConfig),
+      designerApplicationBlob,
     ]
       .filter(section => section)
       .join('\n\n') + '\n'
 
-  // so you can view the string in devTools:
-  console.log(protocolContents)
+  // temporary logging for debugging
+  if (enableQuickTransferProtocolContentsLog) {
+    console.group('🧪 Quick Transfer Protocol Contents')
+    console.log(protocolContents)
+    const downloadProtocolPython = (): void => {
+      const blob = new Blob([protocolContents], { type: 'text/x-python' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const safeName = (protocolName ?? 'protocol name')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+
+      link.download = `debug-${safeName}-${Date.now()}.py`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+    ;(window as any).downloadpy = downloadProtocolPython
+    console.log('💾 Or copy/paste: downloadpy()')
+    console.groupEnd()
+  }
 
   return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
     type: 'text/x-python',

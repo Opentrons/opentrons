@@ -21,7 +21,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.26",
 }
 
 
@@ -70,6 +70,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    helpers.comment_protocol_version(protocol, "02")
+
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
     global REUSE_ANY_200_TIPS  # T/F Whether or not Reusing any p200
@@ -2843,5 +2845,7 @@ def run(protocol: ProtocolContext) -> None:
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )
         raise (e)

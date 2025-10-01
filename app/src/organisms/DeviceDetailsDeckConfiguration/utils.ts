@@ -1,17 +1,15 @@
 import {
-  DEFAULT_AA_FOR_WASTE_CHUTE,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
+  getWasteChuteOptions,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  mapModuleToCutoutConfig,
   MODULE_FIXTURES_BY_MODEL,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '@opentrons/api-client'
@@ -32,39 +30,6 @@ const getFilteredModules = (
 ): AttachedModule[] =>
   unconfiguredMods.filter(mod => mod.moduleModel === moduleModel)
 
-const mapModuleToCutoutConfig = (
-  module: AttachedModule,
-  cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes,
-  addressableAreasById: Record<string, unknown>
-): CutoutConfigMap[] | null => {
-  const keys = Object.keys(addressableAreasById)
-  const cutoutFixtureId = keys.find(
-    key => key === module.moduleModel
-  ) as CutoutFixtureId
-
-  if (!cutoutFixtureId) return null
-
-  const aaforModule = getMainAAForAFixture(
-    cutoutId,
-    cutoutFixtureId,
-    addressableAreaId
-  )
-
-  if (aaforModule === addressableAreaId) return null
-
-  if (!aaforModule) return null
-
-  return [
-    {
-      cutoutId,
-      addressableAreaId: aaforModule,
-      cutoutFixtureId,
-      opentronsModuleSerialNumber: module.serialNumber,
-    },
-  ]
-}
-
 export const getModuleUnconfiguredFixtures = (
   unconfiguredMods: AttachedModule[],
   cutoutId: CutoutId,
@@ -81,10 +46,11 @@ export const getModuleUnconfiguredFixtures = (
   return filteredMods
     .map(mod =>
       mapModuleToCutoutConfig(
-        mod,
+        mod.moduleModel,
         cutoutId,
         addressableAreaId,
-        addressableAreasById
+        addressableAreasById,
+        mod.serialNumber
       )
     )
     .filter((config): config is CutoutConfigMap[] => config !== null)
@@ -192,31 +158,6 @@ export const getModuleOptions = (
     ]
   }
   return availableOptions
-}
-
-export const getWasteChuteOptions = (
-  cutoutId: CutoutId
-): CutoutConfigMap[][] => {
-  if (WASTE_CHUTE_CUTOUT === cutoutId) {
-    return [
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
-        },
-      ],
-      [
-        {
-          cutoutId,
-          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-          addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
-        },
-      ],
-    ]
-  } else {
-    return []
-  }
 }
 
 export const getFixtureOptions = (

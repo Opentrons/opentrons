@@ -47,6 +47,7 @@ const render = (props: ComponentProps<typeof AddStepButton>) => {
   })[0]
 }
 
+const MOCK_LID_ID = 'mockLidId'
 const MOCK_TIPRACK_ID = 'mockTiprackId'
 const MOCK_TUBERACK_ID = 'mockTuberackId'
 const MOCK_TIPRACK_ENTITY = {
@@ -55,6 +56,12 @@ const MOCK_TIPRACK_ENTITY = {
     parameters: {
       isTiprack: true,
     } as LabwareParameters,
+  } as LabwareDefinition2,
+} as LabwareEntity
+const MOCK_LID_ENTITY = {
+  id: MOCK_LID_ID,
+  def: {
+    allowedRoles: ['lid'],
   } as LabwareDefinition2,
 } as LabwareEntity
 const MOCK_TIPRACK_LABWARE = {
@@ -184,6 +191,22 @@ describe('AddStepButton', () => {
   it('should not render liquid handling steps if no compatible labware is present in entities', () => {
     vi.mocked(getLabwareEntities).mockReturnValue({
       [MOCK_TIPRACK_ID]: MOCK_TIPRACK_ENTITY,
+    })
+    render(props)
+    fireEvent.click(screen.getByText('Add Step'))
+    screen.getByText('Comment')
+    expect(screen.queryByText('Transfer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mix')).not.toBeInTheDocument()
+    screen.getByText('Pause')
+    screen.getByText('Thermocycler')
+    screen.getByText('Heater-Shaker')
+    screen.getByText('Temperature')
+    screen.getByText('Magnet')
+  })
+
+  it('should not render liquid handling steps if only labware has a lid on top in entities', () => {
+    vi.mocked(getLabwareEntities).mockReturnValue({
+      [MOCK_LID_ID]: MOCK_LID_ENTITY,
     })
     render(props)
     fireEvent.click(screen.getByText('Add Step'))

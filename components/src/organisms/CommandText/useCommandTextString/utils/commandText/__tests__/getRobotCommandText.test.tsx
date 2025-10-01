@@ -56,11 +56,12 @@ describe('getRobotCommandText', () => {
           leftPlunger: 6,
           rightPlunger: 7,
           extensionJaw: 8,
+          axis96ChannelCam: 9,
         },
       },
     })
     screen.getByText(
-      'Moving robot to (X: 1, Y: 2, left Z: 3, right Z: 4, extension Z: 5, left plunger: 6, right plunger: 7, extension jaw: 8)'
+      'Moving robot to (X: 1, Y: 2, left Z: 3, right Z: 4, extension Z: 5, left plunger: 6, right plunger: 7, extension jaw: 8, pipette tip attach cam: 9)'
     )
   })
   it('should render moveAxesTo with not all axes', () => {
@@ -92,11 +93,12 @@ describe('getRobotCommandText', () => {
           leftPlunger: 6,
           rightPlunger: 7,
           extensionJaw: 8,
+          axis96ChannelCam: 9,
         },
       },
     })
     screen.getByText(
-      'Moving robot by (X: 1, Y: 2, left Z: 3, right Z: 4, extension Z: 5, left plunger: 6, right plunger: 7, extension jaw: 8)'
+      'Moving robot by (X: 1, Y: 2, left Z: 3, right Z: 4, extension Z: 5, left plunger: 6, right plunger: 7, extension jaw: 8, pipette tip attach cam: 9)'
     )
   })
   it('should render moveAxesRelative with not all axes', () => {

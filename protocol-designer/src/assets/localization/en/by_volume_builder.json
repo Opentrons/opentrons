@@ -1,0 +1,26 @@
+{
+  "add_point": "Add point",
+  "calculator": {
+    "calculate": "Calculate",
+    "interpolated_value": "Interpolated {{type}}",
+    "volume_to_calculate": "Input volume"
+  },
+  "flowRate": {
+    "axes": {
+      "x": {
+        "label": "Volume ({{units}})",
+        "units": "µl"
+      },
+      "y": {
+        "label": "Flow Rate ({{units}})",
+        "units": "µl/s"
+      }
+    },
+    "title": "Flow Rate Builder"
+  },
+  "instructions": "Drag the points to adjust the curve.",
+  "reset": "Reset curve",
+  "type": {
+    "flowRate": "flow rate"
+  }
+}

@@ -42,4 +42,4 @@ def test_definition_exists() -> None:
     assert definition_exists(name="water", version=1) is True
     assert definition_exists(name="glycerol_50", version=1) is True
     assert definition_exists(name="glycerol_oh_no", version=1) is False
-    assert definition_exists(name="glycerol_50", version=2) is False
+    assert definition_exists(name="glycerol_50", version=9999) is False

@@ -1,6 +1,6 @@
 {
   "add_gripper_for_plate": "Gripper required to add absorbance reader.",
-  "add_to_slot": "Add to slot {{slotName}}",
+  "add_to_slot": "Add to {{slotName}}",
   "add": "add",
   "agree": "Agree",
   "amount": "Amount:",
@@ -15,6 +15,7 @@
   "confirm_reorder": "Are you sure you want to reorder these steps? It may cause errors.",
   "confirm": "Confirm",
   "consent_to_eula": "By using Protocol Designer, you consent to the Opentrons <link1>EULA</link1>.",
+  "continue": "Continue",
   "continue_with_export": "Continue with export",
   "copyright": "Copyright © {{year}} Opentrons",
   "create_a_protocol": "Create a protocol",

@@ -48,4 +48,6 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         thermocycler_module_1.deactivate_lid()
     except Exception as e:
         if not protocol.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )

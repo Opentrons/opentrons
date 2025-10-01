@@ -221,6 +221,7 @@ export const RELOAD_UI: RELOAD_UI_TYPE = 'shell:RELOAD_UI'
 export const SEND_LOG: SEND_LOG_TYPE = 'shell:SEND_LOG'
 export const CAMERA_STREAM_OPEN: CAMERA_STREAM_OPEN_TYPE =
   'shell:CAMERA_STREAM_OPEN'
+export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
 
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'

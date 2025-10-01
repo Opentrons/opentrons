@@ -15,7 +15,10 @@ from opentrons_shared_data.robot.types import RobotType
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
-from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
+from ..hardware_control.modules import (
+    AbstractModule as HardwareModuleAPI,
+    ModuleModel as HardwareModuleModel,
+)
 from ..protocol_engine import (
     ProtocolEngine,
     CommandCreate,
@@ -380,6 +383,18 @@ class RunOrchestrator:
     def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
+
+    async def asynchronous_module_error(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an asynchronous module error reported by hardware.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.async_module_error(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
 
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]

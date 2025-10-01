@@ -22,9 +22,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
-import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
-import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
-import { deletePipettes } from '/protocol-designer/step-forms/actions'
 import { toggleIsGripperRequired } from '/protocol-designer/step-forms/actions/additionalItems'
 import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
 import { changeSavedStepForm } from '/protocol-designer/steplist/actions'
@@ -87,8 +84,6 @@ export function PipetteOverview({
     return pipette.mount === 'left' ? 'right' : 'left'
   })
 
-  const targetPipetteMount = leftPipette == null ? 'left' : 'right'
-
   const rightInfo =
     rightPipette != null
       ? getSectionsFromPipetteName(rightPipette.name, rightPipette.spec)
@@ -98,13 +93,6 @@ export function PipetteOverview({
       ? getSectionsFromPipetteName(leftPipette.name, leftPipette.spec)
       : null
 
-  const previousLeftPipetteTipracks = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => leftPipette?.tiprackDefURI.includes(tip.labwareDefURI))
-  const previousRightPipetteTipracks = Object.values(labware)
-    .filter(lw => lw.def.parameters.isTiprack)
-    .filter(tip => rightPipette?.tiprackDefURI.includes(tip.labwareDefURI))
-
   const {
     setPage,
     setMount,
@@ -112,22 +100,40 @@ export function PipetteOverview({
     setPipetteGen,
     setPipetteVolume,
     setSelectedTips,
+    temporarilyDeletedPipettes,
+    setTemporarilyDeletedPipettes,
   } = pipetteConfig
+
+  const visibleLeftPipette =
+    leftPipette != null &&
+    !temporarilyDeletedPipettes.includes(leftPipette.id as string)
+      ? leftPipette
+      : null
+  const visibleRightPipette =
+    rightPipette != null &&
+    !temporarilyDeletedPipettes.includes(rightPipette.id as string)
+      ? rightPipette
+      : null
+
+  const targetPipetteMount = visibleLeftPipette == null ? 'left' : 'right'
+
+  const effectiveHas96Channel =
+    (has96Channel &&
+      leftPipette?.spec.channels === 96 &&
+      !temporarilyDeletedPipettes.includes(leftPipette.id as string)) ||
+    (rightPipette?.spec.channels === 96 &&
+      !temporarilyDeletedPipettes.includes(rightPipette.id as string))
 
   const handleAddPipette = (): void => {
     setPage('add')
     setMount(targetPipetteMount)
     setSaveAttemptFailed(false)
   }
-  const allTiprackLidsOnDeck = Object.values(labware).filter(
-    lw => lw.def.parameters.loadName === TIPRACK_LID_LOADNAME
-  )
 
-  const handleDeletingTipLids = (): void => {
-    allTiprackLidsOnDeck.forEach(lid =>
-      dispatch(deleteContainer({ labwareId: lid.id }))
-    )
-  }
+  const isLeftPipette96Channel =
+    visibleLeftPipette != null && visibleLeftPipette.spec.channels === 96
+  const isRightPipette96Channel =
+    visibleRightPipette != null && visibleRightPipette.spec.channels === 96
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
@@ -136,7 +142,7 @@ export function PipetteOverview({
           <StyledText desktopStyle="bodyLargeSemiBold">
             {t('your_pipettes')}
           </StyledText>
-          {has96Channel ||
+          {effectiveHas96Channel ||
           (leftPipette == null && rightPipette == null) ? null : (
             <Btn
               css={LINK_BUTTON_STYLE}
@@ -165,63 +171,95 @@ export function PipetteOverview({
           )}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          {leftPipette?.tiprackDefURI != null && leftInfo != null ? (
+          {/* Show 96-channel pipette as Left + Right Mount regardless of actual mount */}
+          {isLeftPipette96Channel || isRightPipette96Channel ? (
             <PipetteInfoItem
-              mount="left"
-              pipetteName={leftPipette.name}
-              tiprackDefURIs={leftPipette.tiprackDefURI}
+              mount="left" // Always use "left" for display, but PipetteInfoItem will show "Left + Right Mount"
+              pipetteName={
+                isLeftPipette96Channel
+                  ? visibleLeftPipette.name
+                  : visibleRightPipette?.name ?? 'p1000_96'
+              }
+              tiprackDefURIs={
+                (isLeftPipette96Channel
+                  ? visibleLeftPipette.tiprackDefURI
+                  : visibleRightPipette?.tiprackDefURI) as string[]
+              }
               editClick={() => {
-                setPage('add')
-                setMount('left')
-                setPipetteType(leftInfo.type)
-                setPipetteGen(leftInfo.gen)
-                setPipetteVolume(leftInfo.volume)
-                setSelectedTips(leftPipette.tiprackDefURI as string[])
+                const pipette96 = isLeftPipette96Channel
+                  ? visibleLeftPipette
+                  : visibleRightPipette
+                const info96 = isLeftPipette96Channel ? leftInfo : rightInfo
+                if (pipette96 && info96) {
+                  setPage('add')
+                  setMount(pipette96.mount)
+                  setPipetteType(info96.type)
+                  setPipetteGen(info96.gen)
+                  setPipetteVolume(info96.volume)
+                  setSelectedTips(pipette96.tiprackDefURI as string[])
+                }
               }}
               cleanForm={() => {
-                dispatch(deletePipettes([leftPipette.id as string]))
-                previousLeftPipetteTipracks.forEach(tip => {
-                  const tipStack = tip.stack
-                  //  to delete any tiprackAdapters + tipracks
-                  tipStack.forEach(item => {
-                    if (labware[item] != null) {
-                      dispatch(deleteContainer({ labwareId: item }))
-                    }
-                  })
-                })
-                handleDeletingTipLids()
+                const pipette96 = isLeftPipette96Channel
+                  ? visibleLeftPipette
+                  : visibleRightPipette
+                if (pipette96) {
+                  setTemporarilyDeletedPipettes(prev => [...prev, pipette96.id])
+                }
               }}
             />
-          ) : null}
-          {rightPipette?.tiprackDefURI != null && rightInfo != null ? (
-            <PipetteInfoItem
-              mount="right"
-              pipetteName={rightPipette.name}
-              tiprackDefURIs={rightPipette.tiprackDefURI}
-              editClick={() => {
-                setPage('add')
-                setMount('right')
-                setPipetteType(rightInfo.type)
-                setPipetteGen(rightInfo.gen)
-                setPipetteVolume(rightInfo.volume)
-                setSelectedTips(rightPipette.tiprackDefURI as string[])
-              }}
-              cleanForm={() => {
-                dispatch(deletePipettes([rightPipette.id as string]))
-                previousRightPipetteTipracks.forEach(tip => {
-                  const tipStack = tip.stack
-                  //  to delete any tiprackAdapters + tipracks
-                  tipStack.forEach(item => {
-                    if (labware[item] != null) {
-                      dispatch(deleteContainer({ labwareId: item }))
-                    }
-                  })
-                  handleDeletingTipLids()
-                })
-              }}
-            />
-          ) : null}
-          {has96Channel ||
+          ) : (
+            <>
+              {/* Show regular pipettes only if no 96-channel */}
+              {visibleLeftPipette?.tiprackDefURI != null &&
+              leftInfo != null &&
+              leftPipette != null ? (
+                <PipetteInfoItem
+                  mount="left"
+                  pipetteName={leftPipette.name}
+                  tiprackDefURIs={leftPipette.tiprackDefURI}
+                  editClick={() => {
+                    setPage('add')
+                    setMount('left')
+                    setPipetteType(leftInfo.type)
+                    setPipetteGen(leftInfo.gen)
+                    setPipetteVolume(leftInfo.volume)
+                    setSelectedTips(leftPipette.tiprackDefURI as string[])
+                  }}
+                  cleanForm={() => {
+                    setTemporarilyDeletedPipettes(prev => [
+                      ...prev,
+                      leftPipette.id,
+                    ])
+                  }}
+                />
+              ) : null}
+              {visibleRightPipette?.tiprackDefURI != null &&
+              rightInfo != null &&
+              rightPipette != null ? (
+                <PipetteInfoItem
+                  mount="right"
+                  pipetteName={rightPipette.name}
+                  tiprackDefURIs={rightPipette.tiprackDefURI}
+                  editClick={() => {
+                    setPage('add')
+                    setMount('right')
+                    setPipetteType(rightInfo.type)
+                    setPipetteGen(rightInfo.gen)
+                    setPipetteVolume(rightInfo.volume)
+                    setSelectedTips(rightPipette.tiprackDefURI as string[])
+                  }}
+                  cleanForm={() => {
+                    setTemporarilyDeletedPipettes(prev => [
+                      ...prev,
+                      rightPipette.id,
+                    ])
+                  }}
+                />
+              ) : null}
+            </>
+          )}
+          {effectiveHas96Channel ||
           (leftPipette != null && rightPipette != null) ? null : (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <Flex width={FLEX_MAX_CONTENT}>

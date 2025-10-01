@@ -1,5 +1,5 @@
 <Opentrons Standard Labware Catalog>
-Total number of labware: 73
+Total number of labware: 86
 
 <Agilent 1 Well Reservoir 290 mL>
 
@@ -25,6 +25,14 @@ Total number of labware: 73
 - Well count: 1
 - Max volume: 90 mL
 - Well shape: Flat-bottom
+
+<Axygen 96 Well Plate 500 µL>
+
+- Loadname: axygen_96_well_plate_500_µL
+- Dimensions: 8 rows × 12 columns
+- Well count: 96
+- Max volume: 500 µL
+- Well shape: V-bottom
 
 <Bio-Rad 384 Well Plate 50 µL>
 
@@ -91,6 +99,45 @@ Total number of labware: 73
 - Max volume: 360 µL
 - Well shape: Flat-bottom
 
+<Corning 96 Well Plate 360 µL Lid>
+
+- Loadname: corning_96_wellplate_360ul_lid
+- Type: Lid
+- Dimensions: 127 × 85 × 10 mm
+- Compatibility: Corning 96 well plates
+- Note: Stackable up to 5 lids
+
+<EV Resin Tips Flex Short Adapter>
+
+- Loadname: ev_resin_tips_flex_short_adapter
+- Dimensions: 8 rows × 12 columns
+- Well count: 0
+- Max volume: Various
+- Note: Adapter only
+
+<EV Resin Tips Flex Tall Adapter>
+
+- Loadname: ev_resin_tips_flex_tall_adapter
+- Dimensions: 8 rows × 12 columns
+- Well count: 0
+- Max volume: Various
+- Note: Adapter only
+
+<EV Resin Tips Flex 96 Labware>
+
+- Loadname: ev_resin_tips_flex_96_labware
+- Dimensions: 8 rows × 12 columns
+- Tip count: 96
+- Max volume: Various
+
+<EV Resin Tips Flex 96 Tiprack Adapter>
+
+- Loadname: ev_resin_tips_flex_96_tiprack_adapter
+- Dimensions: 8 rows × 12 columns
+- Well count: 0
+- Max volume: Various
+- Note: Adapter only
+
 <GEB 96 Tip Rack 1000 µL>
 
 - Loadname: geb_96_tiprack_1000ul
@@ -104,6 +151,30 @@ Total number of labware: 73
 - Dimensions: 8 rows × 12 columns
 - Tip count: 96
 - Max volume: 10 µL
+
+<Ibidi 96 Square Well Plate 300 µL>
+
+- Loadname: ibidi_96_square_well_plate_300ul
+- Dimensions: 8 rows × 12 columns
+- Well count: 96
+- Max volume: 300 µL
+- Well shape: Flat-bottom
+
+<Ibidi 96 Square Well Plate 300 µL Lid>
+
+- Loadname: ibidi_96_square_well_plate_300ul_lid
+- Type: Lid
+- Dimensions: 127 × 84.5 × 6.95 mm
+- Compatibility: Ibidi 96 square well plates
+- Note: Stackable up to 5 lids
+
+<MILLIPLEX Microtiter Plate Lid>
+
+- Loadname: milliplex_microtiter_plate_lid
+- Type: Lid
+- Dimensions: 127.5 × 85 × 10 mm
+- Compatibility: MILLIPLEX microtiter plates
+- Note: Stackable up to 5 lids
 
 <NEST 12 Well Reservoir 15 mL>
 
@@ -522,6 +593,34 @@ Total number of labware: 73
 - Max volume: Various
 - Note: Adapter only
 
+<Opentrons Flex Absorbance Plate Reader Module Lid>
+
+- Loadname: opentrons_flex_lid_absorbance_plate_reader_module
+- Type: Module Lid
+- Dimensions: 155 × 95.5 × 57 mm
+- Compatibility: Absorbance Plate Reader Module
+
+<Opentrons Flex Tip Rack Lid>
+
+- Loadname: opentrons_flex_tiprack_lid
+- Type: Lid
+- Dimensions: 121 × 78.75 × 17 mm
+- Compatibility: Opentrons Flex tip racks
+
+<Opentrons Tough PCR Auto-Sealing Lid>
+
+- Loadname: opentrons_tough_pcr_auto_sealing_lid
+- Type: Lid
+- Dimensions: 127.7 × 85.48 × 12.8 mm
+- Compatibility: PCR plates on thermocycler
+
+<Opentrons Tough Universal Lid>
+
+- Loadname: opentrons_tough_universal_lid
+- Type: Lid
+- Dimensions: 127.76 × 85.48 × 9.2 mm
+- Compatibility: Universal for most 96-well plates
+
 <Opentrons Universal Flat Heater-Shaker Adapter>
 - Loadname: opentrons_universal_flat_adapter
 - Dimensions: N/A (universal adapter)
@@ -535,6 +634,14 @@ Total number of labware: 73
 - Dimensions: 16 rows × 24 columns
 - Well count: 384
 - Max volume: 112 µL
+- Well shape: Flat-bottom
+
+<SMC 384 Read Plate>
+
+- Loadname: smc_384_read_plate
+- Dimensions: 16 rows × 24 columns
+- Well count: 384
+- Max volume: Various
 - Well shape: Flat-bottom
 
 <Thermo Scientific Nunc 96 Well Plate 1300 µL>
@@ -587,15 +694,19 @@ Total number of labware: 73
 
     <Opentrons Flex Loadnames>
       - flex_1channel_50
-      - volume: 1–50 µL
+        - volume: 1–50 µL
       - flex_1channel_1000
-      - volume: 5–1000 µL
+        - volume: 5–1000 µL
       - flex_8channel_50
-      - volume: 1–50 µL
+        - volume: 1–50 µL
       - flex_8channel_1000
-      - volume: 5–1000 µL
+        - volume: 5–1000 µL
       - flex_96channel_1000
-      - volume: 5–1000 µL
+        - high volume: 5–1000 µL
+      - flex_96channel_200
+        - low volume: 1–200 μL
+  
+  
 
 </Pipettes with volume>
 

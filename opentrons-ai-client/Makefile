@@ -61,7 +61,7 @@ dev:
 # production assets server
 .PHONY: serve
 serve: all
-	node ../scripts/serve-static dist
+	vite preview
 
 .PHONY: test
 test:

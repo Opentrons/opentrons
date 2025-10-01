@@ -109,6 +109,7 @@
     "handlebars": "^4.2.0",
     "handlebars-loader": "^1.7.1",
     "html-webpack-plugin": "^3.2.0",
+    "i18next": "^19.8.3",
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "26.1.0",
     "lost": "^8.3.1",

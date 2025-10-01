@@ -1,0 +1,29 @@
+.icon_button {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-12);
+  border-radius: 50%;
+}
+
+.icon_button:active {
+  background-color: var(--active-color);
+}
+
+.icon_button:hover {
+  background-color: var(--variant-hover);
+}
+
+.icon_button:focus-visible::after {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+  border: 2px solid var(--variant-default);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
