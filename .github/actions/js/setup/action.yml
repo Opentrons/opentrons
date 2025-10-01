@@ -47,5 +47,5 @@ runs:
           PLATFORM="win32-x64"
         fi
         export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}.zip"
-        
+
         make setup-js
