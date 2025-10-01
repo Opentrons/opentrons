@@ -252,8 +252,7 @@ describe('renders the InlineNotification', () => {
     expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'alert',
-        heading:
-          'The shuttle has labware when it should be empty',
+        heading: 'The shuttle has labware when it should be empty',
         message:
           'Remove the labware from the shuttle to complete the stacker retrieve step',
       }),
