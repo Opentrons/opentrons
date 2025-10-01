@@ -23,7 +23,7 @@ class CameraProvider:
     def __init__(
         self,
         camera_settings_callback: Optional[
-            Callable[[], Awaitable[CameraSettings]]
+            Callable[[], [CameraSettings]]
         ] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.

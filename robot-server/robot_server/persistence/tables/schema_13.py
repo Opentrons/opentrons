@@ -351,7 +351,7 @@ class BooleanSettingKey(enum.Enum):
 
 
 boolean_setting_table = sqlalchemy.Table(
-    "boolean_setting",
+    "boolean_setting_extended",
     metadata,
     sqlalchemy.Column(
         "key",
@@ -359,7 +359,7 @@ boolean_setting_table = sqlalchemy.Table(
             BooleanSettingKey,
             values_callable=lambda obj: [e.value for e in obj],
             validate_strings=True,
-            create_constraint=True,
+            create_constraint=False,
         ),
         primary_key=True,
     ),

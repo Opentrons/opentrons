@@ -10,9 +10,11 @@ from pathlib import Path
 from ._util import copy_contents
 from .._folder_migrator import Migration
 import sqlalchemy
-from ..database import sql_engine_ctx
+from ..database import sql_engine_ctx, sqlite_rowid
 
-from robot_server.persistence.tables import schema_13
+from typing import Any, Dict
+
+from robot_server.persistence.tables import schema_11, schema_13
 from robot_server.persistence.file_and_directory_names import DB_FILE
 
 
@@ -24,22 +26,40 @@ class Migration12to13(Migration):  # noqa: D101
         with sql_engine_ctx(
             dest_dir / DB_FILE
         ) as engine, engine.begin() as transaction:
-            _add_boolean_settings_table_changes(transaction)
+            assert (
+                schema_11.boolean_setting_table.name
+                != schema_13.boolean_setting_table.name
+            )
+            _migrate_boolean_settings_table(transaction)
+
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
     """Migrate the exist `boolean_settings` table to the new schema."""
-    
+    old_boolean_settings = connection.execute(
+        sqlalchemy.select(schema_11.boolean_setting_table)
+    )
+    # create a new boolean settings table to account for new constraints
+    schema_13.boolean_setting_table.create(connection)
 
-def _add_boolean_settings_table_changes(connection: sqlalchemy.engine.Connection) -> None:
-    """Add new `boolean_settings` values for Camera enablement."""
-    rows = [
-        {"key": str(schema_13.BooleanSettingKey.ENABLE_CAMERA.value), "value": False},
-        {"key": str(schema_13.BooleanSettingKey.ENABLE_LIVE_STREAM.value), "value": False},
-        {"key": str(schema_13.BooleanSettingKey.ENABLE_ERROR_RECOVERY_CAMERA.value), "value": False},
-    ]
-    resp = connection.execute(sqlalchemy.text("SELECT sql FROM sqlite_master WHERE tbl_name='boolean_setting' AND type='table';"))
-    raise ValueError(f"response: {resp.all()}")
-    for r in rows:
+    # up-migrate all the old elements and new elements to the new table
+    for table_row in old_boolean_settings:
         connection.execute(
-            sqlalchemy.insert(schema_13.boolean_setting_table).values(**r)
+            sqlalchemy.insert(schema_13.boolean_setting_table).values(
+                key=table_row.key, value=table_row.value
+            )
         )
+    new_rows = [
+        {"key": str(schema_13.BooleanSettingKey.ENABLE_CAMERA.value), "value": False},
+        {
+            "key": str(schema_13.BooleanSettingKey.ENABLE_LIVE_STREAM.value),
+            "value": False,
+        },
+        {
+            "key": str(schema_13.BooleanSettingKey.ENABLE_ERROR_RECOVERY_CAMERA.value),
+            "value": False,
+        },
+    ]
+    connection.execute(sqlalchemy.insert(schema_13.boolean_setting_table), new_rows)
+
+    # drop the old boolean settings table
+    schema_11.boolean_setting_table.drop(connection)
