@@ -11,7 +11,7 @@ interface LabwareButtonBasketProps {
   stackOfLabware: string[]
   labware: AllTemporalPropertiesForTimelineFrame['labware']
   setSelectedLabware: (selectedLabwareId: string) => void
-  selectedLabware: string
+  selectedLabware: string[]
 }
 export function LabwareButtonBasket(
   props: LabwareButtonBasketProps
@@ -19,8 +19,6 @@ export function LabwareButtonBasket(
   const { stackOfLabware, labware, selectedLabware, setSelectedLabware } = props
   const { t } = useTranslation('protocol_steps')
 
-  console.log('labware', labware)
-  console.log('stackOfLabware', stackOfLabware)
   return (
     <div className={styles.basket}>
       <StyledText desktopStyle="captionRegular">{t('top_of_stack')}</StyledText>
@@ -31,7 +29,7 @@ export function LabwareButtonBasket(
               key={`${item}_${index}`}
               numberInStack={stackOfLabware.length - 1 - index}
               displayName={labware[item].def.metadata.displayName}
-              isSelected={selectedLabware === item}
+              isSelected={selectedLabware.includes(item)}
               onClick={id => {
                 setSelectedLabware(id)
               }}

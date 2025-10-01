@@ -68,7 +68,18 @@ export function AssignLiquidsModal(
   const selectedWells = useSelector(getSelectedWells)
   const dispatch = useDispatch()
   const { labware } = useSelector(getInitialDeckSetup)
-  console.log('labware', labware)
+  console.log('labwareId', labwareId)
+  const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
+    labwareId ?? '',
+  ])
+
+  const handleAssignToLabware = (newItem: string) => {
+    // Create a new array with the existing items and the new item appended
+    console.log('newItem', newItem)
+    setSelectedLabware(prevItems => [...prevItems, newItem])
+    console.log('selectedLabware', selectedLabwareArray)
+  }
+
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsAllLabware
@@ -84,7 +95,6 @@ export function AssignLiquidsModal(
     return null
   }
   const labwareStack = labware[labwareId].stack
-  console.log('labwareStack', labwareStack)
 
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
@@ -142,8 +152,8 @@ export function AssignLiquidsModal(
                 <LabwareButtonBasket
                   stackOfLabware={labwareStack}
                   labware={labware}
-                  setSelectedLabware={() => {}}
-                  selectedLabware={''}
+                  setSelectedLabware={handleAssignToLabware}
+                  selectedLabware={selectedLabwareArray}
                 />
               </Flex>
               <Box
