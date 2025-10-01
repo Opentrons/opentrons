@@ -468,17 +468,15 @@ class ProtocolContext(CommandPublisher):
 
             .. versionchanged:: 2.26
                ``adapter_namespace`` may now be specified explicitly.
-               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
-               ``adapter_namespace`` will now independently follow the same search rules
-               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+               When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``,
+               ``adapter_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
         :param adapter_version: The version of the adapter being loaded.
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
             .. versionchanged:: 2.26
-               ``adapter_version`` may now be specified explicitly. Also, when it's unspecified,
-               the algorithm to select a version automatically has improved to avoid
-               selecting versions that do not exist.
+               ``adapter_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist when unspecified.  
 
         :param lid: A lid to load on the top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
@@ -492,17 +490,15 @@ class ProtocolContext(CommandPublisher):
 
             .. versionchanged:: 2.26
                ``lid_namespace`` may now be specified explicitly.
-               Also, when you've specified ``namespace`` but not ``lid_namespace``,
-               ``lid_namespace`` will now independently follow the same search rules
-               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
         :param lid_version: The version of the adapter being loaded.
             Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
 
             .. versionchanged:: 2.26
-               ``lid_version`` may now be specified explicitly. Also, when it's unspecified,
-               the algorithm to select a version automatically has improved to avoid
-               selecting versions that do not exist.
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -1623,15 +1619,15 @@ class ProtocolContext(CommandPublisher):
 
             .. versionchanged:: 2.26
                ``adapter_namespace`` may now be specified explicitly.
-               Also, when you've specified ``namespace`` but not ``adapter_namespace``,
-               ``adapter_namespace`` will now independently follow the same search rules
-               described in ``namespace``. Formerly, it took ``namespace``'s exact value.
+                When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``,
+               ``adapter_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
         :param adapter_version: The version of the adapter being loaded.
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
             .. versionadded:: 2.26
-               ``adapter_version`` may now be specified explicitly.
+               ``adapter_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist. 
 
         :return:  The initialized and loaded labware object representing the lid stack.
 
