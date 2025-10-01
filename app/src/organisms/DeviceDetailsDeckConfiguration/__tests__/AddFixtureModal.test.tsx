@@ -29,7 +29,22 @@ vi.mock('/app/organisms/ModuleCard/utils')
 vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
+  initReactI18next: vi.fn(),
 }))
+vi.mock('i18next', () => {
+  return {
+    default: {
+      use: () => ({ init: vi.fn() }),
+      createInstance: () => ({
+        use: () => ({ init: vi.fn() }),
+        init: vi.fn(),
+        t: (k: string) => k,
+      }),
+      init: vi.fn(),
+      t: (k: string) => k,
+    },
+  }
+})
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
