@@ -15803,15 +15803,8 @@
       "result": {
         "eventualDestinationLocationSequence": [
           {
-            "addressableAreaName": "gripperWasteChute",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
-            ]
+            "kind": "notOnDeck",
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -15848,26 +15841,9 @@
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Labware nest_1_reservoir_290ml is already present at addressableAreaName='gripperWasteChute'.",
-        "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "LocationIsOccupiedError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
       "id": "UUID",
       "key": "45d005fae03a2975b084ecf1ea107360",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
+      "notes": [],
       "params": {
         "labwareId": "UUID",
         "newLocation": {
@@ -15875,8 +15851,42 @@
         },
         "strategy": "usingGripper"
       },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "kind": "notOnDeck",
+            "logicalLocationName": "wasteChuteLocation"
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "addressableAreaName": "gripperWasteChute",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutD3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
+            ]
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "addressableAreaName": "C2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutC2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
+          }
+        ]
+      },
       "startedAt": "TIMESTAMP",
-      "status": "failed"
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -15887,40 +15897,7 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 546]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): LocationIsOccupiedError: Labware nest_1_reservoir_290ml is already present at addressableAreaName='gripperWasteChute'.",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "LocationIsOccupiedError: Labware nest_1_reservoir_290ml is already present at addressableAreaName='gripperWasteChute'.",
-          "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "ProtocolCommandFailedError",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": [
-            {
-              "createdAt": "TIMESTAMP",
-              "detail": "Labware nest_1_reservoir_290ml is already present at addressableAreaName='gripperWasteChute'.",
-              "errorCode": "4000",
-              "errorInfo": {},
-              "errorType": "LocationIsOccupiedError",
-              "id": "UUID",
-              "isDefined": false,
-              "wrappedErrors": []
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [],
   "labware": [
     {
@@ -15943,18 +15920,13 @@
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": {
-        "addressableAreaName": "gripperWasteChute"
-      }
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "slotName": "C2"
-      },
-      "offsetId": "UUID"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",
@@ -16038,7 +16010,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {

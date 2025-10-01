@@ -57212,15 +57212,8 @@
       "result": {
         "eventualDestinationLocationSequence": [
           {
-            "addressableAreaName": "gripperWasteChute",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
-            ]
+            "kind": "notOnDeck",
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -57354,26 +57347,9 @@
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Arc out of bounds in the Z-axis",
-        "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "FailedToPlanMoveError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
       "id": "UUID",
       "key": "2c8afd9e44dc0587f3e29977455978c5",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
+      "notes": [],
       "params": {
         "flowRate": 25.0,
         "labwareId": "UUID",
@@ -57390,8 +57366,2056 @@
         },
         "wellName": "A2"
       },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
       "startedAt": "TIMESTAMP",
-      "status": "failed"
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "541474396b4de46d0e988f63c2996b68",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cd94dae746ae344cc0222f372c5fe827",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ddc7df64068579cac389079e1851cedb",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2ecd9d0467a79629b5d7db51d793ddca",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "bef95efec4702f9885638d56e1272e05",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 86.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "955ccc5d4f03ca3485b688228a7cbec6",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 342.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a654f0adeb6172d197d8a3c536bb5754",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 351.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 48.629999999999995,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "83b5c4531a818ec44d030f5c73441efa",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "dd40b6a5bb15be5472f0dd3fdac9c14d",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d0cf09b37a29b77ba8ed05d51530e7e1",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "97da40346993ab3c4f2453aa820aafff",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9c291d82b448d92c9265e467b908fd97",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "26e919c473b45be5a02113dd9e28142a",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 95.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7896a67a8dcbfd8a1143a1a8c97cdcc0",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 351.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "99c1e1ba05d97d1b1a549e5054486827",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 360.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 48.629999999999995,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "eda95242bad483cd6f5b08606a24f8ec",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -25.85
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 187.38,
+          "y": 149.78,
+          "z": 5.55
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "665febbbccb0fe0dc04e3ee833a19d3c",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c18ebe0242fb7dfec3dd433208846adc",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "28bdfea0467dd56000157ca38af73627",
+      "notes": [],
+      "params": {
+        "flowRate": 12.5,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8ffab6d026ce3972ddf85b0e694ab568",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 22.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 22.95
+        },
+        "volume": 22.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "blowout",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d3959041d9a293b79df51c2d44ba0239",
+      "notes": [],
+      "params": {
+        "flowRate": 50.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -3.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 104.3,
+          "y": 74.15,
+          "z": 56.95
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "799135349f7e271b0161efcc3cf3eb35",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 360.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "57591f518e8ea01fd7853b400c4559b8",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID",
+        "rpm": 2000.0
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b9f5444ca1035a24db5d8e50cd8737e9",
+      "notes": [],
+      "params": {
+        "seconds": 300.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/deactivateShaker",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4d79914206f8d3f32fb5a4586f8fe588",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "668c961723c356405da1cbfbc116f3ed",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveLabware",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1472c95dd9f3dacc6cd09d7b1b6fb36c",
+      "notes": [],
+      "params": {
+        "dropOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "labwareId": "UUID",
+        "newLocation": {
+          "moduleId": "UUID"
+        },
+        "pickUpOffset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "strategy": "manualMoveWithPause"
+      },
+      "result": {
+        "eventualDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1D2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "immediateDestinationLocationSequence": [
+          {
+            "addressableAreaName": "magneticBlockV1D2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "magneticBlockV1"
+            ]
+          }
+        ],
+        "originLocationSequence": [
+          {
+            "addressableAreaName": "heaterShakerV1D1",
+            "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
+            "cutoutId": "cutoutD1",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "heaterShakerModuleV1"
+            ]
+          }
+        ]
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/closeLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c61604cc83ba98c4cca73a0cae4f6fa1",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "40e1d24085787cd9dad5e57327d1dbe5",
+      "notes": [],
+      "params": {
+        "seconds": 180.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3a05a1012f9acdde24364bd5541c15c2",
+      "notes": [],
+      "params": {
+        "message": "--> Transferring Supernatant"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5a46b356be94e95041880adfd0856e7b",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 369.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 48.629999999999995,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "47e84ebb2c77c9443eb94bc54f85243d",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2986fef5429915b73cfbf4490b808846",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "81a7b9afea823d0c8e0bef82f8c27c26",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8e2471aec86d7a9ac18a810ada1ed722",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "aea03bcd6af3e0cc6cfc5d1ab79e6e60",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 250.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "59043f439dac4191b7405aafc9d13305",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A9"
+      },
+      "result": {
+        "position": {
+          "x": 66.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "681af2b56f729a3438347fe33709e055",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A4"
+      },
+      "result": {
+        "position": {
+          "x": 369.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "db3c32a390cd786178ca45b49714965f",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 378.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 48.629999999999995,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cc16065cce18dc7cb7e790baa30674c7",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "1c599d7298632f5b991170a4126b6d50",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ba9baba61f7f4b1faff5a38d984d9c90",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3bc71fb4bbdbc96d597ddf37e416ba56",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "354f5897b52d04f4472006eb85dcfb82",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 259.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "97cc4b1adabfc215887284d8f0752f9e",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A10"
+      },
+      "result": {
+        "position": {
+          "x": 75.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e500513f10f09a51e1fc05be58163d48",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A5"
+      },
+      "result": {
+        "position": {
+          "x": 378.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "pickUpTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "15bc32437dbc09f93ef0485f224e5a78",
+      "notes": [],
+      "params": {
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "top"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 387.38,
+          "y": 181.38,
+          "z": 99.0
+        },
+        "tipDiameter": 5.58,
+        "tipLength": 48.629999999999995,
+        "tipVolume": 50.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b8f6bf50b63841b954bd65e563f09693",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.84
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4490c93e2c9e4e59e7b5c2bc8e712b40",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.5
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.84
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "411401cb2d917f101a84bb95acdc6681",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "76ab18eea82dccabe647716e22b16d77",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "437cff28f3951d5114656dcf44d6f0fe",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 10.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -37.8
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 268.3,
+          "y": 74.15,
+          "z": 38.540000000000006
+        },
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispense",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "427c0846d3135c1be0ae7c91ff67117a",
+      "notes": [],
+      "params": {
+        "flowRate": 25.0,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "volume": 20.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -13.95
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A11"
+      },
+      "result": {
+        "position": {
+          "x": 84.375,
+          "y": 356.2,
+          "z": 2.3100000000000014
+        },
+        "volume": 20.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dropTip",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4bd31bb6c1e8c3dd9e942636fb29f2d4",
+      "notes": [],
+      "params": {
+        "alternateDropLocation": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "scrape_tips": true,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "origin": "default"
+        },
+        "wellName": "A6"
+      },
+      "result": {
+        "position": {
+          "x": 387.38,
+          "y": 181.38,
+          "z": 57.891000000000005
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "thermocycler/deactivateBlock",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "52b7df81a09777ed2eca2ed41194533d",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "thermocycler/deactivateLid",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "71c1426c8a8fb47c14ca35a62324d530",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "temperatureModule/deactivate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c635e8f6b311e05a4ee8f290391175d4",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "9f1226f8cd0297859486ec2ba324ba06",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {
+        "pipetteRetracted": false
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "81c7d7289d70b0489e48d264f00271b5",
+      "notes": [],
+      "params": {
+        "message": "=============================================="
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6086bc672742b3ac9d3d11a3525ed749",
+      "notes": [],
+      "params": {
+        "message": "--> Report"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2ffb9ca18b91aa70077acbd961f4f0b8",
+      "notes": [],
+      "params": {
+        "message": "=============================================="
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f7838a8cf55aa6c20de4f8e31c900d49",
+      "notes": [],
+      "params": {
+        "message": "REUSE_50_TIPS []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "664c12fba6e166c8bcdcadb65b5a484b",
+      "notes": [],
+      "params": {
+        "message": "p50_INITIALTIPS []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0733bf59e5d9538c3451eb3b47d4eb1b",
+      "notes": [],
+      "params": {
+        "message": "REUSE_200_TIPS_1 []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "32e0479281adab2e0173ad4fa4e8063f",
+      "notes": [],
+      "params": {
+        "message": "REUSE_200_TIPS_2 []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ed030095c6dd1bafd282d664e5ce11f0",
+      "notes": [],
+      "params": {
+        "message": "p200_INITIALTIPS []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d77724c8333fc6813313bea25059fa47",
+      "notes": [],
+      "params": {
+        "message": "SWAPSPOT []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "cad95ca517371cbf6e2ab8495aebacaf",
+      "notes": [],
+      "params": {
+        "message": "AVAILABLE_POS_ONDECK []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e3062df562faa3087ba6842b21e54679",
+      "notes": [],
+      "params": {
+        "message": "AVAILABLE_POS_OFFDECK ['C4', 'B4', 'A4']"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b25d64cd9c903fc1f8f24f1cc6c6f95f",
+      "notes": [],
+      "params": {
+        "message": "REUSE_50_TIPS_COUNT 0"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "13910c8a37380d3188780870e03d3fd2",
+      "notes": [],
+      "params": {
+        "message": "REUSE_200_TIPS_COUNT 0"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "426bdcac9cc6b9b9268978917da4e17c",
+      "notes": [],
+      "params": {
+        "message": "p50_RACKS_ONDECK []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b2e7c997974df4f891d72e08d8455209",
+      "notes": [],
+      "params": {
+        "message": "p50_RACKS_OFFDECK []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f8172d5a95255d4816da0c5aea33008b",
+      "notes": [],
+      "params": {
+        "message": "p50_RACKS_DROPPED [tiprack_200_1]"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "a867d71af0422eabac49d3cb0ff98938",
+      "notes": [],
+      "params": {
+        "message": "p50_TIPS 6"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "42d6ed6138380c6c61bce54e813225cf",
+      "notes": [],
+      "params": {
+        "message": "p50_RACKS_PIPET [tiprack_50_1, tiprack_50_2]"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "697745b26cc568b5306a17bfb4a9a4f7",
+      "notes": [],
+      "params": {
+        "message": "p200_RACKS_ONDECK [tiprack_200_4]"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d8ea4b8b62315f88a6ecd2a54cfd8d0b",
+      "notes": [],
+      "params": {
+        "message": "p200_RACKS_OFFDECK []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "27e1980a086d1d3ae3918287a95de05b",
+      "notes": [],
+      "params": {
+        "message": "p200_RACKS_DROPPED []"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "32a0aec5be7833c87d0261d066b28981",
+      "notes": [],
+      "params": {
+        "message": "p200_TIPS 0"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4b1d03da45c4223fd76526e4f8ce1aaa",
+      "notes": [],
+      "params": {
+        "message": "p200_RACKS_PIPET [tiprack_200_1, tiprack_200_2, tiprack_200_3, tiprack_200_4]"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "comment",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c19646ed88a05c8e2ebff6eea2e51343",
+      "notes": [],
+      "params": {
+        "message": "RACKS_TO_DUMP [tiprack_200_2, tiprack_200_3, tiprack_50_1]"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
     }
   ],
   "config": {
@@ -57402,40 +59426,7 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [
-    {
-      "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 1656]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): FailedToPlanMoveError: Arc out of bounds in the Z-axis",
-      "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "ExceptionInProtocolError",
-      "id": "UUID",
-      "isDefined": false,
-      "wrappedErrors": [
-        {
-          "createdAt": "TIMESTAMP",
-          "detail": "FailedToPlanMoveError: Arc out of bounds in the Z-axis",
-          "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "ProtocolCommandFailedError",
-          "id": "UUID",
-          "isDefined": false,
-          "wrappedErrors": [
-            {
-              "createdAt": "TIMESTAMP",
-              "detail": "Arc out of bounds in the Z-axis",
-              "errorCode": "4000",
-              "errorInfo": {},
-              "errorType": "FailedToPlanMoveError",
-              "id": "UUID",
-              "isDefined": false,
-              "wrappedErrors": []
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "errors": [],
   "files": [],
   "labware": [
     {
@@ -57495,9 +59486,7 @@
       "displayName": "tiprack_200_1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_200ul",
-      "location": {
-        "addressableAreaName": "gripperWasteChute"
-      }
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",
@@ -57588,7 +59577,7 @@
       "pipetteName": "p50_multi_flex"
     }
   ],
-  "result": "not-ok",
+  "result": "ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": [
     {

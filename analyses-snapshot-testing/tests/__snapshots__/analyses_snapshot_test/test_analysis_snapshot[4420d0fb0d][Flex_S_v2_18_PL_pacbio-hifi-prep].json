@@ -33738,17 +33738,8 @@
       "result": {
         "eventualDestinationLocationSequence": [
           {
-            "addressableAreaName": "gripperWasteChute",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD3",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "flexStackerModuleV1WithWasteChuteRightAdapterNoCover",
-              "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
-              "wasteChuteRightAdapterNoCover"
-            ]
+            "kind": "notOnDeck",
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -49057,9 +49048,7 @@
       "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
-      "location": {
-        "addressableAreaName": "gripperWasteChute"
-      }
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
