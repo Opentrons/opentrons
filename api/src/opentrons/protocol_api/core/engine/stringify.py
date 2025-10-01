@@ -61,7 +61,7 @@ def _labware_location_string(
             f"stored in {_module_in_location_string(location.moduleId, engine_client)}"
         )
     elif location == "wasteChuteLocation":
-        return "[wasteChuteLocation]"
+        return "in waste chute"
 
 
 def _labware_name(engine_client: SyncClient, labware_id: str) -> str:
