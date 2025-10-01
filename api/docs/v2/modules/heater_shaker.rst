@@ -113,6 +113,7 @@ For example, these commands load a well plate on top of the flat bottom adapter:
 .. versionadded:: 2.15
     The ``load_adapter()`` method.   
 
+To properly shake lidded labware, use the ``opentrons_universal_flat_adapter_type_b``. 
 
 Pre-configured Combinations
 ---------------------------

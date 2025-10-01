@@ -130,8 +130,6 @@ If your Stacker will store multiple of the same labware, like 96-well plates, it
 Repeat for as many labware as you'll need, like a ``media_plate`` and ``plasmid_plate``. Make sure your labware quantity will fit in the Stacker. Then, use ``set_stored_labware_items()`` to add them to the Stacker:: 
 
     stacker_1.set_stored_labware_items(
-        labware=[sample_plate, media_plate, plasmid_plate],
-        stacking_offset_z=0
-    )
+        labware=[sample_plate, media_plate, plasmid_plate])
 
 Remember that the first labware item in your list represents the bottom-most labware in the stack, and will be the first accessed using the ``retrieve()`` command. 
