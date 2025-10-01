@@ -29,7 +29,10 @@ import {
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
-import { LabwareButtonBasket, LiquidButton } from '/protocol-designer/components/molecules'
+import {
+  LabwareButtonBasket,
+  LiquidButton,
+} from '/protocol-designer/components/molecules'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -81,6 +84,7 @@ export function AssignLiquidsModal(
     return null
   }
   const labwareStack = labware[labwareId].stack
+  console.log('labwareStack', labwareStack)
 
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
@@ -135,30 +139,12 @@ export function AssignLiquidsModal(
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
               <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-                <StyledText desktopStyle="captionRegular">
-                  {t('top_of_stack')}
-                </StyledText>
-                <LabwareButtonBasket stackOfLabware={labwareStack} labware={labware} setSelectedLabware={() => {}} selectedLabware={''} />
-                  {/* {labwareStack.map((x, index) =>
-                    labware[x] ? (
-                      <ListItem type="default">
-                        <LabwareButton flexDirection={DIRECTION_ROW}>
-                          <StyledText desktopStyle="captionRegular">
-                            {labwareStack.length - 1 - index}
-                          </StyledText>
-                          <RadioButton
-                            buttonLabel={labware[x]?.def.metadata.displayName}
-                            buttonValue={labware[x]?.id}
-                            onChange={function (
-                              event: ChangeEvent<HTMLInputElement>
-                            ): void {
-                              throw new Error('Function not implemented.')
-                            }}
-                          ></RadioButton>
-                        </LabwareButton>
-                      </ListItem>
-                    ) : null
-                  )} */}
+                <LabwareButtonBasket
+                  stackOfLabware={labwareStack}
+                  labware={labware}
+                  setSelectedLabware={() => {}}
+                  selectedLabware={''}
+                />
               </Flex>
               <Box
                 width="100%"

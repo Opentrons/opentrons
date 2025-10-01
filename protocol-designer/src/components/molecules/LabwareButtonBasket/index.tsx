@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { Flex, StyledText } from '@opentrons/components'
 
 import { LabwareButton } from '../../atoms'
 import styles from './labwarebuttonbasket.module.css'
@@ -19,22 +19,26 @@ export function LabwareButtonBasket(
   const { stackOfLabware, labware, selectedLabware, setSelectedLabware } = props
   const { t } = useTranslation('protocol_steps')
 
+  console.log('labware', labware)
+  console.log('stackOfLabware', stackOfLabware)
   return (
     <div className={styles.basket}>
       <StyledText desktopStyle="captionRegular">{t('top_of_stack')}</StyledText>
       <div className={styles.basket_container}>
-        {stackOfLabware.map((item, index) => (
-          <LabwareButton
-            key={`${item}_${index}`}
-            numberInStack={index + 1}
-            displayName={labware[item].def.metadata.displayName}
-            isSelected={selectedLabware === item}
-            onClick={id => {
-              setSelectedLabware(id)
-            }}
-            id={item}
-          />
-        ))}
+        {stackOfLabware.map((item, index) =>
+          labware[item] ? (
+            <LabwareButton
+              key={`${item}_${index}`}
+              numberInStack={stackOfLabware.length - 1 - index}
+              displayName={labware[item].def.metadata.displayName}
+              isSelected={selectedLabware === item}
+              onClick={id => {
+                setSelectedLabware(id)
+              }}
+              id={item}
+            />
+          ) : null
+        )}
       </div>
       <StyledText desktopStyle="captionRegular">
         {t('bottom_of_stack')}
