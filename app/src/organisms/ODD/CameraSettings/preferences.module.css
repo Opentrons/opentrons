@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   padding: 0 var(--spacing-40);
-  margin-top: 7.75rem;
   gap: var(--spacing-24);
 }
 

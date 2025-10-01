@@ -7,9 +7,9 @@ import { MediumButton } from '/app/atoms/buttons'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useStubPreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { ImagePreviewModal } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences/CameraControls/ImagePreviewModal'
 
 import styles from '../preferences.module.css'
+import { ImagePreviewModal } from './ImagePreviewModal'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'

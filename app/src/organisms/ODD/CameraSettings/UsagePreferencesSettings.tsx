@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ListButton, StyledText } from '@opentrons/components'
 
 import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
-import styles from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences/preferences.module.css'
+
+import styles from './preferences.module.css'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'

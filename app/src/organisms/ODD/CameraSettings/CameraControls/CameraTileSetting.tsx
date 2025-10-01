@@ -5,7 +5,8 @@ import { StyledText } from '@opentrons/components'
 
 import { IconButton } from '/app/atoms/buttons/IconButton'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import styles from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences/CameraControls/cameracontrols.module.css'
+
+import styles from './cameracontrols.module.css'
 
 const SETTING_TILE = [1, 2, 3, 4]
 // Each tile adjusts the setting by 25%.

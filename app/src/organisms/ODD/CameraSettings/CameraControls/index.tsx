@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useStubCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
-import { CameraTileSetting } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences/CameraControls/CameraTileSetting'
-import { ZoomSettingsView } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences/CameraControls/ZoomSettingsView'
 
 import { CameraControlsHome } from './CameraControlsHome'
+import { CameraTileSetting } from './CameraTileSetting'
+import { ZoomSettingsView } from './ZoomSettingsView'
 
 export type ActiveControlView =
   | 'zoom'
