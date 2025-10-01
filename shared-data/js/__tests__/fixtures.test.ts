@@ -55,6 +55,20 @@ vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
   initReactI18next: vi.fn(),
 }))
+vi.mock('i18next', () => {
+  return {
+    default: {
+      use: () => ({ init: vi.fn() }),
+      createInstance: () => ({
+        use: () => ({ init: vi.fn() }),
+        init: vi.fn(),
+        t: (k: string) => k,
+      }),
+      init: vi.fn(),
+      t: (k: string) => k,
+    },
+  }
+})
 
 const deckDef = getDeckDefFromRobotType('OT-3 Standard')
 

@@ -2,7 +2,7 @@ import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { i18n } from '../../localization'
+import { i18n, sharedDataEn } from '../../localization'
 import { getLatestCommandTypeList } from '../testHelpers'
 import { useCommandTypeSummaries } from '../useCommandTypeSummaries'
 
@@ -11,7 +11,7 @@ describe('useCommandTypeSummaries', () => {
     await i18n.init({
       lng: 'en',
       fallbackLng: 'en',
-      resources: i18n.options.resources,
+      resources: { en: sharedDataEn },
       ns: ['command_type_summary'],
       defaultNS: 'command_type_summary',
       interpolation: i18n.options.interpolation,
