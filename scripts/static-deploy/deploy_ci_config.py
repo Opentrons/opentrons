@@ -36,16 +36,16 @@ class CIConfig:
 def _determine_application(ref_type: str, ref_name: str) -> str:
     """Determine application from ref type and name."""
     if ref_type == "tag":
-        # Tag-based application detection
-        if any(
-            ref_name.startswith(prefix)
-            for prefix in ["tmp-staging-labware-library", "staging-labware-library", "tmp-labware-library", "labware-library"]
-        ):
+        # Tag-based application detection - normalize to lowercase for comparison
+        ref_name_lower = ref_name.lower()
+        if any(ref_name_lower.startswith(prefix) for prefix in ["staging-labware-library", "labware-library"]):
             return "labware_library"
-        elif any(ref_name.startswith(prefix) for prefix in ["staging-mkdocs", "mkdocs"]):
+        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-mkdocs", "mkdocs"]):
             return "mkdocs"
-        elif any(ref_name.startswith(prefix) for prefix in ["staging-docs", "docs"]):
+        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-docs", "docs"]):
             return "docs"
+        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-protocol-designer", "protocol-designer"]):
+            return "protocol_designer"
     else:
         # If not a tag, determine application from workflow name.
         workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
@@ -81,11 +81,12 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
         return "sandbox", ref_name
 
     if event_name == "push" and ref_type == "tag":
-        # Tag-based environment detection
-        if ref_name.startswith(("tmp-staging-", "staging-")):
+        # Tag-based environment detection - normalize to lowercase for comparison
+        ref_name_lower = ref_name.lower()
+        if ref_name_lower.startswith("staging-"):
             return "staging", ref_name
-        elif ref_name.startswith(("tmp-labware-library", "labware-library", "mkdocs", "docs")):
-            # Production tag patterns (only labware uses tmp- prefix)
+        elif ref_name_lower.startswith(("labware-library", "protocol-designer", "mkdocs", "docs")):
+            # Production tag patterns
             return "production", ref_name
         else:
             # Default to sandbox for unrecognized tags
