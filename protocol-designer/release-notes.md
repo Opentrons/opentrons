@@ -33,6 +33,12 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
 
+## Opentrons Protocol Designer Changes in 8.5.5
+
+**Welcome to Protocol Designer 8.5.5!**
+
+This hotfix release addresses a bug to allow full use of pipettes and tip racks during liquid class transfers.
+
 ## Opentrons Protocol Designer Changes in 8.5.4
 
 **Welcome to Protocol Designer 8.5.4!**

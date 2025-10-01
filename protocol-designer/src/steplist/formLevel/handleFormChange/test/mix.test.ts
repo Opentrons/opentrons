@@ -100,6 +100,7 @@ describe('well selection should update', () => {
       aspirate_flowRate: null,
       dispense_flowRate: null,
       nozzles: null,
+      tipRack: null,
     })
   })
   it('pipette single -> multi', () => {
@@ -112,6 +113,7 @@ describe('well selection should update', () => {
       aspirate_flowRate: null,
       dispense_flowRate: null,
       nozzles: ALL,
+      tipRack: null,
     })
   })
   it('pipette multi -> single', () => {
@@ -125,6 +127,7 @@ describe('well selection should update', () => {
       aspirate_flowRate: null,
       dispense_flowRate: null,
       nozzles: null,
+      tipRack: null,
     })
   })
   it('select single-well labware', () => {
