@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.5
+
+**Welcome to Protocol Designer 8.5.5!**
+
+This hotfix release addresses a bug to allow full use of pipettes and tip racks during liquid class transfers.
+
 ## Opentrons Protocol Designer Changes in 8.5.4
 
 **Welcome to Protocol Designer 8.5.4!**
