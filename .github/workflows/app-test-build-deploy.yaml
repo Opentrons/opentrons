@@ -432,3 +432,121 @@ jobs:
           aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
           node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
           aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+
+  # Notification jobs for tagged builds
+  notify-success:
+    name: 'Notify Build Success'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, backend-unit-test, build-app, deploy-release-app, determine-build-type]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
+    steps:
+      - name: 'Determine tag type'
+        id: tag-type
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" =~ ^ot3@ ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          else
+            echo "tag_type=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Send success notification'
+        uses: ./.github/actions/build-notifications
+        with:
+          status: 'success'
+          workflow_name: 'App test, build, and deploy'
+          build_type: ${{ needs.determine-build-type.outputs.type }}
+          variants: ${{ needs.determine-build-type.outputs.variants }}
+          tag_type: ${{ steps.tag-type.outputs.tag_type }}
+
+  notify-failure:
+    name: 'Notify Build Failure'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, backend-unit-test, build-app, deploy-release-app, determine-build-type]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
+    steps:
+      - name: 'Determine failed job'
+        id: failed-job
+        shell: bash
+        run: |
+          failed_jobs=()
+          if [[ "${{ needs.js-unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("js-unit-test")
+          fi
+          if [[ "${{ needs.backend-unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("backend-unit-test")
+          fi
+          if [[ "${{ needs.build-app.result }}" == "failure" ]]; then
+            failed_jobs+=("build-app")
+          fi
+          if [[ "${{ needs.deploy-release-app.result }}" == "failure" ]]; then
+            failed_jobs+=("deploy-release-app")
+          fi
+          
+          # Join failed jobs with comma
+          IFS=','
+          echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
+          
+          # Determine primary failure reason
+          if [[ "${{ needs.js-unit-test.result }}" == "failure" ]]; then
+            echo "primary_failure=Frontend unit tests failed" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.backend-unit-test.result }}" == "failure" ]]; then
+            echo "primary_failure=Backend unit tests failed" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.build-app.result }}" == "failure" ]]; then
+            echo "primary_failure=App build failed" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.deploy-release-app.result }}" == "failure" ]]; then
+            echo "primary_failure=Deployment failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Determine tag type'
+        id: tag-type-failure
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" =~ ^ot3@ ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          else
+            echo "tag_type=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Send failure notification'
+        uses: ./.github/actions/build-notifications
+        with:
+          status: 'failure'
+          workflow_name: 'App test, build, and deploy'
+          job_name: ${{ steps.failed-job.outputs.failed_jobs }}
+          failure_reason: ${{ steps.failed-job.outputs.primary_failure }}
+          build_type: ${{ needs.determine-build-type.outputs.type }}
+          variants: ${{ needs.determine-build-type.outputs.variants }}
+          tag_type: ${{ steps.tag-type-failure.outputs.tag_type }}
+          assignee: ${{ secrets.RELEASE_MANAGER_SLACK_ID }}
+
+  notify-cancelled:
+    name: 'Notify Build Cancelled'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, backend-unit-test, build-app, deploy-release-app, determine-build-type]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
+    steps:
+      - name: 'Determine tag type'
+        id: tag-type-cancelled
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" =~ ^ot3@ ]]; then
+            echo "tag_type=main-release" >> $GITHUB_OUTPUT
+          else
+            echo "tag_type=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 'Send cancelled notification'
+        uses: ./.github/actions/build-notifications
+        with:
+          status: 'cancelled'
+          workflow_name: 'App test, build, and deploy'
+          build_type: ${{ needs.determine-build-type.outputs.type }}
+          variants: ${{ needs.determine-build-type.outputs.variants }}
+          tag_type: ${{ steps.tag-type-cancelled.outputs.tag_type }}
