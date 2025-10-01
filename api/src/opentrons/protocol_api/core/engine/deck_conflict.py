@@ -300,10 +300,6 @@ def _map_labware(
         or location_from_engine == SYSTEM_LOCATION
         or isinstance(location_from_engine, InStackerHopperLocation)
         or location_from_engine == WASTE_CHUTE_LOCATION
-        or (
-            isinstance(location_from_engine, AddressableAreaLocation)
-            and location_from_engine.addressableAreaName == "gripperWasteChute"
-        )
     ):
         # This labware is off-deck. Exclude it from conflict checking.
         # todo(mm, 2023-02-23): Move this logic into wrapped_deck_conflict.

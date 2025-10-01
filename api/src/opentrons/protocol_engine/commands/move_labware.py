@@ -38,6 +38,7 @@ from ..types import (
     LabwareLocationSequence,
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
 )
 from ..errors import (
     LabwareMovementNotAllowedError,
@@ -226,9 +227,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     y=0,
                     z=0,
                 )
-                state_update.set_addressable_area_used(
-                    addressable_area_name=area_name,
-                )
+                eventual_destination_location_sequence = [
+                    NotOnDeckLocationSequenceComponent(
+                        logicalLocationName=WASTE_CHUTE_LOCATION
+                    )
+                ]
 
             elif fixture_validation.is_trash(area_name):
                 # When dropping labware in the trash bins we want to ensure they are lids
@@ -340,14 +343,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     current_labware.location
                 )
             )
-            # Check if current location is the waste chute
-            if (
-                isinstance(validated_current_loc, AddressableAreaLocation)
-                and validated_current_loc.addressableAreaName == "gripperWasteChute"
-            ):
-                raise LabwareMovementNotAllowedError(
-                    f"Cannot move {current_labware_definition.parameters.loadName} from the waste chute using the gripper"
-                )
 
             if module_location_error:
                 return DefinedErrorData(
