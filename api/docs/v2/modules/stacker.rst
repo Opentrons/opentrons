@@ -13,9 +13,9 @@ The Stacker is represented in code by a :py:class:`.FlexStackerContext` object t
 Loading and Deck Slots
 ========================
 
-Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker's shuttle occupies a deck slot in column 4.
+Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker and its attached shuttle occupy deck slots in column 3 and 4.
 
-Start by loading each Stacker as you would any other module: 
+Start by loading each Stacker in column 4: 
 
 .. code-block:: python
 
@@ -28,7 +28,9 @@ Start by loading each Stacker as you would any other module:
        location="C4"
    )
 
-In this example, Stacker shuttles occupy deck slots A4 and C4. 
+In this example, Stacker shuttles are loaded in deck slots A4 and C4. Bec
+
+Fixtures like the trash bin can't be loaded in column 3 when a Stacker is loaded in the same row. Instead, load your trash bin in a column 1 slot.  
 
 .. versionadded:: 2.25
 
@@ -114,3 +116,22 @@ You can use :py:meth:`~.FlexStackerContext.fill` to fill the Stacker with as man
 Here, ``stacker_2`` is emptied and reconfigured to store NEST reservoirs with ``set_stored_labware()`` and the ``fill`` method adds another Flex tip rack to ``stacker_1``. 
 
 Both ``fill()`` and ``empty()`` methods pause the protocol and allow you to manually add or remove labware from the Stacker. Each method assumes labware is loaded or moved off deck. 
+
+If your Stacker will store multiple of the same labware, like 96-well plates, it might be helpful to name each plate to keep track of each during your protocol. First, load your well plates off deck with unique names. 
+
+.. code-block:: python
+
+    #load labware off deck
+    sample_plate = protocol.load_labware(
+        load_name= "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        location= OFF_DECK,
+    )
+
+Repeat for as many labware as you'll need, like a ``media_plate`` and ``plasmid_plate``. Make sure your labware quantity will fit in the Stacker. Then, use ``set_stored_labware_items()`` to add them to the Stacker:: 
+
+    stacker_1.set_stored_labware_items(
+        labware=[sample_plate, media_plate, plasmid_plate],
+        stacking_offset_z=0
+    )
+
+Remember that the first labware item in your list represents the bottom-most labware in the stack, and will be the first accessed using the ``retrieve()`` command. 
