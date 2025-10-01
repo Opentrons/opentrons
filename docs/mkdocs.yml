@@ -24,7 +24,7 @@ plugins:
       handlers:
         python:
           options:
-            docstring_style: sphinx
+            docstring_style: google
             show_source: false
             show_bases: false
             merge_init_into_class: false

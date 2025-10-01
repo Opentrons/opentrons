@@ -7,6 +7,13 @@
       heading_level: 3
       inherited_members: true
       
+## Flex Stacker
+
+::: opentrons.protocol_api.FlexStackerContext
+    options:
+      heading_level: 3
+      inherited_members: true
+      
 ## Heater-Shaker
 
 ::: opentrons.protocol_api.HeaterShakerContext
