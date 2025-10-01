@@ -57,6 +57,15 @@ function getLabwareInfoRecords(
 
   params.lwLocInfo.forEach(combo => {
     const uri = combo.definitionUri
+
+    const matchedDef = params.labwareDefs?.find(
+      def => getLabwareDefURI(def) === uri
+    ) as LabwareDefinition | undefined
+
+    if (matchedDef?.parameters?.quirks?.includes('noLabwarePositionCheck')) {
+      return
+    }
+
     const locationSpecificOffsetDetails = getLocationSpecificOffsetDetailsForLabware(
       {
         ...params,
