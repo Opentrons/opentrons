@@ -1507,10 +1507,10 @@ class FlexStackerContext(ModuleContext):
             checked_lid_namespace = namespace
             checked_lid_version = version
         else:
-            checked_lid_namespace = lid_namespace
-            checked_lid_version = lid_version
             checked_adapter_namespace = adapter_namespace
             checked_adapter_version = adapter_version
+            checked_lid_namespace = lid_namespace
+            checked_lid_version = lid_version
 
         self._core.set_stored_labware(
             main_load_name=load_name,
