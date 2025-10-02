@@ -78,7 +78,7 @@ def resize_image(image_path: str, new_width: int = 1024, target_kb: int = 250) -
     resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
     resize_image_path = rename_image_path(image_path, "resize")
     quality = 98
-    min_quality = 30 
+    min_quality = 30
     step = 5
     buffer = io.BytesIO()
     while quality >= min_quality:
