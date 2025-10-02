@@ -50,7 +50,7 @@ nav:
   - Examples: examples.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
   - Protocol API Reference:
-      - Overview: api-reference/protocols.md
+      - Protocols: api-reference/protocols.md
       - Instruments: api-reference/instruments.md
       - Labware: api-reference/labware.md
       - Modules: api-reference/modules.md
