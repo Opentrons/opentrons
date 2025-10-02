@@ -25,6 +25,7 @@ plugins:
         python:
           options:
             docstring_style: google
+            docstring_section_style: list
             show_source: false
             show_bases: false
             merge_init_into_class: false
@@ -36,6 +37,7 @@ plugins:
               - "public"
               - "!^__"
             show_root_heading: true
+            show_root_full_path: false
             show_symbol_type_toc: true
             heading_level: 2
             autolink: true
