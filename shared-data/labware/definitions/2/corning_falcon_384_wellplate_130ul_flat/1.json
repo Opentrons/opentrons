@@ -5080,6 +5080,7 @@
       "z": 10
     }
   },
+  "gripHeightFromLabwareBottom": 9,
   "stackingOffsetWithModule": {},
   "allowedRoles": [],
   "gripperOffsets": {},

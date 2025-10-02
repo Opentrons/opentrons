@@ -53,24 +53,20 @@ def run(protocol: ProtocolContext) -> None:
     heater_shaker_enabled = protocol.params.heater_shaker  # type: ignore[attr-defined]
 
     tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "D2")
-    pipette = protocol.load_instrument(
-        "flex_1channel_50", "left", tip_racks=[tip_rack]
-    )
+    pipette = protocol.load_instrument("flex_1channel_50", "left", tip_racks=[tip_rack])
     deck_riser = protocol.load_adapter("opentrons_flex_deck_riser", "B3")
 
-    lid = protocol.load_lid_stack(labware_type, "C3", 1)
+    protocol.load_lid_stack(labware_type, "C3", 1)
     labware = protocol.load_labware("corning_falcon_384_wellplate_130ul_flat", "D3")
 
-
     # Lid loading
-    #if labware_type == "corning_falcon_384_wellplate_130ul_flat_lid":
+    # if labware_type == "corning_falcon_384_wellplate_130ul_flat_lid":
     #    for _ in range(2):
     #        protocol.move_lid("C3", labware, use_gripper=True)
     #        protocol.move_lid(labware, deck_riser, use_gripper=True)
     #        protocol.move_lid(deck_riser, "C3", use_gripper=True)
-    #else:
+    # else:
     #    labware = protocol.load_labware(labware_type, "D3")
-
 
     # pick up tip
     pipette.pick_up_tip()
@@ -81,7 +77,7 @@ def run(protocol: ProtocolContext) -> None:
     pipette.move_to(labware["A6"].bottom(z=1))
     protocol.pause("Check bottom height with shim")
 
-        # Optional heater shaker use
+    # Optional heater shaker use
 
     if heater_shaker_enabled:
         hsh: HeaterShakerContext = protocol.load_module(
