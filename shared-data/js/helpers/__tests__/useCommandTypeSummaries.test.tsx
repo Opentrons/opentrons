@@ -1,20 +1,16 @@
-import { I18nextProvider } from 'react-i18next'
+import { I18nextProvider, initReactI18next } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
+import i18n from 'i18next'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { i18n, sharedDataEn } from '../../localization'
+import { baseI18nConfig } from '../../i18n'
 import { getLatestCommandTypeList } from '../testHelpers'
 import { useCommandTypeSummaries } from '../useCommandTypeSummaries'
 
 describe('useCommandTypeSummaries', () => {
   beforeAll(async () => {
-    await i18n.init({
-      lng: 'en',
-      fallbackLng: 'en',
-      resources: { en: sharedDataEn },
-      ns: ['command_type_summary'],
-      defaultNS: 'command_type_summary',
-      interpolation: i18n.options.interpolation,
+    await i18n.use(initReactI18next).init({
+      ...baseI18nConfig,
       saveMissing: false, // prevent setPath errors in tests
     })
   })

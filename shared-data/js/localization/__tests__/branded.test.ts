@@ -1,15 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { resources } from '..'
-import {
-  ANONYMOUS_RESOURCE,
-  BRANDED_RESOURCE,
-} from '../../../LocalizationProvider'
 
 describe('branded copy', () => {
   it('branded and anonymous resources contain the same translation keys', () => {
-    const brandedKeys = Object.keys(resources.en[BRANDED_RESOURCE])
-    const anonymousKeys = Object.keys(resources.en[ANONYMOUS_RESOURCE])
+    const brandedKeys = Object.keys(resources.en['branded'])
+    const anonymousKeys = Object.keys(resources.en['anonymous'])
 
     brandedKeys.forEach((brandedKey, i) => {
       const anonymousKey = anonymousKeys[i]
@@ -19,8 +15,7 @@ describe('branded copy', () => {
 
   it('non-branded copy does not contain "Opentrons" or "Flex"', () => {
     const nonBrandedResources = Object.entries(resources.en).filter(
-      resource =>
-        resource[0] !== BRANDED_RESOURCE && resource[0] !== ANONYMOUS_RESOURCE
+      resource => resource[0] !== 'branded' && resource[0] !== 'anonymous'
     )
 
     const nonBrandedCopy = nonBrandedResources
