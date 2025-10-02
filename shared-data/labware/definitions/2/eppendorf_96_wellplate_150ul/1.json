@@ -13,7 +13,7 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "brand": { "brand": "eppendorf", "brandId": ["951020427"] },
+  "brand": { "brand": "Eppendorf", "brandId": ["951020427"] },
   "metadata": {
     "displayName": "Eppendorf 96 Well Plate 150 µL",
     "displayCategory": "wellPlate",

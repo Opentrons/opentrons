@@ -433,7 +433,7 @@
       "P24"
     ]
   ],
-  "brand": { "brand": "eppendorf", "brandId": ["951020711"] },
+  "brand": { "brand": "Eppendorf", "brandId": ["951020711"] },
   "metadata": {
     "displayName": "Eppendorf 384 Well Plate 45 µL",
     "displayCategory": "wellPlate",
