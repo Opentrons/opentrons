@@ -105,10 +105,9 @@ class InstrumentContext(publisher.CommandPublisher):
         moving to certain locations, and aspirating or dispensing liquid.
 
     Objects in this class should not be instantiated directly. Instead, instances are
-    returned by :py:meth:`ProtocolContext.load_instrument`.
+    returned by [`ProtocolContext.load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument].
 
-    .. versionadded:: 2.0
-
+    *New in version 2.0*
     """
 
     def __init__(
@@ -147,16 +146,17 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
         """
-        Which well of a tip rack the pipette should start at when automatically choosing tips to pick up.
+        Which well of a tip rack the pipette should start at when automatically choosing
+        tips to pick up.
 
-        See :py:meth:`.pick_up_tip()`.
+        See [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip].
 
-        .. note::
-
+        !!! note
             In robot software versions 6.3.0 and 6.3.1, protocols specifying API level
-            2.14 ignored ``starting_tip`` on the second and subsequent calls to
-            :py:meth:`.InstrumentContext.pick_up_tip` with no argument. This is fixed
-            for all API levels as of robot software version 7.0.0.
+            2.14 ignored `starting_tip` on the second and subsequent calls to
+            [`InstrumentContext.pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip]
+            with no argument. This is fixed for all API levels as of robot software
+            version 7.0.0.
         """
         return self._starting_tip
 
@@ -177,9 +177,10 @@ class InstrumentContext(publisher.CommandPublisher):
         """The speed at which the robot's gantry moves in mm/s.
 
         The default speed for Flex varies between 300 and 350 mm/s. The OT-2 default is
-        400 mm/s. In addition to changing the default, the speed of individual motions
-        can be changed with the ``speed`` argument of the
-        :py:meth:`InstrumentContext.move_to` method. See :ref:`gantry_speed`.
+            400 mm/s. In addition to changing the default, the speed of individual motions
+            can be changed with the `speed` argument of the
+            [`move_to()`][opentrons.protocol_api.InstrumentContext.move_to] method. See
+            [Gantry Speed][gantry-speed].
         """
         return self._core.get_default_speed()
 
@@ -203,52 +204,52 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Draw liquid into a pipette tip.
 
-        See :ref:`new-aspirate` for more details and examples.
+        See [Aspirate][aspirate-building-block] for more details and examples.
 
-        :param volume: The volume to aspirate, measured in µL. If unspecified,
-                    defaults to the maximum volume for the pipette and its currently
-                    attached tip.
+        Args:
+            volume (int or float, optional): The volume to aspirate, measured in µL. If
+                unspecified, defaults to the maximum volume for the pipette and its
+                currently attached tip.
 
-                    If ``aspirate`` is called with a volume of precisely 0, its behavior
-                    depends on the API level of the protocol. On API levels below 2.16,
-                    it will behave the same as a volume of ``None``/unspecified: aspirate
-                    until the pipette is full. On API levels at or above 2.16, no liquid
-                    will be aspirated.
-        :type volume: int or float
-        :param location: Tells the robot where to aspirate from. The location can be
-                         a :py:class:`.Well` or a :py:class:`.Location`.
+                If `aspirate()` is called with a volume of precisely 0, its behavior
+                depends on the API level of the protocol. On API levels below 2.16, it
+                will behave the same as a volume of `None`/unspecified: aspirate until
+                the pipette is full. On API levels at or above 2.16, no liquid will be
+                aspirated.
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], 
+                [`Location`][opentrons.types.Location], optional): Tells the robot where
+                to aspirate from. The location can be a `Well` or a `Location`.
 
-                            - If the location is a ``Well``, the robot will aspirate at
-                              or above the bottom center of the well. The distance (in mm)
-                              from the well bottom is specified by
-                              :py:obj:`well_bottom_clearance.aspirate
-                              <well_bottom_clearance>`.
+                - If the location is a `Well`, the robot will aspirate at or above the
+                bottom center of the well. The distance (in mm) from the well bottom
+                is specified by
+                [`well_bottom_clearance.aspirate`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance].
 
-                            - If the location is a ``Location`` (e.g., the result of
-                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the robot
-                              will aspirate from that specified position.
+                - If the location is a `Location` (e.g., the result of
+                [`Well.top()`][opentrons.protocol_api.labware.Well.top] or
+                [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom]), the
+                robot will aspirate from that specified position.
 
-                            - If the ``location`` is unspecified, the robot will
-                              aspirate from its current position.
-        :param rate: A multiplier for the default flow rate of the pipette. Calculated
-                     as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
-                     <flow_rate>`. If not specified, defaults to 1.0. See
-                     :ref:`new-plunger-flow-rates`.
-        :type rate: float
-        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
-                          ``rate`` must not be set.
-        :type flow_rate: float
-        :returns: This instance.
+                - If the `location` is unspecified, the robot will aspirate from its
+                current position.
+            rate (float, optional): A multiplier for the default flow rate of the
+                pipette. Calculated as `rate` multiplied by
+                [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                If not specified, defaults to 1.0. See
+                [Pipette Flow Rates][pipette-flow-rates].
+                flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
+                is specified, `rate` must not be set.
 
-        .. note::
+        Returns:
+            InstrumentContext: This instance.
 
-            If ``aspirate`` is called with a single, unnamed argument, it will treat
-            that argument as ``volume``. If you want to call ``aspirate`` with only
-            ``location``, specify it as a keyword argument:
-            ``pipette.aspirate(location=plate['A1'])``
+        !!! note
+            If `aspirate()` is called with a single, unnamed argument, it will treat
+            that argument as `volume`. If you want to call `aspirate()` with only
+            `location`, specify it as a keyword argument:
+            `pipette.aspirate(location=plate['A1'])`
 
-        .. versionchanged:: 2.24
-            Added the ``flow_rate`` parameter.
+        *Changed in version 2.24*: Added the `flow_rate` parameter.
         """
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 24):
@@ -350,92 +351,86 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Dispense liquid from a pipette tip.
 
-        See :ref:`new-dispense` for more details and examples.
+        See [Dispense][dispense-building-block] for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL.
+        Args:
+            volume (int or float, optional): The volume to dispense, measured in µL.
 
-                         - If unspecified or ``None``, dispense the :py:attr:`current_volume`.
+                - If unspecified or `None`, dispense the
+                [`current_volume`][opentrons.protocol_api.InstrumentContext.current_volume].
 
-                         - If 0, the behavior of ``dispense()`` depends on the API level
-                           of the protocol. In API version 2.16 and earlier, dispense all
-                           liquid in the pipette (same as unspecified or ``None``). In API
-                           version 2.17 and later, dispense no liquid.
+                - If 0, the behavior of `dispense()` depends on the API level of the
+                protocol. In API version 2.16 and earlier, dispense all liquid in the
+                pipette (same as unspecified or `None`). In API version 2.17 and later,
+                dispense no liquid.
 
-                         - If greater than :py:obj:`.current_volume`, the behavior of
-                           ``dispense()`` depends on the API level of the protocol. In API
-                           version 2.16 and earlier, dispense all liquid in the pipette.
-                           In API version 2.17 and later, raise an error.
+                - If greater than
+                [`current_volume`][opentrons.protocol_api.InstrumentContext.current_volume],
+                the behavior of `dispense()` depends on the API level of the protocol.
+                In API version 2.16 and earlier, dispense all liquid in the pipette. In
+                API version 2.17 and later, raise an error.
 
-        :type volume: int or float
+            location (Union[`Well`][opentrons.protocol_api.labware.Well],
+                [`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin],
+                [`WasteChute`][opentrons.protocol_api.WasteChute], optional): Tells the robot
+                where to dispense liquid held in the pipette. The location can be a `Well`,
+                `Location`, `TrashBin`, or `WasteChute`.
 
-        :param location: Tells the robot where to dispense liquid held in the pipette.
-            The location can be a :py:class:`.Well`, :py:class:`.Location`,
-            :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
+                - If a `Well`, the pipette will dispense at or above the bottom center of
+                the well. The distance (in mm) from the well bottom is specified by
+                [`well_bottom_clearance.dispense`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance].
 
-                            - If a ``Well``, the pipette will dispense
-                              at or above the bottom center of the well. The distance (in
-                              mm) from the well bottom is specified by
-                              :py:obj:`well_bottom_clearance.dispense
-                              <well_bottom_clearance>`.
+                - If a `Location` (e.g., the result of
+                [`Well.top()`][opentrons.protocol_api.labware.Well.top] or
+                [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom]), the
+                pipette will dispense at that specified position.
 
-                            - If a ``Location`` (e.g., the result of
-                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the pipette
-                              will dispense at that specified position.
+                - If a trash container, the pipette will dispense at a location relative
+                to its center and the trash container's top center. See
+                [position-relative-trash](position-relative-trash) for details.
 
-                            - If a trash container, the pipette will dispense at a location
-                              relative to its center and the trash container's top center.
-                              See :ref:`position-relative-trash` for details.
+                - If unspecified, the pipette will dispense at its current position.
 
-                            - If unspecified, the pipette will
-                              dispense at its current position.
+                If only a `location` is passed (e.g., `pipette.dispense(location=plate['A1'])`),
+                all of the liquid aspirated into the pipette will be dispensed (the amount
+                is accessible through
+                [`current_volume`][opentrons.protocol_api.InstrumentContext.current_volume]).
 
-                            If only a ``location`` is passed (e.g.,
-                            ``pipette.dispense(location=plate['A1'])``), all of the
-                            liquid aspirated into the pipette will be dispensed (the
-                            amount is accessible through :py:attr:`current_volume`).
+                *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
 
-            .. versionchanged:: 2.16
-                Accepts ``TrashBin`` and ``WasteChute`` values.
+            rate (float, optional): How quickly a pipette dispenses liquid. The speed in
+                µL/s is calculated as `rate` multiplied by
+                [`flow_rate.dispense`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                If not specified, defaults to 1.0. See [Pipette Flow Rates][pipette-flow-rates].
 
-        :param rate: How quickly a pipette dispenses liquid. The speed in µL/s is
-                     calculated as ``rate`` multiplied by :py:attr:`flow_rate.dispense
-                     <flow_rate>`. If not specified, defaults to 1.0. See
-                     :ref:`new-plunger-flow-rates`.
-        :type rate: float
+            push_out (float, optional): Continue past the plunger bottom to help ensure
+                all liquid leaves the tip. Measured in µL. The default value is `None`.
 
-        :param push_out: Continue past the plunger bottom to help ensure all liquid
-                         leaves the tip. Measured in µL. The default value is ``None``.
+                When not specified or set to `None`, the plunger moves by a non-zero
+                default amount.
 
-                         When not specified or set to ``None``, the plunger moves by a non-zero default amount.
+                For a table of default values, see [Push Out After Dispense][push-out-after-dispense].
 
-                         For a table of default values, see :ref:`push-out-dispense`.
-        :type push_out: float
+            flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
+                is specified, `rate` must not be set.
 
-        :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
-                          ``rate`` must not be set.
-        :type flow_rate: float
+        Returns:
+            InstrumentContext: This instance.
 
-        :returns: This instance.
+        !!! note
+            If `dispense()` is called with a single, unnamed argument, it will treat
+            that argument as `volume`. If you want to call `dispense()` with only
+            `location`, specify it as a keyword argument:
+            `pipette.dispense(location=plate['A1'])`.
 
-        .. note::
+        *New in version 2.15*: Added the `push_out` parameter.
 
-            If ``dispense`` is called with a single, unnamed argument, it will treat
-            that argument as ``volume``. If you want to call ``dispense`` with only
-            ``location``, specify it as a keyword argument:
-            ``pipette.dispense(location=plate['A1'])``.
+        *Changed in version 2.17*: Behavior of the `volume` parameter.
 
-        .. versionchanged:: 2.15
-            Added the ``push_out`` parameter.
+        *New in version 2.24*: Added the `flow_rate` parameter.
 
-        .. versionchanged:: 2.17
-            Behavior of the ``volume`` parameter.
-
-        .. versionchanged:: 2.24
-            Added the ``flow_rate`` parameter.
-
-        .. versionchanged:: 2.24
-            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
-            into a trash bin or waste chute.
+        *Changed in version 2.24*: `location` is no longer required if the pipette just
+        moved to, dispensed, or blew out into a trash bin or waste chute.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -552,53 +547,63 @@ class InstrumentContext(publisher.CommandPublisher):
         final_push_out: Optional[float] = None,
     ) -> InstrumentContext:
         """
-        Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
+        Mix a volume of liquid by repeatedly aspirating and dispensing it in a single
+        location.
 
-        See :ref:`mix` for examples.
+        See [Mix][mix] for examples.
 
-        :param repetitions: Number of times to mix (default is 1).
-        :param volume: The volume to mix, measured in µL. If unspecified, defaults
-                       to the maximum volume for the pipette and its attached tip.
+        Args:
+            repetitions (int, optional): Number of times to mix (default is 1).
+            volume (float, optional): The volume to mix, measured in µL. If unspecified,
+                defaults to the maximum volume for the pipette and its attached tip.
 
-                       If ``mix`` is called with a volume of precisely 0, its behavior
-                       depends on the API level of the protocol. On API levels below 2.16,
-                       it will behave the same as a volume of ``None``/unspecified: mix
-                       the full working volume of the pipette. On API levels at or above 2.16,
-                       no liquid will be mixed.
-        :param location: The :py:class:`.Well` or :py:class:`~.types.Location` where the
-                        pipette will mix. If unspecified, the pipette will mix at its
-                        current position.
-        :param rate: How quickly the pipette aspirates and dispenses liquid while
-                     mixing. The aspiration flow rate is calculated as ``rate``
-                     multiplied by :py:attr:`flow_rate.aspirate <flow_rate>`. The
-                     dispensing flow rate is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense <flow_rate>`. See
-                     :ref:`new-plunger-flow-rates`.
-        :param aspirate_flow_rate: The absolute flow rate for each aspirate in the mix, in µL/s.
-                                   If this is specified, ``rate`` must not be set.
-        :param dispense_flow_rate: The absolute flow rate for each dispense in the mix, in µL/s.
-                                   If this is specified, ``rate`` must not be set.
-        :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
-        :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
-        :param final_push_out: How much volume to push out after the final mix repetition. The
-                               pipette will not push out after earlier repetitions. If
-                               not specified or ``None``, the pipette will push out the
-                               default non-zero amount. See :ref:`push-out-dispense`.
-        :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
-        :returns: This instance.
+                If `mix()` is called with a volume of precisely 0, its behavior depends
+                on the API level of the protocol. On API levels below 2.16, it will
+                behave the same as a volume of `None`/unspecified: mix the full working
+                volume of the pipette. On API levels at or above 2.16, no liquid will
+                be mixed.
+            location (Union[`Well`][opentrons.protocol_api.labware.Well],
+                [`Location`][opentrons.types.Location], optional): The location where the
+                pipette will mix. If unspecified, the pipette will mix at its current
+                position.
+            rate (float, optional): How quickly the pipette aspirates and dispenses
+                liquid while mixing. The aspiration flow rate is calculated as `rate`
+                multiplied by
+                [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                The dispensing flow rate is calculated as `rate` multiplied by
+                [`flow_rate.dispense`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                See [Pipette Flow Rates][pipette-flow-rates].
+            aspirate_flow_rate (float, optional): The absolute flow rate for each
+                aspirate in the mix, in µL/s. If this is specified, `rate` must not be
+                set.
+            dispense_flow_rate (float, optional): The absolute flow rate for each
+                dispense in the mix, in µL/s. If this is specified, `rate` must not be
+                set.
+            aspirate_delay (float, optional): How long to wait after each aspirate in
+                the mix, in seconds.
+            dispense_delay (float, optional): How long to wait after each dispense in
+                the mix, in seconds.
+            final_push_out (float, optional): How much volume to push out after the
+                final mix repetition. The pipette will not push out after earlier
+                repetitions. If not specified or `None`, the pipette will push out the
+                default non-zero amount. See [Push Out After Dispense][push-out-after-dispense].
 
-        .. note::
+        Raises:
+            UnexpectedTipRemovalError: If no tip is attached to the pipette.
 
-            All the arguments of ``mix`` are optional. However, if you omit one of them,
+        Returns:
+            InstrumentContext: This instance.
+
+        !!! note
+            All the arguments of `mix()` are optional. However, if you omit one of them,
             all subsequent arguments must be passed as keyword arguments. For instance,
-            ``pipette.mix(1, location=wellplate['A1'])`` is a valid call, but
-            ``pipette.mix(1, wellplate['A1'])`` is not.
+            `pipette.mix(1, location=wellplate['A1'])` is a valid call, but
+            `pipette.mix(1, wellplate['A1'])` is not.
 
-        .. versionchanged:: 2.21
-            Does not repeatedly check for liquid presence.
-        .. versionchanged:: 2.24
-            Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``,
-            ``dispense_delay``, and ``final_push_out`` parameters.
+        *Changed in version 2.21*: Does not repeatedly check for liquid presence.
+
+        *New in version 2.24*: Added the `aspirate_flow_rate`, `dispense_flow_rate`,
+            `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
@@ -714,28 +719,31 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Blow an extra amount of air through a pipette's tip to clear it.
 
-        If :py:meth:`dispense` is used to empty a pipette, usually a small amount of
-        liquid remains in the tip. During a blowout, the pipette moves the plunger
-        beyond its normal limits to help remove all liquid from the pipette tip. See
-        :ref:`blow-out`.
+        If [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] is used to
+        empty a pipette, usually a small amount of liquid remains in the tip. During a
+        blowout, the pipette moves the plunger beyond its normal limits to help remove
+        all liquid from the pipette tip. See [Blow Out][blow-out].
 
-        :param location: The blowout location. If no location is specified, the pipette
-            will blow out from its current position.
+        Args:
+            location (Union[`Well`][opentrons.protocol_api.labware.Well],
+                [`Location`][opentrons.types.Location], optional): The blowout location.
+                If no location is specified, the pipette will blow out from its current
+                position.
 
-            .. versionchanged:: 2.16
-                Accepts ``TrashBin`` and ``WasteChute`` values.
+                *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
 
-        :type location: :py:class:`.Well` or :py:class:`.Location` or ``None``
+        Raises:
+            RuntimeError: If no location is specified and the location cache is `None`.
+                This should happen if `blow_out()` is called without first calling a
+                method that takes a location, like
+                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
 
-        :raises RuntimeError: If no location is specified and the location cache is
-                              ``None``. This should happen if ``blow_out()`` is called
-                              without first calling a method that takes a location, like
-                              :py:meth:`.aspirate` or :py:meth:`dispense`.
-        :returns: This instance.
+        Returns:
+            InstrumentContext: This instance.
 
-        .. versionchanged:: 2.24
-            ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
-            into a trash bin or waste chute.
+        *Changed in version 2.24*: `location` is no longer required if the pipette just
+        moved to, dispensed, or blew out into a trash bin or waste chute.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -819,50 +827,49 @@ class InstrumentContext(publisher.CommandPublisher):
         mm_from_edge: Union[float, _Unset] = _Unset(),
     ) -> InstrumentContext:
         """
-        Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
+        Touch the pipette tip to the sides of a well, with the intent of removing leftover
+        droplets.
 
-        See :ref:`touch-tip` for more details and examples.
+        See [touch-tip][touch-tip] for more details and examples.
 
-        :param location: If no location is passed, the pipette will touch its tip at the
-                         edges of the current well.
-        :type location: :py:class:`.Well` or ``None``
-        :param radius: How far to move, as a proportion of the target well's radius.
-                       When ``radius=1.0``, the pipette tip will move all the way to the
-                       edge of the target well. When ``radius=0.5``, it will move to 50%
-                       of the well's radius. Default is 1.0 (100%)
-        :type radius: float
-        :param v_offset: How far above or below the well to touch the tip, measured in mm.
-                         A positive offset moves the tip higher above the well.
-                         A negative offset moves the tip lower into the well.
-                         Default is -1.0 mm.
-        :type v_offset: float
-        :param speed: The speed for touch tip motion, in mm/s.
+        Args:
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], None):
+                If no location is passed, the pipette will touch its tip at the edges of
+                the current well.
+            radius (float): How far to move, as a proportion of the target well's radius.
+                When `radius=1.0`, the pipette tip will move all the way to the edge of
+                the target well. When `radius=0.5`, it will move to 50% of the well's
+                radius. Default is 1.0 (100%).
+            v_offset (float): How far above or below the well to touch the tip, measured
+                in mm. A positive offset moves the tip higher above the well. A negative
+                offset moves the tip lower into the well. Default is -1.0 mm.
+            speed (float): The speed for touch tip motion, in mm/s.
 
-                        - Default: 60.0 mm/s
-                        - Maximum: 80.0 mm/s
-                        - Minimum: 1.0 mm/s
-        :type speed: float
-        :param mm_from_edge: How far to move inside the well, as a distance from the
-                             well's edge.
-                             When ``mm_from_edge=0``, the pipette will move to the target well's edge to touch the tip. When ``mm_from_edge=1``,
-                             the pipette will move to 1 mm from the target well's edge to touch the tip.
-                             Values lower than 0 will press the tip harder into the target well's
-                             walls; higher values will touch the well more lightly, or
-                             not at all.
-                             ``mm_from_edge`` and ``radius`` are mutually exclusive: to
-                             use ``mm_from_edge``, ``radius`` must be unspecified (left
-                             to its default value of 1.0).
-        :type mm_from_edge: float
-        :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
-        :raises RuntimeError: If no location is specified and the location cache is
-                              ``None``. This should happen if ``touch_tip`` is called
-                              without first calling a method that takes a location, like
-                              :py:meth:`.aspirate` or :py:meth:`dispense`.
-        :raises: ValueError: If both ``mm_from_edge`` and ``radius`` are specified.
-        :returns: This instance.
+                - Default: 60.0 mm/s
+                - Maximum: 80.0 mm/s
+                - Minimum: 1.0 mm/s
+            mm_from_edge (float): How far to move inside the well, as a distance from the
+                well's edge. When `mm_from_edge=0`, the pipette will move to the target
+                well's edge to touch the tip. When `mm_from_edge=1`, the pipette will move
+                to 1 mm from the target well's edge to touch the tip. Values lower than 0
+                will press the tip harder into the target well's walls; higher values will
+                touch the well more lightly, or not at all. `mm_from_edge` and `radius`
+                are mutually exclusive: to use `mm_from_edge`, `radius` must be
+                unspecified (left to its default value of 1.0).
 
-        .. versionchanged:: 2.24
-                Added the ``mm_from_edge`` parameter.
+        Raises:
+            UnexpectedTipRemovalError: If no tip is attached to the pipette.
+            RuntimeError: If no location is specified and the location cache is `None`.
+                This should happen if `touch_tip()` is called without first calling a
+                method that takes a location, like
+                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
+            ValueError: If both `mm_from_edge` and `radius` are specified.
+
+        Returns:
+            InstrumentContext: This instance.
+
+        *Changed in version 2.24*: Added the `mm_from_edge` parameter.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -937,60 +944,54 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Draw air into the pipette's tip at the current well.
 
-        See :ref:`air-gap`.
+        See [Air Gap][air-gap].
 
-        :param volume: The amount of air, measured in µL. Calling ``air_gap()`` with no
-                       arguments uses the entire remaining volume in the pipette.
-        :type volume: float
+        Args:
+            volume (float, optional): The amount of air, measured in µL. Calling
+                `air_gap()` with no arguments uses the entire remaining volume in the
+                pipette.
+            height (float, optional): The height, in mm, to move above the current well
+                before creating the air gap. The default is 5 mm above the current well.
+                in_place (bool, optional): Air gap at the pipette's current position, without
+                moving to some height above the well. If `in_place` is specified,
+                `height` must be unset.
+            rate (float, optional): A multiplier for the default flow rate of the pipette.
+                Calculated as `rate` multiplied by
+                [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                If neither `rate` nor `flow_rate` is specified, the pipette will aspirate
+                at a rate of 1.0 * `InstrumentContext.flow_rate.aspirate`. See
+                [new-plunger-flow-rates][new-plunger-flow-rates].
+                flow_rate (float, optional): The rate, in µL/s, at which the pipette will draw
+                in air.
 
-        :param height: The height, in mm, to move above the current well before creating
-                       the air gap. The default is 5 mm above the current well.
-        :type height: float
+        Raises:
+            UnexpectedTipRemovalError: If no tip is attached to the pipette.
+            RuntimeError: If location cache is `None` and the air gap is not `in_place`.
+                This would happen if `air_gap()` is called without first calling a method
+                that takes a location (e.g., [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate],
+                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense]).
 
-        :param in_place: Air gap at the pipette's current position, without moving to
-                         some height above the well. If ``in_place`` is specified,
-                         ``height`` must be unset.
-        :type in_place: bool
+        Returns:
+            InstrumentContext: This instance.
 
-        :param rate: A multiplier for the default flow rate of the pipette. Calculated
-                     as ``rate`` multiplied by :py:attr:`flow_rate.aspirate
-                     <flow_rate>`. If neither rate nor flow_rate is specified, the pipette
-                     will aspirate at a rate of 1.0 * InstrumentContext.flow_rate.aspirate. See
-                     :ref:`new-plunger-flow-rates`.
-        :type rate: float
+        Both `volume` and `height` are optional, but if you want to specify only `height`
+        you must do it as a keyword argument: `pipette.air_gap(height=2)`. If you call
+        `air_gap` with a single, unnamed argument, it will always be interpreted as a
+        volume.
 
-        :param flow_rate: The rate, in µL/s, at which the pipette will draw in air.
-        :type flow_rate: float
+        !!! note
+            In API version 2.21 and earlier, this function was implemented as an aspirate,
+            and dispensing into a well would add the air gap volume to the liquid tracked
+            in the well. In API version 2.22 and later, air gap volume is not tracked as
+            liquid when dispensing into a well.
 
-        :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
+        *Changed in version 2.22*: No longer implemented as an aspirate.
 
-        :raises RuntimeError: If location cache is ``None`` and the air gap is not
-                              ``in_place``. This would happen if ``air_gap()`` is called
-                              without first calling a method that takes a location (e.g.,
-                              :py:meth:`.aspirate`, :py:meth:`dispense`)
+        *Changed in version 2.24*: Added the `in_place` option.
 
-        :returns: This instance.
-
-        Both ``volume`` and ``height`` are optional, but if you want to specify only
-        ``height`` you must do it as a keyword argument:
-        ``pipette.air_gap(height=2)``. If you call ``air_gap`` with a single,
-        unnamed argument, it will always be interpreted as a volume.
-
-        .. note::
-
-           In API version 2.21 and earlier, this function was implemented as an aspirate, and
-           dispensing into a well would add the air gap volume to the liquid tracked in
-           the well. In API version 2.22 and later, air gap volume is not tracked as liquid
-           when dispensing into a well.
-
-        .. versionchanged:: 2.22
-            No longer implemented as an aspirate.
-        .. versionchanged:: 2.24
-            Added the ``in_place`` option.
-        .. versionchanged:: 2.24
-            Adds the ``rate`` and ``flow_rate`` parameter. You can only define one or the other. If
-            both are unspecified then ``rate`` is by default set to 1.0.
-            Can air gap over a trash bin or waste chute.
+        *Changed in version 2.24*: Adds the `rate` and `flow_rate` parameter. You can only
+        define one or the other. If both are unspecified then `rate` is by default set to
+        1.0. Can air gap over a trash bin or waste chute.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
@@ -1064,12 +1065,16 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Drop the currently attached tip in its original location in the tip rack.
 
-        Returning a tip does not reset tip tracking, so :py:obj:`.Well.has_tip` will
-        remain ``False`` for the destination.
+        Returning a tip does not reset tip tracking, so
+        [`Well.has_tip`][opentrons.protocol_api.labware.Well.has_tip] will remain
+        `False` for the destination.
 
-        :returns: This instance.
+        Returns:
+            This instance.
 
-        :param home_after: See the ``home_after`` parameter of :py:meth:`drop_tip`.
+        Args:
+            home_after: See the `home_after` parameter of
+                [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip].
         """
         if not self._core.has_tip():
             _log.warning("Pipette has no tip to return")
@@ -1095,19 +1100,20 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Pick up a tip for the pipette to run liquid-handling commands.
 
-        See :ref:`basic-tip-pickup`.
+        See [Picking Up a Tip][picking-up-a-tip].
 
         If no location is passed, the pipette will pick up the next available tip in its
-        :py:attr:`~.InstrumentContext.tip_racks` list. Within each tip rack, tips will
-        be picked up in the order specified by the labware definition and
-        :py:meth:`.Labware.wells`. To adjust where the sequence starts, use
-        :py:obj:`.starting_tip`.
+        [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] list. Within
+        each tip rack, tips will be picked up in the order specified by the labware
+        definition and [`wells()`][opentrons.protocol_api.labware.Labware.wells]. To
+        adjust where the sequence starts, use
+        [`starting_tip`][opentrons.protocol_api.InstrumentContext.starting_tip].
 
         The exact position for tip pickup accounts for the length of the tip and how
         much the tip overlaps with the pipette nozzle. These measurements are fixed
         values on Flex, and are based on the results of tip length calibration on OT-2.
 
-        .. note::
+        !!! note
             API version 2.19 updates the tip overlap values for Flex. When updating a
             protocol from 2.18 (or lower) to 2.19 (or higher), pipette performance
             should improve without additional changes to your protocol. Nevertheless, it
@@ -1115,75 +1121,79 @@ class InstrumentContext(publisher.CommandPublisher):
 
             - Run Labware Position Check.
             - Perform a dry run of your protocol.
-            - If tip position is slightly higher than expected, adjust the ``location``
+            - If tip position is slightly higher than expected, adjust the `location`
               parameter of pipetting actions to achieve the desired result.
 
-        :param location: The location from which to pick up a tip. The ``location``
-                         argument can be specified in several ways:
+        Args:
+            location (Union[`Well`][opentrons.protocol_api.labware.Well],
+                [`Labware`][opentrons.protocol_api.labware.Labware],
+                [`Location`][opentrons.types.Location], optional): The location from
+                which to pick up a tip. The `location` argument can be specified in
+                several ways:
 
-                           * As a :py:class:`.Well`. For example,
-                             ``pipette.pick_up_tip(tiprack.wells()[0])`` will always pick
-                             up the first tip in ``tiprack``, even if the rack is not a
-                             member of :py:obj:`.InstrumentContext.tip_racks`.
+                - As a `Well`. For example,
+                `pipette.pick_up_tip(tiprack.wells()[0])` will always pick up the first
+                tip in `tiprack`, even if the rack is not a member of
+                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
 
-                           * As a labware. ``pipette.pick_up_tip(tiprack)`` will pick up
-                             the next available tip in ``tiprack``, even if the rack is
-                             not a member of :py:obj:`.InstrumentContext.tip_racks`.
+                - As a labware. `pipette.pick_up_tip(tiprack)` will pick up the next
+                available tip in `tiprack`, even if the rack is not a member of
+                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
 
-                           * As a :py:class:`~.types.Location`. Use this to make fine
-                             adjustments to the pickup location. For example, to tell
-                             the robot to start its pick up tip routine 1 mm closer to
-                             the top of the well in the tip rack, call
-                             ``pipette.pick_up_tip(tiprack["A1"].top(z=-1))``.
-        :type location: :py:class:`.Well` or :py:class:`.Labware` or :py:class:`.types.Location`
-        :param presses: The number of times to lower and then raise the pipette when
-                        picking up a tip, to ensure a good seal. Zero (``0``) will
-                        result in the pipette hovering over the tip but not picking it
-                        up (generally not desirable, but could be used for a dry run).
+                - As a `Location`. Use this to make fine adjustments to the pickup
+                location. For example, to tell the robot to start its pick up tip
+                routine 1 mm closer to the top of the well in the tip rack, call
+                `pipette.pick_up_tip(tiprack["A1"].top(z=-1))`.
 
-                            .. deprecated:: 2.14
-                                Use the Opentrons App to change pipette pick-up settings.
-        :type presses: int
-        :param increment: The additional distance to travel on each successive press.
-                          For example, if ``presses=3`` and ``increment=1.0``, then the
-                          first press will travel down into the tip by 3.5 mm, the
-                          second by 4.5 mm, and the third by 5.5 mm).
+            presses (int, optional): The number of times to lower and then raise the
+                pipette when picking up a tip, to ensure a good seal. Zero (`0`) will
+                result in the pipette hovering over the tip but not picking it up
+                (generally not desirable, but could be used for a dry run).
 
-                              .. deprecated:: 2.14
-                                  Use the Opentrons App to change pipette pick-up settings.
-        :type increment: float
-        :param prep_after: Whether the pipette plunger should prepare itself to aspirate
-                           immediately after picking up a tip.
+                *Deprecated in version 2.14*: Use the Opentrons App to change pipette
+                pick-up settings.
 
-                           If ``True``, the pipette will move its plunger position to
-                           bottom in preparation for any following calls to
-                           :py:meth:`.aspirate`.
+            increment (float, optional): The additional distance to travel on each
+                successive press. For example, if `presses=3` and `increment=1.0`, then
+                the first press will travel down into the tip by 3.5 mm, the second by
+                4.5 mm, and the third by 5.5 mm).
 
-                           If ``False``, the pipette will prepare its plunger later,
-                           during the next call to :py:meth:`.aspirate`. This is
-                           accomplished by moving the tip to the top of the well, and
-                           positioning the plunger outside any potential liquids.
+                *Deprecated in version 2.14*: Use the Opentrons App to change pipette
+                pick-up settings.
 
-                           .. warning::
-                               This is provided for compatibility with older Python
-                               Protocol API behavior. You should normally leave this
-                               unset.
+            prep_after (bool, optional): Whether the pipette plunger should prepare
+                itself to aspirate immediately after picking up a tip.
 
-                               Setting ``prep_after=False`` may create an unintended
-                               pipette movement, when the pipette automatically moves
-                               the tip to the top of the well to prepare the plunger.
-        :type prep_after: bool
+                If `True`, the pipette will move its plunger position to bottom in
+                preparation for any following calls to
+                [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate].
 
-        .. versionchanged:: 2.13
-            Adds the ``prep_after`` argument. In version 2.12 and earlier, the plunger
-            can't prepare itself for aspiration during :py:meth:`.pick_up_tip`, and will
-            instead always prepare during :py:meth:`.aspirate`. Version 2.12 and earlier
-            will raise an ``APIVersionError`` if a value is set for ``prep_after``.
+                If `False`, the pipette will prepare its plunger later, during the next
+                call to [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate].
+                This is accomplished by moving the tip to the top of the well, and
+                positioning the plunger outside any potential liquids.
 
-        .. versionchanged:: 2.19
-            Uses new values for how much a tip overlaps with the pipette nozzle.
+                !!! warning
+                    This is provided for compatibility with older Python Protocol API
+                    behavior. You should normally leave this unset.
 
-        :returns: This instance.
+                    Setting `prep_after=False` may create an unintended pipette
+                    movement, when the pipette automatically moves the tip to the top of
+                    the well to prepare the plunger.
+
+        Returns:
+            InstrumentContext: This instance.
+
+        *New in version 2.13*: Adds the `prep_after` argument. In version 2.12
+        and earlier, the plunger can't prepare itself for aspiration during
+        [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip],
+        and will instead always prepare during
+        [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate].
+        Version 2.12 and earlier will raise an `APIVersionError` if a value is
+        set for `prep_after`.
+
+        *Changed in version 2.19*: Uses new values for how much a tip overlaps
+        with the pipette nozzle.
         """
 
         if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
@@ -1335,55 +1345,52 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Drop the current tip.
 
-        See :ref:`pipette-drop-tip` for examples.
+        See [Dropping a Tip][dropping-a-tip] for examples.
 
-        If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
-        the attached tip into its :py:attr:`trash_container`.
+        If no location is passed (e.g. `pipette.drop_tip()`), the pipette will drop
+        the attached tip into its [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container].
 
         The location in which to drop the tip can be manually specified with the
-        ``location`` argument. The ``location`` argument can be specified in several
+        `location` argument. The `location` argument can be specified in several
         ways:
 
-            - As a :py:class:`.Well`. This uses a default location relative to the well.
-              This style of call can be used to make the robot drop a tip into labware
-              like a well plate or a reservoir. For example,
-              ``pipette.drop_tip(location=reservoir["A1"])``.
-            - As a :py:class:`~.types.Location`. For example, to drop a tip from an
-              unusually large height above the tip rack, you could call
-              ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
-            - As a :py:class:`.TrashBin`. This uses a default location relative to the
-              ``TrashBin`` object. For example,
-              ``pipette.drop_tip(location=trash_bin)``.
-            - As a :py:class:`.WasteChute`. This uses a default location relative to
-              the ``WasteChute`` object. For example,
-              ``pipette.drop_tip(location=waste_chute)``.
+        - As a [`Well`][opentrons.protocol_api.labware.Well]. This uses a default
+            location relative to the well. This style of call can be used to make the
+            robot drop a tip into labware like a well plate or a reservoir. For
+            example, `pipette.drop_tip(location=reservoir["A1"])`.
+        - As a [`Location`][opentrons.types.Location]. For example, to drop a tip
+            from an unusually large height above the tip rack, you could call
+            `pipette.drop_tip(tip_rack["A1"].top(z=10))`.
+        - As a [`TrashBin`][opentrons.protocol_api.TrashBin]. This uses a default
+            location relative to the `TrashBin` object. For example,
+            `pipette.drop_tip(location=trash_bin)`.
+        - As a [`WasteChute`][opentrons.protocol_api.WasteChute]. This uses a
+            default location relative to the `WasteChute` object. For example,
+            `pipette.drop_tip(location=waste_chute)`.
 
-        In API versions 2.15 to 2.17, if ``location`` is a ``TrashBin`` or not
-        specified, the API will instruct the pipette to drop tips in different locations
-        within the bin. Varying the tip drop location helps prevent tips
-        from piling up in a single location.
+        *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
 
-        Starting with API version 2.18, the API will only vary the tip drop location if
-        ``location`` is not specified. Specifying a ``TrashBin`` as the ``location``
-        behaves the same as specifying :py:meth:`.TrashBin.top`, which is a fixed position.
+        In API versions 2.15 to 2.17, if `location` is a `TrashBin` or not specified,
+        the API will instruct the pipette to drop tips in different locations within
+        the bin. Varying the tip drop location helps prevent tips from piling up in a
+        single location.
 
-        :param location:
-            Where to drop the tip.
+        *Changed in version 2.18*: The API will only vary the tip drop location if
+        `location` is not specified. Specifying a `TrashBin` as the `location` behaves
+        the same as specifying [`TrashBin.top`][opentrons.protocol_api.TrashBin.top],
+        which is a fixed position.
 
-            .. versionchanged:: 2.16
-                Accepts ``TrashBin`` and ``WasteChute`` values.
+        Args:
+            location: Where to drop the tip.
+            home_after: Whether to home the pipette's plunger after dropping the tip.
+                If not specified, defaults to `True` on an OT-2.
 
-        :type location:
-            :py:class:`~.types.Location` or :py:class:`.Well` or ``None``
-        :param home_after:
-            Whether to home the pipette's plunger after dropping the tip. If not
-            specified, defaults to ``True`` on an OT-2.
+                When `False`, the pipette does not home its plunger. This can save a few
+                seconds, but is not recommended. Homing helps the robot track the
+                pipette's position.
 
-            When ``False``, the pipette does not home its plunger. This can save a few
-            seconds, but is not recommended. Homing helps the robot track the pipette's
-            position.
-
-        :returns: This instance.
+        Returns:
+            This instance.
         """
         alternate_drop_location: bool = False
         if location is None:
@@ -1469,9 +1476,10 @@ class InstrumentContext(publisher.CommandPublisher):
     def home(self) -> InstrumentContext:
         """Home the robot.
 
-        See :ref:`utility-homing`.
+        See [Homing][].
 
-        :returns: This instance.
+        Returns:
+            This instance.
         """
 
         mount_name = self._core.get_mount().name.lower()
@@ -1487,7 +1495,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def home_plunger(self) -> InstrumentContext:
         """Home the plunger associated with this mount.
 
-        :returns: This instance.
+        Returns:
+            This instance.
         """
         self._core.home_plunger()
         return self
@@ -1505,20 +1514,23 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Move a volume of liquid from one source to multiple destinations.
 
-        :param volume: The amount, in µL, to dispense into each destination well.
-        :param source: A single well to aspirate liquid from.
-        :param dest: A list of wells to dispense liquid into.
-        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
-            Some parameters behave differently than when transferring.
+        Args:
+            volume: The amount, in µL, to dispense into each destination well.
+            source: A single well to aspirate liquid from.
+            dest: A list of wells to dispense liquid into.
+            kwargs: See [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer]
+                and the [complex parameters](../complex-commands/parameters.md) page.
+                Some parameters behave differently than when transferring.
 
-              - ``disposal_volume`` aspirates additional liquid to improve the accuracy
+                - `disposal_volume`: Aspirates additional liquid to improve the accuracy
                 of each dispense. Defaults to the minimum volume of the pipette. See
-                :ref:`param-disposal-volume` for details.
+                [disposal volume][opentrons.protocol_api.param-disposal-volume] for
+                details.
 
-              - ``mix_after`` is ignored.
+                - `mix_after`: Ignored.
 
-
-        :returns: This instance.
+        Returns:
+            This instance.
         """
         _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "distribute"
@@ -1544,13 +1556,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Move liquid from multiple source wells to a single destination well.
 
-        :param volume: The amount, in µL, to aspirate from each source well.
-        :param source: A list of wells to aspirate liquid from.
-        :param dest: A single well to dispense liquid into.
-        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
-                       Some parameters behave differently than when transferring.
-                       ``disposal_volume`` and ``mix_before`` are ignored.
-        :returns: This instance.
+        Args:
+            volume: The amount, in µL, to aspirate from each source well.
+            source: A list of wells to aspirate liquid from.
+            dest: A single well to dispense liquid into.
+            kwargs: See [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer]
+                and the [complex parameters](../complex-commands/parameters.md) page.
+                Some parameters behave differently than when transferring.
+                `disposal_volume` and `mix_before` are ignored.
+
+        Returns:
+            This instance.
         """
         _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "consolidate"
@@ -1585,88 +1601,89 @@ class InstrumentContext(publisher.CommandPublisher):
         Move liquid from one well or group of wells to another.
 
         Transfer is a higher-level command, incorporating other
-        :py:class:`InstrumentContext` commands, like :py:meth:`aspirate` and
-        :py:meth:`dispense`. It makes writing a protocol easier at the cost of
-        specificity. See :ref:`v2-complex-commands` for details on how transfer and
+        [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] commands, like
+        [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and
+        [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense]. It makes
+        writing a protocol easier at the cost of specificity. See
+        [Complex Commands](../../complex-commands.md) for details on how transfer and
         other complex commands perform their component steps.
 
-        :param volume: The amount, in µL, to aspirate from each source and dispense to
-                       each destination. If ``volume`` is a list, each amount will be
-                       used for the source and destination at the matching index. A list
-                       item of ``0`` will skip the corresponding wells entirely. See
-                       :ref:`complex-list-volumes` for details and examples.
-        :param source: A single well or a list of wells to aspirate liquid from.
-        :param dest: A single well or a list of wells to dispense liquid into.
+        Args:
+            volume: The amount, in µL, to aspirate from each source and dispense to
+                each destination. If `volume` is a list, each amount will be used for
+                the source and destination at the matching index. A list item of `0`
+                will skip the corresponding wells entirely. See
+                [List of Volumes][list-of-volumes] for details and
+                examples.
+            source: A single well or a list of wells to aspirate liquid from.
+            dest: A single well or a list of wells to dispense liquid into.
 
-        :Keyword Arguments: Transfer accepts a number of optional parameters that give
-            you greater control over the exact steps it performs. See
-            :ref:`complex_params` or the links under each argument's entry below for
-            additional details and examples.
+        Keyword Args:
+            Transfer accepts a number of optional parameters that give you greater control
+            over the exact steps it performs. See [Complex Liquid Handling Parameters](../complex-commands/parameters.md)
+            or the links under each argument's entry below for additional details and examples.
 
-            * **new_tip** (*string*) --
-              When to pick up and drop tips during the command. Defaults to ``"once"``.
+            new_tip (str): When to pick up and drop tips during the command. Defaults to
+                `"once"`.
 
-                - ``"once"``: Use one tip for the entire command.
-                - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
-                - ``"never"``: Do not pick up or drop tips at all.
+                - `"once"`: Use one tip for the entire command.
+                - `"always"`: Use a new tip for each set of aspirate and dispense steps.
+                - `"never"`: Do not pick up or drop tips at all.
 
-              See :ref:`param-tip-handling` for details.
+                See [Tip Handling][tip-handling] for details.
 
-            * **trash** (*boolean*) --
-              If ``True`` (default), the pipette will drop tips in its
-              :py:meth:`~.InstrumentContext.trash_container`.
-              If ``False``, the pipette will return tips to their tip rack.
+            trash (bool): If `True` (default), the pipette will drop tips in its
+                [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container].
+                If `False`, the pipette will return tips to their tip rack.
 
-              See :ref:`param-trash` for details.
+                See [Trash Tips][trash-tips] for details.
 
-            * **touch_tip** (*boolean*) --
-              If ``True``, perform a :py:meth:`touch_tip` following each
-              :py:meth:`aspirate` and :py:meth:`dispense`. Defaults to ``False``.
+            touch_tip (bool): If `True`, perform a [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip]
+                following each [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and
+                [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense]. Defaults to `False`.
 
-              See :ref:`param-touch-tip` for details.
+                See [Touch Tip][touch-tip] for details.
 
-            * **blow_out** (*boolean*) --
-              If ``True``, a :py:meth:`blow_out` will occur following each
-              :py:meth:`dispense`, but only if the pipette has no liquid left
-              in it. If ``False`` (default), the pipette will not blow out liquid.
+            blow_out (bool): If `True`, a [`blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out]
+                will occur following each [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense],
+                but only if the pipette has no liquid left in it. If `False` (default),
+                the pipette will not blow out liquid.
 
-              See :ref:`param-blow-out` for details.
+                See [Blow Out][blow-out] for details.
 
-            * **blowout_location** (*string*) --
-              Accepts one of three string values: ``"trash"``, ``"source well"``, or
-              ``"destination well"``.
+            blowout_location (str): Accepts one of three string values: `"trash"`,
+                `"source well"`, or `"destination well"`.
 
-              If ``blow_out`` is ``False`` (its default), this parameter is ignored.
+                If `blow_out` is `False` (its default), this parameter is ignored.
 
-              If ``blow_out`` is ``True`` and this parameter is not set:
+                If `blow_out` is `True` and this parameter is not set:
 
                 - Blow out into the trash, if the pipette is empty or only contains the
-                  disposal volume.
-
+                disposal volume.
                 - Blow out into the source well, if the pipette otherwise contains liquid.
 
-            * **mix_before** (*tuple*) --
-              Perform a :py:meth:`mix` before each :py:meth:`aspirate` during the
-              transfer. The first value of the tuple is the number of repetitions, and
-              the second value is the amount of liquid to mix in µL.
+            mix_before (tuple): Perform a [`mix()`][opentrons.protocol_api.InstrumentContext.mix]
+                before each [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] during the
+                transfer. The first value of the tuple is the number of repetitions, and
+                the second value is the amount of liquid to mix in µL.
 
-              See :ref:`param-mix-before` for details.
+                See [Mix Before][mix-before] for details.
 
-            * **mix_after** (*tuple*) --
-              Perform a :py:meth:`mix` after each :py:meth:`dispense` during the
-              transfer. The first value of the tuple is the number of repetitions, and
-              the second value is the amount of liquid to mix in µL.
+            mix_after (tuple): Perform a [`mix()`][opentrons.protocol_api.InstrumentContext.mix]
+                after each [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] during the
+                transfer. The first value of the tuple is the number of repetitions, and
+                the second value is the amount of liquid to mix in µL.
 
-              See :ref:`param-mix-after` for details.
+                See [Mix After][mix-after] for details.
 
-            * **disposal_volume** (*float*) --
-              Transfer ignores the numeric value of this parameter. If set, the pipette
-              will not aspirate additional liquid, but it will perform a very small blow
-              out after each dispense.
+            disposal_volume (float): Transfer ignores the numeric value of this parameter.
+                If set, the pipette will not aspirate additional liquid, but it will
+                perform a very small blow out after each dispense.
 
-              See :ref:`param-disposal-volume` for details.
+                See [Disposal Volume][disposal-volume] for details.
 
-        :returns: This instance.
+        Returns:
+            InstrumentContext: This instance.
         """
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 

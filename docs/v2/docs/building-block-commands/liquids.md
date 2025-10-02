@@ -6,7 +6,7 @@ description: Basic commands for working with liquids.
 
 After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
-## Aspirate
+## Aspirate {#aspirate-building-block}
 
 To draw liquid up into a pipette tip, call the [`InstrumentContext.aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] method. Using this method, you can specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to aspirate 200 µL from well location A1.
 
