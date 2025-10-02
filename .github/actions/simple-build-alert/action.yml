@@ -1,0 +1,64 @@
+name: 'Simple Build Alert'
+description: 'Sends Slack alerts for tagged build failures with clear links'
+
+inputs:
+  status:
+    description: 'Build status: success, failure, or cancelled'
+    required: true
+  workflow_name:
+    description: 'Name of the workflow'
+    required: true
+  failed_jobs:
+    description: 'Comma-separated list of failed jobs (optional)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Send Slack Alert'
+      uses: slackapi/slack-github-action@v1.14.0
+      with:
+        payload: |
+          {
+            "channel": "#release-cycle",
+            "username": "GitHub Actions",
+            "icon_emoji": ":robot_face:",
+            "attachments": [
+              {
+                "color": "${{ inputs.status == 'success' && 'good' || inputs.status == 'failure' && 'danger' || 'warning' }}",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "${{ inputs.status == 'success' && '✅ Build Success' || inputs.status == 'failure' && '❌ Build Failed' || '⚠️ Build Cancelled' }}"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Tag:* `${{ github.ref_name }}`"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Workflow:* `${{ inputs.workflow_name }}`"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Status:* `${{ inputs.status }}`"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*View Details:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Open Workflow>"
+                      }
+                      ${{ inputs.failed_jobs && format(',{{ "type": "mrkdwn", "text": "*Failed Jobs:* `{0}`" }}', inputs.failed_jobs) || '' }}
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
