@@ -14,6 +14,9 @@ const ignoredLoadNames = new Set([
   'eppendorf_96_wellplate_1000ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
   'protocol_engine_lid_stack_object',
+  'corning_96_wellplate_330ul',
+  'costar_96_wellplate_2.2ml',
+  'thermoscientific_abgene_96_wellplate_1.2ml',
 ])
 
 const loadNames = Array.from(
