@@ -95,3 +95,4 @@ markdown_extensions:
 
 extra_css:
   - ../opentrons-theme.css
+  - ../python-api.css
