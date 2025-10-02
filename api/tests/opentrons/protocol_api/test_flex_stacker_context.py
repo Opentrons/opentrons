@@ -17,7 +17,7 @@ from opentrons.protocol_api.core.common import (
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
-from . import versions_at_or_above, versions_below, versions_between
+from . import versions_at_or_above, versions_between
 
 
 @pytest.fixture
