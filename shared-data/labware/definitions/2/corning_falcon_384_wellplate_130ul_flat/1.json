@@ -5069,9 +5069,20 @@
     "loadName": "corning_falcon_384_wellplate_130ul_flat",
     "isMagneticModuleCompatible": false
   },
-  "namespace": "opentrons",
-  "version": 1,
   "schemaVersion": 2,
+  "version": 1,
+  "namespace": "custom_beta",
+  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
+  "stackingOffsetWithLabware": {
+    "opentrons_universal_flat_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 10
+    }
+  },
+  "stackingOffsetWithModule": {},
+  "allowedRoles": [],
+  "gripperOffsets": {},
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [

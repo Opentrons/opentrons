@@ -1103,6 +1103,11 @@
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
+  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
+  "stackingOffsetWithLabware": {},
+  "stackingOffsetWithModule": {},
+  "allowedRoles": [],
+  "gripperOffsets": {},
   "innerLabwareGeometry": {
     "conicalWell": {
       "sections": [

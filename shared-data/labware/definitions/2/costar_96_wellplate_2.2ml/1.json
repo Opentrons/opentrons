@@ -1193,9 +1193,14 @@
     "loadName": "costar_96_wellplate_2.2ml",
     "isMagneticModuleCompatible": false
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
+  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
+  "stackingOffsetWithLabware": {},
+  "stackingOffsetWithModule": {},
+  "allowedRoles": [],
+  "gripperOffsets": {},
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [
