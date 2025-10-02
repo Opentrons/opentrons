@@ -11,16 +11,53 @@ inputs:
   failed_jobs:
     description: 'Comma-separated list of failed jobs (optional)'
     required: false
+  channel_override:
+    description: 'Override default channel (optional)'
+    required: false
 
 runs:
   using: 'composite'
   steps:
+    - name: 'Determine channel and webhook'
+      id: channel-config
+      shell: bash
+      run: |
+        # Use override if provided, otherwise determine from tag
+        if [[ -n "${{ inputs.channel_override }}" ]]; then
+          echo "channel=${{ inputs.channel_override }}" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+          # Main version releases go to release cycle
+          echo "channel=#release-cycle" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref_name }}" =~ ^ot3@ ]]; then
+          # OT3 releases go to release cycle
+          echo "channel=#release-cycle" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref_name }}" =~ ^(protocol-designer|labware-library|components|shared-data) ]]; then
+          # Component releases go to builds channel
+          echo "channel=#builds" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref_name }}" =~ ^(ai-client@|ai-server@) ]]; then
+          # AI releases go to builds channel
+          echo "channel=#builds" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref_name }}" =~ ^(docs@|MKDOCS|staging-docs@|staging-MKDOCS|staging-mkdocs) ]]; then
+          # Documentation releases go to builds channel
+          echo "channel=#builds" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        else
+          # Default to release cycle for unknown tags
+          echo "channel=#release-cycle" >> $GITHUB_OUTPUT
+          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
+        fi
+
     - name: 'Send Slack Alert'
       uses: slackapi/slack-github-action@v1.14.0
       with:
         payload: |
           {
-            "channel": "#release-cycle",
+            "channel": "${{ steps.channel-config.outputs.channel }}",
             "username": "GitHub Actions",
             "icon_emoji": ":robot_face:",
             "attachments": [
@@ -61,4 +98,4 @@ runs:
             ]
           }
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ secrets[steps.channel-config.outputs.webhook_secret] }}
