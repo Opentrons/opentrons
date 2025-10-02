@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5.6
+
+**Welcome to Protocol Designer 8.5.6!**
+
+This hotfix release addresses a bug when dispensing into a trash bin or waste chute.
+
 ## Opentrons Protocol Designer Changes in 8.5.5
 
 **Welcome to Protocol Designer 8.5.5!**
