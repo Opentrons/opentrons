@@ -2,6 +2,9 @@ site_name: Opentrons Documentation
 
 docs_dir: ./shared
 
+watch:
+  - ../api/src/opentrons/protocol_api/
+
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
   - Modules:
