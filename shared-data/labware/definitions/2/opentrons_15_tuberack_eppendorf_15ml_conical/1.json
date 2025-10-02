@@ -196,7 +196,7 @@
     "format": "irregular",
     "quirks": [],
     "isTiprack": false,
-    "loadName": "eppendorf_15_tuberack_15ml",
+    "loadName": "opentrons_15_tuberack_eppendorf_15ml_conical",
     "isMagneticModuleCompatible": false
   },
   "namespace": "opentrons",
