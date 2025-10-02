@@ -241,7 +241,7 @@ class LabwareMovementHandler:
                         disable_geometry_grip_check = False
                         if labware_definition.parameters.quirks is not None:
                             disable_geometry_grip_check = (
-                                Quirks.disableGeometryBasedGripCheck  # type: ignore[comparison-overlap]
+                                Quirks.disableGeometryBasedGripCheck.value
                                 in labware_definition.parameters.quirks
                             )
 
