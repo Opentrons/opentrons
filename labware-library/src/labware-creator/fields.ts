@@ -121,6 +121,7 @@ export interface LabwareFields {
   gridOffsetY: string | null | undefined
 
   homogeneousWells: BooleanString | null | undefined
+  hasLpcQuirk: BooleanString | null | undefined
   regularRowSpacing: BooleanString | null | undefined
   regularColumnSpacing: BooleanString | null | undefined
 
@@ -182,7 +183,7 @@ export interface ProcessedLabwareFields {
   wellBottomShape: WellBottomShape | null
   wellDepth: number
   wellShape: WellShape
-
+  hasLpcQuirk: BooleanString
   // used with circular well shape only
   wellDiameter: number
 
@@ -396,7 +397,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   gridSpacingY: null,
   gridOffsetX: null,
   gridOffsetY: null,
-
+  hasLpcQuirk: 'false',
   homogeneousWells: null,
   regularRowSpacing: null,
   regularColumnSpacing: null,
@@ -431,6 +432,8 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
   handPlacedTipFit: 'Fit',
   homogeneousWells: 'Are all your wells the same shape and size?',
+  hasLpcQuirk:
+    'Do you want to exclude this labware from labware position check?',
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',
   labwareZDimension: 'Height',
