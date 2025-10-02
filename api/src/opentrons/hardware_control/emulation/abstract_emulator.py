@@ -10,12 +10,14 @@ class AbstractEmulator(ABC):
         """Handle a command and return a response."""
         ...
 
-    @staticmethod
-    def get_terminator() -> bytes:
+    def get_terminator(self) -> bytes:
         """Get the command terminator for messages coming from PI."""
         return b"\r\n\r\n"
 
-    @staticmethod
-    def get_ack() -> bytes:
+    def get_ack(self) -> bytes:
         """Get the command ack send to the PI."""
         return b"ok\r\nok\r\n"
+
+    def get_autoack(self) -> bool:
+        """Should this system automatically acknowledge messages?"""
+        return True

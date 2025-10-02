@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from enum import Enum
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, Union, TypeVar, Generic
 
 from opentrons.drivers import utils
 from opentrons.drivers.command_builder import CommandBuilder
@@ -36,6 +36,7 @@ class GCODE(str, Enum):
     DEVICE_INFO = "M115"
     GET_RESET_REASON = "M114"
     ENTER_PROGRAMMING = "dfu"
+    GET_ERROR_STATE = "M411"
 
 
 LID_TARGET_DEFAULT = 105  # Degree celsius (floats)
@@ -73,7 +74,7 @@ class ThermocyclerDriverFactory:
     @staticmethod
     async def create(
         port: str, loop: Optional[asyncio.AbstractEventLoop]
-    ) -> ThermocyclerDriver:
+    ) -> ThermocyclerDriver | ThermocyclerDriverV2:
         """
         Create a thermocycler driver.
 
@@ -148,10 +149,15 @@ class ThermocyclerDriverFactory:
         return response.startswith(GCODE.DEVICE_INFO)
 
 
-class ThermocyclerDriver(AbstractThermocyclerDriver):
+_ConnectionKind = TypeVar(
+    "_ConnectionKind", SerialConnection, AsyncResponseSerialConnection
+)
+
+
+class _BaseThermocyclerDriver(AbstractThermocyclerDriver, Generic[_ConnectionKind]):
     def __init__(
         self,
-        connection: SerialKind,
+        connection: _ConnectionKind,
     ) -> None:
         """
         Constructor
@@ -159,7 +165,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         Args:
             connection: SerialConnection to the thermocycler
         """
-        self._connection = connection
+        self._connection: _ConnectionKind = connection
 
     async def connect(self) -> None:
         """Connect to thermocycler"""
@@ -329,8 +335,15 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             "Gen1 Thermocyclers do not support the Jog Lid command."
         )
 
+    async def get_error_state(self) -> None:
+        """For the gen1, do nothing."""
+        pass
 
-class ThermocyclerDriverV2(ThermocyclerDriver):
+
+ThermocyclerDriver = _BaseThermocyclerDriver[SerialConnection]
+
+
+class ThermocyclerDriverV2(_BaseThermocyclerDriver[AsyncResponseSerialConnection]):
     """
     This driver is for Thermocycler model Gen2.
     """
@@ -422,3 +435,12 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
             .add_element("O")
         )
         await self._connection.send_command(command=c, retries=1)
+
+    async def get_error_state(self) -> None:
+        """Raise an error if the thermocycler is stuck in an error state."""
+        await self._connection.send_multiack_command(
+            command=CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+                gcode=GCODE.GET_ERROR_STATE
+            ),
+            acks=2,
+        )

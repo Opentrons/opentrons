@@ -13,6 +13,7 @@ from .deactivate_block_g_code_functionality_def import (
 )
 from .deactivate_all_g_code_functionality_def import DeactivateAllGCodeFunctionalityDef
 from .edit_pid_params_g_code_functionality_def import EditPIDParamsGCodeFunctionalityDef
+from .get_error_status_functionality_def import GetErrorStatusFunctionalityDef
 
 __all__ = [
     "CloseLidGCodeFunctionalityDef",
@@ -28,4 +29,5 @@ __all__ = [
     "DeactivateBlockGCodeFunctionalityDef",
     "DeactivateAllGCodeFunctionalityDef",
     "EditPIDParamsGCodeFunctionalityDef",
+    "GetErrorStatusFunctionalityDef",
 ]
