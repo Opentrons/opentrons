@@ -476,7 +476,7 @@ class ProtocolContext(CommandPublisher):
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
             .. versionchanged:: 2.26
-               ``adapter_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist when unspecified.  
+               ``adapter_version`` may now be specified explicitly. When unspecified, the API uses the newest version available for your protocol's API level. 
 
         :param lid: A lid to load on the top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
@@ -498,7 +498,7 @@ class ProtocolContext(CommandPublisher):
             Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
 
             .. versionchanged:: 2.26
-               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
+               ``lid_version`` may now be specified explicitly. When unspecified, the API uses the newest version available for your protocol's API level. 
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):

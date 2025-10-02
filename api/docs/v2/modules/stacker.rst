@@ -13,7 +13,7 @@ The Stacker is represented in code by a :py:class:`.FlexStackerContext` object t
 Loading and Deck Slots
 ========================
 
-Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker and its attached shuttle occupy deck slots in column 3 and 4.
+Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker's attached shuttle occupies a column 4 deck slot.
 
 Start by loading each Stacker in column 4: 
 
@@ -28,9 +28,9 @@ Start by loading each Stacker in column 4:
        location="C4"
    )
 
-In this example, Stacker shuttles are loaded in deck slots A4 and C4. Bec
+In this example, Stacker shuttles are loaded in deck slots A4 and C4.
 
-Fixtures like the trash bin can't be loaded in column 3 when a Stacker is loaded in the same row. Instead, load your trash bin in a column 1 slot.  
+Fixtures and modules that are placed below the Flex deck can't be loaded in column 3 when a Stacker is loaded in the same row. For the example above, you wouldn't be able to load a trash bin in slots A3 or C3. Instead, load your trash bin in a column 1 slot. 
 
 .. versionadded:: 2.25
 
