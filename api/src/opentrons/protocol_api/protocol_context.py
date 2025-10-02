@@ -1627,7 +1627,7 @@ class ProtocolContext(CommandPublisher):
             Applies to ``adapter`` the same way that ``version`` applies to ``load_name``.
 
             .. versionadded:: 2.26
-               ``adapter_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist. 
+               ``adapter_version`` may now be specified explicitly.  
 
         :return:  The initialized and loaded labware object representing the lid stack.
 

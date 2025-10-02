@@ -112,7 +112,6 @@ For example, these commands load a well plate on top of the flat bottom adapter:
 
 .. versionadded:: 2.15
     The ``load_adapter()`` method.
-
 Pre-configured Combinations
 ---------------------------
 
