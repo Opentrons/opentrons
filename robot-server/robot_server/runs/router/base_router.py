@@ -228,6 +228,7 @@ async def create_run(  # noqa: C901
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
         file_provider: Dependency to provide access to file Reading and Writing to Protocol engine.
+        camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None

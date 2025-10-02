@@ -35,6 +35,7 @@ from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
@@ -55,6 +56,8 @@ from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from opentrons.protocol_engine.resources import FileProvider
 from robot_server.file_provider.provider import FileProviderWrapper
+from opentrons.protocol_engine.resources import CameraProvider
+from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -80,6 +83,12 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_error_recovery_setting_store(decoy: Decoy) -> ErrorRecoverySettingStore:
     """Get a mock ErrorRecoverySettingStore."""
     return decoy.mock(cls=ErrorRecoverySettingStore)
+
+
+@pytest.fixture
+def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
+    """Get a mock CameraSettingStore."""
+    return decoy.mock(cls=CameraSettingStore)
 
 
 @pytest.fixture()
@@ -175,6 +184,20 @@ def mock_file_provider(
     return decoy.mock(cls=FileProvider)
 
 
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
 @pytest.fixture
 def run_resource() -> RunResource:
     """Get a StateSummary value object."""
@@ -204,6 +227,7 @@ def subject(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_camera_setting_store: CameraSettingStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
 ) -> RunDataManager:
@@ -212,6 +236,7 @@ def subject(
         run_orchestrator_store=mock_run_orchestrator_store,
         run_store=mock_run_store,
         error_recovery_setting_store=mock_error_recovery_setting_store,
+        camera_setting_store=mock_camera_setting_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
     )
@@ -245,6 +270,7 @@ async def test_create(
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
             file_provider=sentinel.file_provider,
+            camera_provider=sentinel.camera_provider,
             run_time_param_values=sentinel.run_time_param_values,
             run_time_param_paths=sentinel.run_time_param_paths,
             notify_publishers=mock_notify_publishers,
@@ -287,6 +313,7 @@ async def test_create(
         protocol=protocol,
         deck_configuration=sentinel.deck_configuration,
         file_provider=sentinel.file_provider,
+        camera_provider=sentinel.camera_provider,
         run_time_param_values=sentinel.run_time_param_values,
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
@@ -323,6 +350,7 @@ async def test_create_engine_error(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
     subject: RunDataManager,
 ) -> None:
     """It should not create a resource if engine creation fails."""
@@ -347,6 +375,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -362,6 +391,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -824,6 +854,7 @@ async def test_create_archives_existing(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
     subject: RunDataManager,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
@@ -859,6 +890,7 @@ async def test_create_archives_existing(
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -880,6 +912,7 @@ async def test_create_archives_existing(
         protocol=None,
         deck_configuration=[],
         file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         run_time_param_values=None,
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,

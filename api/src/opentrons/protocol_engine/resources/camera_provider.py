@@ -1,5 +1,5 @@
 """Camera interaction resource provider."""
-from typing import Optional, Callable, Awaitable
+from typing import Optional, Callable
 from pydantic import BaseModel, Field
 
 
@@ -22,9 +22,7 @@ class CameraProvider:
 
     def __init__(
         self,
-        camera_settings_callback: Optional[
-            Callable[[], [CameraSettings]]
-        ] = None,
+        camera_settings_callback: Optional[Callable[[], CameraSettings]] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
 
@@ -36,7 +34,7 @@ class CameraProvider:
     async def get_camera_settings(self) -> CameraSettings:
         """Query the Robot Server for the current Camera Enablement settings."""
         if self._camera_settings_callback is not None:
-            return await self._camera_settings_callback()
+            return self._camera_settings_callback()
         # If we are in analysis or simulation, return as if the camera is enabled
         return CameraSettings(
             camera_enabled=True, live_stream_enabled=True, error_recovery_enabled=True

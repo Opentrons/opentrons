@@ -2,7 +2,7 @@
 
 Summary of changes from schema 13:
 
-This compatability change adds additional camera related fields to the BooleanSettingKey table. 
+This compatability change adds additional camera related fields to the BooleanSettingKey table.
 """
 
 from pathlib import Path
@@ -10,9 +10,7 @@ from pathlib import Path
 from ._util import copy_contents
 from .._folder_migrator import Migration
 import sqlalchemy
-from ..database import sql_engine_ctx, sqlite_rowid
-
-from typing import Any, Dict
+from ..database import sql_engine_ctx
 
 from robot_server.persistence.tables import schema_11, schema_13
 from robot_server.persistence.file_and_directory_names import DB_FILE

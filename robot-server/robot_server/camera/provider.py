@@ -25,6 +25,7 @@ class CameraProviderWrapper:
         self._camera_settings_store = camera_settings_store
 
     def get_camera_settings(self) -> CameraSettings:
+        """Get the Camera Enablement Settings from the Boolean Settings Table."""
         return CameraSettings(
             camera_enabled=self._camera_settings_store.get_camera_enabled(),
             live_stream_enabled=self._camera_settings_store.get_live_stream_enabled(),
