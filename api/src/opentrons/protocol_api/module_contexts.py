@@ -1338,7 +1338,7 @@ class FlexStackerContext(ModuleContext):
     def set_stored_labware_items(
         self,
         labware: list[Labware],
-        stacking_offset_z: float | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
         and the end of the list represents the top of the Stacker.
