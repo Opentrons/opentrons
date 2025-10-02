@@ -3,6 +3,7 @@
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support.types import APIVersion
@@ -14,7 +15,7 @@ from opentrons.protocol_api.core.common import (
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
-from . import versions_at_or_above
+from . import versions_at_or_above, versions_between
 
 
 @pytest.fixture
@@ -156,6 +157,62 @@ def test_set_stored_labware(
             stacking_offset_z=1.0,
         )
     )
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_inclusive_bound=APIVersion(2, 25), high_exclusive_bound=APIVersion(2, 26)
+    ),
+)
+def test_set_stored_labware_namespace_version_param_minimum_version(
+    subject: FlexStackerContext,
+) -> None:
+    """{adapter,lid}_{namespace,version} params were unavailable before version 2.26."""
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            adapter_namespace="foo",
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            adapter_version=123,
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            lid_namespace="foo",
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            lid_version=123,
+        )
 
 
 @pytest.mark.parametrize(
