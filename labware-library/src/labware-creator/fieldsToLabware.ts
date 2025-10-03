@@ -65,10 +65,8 @@ export function fieldsToLabware(
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
     const format = 'irregular'
-    const lpcQuirk =
-      fields.hasLpcQuirk === 'true' ? 'noLabwarePositionCheck' : null
-    let quirks: string[] = [...(lpcQuirk ? [lpcQuirk] : [])]
-
+    let quirks: string[] =
+      fields.hasLpcQuirk === 'true' ? ['noLabwarePositionCheck'] : []
     const heightOrDiameter =
       fields.wellShape === 'circular'
         ? fields.wellDiameter

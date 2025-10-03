@@ -433,7 +433,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   handPlacedTipFit: 'Fit',
   homogeneousWells: 'Are all your wells the same shape and size?',
   hasLpcQuirk:
-    'Do you want to exclude this labware from labware position check?',
+    'Do you want to exclude this labware from Labware Position Check?',
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',
   labwareZDimension: 'Height',

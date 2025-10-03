@@ -60,8 +60,7 @@ function getLabwareInfoRecords(
 
     const matchedDef = params.labwareDefs?.find(
       def => getLabwareDefURI(def) === uri
-    ) as LabwareDefinition | undefined
-
+    )
     if (matchedDef?.parameters?.quirks?.includes('noLabwarePositionCheck')) {
       return
     }
