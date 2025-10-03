@@ -171,10 +171,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **ref** | ${{ github.ref }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **monorepo** | ${{ github.ref }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **event** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **build type** | ${{ steps.determine-build-type.outputs.type }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **variants** | ${{ steps.determine-build-type.outputs.variants }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **buildroot** | (auto-determined from monorepo ref) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **oe-core** | (auto-determined from monorepo ref) |" >> $GITHUB_STEP_SUMMARY
 
   build-app:
     needs: [determine-build-type]
