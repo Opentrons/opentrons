@@ -58,6 +58,16 @@ export function VisualizerContainer(
   const resizingRef = useRef<'left' | 'right' | null>(null)
   const startXRef = useRef<number>(0)
   const startWidthRef = useRef<number>(0)
+  const leftWidthRef = useRef<number>(leftWidth)
+  const rightWidthRef = useRef<number>(rightWidth)
+
+  useEffect(() => {
+    leftWidthRef.current = leftWidth
+  }, [leftWidth])
+
+  useEffect(() => {
+    rightWidthRef.current = rightWidth
+  }, [rightWidth])
 
   const selectedCommandIndex = commands.findIndex(
     command => command.id === selectedCommandId
@@ -144,50 +154,55 @@ export function VisualizerContainer(
     window.addEventListener('mouseup', handleMouseUp)
   }
 
-  const handleMouseMove = useCallback(
-    (e: globalThis.MouseEvent) => {
-      if (resizingRef.current == null) return
+  const handleMouseMove = useCallback((e: globalThis.MouseEvent) => {
+    if (resizingRef.current == null) return
 
-      const containerWidth = containerRef.current?.clientWidth ?? 0
-      if (containerWidth === 0) return
+    const containerWidth = containerRef.current?.clientWidth ?? 0
+    if (containerWidth === 0) return
 
-      const deltaX = e.clientX - startXRef.current
+    const deltaX = e.clientX - startXRef.current
 
-      if (resizingRef.current === 'left') {
-        const newWidth = startWidthRef.current + deltaX
-        // calculate the remaining width of the center column
-        const centerWidth =
-          containerWidth - newWidth - rightWidth - CONTAINER_PADDING_PX
+    if (resizingRef.current === 'left') {
+      const newWidth = startWidthRef.current + deltaX
+      // calculate the remaining width of the center column
+      const centerWidth =
+        containerWidth - newWidth - rightWidthRef.current - CONTAINER_PADDING_PX
 
-        if (
-          newWidth >= MIN_COLUMN_WIDTH_PX &&
-          newWidth <= MAX_COLUMN_WIDTH_PX &&
-          centerWidth >= MIN_CENTER_WIDTH_PX
-        ) {
-          setLeftWidth(newWidth)
-        }
-      } else if (resizingRef.current === 'right') {
-        const newWidth = startWidthRef.current - deltaX
-        const centerWidth =
-          containerWidth - leftWidth - newWidth - CONTAINER_PADDING_PX
-
-        if (
-          newWidth >= MIN_COLUMN_WIDTH_PX &&
-          newWidth <= MAX_COLUMN_WIDTH_PX &&
-          centerWidth >= MIN_CENTER_WIDTH_PX
-        ) {
-          setRightWidth(newWidth)
-        }
+      if (
+        newWidth >= MIN_COLUMN_WIDTH_PX &&
+        newWidth <= MAX_COLUMN_WIDTH_PX &&
+        centerWidth >= MIN_CENTER_WIDTH_PX
+      ) {
+        setLeftWidth(newWidth)
       }
-    },
-    [leftWidth, rightWidth]
-  )
+    } else if (resizingRef.current === 'right') {
+      const newWidth = startWidthRef.current - deltaX
+      const centerWidth =
+        containerWidth - leftWidthRef.current - newWidth - CONTAINER_PADDING_PX
+
+      if (
+        newWidth >= MIN_COLUMN_WIDTH_PX &&
+        newWidth <= MAX_COLUMN_WIDTH_PX &&
+        centerWidth >= MIN_CENTER_WIDTH_PX
+      ) {
+        setRightWidth(newWidth)
+      }
+    }
+  }, [])
 
   const handleMouseUp = useCallback(() => {
     resizingRef.current = null
     window.removeEventListener('mousemove', handleMouseMove)
     window.removeEventListener('mouseup', handleMouseUp)
   }, [handleMouseMove])
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [handleMouseMove, handleMouseUp])
+
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
