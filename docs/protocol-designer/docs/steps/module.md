@@ -68,11 +68,11 @@ Protocol Designer includes Absorbance Plate Reader step details to help you keep
 Adding a Heater-Shaker Module step to your protocol displays any labware and adapters currently on the module. 
 
 <figure class="screenshot" markdown>
-  ![Heater-Shaker step](../images/heater-shaker-2.png)
+  ![Heater-Shaker step](../images/heater_shaker.png)
   <figcaption>Add a temperature, shake speed, and timer for a Heater-Shaker step.</figcaption>
 </figure>
 
-In this example, a Corning 96-well flat plate is placed on top of an Opentrons Universal Flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. To safely shake labware with a lid, use the Universal Flat Heater-Shaker Adapter Type B. 
+In this example, a Corning 96-well flat plate is placed on top of an Opentrons Universal Flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. 
 
 Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](../warnings-errors.md#errors) could occur. 
 

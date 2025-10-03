@@ -48,9 +48,7 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
 Choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack.
 
 !!! Note
-    In Protocol Designer v8.6.0, select **Tip rack** as the tip drop location to return your Flex or OT-2 pipette tips to the tip rack after aspirating, dispensing, or mixing.
-
-    The pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol. 
+    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol.  
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
