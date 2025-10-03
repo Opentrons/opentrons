@@ -1,29 +1,27 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
+  BasicButton,
   BORDERS,
   Box,
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  DISPLAY_GRID,
   Flex,
-  JUSTIFY_END,
-  LegacyStyledText,
-  OVERFLOW_WRAP_ANYWHERE,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
+  Tag,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
@@ -32,7 +30,6 @@ import {
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
-import { ReadMoreContent } from './ReadMoreContent'
 
 import type {
   JsonConfig,
@@ -42,6 +39,8 @@ import type {
 } from '@opentrons/shared-data'
 import type { AnalysisStatus } from '/app/transformations/analysis'
 import type { ProtocolDetailsProps } from './UpdatedProtocolDetails'
+
+const MAX_DESCRIPTION_LENGTH = 200
 
 interface ProtocolDetailsHeaderProps {
   analysisStatus: AnalysisStatus
@@ -66,9 +65,15 @@ export function ProtocolDetailsHeader({
   setShowSendProtocolToFlexSlideout,
   props,
 }: ProtocolDetailsHeaderProps): JSX.Element {
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
+  const [isReadMore, setIsReadMore] = useState(true)
+
+  const protocolDescription = mostRecentAnalysis?.metadata.description ?? ''
+  const slicedDescription = protocolDescription.slice(0, MAX_DESCRIPTION_LENGTH)
+  const isDescriptionTruncated =
+    protocolDescription.length > MAX_DESCRIPTION_LENGTH
 
   const getCreationMethod = (
     config: JsonConfig | PythonConfig,
@@ -147,111 +152,79 @@ export function ProtocolDetailsHeader({
             errors={mostRecentAnalysis.errors.map(e => e.detail)}
           />
         ) : null}
-        <LegacyStyledText
-          css={TYPOGRAPHY.h2SemiBold}
-          marginBottom={SPACING.spacing16}
-          data-testid={`ProtocolDetails_${protocolDisplayName}`}
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-        >
-          {protocolDisplayName}
-        </LegacyStyledText>
-        <Flex
-          display={DISPLAY_GRID}
-          width="100%"
-          gridTemplateColumns={
-            robotType === FLEX_ROBOT_TYPE
-              ? '25.5% 25.5% 25.5% 22.9%'
-              : '26.6% 26.6% 26.6% 20.2%'
-          }
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid="ProtocolDetails_creationMethod"
-          >
-            <LegacyStyledText as="h6" color={COLORS.grey60}>
-              {t('creation_method')}
-            </LegacyStyledText>
-            <LegacyStyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : creationMethod}
-            </LegacyStyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid="ProtocolDetails_lastUpdated"
-          >
-            <LegacyStyledText as="h6" color={COLORS.grey60}>
-              {t('last_updated')}
-            </LegacyStyledText>
-            <LegacyStyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : format(new Date(modified), 'M/d/yy HH:mm')}
-            </LegacyStyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid="ProtocolDetails_lastAnalyzed"
-          >
-            <LegacyStyledText as="h6" color={COLORS.grey60}>
-              {t('last_analyzed')}
-            </LegacyStyledText>
-            <LegacyStyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : lastAnalyzed}
-            </LegacyStyledText>
-          </Flex>
-          <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
-            <SecondaryButton
-              onClick={handleClickTimeline}
-              cursor={CURSOR_POINTER}
+        <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+          <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gap={SPACING.spacing4}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+              paddingRight={SPACING.spacing24}
             >
-              {t('visualize')}
-            </SecondaryButton>
-
-            <PrimaryButton
-              onClick={() => {
-                handleRunProtocolButtonClick()
-              }}
-              data-testid="ProtocolDetails_runProtocol"
-              disabled={analysisStatus === 'loading'}
-              whiteSpace="nowrap"
-            >
-              {t('start_setup')}
-            </PrimaryButton>
-          </Flex>
-        </Flex>
-        <Divider marginY={SPACING.spacing16} />
-        <Flex css={TWO_COL_GRID_STYLE}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid="ProtocolDetails_author"
-          >
-            <LegacyStyledText as="h6" color={COLORS.grey60}>
-              {t('org_or_author')}
-            </LegacyStyledText>
-            <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-              {analysisStatus === 'loading' ? t('shared:loading') : author}
-            </LegacyStyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid="ProtocolDetails_description"
-          >
-            <LegacyStyledText as="h6" color={COLORS.grey60}>
-              {t('description')}
-            </LegacyStyledText>
-            {analysisStatus === 'loading' ? (
-              <LegacyStyledText as="p">{t('shared:loading')}</LegacyStyledText>
-            ) : null}
-            {mostRecentAnalysis != null ? (
-              <ReadMoreContent
-                metadata={mostRecentAnalysis.metadata}
-                protocolType={mostRecentAnalysis.config.protocolType}
+              <StyledText desktopStyle="headingSmallBold">
+                {protocolDisplayName}
+              </StyledText>
+              <Flex gridGap={SPACING.spacing8}>
+                <SecondaryButton
+                  onClick={handleClickTimeline}
+                  cursor={CURSOR_POINTER}
+                >
+                  {t('visualize')}
+                </SecondaryButton>
+                <PrimaryButton
+                  onClick={() => {
+                    handleRunProtocolButtonClick()
+                  }}
+                  data-testid="ProtocolDetails_runProtocol"
+                  disabled={analysisStatus === 'loading'}
+                  whiteSpace="nowrap"
+                >
+                  {t('start_setup')}
+                </PrimaryButton>
+              </Flex>
+            </Flex>
+            {/* description section */}
+            <Flex>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+              >
+                {isDescriptionTruncated && isReadMore
+                  ? `${slicedDescription}... `
+                  : `${protocolDescription} `}
+                {isDescriptionTruncated ? (
+                  <BasicButton
+                    onClick={() => {
+                      setIsReadMore(!isReadMore)
+                    }}
+                    underLine
+                  >
+                    {isReadMore
+                      ? i18n.format(t('read_more'), 'capitalize')
+                      : i18n.format(t('read_less'), 'capitalize')}
+                  </BasicButton>
+                ) : null}
+              </StyledText>
+            </Flex>
+            {/* tag section */}
+            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing4}>
+              <Tag
+                text={`${i18n.format(t('date_added'), 'titleCase')}:  ${format(
+                  new Date(modified),
+                  'M/d/yy HH:mm'
+                )}`}
+                type="default"
               />
-            ) : null}
+              <Tag
+                text={`${i18n.format(
+                  t('last_analyzed'),
+                  'titleCase'
+                )}:  ${lastAnalyzed}`}
+                type="default"
+              />
+              <Tag text={creationMethod} type="default" />
+              <Tag text={`Author:${author}`} type="default" />
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
@@ -274,9 +247,3 @@ export function ProtocolDetailsHeader({
     </Flex>
   )
 }
-
-const TWO_COL_GRID_STYLE = css`
-  display: ${DISPLAY_GRID};
-  grid-gap: ${SPACING.spacing24};
-  grid-template-columns: 22.5% 77.5%;
-`
