@@ -51,7 +51,6 @@ DEFAULT_CAMERA = "/dev/ot_system_camera"
 )
 async def post_camera(
     request_body: RequestModel[CameraEnable],
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
@@ -125,7 +124,6 @@ async def post_camera(
     },
 )
 async def get_camera(
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
