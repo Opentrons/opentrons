@@ -155,7 +155,7 @@ export function VisualizerContainer(
   }
 
   const handleMouseMove = useCallback((e: globalThis.MouseEvent) => {
-    if (resizingRef.current == null) return
+    if (resizingRef.current === null) return
 
     const containerWidth = containerRef.current?.clientWidth ?? 0
     if (containerWidth === 0) return
@@ -196,12 +196,20 @@ export function VisualizerContainer(
     window.removeEventListener('mouseup', handleMouseUp)
   }, [handleMouseMove])
 
+  const handleMouseMoveRef = useRef(handleMouseMove)
+  const handleMouseUpRef = useRef(handleMouseUp)
+
+  useEffect(() => {
+    handleMouseMoveRef.current = handleMouseMove
+    handleMouseUpRef.current = handleMouseUp
+  }, [handleMouseMove, handleMouseUp])
+
   useEffect(() => {
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('mousemove', handleMouseMoveRef.current)
+      window.removeEventListener('mouseup', handleMouseUpRef.current)
     }
-  }, [handleMouseMove, handleMouseUp])
+  }, [])
 
   return (
     <div ref={containerRef} className={styles.layout_container}>
