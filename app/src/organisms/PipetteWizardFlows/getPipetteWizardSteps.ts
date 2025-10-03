@@ -1,5 +1,11 @@
-import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  RIGHT,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 
+import { ODD_SECTION_TITLE_STYLE } from '../ErrorRecoveryFlows/constants'
 import { FLOWS, SECTIONS } from './constants'
 
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -17,20 +23,43 @@ export const getPipetteWizardSteps = (
 ): PipetteWizardStep[] | null => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount,
-          flowType,
-        },
-        { section: SECTIONS.ATTACH_PROBE, mount, flowType },
-        { section: SECTIONS.DETACH_PROBE, mount, flowType },
-        {
-          section: SECTIONS.RESULTS,
-          mount,
-          flowType,
-        },
-      ]
+      if (selectedPipette === NINETY_SIX_CHANNEL) {
+        return [
+          {
+            section: SECTIONS.BEFORE_BEGINNING,
+            mount,
+            flowType,
+          },
+          { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
+          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+          { section: SECTIONS.DETACH_PROBE, mount, flowType },
+          {
+            section: SECTIONS.RESULTS,
+            mount,
+            flowType,
+          },
+          {
+            section: SECTIONS.ATTACH_WASTE_CHUTE,
+            mount,
+            flowType,
+          },
+        ]
+      } else {
+        return [
+          {
+            section: SECTIONS.BEFORE_BEGINNING,
+            mount,
+            flowType,
+          },
+          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+          { section: SECTIONS.DETACH_PROBE, mount, flowType },
+          {
+            section: SECTIONS.RESULTS,
+            mount,
+            flowType,
+          },
+        ]
+      }
     }
     case FLOWS.ATTACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
