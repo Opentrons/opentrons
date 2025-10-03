@@ -425,7 +425,9 @@ def generate_frusta(
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
     well_diameter = inner_well_json["wells"]["A1"].get("diameter")
+    well_side_length = inner_well_json["wells"]["A1"].get("xDimension")
     well_shape = inner_well_json["wells"]["A1"].get("shape")
+
 
     if well_shape == "circular":
         geoID = "conicalWell"
@@ -439,7 +441,7 @@ def generate_frusta(
         inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
 
     frusta_data = []
-    side_length = 0.0
+    frustum_side_length = 0.0
     frustum_diameter = 0.0
 
     for i in range(1, len(data)):
@@ -453,13 +455,13 @@ def generate_frusta(
 
         if geoID == "cuboidalWell":
             if not ctx.is_simulating():
-                side_length = round(np.sqrt(delta_volume / delta_height), 2)
+                frustum_side_length = round(np.sqrt(delta_volume / delta_height), 2)
             section = {
                 "shape": "cuboidal",
-                "bottomXDimension": side_length,
-                "bottomYDimension": side_length,
-                "topXDimension": side_length,
-                "topYDimension": side_length,
+                "bottomXDimension": frustum_side_length,
+                "bottomYDimension": frustum_side_length,
+                "topXDimension": frustum_side_length,
+                "topYDimension": frustum_side_length,
                 "topHeight": round(h2, 2),
                 "bottomHeight": round(h1, 2),
             }
@@ -487,10 +489,10 @@ def generate_frusta(
         if geoID == "cuboidalWell":
             final_section = {
                 "shape": "cuboidal",
-                "topXDimension": side_length,
-                "topYDimension": side_length,
-                "bottomXDimension": side_length,
-                "bottomYDimension": side_length,
+                "topXDimension": well_side_length,
+                "topYDimension": well_side_length,
+                "bottomXDimension": well_side_length,
+                "bottomYDimension": well_side_length,
                 "topHeight": depth,
                 "bottomHeight": bottom_height,
             }
