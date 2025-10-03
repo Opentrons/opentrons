@@ -1110,8 +1110,8 @@
       "sections": [
         {
           "shape": "conical",
-          "topDiameter": 6.9,
-          "bottomDiameter": 6.9,
+          "topDiameter": 7,
+          "bottomDiameter": 7,
           "topHeight": 24,
           "bottomHeight": 14.72
         },

@@ -212,8 +212,8 @@
       "sections": [
         {
           "shape": "conical",
-          "topDiameter": 14.74,
-          "bottomDiameter": 14.74,
+          "topDiameter": 15.2,
+          "bottomDiameter": 15.2,
           "topHeight": 117.5,
           "bottomHeight": 96.56
         },
