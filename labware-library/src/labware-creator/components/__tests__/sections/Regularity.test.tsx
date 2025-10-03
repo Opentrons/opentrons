@@ -49,7 +49,7 @@ describe('Regularity', () => {
       'Are all your FAKE LABWARE NAME PLURAL the same shape and size?'
     )
     screen.getByText(
-      'Do you want to exclude this labware from labware position check?'
+      'Do you want to exclude this labware from Labware Position Check?'
     )
     const radioElements = screen.getAllByRole('radio')
     expect(radioElements).toHaveLength(4)
