@@ -1538,7 +1538,7 @@ class FlexStackerContext(ModuleContext):
             applies to ``load_name``.
 
             .. versionchanged:: 2.26
-                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value. 
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
         :param adapter_version: Applies to ``adapter`` the same way that ``version``
             applies to ``load_name``.
