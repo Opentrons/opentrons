@@ -15,6 +15,7 @@ const EXPECTED_VALID_QUIRKS = [
   'tiprackAdapterFor96Channel',
   'stackingMaxFive',
   'stackingOnly',
+  'noLabwarePositionCheck',
   'disableGeometryBasedGripCheck',
 ]
 
