@@ -1193,7 +1193,7 @@
     "loadName": "costar_96_wellplate_2.2ml",
     "isMagneticModuleCompatible": false
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },

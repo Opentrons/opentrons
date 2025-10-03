@@ -35,7 +35,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "corning_falcon_384_wellplate_130ul_flat_lid"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithModule": {
