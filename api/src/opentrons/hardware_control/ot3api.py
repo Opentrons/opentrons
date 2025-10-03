@@ -1483,6 +1483,7 @@ class OT3API(
         expected_grip_width: float,
         grip_width_uncertainty_wider: float,
         grip_width_uncertainty_narrower: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """Ensure that a gripper pickup succeeded.
 
@@ -1503,6 +1504,7 @@ class OT3API(
             gripper.max_allowed_grip_error,
             gripper.min_jaw_width,
             gripper.max_jaw_width,
+            disable_geometry_grip_check,
         )
 
     def gripper_jaw_can_home(self) -> bool:

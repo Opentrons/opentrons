@@ -33,6 +33,12 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
 
+## Opentrons Protocol Designer Changes in 8.5.6
+
+**Welcome to Protocol Designer 8.5.6!**
+
+This hotfix release addresses a bug when dispensing into a trash bin or waste chute.
+
 ## Opentrons Protocol Designer Changes in 8.5.5
 
 **Welcome to Protocol Designer 8.5.5!**

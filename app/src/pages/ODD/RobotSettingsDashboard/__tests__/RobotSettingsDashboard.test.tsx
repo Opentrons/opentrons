@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -15,7 +16,12 @@ import {
   TouchScreenSleep,
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
-import { getAppLanguage, toggleDevtools } from '/app/redux/config'
+import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
+import {
+  getAppLanguage,
+  toggleDevtools,
+  useFeatureFlag,
+} from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotSettings } from '/app/redux/robot-settings'
@@ -48,6 +54,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchscreenBrightness')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/UpdateChannel')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -93,6 +100,7 @@ describe('RobotSettingsDashboard', () => {
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    when(useFeatureFlag).calledWith('camera').thenReturn(true)
   })
 
   afterEach(() => {
@@ -120,6 +128,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Privacy')
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device Reset')
+    screen.getByText('Camera Preferences')
     screen.getByText('Update Channel')
     screen.getByText('Developer Tools')
     screen.getByText('Access additional logging and feature flags.')
@@ -227,6 +236,13 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Touchscreen Brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
+  })
+
+  it('should render component when tapping camera preferences', () => {
+    render()
+    const button = screen.getByText('Camera Preferences')
+    fireEvent.click(button)
+    expect(vi.mocked(CameraPreferences)).toHaveBeenCalled()
   })
 
   it('should render component when tapping privacy', () => {
