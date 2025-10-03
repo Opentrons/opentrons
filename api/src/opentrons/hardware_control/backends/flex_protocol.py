@@ -451,6 +451,7 @@ class FlexBackend(Protocol):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         ...
 

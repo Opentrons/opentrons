@@ -1,35 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  DIRECTION_COLUMN,
-  Divider,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
 
-import {
-  getEnablePartialTipSupport,
-  getEnableTipPickupLocation,
-} from '/protocol-designer/feature-flags/selectors'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
-  getLabwareEntities,
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
 
 import {
-  ChangeTipField,
-  DropTipField,
   LabwareField,
   PartialTipField,
   PathField,
-  PickUpTipField,
   PipetteField,
   TiprackField,
-  TipWellSelectionField,
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
@@ -47,13 +33,11 @@ export function FirstStepMoveLiquidTools({
   formData,
 }: FirstStepMoveLiquidToolsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
-  const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableTipPickupLocation = useSelector(getEnableTipPickupLocation)
 
   const { pipette, tipRack } = propsForFields
   const is96Channel =
@@ -62,10 +46,6 @@ export function FirstStepMoveLiquidTools({
   const is8Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].spec.channels === 8
-  const userSelectedDropTipLocation =
-    labwares[String(propsForFields.dropTip_location.value)] != null
-  const userSelectedPickUpTipLocation =
-    labwares[String(propsForFields.pickUpTip_location.value)] != null
   const isDisposalLocation =
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'wasteChute' ||
@@ -132,8 +112,6 @@ export function FirstStepMoveLiquidTools({
         )}
       </Flex>
       <Divider marginY="0" />
-      <VolumeField {...propsForFields.volume} />
-      <Divider marginY="0" />
       <PathField
         {...propsForFields.path}
         aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
@@ -148,69 +126,7 @@ export function FirstStepMoveLiquidTools({
         title={t('pipette_path')}
       />
       <Divider marginY="0" />
-      <Flex
-        paddingX={SPACING.spacing16}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-      >
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('tip_management')}
-        </StyledText>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-          <ChangeTipField
-            {...propsForFields.changeTip}
-            aspirateWells={formData.aspirate_wells}
-            dispenseWells={formData.dispense_wells}
-            path={formData.path}
-            stepType={formData.stepType}
-            isDisposalLocation={isDisposalLocation}
-            tooltipContent={null}
-            padding="0"
-          />
-          <DropTipField
-            {...propsForFields.dropTip_location}
-            nozzles={formData.nozzles}
-            tiprackDefUri={formData.tipRack}
-            tooltipContent={null}
-            padding="0"
-          />
-        </Flex>
-      </Flex>
-      {enableTipPickupLocation ? (
-        <>
-          <Divider marginY="0" />
-          <PickUpTipField {...propsForFields.pickUpTip_location} />
-          {userSelectedPickUpTipLocation ? (
-            <>
-              <TipWellSelectionField
-                {...propsForFields.pickUpTip_wellNames}
-                nozzles={
-                  typeof propsForFields.nozzles.value === 'string'
-                    ? propsForFields.nozzles.value
-                    : null
-                }
-                labwareId={propsForFields.pickUpTip_location.value}
-                pipetteId={propsForFields.pipette.value}
-              />
-            </>
-          ) : null}
-        </>
-      ) : null}
-      {userSelectedDropTipLocation && enableTipPickupLocation ? (
-        <>
-          <Divider marginY="0" />
-          <TipWellSelectionField
-            {...propsForFields.dropTip_wellNames}
-            nozzles={
-              typeof propsForFields.nozzles.value === 'string'
-                ? propsForFields.nozzles.value
-                : null
-            }
-            labwareId={propsForFields.dropTip_location.value}
-            pipetteId={propsForFields.pipette.value}
-          />
-        </>
-      ) : null}
+      <VolumeField {...propsForFields.volume} />
     </Flex>
   )
 }

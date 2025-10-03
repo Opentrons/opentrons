@@ -16,6 +16,7 @@ const EXPECTED_VALID_QUIRKS = [
   'stackingMaxFive',
   'stackingOnly',
   'noLabwarePositionCheck',
+  'disableGeometryBasedGripCheck',
 ]
 
 describe('check quirks for all labware defs', () => {

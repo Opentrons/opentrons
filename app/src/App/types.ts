@@ -20,6 +20,7 @@ export interface RouteProps {
 export type RobotSettingsTab =
   | 'calibration'
   | 'networking'
+  | 'camera'
   | 'advanced'
   | 'feature-flags'
 

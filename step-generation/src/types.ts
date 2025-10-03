@@ -21,9 +21,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AUTOMATIC,
   CLEAN,
   DIRTY,
   EMPTY,
+  MANUAL,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -819,3 +821,5 @@ export interface WellContents {
 export interface WellContentsByNumber {
   [wellName: string]: number
 }
+
+export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL
