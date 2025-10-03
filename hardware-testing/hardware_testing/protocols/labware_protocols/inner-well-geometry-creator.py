@@ -507,6 +507,8 @@ def generate_frusta(
         if final_section:
             frusta_data.append(final_section)
 
+        frusta_data.reverse()
+
     inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
     # Rebuild JSON in schema order
