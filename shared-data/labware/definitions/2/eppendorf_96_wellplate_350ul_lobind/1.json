@@ -1110,59 +1110,10 @@
       "sections": [
         {
           "shape": "conical",
-          "bottomDiameter": 5,
-          "topDiameter": 5,
-          "topHeight": 2.04,
-          "bottomHeight": 0
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 5.92,
-          "topDiameter": 5.92,
-          "topHeight": 2.99,
-          "bottomHeight": 2.04
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 7.38,
-          "topDiameter": 7.38,
-          "topHeight": 3.84,
-          "bottomHeight": 2.99
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 7.34,
-          "topDiameter": 7.34,
-          "topHeight": 4.7,
-          "bottomHeight": 3.84
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 7.06,
-          "topDiameter": 7.06,
-          "topHeight": 5.62,
-          "bottomHeight": 4.7
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.66,
-          "topDiameter": 6.66,
-          "topHeight": 6.65,
-          "bottomHeight": 5.62
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.94,
-          "topDiameter": 6.94,
-          "topHeight": 7.61,
-          "bottomHeight": 6.65
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.74,
-          "topDiameter": 6.74,
-          "topHeight": 8.62,
-          "bottomHeight": 7.61
+          "topDiameter": 7.26,
+          "bottomDiameter": 7.26,
+          "topHeight": 11.35,
+          "bottomHeight": 9.49
         },
         {
           "shape": "conical",
@@ -1173,10 +1124,59 @@
         },
         {
           "shape": "conical",
-          "topDiameter": 7.26,
-          "bottomDiameter": 7.26,
-          "topHeight": 11.35,
-          "bottomHeight": 9.49
+          "bottomDiameter": 6.74,
+          "topDiameter": 6.74,
+          "topHeight": 8.62,
+          "bottomHeight": 7.61
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 6.94,
+          "topDiameter": 6.94,
+          "topHeight": 7.61,
+          "bottomHeight": 6.65
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 6.66,
+          "topDiameter": 6.66,
+          "topHeight": 6.65,
+          "bottomHeight": 5.62
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 7.06,
+          "topDiameter": 7.06,
+          "topHeight": 5.62,
+          "bottomHeight": 4.7
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 7.34,
+          "topDiameter": 7.34,
+          "topHeight": 4.7,
+          "bottomHeight": 3.84
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 7.38,
+          "topDiameter": 7.38,
+          "topHeight": 3.84,
+          "bottomHeight": 2.99
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 5.92,
+          "topDiameter": 5.92,
+          "topHeight": 2.99,
+          "bottomHeight": 2.04
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 5,
+          "topDiameter": 5,
+          "topHeight": 2.04,
+          "bottomHeight": 0
         }
       ]
     }

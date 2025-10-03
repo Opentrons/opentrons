@@ -1110,38 +1110,31 @@
       "sections": [
         {
           "shape": "conical",
-          "bottomDiameter": 2.66,
-          "topDiameter": 2.66,
-          "topHeight": 2.68,
-          "bottomHeight": 0
+          "topDiameter": 5.98,
+          "bottomDiameter": 5.98,
+          "topHeight": 14.6,
+          "bottomHeight": 9.89
         },
         {
           "shape": "conical",
-          "bottomDiameter": 3.66,
-          "topDiameter": 3.66,
-          "topHeight": 3.61,
-          "bottomHeight": 2.68
+          "bottomDiameter": 5.98,
+          "topDiameter": 5.98,
+          "topHeight": 9.89,
+          "bottomHeight": 8.91
         },
         {
           "shape": "conical",
-          "bottomDiameter": 3.62,
-          "topDiameter": 3.62,
-          "topHeight": 4.55,
-          "bottomHeight": 3.61
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 4.34,
-          "topDiameter": 4.34,
-          "topHeight": 5.42,
-          "bottomHeight": 4.55
+          "bottomDiameter": 5.1,
+          "topDiameter": 5.1,
+          "topHeight": 8.91,
+          "bottomHeight": 7.83
         },
         {
           "shape": "conical",
           "bottomDiameter": 4.52,
           "topDiameter": 4.52,
-          "topHeight": 6.22,
-          "bottomHeight": 5.42
+          "topHeight": 7.83,
+          "bottomHeight": 7.02
         },
         {
           "shape": "conical",
@@ -1154,29 +1147,36 @@
           "shape": "conical",
           "bottomDiameter": 4.52,
           "topDiameter": 4.52,
-          "topHeight": 7.83,
-          "bottomHeight": 7.02
+          "topHeight": 6.22,
+          "bottomHeight": 5.42
         },
         {
           "shape": "conical",
-          "bottomDiameter": 5.1,
-          "topDiameter": 5.1,
-          "topHeight": 8.91,
-          "bottomHeight": 7.83
+          "bottomDiameter": 4.34,
+          "topDiameter": 4.34,
+          "topHeight": 5.42,
+          "bottomHeight": 4.55
         },
         {
           "shape": "conical",
-          "bottomDiameter": 5.98,
-          "topDiameter": 5.98,
-          "topHeight": 9.89,
-          "bottomHeight": 8.91
+          "bottomDiameter": 3.62,
+          "topDiameter": 3.62,
+          "topHeight": 4.55,
+          "bottomHeight": 3.61
         },
         {
           "shape": "conical",
-          "topDiameter": 5.98,
-          "bottomDiameter": 5.98,
-          "topHeight": 14.6,
-          "bottomHeight": 9.89
+          "bottomDiameter": 3.66,
+          "topDiameter": 3.66,
+          "topHeight": 3.61,
+          "bottomHeight": 2.68
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 2.66,
+          "topDiameter": 2.66,
+          "topHeight": 2.68,
+          "bottomHeight": 0
         }
       ]
     }

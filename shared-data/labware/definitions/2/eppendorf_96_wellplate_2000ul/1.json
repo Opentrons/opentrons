@@ -1202,174 +1202,12 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "bottomXDimension": 4.75,
-          "bottomYDimension": 4.75,
-          "topXDimension": 4.75,
-          "topYDimension": 4.75,
-          "topHeight": 2.21,
-          "bottomHeight": 0
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.33,
-          "bottomYDimension": 7.33,
-          "topXDimension": 7.33,
-          "topYDimension": 7.33,
-          "topHeight": 3.53,
-          "bottomHeight": 2.21
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.35,
-          "bottomYDimension": 8.35,
-          "topXDimension": 8.35,
-          "topYDimension": 8.35,
-          "topHeight": 4.9,
-          "bottomHeight": 3.53
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.53,
-          "bottomYDimension": 7.53,
-          "topXDimension": 7.53,
-          "topYDimension": 7.53,
-          "topHeight": 6.35,
-          "bottomHeight": 4.9
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.12,
-          "bottomYDimension": 8.12,
-          "topXDimension": 8.12,
-          "topYDimension": 8.12,
-          "topHeight": 7.75,
-          "bottomHeight": 6.35
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.12,
-          "bottomYDimension": 7.12,
-          "topXDimension": 7.12,
-          "topYDimension": 7.12,
-          "topHeight": 9.38,
-          "bottomHeight": 7.75
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.98,
-          "bottomYDimension": 7.98,
-          "topXDimension": 7.98,
-          "topYDimension": 7.98,
-          "topHeight": 10.68,
-          "bottomHeight": 9.38
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.71,
-          "bottomYDimension": 7.71,
-          "topXDimension": 7.71,
-          "topYDimension": 7.71,
-          "topHeight": 12.08,
-          "bottomHeight": 10.68
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.77,
-          "bottomYDimension": 7.77,
-          "topXDimension": 7.77,
-          "topYDimension": 7.77,
-          "topHeight": 13.45,
-          "bottomHeight": 12.08
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.19,
-          "bottomYDimension": 8.19,
-          "topXDimension": 8.19,
-          "topYDimension": 8.19,
-          "topHeight": 14.88,
-          "bottomHeight": 13.45
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.99,
-          "bottomYDimension": 7.99,
-          "topXDimension": 7.99,
-          "topYDimension": 7.99,
-          "topHeight": 16.38,
-          "bottomHeight": 14.88
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.84,
-          "bottomYDimension": 7.84,
-          "topXDimension": 7.84,
-          "topYDimension": 7.84,
-          "topHeight": 17.73,
-          "bottomHeight": 16.38
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.88,
-          "bottomYDimension": 7.88,
-          "topXDimension": 7.88,
-          "topYDimension": 7.88,
-          "topHeight": 19.07,
-          "bottomHeight": 17.73
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.7,
-          "bottomYDimension": 7.7,
-          "topXDimension": 7.7,
-          "topYDimension": 7.7,
-          "topHeight": 20.47,
-          "bottomHeight": 19.07
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.09,
-          "bottomYDimension": 8.09,
-          "topXDimension": 8.09,
-          "topYDimension": 8.09,
-          "topHeight": 21.89,
-          "bottomHeight": 20.47
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.1,
-          "bottomYDimension": 8.1,
-          "topXDimension": 8.1,
-          "topYDimension": 8.1,
-          "topHeight": 23.29,
-          "bottomHeight": 21.89
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.07,
-          "bottomYDimension": 8.07,
-          "topXDimension": 8.07,
-          "topYDimension": 8.07,
-          "topHeight": 24.71,
-          "bottomHeight": 23.29
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 7.86,
-          "bottomYDimension": 7.86,
-          "topXDimension": 7.86,
-          "topYDimension": 7.86,
-          "topHeight": 26.2,
-          "bottomHeight": 24.71
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 8.11,
-          "bottomYDimension": 8.11,
-          "topXDimension": 8.11,
-          "topYDimension": 8.11,
-          "topHeight": 27.61,
-          "bottomHeight": 26.2
+          "topXDimension": 8.28,
+          "topYDimension": 8.28,
+          "bottomXDimension": 8.28,
+          "bottomYDimension": 8.28,
+          "topHeight": 41.2,
+          "bottomHeight": 28.96
         },
         {
           "shape": "cuboidal",
@@ -1382,12 +1220,174 @@
         },
         {
           "shape": "cuboidal",
-          "topXDimension": 8.28,
-          "topYDimension": 8.28,
-          "bottomXDimension": 8.28,
-          "bottomYDimension": 8.28,
-          "topHeight": 41.2,
-          "bottomHeight": 28.96
+          "bottomXDimension": 8.11,
+          "bottomYDimension": 8.11,
+          "topXDimension": 8.11,
+          "topYDimension": 8.11,
+          "topHeight": 27.61,
+          "bottomHeight": 26.2
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.86,
+          "bottomYDimension": 7.86,
+          "topXDimension": 7.86,
+          "topYDimension": 7.86,
+          "topHeight": 26.2,
+          "bottomHeight": 24.71
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.07,
+          "bottomYDimension": 8.07,
+          "topXDimension": 8.07,
+          "topYDimension": 8.07,
+          "topHeight": 24.71,
+          "bottomHeight": 23.29
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.1,
+          "bottomYDimension": 8.1,
+          "topXDimension": 8.1,
+          "topYDimension": 8.1,
+          "topHeight": 23.29,
+          "bottomHeight": 21.89
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.09,
+          "bottomYDimension": 8.09,
+          "topXDimension": 8.09,
+          "topYDimension": 8.09,
+          "topHeight": 21.89,
+          "bottomHeight": 20.47
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.7,
+          "bottomYDimension": 7.7,
+          "topXDimension": 7.7,
+          "topYDimension": 7.7,
+          "topHeight": 20.47,
+          "bottomHeight": 19.07
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.88,
+          "bottomYDimension": 7.88,
+          "topXDimension": 7.88,
+          "topYDimension": 7.88,
+          "topHeight": 19.07,
+          "bottomHeight": 17.73
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.84,
+          "bottomYDimension": 7.84,
+          "topXDimension": 7.84,
+          "topYDimension": 7.84,
+          "topHeight": 17.73,
+          "bottomHeight": 16.38
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.99,
+          "bottomYDimension": 7.99,
+          "topXDimension": 7.99,
+          "topYDimension": 7.99,
+          "topHeight": 16.38,
+          "bottomHeight": 14.88
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.19,
+          "bottomYDimension": 8.19,
+          "topXDimension": 8.19,
+          "topYDimension": 8.19,
+          "topHeight": 14.88,
+          "bottomHeight": 13.45
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.77,
+          "bottomYDimension": 7.77,
+          "topXDimension": 7.77,
+          "topYDimension": 7.77,
+          "topHeight": 13.45,
+          "bottomHeight": 12.08
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.71,
+          "bottomYDimension": 7.71,
+          "topXDimension": 7.71,
+          "topYDimension": 7.71,
+          "topHeight": 12.08,
+          "bottomHeight": 10.68
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.98,
+          "bottomYDimension": 7.98,
+          "topXDimension": 7.98,
+          "topYDimension": 7.98,
+          "topHeight": 10.68,
+          "bottomHeight": 9.38
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.12,
+          "bottomYDimension": 7.12,
+          "topXDimension": 7.12,
+          "topYDimension": 7.12,
+          "topHeight": 9.38,
+          "bottomHeight": 7.75
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.12,
+          "bottomYDimension": 8.12,
+          "topXDimension": 8.12,
+          "topYDimension": 8.12,
+          "topHeight": 7.75,
+          "bottomHeight": 6.35
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.53,
+          "bottomYDimension": 7.53,
+          "topXDimension": 7.53,
+          "topYDimension": 7.53,
+          "topHeight": 6.35,
+          "bottomHeight": 4.9
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 8.35,
+          "bottomYDimension": 8.35,
+          "topXDimension": 8.35,
+          "topYDimension": 8.35,
+          "topHeight": 4.9,
+          "bottomHeight": 3.53
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 7.33,
+          "bottomYDimension": 7.33,
+          "topXDimension": 7.33,
+          "topYDimension": 7.33,
+          "topHeight": 3.53,
+          "bottomHeight": 2.21
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 4.75,
+          "bottomYDimension": 4.75,
+          "topXDimension": 4.75,
+          "topYDimension": 4.75,
+          "topHeight": 2.21,
+          "bottomHeight": 0
         }
       ]
     }

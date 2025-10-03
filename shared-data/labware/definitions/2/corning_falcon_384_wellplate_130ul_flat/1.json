@@ -5071,7 +5071,7 @@
   },
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {
@@ -5089,39 +5089,12 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "bottomXDimension": 3.6,
-          "bottomYDimension": 3.6,
-          "topXDimension": 3.6,
-          "topYDimension": 3.6,
-          "topHeight": 2.31,
-          "bottomHeight": 0
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.35,
-          "bottomYDimension": 3.35,
-          "topXDimension": 3.35,
-          "topYDimension": 3.35,
-          "topHeight": 3.99,
-          "bottomHeight": 2.31
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.56,
-          "bottomYDimension": 3.56,
-          "topXDimension": 3.56,
-          "topYDimension": 3.56,
-          "topHeight": 5.47,
-          "bottomHeight": 3.99
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.45,
-          "bottomYDimension": 3.45,
-          "topXDimension": 3.45,
-          "topYDimension": 3.45,
-          "topHeight": 7.05,
-          "bottomHeight": 5.47
+          "topXDimension": 3.68,
+          "topYDimension": 3.68,
+          "bottomXDimension": 3.68,
+          "bottomYDimension": 3.68,
+          "topHeight": 11.5,
+          "bottomHeight": 8.72
         },
         {
           "shape": "cuboidal",
@@ -5134,12 +5107,39 @@
         },
         {
           "shape": "cuboidal",
-          "topXDimension": 3.68,
-          "topYDimension": 3.68,
-          "bottomXDimension": 3.68,
-          "bottomYDimension": 3.68,
-          "topHeight": 11.5,
-          "bottomHeight": 8.72
+          "bottomXDimension": 3.45,
+          "bottomYDimension": 3.45,
+          "topXDimension": 3.45,
+          "topYDimension": 3.45,
+          "topHeight": 7.05,
+          "bottomHeight": 5.47
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.56,
+          "bottomYDimension": 3.56,
+          "topXDimension": 3.56,
+          "topYDimension": 3.56,
+          "topHeight": 5.47,
+          "bottomHeight": 3.99
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.35,
+          "bottomYDimension": 3.35,
+          "topXDimension": 3.35,
+          "topYDimension": 3.35,
+          "topHeight": 3.99,
+          "bottomHeight": 2.31
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.6,
+          "bottomYDimension": 3.6,
+          "topXDimension": 3.6,
+          "topYDimension": 3.6,
+          "topHeight": 2.31,
+          "bottomHeight": 0
         }
       ]
     }

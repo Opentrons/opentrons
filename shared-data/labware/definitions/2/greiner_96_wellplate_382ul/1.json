@@ -1110,31 +1110,10 @@
       "sections": [
         {
           "shape": "conical",
-          "bottomDiameter": 7.22,
-          "topDiameter": 7.22,
-          "topHeight": 2.45,
-          "bottomHeight": 0
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.8,
-          "topDiameter": 6.8,
-          "topHeight": 3.9,
-          "bottomHeight": 2.45
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.68,
-          "topDiameter": 6.68,
-          "topHeight": 5.4,
-          "bottomHeight": 3.9
-        },
-        {
-          "shape": "conical",
-          "bottomDiameter": 6.44,
-          "topDiameter": 6.44,
-          "topHeight": 7.02,
-          "bottomHeight": 5.4
+          "topDiameter": 7.64,
+          "bottomDiameter": 7.64,
+          "topHeight": 10.9,
+          "bottomHeight": 8.62
         },
         {
           "shape": "conical",
@@ -1145,10 +1124,31 @@
         },
         {
           "shape": "conical",
-          "topDiameter": 7.64,
-          "bottomDiameter": 7.64,
-          "topHeight": 10.9,
-          "bottomHeight": 8.62
+          "bottomDiameter": 6.44,
+          "topDiameter": 6.44,
+          "topHeight": 7.02,
+          "bottomHeight": 5.4
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 6.68,
+          "topDiameter": 6.68,
+          "topHeight": 5.4,
+          "bottomHeight": 3.9
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 6.8,
+          "topDiameter": 6.8,
+          "topHeight": 3.9,
+          "bottomHeight": 2.45
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 7.22,
+          "topDiameter": 7.22,
+          "topHeight": 2.45,
+          "bottomHeight": 0
         }
       ]
     }

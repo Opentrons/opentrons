@@ -5078,39 +5078,12 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "bottomXDimension": 3.28,
-          "bottomYDimension": 3.28,
-          "topXDimension": 3.28,
-          "topYDimension": 3.28,
-          "topHeight": 2.32,
-          "bottomHeight": 0
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.43,
-          "bottomYDimension": 3.43,
-          "topXDimension": 3.43,
-          "topYDimension": 3.43,
-          "topHeight": 3.94,
-          "bottomHeight": 2.32
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.38,
-          "bottomYDimension": 3.38,
-          "topXDimension": 3.38,
-          "topYDimension": 3.38,
-          "topHeight": 5.56,
-          "bottomHeight": 3.94
-        },
-        {
-          "shape": "cuboidal",
-          "bottomXDimension": 3.62,
-          "bottomYDimension": 3.62,
-          "topXDimension": 3.62,
-          "topYDimension": 3.62,
-          "topHeight": 6.99,
-          "bottomHeight": 5.56
+          "topXDimension": 3.27,
+          "topYDimension": 3.27,
+          "bottomXDimension": 3.27,
+          "bottomYDimension": 3.27,
+          "topHeight": 11.7,
+          "bottomHeight": 8.49
         },
         {
           "shape": "cuboidal",
@@ -5123,12 +5096,39 @@
         },
         {
           "shape": "cuboidal",
-          "topXDimension": 3.27,
-          "topYDimension": 3.27,
-          "bottomXDimension": 3.27,
-          "bottomYDimension": 3.27,
-          "topHeight": 11.7,
-          "bottomHeight": 8.49
+          "bottomXDimension": 3.62,
+          "bottomYDimension": 3.62,
+          "topXDimension": 3.62,
+          "topYDimension": 3.62,
+          "topHeight": 6.99,
+          "bottomHeight": 5.56
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.38,
+          "bottomYDimension": 3.38,
+          "topXDimension": 3.38,
+          "topYDimension": 3.38,
+          "topHeight": 5.56,
+          "bottomHeight": 3.94
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.43,
+          "bottomYDimension": 3.43,
+          "topXDimension": 3.43,
+          "topYDimension": 3.43,
+          "topHeight": 3.94,
+          "bottomHeight": 2.32
+        },
+        {
+          "shape": "cuboidal",
+          "bottomXDimension": 3.28,
+          "bottomYDimension": 3.28,
+          "topXDimension": 3.28,
+          "topYDimension": 3.28,
+          "topHeight": 2.32,
+          "bottomHeight": 0
         }
       ]
     }
