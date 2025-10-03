@@ -5089,10 +5089,10 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 3.68,
-          "topYDimension": 3.68,
-          "bottomXDimension": 3.68,
-          "bottomYDimension": 3.68,
+          "topXDimension": 3.7,
+          "topYDimension": 3.7,
+          "bottomXDimension": 3.7,
+          "bottomYDimension": 3.7,
           "topHeight": 11.5,
           "bottomHeight": 8.72
         },
