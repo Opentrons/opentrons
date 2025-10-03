@@ -1,0 +1,64 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-40);
+}
+
+.content_container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-60) var(--spacing-120) var(--spacing-60);
+  margin-top: 7.75rem;
+  gap: var(--spacing-24);
+}
+
+.image {
+  /* Fill w/h minus padding. */
+  border-radius: var(--border-radius-4);
+  object-fit: contain;
+}
+
+.image_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom_btn_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.zoom_label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.tile_setting_container {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-48) 0;
+  gap: var(--spacing-24);
+}
+
+.tile_container {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.tile {
+  width: 10.5rem;
+  height: 8.75rem;
+  border-radius: 8px;
+}
+
+.tile_active {
+  background-color: var(--blue-50);
+}
+
+.tile_inactive {
+  background-color: var(--blue-35);
+}
