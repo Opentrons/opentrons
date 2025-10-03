@@ -11,7 +11,7 @@ The protocol starting deck view shows how your Flex or OT-2 deck will look at th
 To start, the deck includes your chosen modules and fixtures. Click **Deck hardware** in the upper left to add, move, or delete modules or fixtures. Protocol Designer only shows compatible options for each slot. 
 
 <figure class="screenshot" markdown>
-  ![Configure hardware](images/configure_hardware.png)
+  ![Configure hardware](images/configure-hardware.png)
   <figcaption>Add, move, or delete deck hardware, like modules and fixtures.</figcaption>
 </figure>
 
