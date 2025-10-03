@@ -1766,6 +1766,7 @@ class OT3Controller(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """
         Check if the gripper is at the expected location.
@@ -1808,6 +1809,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_min
             < -max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws closed too far",
@@ -1821,6 +1823,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_max
             > max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws could not close far enough",

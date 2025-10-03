@@ -216,8 +216,9 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   )
   const labwareId = formData[`${tab}_labware`]
+  const shouldCheckLabwareDef = tab === 'aspirate' || !isDestinationTrash
   // The getMinXYDimension() call below is crashing quite often, but I'm not sure why
-  if (!labwareEntities[labwareId]?.def) {
+  if (shouldCheckLabwareDef && !labwareEntities[labwareId]?.def) {
     throw new Error(
       `missing ${tab}_labware def for ${labwareId}, ` +
         `in labwareEntities: ${!!labwareEntities[labwareId]}`
