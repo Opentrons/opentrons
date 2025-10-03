@@ -424,6 +424,7 @@ def generate_frusta(
 
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
+    well_diameter = inner_well_json["wells"]["A1"].get("diameter")
     well_shape = inner_well_json["wells"]["A1"].get("shape")
 
     if well_shape == "circular":
@@ -439,7 +440,7 @@ def generate_frusta(
 
     frusta_data = []
     side_length = 0.0
-    diameter = 0.0
+    frustum_diameter = 0.0
 
     for i in range(1, len(data)):
         vol1, h1 = data[i - 1]
@@ -465,11 +466,11 @@ def generate_frusta(
         elif geoID == "conicalWell":
             if not ctx.is_simulating():
                 radius = round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
-                diameter = 2 * radius
+                frustum_diameter = 2 * radius
             section = {
                 "shape": "conical",
-                "bottomDiameter": diameter,
-                "topDiameter": diameter,
+                "bottomDiameter": frustum_diameter,
+                "topDiameter": frustum_diameter,
                 "topHeight": round(h2, 2),
                 "bottomHeight": round(h1, 2),
             }
@@ -496,8 +497,8 @@ def generate_frusta(
         elif geoID == "conicalWell":
             final_section = {
                 "shape": "conical",
-                "topDiameter": diameter,
-                "bottomDiameter": diameter,
+                "topDiameter": well_diameter,
+                "bottomDiameter": well_diameter,
                 "topHeight": depth,
                 "bottomHeight": bottom_height,
             }
