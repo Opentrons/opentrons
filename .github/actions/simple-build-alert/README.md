@@ -15,40 +15,44 @@ A lightweight GitHub Action that sends Slack notifications for tagged build fail
 - name: 'Send build alert'
   uses: ./.github/actions/simple-build-alert
   with:
-    status: 'failure'  # success, failure, or cancelled
+    status: 'failure' # success, failure, or cancelled
     workflow_name: 'App test, build, and deploy'
-    failed_jobs: 'js-unit-test,build-app'  # optional
-    channel_override: '#custom-channel'    # optional
+    failed_jobs: 'js-unit-test,build-app' # optional
+    channel_override: '#custom-channel' # optional
 ```
 
 ## Inputs
 
-| Input | Required | Description |
-|-------|----------|-------------|
-| `status` | ✅ | Build status: `success`, `failure`, or `cancelled` |
-| `workflow_name` | ✅ | Name of the workflow that triggered the alert |
-| `failed_jobs` | ❌ | Comma-separated list of failed jobs (e.g., `js-unit-test,build-app`) |
-| `channel_override` | ❌ | Override automatic channel selection (e.g., `#custom-channel`) |
+| Input              | Required | Description                                                          |
+| ------------------ | -------- | -------------------------------------------------------------------- |
+| `status`           | ✅       | Build status: `success`, `failure`, or `cancelled`                   |
+| `workflow_name`    | ✅       | Name of the workflow that triggered the alert                        |
+| `failed_jobs`      | ❌       | Comma-separated list of failed jobs (e.g., `js-unit-test,build-app`) |
+| `channel_override` | ❌       | Override automatic channel selection (e.g., `#custom-channel`)       |
 
 ## Automatic Channel Routing
 
 The action automatically routes notifications to different Slack channels based on the tag pattern:
 
 ### Main Releases → `#release-cycle`
+
 - `v*` - Version releases (v7.2.0, v8.0.0, etc.)
 - `ot3@*` - OT3 releases (ot3@7.2.0, ot3@8.0.0, etc.)
 
 ### Component Releases → `#builds`
+
 - `protocol-designer*` - Protocol Designer releases
 - `labware-library*` - Labware Library releases
 - `components*` - Components releases
 - `shared-data*` - Shared Data releases
 
 ### AI Releases → `#builds`
+
 - `ai-client@*` - AI Client releases
 - `ai-server@*` - AI Server releases
 
 ### Documentation Releases → `#builds`
+
 - `docs@*` - Documentation releases
 - `MKDOCS*` - MkDocs releases
 - `staging-docs@*` - Documentation staging
@@ -56,6 +60,7 @@ The action automatically routes notifications to different Slack channels based 
 - `staging-mkdocs*` - MkDocs staging (lowercase)
 
 ### Default → `#release-cycle`
+
 - Any other tag pattern defaults to the release cycle channel
 
 ## Required Secrets
@@ -63,11 +68,13 @@ The action automatically routes notifications to different Slack channels based 
 You need to set up these repository secrets:
 
 ### 1. Release Cycle Webhook
+
 - **Secret Name**: `OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL`
 - **Channel**: `#release-cycle`
 - **Used for**: Main releases (v*, ot3@*)
 
 ### 2. Builds Channel Webhook
+
 - **Secret Name**: `OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL`
 - **Channel**: `#builds`
 - **Used for**: Component, AI, and documentation releases
@@ -77,6 +84,7 @@ You need to set up these repository secrets:
 ### 1. Create Slack Webhooks
 
 #### For #release-cycle channel:
+
 1. Go to your Slack workspace
 2. Create a new app or use existing one
 3. Go to "Incoming Webhooks"
@@ -84,6 +92,7 @@ You need to set up these repository secrets:
 5. Copy the webhook URL
 
 #### For #builds channel:
+
 1. Create another webhook for `#builds` channel
 2. Copy the webhook URL
 
@@ -103,7 +112,7 @@ Add these notification jobs to any workflow:
 notify-success:
   name: 'Notify Build Success'
   runs-on: 'ubuntu-latest'
-  needs: [job1, job2, job3]  # Replace with your job names
+  needs: [job1, job2, job3] # Replace with your job names
   if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.job1.result == 'success' && needs.job2.result == 'success' && needs.job3.result == 'success'
   steps:
     - name: 'Send success alert'
@@ -116,7 +125,7 @@ notify-success:
 notify-failure:
   name: 'Notify Build Failure'
   runs-on: 'ubuntu-latest'
-  needs: [job1, job2, job3]  # Replace with your job names
+  needs: [job1, job2, job3] # Replace with your job names
   if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.job1.result == 'failure' || needs.job2.result == 'failure' || needs.job3.result == 'failure')
   steps:
     - name: 'Determine failed jobs'
@@ -133,7 +142,7 @@ notify-failure:
         if [[ "${{ needs.job3.result }}" == "failure" ]]; then
           failed_jobs+=("job3")
         fi
-        
+
         IFS=','
         echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
 
@@ -148,7 +157,7 @@ notify-failure:
 notify-cancelled:
   name: 'Notify Build Cancelled'
   runs-on: 'ubuntu-latest'
-  needs: [job1, job2, job3]  # Replace with your job names
+  needs: [job1, job2, job3] # Replace with your job names
   if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.job1.result == 'cancelled' || needs.job2.result == 'cancelled' || needs.job3.result == 'cancelled')
   steps:
     - name: 'Send cancelled alert'
@@ -161,6 +170,7 @@ notify-cancelled:
 ## Example Notifications
 
 ### Success Notification
+
 ```
 ✅ Build Success
 Tag: v7.2.0
@@ -170,6 +180,7 @@ View Details: [Open Workflow]
 ```
 
 ### Failure Notification
+
 ```
 ❌ Build Failed
 Tag: protocol-designer-v1.0.0
@@ -180,6 +191,7 @@ View Details: [Open Workflow]
 ```
 
 ### Cancelled Notification
+
 ```
 ⚠️ Build Cancelled
 Tag: v7.2.0
@@ -191,6 +203,7 @@ View Details: [Open Workflow]
 ## Testing
 
 ### Test with Real Tags
+
 ```bash
 # Test main release (goes to #release-cycle)
 git tag v7.2.0-test && git push origin v7.2.0-test
@@ -203,6 +216,7 @@ git tag ai-client@v1.0.0-test && git push origin ai-client@v1.0.0-test
 ```
 
 ### Test with Channel Override
+
 ```yaml
 - name: 'Send alert to custom channel'
   uses: ./.github/actions/simple-build-alert
