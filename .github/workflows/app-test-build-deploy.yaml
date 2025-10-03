@@ -165,9 +165,16 @@ jobs:
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
-      - name: set summary
+      - name: Add build configuration to summary
         run: |
-          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+          echo "### Decide refs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **ref** | ${{ github.ref }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **event** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **build type** | ${{ steps.determine-build-type.outputs.type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **variants** | ${{ steps.determine-build-type.outputs.variants }} |" >> $GITHUB_STEP_SUMMARY
 
   build-app:
     needs: [determine-build-type]
