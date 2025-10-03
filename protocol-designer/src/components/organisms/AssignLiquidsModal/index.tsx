@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -72,12 +72,17 @@ export function AssignLiquidsModal(
   const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
     labwareId ?? '',
   ])
+  // console.log('selectedLabwareArray', selectedLabwareArray)
+
+  useEffect(() => {
+    setSelectedLabware([labwareId ?? ''])
+  }, [labwareId])
 
   const handleAssignToLabware = (newItem: string) => {
     // Create a new array with the existing items and the new item appended
     console.log('newItem', newItem)
-    setSelectedLabware(prevItems => [...prevItems, newItem])
     console.log('selectedLabware', selectedLabwareArray)
+    setSelectedLabware(prevItems => [...prevItems, newItem])
   }
 
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
@@ -94,6 +99,8 @@ export function AssignLiquidsModal(
     )
     return null
   }
+  console.log('labwareeeeee', labware)
+  console.log('labwareIdddddd', labwareId)
   const labwareStack = labware[labwareId].stack
 
   const labwareDef = labwareEntities[labwareId]?.def
