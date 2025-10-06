@@ -1444,7 +1444,7 @@ class FlexStackerContext(ModuleContext):
     def set_stored_labware_items(
         self,
         labware: list[Labware],
-        stacking_offset_z: float | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
         and the end of the list represents the top of the Stacker.
@@ -1537,8 +1537,14 @@ class FlexStackerContext(ModuleContext):
         :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param adapter_version: Applies to ``adapter`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
@@ -1548,8 +1554,17 @@ class FlexStackerContext(ModuleContext):
         :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param lid_version: Applies to ``lid`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
@@ -1573,16 +1588,61 @@ class FlexStackerContext(ModuleContext):
               - Labware with lid and adapter: the adapter (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
         """
 
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            checked_adapter_namespace = namespace
+            checked_adapter_version = version
+            checked_lid_namespace = namespace
+            checked_lid_version = version
+        else:
+            checked_adapter_namespace = adapter_namespace
+            checked_adapter_version = adapter_version
+            checked_lid_namespace = lid_namespace
+            checked_lid_version = lid_version
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=lid_namespace,
-            lid_version=lid_version,
+            lid_namespace=checked_lid_namespace,
+            lid_version=checked_lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=adapter_namespace,
-            adapter_version=adapter_version,
+            adapter_namespace=checked_adapter_namespace,
+            adapter_version=checked_adapter_version,
             count=count,
             stacking_offset_z=stacking_offset_z,
         )
