@@ -73,6 +73,12 @@ describe('getDefaultOffsetDetailsForLabware', () => {
     },
   }
 
+  const MOCK_LABWARE_DEF_WITH_LPC_QUIRK = {
+    parameters: {
+      quirks: ['noLabwarePositionCheck'],
+    },
+  }
+
   const MOCK_LS_OFFSETS: LocationSpecificOffsetDetails[] = [
     {
       existingOffset: null,
@@ -180,6 +186,18 @@ describe('getDefaultOffsetDetailsForLabware', () => {
         id: LABWARE_ID,
       },
     ])
+  })
+
+  it('should handle labware with noLabwarePositionCheck quirk', () => {
+    const result = getDefaultOffsetDetailsForLabware({
+      uri: LABWARE_URI,
+      lwLocInfo: MOCK_LW_LOC_COMBOS,
+      currentOffsets: [],
+      labwareDefs: [MOCK_LABWARE_DEF_WITH_LPC_QUIRK],
+      locationSpecificOffsetDetails: MOCK_LS_OFFSETS,
+      protocolData: MOCK_PROTOCOL_DATA,
+    } as any)
+    expect(result.workingOffset).toBe(null)
   })
 
   it('should handle when lwLocInfo does not contain matching labware', () => {
