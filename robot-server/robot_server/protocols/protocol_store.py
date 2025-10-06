@@ -538,6 +538,7 @@ async def _compute_protocol_sources(
         except Exception as exception:
             # e.g. if a software downgrade left the robot with some protocol files that
             # are too new for the software version that it's running now.
+            _log.exception(f"Error reading protocol in {protocol_subdirectory}.")
             return _BadProtocolSource(directory=protocol_subdirectory, reason=exception)
 
     async def compute_source_and_store_in_result_dict(
