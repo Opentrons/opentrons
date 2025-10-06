@@ -1,4 +1,5 @@
 """Tests for the ProtocolStore interface."""
+import textwrap
 from opentrons.protocol_engine.types import CSVParameter, FileInfo
 import pytest
 from decoy import Decoy
@@ -7,6 +8,7 @@ from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
+    ProtocolReader,
     ProtocolSource,
     ProtocolSourceFile,
     ProtocolFileRole,
@@ -677,3 +679,93 @@ async def test_get_referenced_data_files(
             source=DataFileSource.UPLOADED,
         ),
     ]
+
+
+async def test_error_tolerance(
+    decoy: Decoy, tmp_path: Path, sql_engine: SQLEngine
+) -> None:
+    """It should tolerate "corrupted" protocol files."""
+    id_1 = "id-1"
+    id_2 = "id-2"
+
+    root_protocol_dir = tmp_path / "protocols"
+    protocol_1_dir = root_protocol_dir / id_1
+    protocol_1_file = protocol_1_dir / "protocol.py"
+    protocol_2_dir = root_protocol_dir / id_2
+    protocol_2_file = protocol_2_dir / "protocol.py"
+
+    ok_python = textwrap.dedent(
+        """\
+        requirements = {"apiLevel": "2.0"}
+        def run(context):
+            pass
+        """
+    )
+    bad_python = textwrap.dedent(
+        """\
+        this ain't even Python
+        """
+    )
+
+    subject_1 = ProtocolStore.create_empty(sql_engine)
+
+    protocol_resource_1 = ProtocolResource(
+        protocol_id=id_1,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=protocol_1_dir,
+            main_file=protocol_1_file,
+            config=PythonProtocolConfig(APIVersion(2, 0)),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc123",
+        ),
+        protocol_key=None,
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+    protocol_1_dir.mkdir(parents=True)
+    protocol_1_file.write_text(ok_python)
+    subject_1.insert(protocol_resource_1)
+
+    protocol_resource_2 = ProtocolResource(
+        protocol_id=id_2,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=protocol_2_dir,
+            main_file=protocol_2_file,
+            config=PythonProtocolConfig(APIVersion(99999, 99999)),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="def456",
+        ),
+        protocol_key=None,
+        protocol_kind=ProtocolKind.STANDARD,
+    )
+    protocol_2_dir.mkdir(parents=True)
+    protocol_2_file.write_text(ok_python)
+    subject_1.insert(protocol_resource_2)
+
+    # Baseline:
+    # With no corrupted files, all getters should work.
+    assert subject_1.get_all_ids() == [id_1, id_2]
+    assert [r.protocol_id for r in subject_1.get_all()] == [id_1, id_2]
+    subject_1.get(id_1)
+    subject_1.get(id_1)
+
+    protocol_2_file.write_text(bad_python)
+
+    subject_2 = await ProtocolStore.rehydrate(
+        sql_engine, root_protocol_dir, ProtocolReader()
+    )
+
+    # With corrupted files, getters that return details about the corrupted
+    # protocol should either silently omit it, if they were returning it as just one
+    # element of many in a collection; or raise the original error, if the caller
+    # was specifically asking for the corrupted protocol.
+    assert subject_2.get_all_ids() == [id_1, id_2]
+    assert [r.protocol_id for r in subject_2.get_all()] == [id_1]
+    subject_2.get(id_1)
+    with pytest.raises(Exception):
+        subject_2.get(id_2)
