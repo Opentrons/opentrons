@@ -1,27 +1,20 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  LegacyStyledText,
-  COLORS,
-  SPACING
-} from '@opentrons/components'
+import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
+
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+
+import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
-interface RemoveWasteChuteProps extends PipetteWizardStepProps {
-  deckConfig: DeckConfiguration
-}
-
 export const RemoveWasteChute = (
-  props: RemoveWasteChuteProps
+  props: PipetteWizardStepProps
 ): JSX.Element | null => {
   const {
     isRobotMoving,
@@ -41,7 +34,7 @@ export const RemoveWasteChute = (
     section: SECTIONS.REMOVE_WASTE_CHUTE,
   }
 
-const handleOnClick = (): void => {
+  const handleOnClick = (): void => {
     proceed()
   }
   if (isRobotMoving)
@@ -55,7 +48,7 @@ const handleOnClick = (): void => {
     />
   ) : (
     <GenericWizardTile
-      header={i18n.format(t('remove_wastechute'), 'capitalize')}
+      header={t('remove_wastechute')}
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel: attachedPipettes[mount]?.data.channels,
@@ -75,7 +68,7 @@ const handleOnClick = (): void => {
         />
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-      proceed = {flowType === FLOWS.ATTACH ? proceed: handleOnClick}
+      proceed={handleOnClick}
       back={goBack}
     />
   )

@@ -1,7 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
 import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -9,18 +8,13 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
-interface AttachWasteChuteProps extends PipetteWizardStepProps {
-  deckConfig: DeckConfiguration
-}
-
 export const AttachWasteChute = (
-  props: AttachWasteChuteProps
+  props: PipetteWizardStepProps
 ): JSX.Element | null => {
   const {
     isRobotMoving,
@@ -74,7 +68,7 @@ export const AttachWasteChute = (
         />
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-      proceed = {flowType === FLOWS.ATTACH ? proceed: handleOnClick}
+      proceed={handleOnClick}
       back={goBack}
     />
   )
