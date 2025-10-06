@@ -82,11 +82,11 @@ export const labwareImages: Record<string, string[]> = {
       .href,
     new URL('../../images/geb_10ul_tip_side_view.jpg', import.meta.url).href,
   ],
-  milliplex_microtiter_plate: [
+  milliplex_r_96_well_microtiter_plate: [
     new URL('../../images/milliplex_microtiter_plate.png', import.meta.url)
       .href,
   ],
-  milliplex_microtiter_plate_lid: [
+  black_96_well_microtiter_plate_lid: [
     new URL('../../images/milliplex_microtiter_plate_lid.png', import.meta.url)
       .href,
   ],
