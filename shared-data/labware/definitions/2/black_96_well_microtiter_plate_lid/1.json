@@ -64,8 +64,8 @@
   "compatibleParentLabware": [
     "protocol_engine_lid_stack_object",
     "opentrons_flex_deck_riser",
-    "milliplex_microtiter_plate",
-    "milliplex_microtiter_plate_lid"
+    "milliplex_r_96_well_microtiter_plate",
+    "black_96_well_microtiter_plate_lid"
   ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 7,
