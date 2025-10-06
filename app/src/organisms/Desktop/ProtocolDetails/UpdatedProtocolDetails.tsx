@@ -90,6 +90,9 @@ export interface ProtocolDetailsProps extends StoredProtocolData {
   groupedCommands: GroupedCommands | null
 }
 
+// Note (kk:2025/10/06) this is a temporary solution to show the updated details page
+// when the protocol timeline is on.
+// when we are ready to remove the ff, this will be renamed to ProtocolDetails
 export function UpdatedProtocolDetails(
   props: ProtocolDetailsProps
 ): JSX.Element | null {
