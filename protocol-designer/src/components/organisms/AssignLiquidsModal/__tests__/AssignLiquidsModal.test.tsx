@@ -14,6 +14,8 @@ import { AssignLiquidsModal } from '..'
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
+const mockNavigate = vi.fn()
+
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -33,6 +35,13 @@ vi.mock('/protocol-designer/step-forms/selectors', async importOriginal => {
   return {
     ...actual,
     getInitialDeckSetup: vi.fn(),
+  }
+})
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
   }
 })
 // vi.mock('/protocol-designer/top-selectors/labware-locations', async (importOriginal) => {
@@ -62,8 +71,13 @@ describe('AssignLiquidsModal', () => {
       () => 'mockLabwareId'
     )
 
-    vi.fn(getInitialDeckSetup).mockImplementation(() => {
-      return {
+    props = {
+      showLiquidOverflowMenu: vi.fn(),
+      setDefineLiquidModal: vi.fn(),
+      data: {
+        nickNames: {},
+        labwareId: 'mockLabwareId',
+        selectedWells: {},
         labware: {
           mockLabwareId: {
             stack: ['mockLabwareId'],
@@ -73,11 +87,21 @@ describe('AssignLiquidsModal', () => {
             pythonName: 'mockPythonName',
           },
         },
-      }
-    })
-    props = {
-      showLiquidOverflowMenu: vi.fn(),
-      setDefineLiquidModal: vi.fn(),
+        labwareEntities: {
+          mockLabwareId: { def: fixture96Plate as LabwareDefinition2 },
+        },
+        allWellContents: {},
+        liquidNamesById: {},
+        liquidDisplayColors: {},
+        liquids: {},
+        selectedWellGroups: {},
+        liquidLocations: {},
+        commonSelectedLiquidId: null,
+        commonSelectedVolume: null,
+        selectedWellsMaxVolume: null,
+        liquidSelectionOptions: [],
+        allWellContentsForActiveItem: {},
+      },
     }
     vi.fn(useSelector).mockReturnValue({
       labwareInvariantProperties: {

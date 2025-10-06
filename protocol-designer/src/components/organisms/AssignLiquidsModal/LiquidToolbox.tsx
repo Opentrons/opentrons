@@ -1,6 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -27,14 +27,9 @@ import {
   removeWellsContents,
   setWellContents,
 } from '/protocol-designer/labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
-import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
-import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import { deselectAllWells } from '/protocol-designer/well-selection/actions'
-import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { LiquidCard } from './LiquidCard'
 
@@ -58,43 +53,51 @@ interface ToolboxFormValues {
   selectedLiquidId?: string | null
   volume?: string | null
 }
+
+interface LiquidToolboxData {
+  liquids: any
+  labwareId: string | null
+  selectedWellGroups: any
+  nickNames: Record<string, string>
+  liquidLocations: any
+  commonSelectedLiquidId: string | null
+  commonSelectedVolume: number | null
+  selectedWellsMaxVolume: number | null
+  liquidSelectionOptions: any[]
+  allWellContentsForActiveItem: any
+}
+
 interface LiquidToolboxProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  data: LiquidToolboxData
 }
 export function LiquidToolbox({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
+  data,
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const liquids = useSelector(getLiquidEntities)
-  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const selectedWellGroups = useSelector(getSelectedWells)
-  const nickNames = useSelector(getLabwareNicknamesById)
+
+  const {
+    liquids,
+    labwareId,
+    selectedWellGroups,
+    nickNames,
+    liquidLocations,
+    commonSelectedLiquidId,
+    commonSelectedVolume,
+    selectedWellsMaxVolume,
+    liquidSelectionOptions,
+    allWellContentsForActiveItem,
+  } = data
+
   const selectedWells = Object.keys(selectedWellGroups)
   const labwareDisplayName = labwareId != null ? nickNames[labwareId] : ''
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
-  const commonSelectedLiquidId = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonIngredId
-  )
-  const commonSelectedVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonVolume
-  )
-  const selectedWellsMaxVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsMaxVolume
-  )
-  const liquidSelectionOptions = useSelector(
-    labwareIngredSelectors.getLiquidSelectionOptions
-  )
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
 
   const allWellsForActiveItem =
     labwareId != null
