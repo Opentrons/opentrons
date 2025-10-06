@@ -46,17 +46,17 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
             return "docs"
         elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-protocol-designer", "protocol-designer"]):
             return "protocol_designer"
-    else:
-        # If not a tag, determine application from workflow name.
-        workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
-        if "Docs build and deploy" in workflow_name:
-            return "mkdocs"
-        elif "PD test, build, and deploy" in workflow_name:
-            return "protocol_designer"
-        elif "Labware Library test, build, and deploy" in workflow_name:
-            return "labware_library"
-        elif "API docs build" in workflow_name:
-            return "docs"
+
+    # If not a tag, or a tag we are not expecting, determine application from workflow name.
+    workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
+    if "Docs build and deploy" in workflow_name:
+        return "mkdocs"
+    elif "PD test, build, and deploy" in workflow_name:
+        return "protocol_designer"
+    elif "Labware Library test, build, and deploy" in workflow_name:
+        return "labware_library"
+    elif "API docs build" in workflow_name:
+        return "docs"
 
     # No application could be determined - exit with error
     raise ValueError(

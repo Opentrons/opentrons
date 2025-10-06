@@ -42,3 +42,21 @@ To deploy a build to production, create an annotated tag with the prefix `protoc
 git tag -a protocol-designer@8.6.0 -m "production release for 8.6.0"
 git push origin protocol-designer@8.6.0
 ```
+
+## Rollback
+
+To "roll back" a release, we push a new tag on the previously working commit.
+The semver will roll forward always, but the code will be identical to the previous release.
+We do not delete tags or releases in GitHub for "rollback" releases.
+For example, if the current production release is `protocol-designer@8.6.0` and we want to roll back to `protocol-designer@8.5.0`, we would do the following:
+
+```shell
+#find the commit sha of the 8.5.0 release
+git switch chore_release-pd-8.5.0
+git log --oneline -n 20
+git checkout <commit-sha-of-tag-protocol-designer@8.5.0>
+git tag -a protocol-designer@8.5.1 -m "rollback to 8.5.0"
+git push origin protocol-designer@8.5.1
+```
+
+This would create a new production release `protocol-designer@8.5.1` that is identical to `protocol-designer@8.5.0`.
