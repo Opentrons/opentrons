@@ -1,12 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  LegacyStyledText,
-} from '@opentrons/components'
+import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import {
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
 
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
@@ -22,6 +23,8 @@ export const AttachWasteChute = (
   props: AttachWasteChuteProps
 ): JSX.Element | null => {
   const {
+    isRobotMoving,
+    errorMessage,
     proceed,
     attachedPipettes,
     mount,
@@ -29,48 +32,50 @@ export const AttachWasteChute = (
     flowType,
   } = props
 
-  const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   const pipetteWizardStep = {
     mount,
     flowType,
-    section: SECTIONS.REMOVE_WASTE_CHUTE,
+    section: SECTIONS.ATTACH_WASTE_CHUTE,
   }
-
-  const is96Channel = attachedPipettes[mount]?.data.channels === 96
-  const deckConfig = useNotifyDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.some(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ?? false
 
   const handleOnClick = (): void => {
     proceed()
   }
-
-  if (isWasteChuteOnDeck && is96Channel) {
-    return (
-      <GenericWizardTile
-        header={i18n.format(t('attach_wastechute'), 'capitalize')}
-        rightHandBody={getPipetteAnimations({
-          pipetteWizardStep,
-          channel: attachedPipettes[mount]?.data.channels,
-        })}
-        bodyText={
-          <LegacyStyledText css={BODY_STYLE}>
-            <Trans
-              t={t}
-              i18nKey="install_waste_chute"
-              components={{
-                bold: <strong />,
-              }}
-            />
-          </LegacyStyledText>
-        }
-        proceedButtonText={t('continue')}
-        proceed={handleOnClick}
-        back={flowType === FLOWS.ATTACH ? undefined : goBack}
-      />
-    )
-  }
-
-  return null
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      iconColor={COLORS.red50}
+      header={t('shared:error_encountered')}
+      isSuccess={false}
+      subHeader={errorMessage}
+    />
+  ) : (
+    <GenericWizardTile
+      header={i18n.format(t('attach_wastechute'), 'capitalize')}
+      rightHandBody={getPipetteAnimations({
+        pipetteWizardStep,
+        channel: attachedPipettes[mount]?.data.channels,
+      })}
+      bodyText={
+        <Trans
+          t={t}
+          i18nKey="install_waste_chute"
+          components={{
+            block: (
+              <LegacyStyledText
+                css={BODY_STYLE}
+                marginBottom={SPACING.spacing16}
+              />
+            ),
+          }}
+        />
+      }
+      proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
+      proceed = {flowType === FLOWS.ATTACH ? proceed: handleOnClick}
+      back={goBack}
+    />
+  )
 }

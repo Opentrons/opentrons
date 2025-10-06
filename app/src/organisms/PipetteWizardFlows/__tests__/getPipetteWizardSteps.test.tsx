@@ -268,6 +268,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
@@ -279,6 +284,11 @@ describe('getPipetteWizardSteps', () => {
       },
       {
         section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
