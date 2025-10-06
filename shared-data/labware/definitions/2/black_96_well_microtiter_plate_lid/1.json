@@ -2,11 +2,11 @@
   "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
-    "brand": "MILLIPLEX",
+    "brand": "Greiner",
     "brandId": []
   },
   "metadata": {
-    "displayName": "MILLIPLEX Microtiter Plate Lid",
+    "displayName": "Black 96-well Microtiter Plate Lid",
     "displayCategory": "lid",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -33,18 +33,18 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "milliplex_microtiter_plate_lid"
+    "loadName": "black_96_well_microtiter_plate_lid"
   },
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
-    "milliplex_microtiter_plate": {
+    "milliplex_r_96_well_microtiter_plate": {
       "x": 0,
       "y": 0,
       "z": 7.4
     },
-    "milliplex_microtiter_plate_lid": {
+    "black_96_well_microtiter_plate_lid": {
       "x": 0,
       "y": 0,
       "z": 1
