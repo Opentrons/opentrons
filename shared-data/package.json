@@ -10,13 +10,13 @@
   "license": "Apache-2.0",
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
-  "main": "lib/index.mjs",
+  "main": "lib/index.cjs",
   "module": "lib/index.mjs",
   "exports": {
     ".": {
-      "types": "./lib/js/index.d.ts",
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.mjs"
+  "types": "./lib/js/index.d.ts",
+  "import": "./lib/index.mjs",
+  "require": "./lib/index.cjs"
     }
   },
   "files": [
