@@ -7,11 +7,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -230,7 +230,7 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel deckLabel={displayLocation} />
+          <RobotInfoLabel deckLabel={displayLocation} />
         </Flex>
         <Flex
           flex="4 0 0"

@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -13,6 +12,7 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -131,7 +131,7 @@ export function SetupLabwareStackView({
           >
             {t('labware_in')}
           </StyledText>
-          <DeckInfoLabel
+          <RobotInfoLabel
             deckLabel={
               slotName === 'offDeck'
                 ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')

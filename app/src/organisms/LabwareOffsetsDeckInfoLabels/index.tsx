@@ -1,7 +1,7 @@
 import {
-  DeckInfoLabel,
   Flex,
   MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
   SPACING,
 } from '@opentrons/components'
 import { getModuleType } from '@opentrons/shared-data'
@@ -32,12 +32,12 @@ export function LabwareOffsetsDeckInfoLabels({
 
   return (
     <Flex gridGap={SPACING.spacing4}>
-      <DeckInfoLabel deckLabel={slotCopy} />
+      <RobotInfoLabel deckLabel={slotCopy} />
       {isLabwareInLwStackup() && (
-        <DeckInfoLabel iconName="stacked" key="stacked-icon" />
+        <RobotInfoLabel iconName="stacked" key="stacked-icon" />
       )}
       {closestBeneathModuleModel != null && (
-        <DeckInfoLabel
+        <RobotInfoLabel
           iconName={
             MODULE_ICON_NAME_BY_TYPE[getModuleType(closestBeneathModuleModel)]
           }

@@ -10,12 +10,12 @@
   background-color: inherit;
 }
 
-.deck_info_label_highlight {
+.robot_info_label_highlight {
   border-color: transparent;
   background-color: var(--blue-50);
 }
 
-.deck_info_label_no_highlight {
+.robot_info_label_no_highlight {
   border-color: var(--black-90);
 }
 

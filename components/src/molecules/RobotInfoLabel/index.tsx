@@ -3,9 +3,9 @@ import clsx from 'clsx'
 import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import styles from './deckinfolabel.module.css'
+import styles from './robotinfolabel.module.css'
 
-export interface DeckInfoLabelProps {
+export interface RobotInfoLabelProps {
   deckLabel?: string
   iconName?: string
   highlight?: boolean
@@ -16,7 +16,7 @@ export interface DeckInfoLabelProps {
   transform?: string
 }
 
-export function DeckInfoLabel({
+export function RobotInfoLabel({
   deckLabel,
   iconName,
   highlight = false,
@@ -25,12 +25,12 @@ export function DeckInfoLabel({
   width,
   transform,
   svgSize,
-}: DeckInfoLabelProps): JSX.Element {
+}: RobotInfoLabelProps): JSX.Element {
   const labelClass = clsx(
     styles.label,
     highlight
-      ? styles.deck_info_label_highlight
-      : styles.deck_info_label_no_highlight,
+      ? styles.robot_info_label_highlight
+      : styles.robot_info_label_no_highlight,
     styles[size],
     {
       [styles.has_deck_label]: deckLabel != null,
@@ -43,8 +43,8 @@ export function DeckInfoLabel({
       style={{ height, width, transform }}
       data-testid={
         deckLabel != null
-          ? `DeckInfoLabel_${deckLabel}`
-          : `DeckInfoLabel_${iconName}`
+          ? `RobotInfoLabel_${deckLabel}`
+          : `RobotInfoLabel_${iconName}`
       }
     >
       {iconName != null ? (
