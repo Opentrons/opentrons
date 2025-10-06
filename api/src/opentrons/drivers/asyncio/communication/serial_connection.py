@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Type, Literal, AsyncIterator
+from typing import Optional, List, Type
 
 from opentrons.drivers.command_builder import CommandBuilder
 
@@ -25,7 +25,7 @@ class SerialConnection:
         port: str,
         baud_rate: int,
         timeout: float,
-        loop: asyncio.AbstractEventLoop | None,
+        loop: Optional[asyncio.AbstractEventLoop],
         reset_buffer_before_write: bool,
     ) -> AsyncSerial:
         return await AsyncSerial.create(
@@ -43,11 +43,11 @@ class SerialConnection:
         baud_rate: int,
         timeout: float,
         ack: str,
-        name: str | None = None,
+        name: Optional[str] = None,
         retry_wait_time_seconds: float = 0.1,
-        loop: asyncio.AbstractEventLoop | None = None,
-        error_keyword: str | None = None,
-        alarm_keyword: str | None = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        error_keyword: Optional[str] = None,
+        alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
         error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
     ) -> "SerialConnection":
@@ -133,7 +133,7 @@ class SerialConnection:
         self._error_codes = error_codes
 
     async def send_command(
-        self, command: CommandBuilder, retries: int = 0, timeout: float | None = None
+        self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
         Send a command and return the response.
@@ -165,7 +165,7 @@ class SerialConnection:
             await self._serial.write(data=encoded_command)
 
     async def send_data(
-        self, data: str, retries: int = 0, timeout: float | None = None
+        self, data: str, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
         Send data and return the response.
@@ -184,7 +184,7 @@ class SerialConnection:
         ):
             return await self._send_data(data=data, retries=retries)
 
-    async def _send_data(self, data: str, retries: int) -> str:
+    async def _send_data(self, data: str, retries: int = 0) -> str:
         """
         Send data and return the response.
 
@@ -351,14 +351,14 @@ class AsyncResponseSerialConnection(SerialConnection):
         baud_rate: int,
         timeout: float,
         ack: str,
-        name: str | None = None,
+        name: Optional[str] = None,
         retry_wait_time_seconds: float = 0.1,
-        loop: asyncio.AbstractEventLoop | None = None,
-        error_keyword: str | None = None,
-        alarm_keyword: str | None = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        error_keyword: Optional[str] = None,
+        alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
         error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
-        async_error_ack: str | None = None,
+        async_error_ack: Optional[str] = None,
         number_of_retries: int = 0,
     ) -> AsyncResponseSerialConnection:
         """
@@ -461,29 +461,11 @@ class AsyncResponseSerialConnection(SerialConnection):
         self._alarm_keyword = alarm_keyword.lower()
         self._async_error_ack = async_error_ack.lower()
 
-    async def send_multiack_command(
+    async def send_command(
         self,
         command: CommandBuilder,
-        retries: int = 0,
+        retries: int | None = None,
         timeout: float | None = None,
-        acks: int = 1,
-    ) -> list[str]:
-        """Send a command and return the responses.
-
-        Some commands result in multiple responses; collate them and return them all.
-
-        Args:
-            command: A command builder.
-            retries: number of times to retry in case of timeout
-            timeout: optional override of default timeout in seconds
-            acks: the number of acks to expect
-        """
-        return await self.send_data_multiack(
-            data=command.build(), retries=retries, timeout=timeout, acks=acks
-        )
-
-    async def send_command(
-        self, command: CommandBuilder, retries: int = 0, timeout: float | None = None
     ) -> str:
         """
         Send a command and return the response.
@@ -503,19 +485,8 @@ class AsyncResponseSerialConnection(SerialConnection):
             timeout=timeout,
         )
 
-    async def send_data_multiack(
-        self, data: str, retries: int = 0, timeout: float | None = None, acks: int = 1
-    ) -> list[str]:
-        """Send data and return all responses."""
-        async with super().send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
-        ):
-            return await self._send_data_multiack(
-                data=data, retries=retries or self._number_of_retries, acks=acks
-            )
-
     async def send_data(
-        self, data: str, retries: int = 0, timeout: float | None = None
+        self, data: str, retries: int | None = None, timeout: float | None = None
     ) -> str:
         """
         Send data and return the response.
@@ -537,99 +508,53 @@ class AsyncResponseSerialConnection(SerialConnection):
                 retries=retries if retries is not None else self._number_of_retries,
             )
 
-    async def _consume_responses(
-        self, acks: int
-    ) -> AsyncIterator[tuple[Literal["response", "error", "empty-unknown"], bytes]]:
-        while acks > 0:
-            data = await self._serial.read_until(match=self._ack)
-            log.debug(f"{self._name}: Read <- {data!r}")
-            if self._async_error_ack.encode() in data:
-                yield "error", data
-            elif self._ack in data:
-                yield "response", data
-                acks -= 1
-            else:
-                # A read timeout, end
-                yield "empty-unknown", data
-
-    async def _send_one_retry(self, data: str, acks: int) -> list[str]:
-        data_encode = data.encode("utf-8")
-        log.debug(f"{self._name}: Write -> {data_encode!r}")
-        await self._serial.write(data=data_encode)
-
-        command_acks: list[bytes] = []
-        async_errors: list[bytes] = []
-        # consume responses before raising so we don't raise and orphan
-        # a response in the buffer
-        async for response_type, response in self._consume_responses(acks):
-            if response_type == "error":
-                async_errors.append(response)
-            elif response_type == "response":
-                command_acks.append(response)
-            else:
-                break
-
-        for async_error in async_errors:
-            # Remove ack from response
-            ackless_response = async_error.replace(self._ack, b"")
-            str_response = self.process_raw_response(
-                command=data, response=ackless_response.decode()
-            )
-            self.raise_on_error(response=str_response, request=data)
-
-        ackless_responses: list[str] = []
-        for command_ack in command_acks:
-            # Remove ack from response
-            ackless_response = command_ack.replace(self._ack, b"")
-            str_response = self.process_raw_response(
-                command=data, response=ackless_response.decode()
-            )
-            self.raise_on_error(response=str_response, request=data)
-            ackless_responses.append(str_response)
-        return ackless_responses
-
-    async def _send_data_multiack(
-        self, data: str, retries: int, acks: int
-    ) -> list[str]:
+    async def _send_data(self, data: str, retries: int = 0) -> str:
         """
-        Send data and return the response(s).
+        Send data and return the response.
 
         Args:
             data: The data to send.
             retries: number of times to retry in case of timeout
-            acks: The number of expected command responses
 
-        This function retries (resends the command) up to (retries) times, and waits
-        for (acks) responses. It also listens for async errors. These are an older
-        mechanism where at the moment an error occurs, some modules will send a message
-        like async error ERR:202:whatever
+        Returns: The command response
 
-        This function will detect async error messages if they were sent before it
-        sent the command or if they are sent before the final ack for the command is
-        sent. It will not catch async errors otherwise.
-
-        This function will always try and consume all the acknowledgements specified for
-        its command if it sends the command, even if an async error happens in between.
-
-        This should all work together to make sure that there aren't any leftover acks
-        after the function ends, which could lead to the read/write mechanics getting out
-        of sync.
-
-        Returns: The command responses
-
-        Raises: SerialException from an error ack to this command or an async error.
+        Raises: SerialException
         """
-        retries = retries or self._number_of_retries
-        responses: list[str] = []
+        data_encode = data.encode()
 
         for retry in range(retries + 1):
-            responses = await self._send_one_retry(data, acks)
-            if responses:
-                return responses
+            log.debug(f"{self._name}: Write -> {data_encode!r}")
+            await self._serial.write(data=data_encode)
+
+            response: List[bytes] = []
+            response.append(await self._serial.read_until(match=self._ack))
+            log.debug(f"{self._name}: Read <- {response[-1]!r}")
+
+            while self._async_error_ack.encode() in response[-1].lower():
+                # check for multiple a priori async errors
+                response.append(await self._serial.read_until(match=self._ack))
+                log.debug(f"{self._name}: Read <- {response[-1]!r}")
+
+            for r in response:
+                if self._async_error_ack.encode() in r:
+                    # Remove ack from response
+                    ackless_response = r.replace(self._ack, b"")
+                    str_response = self.process_raw_response(
+                        command=data, response=ackless_response.decode()
+                    )
+                    self.raise_on_error(response=str_response, request=data)
+
+            if self._ack in response[-1]:
+                # Remove ack from response
+                ackless_response = response[-1].replace(self._ack, b"")
+                str_response = self.process_raw_response(
+                    command=data, response=ackless_response.decode()
+                )
+                self.raise_on_error(response=str_response, request=data)
+                return str_response
+
             log.info(f"{self._name}: retry number {retry}/{retries}")
+
             await self.on_retry()
 
         raise NoResponse(port=self._port, command=data)
-
-    async def _send_data(self, data: str, retries: int) -> str:
-        return (await self._send_data_multiack(data, retries, 1))[0]
