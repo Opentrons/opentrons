@@ -49,48 +49,57 @@ import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const CONTAINER_WIDTH = '49.8125rem'
+
+interface AssignLiquidsModalData {
+  nickNames: Record<string, string>
+  labwareId: string | null
+  selectedWells: WellGroup
+  labware: Record<string, any>
+  labwareEntities: Record<string, any>
+  allWellContents: Record<string, any>
+  liquidNamesById: Record<string, string>
+  liquidDisplayColors: Record<string, string>
+}
 
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  data: AssignLiquidsModalData
 }
 export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
-  const { showLiquidOverflowMenu, setDefineLiquidModal } = props
+  const { showLiquidOverflowMenu, setDefineLiquidModal, data } = props
   const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const [showBadFormState, setShowBadFormState] = useState(false)
-  const nickNames = useSelector(getLabwareNicknamesById)
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
-  const selectedWells = useSelector(getSelectedWells)
   const dispatch = useDispatch()
-  const { labware } = useSelector(getInitialDeckSetup)
-  console.log('labwareId', labwareId)
+
+  const {
+    nickNames,
+    labwareId,
+    selectedWells,
+    labware,
+    labwareEntities,
+    allWellContents,
+    liquidNamesById,
+    liquidDisplayColors,
+  } = data
+
   const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
     labwareId ?? '',
   ])
-  // console.log('selectedLabwareArray', selectedLabwareArray)
 
   useEffect(() => {
     setSelectedLabware([labwareId ?? ''])
   }, [labwareId])
 
   const handleAssignToLabware = (newItem: string) => {
-    // Create a new array with the existing items and the new item appended
-    console.log('newItem', newItem)
-    console.log('selectedLabware', selectedLabwareArray)
     setSelectedLabware(prevItems => [...prevItems, newItem])
   }
-
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const allWellContents = useSelector(
-    wellContentsSelectors.getWellContentsAllLabware
-  )
-  const liquidNamesById = useSelector(selectors.getLiquidNamesById)
-  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   if (labwareId == null) {
     console.assert(
@@ -99,10 +108,8 @@ export function AssignLiquidsModal(
     )
     return null
   }
-  console.log('labwareeeeee', labware)
-  console.log('labwareIdddddd', labwareId)
-  const labwareStack = labware[labwareId].stack
 
+  const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 
@@ -236,5 +243,47 @@ export function AssignLiquidsModal(
         />
       </Flex>
     </Flex>
+  )
+}
+
+interface AssignLiquidsModalContainerProps {
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+}
+
+export function AssignLiquidsModalContainer(
+  props: AssignLiquidsModalContainerProps
+): JSX.Element | null {
+  const { showLiquidOverflowMenu, setDefineLiquidModal } = props
+
+  // All selectors moved here
+  const nickNames = useSelector(getLabwareNicknamesById)
+  const labwareId = useSelector(selectors.getSelectedLabwareId)
+  const selectedWells = useSelector(getSelectedWells)
+  const { labware } = useSelector(getInitialDeckSetup)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const allWellContents = useSelector(
+    wellContentsSelectors.getWellContentsAllLabware
+  )
+  const liquidNamesById = useSelector(selectors.getLiquidNamesById)
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+
+  const data: AssignLiquidsModalData = {
+    nickNames,
+    labwareId: labwareId ?? null,
+    selectedWells,
+    labware,
+    labwareEntities,
+    allWellContents,
+    liquidNamesById,
+    liquidDisplayColors,
+  }
+
+  return (
+    <AssignLiquidsModal
+      showLiquidOverflowMenu={showLiquidOverflowMenu}
+      setDefineLiquidModal={setDefineLiquidModal}
+      data={data}
+    />
   )
 }
