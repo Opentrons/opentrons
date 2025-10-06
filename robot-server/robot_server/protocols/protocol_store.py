@@ -117,8 +117,7 @@ class ProtocolStore:
         Params:
             sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
-                This is expected to already have the proper tables set up;
-                see `add_tables_to_db()`.
+                This is expected to already have the proper tables set up.
                 This should have no protocol data currently stored.
                 If there is data, use `rehydrate()` instead.
         """
@@ -141,8 +140,7 @@ class ProtocolStore:
         Params:
             sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
-                This is expected to already have the proper tables set up;
-                see `add_tables_to_db()`.
+                This is expected to already have the proper tables set up.
             protocols_directory: Where to look for protocol files while rehydrating.
                 This is expected to have one subdirectory per protocol,
                 named after its protocol ID.
