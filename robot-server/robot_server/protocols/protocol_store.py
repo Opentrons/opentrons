@@ -8,6 +8,7 @@ from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Optional, Set
+import shutil
 
 from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
@@ -98,7 +99,7 @@ class ProtocolStore:
         self,
         *,
         _sql_engine: sqlalchemy.engine.Engine,
-        _sources_by_id: Dict[str, ProtocolSource],
+        _sources_by_id: dict[str, ProtocolSource | _BadProtocolSource],
     ) -> None:
         """Do not call directly.
 
@@ -155,7 +156,7 @@ class ProtocolStore:
 
         sources_by_id = await _compute_protocol_sources(
             expected_protocol_ids=expected_ids,
-            protocols_directory=AsyncPath(protocols_directory),
+            protocols_directory=protocols_directory,
             protocol_reader=protocol_reader,
         )
 
@@ -169,16 +170,18 @@ class ProtocolStore:
 
         The resource must have a unique ID.
         """
-        self._sql_insert(
-            resource=_DBProtocolResource(
-                protocol_id=resource.protocol_id,
-                created_at=resource.created_at,
-                protocol_key=resource.protocol_key,
-                protocol_kind=_http_protocol_kind_to_sql(resource.protocol_kind),
+        try:
+            self._sql_insert(
+                resource=_DBProtocolResource(
+                    protocol_id=resource.protocol_id,
+                    created_at=resource.created_at,
+                    protocol_key=resource.protocol_key,
+                    protocol_kind=_http_protocol_kind_to_sql(resource.protocol_kind),
+                )
             )
-        )
-        self._sources_by_id[resource.protocol_id] = resource.source
-        self._clear_caches()
+            self._sources_by_id[resource.protocol_id] = resource.source
+        finally:
+            self._clear_caches()
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, protocol_id: str) -> ProtocolResource:
@@ -188,30 +191,48 @@ class ProtocolStore:
             ProtocolNotFoundError
         """
         sql_resource = self._sql_get(protocol_id=protocol_id)
-        return ProtocolResource(
-            protocol_id=sql_resource.protocol_id,
-            created_at=sql_resource.created_at,
-            protocol_key=sql_resource.protocol_key,
-            protocol_kind=_sql_protocol_kind_to_http(sql_resource.protocol_kind),
-            source=self._sources_by_id[sql_resource.protocol_id],
-        )
+        protocol_source = self._sources_by_id[sql_resource.protocol_id]
+        match protocol_source:
+            case ProtocolSource() as protocol_source:
+                return ProtocolResource(
+                    protocol_id=sql_resource.protocol_id,
+                    created_at=sql_resource.created_at,
+                    protocol_key=sql_resource.protocol_key,
+                    protocol_kind=_sql_protocol_kind_to_http(
+                        sql_resource.protocol_kind
+                    ),
+                    source=protocol_source,
+                )
+            case _BadProtocolSource(reason=reason):
+                raise reason
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store.
 
         Results are ordered from first-added to last-added.
+
+        If there was an error processing a protocol, it's excluded from the returned
+        list. This can happen, for example, if a software downgrade left the robot with
+        protocol files that are too new for the software that it's running now.
         """
         all_sql_resources = self._sql_get_all()
+        all_sql_resources_and_protocol_sources = (
+            (r, self._sources_by_id[r.protocol_id]) for r in all_sql_resources
+        )
         return [
             ProtocolResource(
-                protocol_id=r.protocol_id,
-                created_at=r.created_at,
-                protocol_key=r.protocol_key,
-                protocol_kind=_sql_protocol_kind_to_http(r.protocol_kind),
-                source=self._sources_by_id[r.protocol_id],
+                protocol_id=sql_resource.protocol_id,
+                created_at=sql_resource.created_at,
+                protocol_key=sql_resource.protocol_key,
+                protocol_kind=_sql_protocol_kind_to_http(sql_resource.protocol_kind),
+                source=protocol_source,
             )
-            for r in all_sql_resources
+            for (
+                sql_resource,
+                protocol_source,
+            ) in all_sql_resources_and_protocol_sources
+            if not isinstance(protocol_source, _BadProtocolSource)
         ]
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -256,17 +277,20 @@ class ProtocolStore:
             ProtocolUsedByRunError: the protocol could not be deleted because
                 there is a run currently referencing the protocol.
         """
-        self._sql_remove(protocol_id=protocol_id)
+        try:
+            self._sql_remove(protocol_id=protocol_id)
 
-        deleted_source = self._sources_by_id.pop(protocol_id)
-        protocol_dir = deleted_source.directory
-
-        for source_file in deleted_source.files:
-            source_file.path.unlink()
-        if protocol_dir:
-            protocol_dir.rmdir()
-
-        self._clear_caches()
+            deleted_source = self._sources_by_id.pop(protocol_id)
+            match deleted_source:
+                case ProtocolSource(directory=directory, files=files):
+                    for source_file in files:
+                        source_file.path.unlink()
+                    if directory:
+                        directory.rmdir()
+                case _BadProtocolSource(directory=directory):
+                    shutil.rmtree(directory, ignore_errors=True)
+        finally:
+            self._clear_caches()
 
     # Note that this is NOT cached like the other getters because we would need
     # to invalidate the cache whenever the runs table changes, which is not something
@@ -446,18 +470,11 @@ class ProtocolStore:
         self.has.cache_clear()
 
 
-# TODO(mm, 2022-04-18):
-# Restructure to degrade gracefully in the face of ProtocolReader failures.
-#
-# * ProtocolStore.get_all() should omit protocols for which it failed to compute
-#   a ProtocolSource.
-# * ProtocolStore.get(id) should continue to raise an exception if it failed to compute
-#   that protocol's ProtocolSource.
 async def _compute_protocol_sources(
     expected_protocol_ids: Set[str],
-    protocols_directory: AsyncPath,
+    protocols_directory: Path,
     protocol_reader: ProtocolReader,
-) -> Dict[str, ProtocolSource]:
+) -> dict[str, ProtocolSource | _BadProtocolSource]:
     """Compute `ProtocolSource` objects from protocol source files.
 
     We don't store these `ProtocolSource` objects in the SQL database because
@@ -473,19 +490,19 @@ async def _compute_protocol_sources(
         protocol_reader: An interface to use to compute `ProtocolSource`s.
 
     Returns:
-        A map from protocol ID to computed `ProtocolSource`.
+        A map from protocol ID to computed `ProtocolSource`, or an `Exception` if
+        there was a problem processing that particular protocol.
 
     Raises:
         Exception: This is not expected to raise anything,
             but it might if a software update makes ProtocolReader reject files
             that it formerly accepted.
     """
-    sources_by_id: Dict[str, ProtocolSource] = {}
+    sources_by_id: dict[str, ProtocolSource | _BadProtocolSource] = {}
 
-    directory_members = [m async for m in protocols_directory.iterdir()]
+    directory_members = [m async for m in AsyncPath(protocols_directory).iterdir()]
     directory_member_names = set(m.name for m in directory_members)
     extra_members = directory_member_names - expected_protocol_ids
-    missing_members = expected_protocol_ids - directory_member_names
 
     if extra_members:
         # Extra members may be left over from prior interrupted writes
@@ -496,38 +513,47 @@ async def _compute_protocol_sources(
             f" Ignoring them."
         )
 
-    if missing_members:
-        raise SubdirectoryMissingError(
-            f"Missing subdirectories for protocols: {missing_members}"
-        )
-
     async def compute_source(
-        protocol_id: str, protocol_subdirectory: AsyncPath
+        protocol_subdirectory: Path,
+    ) -> ProtocolSource | _BadProtocolSource:
+        try:
+            # Given that the expected protocol subdirectory exists,
+            # we trust that the files in it are correct.
+            # No extra files, and no files missing.
+            #
+            # This is a safe assumption as long as:
+            #  * Nobody has tampered with file the storage.
+            #  * We don't try to compute the source of any protocol whose insertion
+            #    failed halfway through and left files behind.
+            protocol_files = [
+                Path(f) async for f in AsyncPath(protocol_subdirectory).iterdir()
+            ]
+            protocol_source = await protocol_reader.read_saved(
+                files=protocol_files,
+                directory=Path(protocol_subdirectory),
+                files_are_prevalidated=True,
+                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            )
+            return protocol_source
+        except Exception as exception:
+            # e.g. if a software downgrade left the robot with some protocol files that
+            # are too new for the software version that it's running now.
+            return _BadProtocolSource(directory=protocol_subdirectory, reason=exception)
+
+    async def compute_source_and_store_in_result_dict(
+        protocol_id: str, protocol_subdirectory: Path
     ) -> None:
-        # Given that the expected protocol subdirectory exists,
-        # we trust that the files in it are correct.
-        # No extra files, and no files missing.
-        #
-        # This is a safe assumption as long as:
-        #  * Nobody has tampered with file the storage.
-        #  * We don't try to compute the source of any protocol whose insertion
-        #    failed halfway through and left files behind.
-        protocol_files = [Path(f) async for f in protocol_subdirectory.iterdir()]
-        protocol_source = await protocol_reader.read_saved(
-            files=protocol_files,
-            directory=Path(protocol_subdirectory),
-            files_are_prevalidated=True,
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-        )
-        sources_by_id[protocol_id] = protocol_source
+        result = await compute_source(protocol_subdirectory)
+        sources_by_id[protocol_id] = result
 
     async with create_task_group() as task_group:
-        # Use a TaskGroup instead of asyncio.gather() so,
-        # if any task raises an unexpected exception,
-        # it cancels every other task and raises an exception to signal the bug.
         for protocol_id in expected_protocol_ids:
             protocol_subdirectory = protocols_directory / protocol_id
-            task_group.start_soon(compute_source, protocol_id, protocol_subdirectory)
+            task_group.start_soon(
+                compute_source_and_store_in_result_dict,
+                protocol_id,
+                protocol_subdirectory,
+            )
 
     for id in expected_protocol_ids:
         assert id in sources_by_id
@@ -543,6 +569,14 @@ class _DBProtocolResource:
     created_at: datetime
     protocol_key: Optional[str]
     protocol_kind: ProtocolKindSQLEnum
+
+
+@dataclass(frozen=True)
+class _BadProtocolSource:
+    """Information about files that we failed to process into a ProtocolSource."""
+
+    directory: Path
+    reason: Exception
 
 
 def _convert_sql_row_to_dataclass(
