@@ -21,6 +21,7 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
+  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
@@ -79,6 +80,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
 
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
+  const isCameraEnabled = useFeatureFlag('camera')
 
   return (
     <div className={styles.main_content}>
@@ -167,6 +169,17 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="brightness"
         />
+        {isCameraEnabled && (
+          <RobotSettingButton
+            settingName={t('camera_preferences')}
+            settingInfo={t('camera_preferences_description')}
+            dataTestId="RobotSettingButton_camera_preferences"
+            onClick={() => {
+              setCurrentOption('CameraPreferences')
+            }}
+            iconName="photo-camera"
+          />
+        )}
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"

@@ -483,7 +483,10 @@ class AsyncResponseSerialConnection(SerialConnection):
         )
 
     async def send_command(
-        self, command: CommandBuilder, retries: int = 0, timeout: float | None = None
+        self,
+        command: CommandBuilder,
+        retries: int | None = None,
+        timeout: float | None = None,
     ) -> str:
         """
         Send a command and return the response.
@@ -499,7 +502,7 @@ class AsyncResponseSerialConnection(SerialConnection):
         """
         return await self.send_data(
             data=command.build(),
-            retries=retries or self._number_of_retries,
+            retries=retries if retries is not None else self._number_of_retries,
             timeout=timeout,
         )
 
@@ -515,7 +518,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             )
 
     async def send_data(
-        self, data: str, retries: int = 0, timeout: float | None = None
+        self, data: str, retries: int | None = None, timeout: float | None = None
     ) -> str:
         """
         Send data and return the response.
@@ -533,7 +536,8 @@ class AsyncResponseSerialConnection(SerialConnection):
             "timeout", timeout
         ):
             return await self._send_data(
-                data=data, retries=retries or self._number_of_retries
+                data=data,
+                retries=retries if retries is not None else self._number_of_retries,
             )
 
     async def _consume_responses(
@@ -618,7 +622,6 @@ class AsyncResponseSerialConnection(SerialConnection):
 
         Raises: SerialException from an error ack to this command or an async error.
         """
-        retries = retries or self._number_of_retries
         responses: list[str] = []
 
         for retry in range(retries + 1):
