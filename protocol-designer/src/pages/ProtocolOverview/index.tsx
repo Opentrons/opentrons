@@ -20,6 +20,8 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { InputDeviceInfo } from '/protocol-designer/pages/ProtocolOverview/InputDeviceInfo'
+
 import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import {
@@ -28,6 +30,7 @@ import {
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
 import {
+  getEnableCameraSupport,
   getEnableJsonExport,
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
@@ -83,6 +86,7 @@ export function ProtocolOverview(): JSX.Element {
   ] = useState<boolean>(false)
   const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
+  const enableCameraSupport = useSelector(getEnableCameraSupport)
   const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
     false
   )
@@ -264,6 +268,9 @@ export function ProtocolOverview(): JSX.Element {
               modules={Object.values(modulesOnDeck)}
               additionalEquipment={additionalEquipmentOnDeck}
             />
+            {enableCameraSupport ? (
+              <InputDeviceInfo robotType={robotType} />
+            ) : null}
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
