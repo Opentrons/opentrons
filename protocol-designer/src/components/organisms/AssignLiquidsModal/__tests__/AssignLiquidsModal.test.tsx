@@ -67,10 +67,6 @@ describe('AssignLiquidsModal', () => {
     mockShowLiquidOverflowMenu = vi.fn()
     mockSetDefineLiquidModal = vi.fn()
 
-    vi.fn(labwareIngredSelectors.getSelectedLabwareId).mockImplementation(
-      () => 'mockLabwareId'
-    )
-
     props = {
       showLiquidOverflowMenu: vi.fn(),
       setDefineLiquidModal: vi.fn(),
@@ -103,31 +99,27 @@ describe('AssignLiquidsModal', () => {
         allWellContentsForActiveItem: {},
       },
     }
-    vi.fn(useSelector).mockReturnValue({
-      labwareInvariantProperties: {
-        mockLabwareId: {
-          stack: ['mockLabwareId'],
-          id: 'mockLabwareId',
-          labwareDefURI: 'mockUri',
-          def: fixture96Plate as LabwareDefinition2,
-        },
-      },
-      pipettes: {},
-      modules: {},
-      additionalEquipmentOnDeck: {},
-    })
   })
 
-  it('loads the modal', () => {
+  it('loads the modal without selectable labware', () => {
     render(props)
 
-    const header = screen.getByTestId('header-prop')
-    expect(header).toHaveTextContent('Assign Liquids')
+    expect(screen.getByText('Top of stack')).not.toBeInTheDocument()
+    screen.getByText('mockLabwareId')
+
+    screen.getByText('Click and drag to select wells')
 
     const primaryButton = screen.getByTestId('primary-button')
     expect(primaryButton).toHaveAttribute('data-button-text', 'Continue')
 
     const secondaryButton = screen.getByTestId('secondary-button')
     expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
+  })
+
+  it('loads the modal with selectable labware', () => {
+    render(props)
+
+    screen.getByText('Top of stack')
+    screen.getByText('mockLabwareId')
   })
 })

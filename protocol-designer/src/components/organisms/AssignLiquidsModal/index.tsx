@@ -183,13 +183,17 @@ export function AssignLiquidsModal(
               </StyledText>
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
-              <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-                <LabwareButtonBasket
-                  stackOfLabware={labwareStack}
-                  labware={labware}
-                  setSelectedLabware={handleAssignToLabware}
-                  selectedLabware={selectedLabwareArray}
-                />
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                {labwareStack.length > 1 ? (
+                  <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+                    <LabwareButtonBasket
+                      stackOfLabware={labwareStack}
+                      labware={labware}
+                      setSelectedLabware={handleAssignToLabware}
+                      selectedLabware={selectedLabwareArray}
+                    />
+                  </Flex>
+                ) : null}
               </Flex>
               <Box
                 width="100%"
@@ -291,6 +295,7 @@ export function AssignLiquidsModalContainer(
 
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
+  console.log('nickNames', nickNames)
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
