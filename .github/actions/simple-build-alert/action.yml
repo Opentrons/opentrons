@@ -22,32 +22,12 @@ runs:
       id: channel-config
       shell: bash
       run: |
-        # Use override if provided, otherwise determine from tag
+        # Use override if provided, otherwise default to release cycle
         if [[ -n "${{ inputs.channel_override }}" ]]; then
           echo "channel=${{ inputs.channel_override }}" >> $GITHUB_OUTPUT
           echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
-          # Main version releases go to release cycle
-          echo "channel=#release-cycle" >> $GITHUB_OUTPUT
-          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" =~ ^ot3@ ]]; then
-          # OT3 releases go to release cycle
-          echo "channel=#release-cycle" >> $GITHUB_OUTPUT
-          echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" =~ ^(protocol-designer|labware-library|components|shared-data) ]]; then
-          # Component releases go to builds channel
-          echo "channel=#builds" >> $GITHUB_OUTPUT
-          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" =~ ^(ai-client@|ai-server@) ]]; then
-          # AI releases go to builds channel
-          echo "channel=#builds" >> $GITHUB_OUTPUT
-          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.ref_name }}" =~ ^(docs@|MKDOCS|staging-docs@|staging-MKDOCS|staging-mkdocs) ]]; then
-          # Documentation releases go to builds channel
-          echo "channel=#builds" >> $GITHUB_OUTPUT
-          echo "webhook_secret=OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
         else
-          # Default to release cycle for unknown tags
+          # All tagged builds go to release cycle by default
           echo "channel=#release-cycle" >> $GITHUB_OUTPUT
           echo "webhook_secret=OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL" >> $GITHUB_OUTPUT
         fi
