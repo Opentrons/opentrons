@@ -40,7 +40,7 @@ import type {
 import type { AnalysisStatus } from '/app/transformations/analysis'
 import type { ProtocolDetailsProps } from './UpdatedProtocolDetails'
 
-const MAX_DESCRIPTION_LENGTH = 200
+const MAX_DESCRIPTION_LENGTH = 220
 
 interface ProtocolDetailsHeaderProps {
   analysisStatus: AnalysisStatus
