@@ -71,3 +71,8 @@ export const getEnableTipSelection: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
 )
+// @ts-expect-error -- Will be utilized in development soon!
+export const getEnableCameraSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CAMERA_SUPPORT
+)
