@@ -134,9 +134,6 @@ export function TwoColLwInfoAndDeck(
                 : [],
           }
         })
-        const labwareOnDeckFiltered = labwareOnDeck?.filter(
-          lw => lw.labwareId !== failedLwId
-        )
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}

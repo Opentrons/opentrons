@@ -26,8 +26,6 @@ from opentrons.protocol_engine.types import (
     NonStackedLocation,
     Dimensions,
     GripperMoveType,
-    GripSpecs,
-    GripperMoveType,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -202,14 +200,12 @@ async def test_raise_error_if_gripper_pickup_failed(
             location=starting_location,
             move_type=GripperMoveType.PICK_UP_LABWARE,
             user_additional_offset=user_pick_up_offset,
-            move_type=GripperMoveType.PICK_UP_LABWARE,
-            user_additional_offset=user_pick_up_offset,
         )
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(
-            labware_definition=labware_def,
+            labware_definition=sentinel.my_teleporting_labware_def,
             location=to_location,
             move_type=GripperMoveType.DROP_LABWARE,
             user_additional_offset=user_drop_offset,
@@ -328,20 +324,13 @@ async def test_move_labware_with_gripper(
     pickup_grip_point = Point(101, 102, 119.5)
     drop_grip_point = Point(201, 202, 219.5)
 
-    pickup_grip_point = Point(101, 102, 119.5)
-    drop_grip_point = Point(201, 202, 219.5)
-
     decoy.when(
         state_store.geometry.get_labware_grip_point(
             labware_definition=labware_def,
             location=from_location,
             move_type=GripperMoveType.PICK_UP_LABWARE,
             user_additional_offset=user_pick_up_offset,
-            move_type=GripperMoveType.PICK_UP_LABWARE,
-            user_additional_offset=user_pick_up_offset,
         )
-    ).then_return(pickup_grip_point)
-
     ).then_return(pickup_grip_point)
 
     decoy.when(
@@ -351,8 +340,6 @@ async def test_move_labware_with_gripper(
             move_type=GripperMoveType.DROP_LABWARE,
             user_additional_offset=user_drop_offset,
         )
-    ).then_return(drop_grip_point)
-
     ).then_return(drop_grip_point)
 
     mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
@@ -367,16 +354,6 @@ async def test_move_labware_with_gripper(
     ).then_return(GripSpecs(targetY=100, uncertaintyNarrower=5, uncertaintyWider=10))
 
     expected_waypoints = [
-        Point(
-            pickup_grip_point.x, pickup_grip_point.y, 999
-        ),  # move to above pickup location
-        pickup_grip_point,  # move to pickup location
-        Point(
-            pickup_grip_point.x, pickup_grip_point.y, 999
-        ),  # gripper retract at pickup location
-        Point(drop_grip_point.x, drop_grip_point.y, 999),  # move to above drop location
-        drop_grip_point,  # move down to drop location
-        Point(drop_grip_point.x, drop_grip_point.y, 999),  # retract at drop location
         Point(
             pickup_grip_point.x, pickup_grip_point.y, 999
         ),  # move to above pickup location

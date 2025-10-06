@@ -56,7 +56,6 @@ from ..types import (
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     DeckType,
-    LabwareMovementOffsetData,
     AddressableAreaLocation,
     StackerStoredLabwareGroup,
 )
@@ -1330,19 +1329,6 @@ class ModuleView:
                     f"Module {module.model} is already present at {location}."
                 )
 
-    def is_column_4_module(self, model: ModuleModel) -> bool:
-        """Determine whether or not a module is a Column 4 Module."""
-        if model in _COLUMN_4_MODULES:
-            return True
-        return False
-
-    def get_default_gripper_offsets(
-        self, module_id: str
-    ) -> Optional[LabwareMovementOffsetData]:
-        """Get the deck's default gripper offsets."""
-        offsets = self.get_definition(module_id).gripperOffsets
-        return offsets.get("default") if offsets else None
-
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName
     ) -> Optional[LoadedModule]:
@@ -1519,3 +1505,24 @@ class ModuleView:
                 f"Provided overlap offset {overlap_offset} does not match "
                 f"configured {configured}."
             )
+
+    def get_has_module_probably_matching_hardware_details(
+        self, module_model: ModuleModel, module_serial: str | None
+    ) -> bool:
+        """Get the ID of a model that possibly matches the provided details.
+
+        If the provided serial is not None, return True if there is a module with the same serial or
+        False if there is not.
+        If the provided serial is None, return True if there is a module with the same model or False if
+        there is not.
+
+        This is intended to provide a good probability that a module matching the provided details
+        is or is not present in the state store. It is used to drive whether the engine cancels a protocol
+        in response to an asynchronous module error or not.
+        """
+        for module_id, module in self._state.hardware_by_module_id.items():
+            if module_serial is not None and module_serial == module.serial_number:
+                return True
+            if module_serial is None and module.definition.model == module_model:
+                return True
+        return False

@@ -16,7 +16,6 @@ import { migrateFile as migrateFileEightTwo } from './8_2_0'
 import { migrateFile as migrateFileEightTwoPointTwo } from './8_2_2'
 import { migrateFile as migrateFileEightFourFour } from './8_4_4'
 import { migrateFile as migrateFileEightFive } from './8_5_0'
-import { migrateFile as migrateFileEightFiveFive } from './8_5_5'
 import { migrateFile as migrateFileEightSix } from './8_6_0'
 
 import type {
@@ -70,8 +69,6 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '8.4.4': migrateFileEightFourFour,
   // @ts-expect-error
   '8.5.0': migrateFileEightFive,
-  // @ts-expect-error
-  '8.5.5': migrateFileEightFiveFive,
   // @ts-expect-error
   '8.6.0': migrateFileEightSix,
 }

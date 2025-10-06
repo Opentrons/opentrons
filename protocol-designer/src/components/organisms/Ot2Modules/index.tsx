@@ -37,7 +37,6 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
 import {
   FixedTrashText,
   MagnetModuleChangeContent,
