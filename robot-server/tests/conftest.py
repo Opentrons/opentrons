@@ -45,7 +45,8 @@ from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.tables import metadata
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
-from robot_server.runs.dependencies import get_run_data_manager, RunDataManager
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.dependencies import get_run_data_manager
 
 test_router = routing.APIRouter()
 
@@ -110,6 +111,7 @@ def hardware() -> MagicMock:
 @pytest.fixture
 def run_data() -> MagicMock:
     return MagicMock(spec=RunDataManager)
+
 
 @pytest.fixture
 def versions() -> MagicMock:
@@ -189,8 +191,9 @@ def api_client(
     )
     return client
 
+
 @pytest.fixture
-def api_client_override_runs(
+def api_client_camera_overrides(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
@@ -202,6 +205,7 @@ def api_client_override_runs(
         {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
     )
     return client
+
 
 @pytest.fixture
 def api_client_no_errors(

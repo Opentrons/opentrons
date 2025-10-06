@@ -5,8 +5,10 @@ import tempfile
 from pathlib import Path
 from opentrons.system import camera
 from decoy import Decoy
-from robot_server.runs.run_data_manager import RunDataManager, RunStore, RunOrchestratorStore
-from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA
+from robot_server.runs.run_data_manager import (
+    RunStore,
+    RunOrchestratorStore,
+)
 
 
 @pytest.fixture
@@ -27,17 +29,6 @@ def mock_camera_configuration_filepath(
         camera,
         "get_stream_configuration_filepath",
         decoy.mock(func=camera.get_stream_configuration_filepath),
-    )
-
-@pytest.fixture(autouse=True)
-def mock_camera_exists(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Mock out the camera stream configuration data query."""
-    monkeypatch.setattr(
-        os.path,
-        "exists",
-        decoy.mock(func=os.path.exists),
     )
 
 
@@ -72,54 +63,6 @@ def mock_run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=RunOrchestratorStore)
 
-@pytest.fixture
-def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
-    """Get a mock RunDataManager."""
-    return decoy.mock(cls=RunDataManager)
-
-
-# Casey NOTE:
-# Test for set camera enable, set lvie stream enable, and set er camera enable seperately
-# should include some kind of "assert was called" thing
-# Test the get camera/live/er cam enable
-# should include an assert was called thing
-
-
-
-def test_take_a_picture_camera_disabled_exception(api_client_override_runs, decoy: Decoy, mock_run_data_manager: RunDataManager):
-    """
-    Test that we return a HTTP 422 error if they attempt to use the legacy camera
-    endpoint but the camera is disabled.
-    """
-    with tempfile.NamedTemporaryFile() as conf:
-        conf.write(
-            b"BOOT_ID=BANANAS\n"
-            b"STATUS=OFF\n"
-            b"SOURCE=ABC\n"
-            b"RESOLUTION=10x20\n"
-            b"FRAMERATE=1\n"
-            b"BITRATE=2000K\n"
-        )
-        conf.flush()
-        conf.seek(0)
-        decoy.when(os.path.exists(DEFAULT_CAMERA)).then_return(True)
-        decoy.when(camera.get_stream_configuration_filepath()).then_return(
-            Path(conf.name)
-        )
-
-        result = api_client_override_runs.post("/camera", json={"data": {"cameraEnabled": False, "liveStreamEnabled": False, "errorRecoveryCameraEnabled": False}})
-        
-        #getting really close! We need to verify those functions are getting called, add a raise in them
-        #NOTE: they are being called, with the proper value! Are they being set? (probably not...)
-        raise ValueError(f"result: {result.json()}")
-        decoy.when(os.path.exists(DEFAULT_CAMERA)).then_return(True)
-        resp = api_client_override_runs.get("/camera")
-        raise ValueError(f"RESP: {resp.json()}")
-    # CASEY NOTE : here we should mock the get_camera_settings response to just be false
-    res = api_client_override_runs.post("/camera/picture")
-    raise ValueError(f"res: {res.json()}")
-    assert res.status_code == 422
-
 
 def test_camera_exception(mock_take_picture, api_client):
     """
@@ -135,14 +78,13 @@ def test_camera_exception(mock_take_picture, api_client):
     res = api_client.post("/camera/picture")
     assert res.status_code == 500
 
-# CASEY NOTE: Is this test still possible? maybe the camera settings store needs a mock?
+
 def test_camera_success(mock_take_picture, api_client):
     """
     Test that we return the contents of the file we direct camera to write
     image to.
     """
     state = {}
-    #api_client.post("/camera", json={"data": {"enabled": True}})
 
     async def fake_picture(filename, loop=None):
         # Save the filename
@@ -160,17 +102,19 @@ def test_camera_success(mock_take_picture, api_client):
     assert os.path.exists(state["filename"]) is False
 
 
-async def test_camera_get(api_client, decoy: Decoy):
+async def test_camera_get(api_client_camera_overrides):
     """
     Test that we can GET and POST the robots camera enablement status.
     """
-    #decoy.when(api_client.(DEFAULT_CAMERA)).then_return(True)
-    get_res = api_client.get("/camera")
-    #CASEY NOTE: THESE SHOULD BE FALSE
-    assert get_res.json() == {"cameraEnabled": True, "liveStreamEnabled": True, "errorRecoveryCameraEnabled": True}
+    get_res = api_client_camera_overrides.get("/camera")
+    assert get_res.json() == {
+        "cameraEnabled": True,
+        "liveStreamEnabled": True,
+        "errorRecoveryCameraEnabled": True,
+    }
 
 
-async def test_camera_stream_enable(api_client, decoy: Decoy):
+async def test_camera_stream_enable(api_client_camera_overrides, decoy: Decoy):
     """
     Test that we can GET the Opentrons Live Stream enablement status.
     """
@@ -189,8 +133,7 @@ async def test_camera_stream_enable(api_client, decoy: Decoy):
         decoy.when(camera.get_stream_configuration_filepath()).then_return(
             Path(conf.name)
         )
-        get_stream = api_client.get("/camera/stream")
-        #CASEY NOTE: THIS SHOULD BE FALSE
+        get_stream = api_client_camera_overrides.get("/camera/stream")
         assert get_stream.json() == {
             "enabled": True,
             "hls": "/hls/stream.m3u",
@@ -198,7 +141,7 @@ async def test_camera_stream_enable(api_client, decoy: Decoy):
         }
 
 
-async def test_camera_stream_settings(api_client, decoy: Decoy):
+async def test_camera_stream_settings(api_client_camera_overrides, decoy: Decoy):
     """
     Test that we can GET and POST settings to the Opentrons Live Stream.
     """
@@ -216,7 +159,7 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
         decoy.when(camera.get_stream_configuration_filepath()).then_return(
             Path(conf.name)
         )
-        post_settings = api_client.post(
+        post_settings = api_client_camera_overrides.post(
             "/camera/stream/settings",
             json={
                 "data": {
@@ -233,7 +176,7 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
         }
 
         # Of note, the handler automatically cleans up input sources to include quotations
-        post_settings = api_client.post(
+        post_settings = api_client_camera_overrides.post(
             "/camera/stream/settings",
             json={
                 "data": {
@@ -244,7 +187,7 @@ async def test_camera_stream_settings(api_client, decoy: Decoy):
                 }
             },
         )
-        get_settings = api_client.get("/camera/stream/settings")
+        get_settings = api_client_camera_overrides.get("/camera/stream/settings")
         assert get_settings.json() == {
             "source": '"NONE"',
             "resolution": {"height": 10, "width": 20},

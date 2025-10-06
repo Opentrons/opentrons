@@ -23,8 +23,6 @@ from robot_server.service.json_api import RequestModel
 from opentrons.config import IS_ROBOT
 from robot_server.runs.dependencies import get_run_data_manager
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.hardware import get_robot_type_enum
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.protocol_engine import EngineStatus
 from robot_server.camera.settings.store import (
     CameraSettingStore,
@@ -154,7 +152,6 @@ async def get_camera(
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
 )
 async def post_picture_capture(
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
@@ -204,7 +201,6 @@ def _cleanup(filename: Path, fd: io.IOBase) -> None:
     },
 )
 async def get_live_stream(
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
@@ -236,7 +232,6 @@ async def get_live_stream(
 )
 async def post_live_stream_settings(
     request_body: RequestModel[LiveStreamSettings],
-    robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
@@ -424,7 +419,7 @@ def _write_stream_settings(
 
 
 def _validate_camera_present() -> None:
-    if not os.path.exists(DEFAULT_CAMERA):
+    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA):
         # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements, but eventually this will be dynamic
         # As of 2025-09-19 we do not know if this device will be removed from some units, so we need to do error validation eagerly for now.
         raise LegacyErrorResponse(
