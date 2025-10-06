@@ -5,7 +5,6 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { ODD_SECTION_TITLE_STYLE } from '../ErrorRecoveryFlows/constants'
 import { FLOWS, SECTIONS } from './constants'
 
 import type { PipetteMount } from '@opentrons/shared-data'
