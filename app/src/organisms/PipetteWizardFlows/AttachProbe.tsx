@@ -70,10 +70,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const deckConfig = useNotifyDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
+
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
@@ -226,19 +223,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
               }}
             />
           </LegacyStyledText>
-          {is96Channel && (
-            <Banner
-              type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
-              size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
-              marginTop={
-                Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-              }
-            >
-              {Boolean(isWasteChuteOnDeck)
-                ? t('waste_chute_error')
-                : t('waste_chute_warning')}
-            </Banner>
-          )}
         </>
       }
       proceedButtonText={t('begin_calibration')}

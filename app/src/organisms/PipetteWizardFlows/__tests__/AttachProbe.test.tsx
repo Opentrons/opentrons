@@ -255,18 +255,4 @@ describe('AttachProbe', () => {
     }
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
-
-  it('renders a waste chute warning when 96 channel and waste chute are attached', () => {
-    props = {
-      ...props,
-      attachedPipettes: {
-        left: mock96ChannelAttachedPipetteInformation,
-        right: null,
-      },
-    }
-    render(props)
-    screen.getByText(
-      'Remove the waste chute from the deck plate adapter before proceeding.'
-    )
-  })
 })
