@@ -694,6 +694,7 @@ class GeometryView:
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         if lw_data.location == WASTE_CHUTE_LOCATION:
+            # Returns 0 so that the waste chute height is not added to the height of the lbw
             return 0
         labware_pos = self.get_labware_position(lw_data.id)
         z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
