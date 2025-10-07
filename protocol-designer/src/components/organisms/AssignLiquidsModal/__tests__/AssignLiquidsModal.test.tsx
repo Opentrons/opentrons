@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -6,12 +7,12 @@ import { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
+
 import { AssignLiquidsModal } from '..'
+import { LiquidToolboxContainer } from '../LiquidToolbox'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
-import { NavigateFunction } from 'react-router-dom'
-import { LiquidToolboxContainer } from '../LiquidToolbox'
 
 const mockNavigate = vi.fn()
 const mockDispatch = vi.fn()
@@ -39,9 +40,9 @@ vi.mock('/protocol-designer/step-forms/selectors', async importOriginal => {
 })
 // Mock the MyButton component
 vi.mock('../LiquidToolbox', () => ({
-    LiquidToolboxContainer: vi.fn(() => <div>mock LiquidToolbox</div>),
-  }));
-  
+  LiquidToolboxContainer: vi.fn(() => <div>mock LiquidToolbox</div>),
+}))
+
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -94,14 +95,6 @@ describe('AssignLiquidsModal', () => {
         allWellContents: {},
         liquidNamesById: {},
         liquidDisplayColors: {},
-        liquids: {},
-        selectedWellGroups: {},
-        liquidLocations: {},
-        commonSelectedLiquidId: null,
-        commonSelectedVolume: null,
-        selectedWellsMaxVolume: null,
-        liquidSelectionOptions: [],
-        allWellContentsForActiveItem: {},
       },
     }
   })

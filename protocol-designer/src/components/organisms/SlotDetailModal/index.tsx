@@ -132,7 +132,7 @@ export const SlotDetailModal = (
           {stackOfLabware.length > 1 ? (
             <LabwareButtonBasket
               stackOfLabware={stackOfLabware}
-              selectedLabware={selectedLabware}
+              selectedLabware={[selectedLabware]}
               labware={labware}
               setSelectedLabware={(selectedLabwareId: string) => {
                 const wellContentsForNewlySelected =

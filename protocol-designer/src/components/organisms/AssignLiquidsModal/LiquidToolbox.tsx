@@ -20,6 +20,7 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LiquidEntities } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
@@ -60,7 +61,7 @@ interface ToolboxFormValues {
 }
 
 interface LiquidToolboxData {
-  liquids: any
+  liquids: LiquidEntities
   labwareId: string | null
   selectedWellGroups: any
   nickNames: Record<string, string>
@@ -69,7 +70,7 @@ interface LiquidToolboxData {
   commonSelectedVolume: number | null
   selectedWellsMaxVolume: number | null
   liquidSelectionOptions: any[]
-  allWellContentsForActiveItem: any
+  allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null
 }
 
 interface LiquidToolboxProps {
@@ -417,7 +418,7 @@ export function LiquidToolbox({
                               message: t(t('liquid_volume_nonzero')),
                             },
                             max: {
-                              value: selectedWellsMaxVolume,
+                              value: selectedWellsMaxVolume ?? 0,
                               message: t(
                                 'form:liquid_placement.errors.volume_exceeded',
                                 { volume: selectedWellsMaxVolume }

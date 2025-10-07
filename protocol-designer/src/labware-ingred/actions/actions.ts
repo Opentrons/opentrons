@@ -182,7 +182,7 @@ export const deleteLiquidGroup: (
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export interface SetWellContentsPayload {
   liquidGroupId: string
-  labwareId: string
+  labwareId: string | string[]
   wells: string[]
   // NOTE: order should not be meaningful
   volume: number

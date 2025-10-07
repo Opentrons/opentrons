@@ -280,7 +280,17 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
         (acc, wellName) => ({ ...acc, [wellName]: newWellContents }),
         {}
       )
-      return { ...state, [labwareId]: { ...state[labwareId], ...updatedWells } }
+
+      // Handle single labwareId or array of labwareIds
+      const labwareIds = Array.isArray(labwareId) ? labwareId : [labwareId]
+
+      return labwareIds.reduce<LocationsState>(
+        (acc, id) => ({
+          ...acc,
+          [id]: { ...acc[id], ...updatedWells },
+        }),
+        state
+      )
     },
     DUPLICATE_LABWARE: (
       state: LocationsState,
