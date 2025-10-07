@@ -78,11 +78,13 @@ interface LiquidToolboxProps {
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   data: LiquidToolboxData
+  selectedLabwareIds: string[]
 }
 export function LiquidToolbox({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
+  selectedLabwareIds,
   data,
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
@@ -223,7 +225,7 @@ export function LiquidToolbox({
       dispatch(
         setWellContents({
           liquidGroupId: selectedLiquidId,
-          labwareId,
+          labwareId: selectedLabwareIds,
           wells: selectedWells ?? [],
           volume: Number(values.volume),
         })
@@ -503,12 +505,14 @@ interface LiquidToolboxContainerProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  selectedLabwareIds: string[]
 }
 
 export function LiquidToolboxContainer({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
+  selectedLabwareIds,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const liquids = useSelector(getLiquidEntities)
@@ -552,6 +556,7 @@ export function LiquidToolboxContainer({
       showBadFormState={showBadFormState}
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}
+      selectedLabwareIds={selectedLabwareIds}
       data={data}
     />
   )

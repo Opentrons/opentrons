@@ -238,6 +238,7 @@ export function AssignLiquidsModal(
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
         </Box>
         <LiquidToolboxContainer
+          selectedLabwareIds={selectedLabwareArray}
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
           setDefineLiquidModal={setDefineLiquidModal}
