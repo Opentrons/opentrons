@@ -20,6 +20,7 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
 
   return (
     <button
+      data-testid={`LabwareButton-${numberInStack}`}
       onClick={() => {
         onClick(id)
       }}

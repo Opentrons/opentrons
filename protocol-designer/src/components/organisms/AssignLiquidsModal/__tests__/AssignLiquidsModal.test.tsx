@@ -1,13 +1,11 @@
 import { useSelector } from 'react-redux'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
-import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { AssignLiquidsModal } from '..'
 
@@ -104,22 +102,20 @@ describe('AssignLiquidsModal', () => {
   it('loads the modal without selectable labware', () => {
     render(props)
 
-    expect(screen.getByText('Top of stack')).not.toBeInTheDocument()
+    expect(screen.queryByText('Top of stack')).not.toBeInTheDocument()
     screen.getByText('mockLabwareId')
 
     screen.getByText('Click and drag to select wells')
-
-    const primaryButton = screen.getByTestId('primary-button')
-    expect(primaryButton).toHaveAttribute('data-button-text', 'Continue')
-
-    const secondaryButton = screen.getByTestId('secondary-button')
-    expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
   })
 
   it('loads the modal with selectable labware', () => {
+    props.data.labware['mockLabwareId'].stack = ['mockLabwareId', 'A1']
     render(props)
 
     screen.getByText('Top of stack')
-    screen.getByText('mockLabwareId')
+    screen.getByText('ANSI 96 Standard Microplate')
+    const firstButton = screen.getByTestId('LabwareButton-1')
+    fireEvent.click(firstButton)
+    expect(firstButton).toHaveClass('_button_active_386e4e')
   })
 })
