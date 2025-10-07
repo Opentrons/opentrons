@@ -10,6 +10,7 @@ from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
 from opentrons.system import camera
+from opentrons.system.camera import StreamConfigurationKeys
 from robot_server.errors.error_responses import LegacyErrorResponse
 from opentrons_shared_data.errors import ErrorCodes
 from robot_server.service.legacy.models.settings import (
@@ -104,7 +105,8 @@ async def post_camera(
         stream_status = StreamStatusType.ON
     else:
         stream_status = StreamStatusType.OFF
-    _write_stream_settings(stream_settings, stream_status)
+
+    _live_stream_settings_to_configuration_file(stream_settings, stream_status)
     await camera.restart_live_stream()
 
     return CameraEnable(
@@ -305,7 +307,7 @@ async def post_live_stream_settings(
     )
 
     # write changes to the configuration file
-    _write_stream_settings(updated_settings, stream_status)
+    _live_stream_settings_to_configuration_file(updated_settings, stream_status)
 
     await camera.restart_live_stream()
 
@@ -339,14 +341,8 @@ def _get_stream_settings() -> LiveStreamSettings:
 
 
 def _parse_stream_settings(filename: Path) -> LiveStreamSettings:
-    with filename.open("rb") as fd:
-        contents = {
-            key.decode("utf-8"): val.decode("utf-8")
-            for key, val in [
-                line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
-            ]
-        }
-    if sorted(list(contents.keys())) != sorted(camera.STREAM_CONF_FILE_KEYS):
+    contents = camera.parse_stream_configuration_file_data()
+    if contents is None:
         raise LegacyErrorResponse(
             message="Stream Configuration file data is incorrect or missing.",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
@@ -394,34 +390,24 @@ def _parse_stream_settings(filename: Path) -> LiveStreamSettings:
     )
 
 
-def _write_stream_settings(
+def _live_stream_settings_to_configuration_file(
     settings: LiveStreamSettings, stream_status: StreamStatusType
 ) -> None:
-    src = camera.get_stream_configuration_filepath()
-
-    if not src.exists():
-        # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for missing stream configuration file, maybe just general?
-        raise LegacyErrorResponse(
-            message=f"Stream Configuration file not found: {src}",
-            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    with src.open("w") as fd:
-        file_lines = [
-            f"BOOT_ID={_get_boot_id()}\n",
-            f"STATUS={stream_status}\n",
-            f"SOURCE={settings.source}\n",
-            f"RESOLUTION={settings.resolution.width}x{settings.resolution.height}\n",
-            f"FRAMERATE={settings.framerate}\n",
-            f"BITRATE={settings.bitrate_k}K\n",
-        ]
-        fd.writelines(file_lines)
+    contents: dict[str, str] = {
+        StreamConfigurationKeys.BOOT_ID: _get_boot_id(),
+        StreamConfigurationKeys.STATUS: stream_status,
+        StreamConfigurationKeys.SOURCE: settings.source,
+        StreamConfigurationKeys.RESOLUTION: f"{settings.resolution.width}x{settings.resolution.height}",
+        StreamConfigurationKeys.FRAMERATE: str(settings.framerate),
+        StreamConfigurationKeys.BITRATE: f"{settings.bitrate_k}K",
+    }
+    camera.write_stream_configuration_file_data(contents)
 
 
 def _validate_camera_present() -> None:
     if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA):
-        # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements, but eventually this will be dynamic
-        # As of 2025-09-19 we do not know if this device will be removed from some units, so we need to do error validation eagerly for now.
+        # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements
+        # incase the camera isn't present, however eventually we can change this to support dynamically set third party cameras
         raise LegacyErrorResponse(
             message=f"No video device found with device path: {DEFAULT_CAMERA}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,

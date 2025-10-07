@@ -2,6 +2,8 @@ import asyncio
 import os
 from pathlib import Path
 import logging
+from enum import Enum
+from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
@@ -18,6 +20,16 @@ STREAM_CONF_FILE_KEYS = [
     "FRAMERATE",
     "BITRATE",
 ]
+
+class StreamConfigurationKeys(str, Enum):
+    """The Configuration Key Types."""
+
+    BOOT_ID = "BOOT_ID"
+    STATUS = "STATUS"
+    SOURCE = "SOURCE"
+    RESOLUTION = "RESOLUTION"
+    FRAMERATE = "FRAMERATE"
+    BITRATE ="BITRATE"
 
 
 class CameraException(CommunicationError):
@@ -73,28 +85,11 @@ async def update_live_stream_status(
     stream_status: bool, camera_provider: CameraProvider
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
-    src = get_stream_configuration_filepath()
-    if not src.exists():
-        log.error(f"Opentrons Live Stream configuration file not found: {src}")
-        return None
-    with src.open("rb") as fd:
-        try:
-            contents = {
-                key.decode("utf-8"): val.decode("utf-8")
-                for key, val in [
-                    line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
-                ]
-            }
-        except Exception as e:
-            log.error(
-                f"Opentrons Live Stream status update file parsing failed with: {e}"
-            )
-            return None
-    if sorted(list(contents.keys())) != sorted(STREAM_CONF_FILE_KEYS):
+    contents = parse_stream_configuration_file_data()
+    if contents is None:
         log.error(
-            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+            "Opentrons Live Stream Configuraiton file cannot be updated."
         )
-        # We don't want to write bad or incomplete data to the file
         return None
 
     # Validate the stream status
@@ -113,16 +108,9 @@ async def update_live_stream_status(
             )
         # Enable the stream
         status = "ON"
-    with src.open("w") as fd:
-        file_lines = [
-            f"BOOT_ID={contents['BOOT_ID']}\n",
-            f"STATUS={status}\n",
-            f"SOURCE={contents['SOURCE']}\n",
-            f"RESOLUTION={contents['RESOLUTION']}\n",
-            f"FRAMERATE={contents['FRAMERATE']}\n",
-            f"BITRATE={contents['BITRATE']}\n",
-        ]
-        fd.writelines(file_lines)
+    # Overwrite the contents
+    contents["STATUS"] = status
+    write_stream_configuration_file_data(contents)
     await restart_live_stream()
 
 
@@ -141,3 +129,60 @@ async def restart_live_stream() -> None:
         log.error(
             f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
+
+def parse_stream_configuration_file_data() -> Dict[str, str] | None:
+    """
+    Parse the Opentrons Live Stream Conf file and return a dictionary of results keyed by configuration constants.
+    Returns None if an error occurred during parsing.
+    """
+    src = get_stream_configuration_filepath()
+    if not src.exists():
+        log.error(f"Opentrons Live Stream configuration file not found: {src}")
+        return None
+    with src.open("rb") as fd:
+        try:
+            contents: Dict[str, str] = {
+                key.decode("utf-8"): val.decode("utf-8")
+                for key, val in [
+                    line.split(b"=") for line in fd.read().split(b"\n") if b"=" in line
+                ]
+            }
+        except Exception as e:
+            log.error(
+                f"Opentrons Live Stream status update file parsing failed with: {e}"
+            )
+            return None
+        
+    enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
+    if sorted(list(contents.keys())) != sorted(enum_stream_keys):
+        log.error(
+            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+        )
+        # We don't want to write bad or incomplete data to the file
+        return None
+    return contents
+
+def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
+    src = get_stream_configuration_filepath()
+    if not src.exists():
+        log.error(f"Opentrons Live Stream configuration file not found: {src}")
+        return None
+    
+    enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
+    if sorted(list(data.keys())) != sorted(enum_stream_keys):
+        log.error(
+            "Data provided to write is not compatible with Opentrons Live Stream Configuraiton file."
+        )
+        return None
+
+    with src.open("w") as fd:
+        file_lines = [
+            f"{StreamConfigurationKeys.BOOT_ID}={data[StreamConfigurationKeys.BOOT_ID]}\n",
+            f"{StreamConfigurationKeys.STATUS}={data[StreamConfigurationKeys.STATUS]}\n",
+            f"{StreamConfigurationKeys.SOURCE}={data[StreamConfigurationKeys.SOURCE]}\n",
+            f"{StreamConfigurationKeys.RESOLUTION}={data[StreamConfigurationKeys.RESOLUTION]}\n",
+            f"{StreamConfigurationKeys.FRAMERATE}={data[StreamConfigurationKeys.FRAMERATE]}\n",
+            f"{StreamConfigurationKeys.BITRATE}={data[StreamConfigurationKeys.BITRATE]}\n",
+        ]
+        fd.writelines(file_lines)
+ 
