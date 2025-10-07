@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   Btn,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
@@ -14,6 +13,7 @@ import {
   Icon,
   InfoScreen,
   POSITION_FIXED,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Toolbox,
@@ -247,7 +247,7 @@ export function DeckSetupToolbox(
         {...positionStyles}
         title={
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-            <DeckInfoLabel
+            <RobotInfoLabel
               deckLabel={
                 slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')

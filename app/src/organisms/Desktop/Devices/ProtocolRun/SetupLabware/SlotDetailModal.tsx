@@ -6,13 +6,13 @@ import {
   ALIGN_CENTER,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
   Modal,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -156,7 +156,7 @@ export const SlotDetailModal = (
         {t('labware_in')}
       </StyledText>
       {isFlex ? (
-        <DeckInfoLabel deckLabel={slotDisplayName} />
+        <RobotInfoLabel deckLabel={slotDisplayName} />
       ) : (
         <StyledText>{slotDisplayName}</StyledText>
       )}

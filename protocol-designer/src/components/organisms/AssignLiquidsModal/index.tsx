@@ -7,7 +7,6 @@ import {
   BORDERS,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DISPLAY_GRID,
   Flex,
@@ -15,6 +14,7 @@ import {
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   WELL_LABEL_OPTIONS,
@@ -115,7 +115,7 @@ export function AssignLiquidsModal(
               alignItems={ALIGN_CENTER}
               gap={SPACING.spacing10}
             >
-              <DeckInfoLabel
+              <RobotInfoLabel
                 size="large"
                 deckLabel={
                   getSlotInLocationStack(labware[labwareId].stack) ?? ''

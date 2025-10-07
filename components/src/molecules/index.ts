@@ -1,6 +1,6 @@
 export * from './Banner'
 export * from './CustomizeExpandButton'
-export * from './DeckInfoLabel'
+export * from './RobotInfoLabel'
 export * from './DeckLabel'
 export * from './DropdownMenu'
 export * from './IconButton'

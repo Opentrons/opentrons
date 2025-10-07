@@ -7,13 +7,13 @@ import {
   ALIGN_CENTER,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
   Modal,
+  RobotInfoLabel,
   RobotWorkSpace,
   SPACING,
   StyledText,
@@ -99,7 +99,7 @@ export const SlotDetailModal = (
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
-      <DeckInfoLabel
+      <RobotInfoLabel
         deckLabel={slotName === 'offDeck' ? t('off_deck') : slotName}
       />
     </Flex>

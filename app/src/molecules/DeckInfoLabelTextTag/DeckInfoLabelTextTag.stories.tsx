@@ -1,4 +1,4 @@
-import { DeckInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
+import { RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { DeckInfoLabelTextTag as DeckInfoLabelTextTagComponent } from '.'
 
@@ -37,7 +37,7 @@ const Template: Story<DeckInfoLabelTextTagStoryProps> = args => {
   const deckInfoLabels = []
   for (let i = 0; i < numDeckInfoLabels; i++) {
     deckInfoLabels.push(
-      <DeckInfoLabel
+      <RobotInfoLabel
         key={`deck-label-${i}`}
         highlight={i === 1}
         iconName={
