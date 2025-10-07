@@ -41,6 +41,7 @@ describe('AttachWasteChute', () => {
     render(props)
     screen.getByText('Attach waste chute')
     screen.getByText('Attach waste chute to the deck plate adapter')
+
     const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()

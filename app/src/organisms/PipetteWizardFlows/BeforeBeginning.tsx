@@ -119,6 +119,12 @@ export const BeforeBeginning = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       bodyTranslationKey = 'remove_labware_to_get_started'
+      if (
+        selectedPipette === NINETY_SIX_CHANNEL &&
+        Boolean(isWasteChuteOnDeck)
+      ) {
+        equipmentList.push(hexScrewdriverWithSubtitle)
+      }
       break
     }
     case FLOWS.ATTACH: {
@@ -268,37 +274,19 @@ export const BeforeBeginning = (
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
-              flowType === FLOWS.ATTACH &&
-              !Boolean(isOnDevice) && (
-                <LegacyStyledText css={BODY_STYLE}>
+              (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
+              (
+                <Banner
+                  type="warning"
+                  size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                  marginTop={
+                    Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                  }
+                >
                   {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-                </LegacyStyledText>
+                </Banner>
               )}
           </Flex>
-          {selectedPipette === NINETY_SIX_CHANNEL &&
-            (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
-              <Banner
-                type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
-                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
-                marginTop={
-                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-                }
-              >
-                {Boolean(isWasteChuteOnDeck)
-                  ? t('waste_chute_error')
-                  : t('waste_chute_warning')}
-              </Banner>
-            ) : (
-              <Banner
-                type="warning"
-                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
-                marginTop={
-                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-                }
-              >
-                {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-              </Banner>
-            ))}
         </>
       }
       proceedButtonText={proceedButtonText}

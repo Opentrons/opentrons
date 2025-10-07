@@ -43,6 +43,10 @@ describe('RemoveWasteChute', () => {
     screen.getByText(
       'Remove the waste chute from the deck plate adapter before proceeding.'
     )
+    screen.getByLabelText('icon_error')
+    screen.getByText(
+      'Failure to remove the waste chute will result in the pipetting crashing into the waste chute'
+    )
     const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()

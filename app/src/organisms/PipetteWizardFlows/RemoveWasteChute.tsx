@@ -1,6 +1,11 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
+import {
+  Banner,
+  COLORS,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -21,6 +26,7 @@ export const RemoveWasteChute = (
     errorMessage,
     proceed,
     attachedPipettes,
+    isOnDevice,
     mount,
     goBack,
     flowType,
@@ -37,8 +43,11 @@ export const RemoveWasteChute = (
   const handleOnClick = (): void => {
     proceed()
   }
-  if (isRobotMoving)
+
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
+
   return errorMessage != null ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
@@ -54,18 +63,28 @@ export const RemoveWasteChute = (
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <Trans
-          t={t}
-          i18nKey="waste_chute_error"
-          components={{
-            block: (
-              <LegacyStyledText
-                css={BODY_STYLE}
-                marginBottom={SPACING.spacing16}
-              />
-            ),
-          }}
-        />
+        <>
+          <Trans
+            t={t}
+            i18nKey="waste_chute_error"
+            components={{
+              block: (
+                <LegacyStyledText
+                  css={BODY_STYLE}
+                  marginBottom={SPACING.spacing16}
+                />
+              ),
+            }}
+          />
+          <Banner
+            type="error"
+            marginTop={
+              Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+            }
+          >
+            {t('waste_chute_warning')}
+          </Banner>
+        </>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleOnClick}
