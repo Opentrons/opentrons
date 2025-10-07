@@ -64,7 +64,7 @@ Each Opentrons-verified liquid class is defined by a set of properties:
         **Delay after submerging**
       - The pipette delays a specified amount of time:
 
-        - before submerging into or retracting from liquid.
+        - after submerging into or retracting from liquid.
         - before or after an aspirate or dispense.
         - after a push out.
     * - .. image:: ../img/lc_icons/mix.png
