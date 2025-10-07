@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 
 import {
   AnimationVideo,
-  Banner,
   COLORS,
   Flex,
   LegacyStyledText,
@@ -12,7 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LEFT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
@@ -22,7 +21,6 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import { ProbeNotAttached } from './ProbeNotAttached'

@@ -1,11 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'

@@ -431,19 +431,19 @@ export const PipetteWizardFlows = (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
-    ;(onExit = confirmExit),
-      (modalContent = showConfirmExit ? (
+    ;(onExit = confirmExit)
+      modalContent = showConfirmExit ? (
         exitModal
       ) : (
         <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
-      ))
+      )
   } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
-    ;(onExit = confirmExit),
-      (modalContent = showConfirmExit ? (
+    ;(onExit = confirmExit)
+      modalContent = showConfirmExit ? (
         exitModal
       ) : (
         <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
-      ))
+      )
   }
   const buildWizardOnExit = (): (() => void) => {
     if (isFatalError || showConfirmExit) {
