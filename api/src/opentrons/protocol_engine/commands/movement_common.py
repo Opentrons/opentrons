@@ -77,9 +77,10 @@ class DynamicLiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
         default_factory=LiquidHandlingWellLocation,
         description="Relative well location at which to start the operation",
     )
-    trackToLocation: LiquidHandlingWellLocation = Field(
-        default_factory=LiquidHandlingWellLocation,
+    trackToLocation: LiquidHandlingWellLocation | SkipJsonSchema[None] = Field(
+        None,
         description="Relative well location at which to end the operation",
+        json_schema_extra=_remove_default,
     )
 
 
