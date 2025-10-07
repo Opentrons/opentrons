@@ -1,6 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -27,9 +27,14 @@ import {
   removeWellsContents,
   setWellContents,
 } from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import { deselectAllWells } from '/protocol-designer/well-selection/actions'
+import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { LiquidCard } from './LiquidCard'
 
@@ -490,5 +495,63 @@ export function LiquidToolbox({
         )}
       </Toolbox>
     </>
+  )
+}
+
+interface LiquidToolboxContainerProps {
+  showBadFormState: boolean
+  setShowBadFormState: Dispatch<SetStateAction<boolean>>
+  setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+}
+
+export function LiquidToolboxContainer({
+  showBadFormState,
+  setShowBadFormState,
+  setDefineLiquidModal,
+}: LiquidToolboxContainerProps): JSX.Element {
+  // All selectors moved here
+  const liquids = useSelector(getLiquidEntities)
+  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const selectedWellGroups = useSelector(getSelectedWells)
+  const nickNames = useSelector(getLabwareNicknamesById)
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
+  const commonSelectedLiquidId = useSelector(
+    wellContentsSelectors.getSelectedWellsCommonIngredId
+  )
+  const commonSelectedVolume = useSelector(
+    wellContentsSelectors.getSelectedWellsCommonVolume
+  )
+  const selectedWellsMaxVolume = useSelector(
+    wellContentsSelectors.getSelectedWellsMaxVolume
+  )
+  const liquidSelectionOptions = useSelector(
+    labwareIngredSelectors.getLiquidSelectionOptions
+  )
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
+
+  const data: LiquidToolboxData = {
+    liquids,
+    labwareId: labwareId ?? null,
+    selectedWellGroups,
+    nickNames,
+    liquidLocations,
+    commonSelectedLiquidId: commonSelectedLiquidId ?? null,
+    commonSelectedVolume: commonSelectedVolume ?? null,
+    selectedWellsMaxVolume: selectedWellsMaxVolume ?? null,
+    liquidSelectionOptions,
+    allWellContentsForActiveItem,
+  }
+
+  return (
+    <LiquidToolbox
+      showBadFormState={showBadFormState}
+      setShowBadFormState={setShowBadFormState}
+      setDefineLiquidModal={setDefineLiquidModal}
+      data={data}
+    />
   )
 }

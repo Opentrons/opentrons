@@ -35,10 +35,7 @@ import {
 } from '/protocol-designer/components/molecules'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
-import {
-  getInitialDeckSetup,
-  getLiquidEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
@@ -48,7 +45,7 @@ import {
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { LiquidToolbox } from './LiquidToolbox'
+import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
@@ -64,15 +61,6 @@ interface AssignLiquidsModalData {
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>
-  // LiquidToolbox data
-  liquids: any
-  selectedWellGroups: any
-  liquidLocations: any
-  commonSelectedLiquidId: string | null
-  commonSelectedVolume: number | null
-  selectedWellsMaxVolume: number | null
-  liquidSelectionOptions: any[]
-  allWellContentsForActiveItem: any
 }
 
 interface AssignLiquidsModalProps {
@@ -98,15 +86,6 @@ export function AssignLiquidsModal(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
-    // LiquidToolbox data
-    liquids,
-    selectedWellGroups,
-    liquidLocations,
-    commonSelectedLiquidId,
-    commonSelectedVolume,
-    selectedWellsMaxVolume,
-    liquidSelectionOptions,
-    allWellContentsForActiveItem,
   } = data
 
   const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
@@ -130,7 +109,6 @@ export function AssignLiquidsModal(
   }
 
   const labwareStack = labware[labwareId].stack
-  console.log('labwareStack', labwareStack)
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 
@@ -183,17 +161,13 @@ export function AssignLiquidsModal(
               </StyledText>
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                {labwareStack.length > 1 ? (
-                  <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-                    <LabwareButtonBasket
-                      stackOfLabware={labwareStack}
-                      labware={labware}
-                      setSelectedLabware={handleAssignToLabware}
-                      selectedLabware={selectedLabwareArray}
-                    />
-                  </Flex>
-                ) : null}
+              <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+                <LabwareButtonBasket
+                  stackOfLabware={labwareStack}
+                  labware={labware}
+                  setSelectedLabware={handleAssignToLabware}
+                  selectedLabware={selectedLabwareArray}
+                />
               </Flex>
               <Box
                 width="100%"
@@ -261,22 +235,10 @@ export function AssignLiquidsModal(
         >
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
         </Box>
-        <LiquidToolbox
+        <LiquidToolboxContainer
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
           setDefineLiquidModal={setDefineLiquidModal}
-          data={{
-            liquids,
-            labwareId,
-            selectedWellGroups,
-            nickNames,
-            liquidLocations,
-            commonSelectedLiquidId,
-            commonSelectedVolume,
-            selectedWellsMaxVolume,
-            liquidSelectionOptions,
-            allWellContentsForActiveItem,
-          }}
         />
       </Flex>
     </Flex>
@@ -295,7 +257,6 @@ export function AssignLiquidsModalContainer(
 
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
-  console.log('nickNames', nickNames)
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
@@ -306,26 +267,6 @@ export function AssignLiquidsModalContainer(
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
-  // LiquidToolbox selectors
-  const liquids = useSelector(getLiquidEntities)
-  const selectedWellGroups = useSelector(getSelectedWells)
-  const liquidLocations = useSelector(selectors.getLiquidsByLabwareId)
-  const commonSelectedLiquidId = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonIngredId
-  )
-  const commonSelectedVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonVolume
-  )
-  const selectedWellsMaxVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsMaxVolume
-  )
-  const liquidSelectionOptions = useSelector(
-    selectors.getLiquidSelectionOptions
-  )
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
-
   const data: AssignLiquidsModalData = {
     nickNames,
     labwareId: labwareId ?? null,
@@ -335,15 +276,6 @@ export function AssignLiquidsModalContainer(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
-    // LiquidToolbox data
-    liquids,
-    selectedWellGroups,
-    liquidLocations,
-    commonSelectedLiquidId: commonSelectedLiquidId ?? null,
-    commonSelectedVolume: commonSelectedVolume ?? null,
-    selectedWellsMaxVolume: selectedWellsMaxVolume ?? null,
-    liquidSelectionOptions,
-    allWellContentsForActiveItem,
   }
 
   return (
