@@ -1,5 +1,8 @@
 import { getIsTiprack, getPositionFromSlotId } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  COLUMN_4_SLOTS,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type {
@@ -11,9 +14,14 @@ export const getIsTiprackSelectable = (
   labware: LabwareOnDeck,
   formTiprackUri: string
 ): boolean => {
-  // TODO: check if tiprack is reachable by pipette
-  const { def, labwareDefURI } = labware
-  return getIsTiprack(def) && labwareDefURI === formTiprackUri
+  // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
+  const { def, labwareDefURI, stack } = labware
+  const slot = getSlotInLocationStack(stack)
+  return (
+    getIsTiprack(def) &&
+    labwareDefURI === formTiprackUri &&
+    !COLUMN_4_SLOTS.includes(slot)
+  )
 }
 
 // arbitrary constant to show slots surrounding the selected tiprack
