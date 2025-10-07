@@ -117,7 +117,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.sandbox.designer",
+            s3_bucket="sandbox.designer.opentrons.com",
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.designer.opentrons.com/",
         ),
@@ -145,7 +145,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.staging.designer",
+            s3_bucket="opentrons.staging.protocol-designer",
             cloudfront_id="",  # Add CloudFront ID when available
             url="https://staging.protocol-designer.opentrons.com/",
         ),
@@ -173,7 +173,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.production.designer",
+            s3_bucket="opentrons.production.protocol-designer",
             cloudfront_id="",  # Add CloudFront ID when available
             url="https://protocol-designer.opentrons.com/",
         ),
