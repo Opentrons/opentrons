@@ -48,7 +48,7 @@ class WellLocationMixin(BaseModel):
     )
 
 
-class LiquidHnadlingWellMixin(BaseModel):
+class LiquidHandlingWellMixin(BaseModel):
     """Base Mixin for command requests that take a well."""
 
     labwareId: str = Field(
@@ -61,7 +61,7 @@ class LiquidHnadlingWellMixin(BaseModel):
     )
 
 
-class LiquidHandlingWellLocationMixin(LiquidHnadlingWellMixin):
+class LiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
     """Mixin for command requests that take a location that's somewhere in a well."""
 
     wellLocation: LiquidHandlingWellLocation = Field(
@@ -70,7 +70,7 @@ class LiquidHandlingWellLocationMixin(LiquidHnadlingWellMixin):
     )
 
 
-class DynamicLiquidHandlingWellLocationMixin(LiquidHnadlingWellMixin):
+class DynamicLiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
     """Mixin for command requests that move between two locations in a well."""
 
     trackFromLocation: LiquidHandlingWellLocation = Field(
