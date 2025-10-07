@@ -4,10 +4,10 @@ import { useSelector } from 'react-redux'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
-import { useKitchen } from '../../../../../../components/organisms/Kitchen/useKitchen'
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'

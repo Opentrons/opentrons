@@ -53,7 +53,7 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
   const footerElement = (
     <div className={styles.modal_footer}>
       {showBackButton ? (
-        <SecondaryButton onClick={onBack}>{t('back')}</SecondaryButton>
+        <SecondaryButton onClick={onBack}>{t('go_back')}</SecondaryButton>
       ) : null}
       <PrimaryButton onClick={onContinue}>{continueText}</PrimaryButton>
     </div>

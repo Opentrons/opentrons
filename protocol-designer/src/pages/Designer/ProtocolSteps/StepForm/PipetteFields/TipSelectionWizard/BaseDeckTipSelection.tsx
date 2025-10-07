@@ -40,7 +40,7 @@ import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 interface BaseDeckTipSelectionProps {
   controls: JSX.Element
-  hover?: string | null
+  hoveredId?: string | null
   showSlotLabels?: boolean
   viewBox?: string | null
 }
@@ -48,7 +48,7 @@ interface BaseDeckTipSelectionProps {
 export function BaseDeckTipSelection(
   props: BaseDeckTipSelectionProps
 ): JSX.Element {
-  const { controls, hover, showSlotLabels = true, viewBox } = props
+  const { controls, hoveredId, showSlotLabels = true, viewBox } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const robotType = useSelector(getRobotType)
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -241,7 +241,7 @@ export function BaseDeckTipSelection(
                 x={slotPosition[0]}
                 y={slotPosition[1]}
                 labwareOnDeck={labware}
-                highlight={labware.id === hover}
+                highlight={labware.id === hoveredId}
                 showHighlightedWells={false}
               />
             )

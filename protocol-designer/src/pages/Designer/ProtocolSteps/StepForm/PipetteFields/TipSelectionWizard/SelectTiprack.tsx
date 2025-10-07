@@ -27,7 +27,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
   } = props
   const { t } = useTranslation('tip_selection')
   const { labware: allLabware } = activeDeckSetup
-  const [hover, setHover] = useState<string | null>(null)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
   const controls = (
     <>
       {Object.values(allLabware).map(labware => {
@@ -65,7 +65,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
             ) : null}
             <TiprackSelectHover
               labware={labware}
-              setHover={setHover}
+              setHover={setHoveredId}
               slotPosition={slotPosition}
               onClick={() => {
                 setSelectedTiprackId(id)
@@ -82,7 +82,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
       <StyledText desktopStyle="headingSmallBold">
         {t('select_tiprack')}
       </StyledText>
-      <BaseDeckTipSelection hover={hover} controls={controls} />
+      <BaseDeckTipSelection hoveredId={hoveredId} controls={controls} />
     </div>
   )
 }
