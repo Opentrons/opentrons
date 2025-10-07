@@ -20,24 +20,22 @@ import {
 import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
-} from '../../../../components/atoms'
-import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
-import { getFileMetadata } from '../../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import {
-  getInitialDeckSetup,
-  getUnsavedForm,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/components/atoms'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
   actions as steplistActions,
-} from '../../../../steplist'
-import { actions as stepsActions } from '../../../../ui/steps'
+} from '/protocol-designer/steplist'
+import { actions as stepsActions } from '/protocol-designer/ui/steps'
 import {
   selectDropdownItem,
   selectTerminalItem,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
+
 import { AddStepButton } from './AddStepButton'
 import { Configurations } from './Configurations'
 import { DraggableSteps } from './DraggableSteps'
@@ -45,8 +43,8 @@ import { PresavedStep } from './PresavedStep'
 import { TerminalItemStep } from './TerminalItemStep'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { StepIdType } from '../../../../form-types'
-import type { ThunkDispatch } from '../../../../types'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
 const SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT = 100
@@ -65,7 +63,6 @@ export function TimelineToolbox({
     'starting_deck_state',
   ])
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
-  const formData = useSelector(getUnsavedForm)
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -155,12 +152,10 @@ export function TimelineToolbox({
       titlePadding={SPACING.spacing12}
       childrenPadding="0px"
       confirmButton={
-        formData != null ? undefined : (
-          <AddStepButton
-            hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
-            sidebarWidth={sidebarWidth}
-          />
-        )
+        <AddStepButton
+          hasText={sidebarWidth > SIDEBAR_MIN_WIDTH_FOR_ICON}
+          sidebarWidth={sidebarWidth}
+        />
       }
     >
       <Flex
@@ -180,7 +175,12 @@ export function TimelineToolbox({
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('timeline')}
           </StyledText>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            // Negative margin to undo the first and last steps' built-in y-padding.
+            // eslint-disable-next-line opentrons/no-margins-inline
+            marginY={`-${SPACING.spacing2}`}
+          >
             <TerminalItemStep
               id={START_TERMINAL_ITEM_ID}
               sidebarWidth={sidebarWidth}

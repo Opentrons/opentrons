@@ -1,14 +1,14 @@
 import styled from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
+import { Btn, styleProps } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
+export const AlertPrimaryButton = styled(Btn)`
+  color: ${COLORS.white};
   background-color: ${COLORS.red50};
   border-radius: ${BORDERS.borderRadius8};
-  padding-left: ${SPACING.spacing16};
-  padding-right: ${SPACING.spacing16};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}

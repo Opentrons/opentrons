@@ -14,12 +14,11 @@ from opentrons.protocol_engine.errors.exceptions import (
     CannotPerformGripperAction,
     GripperNotAttachedError,
 )
-from opentrons.types import Point
-
 from ...types import (
     DeckSlotLocation,
     ModuleModel,
     OnDeckLabwareLocation,
+    GripperMoveType,
 )
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
@@ -100,22 +99,6 @@ class UnsafePlaceLabwareImplementation(
             LabwareUri(params.labwareURI)
         )
 
-        # todo(mm, 2024-11-06): This is only correct in the special case of an
-        # absorbance reader lid. Its definition currently puts the offsets for *itself*
-        # in the property that's normally meant for offsets for its *children.*
-        final_offsets = self._state_view.labware.get_child_gripper_offsets(
-            labware_definition=definition, slot_name=None
-        )
-        drop_offset = (
-            Point(
-                final_offsets.dropOffset.x,
-                final_offsets.dropOffset.y,
-                final_offsets.dropOffset.z,
-            )
-            if final_offsets
-            else None
-        )
-
         if isinstance(params.location, DeckSlotLocation):
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 params.location.slotName.id
@@ -139,7 +122,7 @@ class UnsafePlaceLabwareImplementation(
         await ot3api.update_axis_position_estimations([Axis.X, Axis.Y])
 
         # Place the labware down
-        await self._start_movement(ot3api, definition, location, drop_offset)
+        await self._start_movement(ot3api, definition, location)
 
         return SuccessData(public=UnsafePlaceLabwareResult())
 
@@ -148,7 +131,6 @@ class UnsafePlaceLabwareImplementation(
         ot3api: OT3HardwareControlAPI,
         labware_definition: LabwareDefinition,
         location: OnDeckLabwareLocation,
-        drop_offset: Optional[Point],
     ) -> None:
         gripper_homed_position = await ot3api.gantry_position(
             mount=OT3Mount.GRIPPER,
@@ -156,13 +138,15 @@ class UnsafePlaceLabwareImplementation(
         )
 
         to_labware_center = self._state_view.geometry.get_labware_grip_point(
-            labware_definition=labware_definition, location=location
+            labware_definition=labware_definition,
+            location=location,
+            move_type=GripperMoveType.DROP_LABWARE,
+            user_additional_offset=None,
         )
 
         movement_waypoints = get_gripper_labware_placement_waypoints(
             to_labware_center=to_labware_center,
             gripper_home_z=gripper_homed_position.z,
-            drop_offset=drop_offset,
         )
 
         # start movement

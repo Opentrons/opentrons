@@ -15,10 +15,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { selectDropdownItem } from '../../../ui/steps/actions/actions'
+import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
-import type { DropdownOption } from '@opentrons/components'
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { DropdownOption, MenuPlacement } from '@opentrons/components'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export interface DropdownStepFormFieldProps extends FieldProps {
   options: DropdownOption[]
@@ -26,6 +26,7 @@ export interface DropdownStepFormFieldProps extends FieldProps {
   width?: string
   onEnter?: (id: string) => void
   onExit?: () => void
+  menuPlacement?: MenuPlacement
 }
 
 const FIRST_FIELDS = ['aspirate_labware', 'labware', 'moduleId']
@@ -48,6 +49,7 @@ export function DropdownStepFormField(
     onExit,
     onFieldBlur,
     name: fieldName,
+    menuPlacement,
   } = props
   const { t } = useTranslation(['tooltip', 'application'])
   const dispatch = useDispatch()
@@ -114,6 +116,7 @@ export function DropdownStepFormField(
           }}
           onEnter={onEnter}
           onExit={onExit}
+          menuPlacement={menuPlacement}
         />
       ) : (
         <Flex
@@ -137,12 +140,14 @@ export function DropdownStepFormField(
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={options[0].subtext != null ? SPACING.spacing4 : '0'}
               >
-                <StyledText
-                  desktopStyle="captionRegular"
-                  css={LINE_CLAMP_TEXT_STYLE(3, true)}
-                >
-                  {options[0].name}
-                </StyledText>
+                {options[0].name !== options[0].deckLabel ? (
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                  >
+                    {options[0].name}
+                  </StyledText>
+                ) : null}
                 <StyledText
                   desktopStyle="captionRegular"
                   color={COLORS.black70}

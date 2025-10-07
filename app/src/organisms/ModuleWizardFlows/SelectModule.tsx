@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -8,26 +8,37 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
 } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { useGetNewModules } from '/app/App/hooks'
+import {
+  useGetModulesNeedingSetup,
+  useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
+} from '/app/App/hooks'
+import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
+import { useSendIdentifyStacker } from './hooks'
+
 import type { AttachedModule } from '@opentrons/api-client'
-import type { IdentifyColor } from '@opentrons/shared-data'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
+  isOnDevice: boolean
+  selectedModule: AttachedModule | null
+  setSelectedModule: (module: AttachedModule | null) => void
+  setShowLaunchSetup: (show: boolean) => void
+  attachedModuleOnLaunch?: AttachedModule | null
 }
 
 interface ModuleNameAndPort {
@@ -35,54 +46,61 @@ interface ModuleNameAndPort {
   port: string
 }
 
-export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
-  const { buildFlowForSelectedModule } = props
+export function SelectModule(props: SelectModuleProps): JSX.Element | null {
+  const {
+    buildFlowForSelectedModule,
+    isOnDevice,
+    selectedModule,
+    setSelectedModule,
+    setShowLaunchSetup,
+    attachedModuleOnLaunch = null,
+  } = props
   const { t } = useTranslation('module_wizard_flows')
 
-  const newModules = useGetNewModules()
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-  const [stackerNotInstalled, setStackerNotInstalled] = useState(false)
-  const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
-    null
-  )
+  const { parseModuleUSBPort } = useModuleUSBPort()
+  // Every module that needs setup (isn't calibrated, isn't in deck config) that also
+  // CAN be set up with the current robot configuration (pipettes or not pipettes)
+  const allSetupable = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  // Every module that needs setup, but not all are guaranteed to be able to be set up
+  // right now (e.g. because they need calibration but we don't have a pipette)
+  const allNeedingSetup = useGetModulesNeedingSetup()
+  const newModules =
+    attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
+  // if there are more modules that need setup than modules that can be set up, then
+  // it follows that some modules need setup but cannot be set up. in that case we want
+  // a warning
+  const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
+  // And our special short-circuit flows where we never show a menu if there's only one
+  // entry should be avoided if we have that warning
+  const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
+  // Unless, of course, we're being invoked by a caller giving us a specific module
+  const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
+  const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
-    const usbPort = module.usbPort
     const name = getModuleDisplayName(module.moduleModel)
-    const port =
-      usbPort?.hubPort != null
-        ? `${usbPort.port}.${usbPort.hubPort}`
-        : `${usbPort?.port}`
+    const port = parseModuleUSBPort(module)
     return { name, port }
   }
 
-  const sendIdentifyModule = (
-    module: AttachedModule,
-    start: boolean,
-    color: IdentifyColor = null
-  ): void => {
-    createLiveCommand({
-      command: {
-        commandType: 'identifyModule',
-        params: {
-          model: module.moduleModel,
-          moduleId: module.id,
-          start,
-          color,
-        },
-      },
-    })
-  }
+  // Handler for when there is one module
+  useEffect(() => {
+    if (shortCircuitFlow) {
+      setSelectedModule(newModules[0])
+      sendIdentifyStacker(newModules[0], true)
+    }
+  }, [shortCircuitFlow])
 
+  // Handler for when there are multiple modules.
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
     if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
+      sendIdentifyStacker(selectedModule, false)
     }
-    // blink new module
+    // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
-        sendIdentifyModule(mod, true)
+        sendIdentifyStacker(mod, true)
         setSelectedModule(mod)
         break
       }
@@ -92,24 +110,9 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
   const handleStartSetup = (module: AttachedModule | null): void => {
     if (module != null) {
       // If this is a Flex Stacker makes sure its installed properly
-      if (
-        module.moduleType === 'flexStackerModuleType' &&
-        !module.data.installDetected
-      ) {
-        sendIdentifyModule(module, true, 'red')
-        setStackerNotInstalled(true)
-        return
-      }
       // Proceed to module setup
       buildFlowForSelectedModule(module)
-    }
-  }
-
-  const handleTryAgain = (): void => {
-    if (selectedModule != null) {
-      sendIdentifyModule(selectedModule, false)
-      setStackerNotInstalled(false)
-      setSelectedModule(null)
+      setShowLaunchSetup(false)
     }
   }
 
@@ -125,26 +128,10 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
       padding-left: ${SPACING.spacing32};
     }
   `
-
-  if (stackerNotInstalled) {
-    return (
-      <SimpleWizardBody
-        justifyContentForOddButton={JUSTIFY_FLEX_END}
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('error_stacker_not_installed')}
-        subHeader={
-          <Trans t={t} i18nKey={t('error_stacker_not_installed_message')} />
-        }
-      >
-        <PrimaryButton onClick={handleTryAgain}>
-          {i18n.format(t('try_again'), 'capitalize')}
-        </PrimaryButton>
-      </SimpleWizardBody>
-    )
-  } else if (newModules.length === 1) {
-    const mod = newModules[0]
-    const m = getModuleNameAndPort(mod)
+  if (newModules.length === 0) {
+    return null
+  } else if (shortCircuitFlow && selectedModule != null) {
+    const m = getModuleNameAndPort(selectedModule)
     return (
       <SimpleWizardBody
         justifyContentForOddButton={JUSTIFY_FLEX_END}
@@ -152,17 +139,26 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
         iconColor={COLORS.green50}
         header={t('module_attached_to_port', { module: m.name, port: m.port })}
       >
-        <PrimaryButton
-          onClick={() => {
-            sendIdentifyModule(mod, true)
-            handleStartSetup(mod)
-          }}
-        >
-          {i18n.format(t('module_start_setup'), 'capitalize')}
-        </PrimaryButton>
+        {isOnDevice ? (
+          <SmallButton
+            buttonType="primary"
+            onClick={() => {
+              handleStartSetup(selectedModule)
+            }}
+            buttonText={i18n.format(t('module_start_setup'), 'capitalize')}
+          />
+        ) : (
+          <PrimaryButton
+            onClick={() => {
+              handleStartSetup(selectedModule)
+            }}
+          >
+            {i18n.format(t('module_start_setup'), 'capitalize')}
+          </PrimaryButton>
+        )}
       </SimpleWizardBody>
     )
-  } else if (newModules.length > 1) {
+  } else {
     const moduleButtons = newModules.map(module => {
       const m = getModuleNameAndPort(module)
       return {
@@ -176,6 +172,7 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
           margin={SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           height="100%"
+          overflowY={OVERFLOW_AUTO}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <ModalContentOneColSimpleButtons
@@ -184,20 +181,34 @@ export const SelectModule = (props: SelectModuleProps): JSX.Element | null => {
             onSelect={event => {
               handleModuleSelected(event.target.value)
             }}
+            subText={
+              hasUnsetupabbleModules
+                ? t('connect_a_pipette_to_set_up_more_modules')
+                : null
+            }
+            scroll={true}
           />
         </Flex>
         <Flex css={BUTTON_STYLE}>
-          <PrimaryButton
-            onClick={() => {
-              handleStartSetup(selectedModule)
-            }}
-          >
-            {i18n.format(t('module_start_setup'), 'capitalize')}
-          </PrimaryButton>
+          {isOnDevice ? (
+            <SmallButton
+              buttonType="primary"
+              onClick={() => {
+                handleStartSetup(selectedModule)
+              }}
+              buttonText={i18n.format(t('module_start_setup'), 'capitalize')}
+            />
+          ) : (
+            <PrimaryButton
+              onClick={() => {
+                handleStartSetup(selectedModule)
+              }}
+            >
+              {i18n.format(t('module_start_setup'), 'capitalize')}
+            </PrimaryButton>
+          )}
         </Flex>
       </SimpleWizardBodyContainer>
     )
-  } else {
-    return null
   }
 }

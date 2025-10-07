@@ -29,7 +29,7 @@ describe('RecoveryInProgress', () => {
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
-    ROBOT_RELEASING_LABWARE_LATCH,
+    STACKER_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   let props: ComponentProps<typeof RecoveryInProgress>
 
@@ -137,12 +137,12 @@ describe('RecoveryInProgress', () => {
     screen.getByText('Gripper will release labware in 3 seconds')
   })
 
-  it(`renders appropriate copy when the route is ${ROBOT_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
+  it(`renders appropriate copy when the route is ${STACKER_RELEASING_LABWARE_LATCH.ROUTE}`, () => {
     props = {
       ...props,
       recoveryMap: {
-        route: ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
-        step: ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
+        route: STACKER_RELEASING_LABWARE_LATCH.ROUTE,
+        step: STACKER_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
       },
     }
     render(props)
@@ -181,8 +181,8 @@ describe('RecoveryInProgress', () => {
     props = {
       ...props,
       recoveryMap: {
-        route: ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
-        step: ROBOT_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
+        route: STACKER_RELEASING_LABWARE_LATCH.ROUTE,
+        step: STACKER_RELEASING_LABWARE_LATCH.STEPS.RELEASING_LABWARE_LATCH,
       },
     }
     render(props)
@@ -265,16 +265,14 @@ describe('useReleaseLabware', () => {
         nextStep: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE,
       },
       {
-        recoveryOption: RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
-        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
-        nextStep:
-          RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH,
+        recoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+        currentRoute: RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE,
+        nextStep: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.REENGAGE_LATCH,
       },
       {
-        recoveryOption: RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-        currentRoute: RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE,
-        nextStep:
-          RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH,
+        recoveryOption: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+        currentRoute: RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE,
+        nextStep: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH,
       },
     ])(
       'executes the full sequence of commands for $recoveryOption',
@@ -308,17 +306,17 @@ describe('useReleaseLabware', () => {
         } = props.routeUpdateActions
 
         switch (recoveryOption) {
-          case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-          case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+          case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+          case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
             expect(releaseLabwareLatch).toHaveBeenCalledTimes(1)
             break
           default:
             expect(releaseGripperJaws).toHaveBeenCalledTimes(1)
+            expect(handleMotionRouting).toHaveBeenNthCalledWith(1, true)
+            expect(homeExceptPlungers).toHaveBeenCalledTimes(1)
+            expect(handleMotionRouting).toHaveBeenNthCalledWith(2, false)
             break
         }
-        expect(handleMotionRouting).toHaveBeenNthCalledWith(1, true)
-        expect(homeExceptPlungers).toHaveBeenCalledTimes(1)
-        expect(handleMotionRouting).toHaveBeenNthCalledWith(2, false)
         expect(proceedToRouteAndStep).toHaveBeenCalledWith(
           recoveryOption,
           nextStep

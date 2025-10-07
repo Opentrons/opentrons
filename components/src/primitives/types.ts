@@ -70,6 +70,7 @@ export interface GridProps {
 
 export interface LayoutProps {
   display?: string
+  visibility?: string
   size?: string | number
   width?: string | number
   minWidth?: string | number

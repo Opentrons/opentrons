@@ -151,11 +151,13 @@ export function AvailableRobotOption(
             >
               {robotName}
               <Icon
-                aria-label={iconName}
-                marginBottom={`-${SPACING.spacing4}`}
-                marginLeft={SPACING.spacing8}
+                aria-label={iconName ?? 'wifi-icon'}
                 name={iconName ?? 'wifi'}
                 size={SIZE_1}
+                style={{
+                  marginLeft: SPACING.spacing8,
+                  marginBottom: `-${SPACING.spacing4}`,
+                }}
               />
             </LegacyStyledText>
           </Box>

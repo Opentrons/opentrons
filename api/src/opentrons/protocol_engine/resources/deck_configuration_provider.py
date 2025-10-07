@@ -2,6 +2,7 @@
 
 from typing import List, Set, Tuple
 
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     CutoutFixture,
@@ -123,10 +124,18 @@ def get_addressable_area_from_name(
                 y=addressable_area["boundingBox"]["yDimension"],
                 z=addressable_area["boundingBox"]["zDimension"],
             )
+            features = addressable_area["features"]
+            orientation = (
+                addressable_area["orientation"]
+                if addressable_area["orientation"]
+                else ModuleOrientation.NOT_APPLICABLE
+            )
+            mating_surface_unit_vector = addressable_area.get("matingSurfaceUnitVector")
 
             return AddressableArea(
                 area_name=addressable_area["id"],
                 area_type=AreaType(addressable_area["areaType"]),
+                mating_surface_unit_vector=mating_surface_unit_vector,
                 base_slot=base_slot,
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,
@@ -134,6 +143,8 @@ def get_addressable_area_from_name(
                 compatible_module_types=addressable_area.get(
                     "compatibleModuleTypes", []
                 ),
+                features=features,
+                orientation=orientation,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

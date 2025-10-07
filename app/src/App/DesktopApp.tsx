@@ -29,7 +29,7 @@ import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetail
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
-import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
+import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -80,9 +80,17 @@ export const DesktopApp = (): JSX.Element => {
       path: '/protocols/:protocolKey',
     },
     {
-      Component: ProtocolTimeline,
-      name: 'Protocol Timeline',
-      path: '/protocols/:protocolKey/timeline',
+      Component: ProtocolPreview,
+      name: 'Visualization',
+      path: '/protocols/:protocolKey/visualization',
+    },
+    // for protocol visualization path from protocol setup page and back to protocol setup page
+    // protocolKey is for visualization page and runId is for back to protocol setup page
+    {
+      Component: ProtocolPreview,
+      name: 'Visualization',
+      path:
+        '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: Labware,
@@ -124,8 +132,8 @@ export const DesktopApp = (): JSX.Element => {
   ]
 
   return (
-    <NiceModal.Provider>
-      <LocalizationProvider>
+    <LocalizationProvider>
+      <NiceModal.Provider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
           <ReactQueryDevtools />
           <SystemLanguagePreferenceModal />
@@ -176,8 +184,8 @@ export const DesktopApp = (): JSX.Element => {
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>
-      </LocalizationProvider>
-    </NiceModal.Provider>
+      </NiceModal.Provider>
+    </LocalizationProvider>
   )
 }
 

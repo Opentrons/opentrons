@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.header_with_controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-40);
+}
+
+.status_section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.controls_section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-40);
+  gap: var(--spacing-32);
+}
+
+.button_row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-16);
+}
+
+.command_list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}

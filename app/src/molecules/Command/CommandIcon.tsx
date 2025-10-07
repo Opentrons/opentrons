@@ -1,6 +1,6 @@
-import { Icon } from '@opentrons/components'
+import { COLORS, Icon } from '@opentrons/components'
 
-import type { IconName, StyleProps } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 type CommandType = RunTimeCommand['commandType']
@@ -11,12 +11,18 @@ const ICON_BY_COMMAND_TYPE: Partial<Record<CommandType, IconName>> = {
   waitForDuration: 'pause-circle',
   waitForResume: 'pause-circle',
 }
-interface CommandIconProps extends StyleProps {
+interface CommandIconProps {
   command: RunTimeCommand
   size?: string | number
+  color?: string
 }
 export function CommandIcon(props: CommandIconProps): JSX.Element | null {
-  const { command, size = '1rem', ...styleProps } = props
+  const {
+    command,
+    size = '1rem',
+    color = COLORS.black90,
+    ...styleProps
+  } = props
   let iconName = null
   if (
     command.commandType === 'moveLabware' &&
@@ -33,6 +39,12 @@ export function CommandIcon(props: CommandIconProps): JSX.Element | null {
   }
 
   return iconName != null ? (
-    <Icon {...styleProps} size={size} name={iconName} flex="0 0 auto" />
+    <Icon
+      {...styleProps}
+      size={size}
+      name={iconName}
+      color={color}
+      flex="0 0 auto"
+    />
   ) : null
 }

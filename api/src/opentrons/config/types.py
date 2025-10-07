@@ -18,13 +18,15 @@ Vt = TypeVar("Vt")
 
 
 class GantryLoad(Enum):
-    HIGH_THROUGHPUT = "high_throughput"
+    HIGH_THROUGHPUT_1000 = "high_throughput_1000"
+    HIGH_THROUGHPUT_200 = "high_throughput_200"
     LOW_THROUGHPUT = "low_throughput"
 
 
 @dataclass
 class ByGantryLoad(Generic[Vt]):
-    high_throughput: Vt
+    high_throughput_1000: Vt
+    high_throughput_200: Vt
     low_throughput: Vt
 
     def __getitem__(self, key: GantryLoad) -> Vt:

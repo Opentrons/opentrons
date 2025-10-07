@@ -1,8 +1,9 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { i18n } from '/ai-client/i18n'
+
 import { UpdateProtocol } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
@@ -14,13 +15,13 @@ const mockNavigate = vi.fn()
 const mockUseTrackEvent = vi.fn()
 const mockUseChatData = vi.fn()
 
-vi.mock('../../../resources/hooks/useTrackEvent', () => ({
+vi.mock('/ai-client/resources/hooks/useTrackEvent', () => ({
   useTrackEvent: () => mockUseTrackEvent,
 }))
 
 File.prototype.text = vi.fn().mockResolvedValue('test file content')
 
-vi.mock('../../../resources/chatDataAtom', () => ({
+vi.mock('/ai-client/resources/chatDataAtom', () => ({
   chatDataAtom: () => mockUseChatData,
 }))
 
@@ -54,6 +55,26 @@ describe('Update Protocol', () => {
     expect(
       screen.getByText('Provide details of changes you want to make')
     ).toBeInTheDocument()
+  })
+
+  it('should display all update options in dropdown including Add Flex Stacker(s)', () => {
+    render()
+
+    // Click the dropdown to open it
+    const dropdown = screen.getByText('Select an option')
+    fireEvent.click(dropdown)
+
+    // Check that all options are present
+    expect(
+      screen.getByText('Adapt Python protocol from OT-2 to Flex')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Add Flex Stacker(s) to protocol')
+    ).toBeInTheDocument()
+    expect(screen.getByText('Add Runtime Parameters')).toBeInTheDocument()
+    expect(screen.getByText('Change labware')).toBeInTheDocument()
+    expect(screen.getByText('Change pipettes')).toBeInTheDocument()
+    expect(screen.getByText('Other')).toBeInTheDocument()
   })
 
   it('should update the file value when the file is uploaded', async () => {

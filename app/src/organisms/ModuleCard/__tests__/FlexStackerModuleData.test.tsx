@@ -69,7 +69,7 @@ describe('FlexStackerModuleData', () => {
     props.moduleData.platformState = 'missing'
     render(props)
     const shuttleChip = screen.getByTestId('stacker_shuttle_label')
-    expect(shuttleChip).toHaveTextContent('Unknown')
+    expect(shuttleChip).toHaveTextContent('Missing')
     expect(shuttleChip).toHaveStyle(`background-color: ${COLORS.red35}`)
   })
 })

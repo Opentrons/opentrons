@@ -1,16 +1,17 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { ChatFooter } from '../../../molecules/ChatFooter'
-import { PromptGuide } from '../../../molecules/PromptGuide'
+import { renderWithProviders } from '/ai-client/__testing-utils__'
+import { ChatFooter } from '/ai-client/components/molecules/ChatFooter'
+import { PromptGuide } from '/ai-client/components/molecules/PromptGuide'
+import { i18n } from '/ai-client/i18n'
+
 import { Chat } from '../index'
 
 import type { NavigateFunction } from 'react-router-dom'
 
-vi.mock('../../../molecules/PromptGuide')
-vi.mock('../../../molecules/ChatFooter')
+vi.mock('/ai-client/components/molecules/PromptGuide')
+vi.mock('/ai-client/components/molecules/ChatFooter')
 // Note (kk:05/20/2024) to avoid TypeError: scrollRef.current.scrollIntoView is not a function
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 const mockNavigate = vi.fn()

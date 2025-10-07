@@ -49,28 +49,39 @@ export function SelectRecoveryOptionHome({
   getRecoveryOptionCopy,
   analytics,
   isOnDevice,
+  failedCommand,
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { proceedToRouteAndStep } = routeUpdateActions
   const { determineTipStatus } = tipStatusUtils
   const { setSelectedRecoveryOption } = currentRecoveryOptionUtils
-  const validRecoveryOptions = getRecoveryOptions(errorKind)
+  const validRecoveryOptions = getRecoveryOptions(
+    errorKind,
+    failedCommand?.byRunRecord.commandType
+  )
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
     head(validRecoveryOptions) as RecoveryRoute
   )
 
   useCurrentTipStatus(determineTipStatus)
 
+  const proceed = (): void => {
+    analytics.reportActionSelectedEvent(selectedRoute)
+    setSelectedRecoveryOption(selectedRoute)
+    void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
+  }
+
+  if (validRecoveryOptions.length === 1) {
+    // If there is only one valid recovery option, automatically proceed to that route
+    proceed()
+  }
+
   return (
     <Flex css={CONTAINER_STYLE}>
       <RecoverySingleColumnContentWrapper
         css={CONTENT_WRAPPER_OVERRIDE_STYLE}
         footerDetails={{
-          primaryBtnOnClick: () => {
-            analytics.reportActionSelectedEvent(selectedRoute)
-            setSelectedRecoveryOption(selectedRoute)
-            void proceedToRouteAndStep(selectedRoute as RecoveryRoute)
-          },
+          primaryBtnOnClick: proceed,
           isSticky: true,
         }}
       >
@@ -169,7 +180,10 @@ export function useCurrentTipStatus(
   }, [])
 }
 
-export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
+export function getRecoveryOptions(
+  errorKind: ErrorKind,
+  commandType?: string
+): RecoveryRoute[] {
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
       return NO_LIQUID_DETECTED_OPTIONS
@@ -189,37 +203,63 @@ export function getRecoveryOptions(errorKind: ErrorKind): RecoveryRoute[] {
       return GENERAL_ERROR_OPTIONS
     case ERROR_KINDS.STALL_OR_COLLISION:
       return STALL_OR_COLLISION_OPTIONS
-    case ERROR_KINDS.STALL_WHILE_STACKING:
-      return STALL_WHILE_STACKING_OPTIONS
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
-      return LABWARE_MISSING_IN_HOPPER_OPTIONS
-    case ERROR_KINDS.SHUTTLE_MISSING:
-      return SHUTTLE_MISSING_OPTIONS
-    case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
-      return LABWARE_MISSING_IN_SHUTTLE_OPTIONS
+    case ERROR_KINDS.STACKER_STALLED:
+      return commandType === 'flexStacker/store'
+        ? STACKER_STALLED_STORE_OPTIONS
+        : STACKER_STALLED_RETRIEVE_OPTIONS
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
+      return STACKER_HOPPER_EMPTY_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+      return STACKER_SHUTTLE_MISSING_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
+      return STACKER_SHUTTLE_EMPTY_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
+      return STACKER_SHUTTLE_EMPTY_STORE_OPTIONS
+    case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+      return STACKER_SHUTTLE_OCCUPIED_OPTIONS
+    case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+      return [RECOVERY_MAP.STACKER_HOPPER_OR_SHUTTLE_EMPTY.ROUTE]
   }
 }
 
-export const LABWARE_MISSING_IN_SHUTTLE_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-  RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+export const STACKER_SHUTTLE_OCCUPIED_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE,
+  RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
-export const SHUTTLE_MISSING_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE,
+export const STACKER_SHUTTLE_EMPTY_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
-export const LABWARE_MISSING_IN_HOPPER_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE,
-  RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
+export const STACKER_SHUTTLE_EMPTY_STORE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 
-export const STALL_WHILE_STACKING_OPTIONS: RecoveryRoute[] = [
-  RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-  RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE,
+export const STACKER_SHUTTLE_MISSING_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_HOPPER_EMPTY_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_STALLED_RETRIEVE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+  RECOVERY_MAP.CANCEL_RUN.ROUTE,
+]
+
+export const STACKER_STALLED_STORE_OPTIONS: RecoveryRoute[] = [
+  RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE,
+  RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
   RECOVERY_MAP.CANCEL_RUN.ROUTE,
 ]
 

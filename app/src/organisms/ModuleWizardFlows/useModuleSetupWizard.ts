@@ -1,10 +1,7 @@
 import { useEffect, useReducer, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import {
-  useCreateLiveCommandMutation,
-  useDeleteMaintenanceRunMutation,
-} from '@opentrons/react-api-client'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getIsOnDevice } from '/app/redux/config'
@@ -20,6 +17,7 @@ import {
 } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
+import { useSendIdentifyStacker } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
 import type { SetStateAction } from 'react'
@@ -45,7 +43,10 @@ export interface UseModuleSetupWizardResult {
       continuePastCommandFailure: boolean
     ) => Promise<CommandData[]>
     isRobotMoving: boolean
+    isModuleUpdating: boolean
+    setIsModuleUpdating: (updating: boolean) => void
     proceed: () => void
+    restartSetup: () => void
     maintenanceRunId: string | null
     goBack: () => void
     setErrorMessage: (message: string | null) => void
@@ -70,7 +71,7 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const sendIdentifyStacker = useSendIdentifyStacker()
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -141,37 +142,25 @@ export function useModuleSetupWizard(
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => {
       setMaintenanceRunId(null)
-      handleClose()
     },
     onError: () => {
       setMaintenanceRunId(null)
-      handleClose()
     },
   })
 
   const handleCleanUpAndClose = (): void => {
-    if (attachedModule != null) {
-      createLiveCommand({
-        command: {
-          commandType: 'identifyModule',
-          params: {
-            model: attachedModule.moduleModel,
-            moduleId: attachedModule.id,
-            start: false,
-          },
-        },
-      })
-    }
     setIsExiting(true)
+    if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
     if (maintenanceRunId == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunId as string,
+        maintenanceRunId,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
         .then(() => {
           deleteMaintenanceRun(maintenanceRunId)
+          handleClose()
         })
         .catch(error => {
           console.error(error.message)
@@ -180,7 +169,17 @@ export function useModuleSetupWizard(
     }
   }
 
+  const restartSetup = (): void => {
+    if (maintenanceRunId != null) {
+      deleteMaintenanceRun(maintenanceRunId)
+    }
+    dispatch({
+      type: ACTIONS.RESTART_FLOW,
+    })
+  }
+
   const [isRobotMoving, setIsRobotMoving] = useState<boolean>(false)
+  const [isModuleUpdating, setIsModuleUpdating] = useState<boolean>(false)
 
   useEffect(() => {
     if (
@@ -207,20 +206,19 @@ export function useModuleSetupWizard(
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
-      chainRunCommands(
-        maintenanceRunId as string,
-        commands,
-        continuePastCommandFailure
-      )
+      chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
   }
 
   const calibrateBaseProps = {
     attachedPipette,
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
+    isModuleUpdating,
+    setIsModuleUpdating,
     proceed,
     maintenanceRunId,
     goBack,
+    restartSetup,
     setErrorMessage,
     errorMessage,
     isOnDevice,
@@ -308,5 +306,6 @@ function useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,
     monitorMaintenanceRunForDeletion,
     setMaintenanceRunId,
+    closeFlow,
   ])
 }

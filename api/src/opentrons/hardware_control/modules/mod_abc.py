@@ -11,6 +11,7 @@ from ..execution_manager import ExecutionManager
 from .types import (
     BundledFirmware,
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     UploadFunction,
     LiveData,
     ModuleType,
@@ -46,13 +47,14 @@ class AbstractModule(abc.ABC):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
-        poll_interval_seconds: Optional[float] = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
+        poll_interval_seconds: float | None = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -64,9 +66,10 @@ class AbstractModule(abc.ABC):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
@@ -75,6 +78,7 @@ class AbstractModule(abc.ABC):
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
         self._disconnected_callback = disconnected_callback
         self._updating = False
+        self._error_callback = error_callback
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -103,6 +107,10 @@ class AbstractModule(abc.ABC):
         if self._disconnected_callback is not None:
             self._disconnected_callback(self.port, self.serial_number)
 
+    def error_callback(self, exc: Exception) -> None:
+        """Called from within the module object when an asynchronous hardware error occurrs."""
+        self._error_callback(exc, self.model(), self.port, self.serial_number)
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
@@ -127,11 +135,12 @@ class AbstractModule(abc.ABC):
         return False
 
     async def wait_for_is_running(self) -> None:
-        if not self.is_simulated:
+        if not self.is_simulated and self._execution_manager is not None:
             await self._execution_manager.wait_for_is_running()
 
     def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
-        self._execution_manager.register_cancellable_task(task)
+        if self._execution_manager is not None:
+            self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
     async def deactivate(self, must_be_running: bool = True) -> None:
@@ -235,6 +244,10 @@ class AbstractModule(abc.ABC):
         """Listen for events and update the module state."""
         pass
 
-    async def identify(self, start: bool, color: Optional[str] = None) -> None:
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
         """Identify the module."""
+        pass
+
+    def cleanup_persistent(self) -> None:
+        """Reset any persistent data on the module that should not exist outside of a run."""
         pass

@@ -2,9 +2,11 @@
 opentrons_shared_data.module.types: types requiring typing_extensions
 for modules
 """
-
+import enum
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
+
+from opentrons_shared_data.labware.types import LocatingFeatures, Extents
 
 SchemaV1 = Literal["1"]
 SchemaV2 = Literal["2"]
@@ -99,9 +101,22 @@ class GripperOffsets(TypedDict):
     dropOffset: NamedOffset
 
 
+class TOFBaseline(TypedDict):
+    extend: Dict[int, List[float]]
+    retract: Dict[int, List[float]]
+
+
 class TOFSensorBaseline(TypedDict):
-    X: Dict[int, List[float]]
-    Z: Dict[int, List[float]]
+    version: str
+    X: TOFBaseline
+    Z: TOFBaseline
+
+
+class ModuleOrientation(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    CENTER = "center"
+    NOT_APPLICABLE = None
 
 
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
@@ -113,6 +128,8 @@ ModuleDefinitionV3 = TypedDict(
         "model": ModuleModel,
         "labwareOffset": ModuleLabwareOffset,
         "cornerOffsetFromSlot": CornerOffsetFromSlot,
+        "features": LocatingFeatures,
+        "extents": Extents,
         "dimensions": ModuleDimensions,
         "calibrationPoint": ModuleCalibrationPointOffsetWithZ,
         "config": Dict[str, int],
@@ -122,8 +139,8 @@ ModuleDefinitionV3 = TypedDict(
         "compatibleWith": List[ModuleModel],
         "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
-        "twoDimensionalRendering": Dict[str, Any],
         "gripperOffsets": Dict[str, GripperOffsets],
+        "orientation": Dict[str, str],
     },
     total=False,
 )

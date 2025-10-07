@@ -1,5 +1,6 @@
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
-import { useAssignLiquidClass, useSupportedLiquidClassOptions } from './hooks'
+import { useAssignLiquidClass } from './hooks/useAssignLiquidClass'
+import { useSupportedLiquidClassOptions } from './hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
 

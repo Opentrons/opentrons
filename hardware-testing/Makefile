@@ -85,37 +85,10 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: test-gravimetric-single
-test-gravimetric-single:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1 --increment --tip 50
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 50
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 200
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 1000
-
-.PHONY: test-gravimetric-multi
-test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1 --no-blank --extra
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --no-blank --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --trials 1 --extra --no-blank
-
-.PHONY: test-gravimetric-96
-test-gravimetric-96:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --trials 2 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 200 --channels 96 --trials 2 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 200 --channels 96 --trials 1 --no-blank --increment --tip 20
-
 .PHONY: test-gravimetric
 test-gravimetric:
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
-	$(MAKE) test-gravimetric-single
-	$(MAKE) test-gravimetric-multi
-	$(MAKE) test-gravimetric-96
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -152,7 +125,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: test-stacker
 test-stacker:
-	$(python) -m hardware_testing.modules.flex_stacker_dvt_qc --simulate
+	$(python) -m hardware_testing.modules.flex_stacker_qc --simulate
+
+.PHONY: test-tc
+test-tc:
+	$(python) -m hardware_testing.scripts.monitor_thermocycler
 
 .PHONY: lint
 lint:
@@ -217,6 +194,11 @@ push-ot3:
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3
 	#cd ../ && $(MAKE) -C shared-data push-ot3
+
+.PHONE: open-dev-app
+open-dev-app:
+	cd .. && $(MAKE) -C app dev
+
 
 .PHONE: open-dev-app
 open-dev-app:

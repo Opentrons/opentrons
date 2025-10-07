@@ -1,6 +1,18 @@
 """Exception hierarchy for error codes."""
 
-from typing import Dict, Any, Optional, List, Iterator, Union, Sequence, overload
+from __future__ import annotations
+from typing import (
+    Dict,
+    Any,
+    Optional,
+    List,
+    Iterator,
+    Union,
+    Sequence,
+    overload,
+    Type,
+    TypeVar,
+)
 from logging import getLogger
 from traceback import format_exception_only, format_tb
 import inspect
@@ -15,6 +27,18 @@ log = getLogger(__name__)
 
 class EnumeratedError(Exception):
     """The root class of error-code-bearing exceptions."""
+
+    @classmethod
+    def ensure(cls: Type[_ET], exception: Exception) -> _ET:
+        """Ensure that an exception is enumerated.
+
+        If the passed exception is an EnumeratedError, returns it; otherwise, wraps it in an appropriate
+        child class.
+        """
+        if isinstance(exception, cls):
+            return exception
+        else:
+            return PythonException(exception)  # type: ignore[return-value]
 
     def __init__(
         self,
@@ -48,6 +72,9 @@ class EnumeratedError(Exception):
             and self.detail == other.detail
             and self.wrapping == other.wrapping
         )
+
+
+_ET = TypeVar("_ET", bound=EnumeratedError, covariant=True)
 
 
 class CommunicationError(EnumeratedError):
@@ -847,6 +874,35 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
             checked_message = f"Labware {'not' if labware_expected else ''} detected in Flex Stacker hopper"
         super().__init__(
             ErrorCodes.STACKER_HOPPER_LABWARE_FAILED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
+class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
+    """An error occurred when the Flex Stacker Shuttle is not empty when it should be."""
+
+    def __init__(
+        self,
+        serial: str,
+        shuttle_state: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerShuttleNotEmptyError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["shuttle_state"] = shuttle_state
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Flex Stacker {serial} shuttle is not empty."
+        super().__init__(
+            ErrorCodes.STACKER_SHUTTLE_OCCUPIED,
             checked_message,
             checked_detail,
             wrapping,

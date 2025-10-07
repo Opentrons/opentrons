@@ -3,7 +3,7 @@ from unittest.mock import sentinel
 from datetime import datetime
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Union, Type

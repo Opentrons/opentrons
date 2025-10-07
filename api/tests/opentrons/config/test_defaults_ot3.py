@@ -65,24 +65,24 @@ def test_load_per_pipette_vals() -> None:
     )
 
     # altered values are preserved
-    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] -= 2
+    mostly_right["motion_settings"]["acceleration"]["high_throughput_1000"]["X"] -= 2
     assert (
         defaults_ot3._build_default_bpk(
             mostly_right["motion_settings"]["acceleration"],
             defaults_ot3.DEFAULT_ACCELERATIONS,
-        ).high_throughput[OT3AxisKind.X]
-        == defaults_ot3.DEFAULT_ACCELERATIONS.high_throughput[OT3AxisKind.X] - 2
+        ).high_throughput_1000[OT3AxisKind.X]
+        == defaults_ot3.DEFAULT_ACCELERATIONS.high_throughput_1000[OT3AxisKind.X] - 2
     )
 
     # added values are preserved
     altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
-    altered_default.high_throughput.pop(OT3AxisKind.X, None)
+    altered_default.high_throughput_1000.pop(OT3AxisKind.X, None)
 
-    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] = -72
+    mostly_right["motion_settings"]["acceleration"]["high_throughput_1000"]["X"] = -72
     assert (
         defaults_ot3._build_default_bpk(
             mostly_right["motion_settings"]["acceleration"], altered_default
-        ).high_throughput[OT3AxisKind.X]
+        ).high_throughput_1000[OT3AxisKind.X]
         == -72
     )
 

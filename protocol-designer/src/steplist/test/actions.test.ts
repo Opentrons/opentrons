@@ -1,5 +1,5 @@
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import { legacy_configureStore } from 'redux-mock-store'
+import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -8,7 +8,7 @@ import { deleteMultipleSteps } from '../actions/actions'
 
 vi.mock('../../step-forms/selectors')
 
-const mockStore = configureMockStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 describe('step list actions', () => {
   describe('deleteMultipleSteps', () => {
     let store: any

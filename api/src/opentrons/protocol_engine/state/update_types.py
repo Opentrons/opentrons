@@ -15,13 +15,17 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     OnLabwareLocation,
     TipGeometry,
+    TipRackWellState,
     AspiratedFluid,
     LiquidClassRecord,
     ABSMeasureMode,
     LiquidTrackingType,
     StackerStoredLabwareGroup,
+    ModuleModel,
+    ModuleDefinition,
+    LabwareWellId,
 )
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -63,14 +67,6 @@ Unfortunately, mypy doesn't let us write `Literal[CLEAR]`. Use this instead.
 
 
 @dataclasses.dataclass(frozen=True)
-class Well:
-    """Designates a well in a labware."""
-
-    labware_id: str
-    well_name: str
-
-
-@dataclasses.dataclass(frozen=True)
 class AddressableArea:
     """Designates an addressable area."""
 
@@ -84,7 +80,7 @@ class PipetteLocationUpdate:
     pipette_id: str
     """The ID of the already-loaded pipette."""
 
-    new_location: Well | AddressableArea | None | NoChangeType
+    new_location: LabwareWellId | AddressableArea | None | NoChangeType
     """The pipette's new logical location.
 
     Note: `new_location=None` means "change the location to `None` (unknown)",
@@ -228,6 +224,7 @@ class PipetteTipStateUpdate:
 
     pipette_id: str
     tip_geometry: TipGeometry | None
+    tip_source: LabwareWellId | None
 
 
 @dataclasses.dataclass
@@ -239,8 +236,10 @@ class PipetteAspirateReadyUpdate:
 
 
 @dataclasses.dataclass
-class TipsUsedUpdate:
-    """Represents an update that marks tips in a tip rack as used."""
+class TipsStateUpdate:
+    """Represents an update that marks tips in a tip rack as the requested state."""
+
+    tip_state: TipRackWellState
 
     labware_id: str
     """The labware ID of the tip rack."""
@@ -358,6 +357,7 @@ class FlexStackerPoolConstraint:
 
     max_pool_count: int
     pool_overlap: float
+    pool_height: float
     primary_definition: LabwareDefinition
     lid_definition: LabwareDefinition | None
     adapter_definition: LabwareDefinition | None
@@ -409,12 +409,25 @@ class AddressableAreaUsedUpdate:
 
 
 @dataclasses.dataclass
+class LoadModuleUpdate:
+    """An update that loads a module."""
+
+    module_id: str
+    definition: ModuleDefinition
+    slot_name: DeckSlotName
+    requested_model: ModuleModel
+    serial_number: typing.Optional[str]
+
+
+@dataclasses.dataclass
 class StateUpdate:
     """Represents an update to perform on engine state."""
 
     pipette_location: PipetteLocationUpdate | NoChangeType | ClearType = NO_CHANGE
 
     loaded_pipette: LoadPipetteUpdate | NoChangeType = NO_CHANGE
+
+    loaded_module: LoadModuleUpdate | NoChangeType = NO_CHANGE
 
     pipette_config: PipetteConfigUpdate | NoChangeType = NO_CHANGE
 
@@ -442,7 +455,7 @@ class StateUpdate:
 
     labware_lid: LabwareLidUpdate | NoChangeType = NO_CHANGE
 
-    tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
+    tips_state: TipsStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_loaded: LiquidLoadedUpdate | NoChangeType = NO_CHANGE
 
@@ -546,7 +559,9 @@ class StateUpdate:
         else:
             self.pipette_location = PipetteLocationUpdate(
                 pipette_id=pipette_id,
-                new_location=Well(labware_id=new_labware_id, well_name=new_well_name),
+                new_location=LabwareWellId(
+                    labware_id=new_labware_id, well_name=new_well_name
+                ),
                 new_deck_point=new_deck_point,
             )
         return self
@@ -664,6 +679,24 @@ class StateUpdate:
         )
         return self
 
+    def set_load_module(
+        self: Self,
+        module_id: str,
+        definition: ModuleDefinition,
+        slot_name: DeckSlotName,
+        requested_model: ModuleModel,
+        serial_number: typing.Optional[str],
+    ) -> Self:
+        """Add a new module to state. See `LoadModuleUpdate`."""
+        self.loaded_module = LoadModuleUpdate(
+            module_id=module_id,
+            definition=definition,
+            serial_number=serial_number,
+            slot_name=slot_name,
+            requested_model=requested_model,
+        )
+        return self
+
     def update_pipette_config(
         self: Self,
         pipette_id: str,
@@ -686,17 +719,26 @@ class StateUpdate:
         return self
 
     def update_pipette_tip_state(
-        self: Self, pipette_id: str, tip_geometry: TipGeometry | None
+        self: Self,
+        pipette_id: str,
+        tip_geometry: TipGeometry | None,
+        tip_source: LabwareWellId | None,
     ) -> Self:
         """Update a pipette's tip state. See `PipetteTipStateUpdate`."""
         self.pipette_tip_state = PipetteTipStateUpdate(
-            pipette_id=pipette_id, tip_geometry=tip_geometry
+            pipette_id=pipette_id,
+            tip_geometry=tip_geometry,
+            tip_source=tip_source,
         )
         return self
 
-    def mark_tips_as_used(self: Self, labware_id: str, well_names: list[str]) -> Self:
-        """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
-        self.tips_used = TipsUsedUpdate(labware_id=labware_id, well_names=well_names)
+    def update_tip_rack_well_state(
+        self: Self, tip_state: TipRackWellState, labware_id: str, well_names: list[str]
+    ) -> Self:
+        """Marks tips in a tip rack to provided tip state. See `TipsStateUpdate`."""
+        self.tips_state = TipsStateUpdate(
+            tip_state=tip_state, labware_id=labware_id, well_names=well_names
+        )
         return self
 
     def set_liquid_loaded(
@@ -824,6 +866,7 @@ class StateUpdate:
         module_id: str,
         max_count: int,
         pool_overlap: float,
+        pool_height: float,
         primary_definition: LabwareDefinition,
         adapter_definition: LabwareDefinition | None,
         lid_definition: LabwareDefinition | None,
@@ -836,6 +879,7 @@ class StateUpdate:
             pool_constraint=FlexStackerPoolConstraint(
                 max_pool_count=max_count,
                 pool_overlap=pool_overlap,
+                pool_height=pool_height,
                 primary_definition=primary_definition,
                 lid_definition=lid_definition,
                 adapter_definition=adapter_definition,

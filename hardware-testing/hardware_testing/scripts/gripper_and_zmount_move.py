@@ -188,7 +188,7 @@ jira credentials to: {storage_directory}."
     )
     await asyncio.sleep(1)
     await hw_api.cache_instruments()
-    timeout_start = time.time()
+    timeout_start = time.monotonic()
     timeout = time_min * 60
     count = 0
     errored = False
@@ -198,14 +198,14 @@ jira credentials to: {storage_directory}."
         await hw_api.home()
         await asyncio.sleep(1)
         await hw_api.move_rel(mount, Point(0, 0, -1))
-        while time.time() < timeout_start + timeout:
+        while time.monotonic() < timeout_start + timeout:
             # while True:
             await hw_api.move_rel(mount, Point(0, 0, (-1 * int(travel))))
             await hw_api.move_rel(mount, Point(0, 0, int(travel)))
             # grab and print time and move count
             count += 1
             print(f"cycle: {count}")
-            runtime = time.time() - timeout_start
+            runtime = time.monotonic() - timeout_start
             print(f"time: {runtime}")
             # write count and runtime to csv sheet
             run_data = [

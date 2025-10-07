@@ -196,7 +196,9 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
       <LPCContentContainer
         {...props}
         header={contentHeader}
-        buttonText={t('confirm_placement')}
+        desktopHeaderBtnCopy={t('exit')}
+        desktopFooterBtnCopy={t('confirm_placement')}
+        oddHeaderBtnCopy={t('confirm_placement')}
         onClickButton={handleProceed}
         onClickBack={handleGoBack}
       >
@@ -283,7 +285,9 @@ function CheckLabwareContentDesktop(
     <LPCContentContainer
       {...props}
       header={contentHeader}
-      buttonText={t('confirm_placement')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('confirm_placement')}
+      oddHeaderBtnCopy={t('confirm_placement')}
       onClickButton={handleProceed}
       onClickBack={handleGoBack}
       containerStyle={DESKTOP_CONTAINER_STYLE}

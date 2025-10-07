@@ -75,7 +75,8 @@ def subject(
             ),
             FlexStackerPoolConstraint(
                 max_pool_count=10,
-                pool_overlap=0,
+                pool_overlap=5.0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=sentinel.adapter_definition,
@@ -152,7 +153,8 @@ def subject(
             None,
             FlexStackerPoolConstraint(
                 max_pool_count=10,
-                pool_overlap=0,
+                pool_overlap=5.0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=None,
@@ -190,10 +192,11 @@ def subject(
             ),
             FlexStackerPoolConstraint(
                 max_pool_count=10,
-                pool_overlap=0,
+                pool_overlap=5.0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=None,
+                pool_height=sentinel.pool_height,
             ),
             [
                 StackerStoredLabwareGroup(
@@ -244,7 +247,8 @@ def subject(
             None,
             FlexStackerPoolConstraint(
                 max_pool_count=10,
-                pool_overlap=0,
+                pool_overlap=5.0,
+                pool_height=sentinel.pool_height,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=sentinel.adapter_definition,
@@ -338,6 +342,7 @@ async def test_set_stored_labware_happypath(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
@@ -366,20 +371,6 @@ async def test_set_stored_labware_happypath(
             )
         ).then_return((tiprack_adapter_def, sentinel.unused))
         adapter_definition = tiprack_adapter_def
-
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack(
-            [
-                x
-                for x in [
-                    lid_definition,
-                    flex_50uL_tiprack,
-                    adapter_definition,
-                ]
-                if x is not None
-            ]
-        )
-    ).then_return(sentinel.pool_height)
 
     for labware_group in initial_stored_labware:
         decoy.when(
@@ -439,43 +430,39 @@ async def test_set_stored_labware_happypath(
             ).then_return(labware_group.lidLabwareId)
             offset_ids_by_id[labware_group.lidLabwareId] = None
 
-    if lid_labware and adapter_labware:
-        decoy.when(
-            state_view._labware.get_labware_overlap_offsets(
-                adapter_definition, tiprack_lid_def.parameters.loadName
-            )
-        ).then_return(OverlapOffset(x=0, y=0, z=0))
-    elif lid_labware:
-        decoy.when(
-            state_view._labware.get_labware_overlap_offsets(
-                flex_50uL_tiprack, tiprack_lid_def.parameters.loadName
-            )
-        ).then_return(OverlapOffset(x=0, y=0, z=0))
-    elif adapter_labware:
-        decoy.when(
-            state_view._labware.get_labware_overlap_offsets(
-                adapter_definition, flex_50uL_tiprack.parameters.loadName
-            )
-        ).then_return(OverlapOffset(x=0, y=0, z=0))
-    else:
-        decoy.when(
-            state_view._labware.get_labware_overlap_offsets(
-                flex_50uL_tiprack, flex_50uL_tiprack.parameters.loadName
-            )
-        ).then_return(OverlapOffset(x=0, y=0, z=0))
+    ordered_definitions = [
+        x
+        for x in [
+            lid_definition,
+            flex_50uL_tiprack,
+            adapter_definition,
+        ]
+        if x is not None
+    ]
+
+    decoy.when(
+        state_view.labware.stacker_labware_pool_to_ordered_list(
+            primary_labware_definition=flex_50uL_tiprack,
+            lid_labware_definition=lid_definition,
+            adapter_labware_definition=adapter_definition,
+        )
+    ).then_return(ordered_definitions)
+
+    decoy.when(
+        state_view.geometry.get_height_of_labware_stack(ordered_definitions)
+    ).then_return(sentinel.pool_height)
+
+    decoy.when(
+        state_view.labware.get_stacker_labware_overlap_offset(ordered_definitions)
+    ).then_return(OverlapOffset(x=0, y=0, z=5.0))
 
     decoy.when(
         state_view.modules.stacker_max_pool_count_by_height(
-            module_id, sentinel.pool_height, 0.0
+            module_id, sentinel.pool_height, 5.0
         )
     ).then_return(10)
 
     result = await subject.execute(params)
-    decoy.verify(
-        state_view.labware.raise_if_stacker_labware_pool_is_not_valid(
-            flex_50uL_tiprack, lid_definition, adapter_definition
-        )
-    )
 
     assert result == SuccessData(
         public=SetStoredLabwareResult.model_construct(
@@ -573,6 +560,7 @@ async def test_set_stored_labware_requires_empty_hopper(
             ],
             max_pool_count=6,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     with pytest.raises(FlexStackerNotLogicallyEmptyError):
@@ -623,6 +611,10 @@ async def test_set_stored_labware_requires_empty_hopper(
         ),
     ],
 )
+@pytest.mark.parametrize(
+    "overlap_override",
+    [None, 5.0],
+)
 async def test_set_stored_labware_limits_count(
     input_count: int | None,
     input_labware: list[StackerStoredLabwareGroup] | None,
@@ -634,6 +626,7 @@ async def test_set_stored_labware_limits_count(
     subject: SetStoredLabwareImpl,
     model_utils: ModelUtils,
     flex_50uL_tiprack: LabwareDefinition,
+    overlap_override: float | None,
 ) -> None:
     """It should default and limit the input count."""
     module_id = "module-id"
@@ -648,6 +641,7 @@ async def test_set_stored_labware_limits_count(
         adapterLabware=None,
         initialCount=input_count,
         initialStoredLabware=input_labware,
+        poolOverlapOverride=overlap_override,
     )
     for i in range(len(output_labware)):
         decoy.when(model_utils.generate_id()).then_return(f"labware-{i+1}")
@@ -661,6 +655,7 @@ async def test_set_stored_labware_limits_count(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
@@ -674,20 +669,29 @@ async def test_set_stored_labware_limits_count(
     )
 
     decoy.when(
-        state_view._labware.get_labware_overlap_offsets(
-            flex_50uL_tiprack, "opentrons_flex_96_filtertiprack_50ul"
+        state_view.labware.stacker_labware_pool_to_ordered_list(
+            flex_50uL_tiprack,
+            None,
+            None,
         )
-    ).then_return(OverlapOffset(x=0, y=0, z=0))
+    ).then_return([flex_50uL_tiprack])
 
     decoy.when(
         state_view.geometry.get_height_of_labware_stack([flex_50uL_tiprack])
     ).then_return(sentinel.pool_height)
 
     decoy.when(
+        state_view.labware.get_stacker_labware_overlap_offset([flex_50uL_tiprack])
+    ).then_return(OverlapOffset(x=0, y=0, z=10.0))
+
+    decoy.when(
         state_view.modules.stacker_max_pool_count_by_height(
-            module_id, sentinel.pool_height, 0.0
+            module_id,
+            sentinel.pool_height,
+            10.0 if overlap_override is None else overlap_override,
         )
     ).then_return(2)
+
     # we need to control multiple return values from generate_id and it doesnt take
     # an argument so we can do this iter side-effecting thing
     labware_ids = iter(("labware-1", "labware-2"))
@@ -773,7 +777,8 @@ async def test_set_stored_labware_limits_count(
                 module_id=module_id,
                 pool_constraint=FlexStackerPoolConstraint(
                     max_pool_count=2,
-                    pool_overlap=0,
+                    pool_overlap=overlap_override or 10.0,
+                    pool_height=sentinel.pool_height,
                     primary_definition=flex_50uL_tiprack,
                     lid_definition=None,
                     adapter_definition=None,
@@ -861,6 +866,7 @@ async def test_set_stored_labware_exceeding_max(
             contained_labware_bottom_first=[],
             max_pool_count=0,
             pool_overlap=0,
+            pool_height=0,
         )
     )
     decoy.when(
@@ -874,9 +880,15 @@ async def test_set_stored_labware_exceeding_max(
     )
 
     decoy.when(
-        state_view._labware.get_labware_overlap_offsets(
-            flex_50uL_tiprack, "opentrons_flex_96_filtertiprack_50ul"
+        state_view.labware.stacker_labware_pool_to_ordered_list(
+            flex_50uL_tiprack,
+            None,
+            None,
         )
+    ).then_return([flex_50uL_tiprack])
+
+    decoy.when(
+        state_view.labware.get_stacker_labware_overlap_offset([flex_50uL_tiprack])
     ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     decoy.when(

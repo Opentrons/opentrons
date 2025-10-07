@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
@@ -17,7 +18,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 import { FlexHardware, Ot2Modules } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 
@@ -72,6 +73,7 @@ export function Hardware(): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
+          alignItems={ALIGN_CENTER}
         >
           <StyledText desktopStyle="headingSmallBold">
             {protocolName}
@@ -90,19 +92,25 @@ export function Hardware(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          padding={`${SPACING.spacing80} ${SPACING.spacing80} 0 ${SPACING.spacing80}`}
+          gridGap={SPACING.spacing60}
+          padding={SPACING.spacing80}
         >
-          <StyledText desktopStyle="displayBold">
-            {robotType === FLEX_ROBOT_TYPE
-              ? t('edit_hardware')
-              : t('edit_modules')}
-          </StyledText>
-          <StyledText desktopStyle="headingLargeRegular" color={COLORS.grey60}>
-            {robotType === FLEX_ROBOT_TYPE
-              ? t('place_hardware')
-              : t('place_modules')}
-          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+            <StyledText desktopStyle="displayBold">
+              {robotType === FLEX_ROBOT_TYPE
+                ? t('edit_hardware')
+                : t('edit_modules')}
+            </StyledText>
+            <StyledText
+              desktopStyle="headingLargeRegular"
+              color={COLORS.grey60}
+            >
+              {robotType === FLEX_ROBOT_TYPE
+                ? t('place_hardware')
+                : t('place_modules')}
+            </StyledText>
+          </Flex>
+
           {robotType === FLEX_ROBOT_TYPE ? <FlexHardware /> : <Ot2Modules />}
         </Flex>
       </Flex>

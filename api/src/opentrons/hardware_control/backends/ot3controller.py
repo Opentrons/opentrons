@@ -48,7 +48,6 @@ from .ot3utils import (
     moving_pipettes_in_move_group,
     gripper_jaw_state_from_fw,
     get_system_constraints,
-    get_system_constraints_for_calibration,
     get_system_constraints_for_plunger_acceleration,
 )
 from .tip_presence_manager import TipPresenceManager
@@ -409,19 +408,6 @@ class OT3Controller(FlexBackend):
         pip_node = axis_to_node(pipette_axis)
         return self._pressure_sensor_available[pip_node]
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._move_manager.update_constraints(
-            get_system_constraints_for_calibration(
-                self._configuration.motion_settings, gantry_load
-            )
-        )
-        log.debug(
-            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
-        )
-
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._move_manager.update_constraints(
             get_system_constraints(self._configuration.motion_settings, gantry_load)
@@ -700,9 +686,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             False,
         )
@@ -726,9 +712,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[tip_motor_move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             True,
         )
@@ -913,12 +899,15 @@ class OT3Controller(FlexBackend):
         async with self._monitor_overpressure(checked_moving_pipettes):
             positions = await asyncio.gather(*coros)
         # TODO(CM): default gear motor homing routine to have some acceleration
-        if Axis.Q in checked_axes:
+        if gantry_load in [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            GantryLoad.HIGH_THROUGHPUT_200,
+        ]:
             await self.home_tip_motors(
                 distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-                    Axis.to_kind(Axis.Q)
-                ],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity[
+                    gantry_load
+                ][Axis.to_kind(Axis.Q)],
             )
 
         for position in positions:
@@ -950,9 +939,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -987,9 +976,9 @@ class OT3Controller(FlexBackend):
         move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -1409,6 +1398,9 @@ class OT3Controller(FlexBackend):
         except RuntimeError:
             return
 
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
+
         if hasattr(self, "_event_watcher"):
             if (
                 loop.is_running()
@@ -1774,6 +1766,7 @@ class OT3Controller(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """
         Check if the gripper is at the expected location.
@@ -1788,7 +1781,16 @@ class OT3Controller(FlexBackend):
             expected_grip_width + grip_width_uncertainty_wider
         )
         current_gripper_position = jaw_width
-        if isclose(current_gripper_position, hard_limit_lower):
+        log.info(
+            f"Checking gripper position: current {jaw_width}; max error {max_allowed_grip_error}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
+        )
+        if (
+            isclose(current_gripper_position, hard_limit_lower)
+            # this odd check handles internal backlash that can lead the position to read as if
+            # the gripper has overshot its lower bound; this is physically impossible and an
+            # artifact of the gearing, so it always indicates a hard stop
+            or current_gripper_position < hard_limit_lower
+        ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws all the way closed",
                 details={
@@ -1807,6 +1809,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_min
             < -max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws closed too far",
@@ -1820,6 +1823,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_max
             > max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws could not close far enough",

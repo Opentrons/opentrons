@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getInitialSummaryState } from '../../utils'
 
+vi.mock('../../utils/retrieveLiquidClassValues')
+
 describe('getInitialSummaryState', () => {
   const props = {
     state: {
@@ -38,6 +40,8 @@ describe('getInitialSummaryState', () => {
       transferType: 'transfer',
       volume: 25,
       path: 'single',
+      liquidClassValuesInitialized: false,
+      changeTip: 'always',
     } as any,
     deckConfig: [
       {
@@ -72,11 +76,14 @@ describe('getInitialSummaryState', () => {
       ...props,
       state: {
         ...props.state,
+        volume: 1,
+        path: 'multiAspirate',
         transferType: 'consolidate',
       },
     })
     expect(initialSummaryState).toEqual({
       ...props.state,
+      volume: 1,
       transferType: 'consolidate',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -122,13 +129,14 @@ describe('getInitialSummaryState', () => {
       ...props,
       state: {
         ...props.state,
-        volume: 10,
+        volume: 1,
+        path: 'multiDispense',
         transferType: 'distribute',
       },
     })
     expect(initialSummaryState).toEqual({
       ...props.state,
-      volume: 10,
+      volume: 1,
       transferType: 'distribute',
       aspirateFlowRate: 50,
       dispenseFlowRate: 75,
@@ -141,8 +149,11 @@ describe('getInitialSummaryState', () => {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'trashBinAdapter',
       },
-      disposalVolume: 10,
-      blowOut: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+      disposalVolume: 1,
+      blowOutDispense: {
+        location: { cutoutId: 'cutoutA3', cutoutFixtureId: 'trashBinAdapter' },
+        flowRate: 75,
+      },
     })
   })
   it('generates the summary state with correct default value for 1 to n transfer with too high of volume for multiDispense', () => {
@@ -291,6 +302,7 @@ describe('getInitialSummaryState', () => {
       state: {
         ...props.state,
         destinationWells: destWells,
+        changeTip: 'once',
       },
     })
     expect(initialSummaryState).toEqual({

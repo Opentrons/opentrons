@@ -15,6 +15,10 @@ import {
   LabwareMissingOnShuttleErrorBanner,
   NoLiquidDetectedBanner,
   OverpressureBanner,
+  StackerHopperOrShuttleEmptyErrorBanner,
+  StackerShuttleMissingErrorBanner,
+  StackerShuttleOccupiedErrorBanner,
+  StackerShuttleStoreEmptyErrorBanner,
   StackerStallErrorBanner,
   StallErrorBanner,
   TipNotDetectedBanner,
@@ -241,6 +245,34 @@ describe('renders the InlineNotification', () => {
       {}
     )
   })
+  it('renders the InlineNotification for StackerShuttleOccupiedErrorBanner', () => {
+    renderWithProviders(<StackerShuttleOccupiedErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading: 'The shuttle has labware when it should be empty',
+        message:
+          'Remove the labware from the shuttle to complete the stacker retrieve step',
+      }),
+      {}
+    )
+  })
+  it('renders the InlineNotification for StackerHopperOrShuttleEmptyErrorBanner', () => {
+    renderWithProviders(<StackerHopperOrShuttleEmptyErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker errors occur when the stacker is empty when the robot expects the stacker to be filled, or when labware is stuck on the labware latch',
+        message: 'Troubleshoot the issue to complete the stacker retrieve step',
+      }),
+      {}
+    )
+  })
 
   it('renders the InlineNotification for LabwareMissingErrorBanner', () => {
     renderWithProviders(<LabwareMissingErrorBanner />, {
@@ -252,7 +284,7 @@ describe('renders the InlineNotification', () => {
         heading:
           'Stacker empty errors occur when the robot tries to retrieve labware from an empty stacker',
         message:
-          'Load the stacker with the correct labware to complete the stacker retrieve step.',
+          'Load the stacker with the correct labware to complete the stacker retrieve step',
       }),
       {}
     )
@@ -269,6 +301,37 @@ describe('renders the InlineNotification', () => {
           'Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions',
         message:
           'If the issue persists, cancel the run and reach out to Opentrons support',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for StackerShuttleMissingErrorBanner', () => {
+    renderWithProviders(<StackerShuttleMissingErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track',
+        message: 'Load the stacker shuttle onto the track to proceed',
+      }),
+      {}
+    )
+  })
+
+  it('renders the InlineNotification for StackerShuttleStoreEmptyErrorBanner', () => {
+    renderWithProviders(<StackerShuttleStoreEmptyErrorBanner />, {
+      i18nInstance: i18n,
+    })
+    expect(vi.mocked(InlineNotification)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'alert',
+        heading:
+          'Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle',
+        message:
+          'Load the shuttle with the correct labware to complete the stacker store step',
       }),
       {}
     )

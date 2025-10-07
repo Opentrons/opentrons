@@ -48,6 +48,7 @@ async def test_open_latch_command(
         contained_labware_bottom_first=[],
         max_pool_count=0,
         pool_overlap=0,
+        pool_height=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)

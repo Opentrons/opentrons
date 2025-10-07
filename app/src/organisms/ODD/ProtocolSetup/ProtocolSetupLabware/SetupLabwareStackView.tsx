@@ -19,23 +19,23 @@ import {
   truncateString,
 } from '@opentrons/components'
 import {
+  getLabwareDefinitionsByURIForProtocol,
   getSchema2CornerOffsetFromSlot,
   getSchema2Dimensions,
+  getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
 import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
-import { getLabwareDefinitionsByURIForProtocol } from '/app/transformations/commands'
 
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
+  CompletedProtocolAnalysis,
   LabwareByLiquidId,
   LabwareInStack,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
@@ -86,8 +86,9 @@ export function SetupLabwareStackView({
 
   const wellFill = getWellFillFromLabwareId(
     selectedLabware.labwareId,
-    mostRecentAnalysis?.liquids ?? [],
-    labwareByLiquidId
+    mostRecentAnalysis.liquids,
+    labwareByLiquidId,
+    mostRecentAnalysis.commands
   )
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
@@ -194,6 +195,7 @@ export function SetupLabwareStackView({
             >
               <LabwareRender
                 definition={labwareDefinition}
+                positioningMode="offsetInSlot"
                 wellFill={wellFill}
               />
             </g>

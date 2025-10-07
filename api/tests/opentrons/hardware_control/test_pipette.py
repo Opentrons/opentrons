@@ -5,7 +5,7 @@ from pathlib import Path
 from opentrons_shared_data.errors.exceptions import InvalidLiquidClassName
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point, Mount
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 from opentrons.hardware_control.instruments.ot2 import (
     pipette as ot2_pipette,
     instrument_calibration,

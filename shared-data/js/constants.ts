@@ -1,6 +1,13 @@
 import type { WellLocation, WellOrigin } from '../command'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
-import type { ModuleModel, ModuleType, PositionReference } from './types'
+import type {
+  AddressableArea,
+  AreaType,
+  FakeAddressableArea,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -140,11 +147,11 @@ export const MODULE_TYPES = [
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
 
-export const IDENTITY_VECTOR = { x: 0, y: 0, z: 0 }
-
 export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
+
+export const FLEX_96_CHANNEL_PIPETTES = ['p1000_96', 'p200_96']
 
 //  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
@@ -240,6 +247,11 @@ export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
   'cutoutD2',
 ]
 
+export const LEFT_AND_CENTER_CUTOUTS = [
+  ...SINGLE_LEFT_CUTOUTS,
+  ...SINGLE_CENTER_CUTOUTS,
+]
+
 export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
@@ -288,6 +300,40 @@ export const D1_ADDRESSABLE_AREA: 'D1' = 'D1'
 export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
+
+// fake AA
+export const FAKE_D4_ADDRESSABLE_AREA: 'fakeD4' = 'fakeD4'
+export const FAKE_C4_ADDRESSABLE_AREA: 'fakeC4' = 'fakeC4'
+export const FAKE_B4_ADDRESSABLE_AREA: 'fakeB4' = 'fakeB4'
+export const FAKE_A4_ADDRESSABLE_AREA: 'fakeA4' = 'fakeA4'
+
+export const FAKE_AA = [
+  FAKE_A4_ADDRESSABLE_AREA,
+  FAKE_C4_ADDRESSABLE_AREA,
+  FAKE_B4_ADDRESSABLE_AREA,
+  FAKE_A4_ADDRESSABLE_AREA,
+]
+
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeCutoutFixtureId =
+  | 'fakeStagingAreaRightSlot'
+  | 'fakeWasteChuteWithEmptySlot'
+  | 'fakeStagingSlotWithMagBlockV1'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
+
+export type CutoutFixtureIdsWithFakes = CutoutFixtureId | FakeCutoutFixtureId
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
 
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
@@ -478,6 +524,11 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
 ]
 
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] = [
+  ...FLEX_STAGING_ADDRESSABLE_AREAS,
+  ...FAKE_AA,
+]
+
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
 export const ADDRESSABLE_AREA_3: '3' = '3'
@@ -551,6 +602,15 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
+  'fakeStagingAreaRightSlot'
+
+export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE: 'fakeWasteChuteWithEmptySlot' =
+  'fakeWasteChuteWithEmptySlot'
+
+export const FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE: 'fakeStagingSlotWithMagBlockV1' =
+  'fakeStagingSlotWithMagBlockV1'
+
 export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
@@ -580,10 +640,89 @@ export const FLEX_STACKER_V1_FIXTURE: 'flexStackerModuleV1' =
   'flexStackerModuleV1'
 export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterCovered' =
   'flexStackerModuleV1WithWasteChuteRightAdapterCovered'
-export const FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterNoCover' =
+export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterNoCover' =
   'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
 export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
   'flexStackerModuleV1WithMagneticBlockV1'
+
+export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
+  [moduleModel in ModuleModel]?: AreaType
+} = {
+  [HEATERSHAKER_MODULE_V1]: 'heaterShaker',
+  [TEMPERATURE_MODULE_V2]: 'temperatureModule',
+  [MAGNETIC_BLOCK_V1]: 'magneticBlock',
+  [THERMOCYCLER_MODULE_V2]: 'thermocycler',
+  [ABSORBANCE_READER_V1]: 'absorbanceReader',
+  [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+}
+
+export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  ABSORBANCE_READER_V1_FIXTURE,
+  FLEX_STACKER_V1_FIXTURE,
+]
+
+export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
+]
+
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+]
+
+export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+]
+
+export const WASTE_CHUTE_WITH_FAKE_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+]
+
+export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] = [
+  ...WASTE_CHUTE_ONLY_FIXTURES,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+]
+
+export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_FLEX_STACKER_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+]
+
+export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+]
 
 export const MODULE_FIXTURES_BY_MODEL: {
   [moduleModel in ModuleModel]?: CutoutFixtureId[]
@@ -599,49 +738,11 @@ export const MODULE_FIXTURES_BY_MODEL: {
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
 }
 
-export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
-  HEATERSHAKER_MODULE_V1_FIXTURE,
-  TEMPERATURE_MODULE_V2_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  ABSORBANCE_READER_V1_FIXTURE,
-  FLEX_STACKER_V1_FIXTURE,
-]
+export const DEFAULT_AA_FOR_WASTE_CHUTE = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
 
-export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureId[] = [
-  MAGNETIC_BLOCK_V1_FIXTURE,
+export const STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-]
-
-export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
-]
-
-export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-]
-
-export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
-  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-]
-
-export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-]
-
-export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
-  FLEX_STACKER_V1_FIXTURE,
-  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
@@ -703,3 +804,17 @@ export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
     z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
   },
 }
+
+export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  FAKE_STAGING_AREA_RIGHT_SLOT,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+]
+
+export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  ...FLEX_STACKER_FIXTURES,
+  ...MAGNETIC_BLOCK_FIXTURES,
+  ...WASTE_CHUTE_FIXTURES,
+  ...FAKE_FIXTURE_IDS,
+  ...STAGING_AREA_FIXTURES,
+]

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
+from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING, Sequence
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -24,6 +24,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
+from .tasks import TaskCoreType
 from .._liquid import Liquid, LiquidClass
 from .robot import AbstractRobot
 from .._types import OffDeckType
@@ -34,7 +35,7 @@ if TYPE_CHECKING:
 
 
 class AbstractProtocol(
-    ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
+    ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType, TaskCoreType]
 ):
     @property
     @abstractmethod
@@ -193,6 +194,14 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def wait_for_tasks(self, task_cores: Sequence[TaskCoreType]) -> None:
+        ...
+
+    @abstractmethod
+    def create_timer(self, seconds: float) -> TaskCoreType:
+        ...
+
+    @abstractmethod
     def home(self) -> None:
         ...
 
@@ -297,7 +306,7 @@ class AbstractProtocol(
         """Define a liquid to load into a well."""
 
     @abstractmethod
-    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+    def get_liquid_class(self, name: str, version: Optional[int]) -> LiquidClass:
         """Get an instance of a built-in liquid class."""
 
     @abstractmethod

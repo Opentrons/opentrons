@@ -20,6 +20,7 @@ import {
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
+  StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -27,7 +28,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { StepMeter } from '/app/atoms/StepMeter'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'

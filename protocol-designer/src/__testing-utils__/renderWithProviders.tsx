@@ -4,11 +4,11 @@ import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { render } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
-import type { PreloadedState, Store } from 'redux'
+import type { Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
@@ -28,10 +28,7 @@ export function renderWithProviders<State>(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {}, i18nInstance = null } = options || {}
 
-  const store: Store<State> = createStore(
-    vi.fn(),
-    initialState as PreloadedState<State>
-  )
+  const store: Store<State> = legacy_createStore(vi.fn(), initialState)
   store.dispatch = vi.fn()
   store.getState = vi.fn(() => initialState) as () => State
 
@@ -55,4 +52,33 @@ export function renderWithProviders<State>(
   }
 
   return [render(Component, { wrapper: ProviderWrapper }), store]
+}
+
+//  to use for testing hooks that need access to a provider
+export function getProviderWrapperForHooks<State>(
+  initialState: State, // this is the state you need redux to be in, often times an empty state {} is fine
+  i18nInstance?: ComponentProps<typeof I18nextProvider>['i18n'] // if your hook uses i18n
+): ComponentType<PropsWithChildren<{}>> {
+  const store: Store<State> = legacy_createStore(vi.fn(), initialState)
+  store.dispatch = vi.fn()
+  store.getState = vi.fn(() => initialState) as () => State
+
+  const queryClient = new QueryClient()
+
+  const ProviderWrapper: ComponentType<PropsWithChildren<{}>> = ({
+    children,
+  }) => {
+    const base = (
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
+    )
+    return i18nInstance ? (
+      <I18nextProvider i18n={i18nInstance}>{base}</I18nextProvider>
+    ) : (
+      base
+    )
+  }
+
+  return ProviderWrapper
 }

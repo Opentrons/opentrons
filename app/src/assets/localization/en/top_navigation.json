@@ -21,5 +21,6 @@
   "robot_settings": "Robot Settings",
   "run": "run",
   "run_details": "Run Details",
-  "settings": "Settings"
+  "settings": "Settings",
+  "visualization": "Visualization"
 }

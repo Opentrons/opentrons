@@ -13,6 +13,7 @@ from . import types as command_types
 from opentrons.types import Location
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._liquid import LiquidClass
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -444,4 +445,39 @@ def resin_tip_dispense(
     return {
         "name": command_types.PRESSURIZE,
         "payload": {"instrument": instrument, "text": text},
+    }
+
+
+def configure_for_volume(
+    instrument: InstrumentContext,
+    volume: float,
+) -> command_types.ConfigureForVolumeCommand:
+    text = f"Configure pipette on {instrument.mount} mount to handle {volume} µL."
+    return {
+        "name": command_types.CONFIGURE_FOR_VOLUME,
+        "payload": {"instrument": instrument, "volume": volume, "text": text},
+    }
+
+
+def configure_nozzle_layout(
+    instrument: InstrumentContext,
+    style: NozzleLayout,
+    start: str | None,
+    end: str | None,
+) -> command_types.ConfigureNozzleLayoutCommand:
+    text = f"Configure pipette on {instrument.mount} mount to use {style} layout"
+    if start:
+        text += f" starting at nozzle {start}"
+    if end:
+        text += f" ending at nozzle {end}"
+    text += "."
+    return {
+        "name": command_types.CONFIGURE_NOZZLE_LAYOUT,
+        "payload": {
+            "instrument": instrument,
+            "style": style,
+            "start": start,
+            "end": end,
+            "text": text,
+        },
     }

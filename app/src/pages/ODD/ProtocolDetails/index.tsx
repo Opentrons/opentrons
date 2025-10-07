@@ -38,8 +38,8 @@ import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
-  ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsHeaderChipSkeleton,
+  ProtocolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '/app/organisms/ODD/ProtocolDetails'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
@@ -142,7 +142,7 @@ const ProtocolHeader = ({
               {displayedTitle}
             </LegacyStyledText>
           ) : (
-            <ProcotolDetailsHeaderTitleSkeleton />
+            <ProtocolDetailsHeaderTitleSkeleton />
           )}
         </Flex>
       </Flex>

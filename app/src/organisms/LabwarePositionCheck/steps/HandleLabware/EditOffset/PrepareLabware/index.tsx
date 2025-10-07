@@ -70,7 +70,9 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={contentHeader}
-      buttonText={t('confirm_placement')}
+      desktopHeaderBtnCopy={t('exit')}
+      desktopFooterBtnCopy={t('confirm_placement')}
+      oddHeaderBtnCopy={t('confirm_placement')}
       onClickButton={handleConfirmPlacement}
       onClickBack={goBackSubstep}
       tertiaryBtnProps={{ text: t('go_back'), onClick: goBackSubstep }}

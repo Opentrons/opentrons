@@ -2,7 +2,7 @@
 from typing import cast
 import pytest
 from _pytest.fixtures import SubRequest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTrackEvent } from '/app/redux/analytics'
@@ -30,11 +30,11 @@ const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 let mockTrackEvent: Mock
 let mockGetProtocolRunAnalyticsData: Mock
 let wrapper: FunctionComponent<{ children: ReactNode }>
-let store: Store<any> = createStore(vi.fn(), {})
+let store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useTrackCreateProtocolRunEvent hook', () => {
   beforeEach(() => {
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

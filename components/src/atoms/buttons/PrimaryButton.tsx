@@ -1,15 +1,15 @@
 import styled from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { NewPrimaryBtn, styleProps } from '../../primitives'
+import { Btn, styleProps } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-export const PrimaryButton = styled(NewPrimaryBtn)`
+export const PrimaryButton = styled(Btn)`
+  color: ${COLORS.white};
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: none;
-  padding-left: ${SPACING.spacing16};
-  padding-right: ${SPACING.spacing16};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   font-size: ${TYPOGRAPHY.fontSizeH3};

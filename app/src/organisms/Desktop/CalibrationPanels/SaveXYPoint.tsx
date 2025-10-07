@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   ALIGN_STRETCH,
+  AnimationVideo,
   Box,
   DIRECTION_COLUMN,
   Flex,
@@ -41,7 +42,6 @@ import { formatJogVector } from './utils'
 import type { Mount } from '@opentrons/components'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type {
-  CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandString,
   SessionType,
@@ -49,7 +49,7 @@ import type {
 import type { CalibrationPanelProps } from './types'
 
 const assetMap: Record<
-  CalibrationLabware['slot'],
+  string,
   Record<Mount, Record<'multi' | 'single', string>>
 > = {
   '1': {
@@ -233,21 +233,18 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
             </LegacyStyledText>
           </Flex>
           <Box flex="1">
-            <video
+            <AnimationVideo
               key={String(demoAsset)}
               css={css`
                 max-width: 100%;
                 max-height: 15rem;
               `}
-              autoPlay={true}
-              loop={true}
-              controls={false}
               aria-label={`${mount} ${
                 isMulti ? 'multi' : 'single'
               } channel pipette moving to slot ${slotNumber}`}
             >
               <source src={demoAsset} />
-            </video>
+            </AnimationVideo>
           </Box>
         </Flex>
         <JogControls

@@ -3,6 +3,7 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
+
 import pytest
 import textwrap
 from decoy import matchers
@@ -68,3 +69,4 @@ async def test_legacy_custom_labware(custom_labware_protocol_files: List[Path]) 
 
     assert result.state_summary.errors == []
     assert expected_labware in result.state_summary.labware
+    await subject.finish()

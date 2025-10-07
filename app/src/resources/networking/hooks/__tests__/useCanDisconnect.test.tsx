@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -21,7 +21,7 @@ vi.mock('../useWifiList')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 
-const store: Store<State> = createStore(state => state, {})
+const store: Store<State> = legacy_createStore(state => state, {})
 
 const wrapper: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
   <Provider store={store}>{children}</Provider>

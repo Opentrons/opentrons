@@ -43,7 +43,7 @@ class AspirateVolumeMixin(BaseModel):
         " the pipette (see `loadPipette`), its configuration (see `configureForVolume`),"
         " the tip (see `pickUpTip`), and the amount you've aspirated so far."
         " There is some tolerance for floating point rounding errors.",
-        ge=0,
+        ge=0.0,
     )
     correctionVolume: Optional[float] = Field(
         None,
@@ -59,7 +59,7 @@ class DispenseVolumeMixin(BaseModel):
         description="The amount of liquid to dispense, in µL."
         " Must not be greater than the currently aspirated volume."
         " There is some tolerance for floating point rounding errors.",
-        ge=0,
+        ge=0.0,
     )
     correctionVolume: Optional[float] = Field(
         None,
@@ -71,7 +71,7 @@ class FlowRateMixin(BaseModel):
     """Mixin for command requests that take a flow rate."""
 
     flowRate: float = Field(
-        ..., description="Speed in µL/s configured for the pipette", gt=0
+        ..., description="Speed in µL/s configured for the pipette", gt=0.0
     )
 
 
@@ -81,7 +81,7 @@ class BaseLiquidHandlingResult(BaseModel):
     volume: float = Field(
         ...,
         description="Amount of liquid in uL handled in the operation.",
-        ge=0,
+        ge=0.0,
     )
 
 

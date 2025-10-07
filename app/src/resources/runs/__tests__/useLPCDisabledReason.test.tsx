@@ -1,7 +1,7 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -47,7 +47,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   const wrapper: FunctionComponent<{ children: ReactNode }> = ({
     children,
   }) => (

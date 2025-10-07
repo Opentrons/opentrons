@@ -14,7 +14,7 @@ class GripperController(Protocol):
     ) -> None:
         ...
 
-    async def home_gripper_jaw(self) -> None:
+    async def home_gripper_jaw(self, recalibrate_jaw_width: bool = False) -> None:
         ...
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
@@ -41,6 +41,7 @@ class GripperController(Protocol):
         expected_grip_width: float,
         grip_width_uncertainty_wider: float,
         grip_width_uncertainty_narrower: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """Ensure that a gripper pickup succeeded."""
 

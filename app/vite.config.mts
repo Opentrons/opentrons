@@ -1,12 +1,15 @@
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
+
 import { versionForProject } from '../scripts/git-version.mjs'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
+
 import type { UserConfig } from 'vite'
 
 export default defineConfig(
@@ -19,7 +22,7 @@ export default defineConfig(
       build: {
         // Relative to the root
         outDir: 'dist',
-        sourcemap: true
+        sourcemap: true,
       },
       plugins: [
         react({
@@ -29,6 +32,7 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        cssModuleSideEffect(),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -47,17 +51,23 @@ export default defineConfig(
         },
       },
       define: {
-        'process.env': {
-          NODE_ENV: process.env.NODE_ENV,
-          OT_APP_MIXPANEL_ID: process.env.OT_APP_MIXPANEL_ID,
-          OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
-        },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
-        _PKG_VERSION_: JSON.stringify(version),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
+        // _OT_LL_ variables because app/ imports files directly from labware-library/,
+        // causing them to be processed in the context of this Vite config instead of
+        // labware-library's Vite config.
+        _OT_LL_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_DEV_ID),
+        _OT_LL_MIXPANEL_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_ID),
+        _PKG_VERSION_: JSON.stringify(version),
       },
       resolve: {
         alias: {
+          '@opentrons/components/styles/global': path.resolve(
+            '../components/src/styles/global.css'
+          ),
           '@opentrons/components/styles': path.resolve(
             '../components/src/index.module.css'
           ),

@@ -11,6 +11,7 @@ import {
   POSITION_FIXED,
   RadioButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -47,6 +48,11 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
       ? state.touchTipAspirate != null
       : state.touchTipDispense != null
   )
+  const initialSpeed =
+    kind === 'aspirate'
+      ? state.touchTipAspirateSpeed
+      : state.touchTipDispenseSpeed
+  const [speed, setSpeed] = useState<number | null>(initialSpeed ?? null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const touchTipAspirate =
     state.touchTipAspirate != null ? state.touchTipAspirate.toString() : null
@@ -97,9 +103,14 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
+      setCurrentStep(3)
+    } else if (currentStep === 3) {
       dispatch({
         type: touchTipAction,
         position: position != null ? parseInt(position) : undefined,
+        [kind === 'aspirate'
+          ? 'touchTipAspirateSpeed'
+          : 'touchTipDispenseSpeed']: speed,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -112,7 +123,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
   }
 
   const setSaveOrContinueButtonText =
-    touchTipIsEnabled && currentStep < 2
+    touchTipIsEnabled && currentStep < 3
       ? t('shared:continue')
       : t('shared:save')
 
@@ -151,7 +162,18 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
+    buttonIsDisabled = speed == null
+  }
+  if (currentStep === 3) {
     buttonIsDisabled = position == null || positionError != null
+  }
+
+  const handleSpeedChange = (userInput: string): void => {
+    if (userInput === '') {
+      setSpeed(null)
+    }
+    const parsedSpeed = parseInt(userInput)
+    setSpeed(!isNaN(parsedSpeed) ? parsedSpeed : null)
   }
 
   return createPortal(
@@ -160,7 +182,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
         header={
           kind === 'aspirate'
             ? t('touch_tip_after_aspirating')
-            : t('touch_tip_before_dispensing')
+            : t('touch_tip_after_dispensing')
         }
         buttonText={i18n.format(setSaveOrContinueButtonText, 'capitalize')}
         onClickBack={handleClickBackOrExit}
@@ -173,19 +195,26 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           marginTop={SPACING.spacing120}
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing24}
           width="100%"
         >
-          {enableTouchTipDisplayItems.map(displayItem => (
-            <RadioButton
-              key={displayItem.description}
-              isSelected={touchTipIsEnabled === displayItem.option}
-              onChange={displayItem.onClick}
-              buttonValue={displayItem.description}
-              buttonLabel={displayItem.description}
-              radioButtonType="large"
-            />
-          ))}
+          <StyledText oddStyle="level4HeaderRegular">
+            {kind === 'aspirate'
+              ? t('touch_tip_description_aspirating')
+              : t('touch_tip_description_dispensing')}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {enableTouchTipDisplayItems.map(displayItem => (
+              <RadioButton
+                key={displayItem.description}
+                isSelected={touchTipIsEnabled === displayItem.option}
+                onChange={displayItem.onClick}
+                buttonValue={displayItem.description}
+                buttonLabel={displayItem.description}
+                radioButtonType="large"
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : null}
       {currentStep === 2 ? (
@@ -207,11 +236,57 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <InputField
               type="text"
+              value={String(speed ?? '')}
+              title={t('speed')}
+              readOnly
+            />
+          </Flex>
+          <Flex
+            paddingX={SPACING.spacing24}
+            height="21.25rem"
+            marginTop="7.75rem"
+            borderRadius="0"
+          >
+            <NumericalKeyboard
+              keyboardRef={keyboardRef}
+              initialValue={String(speed ?? '')}
+              onChange={e => {
+                handleSpeedChange(e)
+              }}
+            />
+          </Flex>
+        </Flex>
+      ) : null}
+      {currentStep === 3 ? (
+        <Flex
+          alignSelf={ALIGN_CENTER}
+          gridGap={SPACING.spacing48}
+          paddingX={SPACING.spacing40}
+          padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+          marginTop="7.75rem" // using margin rather than justify due to content moving with error message
+          alignItems={ALIGN_CENTER}
+          height="22rem"
+        >
+          <Flex
+            width="30.5rem"
+            height="100%"
+            gridGap={SPACING.spacing8}
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing68}
+          >
+            <InputField
+              type="text"
               value={String(position ?? '')}
               title={t('touch_tip_position_mm')}
               error={positionError}
               readOnly
             />
+            <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
+              {t('touch_tip_from_top', {
+                min: positionRange.min,
+                max: positionRange.max,
+              })}
+            </StyledText>
           </Flex>
           <Flex
             paddingX={SPACING.spacing24}

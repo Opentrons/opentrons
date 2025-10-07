@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
 import { i18n } from '../../../assets/localization'
 import { useAnnouncements } from '../../../components/organisms/AnnouncementModal/announcements'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { loadProtocolFile } from '../../../load-file/actions'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
@@ -16,7 +16,7 @@ vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../navigation/actions')
 vi.mock('../../../components/organisms/AnnouncementModal/announcements')
-vi.mock('../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../components/organisms/Kitchen/useKitchen')
 vi.mock('../../../analytics/selectors')
 
 const mockMakeSnackbar = vi.fn()

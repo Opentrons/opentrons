@@ -88,5 +88,11 @@ export const CUSTOM_LABWARE_PROMPT_W_RESULTS = "Don't see your labware here?"
 export const CUSTOM_LABWARE_SUPPORT_BTN =
   'Learn more about creating custom definitions'
 export const LABWARE_CREATOR_BTN = 'Go to the labware creator'
-export const NEW_LABWARE_MESSAGE =
-  'Note: This labware definition requires Opentrons software v5.0 or later.'
+
+export const LABWARE_TOO_TALL_MESSAGE =
+  'This labware may be too tall for the gripper to pick it up when stacked or for the robot to move around the deck without colliding. Please test on robot.'
+
+export const STACKING_OFFSET_PURPOSE =
+  'Stacking offset is only required for labware that can be placed on an adapter, module, or itself.'
+export const STACKING_OFFSET_HOW_TO =
+  'Stack the labware onto the adapter, module, or itself and then make the required measurement with calipers.'

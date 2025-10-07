@@ -2,15 +2,10 @@ import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  POSITION_STICKY,
-  StepMeter,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { StepMeter, useConditionalConfirm } from '@opentrons/components'
 
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_EXIT_EARLY } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { ConfirmExitModal } from './ConfirmExitModal'
 import { CreateNewTransfer } from './CreateNewTransfer'
@@ -32,7 +27,6 @@ import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
-// const QUICK_TRANSFER_WIZARD_STEPS = 8
 const initialQuickTransferState: QuickTransferWizardState = {}
 
 export const QuickTransferFlow = (): JSX.Element => {
@@ -46,11 +40,7 @@ export const QuickTransferFlow = (): JSX.Element => {
   const [currentStep, setCurrentStep] = useState(0)
 
   const [analyticsStartTime] = useState<Date>(new Date())
-  // ToDo (kk:04/09/2025) this will be removed when ff is removed
-  const enableLiquidClassesForQT = useFeatureFlag(
-    'liquidClassesForQuickTransfer'
-  )
-  const QUICK_TRANSFER_WIZARD_STEPS = enableLiquidClassesForQT ? 12 : 8
+  const QUICK_TRANSFER_WIZARD_STEPS = 12
 
   const {
     confirm: confirmExit,
@@ -98,14 +88,10 @@ export const QuickTransferFlow = (): JSX.Element => {
     <SelectDestLabware key={5} {...sharedMiddleStepProps} />,
     <SelectDestWells key={6} {...sharedMiddleStepProps} />,
     <VolumeEntry key={7} {...sharedMiddleStepProps} />,
-    ...(enableLiquidClassesForQT
-      ? [
-          <SelectPipettePath key={8} {...sharedMiddleStepProps} />,
-          <SelectTipFrequency key={9} {...sharedMiddleStepProps} />,
-          <SelectTipDropLocation key={10} {...sharedMiddleStepProps} />,
-          <SelectLiquidClass key={11} {...sharedMiddleStepProps} />,
-        ]
-      : []),
+    <SelectPipettePath key={8} {...sharedMiddleStepProps} />,
+    <SelectTipFrequency key={9} {...sharedMiddleStepProps} />,
+    <SelectTipDropLocation key={10} {...sharedMiddleStepProps} />,
+    <SelectLiquidClass key={11} {...sharedMiddleStepProps} />,
     <SummaryAndSettings
       key={QUICK_TRANSFER_WIZARD_STEPS}
       {...sharedMiddleStepProps}
@@ -123,8 +109,6 @@ export const QuickTransferFlow = (): JSX.Element => {
             <StepMeter
               totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
               currentStep={currentStep + 1}
-              position={POSITION_STICKY}
-              top="0"
             />
           ) : null}
           {contentInOrder[currentStep]}

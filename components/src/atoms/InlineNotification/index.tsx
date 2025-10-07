@@ -72,6 +72,7 @@ export function InlineNotification(
     linkText,
     onLinkClick,
   } = props
+  // TODO (sb: 8/20/25) RSQ-189 Remove punctuation from this component and add to translation strings
   const fullHeading = `${heading}${message ? '. ' : ''}`
   const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]

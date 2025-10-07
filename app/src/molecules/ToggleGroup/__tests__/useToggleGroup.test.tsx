@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -19,7 +19,7 @@ vi.mock('/app/redux/analytics')
 let mockTrackEvent: any
 
 describe('useToggleGroup', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
   beforeEach(() => {
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)

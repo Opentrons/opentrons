@@ -134,9 +134,14 @@ def _retract(
     # change discontinuity per the liquid-class settings
     hw_api = ctx._core.get_hardware()
     if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
+        if pipette.max_volume == 1000:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_1000[
+                OT3AxisKind.Z
+            ] = z_discontinuity
+        else:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_200[
+                OT3AxisKind.Z
+            ] = z_discontinuity
     else:
         hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
             OT3AxisKind.Z
@@ -147,9 +152,14 @@ def _retract(
     pipette.move_to(well.bottom(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
     if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+        if pipette.max_volume == 1000:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_1000[
+                OT3AxisKind.Z
+            ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput_1000[OT3AxisKind.Z]
+        else:
+            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_200[
+                OT3AxisKind.Z
+            ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput_200[OT3AxisKind.Z]
     else:
         hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
             OT3AxisKind.Z

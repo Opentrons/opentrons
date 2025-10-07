@@ -43,6 +43,7 @@ from .deck_configuration import (
     AddressableArea,
     DeckConfigurationType,
     DeckType,
+    DeckLocationDefinition,
 )
 from .liquid_class import LiquidClassRecord, LiquidClassRecordWithId
 from .module import (
@@ -67,6 +68,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -98,6 +100,8 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
+    LabwareWellId,
+    GripSpecs,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -127,6 +131,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -140,9 +145,10 @@ from .liquid_level_detection import (
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
-from .tip import TipGeometry
+from .tip import TipGeometry, TipRackWellState
 from .hardware_passthrough import MovementAxis, MotorAxis
 from .util import Vec3f, Dimensions
+from .tasks import Task, TaskSummary, FinishedTask
 
 __all__ = [
     # Runtime parameters
@@ -182,6 +188,7 @@ __all__ = [
     "AddressableArea",
     "DeckConfigurationType",
     "DeckType",
+    "DeckLocationDefinition",
     # Liquid classes
     "LiquidClassRecord",
     "LiquidClassRecordWithId",
@@ -208,6 +215,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -249,6 +257,8 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
+    "LabwareWellId",
+    "GripSpecs",
     # Liquids
     "HexColor",
     "EmptyLiquidId",
@@ -276,6 +286,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",
@@ -291,6 +302,7 @@ __all__ = [
     "LabwareMovementOffsetData",
     # Tips
     "TipGeometry",
+    "TipRackWellState",
     # Hardware passthrough
     "MovementAxis",
     "MotorAxis",
@@ -299,4 +311,8 @@ __all__ = [
     "Dimensions",
     # Convenience re-export
     "LabwareUri",
+    # Tasks
+    "Task",
+    "TaskSummary",
+    "FinishedTask",
 ]

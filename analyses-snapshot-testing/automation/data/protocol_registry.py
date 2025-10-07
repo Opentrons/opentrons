@@ -1,5 +1,7 @@
 from typing import Optional
 
+from rich import print
+
 from automation.data.protocol import Protocol
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
 from automation.data.protocols import Protocols
@@ -51,4 +53,8 @@ class ProtocolRegistry:
             getattr(self.protocols_with_overrides, prop) for prop in dir(self.protocols_with_overrides) if "__" not in prop
         ]
         # Flatten the list of lists into a single list of protocols
-        return [protocol for protocol_with_overrides in protocols_with_overrides for protocol in protocol_with_overrides.protocols]
+        override_protocols = [
+            protocol for protocol_with_overrides in protocols_with_overrides for protocol in protocol_with_overrides.protocols
+        ]
+        print(f"Found {len(override_protocols)} generated protocols.")
+        return override_protocols

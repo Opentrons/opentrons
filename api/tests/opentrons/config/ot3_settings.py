@@ -11,7 +11,15 @@ ot3_dummy_settings = {
                 "P": 15,
                 "Z_G": 5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
+                "Q": 5,
+                "Z_G": 5,
+            },
+            "high_throughput_200": {
                 "X": 3,
                 "Y": 2,
                 "Z": 15,
@@ -28,7 +36,15 @@ ot3_dummy_settings = {
                 "P": 4,
                 "Z_G": 5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
+                "Q": 5,
+                "Z_G": 6,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -45,7 +61,15 @@ ot3_dummy_settings = {
                 "P": 40,
                 "Z_G": 50,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
+                "Q": 5,
+                "Z_G": 7,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -62,7 +86,15 @@ ot3_dummy_settings = {
                 "P": 20,
                 "Z_G": 15,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
+                "Q": 5,
+                "Z_G": 15,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -81,7 +113,15 @@ ot3_dummy_settings = {
                 "P": 0.8,
                 "Z_G": 0.5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 0.7,
+                "Y": 0.7,
+                "Z": 0.7,
+                "P": 0.8,
+                "Q": 0.3,
+                "Z_G": 0.5,
+            },
+            "high_throughput_200": {
                 "X": 0.7,
                 "Y": 0.7,
                 "Z": 0.7,
@@ -98,7 +138,15 @@ ot3_dummy_settings = {
                 "P": 5.0,
                 "Z_G": 5.0,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 0.2,
+                "Y": 0.5,
+                "Z": 0.4,
+                "P": 2.0,
+                "Q": 0.3,
+                "Z_G": 0.5,
+            },
+            "high_throughput_200": {
                 "X": 0.2,
                 "Y": 0.5,
                 "Z": 0.4,

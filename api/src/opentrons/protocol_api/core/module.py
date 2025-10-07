@@ -18,6 +18,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
 )
 from .labware import LabwareCoreType, AbstractLabware
+from .tasks import AbstractTaskCore
 from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
@@ -59,7 +60,7 @@ class AbstractTemperatureModuleCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the Temperature Module's target temperature in °C."""
 
     @abstractmethod
@@ -161,9 +162,10 @@ class AbstractThermocyclerCore(
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set the target temperature for the well block, in °C.
 
         Note:
@@ -183,7 +185,7 @@ class AbstractThermocyclerCore(
         """Wait for target block temperature to be reached."""
 
     @abstractmethod
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the target temperature for the heated lid, in °C."""
 
     @abstractmethod
@@ -205,6 +207,33 @@ class AbstractThermocyclerCore(
             Unlike the :py:meth:`set_block_temperature`, either or both of
             'hold_time_minutes' and 'hold_time_seconds' must be defined
             and finite for each step.
+        Args:
+            steps: List of unique steps that make up a single cycle.
+                Each list item should be a dictionary that maps to
+                the parameters of the :py:meth:`set_block_temperature`
+                method with keys 'temperature', 'hold_time_seconds',
+                and 'hold_time_minutes'.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
+        """
+
+    @abstractmethod
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> AbstractTaskCore:
+        """Start a Thermocycler Profile.
+
+        Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
+
+        Note:
+            Unlike the :py:meth:`execute_profile`, once the profile has started
+            the protocol will immediately move on to the next command, rather than waiting
+            for it to finish.
         Args:
             steps: List of unique steps that make up a single cycle.
                 Each list item should be a dictionary that maps to
@@ -294,7 +323,7 @@ class AbstractHeaterShakerCore(
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod
@@ -304,6 +333,10 @@ class AbstractHeaterShakerCore(
     @abstractmethod
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
+
+    @abstractmethod
+    def set_shake_speed(self, rpm: int) -> AbstractTaskCore:
+        """Set the shaker's target shake speed."""
 
     @abstractmethod
     def open_labware_latch(self) -> None:
@@ -435,6 +468,7 @@ class AbstractFlexStackerCore(
     def set_stored_labware_items(
         self,
         labware: Sequence[LabwareCoreType],
+        stacking_offset_z: float | None,
     ) -> None:
         """Configure the stacker to contain a set of labware."""
 
@@ -450,6 +484,7 @@ class AbstractFlexStackerCore(
     def get_max_storable_labware_from_list(
         self,
         labware: Sequence[LabwareCoreType],
+        overlap_offset: float | None = None,
     ) -> Sequence[LabwareCoreType]:
         """Limit the passed list to how many labware can fit in a stacker."""
 
@@ -477,5 +512,6 @@ class AbstractFlexStackerCore(
         adapter_namespace: str | None,
         adapter_version: int | None,
         count: int | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""

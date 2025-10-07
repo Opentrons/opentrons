@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
 import { Auth0Provider } from '@auth0/auth0-react'
 
+import '@opentrons/components/styles/global'
+
 import { App } from './App'
-import { GlobalStyle } from './atoms/GlobalStyle'
 import { i18n } from './i18n'
 import {
   AUTH0_DOMAIN,
@@ -14,10 +15,15 @@ import {
   STAGING_AUTH0_CLIENT_ID,
 } from './resources/constants'
 
+import '@fontsource/public-sans'
+import '@fontsource/public-sans/600.css'
+import '@fontsource/public-sans/700.css'
+import './global.css'
+
 const rootElement = document.getElementById('root')
 
 const getClientId = (): string => {
-  switch (process.env.NODE_ENV) {
+  switch (_NODE_ENV_) {
     case 'production':
       return PROD_AUTH0_CLIENT_ID
     case 'development':
@@ -28,9 +34,7 @@ const getClientId = (): string => {
 }
 
 const getDomain = (): string => {
-  return process.env.NODE_ENV === 'development'
-    ? LOCAL_AUTH0_DOMAIN
-    : AUTH0_DOMAIN
+  return _NODE_ENV_ === 'development' ? LOCAL_AUTH0_DOMAIN : AUTH0_DOMAIN
 }
 
 if (rootElement != null) {
@@ -46,7 +50,6 @@ if (rootElement != null) {
           redirect_uri: window.location.origin,
         }}
       >
-        <GlobalStyle />
         <I18nextProvider i18n={i18n}>
           <App />
         </I18nextProvider>

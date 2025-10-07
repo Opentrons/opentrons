@@ -50,7 +50,7 @@ tests: List[Union[TestHelp, TestSimulate]] = [
     TestSimulate(
         test_key="OT2_v6PD_expect_error",
         test_helper="simulate",
-        protocol_path="../analyses-snapshot-testing/files/protocols/OT2_X_v6_P300M_P20S_HS_MM_TM_TC_AllMods.json",
+        protocol_path="../analyses-snapshot-testing/files/protocols/protocol_designer/OT2_X_v6_P300M_P20S_HS_MM_TM_TC_AllMods.json",
         expected_return_code="1",
     ),
 ]

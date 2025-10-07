@@ -1,3 +1,5 @@
+import max from 'lodash/max'
+
 import {
   FLEX_ROBOT_TYPE,
   getAllLiquidClassDefs,
@@ -9,7 +11,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -23,11 +24,17 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 
-import type { CutoutId, ProtocolFile, RobotType } from '@opentrons/shared-data'
+import type {
+  CutoutId,
+  LabwareDefinition2,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   InvariantContext,
   LabwareEntities,
+  LabwareEntity,
   LabwareLiquidState,
   LiquidEntities,
   ModuleEntities,
@@ -38,15 +45,15 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-const PAPI_VERSION = '2.24' // latest version from api/src/opentrons/protocols/api_support/definitions.py
-export const PD_APPLICATION_VERSION = '8.5.5' // latest PD version to insert into DESIGNER_APPLICATION blob
+const PAPI_VERSION = '2.26' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+export const PD_APPLICATION_VERSION = '8.6.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
-  fileMetadata: ProtocolFile<{}>['metadata']
+  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string }
 ): string {
   // FileMetadataFields has timestamps, lists, etc., but Python metadata dict can only contain strings
   function formatTimestamp(timestamp: number | null | undefined): string {
@@ -62,7 +69,7 @@ export function pythonMetadata(
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
-      protocolDesigner: process.env.OT_PD_VERSION,
+      protocolDesigner: fileMetadata.protocolDesigner,
       source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries
   )
@@ -162,6 +169,97 @@ export function getLoadAdapters(
   return pythonAdapters ? `# Load Adapters:\n${pythonAdapters}` : ''
 }
 
+const _getLidStacks = (
+  lidEntities: LabwareEntity[],
+  allLabwareEntities: LabwareEntities,
+  labwareState: TimelineFrame['labware']
+): Record<string, { loadName: string; quantity: number }> =>
+  lidEntities.reduce<Record<string, { loadName: string; quantity: number }>>(
+    (acc, { id, labwareDefURI, def }) => {
+      const { stack } = labwareState[id]
+      const nonSlotStackLength = stack.length - 1
+      const parentLabware = stack.slice(1, nonSlotStackLength) // excluding stack
+      const deckRiserParentLabware = parentLabware.find(
+        parentLabwareId =>
+          allLabwareEntities[parentLabwareId]?.def.parameters.loadName ===
+          'opentrons_flex_deck_riser'
+      )
+      const isLidStack =
+        parentLabware.every(
+          parentLabwareId =>
+            allLabwareEntities[parentLabwareId]?.labwareDefURI === labwareDefURI
+        ) || deckRiserParentLabware != null
+
+      const loadName = def.parameters.loadName
+      if (!isLidStack) {
+        return acc
+      }
+      const lidSlot =
+        deckRiserParentLabware != null
+          ? allLabwareEntities[deckRiserParentLabware]?.pythonName
+          : getSlotInLocationStack(stack)
+      const nonSlotAndAdapterLength =
+        stack.length - (deckRiserParentLabware != null ? 2 : 1)
+
+      if (!(lidSlot in acc)) {
+        return {
+          ...acc,
+          [lidSlot]: { loadName, quantity: nonSlotAndAdapterLength },
+        }
+      }
+      const { quantity } = acc[lidSlot]
+      const newQuantity = max([quantity, nonSlotAndAdapterLength]) ?? quantity
+      return { ...acc, [lidSlot]: { loadName, quantity: newQuantity } }
+    },
+    {}
+  )
+
+export const getLoadLidStacks = (
+  allLabwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware']
+): string => {
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
+  )
+
+  // store quantity here
+  const lidStacks = _getLidStacks(
+    lidEntities,
+    allLabwareEntities,
+    labwareRobotState
+  )
+
+  const pythonLidStacks = Object.entries(lidStacks)
+    .map<string>(([location, { loadName, quantity }]) => {
+      const isLidSlotOnAdapter = Object.values(allLabwareEntities).some(
+        ({ pythonName }) => pythonName === location
+      )
+      const loadNameArg = `load_name=${formatPyStr(loadName)}`
+      const locationArg = `location=${
+        isLidSlotOnAdapter ? location : formatPyStr(location)
+      }`
+      const quantityArg = `quantity=${quantity}`
+      const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
+      const allArgsIndented = indentPyLines(allArgs)
+      return (
+        `lid_stack_${location} = ${PROTOCOL_CONTEXT_NAME}.load_lid_stack(\n` +
+        `${allArgsIndented},\n` +
+        `)`
+      )
+    })
+    .join('\n')
+  return pythonLidStacks ? `# Load Lid Stacks:\n${pythonLidStacks}` : ''
+}
+
+const getFormatLidParams = (def: LabwareDefinition2): string[] => {
+  const { parameters, namespace, version } = def
+  return [
+    `lid=${formatPyStr(parameters.loadName)}`,
+    `lid_namespace=${formatPyStr(namespace)}`,
+    `lid_version=${version}`,
+  ]
+}
+
 export function getLoadLabware(
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
@@ -169,12 +267,22 @@ export function getLoadLabware(
   labwareNicknamesById: Record<string, string>
 ): string {
   const labwareEntities = Object.values(allLabwareEntities).filter(
-    lw => !lw.def.allowedRoles?.includes('adapter')
+    lw =>
+      !lw.def.allowedRoles?.includes('adapter') &&
+      !lw.def.allowedRoles?.includes('lid')
   )
+  const lidEntities = Object.values(allLabwareEntities).filter(lw =>
+    lw.def.allowedRoles?.includes('lid')
+  )
+
   const pythonLabware = Object.values(labwareEntities)
-    .map(labware => {
+    .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
       const { metadata, parameters, namespace, version } = def
+      const lidEntity = Object.values(lidEntities).find(
+        lid => labwareRobotState[lid.id].stack[1] === id
+      )
+
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
@@ -207,12 +315,14 @@ export function getLoadLabware(
           ...(labelArg ? [labelArg] : []),
           `namespace=${formatPyStr(namespace)}`,
           `version=${version}`,
+          ...(lidEntity != null ? getFormatLidParams(lidEntity.def) : []),
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware(\n` +
-          `${indentPyLines(loadLabwareArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadLabwareArgs)},\n` +
+            `)`,
+        ]
       } else {
         // custom labware
         const loadFromDefnArgs = [
@@ -220,13 +330,14 @@ export function getLoadLabware(
           ...(locationArg ? [locationArg] : []),
           ...(labelArg ? [labelArg] : []),
         ].join(',\n')
-        return (
+        return [
+          ...acc,
           `${pythonName} = ${parentName}.load_labware_from_definition(\n` +
-          `${indentPyLines(loadFromDefnArgs)},\n` +
-          `)`
-        )
+            `${indentPyLines(loadFromDefnArgs)},\n` +
+            `)`,
+        ]
       }
-    })
+    }, [])
     .join('\n')
 
   return pythonLabware ? `# Load Labware:\n${pythonLabware}` : ''
@@ -234,47 +345,20 @@ export function getLoadLabware(
 
 export function getLoadPipettes(
   pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities,
-  labwareRobotState: TimelineFrame['labware'],
   pipetteRobotState: TimelineFrame['pipettes']
 ): string {
   const pythonPipette = Object.values(pipetteEntities)
     .map(pipette => {
-      const { name, id, spec, pythonName, tiprackDefURI } = pipette
+      const { name, id, spec, pythonName } = pipette
       const mount =
         spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
-      const sortedLabwareIds = sortLabwareBySlot(labwareRobotState)
-      const allTipracks = sortedLabwareIds
-        .map(id => labwareEntities[id])
-        .filter(lw => lw && tiprackDefURI.includes(lw.labwareDefURI))
-      const onDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) !==
-          'offDeck'
-      )
-      const offDeckTipracks = allTipracks.filter(
-        tiprack =>
-          getSlotInLocationStack(labwareRobotState[tiprack.id].stack) ===
-          'offDeck'
-      )
-      const tiprackPythonNames = [...onDeckTipracks, ...offDeckTipracks]
-        .map(tiprack => tiprack.pythonName)
-        .join(', ')
-      const pythonTipRacks =
-        tiprackDefURI.length === 0 ? '' : `tip_racks=[${tiprackPythonNames}]`
 
       return (
-        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(\n` +
-        `${indentPyLines(
-          [
-            formatPyStr(pipetteName),
-            ...(mount ? [mount] : []),
-            ...(pythonTipRacks ? [pythonTipRacks] : []),
-          ].join(', ')
-        )},\n` +
+        `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(` +
+        `${[formatPyStr(pipetteName), ...(mount ? [mount] : [])].join(', ')}` +
         ')'
       )
     })
@@ -424,16 +508,30 @@ export function getLoadWasteChute(
     : ''
 }
 
+const formatDescription = (description?: string | null): string => {
+  if (!description) {
+    return ''
+  }
+  return (
+    `\n` +
+    description
+      .split(/\r\n|\r|\n/)
+      .map(line => `# ${line}`)
+      .join('\n')
+  )
+}
+
 export function stepCommands(robotStateTimeline: Timeline): string {
   return (
     '# PROTOCOL STEPS\n\n' +
     robotStateTimeline.timeline
-      .map(
-        timelineFrame =>
-          `# Step ${timelineFrame.stepNumber}:\n${
-            timelineFrame.python || 'pass'
-          }`
-      )
+      .map(timelineFrame => {
+        const { stepInfo } = timelineFrame
+        const description = stepInfo?.description
+        return `# Step ${stepInfo?.stepNumber}: ${
+          stepInfo?.name
+        }${formatDescription(description)}\n${timelineFrame.python || 'pass'}`
+      })
       .join('\n\n')
   )
 }
@@ -459,13 +557,14 @@ export function pythonDefRun(
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
+    getLoadLidStacks(labwareEntities, labware),
     getLoadLabware(
       moduleEntities,
       labwareEntities,
       labware,
       labwareNicknamesById
     ),
-    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
+    getLoadPipettes(pipetteEntities, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
           getLoadTrashBins(trashBinEntities),

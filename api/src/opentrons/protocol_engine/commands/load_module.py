@@ -14,7 +14,6 @@ from ..types import (
     AddressableAreaLocation,
     ModuleType,
     ModuleModel,
-    ModuleDefinition,
 )
 from opentrons.types import DeckSlotName
 
@@ -78,18 +77,10 @@ class LoadModuleParams(BaseModel):
 class LoadModuleResult(BaseModel):
     """The results of loading a module."""
 
+    # The `definition` used to exist here, but we intentionally removed it. See #18639.
+
     moduleId: str = Field(
         description="An ID to reference this module in subsequent commands."
-    )
-
-    # TODO(mm, 2023-04-13): Remove this field. Jira RSS-221.
-    definition: ModuleDefinition = Field(
-        json_schema_extra={"deprecated": True},
-        description=(
-            "The definition of the connected module."
-            " This field is an implementation detail. We might change or remove it without warning."
-            " Do not access it or rely on it being present."
-        ),
     )
 
     model: ModuleModel = Field(
@@ -168,12 +159,19 @@ class LoadModuleImplementation(
                 module_id=params.moduleId,
             )
 
+        state_update.set_load_module(
+            module_id=loaded_module.module_id,
+            definition=loaded_module.definition,
+            requested_model=params.model,
+            serial_number=loaded_module.serial_number,
+            slot_name=params.location.slotName,
+        )
+
         return SuccessData(
             public=LoadModuleResult(
                 moduleId=loaded_module.module_id,
                 serialNumber=loaded_module.serial_number,
                 model=loaded_module.definition.model,
-                definition=loaded_module.definition,
             ),
             state_update=state_update,
         )

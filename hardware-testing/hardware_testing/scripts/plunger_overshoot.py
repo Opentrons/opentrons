@@ -67,15 +67,15 @@ def _dial_thread(simulate: bool, csv_file_name: str) -> None:
         dial = Mitutoyo_Digimatic_Indicator(list_ports_and_select("dial-indicator"))
         dial.connect()
     DIAL_THREAD_RUNNING.set()  # set the flag
-    start_timestamp = time.time()
+    start_timestamp = time.monotonic()
     read_timestamp = start_timestamp
     dial_zero = 0.0
     plunger_zero = 0.0
     data_buffer = []
     while DIAL_THREAD_RUNNING.is_set():  # continue until flag is cleared
         time.sleep(0.01)  # give time to main thread
-        if read_timestamp + DIAL_INDICATOR_READ_SECONDS < time.time():
-            read_timestamp = time.time()
+        if read_timestamp + DIAL_INDICATOR_READ_SECONDS < time.monotonic():
+            read_timestamp = time.monotonic()
             if simulate or not dial:
                 dial_pos = random()
             else:

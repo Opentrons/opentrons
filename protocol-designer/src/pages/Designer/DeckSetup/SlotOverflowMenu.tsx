@@ -25,7 +25,7 @@ import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   deleteContainer,
@@ -286,10 +286,8 @@ export function SlotOverflowMenu(
       width="10.75rem"
       height="11.25rem"
       innerDivProps={{
-        style: {
-          position: POSITION_ABSOLUTE,
-          transform: `rotate(180deg) scaleX(-1) ${invertY ? 'scaleY(-1)' : ''}`,
-        },
+        position: POSITION_ABSOLUTE,
+        transform: `rotate(180deg) scaleX(-1) ${invertY ? 'scaleY(-1)' : ''}`,
       }}
     >
       {slotOverflowBody}

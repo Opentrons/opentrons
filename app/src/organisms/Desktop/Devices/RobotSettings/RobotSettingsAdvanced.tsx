@@ -30,6 +30,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 
 import {
   DeviceReset,
+  DisableStackerSensors,
   DisplayRobotName,
   EnableErrorRecoveryMode,
   EnableStatusLight,
@@ -219,6 +220,15 @@ export function RobotSettingsAdvanced({
           <>
             <Divider marginY={SPACING.spacing16} />
             <EnableErrorRecoveryMode isRobotBusy={isRobotBusy} />
+          </>
+        ) : null}
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <DisableStackerSensors
+              robotName={robotName}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            />
           </>
         ) : null}
         <Divider marginY={SPACING.spacing16} />

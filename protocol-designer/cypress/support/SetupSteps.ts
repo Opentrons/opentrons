@@ -57,7 +57,7 @@ export enum SetupContent {
   SampleLiquidName = 'My liquid!',
   ProtocolSteps = 'Protocol steps',
   AddStep = 'Add Step',
-  NestDeepWell = 'NEST 96 Deep Well Plate 2mL',
+  NestDeepWell = 'NEST 96 Deep Well Plate 2 mL',
   Save = 'Save',
 }
 
@@ -87,7 +87,7 @@ export enum SetupLocators {
   button = 'button',
   svg = 'svg',
   exist = 'exist',
-  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0',
+  StepOptionsTestIDThreeDots = '[data-testid="StepContainer_OverflowBtn"]:visible',
   AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU',
 }
 
@@ -265,7 +265,7 @@ export const SetupSteps = {
    */
   AddHeaterShaker: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD1"]').click()
+      cy.get('button[data-testid="D1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.HeaterShaker).click()
       cy.get('button[data-testid="Heater-Shaker Module GEN1"]').click()
@@ -277,7 +277,7 @@ export const SetupSteps = {
    */
   AddTempdeck2: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutC1"]').click()
+      cy.get('button[data-testid="C1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Tempdeck2).click()
       cy.get('button[data-testid="Temperature Module GEN2"]').click()
@@ -289,7 +289,7 @@ export const SetupSteps = {
    */
   AddMagBlock: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutB2"]').click()
+      cy.get('button[data-testid="B2"]').click()
       cy.contains(SetupContent.MagBlock).click()
       cy.get('button[data-testid="Magnetic Block GEN1"]').click()
     },
@@ -333,7 +333,7 @@ export const SetupSteps = {
 
   AddPlateReader: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader).click()
       cy.get(
@@ -381,7 +381,6 @@ export const SetupSteps = {
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv')
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -603,7 +602,7 @@ export const SetupSteps = {
   }),
 
   /**
-   * Adds "NEST 96 Deep Well Plate 2mL".
+   * Adds "NEST 96 Deep Well Plate 2 mL".
    */
   AddNest96DeepWellPlate: (): StepThunk => ({
     call: () => {
@@ -815,7 +814,7 @@ export const SetupSteps = {
         .find('button[type="button"]')
         .click()
       cy.contains('Choose option').click()
-      cy.contains('Destination Well').click()
+      cy.contains('Destination well').click()
     },
   }),
 
@@ -942,7 +941,7 @@ export const SetupVerifications = {
     call: () => {
       cy.contains(SetupContent.ModulePageH).should('be.visible')
       cy.contains(SetupContent.ModulePageB).should('be.visible')
-      cy.get('button[data-testid="cutoutB1"]').click()
+      cy.get('button[data-testid="B1"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.Thermocycler).should('be.visible')
       cy.contains(SetupContent.HeaterShaker).should('be.visible')
@@ -992,10 +991,10 @@ export const SetupVerifications = {
 
   AbsorbanceNotSelectable: (): StepThunk => ({
     call: () => {
-      cy.get('button[data-testid="cutoutD3"]').click()
+      cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader)
-      cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
+      cy.get('[data-testid="ModalHeader_icon_close_Add to Slot D3"]').click()
     },
   }),
 

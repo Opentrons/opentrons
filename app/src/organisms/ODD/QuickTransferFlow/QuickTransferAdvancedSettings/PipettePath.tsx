@@ -50,7 +50,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOut)
+  >(state.blowOutDispense?.location)
 
   const [disposalVolume, setDisposalVolume] = useState<number | undefined>(
     state?.disposalVolume

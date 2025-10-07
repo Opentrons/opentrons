@@ -3,8 +3,9 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { Flex } from '@opentrons/components'
 
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { SlotInformation as SlotInformationComponent } from '.'
-import { i18n } from '../../../assets/localization'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

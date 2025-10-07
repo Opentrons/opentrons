@@ -2,8 +2,8 @@ import type { Mount } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   LabwareDefinition2,
-  LiquidClass,
   PipetteV2Specs,
+  PositionReference,
 } from '@opentrons/shared-data'
 import type {
   ACTIONS,
@@ -28,7 +28,7 @@ export interface QuickTransferWizardState {
   path?: PathOption
   changeTip?: ChangeTipOptions
   dropTipLocation?: CutoutConfig
-  liquidClass?: LiquidClass
+  liquidClassName?: string
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -64,23 +64,29 @@ export interface QuickTransferSummaryState {
   path: PathOption
   tipPositionAspirate: number
   preWetTip: boolean
+  pushOutDispense?: {
+    volume: number
+  }
   mixOnAspirate?: {
     mixVolume: number
     repetitions: number
   }
   submergeAspirate?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
   retractAspirate?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
   delayAspirate?: {
     delayDuration: number
-    positionFromBottom: number
   }
-  touchTipAspirate?: number
+  touchTipAspirate?: number // specifies the tip position from the top of the well
   touchTipAspirateSpeed?: number
   airGapAspirate?: number
   tipPositionDispense: number
@@ -90,24 +96,38 @@ export interface QuickTransferSummaryState {
   }
   submergeDispense?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
   retractDispense?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
   delayDispense?: {
     delayDuration: number
-    positionFromBottom: number
   }
-  touchTipDispense?: number
+  touchTipDispense?: number // specifies the tip position from the top of the well
   touchTipDispenseSpeed?: number
   disposalVolume?: number
-  blowOut?: BlowOutLocation
+  blowOutDispense?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
   airGapDispense?: number
   changeTip: ChangeTipOptions
   dropTipLocation: CutoutConfig
-  liquidClass: LiquidClass
+  liquidClassName: string
+  conditionAspirate?: number
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
+  // Note this is used to apply liquid class values to the state only once
+  liquidClassValuesInitialized: boolean
 }
 
 export type TransferType =
@@ -150,6 +170,10 @@ export type QuickTransferSummaryAction =
   | SetRetractDispense
   | SetChangeTip
   | SetDropTipLocation
+  | SetPushOut
+  | SetConditionAspirate
+  | SetDisposalVolumeDispense
+  | SetLiquidClassValues
 
 interface SetAspirateFlowRateAction {
   type: typeof ACTIONS.SET_ASPIRATE_FLOW_RATE
@@ -181,12 +205,12 @@ interface SetDelayAspirate {
   type: typeof ACTIONS.SET_DELAY_ASPIRATE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipAspirate {
   type: typeof ACTIONS.SET_TOUCH_TIP_ASPIRATE
   position?: number
+  touchTipAspirateSpeed?: number
 }
 interface SetAirGapAspirate {
   type: typeof ACTIONS.SET_AIR_GAP_ASPIRATE
@@ -196,14 +220,18 @@ interface SetSubmergeAspirate {
   type: typeof ACTIONS.SET_SUBMERGE_ASPIRATE
   submergeSettings?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
 }
 interface SetRetractAspirate {
   type: typeof ACTIONS.SET_RETRACT_ASPIRATE
   retractSettings?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
 }
 interface SetDispenseTipPosition {
@@ -218,16 +246,19 @@ interface SetDelayDispense {
   type: typeof ACTIONS.SET_DELAY_DISPENSE
   delaySettings?: {
     delayDuration: number
-    positionFromBottom: number
   }
 }
 interface SetTouchTipDispense {
   type: typeof ACTIONS.SET_TOUCH_TIP_DISPENSE
   position?: number
+  touchTipDispenseSpeed?: number
 }
 interface SetBlowOut {
   type: typeof ACTIONS.SET_BLOW_OUT
-  location?: BlowOutLocation
+  blowOutSettings?: {
+    location?: BlowOutLocation
+    flowRate?: number
+  }
 }
 interface SetAirGapDispense {
   type: typeof ACTIONS.SET_AIR_GAP_DISPENSE
@@ -237,14 +268,18 @@ interface SetSubmergeDispense {
   type: typeof ACTIONS.SET_SUBMERGE_DISPENSE
   submergeSettings?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
 }
 interface SetRetractDispense {
   type: typeof ACTIONS.SET_RETRACT_DISPENSE
   retractSettings?: {
     speed: number
-    positionFromBottom: number
+    delayDuration: number
+    position: number
+    positionReference?: PositionReference
   }
 }
 interface SetChangeTip {
@@ -258,7 +293,7 @@ interface SetDropTipLocation {
 
 interface SetLiquidClassAction {
   type: typeof ACTIONS.SET_LIQUID_CLASS
-  liquidClass: LiquidClass
+  liquidClassName: string
 }
 
 interface SelectPipetteAction {
@@ -289,4 +324,29 @@ interface SetDestWellsAction {
 interface SetVolumeAction {
   type: typeof ACTIONS.SET_VOLUME
   volume: number
+}
+
+interface SetPushOut {
+  type: typeof ACTIONS.SET_PUSH_OUT
+  pushOutSettings?: {
+    volume: number
+  }
+}
+
+interface SetConditionAspirate {
+  type: typeof ACTIONS.SET_CONDITION_ASPIRATE
+  conditionAspirate: number
+}
+
+interface SetDisposalVolumeDispense {
+  type: typeof ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
+}
+interface SetLiquidClassValues {
+  type: typeof ACTIONS.SET_LIQUID_CLASS_VALUES
+  liquidClassValues: QuickTransferSummaryState
 }

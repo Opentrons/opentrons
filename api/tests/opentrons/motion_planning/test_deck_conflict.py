@@ -1,4 +1,5 @@
 """Tests for opentrons.protocols.geometry.deck_conflict."""
+
 from typing import ContextManager
 from contextlib import nullcontext
 
@@ -270,13 +271,13 @@ def test_labware_when_heater_shaker(
         highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
     cool_labware = deck_conflict.Labware(
-        uri=LabwareUri("cool_labware_uri"),
+        uri=LabwareUri("test/cool_labware/1"),
         highest_z=1,
         is_fixed_trash=False,
         name_for_errors="cool_labware",
     )
     lame_labware = deck_conflict.Labware(
-        uri=LabwareUri("lame_labware_uri"),
+        uri=LabwareUri("test/lame_labware/1"),
         highest_z=999,
         is_fixed_trash=False,
         name_for_errors="lame_labware",
@@ -405,9 +406,10 @@ def test_no_modules_when_heater_shaker(
 
 
 @pytest.mark.parametrize(
-    "allowed_tip_rack_uri",
+    "allowed_tip_rack_load_name",
     deck_conflict.HS_ALLOWED_ADJACENT_TALL_LABWARE,
 )
+@pytest.mark.parametrize("allowed_tip_rack_version", [1, 2])
 @pytest.mark.parametrize(
     ("heater_shaker_location", "tip_rack_location"),
     [
@@ -428,7 +430,8 @@ def test_no_modules_when_heater_shaker(
     ],
 )
 def test_tip_rack_when_heater_shaker(
-    allowed_tip_rack_uri: LabwareUri,
+    allowed_tip_rack_load_name: str,
+    allowed_tip_rack_version: int,
     heater_shaker_location: DeckSlotName,
     tip_rack_location: DeckSlotName,
 ) -> None:
@@ -440,8 +443,11 @@ def test_tip_rack_when_heater_shaker(
 
     too_high = deck_conflict.HS_MAX_X_ADJACENT_ITEM_HEIGHT + 0.1
 
+    cool_tip_rack_uri = LabwareUri(
+        f"opentrons/{allowed_tip_rack_load_name}/{allowed_tip_rack_version}"
+    )
     cool_tip_rack = deck_conflict.Labware(
-        uri=allowed_tip_rack_uri,
+        uri=cool_tip_rack_uri,
         highest_z=too_high,
         is_fixed_trash=False,
         name_for_errors="cool_tip_rack",
@@ -641,6 +647,43 @@ def test_no_staging_slot_adjacent_to_module(
     deck_conflict.check(
         existing_items={adjacent_staging_slot: staging_slot_labware},
         new_item=magnetic_block,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )
+
+
+@pytest.mark.parametrize(
+    ("deck_slot_name",),
+    [
+        (DeckSlotName.SLOT_A3,),
+        (DeckSlotName.SLOT_B3,),
+        (DeckSlotName.SLOT_C3,),
+        (DeckSlotName.SLOT_D3,),
+    ],
+)
+def test_allow_labware_in_stacker_quote_slot_unquote(
+    deck_slot_name: DeckSlotName,
+) -> None:
+    """You should be able to load labware "in" "the same" "slot" as a stacker."""
+    labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
+    stacker = deck_conflict.FlexStackerModule(
+        name_for_errors="some_stacker",
+        highest_z_including_labware=123,
+    )
+    deck_conflict.check(
+        existing_items={deck_slot_name: stacker},
+        new_item=labware,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )
+    deck_conflict.check(
+        existing_items={deck_slot_name: labware},
+        new_item=stacker,
         new_location=deck_slot_name,
         robot_type="OT-3 Standard",
     )

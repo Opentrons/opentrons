@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 
@@ -31,7 +31,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
   const { t, i18n } = useTranslation('onboarding')
   const allLabware = useSelector(getLabwareDefsByURI)
-  const is96Channel = pipetteName === 'p1000_96'
+  const is96Channel = ['p1000_96', 'p200_96'].includes(pipetteName)
 
   return (
     <ListItem type="default">

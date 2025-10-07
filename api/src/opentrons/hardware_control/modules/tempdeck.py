@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Callable
 
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     TemperatureStatus,
 )
 from opentrons.hardware_control.poller import Reader, Poller
@@ -37,13 +38,14 @@ class TempDeck(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "TempDeck":
         """
         Build a TempDeck
@@ -51,8 +53,8 @@ class TempDeck(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             sim_model: The model name used by simulator
@@ -83,6 +85,7 @@ class TempDeck(mod_abc.AbstractModule):
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -96,13 +99,14 @@ class TempDeck(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractTempDeckDriver,
         reader: TempDeckReader,
         poller: Poller,
         device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -111,11 +115,13 @@ class TempDeck(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver
         self._reader = reader
         self._poller = poller
+        self._reader.set_error_callback(self.error_callback)
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
@@ -293,7 +299,21 @@ class TempDeckReader(Reader):
     def __init__(self, driver: AbstractTempDeckDriver) -> None:
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
+        self._error_callback: Optional[Callable[[Exception], None]] = None
 
     async def read(self) -> None:
         """Read the module's current and target temperatures."""
         self.temperature = await self._driver.get_temperature()
+
+    def set_error_callback(
+        self, error_callback: Callable[[Exception], None]
+    ) -> Callable[[], None]:
+        self._error_callback = error_callback
+        return self._remove_error_callback
+
+    def _remove_error_callback(self) -> None:
+        self._error_callback = None
+
+    def on_error(self, exception: Exception) -> None:
+        if self._error_callback:
+            self._error_callback(exception)

@@ -31,7 +31,7 @@ describe('HeaterShakerModuleCard', () => {
 
   it('renders the correct info', () => {
     render(props)
-    screen.getByText('usb-1')
+    screen.getByText('USB-1')
     screen.getByText('Heater-Shaker Module GEN1')
     screen.getByText('mock heater shaker module data')
     screen.getByAltText('Heater-Shaker')

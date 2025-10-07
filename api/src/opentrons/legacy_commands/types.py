@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well
     from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
     from opentrons.protocol_api._liquid import LiquidClass
+    from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from opentrons.types import Location, Mount, AxisMapType
 
@@ -50,6 +51,8 @@ CONSOLIDATE_WITH_LIQUID_CLASS: Final = "command.CONSOLIDATE_WITH_LIQUID_CLASS"
 SEAL: Final = "command.SEAL"
 UNSEAL: Final = "command.UNSEAL"
 PRESSURIZE: Final = "command.PRESSURIZE"
+CONFIGURE_FOR_VOLUME: Final = "command.CONFIGURE_FOR_VOLUME"
+CONFIGURE_NOZZLE_LAYOUT: Final = "command.CONFIGURE_NOZZLE_LAYOUT"
 
 
 # Modules #
@@ -61,6 +64,7 @@ HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMP
 HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = (
     "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
 )
+HEATER_SHAKER_SET_SHAKE_SPEED: Final = "command.HEATER_SHAKER_SET_SHAKE_SPEED"
 HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
 HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
 HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
@@ -78,6 +82,7 @@ THERMOCYCLER_OPEN: Final = "command.THERMOCYCLER_OPEN"
 THERMOCYCLER_CLOSE: Final = "command.THERMOCYCLER_CLOSE"
 THERMOCYCLER_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_SET_BLOCK_TEMP"
 THERMOCYCLER_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_EXECUTE_PROFILE"
+THERMOCYCLER_START_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_START_EXECUTE_PROFILE"
 THERMOCYCLER_DEACTIVATE: Final = "command.THERMOCYCLER_DEACTIVATE"
 THERMOCYCLER_WAIT_FOR_HOLD: Final = "command.THERMOCYCLER_WAIT_FOR_HOLD"
 THERMOCYCLER_WAIT_FOR_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_TEMP"
@@ -86,12 +91,22 @@ THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
+FLEX_STACKER_SET_STORED_LABWARE: Final = "command.FLEX_STACKER_SET_STORED_LABWARE"
+FLEX_STACKER_RETRIEVE: Final = "command.FLEX_STACKER_RETRIEVE"
+FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
+FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
+FLEX_STACKER_FILL: Final = "command.FLEX_STACKER_FILL"
+
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
 ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
 ROBOT_MOVE_RELATIVE_TO: Final = "command.ROBOT_MOVE_RELATIVE_TO"
 ROBOT_OPEN_GRIPPER_JAW: Final = "command.ROBOT_OPEN_GRIPPER_JAW"
 ROBOT_CLOSE_GRIPPER_JAW: Final = "command.ROBOT_CLOSE_GRIPPER_JAW"
+
+# Tasks #
+WAIT_FOR_TASKS: Final = "command.WAIT_FOR_TASKS"
+CREATE_TIMER: Final = "command.CREATE_TIMER"
 
 
 class TextOnlyPayload(TypedDict):
@@ -151,6 +166,9 @@ class ResumeCommand(TypedDict):
     payload: ResumeCommandPayload
 
 
+# Module commands
+
+
 class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
     pass
 
@@ -176,6 +194,15 @@ class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
 class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
     payload: HeaterShakerSetAndWaitForShakeSpeedPayload
+
+
+class HeaterShakerSetShakeSpeedPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerSetShakeSpeedCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_SHAKE_SPEED"]
+    payload: HeaterShakerSetShakeSpeedPayload
 
 
 class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
@@ -296,6 +323,15 @@ class ThermocyclerExecuteProfileCommand(TypedDict):
     payload: ThermocyclerExecuteProfileCommandPayload
 
 
+class ThermocyclerStartExecuteProfileCommandPayload(TextOnlyPayload):
+    steps: List[ThermocyclerStep]
+
+
+class ThermocyclerStartExecuteProfileCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_EXECUTE_PROFILE"]
+    payload: ThermocyclerStartExecuteProfileCommandPayload
+
+
 class ThermocyclerWaitForHoldCommandPayload(TextOnlyPayload):
     pass
 
@@ -366,6 +402,34 @@ class ThermocyclerCloseCommandPayload(TextOnlyPayload):
 class ThermocyclerCloseCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_CLOSE"]
     payload: ThermocyclerCloseCommandPayload
+
+
+class FlexStackerSetStoredLabwareCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_SET_STORED_LABWARE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerRetrieveCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_RETRIEVE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerStoreCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_STORE"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerEmptyCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_EMPTY"]
+    payload: TextOnlyPayload
+
+
+class FlexStackerFillCommand(TypedDict):
+    name: Literal["command.FLEX_STACKER_FILL"]
+    payload: TextOnlyPayload
+
+
+# Module command end
 
 
 class HomeCommandPayload(TextOnlyPayload):
@@ -589,6 +653,18 @@ class PressurizeCommandPayload(TextOnlyPayload):
     instrument: InstrumentContext
 
 
+class ConfigureForVolumePayload(TypedDict, TextOnlyPayload):
+    instrument: InstrumentContext
+    volume: float
+
+
+class ConfigureNozzleLayoutPayload(TypedDict, TextOnlyPayload):
+    instrument: InstrumentContext
+    style: NozzleLayout
+    start: Union[str, None]
+    end: Union[str, None]
+
+
 class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
@@ -607,6 +683,16 @@ class UnsealCommand(TypedDict):
 class PressurizeCommand(TypedDict):
     name: Literal["command.PRESSURIZE"]
     payload: PressurizeCommandPayload
+
+
+class ConfigureForVolumeCommand(TypedDict):
+    name: Literal["command.CONFIGURE_FOR_VOLUME"]
+    payload: ConfigureForVolumePayload
+
+
+class ConfigureNozzleLayoutCommand(TypedDict):
+    name: Literal["command.CONFIGURE_NOZZLE_LAYOUT"]
+    payload: ConfigureNozzleLayoutPayload
 
 
 # Robot Commands and Payloads
@@ -652,6 +738,27 @@ class RobotCloseGripperJawCommand(TypedDict):
     payload: GripperCommandPayload
 
 
+# Task Commands and Payloads
+
+
+class WaitForTasksPayload(TextOnlyPayload):
+    pass
+
+
+class CreateTimerPayload(TextOnlyPayload):
+    time: float
+
+
+class WaitForTasksCommand(TypedDict):
+    name: Literal["command.WAIT_FOR_TASKS"]
+    payload: WaitForTasksPayload
+
+
+class CreateTimerCommand(TypedDict):
+    name: Literal["command.CREATE_TIMER"]
+    payload: CreateTimerPayload
+
+
 Command = Union[
     DropTipCommand,
     DropTipInDisposalLocationCommand,
@@ -672,6 +779,7 @@ Command = Union[
     HeaterShakerSetTargetTemperatureCommand,
     HeaterShakerWaitForTemperatureCommand,
     HeaterShakerSetAndWaitForShakeSpeedCommand,
+    HeaterShakerSetShakeSpeedCommand,
     HeaterShakerOpenLabwareLatchCommand,
     HeaterShakerCloseLabwareLatchCommand,
     HeaterShakerDeactivateShakerCommand,
@@ -685,6 +793,7 @@ Command = Union[
     ThermocyclerWaitForTempCommand,
     ThermocyclerWaitForHoldCommand,
     ThermocyclerExecuteProfileCommand,
+    ThermocyclerStartExecuteProfileCommand,
     ThermocyclerSetBlockTempCommand,
     ThermocyclerOpenCommand,
     TempdeckDeactivateCommand,
@@ -706,12 +815,23 @@ Command = Union[
     SealCommand,
     UnsealCommand,
     PressurizeCommand,
+    ConfigureForVolumeCommand,
+    ConfigureNozzleLayoutCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
     RobotMoveAxisRelativeCommand,
     RobotOpenGripperJawCommand,
     RobotCloseGripperJawCommand,
+    # Flex Stacker commands
+    FlexStackerSetStoredLabwareCommand,
+    FlexStackerRetrieveCommand,
+    FlexStackerStoreCommand,
+    FlexStackerEmptyCommand,
+    FlexStackerFillCommand,
+    # Task commands
+    WaitForTasksCommand,
+    CreateTimerCommand,
 ]
 
 
@@ -721,6 +841,7 @@ CommandPayload = Union[
     HeaterShakerSetTargetTemperaturePayload,
     HeaterShakerWaitForTemperaturePayload,
     HeaterShakerSetAndWaitForShakeSpeedPayload,
+    HeaterShakerSetShakeSpeedPayload,
     HeaterShakerOpenLabwareLatchPayload,
     HeaterShakerCloseLabwareLatchPayload,
     HeaterShakerDeactivateShakerPayload,
@@ -753,6 +874,7 @@ CommandPayload = Union[
     DispenseInDisposalLocationCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
+    ThermocyclerStartExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
     TempdeckAwaitTempCommandPayload,
     TempdeckSetTempCommandPayload,
@@ -765,11 +887,16 @@ CommandPayload = Union[
     SealCommandPayload,
     UnsealCommandPayload,
     PressurizeCommandPayload,
+    ConfigureForVolumePayload,
+    ConfigureNozzleLayoutPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,
     RobotMoveAxisToCommandPayload,
     GripperCommandPayload,
+    # Task payloads
+    WaitForTasksPayload,
+    CreateTimerPayload,
 ]
 
 
@@ -880,6 +1007,12 @@ class HeaterShakerSetAndWaitForShakeSpeedMessage(
     pass
 
 
+class HeaterShakerSetShakeSpeedMessage(
+    CommandMessageFields, HeaterShakerSetShakeSpeedCommand
+):
+    pass
+
+
 class HeaterShakerOpenLabwareLatchMessage(
     CommandMessageFields, HeaterShakerOpenLabwareLatchCommand
 ):
@@ -956,6 +1089,12 @@ class ThermocyclerExecuteProfileMessage(
     pass
 
 
+class ThermocyclerStartExecuteProfileMessage(
+    CommandMessageFields, ThermocyclerStartExecuteProfileCommand
+):
+    pass
+
+
 class ThermocyclerSetBlockTempMessage(
     CommandMessageFields, ThermocyclerSetBlockTempCommand
 ):
@@ -987,6 +1126,28 @@ class MagdeckDisengageMessage(CommandMessageFields, MagdeckDisengageCommand):
 
 
 class MagdeckEngageMessage(CommandMessageFields, MagdeckEngageCommand):
+    pass
+
+
+class FlexStackerSetStoredLabwareMessage(
+    CommandMessageFields, FlexStackerSetStoredLabwareCommand
+):
+    pass
+
+
+class FlexStackerRetrieveMessage(CommandMessageFields, FlexStackerRetrieveCommand):
+    pass
+
+
+class FlexStackerStoreMessage(CommandMessageFields, FlexStackerStoreCommand):
+    pass
+
+
+class FlexStackerEmptyMessage(CommandMessageFields, FlexStackerEmptyCommand):
+    pass
+
+
+class FlexStackerFillMessage(CommandMessageFields, FlexStackerFillCommand):
     pass
 
 
@@ -1030,6 +1191,14 @@ class RobotCloseGripperJawMessage(CommandMessageFields, RobotCloseGripperJawComm
     pass
 
 
+class WaitForTasksMessage(CommandMessageFields, WaitForTasksCommand):
+    pass
+
+
+class CreateTimerMessage(CommandMessageFields, CreateTimerCommand):
+    pass
+
+
 CommandMessage = Union[
     DropTipMessage,
     DropTipInDisposalLocationMessage,
@@ -1050,6 +1219,7 @@ CommandMessage = Union[
     HeaterShakerSetTargetTemperatureMessage,
     HeaterShakerWaitForTemperatureMessage,
     HeaterShakerSetAndWaitForShakeSpeedMessage,
+    HeaterShakerSetShakeSpeedMessage,
     HeaterShakerOpenLabwareLatchMessage,
     HeaterShakerCloseLabwareLatchMessage,
     HeaterShakerDeactivateShakerMessage,
@@ -1063,6 +1233,7 @@ CommandMessage = Union[
     ThermocyclerWaitForTempMessage,
     ThermocyclerWaitForHoldMessage,
     ThermocyclerExecuteProfileMessage,
+    ThermocyclerStartExecuteProfileMessage,
     ThermocyclerSetBlockTempMessage,
     ThermocyclerOpenMessage,
     TempdeckSetTempMessage,
@@ -1083,4 +1254,13 @@ CommandMessage = Union[
     RobotMoveAxisRelativeMessage,
     RobotOpenGripperJawMessage,
     RobotCloseGripperJawMessage,
+    # Flex Stacker Messages
+    FlexStackerSetStoredLabwareMessage,
+    FlexStackerRetrieveMessage,
+    FlexStackerStoreMessage,
+    FlexStackerEmptyMessage,
+    FlexStackerFillMessage,
+    # Task Messages
+    WaitForTasksMessage,
+    CreateTimerMessage,
 ]

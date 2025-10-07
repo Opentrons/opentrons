@@ -71,9 +71,13 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.GRIPPER_ERROR:
       case ERROR_KINDS.STALL_OR_COLLISION:
       case ERROR_KINDS.NO_LIQUID_DETECTED:
-      case ERROR_KINDS.STALL_WHILE_STACKING:
-      case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
-      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      case ERROR_KINDS.STACKER_STALLED:
+      case ERROR_KINDS.STACKER_HOPPER_EMPTY:
+      case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
+      case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+      case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
+      case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+      case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
         return true
       default:
         return false
@@ -136,7 +140,7 @@ export function ErrorDetailsModalDesktop(
       name: 'information',
       color: COLORS.grey60,
       size: SPACING.spacing20,
-      marginRight: SPACING.spacing8,
+      style: { marginRight: SPACING.spacing8 },
     }
   }
 
@@ -224,12 +228,20 @@ export function NotificationBanner({
         return <StallErrorBanner />
       case ERROR_KINDS.NO_LIQUID_DETECTED:
         return <NoLiquidDetectedBanner />
-      case ERROR_KINDS.STALL_WHILE_STACKING:
+      case ERROR_KINDS.STACKER_STALLED:
         return <StackerStallErrorBanner />
-      case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+      case ERROR_KINDS.STACKER_HOPPER_EMPTY:
         return <LabwareMissingErrorBanner />
-      case ERROR_KINDS.LABWARE_MISSING_IN_SHUTTLE:
+      case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
         return <LabwareMissingOnShuttleErrorBanner />
+      case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+        return <StackerShuttleMissingErrorBanner />
+      case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
+        return <StackerShuttleStoreEmptyErrorBanner />
+      case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
+        return <StackerShuttleOccupiedErrorBanner />
+      case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+        return <StackerHopperOrShuttleEmptyErrorBanner />
       default:
         console.error('Handle error kind notification banners explicitly.')
         return <div />
@@ -307,6 +319,54 @@ export function LabwareMissingErrorBanner(): JSX.Element {
       type="alert"
       heading={t('labware_missing_detected_when')}
       message={t('load_stacker_with_correct_labware')}
+    />
+  )
+}
+
+export function StackerShuttleMissingErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_shuttle_missing_error_occurs_when')}
+      message={t('load_stacker_shuttle_to_proceed')}
+    />
+  )
+}
+
+export function StackerShuttleStoreEmptyErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_shuttle_store_empty_error_occurs_when')}
+      message={t('load_labware_shuttle_to_proceed')}
+    />
+  )
+}
+
+export function StackerShuttleOccupiedErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_shuttle_occupied_error_occurs_when')}
+      message={t('remove_labware_from_shuttle_to_proceed')}
+    />
+  )
+}
+
+export function StackerHopperOrShuttleEmptyErrorBanner(): JSX.Element {
+  const { t } = useTranslation('error_recovery')
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('stacker_hopper_or_shuttle_empty_error_occurs_when')}
+      message={t('troubleshoot_issue_complete_retrieve_step')}
     />
   )
 }

@@ -23,26 +23,31 @@ import {
 import {
   ConfirmDeleteEntityInUseModal,
   EditNickNameModal,
-} from '../../../components/organisms'
-import { deleteContainer, editSlotInfo } from '../../../labware-ingred/actions'
-import { getIsLabwareOnSlotInUse } from '../../../pages/Designer/DeckSetup/utils'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getModuleIdFromStack } from '../../../utils'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/components/organisms'
+import {
+  deleteContainer,
+  editSlotInfo,
+} from '/protocol-designer/labware-ingred/actions'
+import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getModuleIdFromStack } from '/protocol-designer/utils'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { LabwareNotCompatibleModal } from '../LabwareNotCompatibleModal'
 
 import type { Dispatch, MouseEvent, SetStateAction } from 'react'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardOverflowMenuProps {
   labwareIds: string[]
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
+  lidId?: string
 }
 export function LabwareCardOverflowMenu(
   props: LabwareCardOverflowMenuProps
 ): JSX.Element | null {
-  const { labwareIds, setShowOverflowMenu } = props
+  const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -72,7 +77,11 @@ export function LabwareCardOverflowMenu(
     'adapter'
   )
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
-  const fullStack = getFullStackFromLabwares(deckSetupLabware, slotName)
+  const fullStack = getFullStackFromLabwares(
+    deckSetupLabware,
+    slotName,
+    topLabwareId
+  )
   const moduleId = getModuleIdFromStack(fullStack, deckSetupModules)
   const moduleType = moduleId != null ? deckSetupModules[moduleId].type : null
   const labwareAboveAdapter = fullStack[fullStack.indexOf(topLabwareId) - 1]
@@ -98,11 +107,13 @@ export function LabwareCardOverflowMenu(
     savedSteps,
     deckSetupLabware[topLabwareId]
   )
-
   const handleClear = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
     })
+    if (lidId != null) {
+      dispatch(deleteContainer({ labwareId: lidId }))
+    }
     const module = moduleId != null ? deckSetupModules[moduleId] : null
     const moduleModel = module?.model ?? null
     const newSlotInfo = {

@@ -1,33 +1,27 @@
 import { useMemo } from 'react'
 
-import { BaseDeck, Flex } from '@opentrons/components'
+import { BaseDeck, Flex, LabwareRender } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getLabwareDefinitionsByURIForProtocol,
+  getLabwareOnDeck,
   getSimplestDeckConfigForProtocol,
+  getStacksOnModules,
+  getTopLabwareFromStack,
+  getWellFillFromLabwareId,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
-import { getWellFillFromLabwareId } from '/app/organisms/ProtocolDeck'
-import {
-  getLabwareDefinitionsByURIForProtocol,
-  getLabwareOnDeck,
-  getModuleFromStack,
-  getStacksOnModules,
-  getTopLabwareFromStack,
-} from '/app/transformations/commands'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
-  ModuleModel,
-} from '@opentrons/shared-data'
-import type {
   LabwareByLiquidId,
   StackedItemsOnDeck,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 interface LabwareMapViewProps {
   handleLabwareClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
@@ -50,30 +44,38 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     [mostRecentAnalysis]
   )
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
-    ([slotName, stackedItems]) => {
-      const module = getModuleFromStack(stackedItems)
+    ([slotName, { allItemsInStack: stackedItems, moduleInStack: module }]) => {
       const topLabwareInfo = getTopLabwareFromStack(stackedItems)
       const topLabwareDefinition =
         topLabwareInfo != null
           ? definitionsByURI[topLabwareInfo.definitionUri]
           : null
+      // TODO: ja 8.27.25: find a better way to find the matching lid def without
+      // relying on the lidDisplayNames
+      const matchingLidDef = Object.values(definitionsByURI).find(
+        uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+      )
       const isLabwareStacked = topLabwareInfo != null && stackedItems.length > 2
       const wellFill =
         topLabwareInfo != null
           ? getWellFillFromLabwareId(
               topLabwareInfo.labwareId,
               mostRecentAnalysis?.liquids ?? [],
-              labwareByLiquidId
+              labwareByLiquidId,
+              mostRecentAnalysis?.commands ?? []
             )
           : undefined
       return {
-        moduleModel: module?.moduleModel ?? ('' as ModuleModel),
-        moduleLocation: { slotName: module?.moduleSlotName ?? slotName },
+        moduleModel: module.moduleModel,
+        moduleLocation: { slotName: module.moduleSlotName },
         innerProps:
-          module?.moduleModel === THERMOCYCLER_MODULE_V1
+          module.moduleModel === THERMOCYCLER_MODULE_V1
             ? { lidMotorState: 'open' }
             : {},
-        nestedLabwareDef: topLabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          ...(topLabwareDefinition != null ? [topLabwareDefinition] : []),
+          ...(matchingLidDef != null ? [matchingLidDef] : []),
+        ],
         nestedLabwareWellFill: wellFill,
         onLabwareClick:
           topLabwareInfo != null
@@ -95,13 +97,17 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       topLabwareInfo != null
         ? definitionsByURI[topLabwareInfo.definitionUri]
         : null
+    const matchingLidDef = Object.values(definitionsByURI).find(
+      uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
+    )
     if (topLabwareInfo == null || topLabwareDefinition == null) return null
 
     const isLabwareInStack = stackedItems.length > 1
     const wellFill = getWellFillFromLabwareId(
       topLabwareInfo.labwareId,
       mostRecentAnalysis?.liquids ?? [],
-      labwareByLiquidId
+      labwareByLiquidId,
+      mostRecentAnalysis?.commands ?? []
     )
 
     return {
@@ -113,6 +119,13 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       wellFill: wellFill,
       highlight: true,
       stacked: isLabwareInStack,
+      labwareChildren:
+        matchingLidDef != null ? (
+          <LabwareRender
+            definition={matchingLidDef}
+            positioningMode="passThrough"
+          />
+        ) : null,
     }
   })
 

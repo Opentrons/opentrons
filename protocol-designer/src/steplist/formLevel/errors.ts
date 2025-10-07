@@ -1,4 +1,5 @@
 import {
+  getMaxPushOutVolume,
   getMinXYDimension,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
@@ -31,11 +32,7 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import {
-  canPipetteUseLabware,
-  getMaxConditioningVolume,
-  getMaxPushOutVolume,
-} from '../../utils'
+import { canPipetteUseLabware, getMaxConditioningVolume } from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
@@ -82,6 +79,7 @@ export interface FormError {
 }
 
 const RANGE_TITLE = 'Enter a value within the specified range'
+const TIME_TITLE = 'Enter a value that uses the specified format'
 
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
@@ -176,47 +174,47 @@ const PROFILE_VOLUME_REQUIRED: FormError = {
   page: 1,
 }
 const PROFILE_LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActive', 'lidTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
   location: 'field',
   page: 1,
 }
 const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
   location: 'field',
   page: 1,
 }
 const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
   location: 'field',
   page: 1,
 }
 const SHAKE_SPEED_REQUIRED: FormError = {
-  title: 'Speed required',
+  title: RANGE_TITLE,
   dependentFields: ['setShake', 'targetSpeed'],
   location: 'field',
 }
 const SHAKE_TIME_REQUIRED: FormError = {
-  title: 'Duration required',
+  title: TIME_TITLE,
   dependentFields: ['heaterShakerSetTimer', 'heaterShakerTimer'],
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: 'Must be a valid time (mm:ss)',
+  title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
@@ -238,7 +236,7 @@ const PAUSE_TEMP_REQUIRED: FormError = {
   location: 'field',
 }
 const HS_TEMPERATURE_REQUIRED: FormError = {
-  title: 'Temperature required',
+  title: RANGE_TITLE,
   dependentFields: [
     'targetHeaterShakerTemperature',
     'setHeaterShakerTemperature',
@@ -936,18 +934,10 @@ export const shakeTimeRequired = (
   let error = null
   if (heaterShakerSetTimer && !heaterShakerTimer) {
     error = SHAKE_TIME_REQUIRED
-  } else if (
-    heaterShakerSetTimer &&
-    !isTimeFormatMinutesSeconds(heaterShakerTimer)
-  ) {
+  } else if (heaterShakerSetTimer && !isTimeFormat(heaterShakerTimer)) {
     error = SHAKER_TIME_FORMAT
   }
   return error
-}
-
-const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
-  const timeRegex = /^(?:[0-9]?\d):(?:[0-5]\d|[0-9])$/g
-  return value != null && timeRegex.test(value)
 }
 
 export const temperatureRequired = (

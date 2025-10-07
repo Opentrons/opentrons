@@ -49,6 +49,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
     if (Object.keys(labwareDef.wells).length === 1) {
       probeOffsetX = 99 / 2
     }
+    if (Object.keys(labwareDef.wells).length === 384) {
+      probeOffsetY = 65.75
+    }
   }
 
   return (
@@ -63,11 +66,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       y={y}
       outerProps={{ style: { overflow: 'visible' } }}
       innerDivProps={{
-        style: {
-          width: '100%',
-          height: '100%',
-          overflow: 'visible',
-        },
+        width: '100%',
+        height: '100%',
+        overflow: 'visible',
       }}
     >
       <svg overflow="visible">

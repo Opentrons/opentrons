@@ -51,7 +51,6 @@ class GripperHandler:
             og_gripper.config,
             load_gripper_calibration_offset(og_gripper.gripper_id),
             og_gripper.gripper_id,
-            og_gripper._jaw_max_offset,
         )
         self._gripper = new_gripper
 
@@ -72,6 +71,7 @@ class GripperHandler:
         """
         gripper = self.get_gripper()
         gripper.reset_offset(to_default)
+        gripper.reset_jaw_width_calibration(to_default)
 
     def save_instrument_offset(self, delta: Point) -> GripperCalibrationOffset:
         """

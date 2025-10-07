@@ -21,6 +21,15 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
   invariantContext,
   prevRobotState
 ) => {
+  const {
+    timerHours,
+    timerMinutes,
+    timerSeconds,
+    latchOpen,
+    targetTemperature,
+    rpm,
+  } = args
+  console.log('from step-gen', timerHours, timerMinutes, timerSeconds)
   if (args.moduleId == null) {
     return {
       errors: [errorCreators.missingModuleError()],
@@ -38,7 +47,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
 
   const commandCreators: CurriedCommandCreator[] = []
 
-  if (!args.latchOpen) {
+  if (!latchOpen) {
     commandCreators.push(
       curryCommandCreator(heaterShakerCloseLatch, {
         moduleId,
@@ -46,7 +55,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   }
 
-  if (args.targetTemperature === null) {
+  if (targetTemperature === null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerDeactivateHeater, {
         moduleId,
@@ -56,13 +65,13 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     commandCreators.push(
       curryCommandCreator(setTemperature, {
         moduleId,
-        celsius: args.targetTemperature,
+        celsius: targetTemperature,
       })
     )
   }
 
   if (
-    args.rpm === null &&
+    rpm === null &&
     'targetSpeed' in heaterShakerState &&
     heaterShakerState.targetSpeed !== null
   ) {
@@ -71,30 +80,31 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
         moduleId,
       })
     )
-  } else if (args.rpm !== null) {
+  } else if (rpm !== null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerSetTargetShakeSpeed, {
         moduleId,
-        rpm: args.rpm,
+        rpm,
       })
     )
   }
 
-  if (
-    (args.timerMinutes != null && args.timerMinutes !== 0) ||
-    (args.timerSeconds != null && args.timerSeconds !== 0)
-  ) {
-    if (args.targetTemperature !== null) {
+  const hasATime = [timerHours, timerMinutes, timerSeconds].some(
+    value => value != null && value !== 0
+  )
+
+  if (hasATime) {
+    if (targetTemperature !== null) {
       commandCreators.push(
         curryCommandCreator(waitForTemperature, {
           moduleId,
-          celsius: args.targetTemperature,
+          celsius: targetTemperature,
         })
       )
     }
 
     const totalSeconds =
-      (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
+      (timerHours ?? 0) * 3600 + (timerMinutes ?? 0) * 60 + (timerSeconds ?? 0)
     commandCreators.push(
       curryCommandCreator(delay, {
         seconds: totalSeconds,
@@ -102,20 +112,20 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
     commandCreators.push(
       curryCommandCreator(heaterShakerStopShake, {
-        moduleId: args.moduleId,
+        moduleId,
       })
     )
     commandCreators.push(
       curryCommandCreator(heaterShakerDeactivateHeater, {
-        moduleId: args.moduleId,
+        moduleId,
       })
     )
   }
 
-  if (args.latchOpen) {
+  if (latchOpen) {
     commandCreators.push(
       curryCommandCreator(heaterShakerOpenLatch, {
-        moduleId: args.moduleId,
+        moduleId,
       })
     )
   }

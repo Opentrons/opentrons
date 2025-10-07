@@ -10,7 +10,10 @@
   ],
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/ai-client/*": ["./src/*"]
+    }
   },
   "include": ["typings", "src"]
 }

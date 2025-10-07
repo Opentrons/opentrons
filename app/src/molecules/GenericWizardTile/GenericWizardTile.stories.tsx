@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 
 import {
   DIRECTION_COLUMN,
@@ -8,12 +8,12 @@ import {
   ModalShell,
   PrimaryButton,
   SPACING,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
 import { configReducer } from '/app/redux/config/reducer'
 
-import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
 
 import type { Meta, Story } from '@storybook/react'
@@ -26,7 +26,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

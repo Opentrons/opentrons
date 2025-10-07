@@ -112,7 +112,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
 
   it('should render text and button', () => {
     render(props)
-    screen.getByText('otie deck configuration')
+    screen.getByText('otie Deck configuration')
     screen.getByRole('button', { name: 'Setup Instructions' })
     screen.getByText('Location')
     screen.getByText('Deck hardware')

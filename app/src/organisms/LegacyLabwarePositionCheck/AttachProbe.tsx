@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
+  AnimationVideo,
   LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
@@ -32,7 +33,7 @@ import type {
   WorkingOffset,
 } from './types'
 
-const StyledVideo = styled.video`
+const VIDEO_STYLE = css`
   padding-top: ${SPACING.spacing4};
   width: 100%;
   min-height: 18rem;
@@ -173,9 +174,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={
-        <StyledVideo autoPlay loop controls={false}>
+        <AnimationVideo css={VIDEO_STYLE}>
           <source src={probeVideoSrc} />
-        </StyledVideo>
+        </AnimationVideo>
       }
       bodyText={
         <StyledBody>

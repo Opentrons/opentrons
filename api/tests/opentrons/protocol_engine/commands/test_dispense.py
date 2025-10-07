@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId
 from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
@@ -80,6 +81,7 @@ async def test_dispense_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -126,7 +128,7 @@ async def test_dispense_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id-abc123",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id-abc123",
                     well_name="A3",
                 ),
@@ -202,6 +204,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
 
@@ -233,7 +236,7 @@ async def test_overpressure_error(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id",
                     well_name="well-name",
                 ),
@@ -254,7 +257,7 @@ async def test_overpressure_error(
         state_update_if_false_positive=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="pipette-id",
-                new_location=update_types.Well(
+                new_location=LabwareWellId(
                     labware_id="labware-id",
                     well_name="well-name",
                 ),
@@ -303,6 +306,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

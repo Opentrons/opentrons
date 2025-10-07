@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -33,7 +33,7 @@ describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
   let store: Store<State>
   beforeEach(() => {
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     store.dispatch = vi.fn()
     props = {
       robotName: 'test robot',

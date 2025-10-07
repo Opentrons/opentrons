@@ -9,6 +9,7 @@ import type { RecoveryContentProps } from '../types'
 
 export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
   const {
+    failedCommand,
     recoveryCommands,
     routeUpdateActions,
     currentRecoveryOptionUtils,
@@ -18,25 +19,58 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     SKIP_STEP_WITH_NEW_TIPS,
     MANUAL_MOVE_AND_SKIP,
     IGNORE_AND_SKIP,
-    MANUAL_LOAD_IN_STACKER_AND_SKIP,
-    HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_STALLED_SKIP,
+    STACKER_HOPPER_EMPTY_SKIP,
+    STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_STALLED_STORE_SKIP,
+    SHUTTLE_FULL_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
-  const { moveLabwareWithoutPause } = recoveryCommands
+  const {
+    moveLabwareWithoutPause,
+    manualRetrieve,
+    manualStore,
+  } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const primaryBtnOnClick = (): Promise<void> => {
     return handleMotionRouting(true, ROBOT_SKIPPING_STEP.ROUTE).then(() => {
-      if (selectedRecoveryOption === MANUAL_MOVE_AND_SKIP.ROUTE) {
-        void moveLabwareWithoutPause().then(() => {
+      switch (selectedRecoveryOption) {
+        case MANUAL_MOVE_AND_SKIP.ROUTE:
+          void moveLabwareWithoutPause().then(() => {
+            skipFailedCommand()
+          })
+          break
+        case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+        case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+        case STACKER_STALLED_SKIP.ROUTE:
+        case SHUTTLE_FULL_SKIP.ROUTE:
+          if (
+            failedCommand?.byRunRecord.commandType === 'flexStacker/retrieve'
+          ) {
+            void manualRetrieve().then(() => {
+              skipFailedCommand()
+            })
+          } else if (
+            failedCommand?.byRunRecord.commandType === 'flexStacker/store'
+          ) {
+            void manualStore().then(() => {
+              skipFailedCommand()
+            })
+          }
+          break
+        case STACKER_STALLED_STORE_SKIP.ROUTE:
+        case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
+          void manualStore().then(() => {
+            skipFailedCommand()
+          })
+          break
+        default:
           skipFailedCommand()
-        })
-      } else {
-        skipFailedCommand()
       }
     })
   }
@@ -49,9 +83,12 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         return t('skip_to_next_step_new_tips')
       case IGNORE_AND_SKIP.ROUTE:
       case MANUAL_MOVE_AND_SKIP.ROUTE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case STACKER_STALLED_STORE_SKIP.ROUTE:
+      case SHUTTLE_FULL_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
         return t('skip_to_next_step')
       default:
         console.error(
@@ -69,9 +106,12 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return 'failed_dispense_step_not_completed'
       case MANUAL_MOVE_AND_SKIP.ROUTE:
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_STALLED_SKIP.ROUTE:
+      case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case STACKER_STALLED_STORE_SKIP.ROUTE:
+      case SHUTTLE_FULL_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
         return 'robot_not_attempt_to_move_lw'
       default:
         console.error(

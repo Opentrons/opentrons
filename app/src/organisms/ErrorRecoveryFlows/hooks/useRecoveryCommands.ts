@@ -24,6 +24,8 @@ import type {
   CreateCommand,
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
+  FlexStackerRetrieveRunTimeCommand,
+  FlexStackerStoreRunTimeCommand,
   LoadedLabware,
   MoveLabwareParams,
   MoveToCoordinatesCreateCommand,
@@ -85,6 +87,8 @@ export interface UseRecoveryCommandsResult {
   homeShuttle: () => Promise<CommandData[]>
   /* A non-terminal recovery-command */
   manualRetrieve: () => Promise<CommandData[]>
+  /* A non-terminal recovery-command */
+  manualStore: () => Promise<CommandData[]>
 }
 
 // TODO(jh, 07-24-24): Create tighter abstractions for terminal vs. non-terminal commands.
@@ -203,7 +207,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/openLatch',
+      commandType: 'unsafe/flexStacker/openLatch',
       params: {
         moduleId: moduleId,
       },
@@ -223,7 +227,7 @@ export function useRecoveryCommands({
         ? storeOrRetriveFailedCommandParams.moduleId
         : ''
     return {
-      commandType: 'flexStacker/closeLatch',
+      commandType: 'unsafe/flexStacker/closeLatch',
       params: {
         moduleId: moduleId,
       },
@@ -416,6 +420,17 @@ export function useRecoveryCommands({
     }
   }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
 
+  const manualStore = useCallback((): Promise<CommandData[]> => {
+    const manualStoreCommand = buildManualStore(unvalidatedFailedCommand)
+    if (manualStoreCommand == null) {
+      return reportAndRouteFailedCmd(
+        new Error('Invalid use of manual store command')
+      )
+    } else {
+      return chainRunRecoveryCommands([manualStoreCommand])
+    }
+  }, [chainRunRecoveryCommands, unvalidatedFailedCommand])
+
   const moveLabwareWithoutPause = useCallback((): Promise<CommandData[]> => {
     const moveLabwareCmd = buildMoveLabwareWithoutPause(
       unvalidatedFailedCommand
@@ -443,6 +458,7 @@ export function useRecoveryCommands({
     homeAll,
     homeShuttle,
     manualRetrieve,
+    manualStore,
     closeLabwareLatch,
     releaseLabwareLatch,
   }
@@ -456,9 +472,9 @@ export function isAssumeFalsePositiveResumeKind(
   switch (errorKind) {
     case ERROR_KINDS.TIP_NOT_DETECTED:
     case ERROR_KINDS.TIP_DROP_FAILED:
-    case ERROR_KINDS.STALL_WHILE_STACKING:
-    case ERROR_KINDS.SHUTTLE_MISSING:
-    case ERROR_KINDS.LABWARE_MISSING_IN_HOPPER:
+    case ERROR_KINDS.STACKER_STALLED:
+    case ERROR_KINDS.STACKER_SHUTTLE_MISSING:
+    case ERROR_KINDS.STACKER_HOPPER_EMPTY:
       return true
     default:
       return false
@@ -521,15 +537,28 @@ const buildManualRetrieve = (
   if (failedCommand == null) {
     return null
   }
-  const storeOrRetriveFailedCommandParams = failedCommand.params
-  const moduleId =
-    'moduleId' in storeOrRetriveFailedCommandParams
-      ? storeOrRetriveFailedCommandParams.moduleId
-      : ''
+  const retrieveCommand = failedCommand as FlexStackerRetrieveRunTimeCommand
   return {
     commandType: 'unsafe/flexStacker/manualRetrieve',
     params: {
-      moduleId: moduleId,
+      moduleId: retrieveCommand.params.moduleId,
+    },
+    intent: 'fixit',
+  }
+}
+
+const buildManualStore = (
+  failedCommand: FailedCommand | null
+): CreateCommand | null => {
+  if (failedCommand == null) {
+    return null
+  }
+  const storeCommand = failedCommand as FlexStackerStoreRunTimeCommand
+  return {
+    commandType: 'flexStacker/store',
+    params: {
+      moduleId: storeCommand.params.moduleId,
+      strategy: 'manual',
     },
     intent: 'fixit',
   }

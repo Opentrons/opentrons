@@ -18,6 +18,9 @@ const mockPipettes = [
     mount: 'left',
     id: 'mock-left',
     name: 'p50_single_flex',
+    spec: {
+      channels: 1,
+    },
     tiprackDefURI: ['opentrons/opentrons_flex_96_tiprack_50ul/1'],
     tiprackLabwareDef: [
       {
@@ -34,6 +37,9 @@ const mockPipettes = [
     mount: 'right',
     id: 'mock-right',
     name: 'p50_multi_flex',
+    spec: {
+      channels: 8,
+    },
     tiprackDefURI: ['opentrons/opentrons_flex_96_filtertiprack_50ul/1'],
     tiprackLabwareDef: [
       {
@@ -53,6 +59,9 @@ const mock96Pipette = [
     mount: 'left',
     id: 'mock-96channels',
     name: 'p1000_96',
+    spec: {
+      channels: 96,
+    },
     tiprackDefURI: ['opentrons/opentrons_flex_96_filtertiprack_1000ul/1'],
     tiprackLabwareDef: [
       {
@@ -129,6 +138,15 @@ describe('InstrumentsInfo', () => {
     props = {
       ...props,
       pipettesOnDeck: mock96Pipette,
+    }
+    render(props)
+    screen.getByText('Left + Right Mount')
+  })
+
+  it('should render left + right mount when p200 96 channel is selected', () => {
+    props = {
+      ...props,
+      pipettesOnDeck: [{ ...mock96Pipette[0], name: 'p200_96' }],
     }
     render(props)
     screen.getByText('Left + Right Mount')

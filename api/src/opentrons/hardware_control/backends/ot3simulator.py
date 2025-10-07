@@ -230,12 +230,6 @@ class OT3Simulator(FlexBackend):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._sim_gantry_load = gantry_load
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        self._sim_gantry_load = gantry_load
-
     def update_constraints_for_plunger_acceleration(
         self,
         mount: OT3Mount,
@@ -734,7 +728,8 @@ class OT3Simulator(FlexBackend):
     @ensure_yield
     async def clean_up(self) -> None:
         """Clean up."""
-        pass
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
 
     @staticmethod
     def _get_home_position() -> Dict[Axis, float]:
@@ -787,7 +782,7 @@ class OT3Simulator(FlexBackend):
                 next_fw_version=1,
                 fw_update_needed=False,
                 current_fw_sha="simulated",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             )
             for axis in self._present_axes
@@ -854,6 +849,7 @@ class OT3Simulator(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         # This is a (pretty bad) simulation of the gripper actually gripping something,
         # but it should work.

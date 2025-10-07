@@ -27,9 +27,10 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
+  getLabwareLiquidRenderInfoFromStack,
+  getLabwareViewBox,
+  getModuleFromStack,
   getModuleType,
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -37,10 +38,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import {
-  getLabwareLiquidRenderInfoFromStack,
-  getModuleFromStack,
-} from '/app/transformations/commands'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
@@ -48,16 +45,14 @@ import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition,
-  ModuleType,
-} from '@opentrons/shared-data'
-import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type {
   LabwareByLiquidId,
+  LabwareDefinition,
   LabwareDefinitionsByURI,
   LabwareInStack,
+  ModuleType,
   StackItem,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
+import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface LabwareListItemProps {
@@ -67,6 +62,7 @@ interface LabwareListItemProps {
   slotName: string
   stackedItems: StackItem[]
   onClick: () => void
+  offDeckQuantity?: number
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
   definitionsByURI?: LabwareDefinitionsByURI
@@ -78,6 +74,7 @@ export function LabwareListItem(
   const {
     stackedItems,
     slotName,
+    offDeckQuantity,
     attachedModuleInfo,
     extraAttentionModules,
     isFlex,
@@ -264,70 +261,73 @@ export function LabwareListItem(
           width="100%"
         >
           <>
-            {labwareLiquidRenderInfo.map((labware, index) => (
-              <>
-                <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
-                  {showLabwareSVG && definitionsByURI != null ? (
-                    <StandaloneLabware
-                      definition={definitionsByURI[labware.definitionUri]}
+            {labwareLiquidRenderInfo.map((labware, index) => {
+              const quantityTag = offDeckQuantity ?? labware.quantity
+              return (
+                <>
+                  <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
+                    {showLabwareSVG && definitionsByURI != null ? (
+                      <StandaloneLabware
+                        definition={definitionsByURI[labware.definitionUri]}
+                      />
+                    ) : null}
+                    <Flex
+                      flexDirection={DIRECTION_COLUMN}
+                      gridGap={SPACING.spacing4}
+                    >
+                      <StyledText desktopStyle="bodyDefaultSemiBold">
+                        {labware.displayName}
+                      </StyledText>
+                      {labware.lidDisplayName != null ? (
+                        <StyledText
+                          desktopStyle="bodyDefaultRegular"
+                          color={COLORS.grey60}
+                        >
+                          {t('with_lid', {
+                            lidDisplayName: labware.lidDisplayName,
+                          })}
+                        </StyledText>
+                      ) : null}
+                      {quantityTag > 1 || labware.liquids > 0 ? (
+                        <Flex
+                          flexDirection={DIRECTION_ROW}
+                          gridGap={SPACING.spacing4}
+                        >
+                          {quantityTag > 1 ? (
+                            <Tag
+                              type="default"
+                              text={t('labware_quantity', {
+                                quantity: quantityTag,
+                              })}
+                            />
+                          ) : null}
+                          {labware.liquids > 0 ? (
+                            <Tag
+                              type="default"
+                              text={
+                                labware.quantity > 1
+                                  ? t('multiple_liquid_layouts')
+                                  : t('number_of_liquids', {
+                                      number: labware.liquids,
+                                      count: labware.liquids,
+                                    })
+                              }
+                            />
+                          ) : null}
+                        </Flex>
+                      ) : null}
+                    </Flex>
+                  </Flex>
+                  {index !== labwareLiquidRenderInfo.length - 1 ? (
+                    <Box
+                      borderBottom={`1px solid ${String(COLORS.grey40)}`}
+                      marginY="0"
+                      width="100%"
                     />
                   ) : null}
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    gridGap={SPACING.spacing4}
-                  >
-                    <StyledText desktopStyle="bodyDefaultSemiBold">
-                      {labware.displayName}
-                    </StyledText>
-                    {labware.lidDisplayName != null ? (
-                      <StyledText
-                        desktopStyle="bodyDefaultRegular"
-                        color={COLORS.grey60}
-                      >
-                        {t('with_lid', {
-                          lidDisplayName: labware.lidDisplayName,
-                        })}
-                      </StyledText>
-                    ) : null}
-                    {labware.quantity > 1 || labware.liquids > 0 ? (
-                      <Flex
-                        flexDirection={DIRECTION_ROW}
-                        gridGap={SPACING.spacing4}
-                      >
-                        {labware.quantity > 1 ? (
-                          <Tag
-                            type="default"
-                            text={t('labware_quantity', {
-                              quantity: labware.quantity,
-                            })}
-                          />
-                        ) : null}
-                        {labware.liquids > 0 ? (
-                          <Tag
-                            type="default"
-                            text={
-                              labware.quantity > 1
-                                ? t('multiple_liquid_layouts')
-                                : t('number_of_liquids', {
-                                    number: labware.liquids,
-                                    count: labware.liquids,
-                                  })
-                            }
-                          />
-                        ) : null}
-                      </Flex>
-                    ) : null}
-                  </Flex>
-                </Flex>
-                {index !== labwareLiquidRenderInfo.length - 1 ? (
-                  <Box
-                    borderBottom={`1px solid ${String(COLORS.grey40)}`}
-                    marginY="0"
-                    width="100%"
-                  />
-                ) : null}
-              </>
-            ))}
+                </>
+              )
+            })}
           </>
         </Flex>
         <Flex
@@ -395,15 +395,13 @@ function StandaloneLabware(props: {
   definition: LabwareDefinition
 }): JSX.Element {
   const { definition } = props
-  const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
-  const dimensions = getSchema2Dimensions(definition)
+  const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
 
   return (
-    <LabwareThumbnail
-      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-    >
+    <LabwareThumbnail viewBox={`${minX} ${minY} ${xDimension} ${yDimension}`}>
       <LabwareRender
         definition={definition}
+        positioningMode="passThrough"
         wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
       />
     </LabwareThumbnail>

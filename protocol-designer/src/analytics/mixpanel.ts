@@ -15,8 +15,8 @@ export type AnalyticsEvent =
 
 // pulled in from environment at build time
 const MIXPANEL_ID = getIsProduction()
-  ? process.env.OT_PD_MIXPANEL_ID
-  : process.env.OT_PD_MIXPANEL_DEV_ID
+  ? _OT_PD_MIXPANEL_ID_
+  : _OT_PD_MIXPANEL_DEV_ID_
 
 const MIXPANEL_OPTS = {
   opt_out_tracking_by_default: true,
@@ -62,7 +62,7 @@ export function setMixpanelTracking(optedIn: boolean): void {
         console.debug('User has opted into analytics; tracking with Mixpanel')
         mixpanel.opt_in_tracking()
         mixpanel.register({
-          appVersion: process.env.OT_PD_VERSION,
+          appVersion: _OT_PD_VERSION_,
           appName: 'protocolDesigner',
           viewportHeight: window.innerHeight,
           viewportWidth: window.innerWidth,

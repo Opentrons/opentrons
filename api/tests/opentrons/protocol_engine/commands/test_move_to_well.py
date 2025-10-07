@@ -24,7 +24,7 @@ from opentrons.protocol_engine.commands.move_to_well import (
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import LiquidHandlingWellLocation
+from opentrons.protocol_engine.types import LiquidHandlingWellLocation, LabwareWellId
 
 
 @pytest.fixture
@@ -71,6 +71,7 @@ async def test_move_to_well_implementation(
             speed=7.89,
             current_well=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=9, y=8, z=7))
 
@@ -81,7 +82,7 @@ async def test_move_to_well_implementation(
         state_update=update_types.StateUpdate(
             pipette_location=update_types.PipetteLocationUpdate(
                 pipette_id="abc",
-                new_location=update_types.Well(labware_id="123", well_name="A3"),
+                new_location=LabwareWellId(labware_id="123", well_name="A3"),
                 new_deck_point=DeckPoint(x=9, y=8, z=7),
             )
         ),
@@ -137,6 +138,7 @@ async def test_move_to_well_stall_defined_error(
             speed=7.89,
             current_well=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_raise(StallOrCollisionDetectedError())
     decoy.when(mock_model_utils.generate_id()).then_return(error_id)

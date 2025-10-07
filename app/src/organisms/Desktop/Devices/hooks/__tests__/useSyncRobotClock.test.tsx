@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { syncSystemTime } from '/app/redux/robot-admin'
@@ -13,7 +13,7 @@ import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('/app/redux/discovery')
 
-const store: Store<any> = createStore(vi.fn(), {})
+const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 describe('useSyncRobotClock hook', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>

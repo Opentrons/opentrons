@@ -363,7 +363,7 @@ describe('createPresavedStepForm', () => {
       // Default fields
       setTemperature: null,
       targetTemperature: null,
-      stepName: 'temperature module state',
+      stepName: 'temperature',
       stepDetails: '',
       stepNumber: 0,
     })

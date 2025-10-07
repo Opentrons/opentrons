@@ -413,6 +413,36 @@ class WellDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class NoTaskFoundError(ProtocolEngineError):
+    """Raised when referencing a task that does not exist.
+
+    This error could be raised if a protocol references a task before it
+    has been created.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NoTaskFoundError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class TaskFailedError(ProtocolEngineError):
+    """Raised when waiting on a task that failed."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TaskFailedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class PipetteNotLoadedError(ProtocolEngineError):
     """Raised when referencing a pipette that has not been loaded."""
 
@@ -825,6 +855,19 @@ class InvalidTargetTemperatureError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidRampRateError(ProtocolEngineError):
+    """Raised when attempting to set an invalid ramp rate."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidRampRateError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class InvalidBlockVolumeError(ProtocolEngineError):
     """Raised when attempting to set an invalid block max volume."""
 
@@ -1196,6 +1239,19 @@ class IncompleteLabwareDefinitionError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidUserDefinedVolumesError(ProtocolEngineError):
+    """Raised when a UserDefinedVolumes type InnerLabwareDefinition is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidUserDefinedVolumesError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class IncompleteWellDefinitionError(ProtocolEngineError):
     """Raised when a well definition lacks a geometryDefinitionId."""
 
@@ -1285,6 +1341,18 @@ class FlexStackerLabwarePoolNotYetDefinedError(ProtocolEngineError):
 
 class InvalidLabwarePositionError(ProtocolEngineError):
     """Raised when a labware position is internally invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidModuleOrientation(ProtocolEngineError):
+    """Raised when a module orientation is invalid for a slot id."""
 
     def __init__(
         self,

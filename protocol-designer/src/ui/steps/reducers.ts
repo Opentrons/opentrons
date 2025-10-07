@@ -13,7 +13,6 @@ import type {
   DeleteStepAction,
 } from '../../steplist/actions'
 import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
-import type { Action } from '../../types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
 import type {
   AddStepAction,
@@ -255,6 +254,4 @@ export const _allReducers = {
   hoveredDropdownItem,
   selectedDropdownItem,
 }
-export const rootReducer: Reducer<StepsState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer = combineReducers(_allReducers)

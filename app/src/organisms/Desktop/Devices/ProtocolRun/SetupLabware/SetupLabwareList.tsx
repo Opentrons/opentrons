@@ -8,12 +8,12 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-
 import {
   getLabwareInfoByLiquidId,
+  getOffDeckRenderInfo,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
-} from '/app/transformations/commands'
+} from '@opentrons/shared-data'
 
 import { LabwareListItem } from './LabwareListItem'
 import { SlotDetailModal } from './SlotDetailModal'
@@ -21,9 +21,9 @@ import { SlotDetailModal } from './SlotDetailModal'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
+  StackItem,
 } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
-import type { StackItem } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SetupLabwareListProps {
@@ -62,9 +62,7 @@ export function SetupLabwareList(
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
-    ? startingDeck.offDeck
-    : null
+  const offDeckItems = getOffDeckRenderInfo(stacksWithLaware)
 
   return (
     <>
@@ -112,6 +110,7 @@ export function SetupLabwareList(
             extraAttentionModules={extraAttentionModules}
             slotName={'offDeck'}
             stackedItems={[item]}
+            offDeckQuantity={item.quantity}
             isFlex={isFlex}
             onClick={() => {
               setSelectedStack({ slotName: 'offDeck', stack: [item] })

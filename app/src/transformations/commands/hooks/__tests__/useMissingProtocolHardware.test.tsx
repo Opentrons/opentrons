@@ -209,6 +209,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: false,
@@ -243,6 +244,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: true,
@@ -338,6 +340,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: true,

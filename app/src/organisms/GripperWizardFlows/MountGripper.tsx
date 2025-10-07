@@ -6,6 +6,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  AnimationVideo,
   Btn,
   COLORS,
   Flex,
@@ -129,18 +130,15 @@ export const MountGripper = (
     <GenericWizardTile
       header={t('branded:connect_and_screw_in_gripper')}
       rightHandBody={
-        <video
+        <AnimationVideo
           css={css`
             max-width: 100%;
             max-height: 20rem;
           `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
           aria-label="connect and screw in gripper"
         >
           <source src={mountGripper} />
-        </video>
+        </AnimationVideo>
       }
       bodyText={
         <LegacyStyledText as="p">

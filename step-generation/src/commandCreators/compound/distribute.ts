@@ -6,6 +6,7 @@ import {
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
+  getIsTiprack,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
@@ -18,7 +19,10 @@ import {
 } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import {
+  getNextTiprack,
+  getPipetteWithTipMaxVol,
+} from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
@@ -46,6 +50,7 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
+  dropTip,
   moveToAddressableArea,
   moveToWell,
   prepareToAspirate,
@@ -157,7 +162,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-
+  const isTouchTipDisabled = labwareEntities[
+    sourceLabware
+  ]?.def.parameters.quirks?.includes('touchTipDisabled')
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   const disposalVolume =
@@ -204,10 +211,34 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
-  const isWasteChute = wasteChuteEntities[dropTipLocation] != null
-  const isTrashBin = trashBinEntities[dropTipLocation] != null
+  const trashLikeIds = [
+    ...Object.keys(invariantContext.trashBinEntities),
+    ...Object.keys(invariantContext.wasteChuteEntities),
+  ]
 
-  if (!dropTipLocation || (!isWasteChute && !isTrashBin)) {
+  const fallBackTrashLikeId = trashLikeIds.length > 0 ? trashLikeIds[0] : null
+
+  // tiprack for return tip
+  const dropTipLabware = Object.values(invariantContext.labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
+
+  const isWasteChuteDropLocation =
+    invariantContext.wasteChuteEntities[dropTipLocation] != null
+  const isTrashBinDropLocation =
+    invariantContext.trashBinEntities[dropTipLocation] != null
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (
+    dropTipLocation == null ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
+    (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
+  ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -352,6 +383,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
     return {
       errors,
     }
+  const { tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    ...(nozzles != null ? [nozzles] : [])
+  )
 
   const dispenseCorrectionVolumeForDestination =
     getByVolumeValue({
@@ -398,26 +436,28 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const pythonAssignTipracks = getPythonAssignTipRacksString({
-    pipetteEntity: pipetteEntities[pipette],
-    labwareEntities,
-    labwareState: prevRobotState.labware,
-    tiprackURI: tipRack,
-  })
-
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
-    `trash_location=${trashPipetteName}`,
+    ...(isReturnTip
+      ? [`return_tip=True`]
+      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
-    `keep_last_tip=True`,
+    ...(tipracks.filteredSortedTiprackIds.length > 0
+      ? [
+          getPythonAssignTipRacksString({
+            labwareEntities,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
+          }),
+        ]
+      : []),
     `liquid_class=${customLiquidClass}`,
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pythonAssignTipracks}${pythonPipetteName}.distribute_with_liquid_class(\n${indentPyLines(
+    python: `${pythonPipetteName}.distribute_with_liquid_class(\n${indentPyLines(
       pythonArgs.join(',\n')
     )},\n)`,
   })
@@ -558,7 +598,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ? [
             curryCommandCreator(replaceTip, {
               pipette,
-              dropTipLocation,
+              dropTipLocation:
+                isReturnTip && fallBackTrashLikeId != null
+                  ? fallBackTrashLikeId
+                  : dropTipLocation,
               tipRack,
               ...(nozzles != null ? { nozzles } : {}),
             }),
@@ -1098,8 +1141,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 },
               }),
               ...blowoutInPlaceCommand,
-              // touch tip at source well with dispense touch tip parameters
-              ...(touchTipAfterDispense
+              // touch tip at source well with source touch tip parameters
+              // only if source is touchTip-able
+              ...(touchTipAfterDispense && !isTouchTipDisabled
                 ? [
                     curryWithoutPython(touchTip, {
                       pipetteId: pipette,
@@ -1158,6 +1202,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
         }
       )
 
+      const returnTipCommands: CurriedCommandCreator[] =
+        isReturnTip &&
+        (chunkIndex === destWellChunks.length - 1 || changeTip === 'always')
+          ? [
+              curryWithoutPython(dropTip, {
+                pipette,
+                dropTipLocation: tipRack,
+                isReturnTip,
+              }),
+            ]
+          : []
+
       return [
         ...tipCommands,
         ...preAspirateSubmergeCommands,
@@ -1169,6 +1225,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ...touchTipAfterAspirateRetractCommands,
         ...airGapAfterAspirateRetractCommands,
         ...dispenseChunkCommands,
+        ...returnTipCommands,
       ]
     }
   )

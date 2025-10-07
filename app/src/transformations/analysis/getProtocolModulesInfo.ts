@@ -1,6 +1,6 @@
 import {
   getLoadedLabwareDefinitionsByUri,
-  getModuleDef2,
+  getModuleDef,
   getPositionFromSlotId,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
@@ -35,7 +35,7 @@ export const getProtocolModulesInfo = (
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {
     return protocolData.modules.reduce<ProtocolModuleInfo[]>((acc, module) => {
-      const moduleDef = getModuleDef2(module.model)
+      const moduleDef = getModuleDef(module.model)
       const nestedLabwareId =
         protocolData.commands
           .filter(

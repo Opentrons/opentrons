@@ -5,25 +5,25 @@
 }
 
 .panel {
-  flex-shrink: 0;
+  position: relative;
   overflow: visible;
+  flex-shrink: 0;
+  padding: 0 4px;
   border-right: var(--bd-light);
   background-color: var(--c-bg-light);
-  position: relative;
-  padding: 0 4px;
 }
 
 .title_bar {
   display: flex;
-  align-items: center;
   width: var(--sidebar-width);
+  align-items: center;
 }
 
 .title {
+  margin: 1rem auto;
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
   font-size: var(--fs-header); /* from legacy --font-header-dark */
   font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-  color: var(--c-font-dark); /* from legacy --font-header-dark */
-  margin: 1rem auto;
 }
 
 .panel_contents {

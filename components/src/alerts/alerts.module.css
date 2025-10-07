@@ -12,8 +12,8 @@
 .title_bar {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 0.5rem 1rem;
   font-weight: var(--fw-semibold);
 }
@@ -79,8 +79,8 @@
   background-color: white;
 
   & a {
-    text-decoration: underline;
     color: inherit;
+    text-decoration: underline;
   }
 
   &:empty {

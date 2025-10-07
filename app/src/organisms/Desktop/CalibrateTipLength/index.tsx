@@ -5,14 +5,18 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
 
-import { ModalShell, useConditionalConfirm } from '@opentrons/components'
+import {
+  AnimationVideo,
+  ModalShell,
+  useConditionalConfirm,
+  WizardHeader,
+} from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   CalibrationError,
   useCalibrationError,
@@ -41,7 +45,6 @@ import type {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
-export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, ComponentType<CalibrationPanelProps>>
@@ -186,9 +189,7 @@ export function CalibrateTipLength({
   )
 }
 
-const blockRemovalAssetBySlot: {
-  [slot in CalibrationLabware['slot']]: string
-} = {
+const blockRemovalAssetBySlot: Record<string, string> = {
   '1': slotOneRemoveBlockAsset,
   '3': slotThreeRemoveBlockAsset,
 }
@@ -201,18 +202,25 @@ function TipLengthCalibrationComplete(
 
   const visualAid =
     calBlock != null ? (
-      <video
-        key={blockRemovalAssetBySlot[calBlock.slot]}
+      <AnimationVideo
+        key={
+          blockRemovalAssetBySlot[
+            Sessions.slotNameFromCalibrationSlot(calBlock.slot)
+          ]
+        }
         css={css`
           max-width: 100%;
           max-height: 15rem;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
       >
-        <source src={blockRemovalAssetBySlot[calBlock.slot]} />
-      </video>
+        <source
+          src={
+            blockRemovalAssetBySlot[
+              Sessions.slotNameFromCalibrationSlot(calBlock.slot)
+            ]
+          }
+        />
+      </AnimationVideo>
     ) : null
 
   return (

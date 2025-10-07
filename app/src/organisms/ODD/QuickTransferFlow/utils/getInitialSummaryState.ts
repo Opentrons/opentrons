@@ -6,9 +6,9 @@ import {
 
 import type { Mount } from '@opentrons/api-client'
 import type {
+  CutoutConfig,
   DeckConfiguration,
   LabwareDefinition2,
-  LiquidClass,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
@@ -30,7 +30,12 @@ interface InitialSummaryStateProps {
     transferType: TransferType
     volume: number
     path: PathOption
-    liquidClass: LiquidClass
+    liquidClassName: string
+    pushOutDispense?: {
+      volume: number
+    }
+    changeTip: ChangeTipOptions
+    dropTipLocation?: CutoutConfig
   }
   deckConfig: DeckConfiguration
 }
@@ -54,25 +59,21 @@ export function getInitialSummaryState(
   let path: PathOption = state.path
   // for multiDispense the volume capacity must be at least 3x the volume per well
   // to account for the 1x volume per well disposal volume default
+  // otherwise, we set the path to single
   if (
     state.transferType === 'distribute' &&
-    maxTipCapacity >= state.volume * 3
+    maxTipCapacity < state.volume * 3 &&
+    state.path === 'multiDispense'
   ) {
-    path = 'multiDispense'
+    path = 'single'
     // for multiAspirate the volume capacity must be at least 2x the volume per well
+    // otherwise, we set the path to single
   } else if (
     state.transferType === 'consolidate' &&
-    maxTipCapacity >= state.volume * 2
+    maxTipCapacity < state.volume * 2 &&
+    state.path === 'multiAspirate'
   ) {
-    path = 'multiAspirate'
-  }
-
-  let changeTip: ChangeTipOptions = 'always'
-  if (
-    state.sourceWells.length * state.pipette.channels > 96 ||
-    state.destinationWells.length * state.pipette.channels > 96
-  ) {
-    changeTip = 'once'
+    path = 'single'
   }
 
   const trashConfigCutout = deckConfig.find(
@@ -96,12 +97,20 @@ export function getInitialSummaryState(
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
     disposalVolume: path === 'multiDispense' ? state.volume : undefined,
-    blowOut: path === 'multiDispense' ? trashConfigCutout : undefined,
+    blowOutDispense:
+      path === 'multiDispense'
+        ? {
+            location: trashConfigCutout,
+            flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
+          }
+        : undefined,
     tipPositionAspirate: 1,
     preWetTip: false,
     tipPositionDispense: 1,
-    changeTip,
-    dropTipLocation: trashConfigCutout,
-    liquidClass: state.liquidClass,
+    changeTip: state.changeTip,
+    dropTipLocation: state.dropTipLocation ?? trashConfigCutout,
+    liquidClassName: state.liquidClassName,
+    liquidClassValuesInitialized: false,
+    pushOutDispense: state.pushOutDispense,
   }
 }

@@ -26,12 +26,11 @@ describe('CustomizeExpandButton', () => {
 
   beforeEach(() => {
     props = {
-      enableStackingFF: true,
       buttonText: 'mock text',
       buttonValue: 'mockValue',
       onChange: vi.fn(),
       allowInputField: false,
-      loadName: 'mockLoadName',
+      isNestedDefALid: false,
     }
   })
 

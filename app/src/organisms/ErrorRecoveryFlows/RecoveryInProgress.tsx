@@ -32,7 +32,7 @@ export function RecoveryInProgress({
     ROBOT_PICKING_UP_TIPS,
     ROBOT_SKIPPING_STEP,
     ROBOT_RELEASING_LABWARE,
-    ROBOT_RELEASING_LABWARE_LATCH,
+    STACKER_RELEASING_LABWARE_LATCH,
   } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { route } = recoveryMap
@@ -68,7 +68,7 @@ export function RecoveryInProgress({
           return t('gripper_releasing_labware')
         }
       }
-      case ROBOT_RELEASING_LABWARE_LATCH.ROUTE: {
+      case STACKER_RELEASING_LABWARE_LATCH.ROUTE: {
         if (releaseCountdown > 0) {
           return t('latch_will_release_in_s', {
             seconds: releaseCountdown,
@@ -127,8 +127,8 @@ export function useReleaseLabware({
   const {
     MANUAL_MOVE_AND_SKIP,
     MANUAL_REPLACE_AND_RETRY,
-    REPLACE_LABWARE_IN_HOPPER_AND_RETRY,
-    MANUAL_LOAD_ON_SHUTTLE_AND_SKIP,
+    STACKER_SHUTTLE_EMPTY_RETRY,
+    STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
   const [countdown, setCountdown] = useState(RELEASE_COUNTDOWN_S)
 
@@ -167,16 +167,16 @@ export function useReleaseLabware({
           MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE
         )
         break
-      case REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
         void proceedToRouteAndStep(
-          REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE,
-          REPLACE_LABWARE_IN_HOPPER_AND_RETRY.STEPS.REENGAGE_LATCH
+          STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
+          STACKER_SHUTTLE_EMPTY_RETRY.STEPS.REENGAGE_LATCH
         )
         break
-      case MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         void proceedToRouteAndStep(
-          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE,
-          MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.STEPS.REENGAGE_LATCH
+          STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+          STACKER_SHUTTLE_EMPTY_SKIP.STEPS.REENGAGE_LATCH
         )
         break
       default:
@@ -189,7 +189,7 @@ export function useReleaseLabware({
     let intervalId: NodeJS.Timeout | null = null
     switch (recoveryMap.route) {
       case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
-      case RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE:
+      case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
         intervalId = setInterval(() => {
           setCountdown(prevCountdown => {
             const updatedCountdown = prevCountdown - 1
@@ -200,21 +200,12 @@ export function useReleaseLabware({
               }
               if (
                 recoveryMap.route ===
-                RECOVERY_MAP.ROBOT_RELEASING_LABWARE_LATCH.ROUTE
+                RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
               ) {
                 void releaseLabwareLatch().then(() => {
-                  if (isDoorOpen) {
-                    return handleMotionRouting(false).then(() => {
-                      proceedToDoorStep()
-                    })
-                  }
-
-                  return handleMotionRouting(true)
-                    .then(() => homeExceptPlungers())
-                    .then(() => handleMotionRouting(false))
-                    .then(() => {
-                      proceedToValidNextStep()
-                    })
+                  return handleMotionRouting(false).then(() => {
+                    proceedToValidNextStep()
+                  })
                 })
               } else {
                 void releaseGripperJaws().then(() => {

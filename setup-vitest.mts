@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
+
 import { cleanup } from '@testing-library/react'
-import { vi, afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 
 vi.mock('protocol-designer/src/labware-defs/utils')
 vi.mock('electron-store')
@@ -18,7 +19,8 @@ vi.mock('./app/src/resources/useNotifyDataReady', async () => {
   }
 })
 
-process.env.OT_PD_VERSION = 'fake_PD_version'
+global._OT_PD_VERSION_ = 'fake_PD_version'
+global._OT_PD_REQUIRED_APP_VERSION_ = 'fake_app_version'
 global._PKG_VERSION_ = 'test environment'
 global._OPENTRONS_PROJECT_ = 'robotics'
 global._PKG_PRODUCT_NAME_ = 'test product'

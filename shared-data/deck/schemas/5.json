@@ -47,6 +47,19 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
+    },
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
     }
   },
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
@@ -126,7 +139,9 @@
               "areaType",
               "offsetFromCutoutFixture",
               "boundingBox",
-              "displayName"
+              "displayName",
+              "features",
+              "orientation"
             ],
             "properties": {
               "id": {
@@ -167,6 +182,37 @@
                 "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
               },
+              "features": {
+                "type": "object",
+                "description": "Locating features when this addressable area is a part of a stackup.",
+                "required": [],
+                "properties": {
+                  "slotFootprintAsParent": {
+                    "description": "The 2D plane on which a child deck item resides.",
+                    "type": "object",
+                    "required": ["backLeft", "frontRight", "z"],
+                    "properties": {
+                      "backLeft": {
+                        "description": "(-x, +y), the back left corner of an addressable area.",
+                        "$ref": "#/definitions/vector2D"
+                      },
+                      "frontRight": {
+                        "description": "(+x, -y), the back left corner of an addressable area.",
+                        "$ref": "#/definitions/vector2D"
+                      },
+                      "z": {
+                        "description": "Always zero by convention. The z-offset from the bottom of the addressable area's plane to the plane on which a child deck item resides.",
+                        "type": "number"
+                      },
+                      "springDirectionalForce": {
+                        "description": "Applicable when the addressable area contains a spring that influences a child deck item.",
+                        "type": "string",
+                        "enum": ["backLeftBottom"]
+                      }
+                    }
+                  }
+                }
+              },
               "compatibleModuleTypes": {
                 "description": "OT-2 Only parameter. An array of module types that can be placed in this area. The module type names can be found in the moduleType field of a module definition.",
                 "type": "array",
@@ -181,6 +227,11 @@
               "ableToDropLabware": {
                 "description": "Whether labware is allowed to be dropped (different from being placed) into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of the labware when it's dropped.",
                 "type": "boolean"
+              },
+              "orientation": {
+                "description": "The orientation of the underlying module when this addressable area overlays a module.",
+                "type": "string",
+                "enum": ["left", "right", "center", null]
               }
             }
           }

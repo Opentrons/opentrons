@@ -131,7 +131,7 @@ deploy-py: export pypi_username = $(pypi_username)
 deploy-py: export pypi_password = $(pypi_password)
 deploy-py:
 	$(MAKE) -C $(API_DIR) deploy
-	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
+	$(MAKE) -C $(SHARED_DATA_DIR) deploy
 
 .PHONY: push-api
 push-api: export host = $(usb_host)
@@ -215,7 +215,7 @@ test-js: test-js-internal
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
+lint: lint-py lint-js lint-json lint-css check-js check-css circular-dependencies-js
 
 PYTHON_LINT_TARGETS  = $(addsuffix -py-lint, $(PYTHON_DIRS))
 
@@ -246,7 +246,7 @@ lint-css:
 	yarn stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
-format: format-js format-py
+format: format-js format-py format-css
 
 PYTHON_FORMAT_TARGETS := $(addsuffix -py-format, $(PYTHON_DIRS))
 
@@ -259,6 +259,10 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 .PHONY: format-js
 format-js:
 	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
+.PHONY: format-css
+format-css:
+	yarn stylelint "**/*.css" --fix
 
 .PHONY: check-js
 check-js: build-ts

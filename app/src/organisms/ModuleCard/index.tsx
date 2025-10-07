@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   ALIGN_START,
   Banner,
@@ -25,6 +24,10 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  useCurrentAllSubsystemUpdatesQuery,
+  useHost,
+} from '@opentrons/react-api-client'
+import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
@@ -35,9 +38,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
@@ -50,6 +53,7 @@ import {
 } from '/app/redux/robot-api'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
@@ -75,6 +79,7 @@ import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 import type {
@@ -93,6 +98,8 @@ const NO_CALIBRATION_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
 ]
 
+const POLL_INTERVAL_MS = 5000
+
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
@@ -108,6 +115,8 @@ interface ModuleCardProps {
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
+  const host = useHost() as HostConfig
+
   const {
     module,
     robotName,
@@ -138,11 +147,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showTestShake, setShowTestShake] = useState(false)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
   const [showFWBanner, setShowFWBanner] = useState(true)
-  const [showCalModal, setShowCalModal] = useState(false)
-
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const runStatus = useCurrentRunStatus()
+  const { isRunRunning } = useRunStatuses()
+  const { parseModuleUSBPort } = useModuleUSBPort()
 
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
@@ -174,7 +182,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
+  const {
+    data: currentSubsystemsUpdatesData,
+  } = useCurrentAllSubsystemUpdatesQuery({
+    refetchInterval: POLL_INTERVAL_MS,
+  })
+  const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
+    update =>
+      update.updateStatus === 'queued' || update.updateStatus === 'updating'
+  )
+
   const isPending = latestRequest?.status === PENDING
+
+  const hideBanners =
+    isPending || isRunRunning || ongoingSubsystemUpdate != null
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
   const isFlex = useIsFlex(robotName)
   const deckConfig = useNotifyDeckConfigurationQuery().data
@@ -202,9 +223,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
   const { requireModuleCalibration, requireModuleSetup } = getSetupWizardFlow()
-
-  const isOverflowBtnDisabled =
-    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const isTooHot = getModuleTooHot(module)
 
@@ -280,7 +298,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   const handleSetupClick = (): void => {
-    setShowCalModal(true)
+    handleModuleWizardFlows({
+      attachedModule: module,
+      showSetupLauncher: true,
+      isLoadedInRun,
+      robotName,
+      host,
+    })
   }
 
   return (
@@ -290,16 +314,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showCalModal ? (
-        <ModuleWizardFlows
-          attachedModule={module}
-          closeFlow={() => {
-            setShowCalModal(false)
-          }}
-          isLoadedInRun={isLoadedInRun}
-          robotName={robotName}
-        />
-      ) : null}
       {showSetupWizard &&
         HAS_SETUP_INSTRUCTIONS_TYPE.includes(module.moduleType) && (
           <ModuleSetupModal
@@ -366,7 +380,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 errorMessage={getErrorResponseMessage(latestRequest.error)}
               />
             )}
-            {!isPending && (requireModuleCalibration || requireModuleSetup) ? (
+            {!hideBanners &&
+            (requireModuleCalibration || requireModuleSetup) ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType={requireModuleCalibration ? 'calibration' : 'setup'}
@@ -377,7 +392,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
-            ) : !isPending && module.hasAvailableUpdate && showFWBanner ? (
+            ) : !hideBanners && module.hasAvailableUpdate && showFWBanner ? (
               <UpdateBanner
                 robotName={robotName}
                 updateType="firmware"
@@ -436,15 +451,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {module?.usbPort !== null
-                    ? t('usb_port', {
-                        port: module?.usbPort?.port,
-                        hubPort:
-                          module?.usbPort?.hubPort != null
-                            ? `.${module.usbPort.hubPort}`
-                            : '',
-                      })
-                    : t('usb_port_not_connected')}
+                  {parseModuleUSBPort(module)}
                 </StyledText>
                 <Flex
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
@@ -480,11 +487,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
+          disabled={isRunRunning || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />
-        {isOverflowBtnDisabled && (
+        {isRunRunning && (
           <Tooltip tooltipProps={tooltipProps}>
             {t('module_actions_unavailable')}
           </Tooltip>

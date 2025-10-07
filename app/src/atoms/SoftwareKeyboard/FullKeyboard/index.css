@@ -11,9 +11,9 @@
 .simple-keyboard.oddTheme1.hg-theme-default {
   width: 100%;
   height: 100%;
+  padding: 8px;
   background-color: #cbcccc; /* grey35 */
   font-family: 'Public Sans', sans-serif;
-  padding: 8px;
 }
 
 .hg-layout-default .hg-row,
@@ -29,21 +29,21 @@
 }
 
 .simple-keyboard .hg-button:active {
-  color: #16212d;
   background-color: #dedede;
+  color: #16212d;
 }
 
 .hg-layout-default .hg-row .hg-button,
 .hg-layout-shift .hg-row .hg-button,
 .hg-layout-symbols .hg-row .hg-button,
 .hg-layout-numbers .hg-row .hg-button {
+  padding: 10px 22px;
+  background-color: #fff;
   color: #16212d;
   font-size: 20px;
   font-style: normal;
   font-weight: 600;
   line-height: 24px;
-  background-color: #ffffff;
-  padding: 10px 22px;
 }
 
 .hg-layout-default .hg-row:nth-child(1) .hg-button,
@@ -100,8 +100,8 @@
 }
 
 .simple-keyboard .hg-button:active {
-  color: #16212d;
   background-color: #e3e3e3; /* grey30 */
+  color: #16212d;
 }
 
 .hg-candidate-box {
@@ -109,6 +109,6 @@
 }
 
 li.hg-candidate-box-list-item {
-  height: 60px;
   width: 60px;
+  height: 60px;
 }

@@ -206,6 +206,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     <FirmwareUpdateTakeover />
                     {showModuleSetupModal && localRobot?.name != null ? (
                       <ModuleWizardFlows
+                        showSetupLauncher={true}
                         closeFlow={() => {
                           setShowModuleSetupModal(false)
                         }}
@@ -217,8 +218,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                         <ProtocolReceiptToasts />
                         {!showModuleSetupModal ? (
                           <ModuleAttachedToasts
-                            openFlow={() => {
-                              setShowModuleSetupModal(true)
+                            openFlow={(open: boolean) => {
+                              setShowModuleSetupModal(open)
                             }}
                           />
                         ) : null}
@@ -311,7 +312,11 @@ function ProtocolReceiptToasts(): null {
   return null
 }
 
-function ModuleAttachedToasts({ openFlow }: { openFlow: () => void }): null {
+function ModuleAttachedToasts({
+  openFlow,
+}: {
+  openFlow: (open: boolean) => void
+}): null {
   useModuleAttachedToast(openFlow)
   return null
 }

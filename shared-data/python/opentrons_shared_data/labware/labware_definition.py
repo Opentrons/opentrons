@@ -22,6 +22,7 @@ from pydantic import (
 )
 from typing_extensions import Annotated, Literal
 
+from .types import LocatingFeatures
 from .constants import (
     Conical,
     Cuboidal,
@@ -112,6 +113,10 @@ class LabwareRole(str, Enum):
     maintenance = "maintenance"
     lid = "lid"
     system = "system"
+
+
+class Quirks(Enum):
+    disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
 
 
 class Metadata(BaseModel):
@@ -545,13 +550,21 @@ WellSegment = Annotated[
 ]
 
 
+class HeightVolumePair(BaseModel):
+    height: float
+    volume: float
+
+
 class InnerWellGeometry(BaseModel):
     sections: Annotated[list[WellSegment], Field(min_length=1)]
 
 
+class UserDefinedVolumes(BaseModel):
+    heightToVolumeMap: list[HeightVolumePair]
+
+
 class Extents(BaseModel):
     total: AxisAlignedBoundingBox3D
-    footprint: AxisAlignedBoundingBox2D
 
 
 class LabwareDefinition2(BaseModel):
@@ -574,7 +587,9 @@ class LabwareDefinition2(BaseModel):
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+    innerLabwareGeometry: dict[
+        str, InnerWellGeometry | UserDefinedVolumes
+    ] | None = None
 
 
 class LabwareDefinition3(BaseModel):
@@ -588,15 +603,17 @@ class LabwareDefinition3(BaseModel):
     brand: BrandData
     parameters: Parameters3
     ordering: list[list[str]]
+    features: LocatingFeatures
     extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]
     stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    legacyStackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
     stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
-    gripHeightFromLabwareBottom: float | None = None
+    gripHeightFromLabwareOrigin: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None

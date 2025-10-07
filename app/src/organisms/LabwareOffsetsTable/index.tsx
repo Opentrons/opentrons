@@ -61,6 +61,7 @@ export function LabwareOffsetsTable(
                 {...props}
                 uri={aLwInfo.uri}
                 lwDisplayName={aLwInfo.info.displayName}
+                lwVersion={aLwInfo.info.version}
               />
             }
           >

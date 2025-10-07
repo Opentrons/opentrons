@@ -43,6 +43,7 @@ from .module_validation_and_errors import (
 )
 from .labware import Labware
 from . import validation
+from . import Task
 
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
@@ -123,7 +124,7 @@ class ModuleContext(CommandPublisher):
 
         return core.geometry.add_labware(labware)
 
-    def load_labware(
+    def load_labware(  # noqa: C901
         self,
         name: str,
         label: Optional[str] = None,
@@ -131,6 +132,11 @@ class ModuleContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        *,
+        adapter_namespace: Optional[str] = None,
+        adapter_version: Optional[int] = None,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -142,7 +148,11 @@ class ModuleContext(CommandPublisher):
         :returns: The initialized and loaded labware object.
 
         .. versionadded:: 2.1
-            The *label,* *namespace,* and *version* parameters.
+            The ``label``, ``namespace``, and ``version`` parameters.
+
+        .. versionadded:: 2.26
+            The ``adapter_namespace``, ``adapter_version``,
+            ``lid_namespace``, and ``lid_version`` parameters.
         """
         if self._api_version < APIVersion(2, 1) and (
             label is not None or namespace is not None or version != 1
@@ -152,6 +162,40 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
         load_location: Union[ModuleCore, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
@@ -160,9 +204,21 @@ class ModuleContext(CommandPublisher):
                     until_version="2.15",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_adapter_namespace = namespace
+                checked_adapter_version = None
+            else:
+                checked_adapter_namespace = adapter_namespace
+                checked_adapter_version = adapter_version
+
             loaded_adapter = self.load_adapter(
                 name=adapter,
-                namespace=namespace,
+                namespace=checked_adapter_namespace,
+                version=checked_adapter_version,
             )
             load_location = loaded_adapter._core
         else:
@@ -193,11 +249,22 @@ class ModuleContext(CommandPublisher):
                     until_version="2.23",
                     current_version=f"{self._api_version}",
                 )
+
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_lid_namespace = namespace
+                checked_lid_version = None
+            else:
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+
             self._protocol_core.load_lid(
                 load_name=lid,
                 location=labware_core,
-                namespace=namespace,
-                version=version,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
             )
 
         if isinstance(self._core, LegacyModuleCore):
@@ -248,7 +315,7 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """
         .. deprecated:: 2.0
-            Use :py:meth:`load_labware` instead.
+            Use ``load_labware`` instead.
         """
         _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(
@@ -381,18 +448,28 @@ class TemperatureModuleContext(ModuleContext):
         No other protocol commands will execute while waiting for the temperature.
 
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
+
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
-    def start_set_temperature(self, celsius: float) -> None:
+    def start_set_temperature(self, celsius: float) -> Task:
         """Set the target temperature without waiting for the target to be hit.
 
+        .. versionchanged:: 2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
-        self._core.set_target_temperature(celsius)
+        task = self._core.set_target_temperature(celsius)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
@@ -590,8 +667,15 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> Task:
         """Set the target temperature for the well block, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -616,17 +700,28 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
-        self._core.set_target_block_temperature(
+        task = self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
+            ramp_rate=ramp_rate,
         )
-        self._core.wait_for_block_temperature()
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> None:
+    def set_lid_temperature(self, temperature: float) -> Task:
         """Set the target temperature for the heated lid, in °C.
+
+        .. versionchanged::2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+            the preheat to complete.
+
+        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -637,8 +732,11 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        self._core.set_target_lid_temperature(celsius=temperature)
-        self._core.wait_for_lid_temperature()
+        task = self._core.set_target_lid_temperature(celsius=temperature)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
@@ -672,6 +770,39 @@ class ThermocyclerContext(ModuleContext):
             repetitions=repetitions,
             block_max_volume=block_max_volume,
         )
+
+    @publish(command=cmds.thermocycler_start_execute_profile)
+    @requires_version(2, 27)
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Start a Thermocycler profile and return a :py:class:`Task` representing its execution.
+        Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
+
+        Returns a task object that represents concurrent execution of the profile.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        :param steps: List of steps that make up a single cycle.
+                      Each list item should be a dictionary that maps to the parameters
+                      of the :py:meth:`set_block_temperature` method. The dictionary's
+                      keys must be ``temperature`` and one or both of
+                      ``hold_time_seconds`` and ``hold_time_minutes``.
+        :param repetitions: The number of times to repeat the cycled steps.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+        """
+        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        validated_steps = validation.ensure_thermocycler_profile_steps(steps)
+        task = self._core.start_execute_profile(
+            steps=validated_steps,
+            repetitions=repetitions,
+            block_max_volume=block_max_volume,
+        )
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
@@ -894,7 +1025,11 @@ class HeaterShakerContext(ModuleContext):
 
         No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: A value between 27 and 95, representing the target temperature in °C.
+        .. versionchanged:: 2.25
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            not achievable.
+
+        :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
@@ -903,21 +1038,34 @@ class HeaterShakerContext(ModuleContext):
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> Task:
         """Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
         target temperature has reached.
         Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
-        protocol execution.
+        protocol execution for api levels below 2.27.
 
-        :param celsius: A value between 27 and 95, representing the target temperature in °C.
+        .. versionchanged:: 2.25
+            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
+            not achievable.
+        .. versionchanged:: 2.27
+            Returns a task object that represents concurrent preheating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+
+        :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
-        validated_temp = validate_heater_shaker_temperature(celsius=celsius)
-        self._core.set_target_temperature(celsius=validated_temp)
+        validated_temp = validate_heater_shaker_temperature(
+            celsius=celsius, api_version=self.api_version
+        )
+        task = self._core.set_target_temperature(celsius=validated_temp)
+        if self._api_version >= APIVersion(2, 27):
+            return Task(api_version=self._api_version, core=task)
+        else:
+            return cast(Task, None)
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
@@ -944,6 +1092,21 @@ class HeaterShakerContext(ModuleContext):
         """
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
+
+    @requires_version(2, 27)
+    @publish(command=cmds.heater_shaker_set_shake_speed)
+    def set_shake_speed(self, rpm: int) -> Task:
+        """Set a shake speed in rpm to run in the background.
+
+        .. note::
+
+            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
+
+        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
+        """
+        validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        task = self._core.set_shake_speed(rpm=validated_speed)
+        return Task(api_version=self._api_version, core=task)
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_open_labware_latch)
@@ -1118,20 +1281,23 @@ class FlexStackerContext(ModuleContext):
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
 
-    .. versionadded:: 2.23
+    .. versionadded:: 2.25
     """
 
     _core: FlexStackerCore
 
     @property
-    @requires_version(2, 23)
+    @requires_version(2, 25)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_retrieve)
     def retrieve(self) -> Labware:
-        """Retrieve a labware from the Flex Stacker and place it on the shuttle.
+        """Retrieve a labware from the Flex Stacker and move it onto the shuttle.
+
+        The Stacker will retrieve the bottom-most labware in the stack.
 
         :returns: The retrieved :py:class:`Labware` object. This will always be the main labware,
                   even if the Flex Stacker contains labware on an adapter. To get the adapter object,
@@ -1147,9 +1313,13 @@ class FlexStackerContext(ModuleContext):
             ),
         )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_store)
     def store(self) -> None:
-        """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
+        """Move a labware currently on the Flex Stacker shuttle into the Flex Stacker.
+
+        The labware must be the same type the Stacker is configured to store using :py:meth:`.set_stored_labware()`. If labware is currently stacked inside the module, this method moves the new labware to the bottom-most position of the stack.
+        """
         self._core.store()
 
     def _labware_to_cores(self, labware: Sequence[Labware]) -> list[LabwareCore]:
@@ -1167,45 +1337,60 @@ class FlexStackerContext(ModuleContext):
 
         return list(_convert())
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_max_storable_labware_from_list(
-        self, labware: list[Labware]
+        self,
+        labware: list[Labware],
+        stacking_offset_z: float | None = None,
     ) -> list[Labware]:
         """Limit a list of labware instances to the number that can be stored in a Flex Stacker.
+        Items will be taken from the head of the list.
 
         A Flex Stacker has a limited amount of internal space and computes the number of labware
-        (or labware with lids or adapters) that it can store based on the heights of the labware
-        and the amount they overlap when placed on top of each other. To know how many of a given
-        labware the Flex Stacker can store, the Flex Stacker must know what labware it is.
+        (or labware with lids or adapters) that it can store based on the ``z`` heights of the labware
+        and the amount they overlap when stacked. To calculate how many of a given
+        labware the Stacker can store, the labware type must be specified.
 
-        You can use this function to take a list of labware and return the elements that the
-        stacker can currently store from it. The returned list is then guaranteed to be suitable
+        Provide a list of labware to this function to return the maximum number of labware of the given type that the
+        Stacker can store. The returned list is guaranteed to be suitable
         for passing to :py:meth:`.set_stored_labware_items`.
 
-        This function limits the list of labware based on the overall maximum number the stacker
+        This function limits the list of labware based on the overall maximum number the Stacker
         can hold and will not change as labware is added or removed. To limit a list of labware to
         the amount that will currently fit in the Flex Stacker, use
         :py:meth:`.get_current_storable_labware_from_list`.
+
+        .. note::
+
+            If a ``z`` stacking offset is provided, be sure to specify the same value when
+            configuring the Flex Stacker with :py:meth:`.set_stored_labware_items`.
+
+            See :py:meth:`.set_stored_labware_items` for more details on stacking offset.
+
         """
         return self._cores_to_labware(
             self._core.get_max_storable_labware_from_list(
-                self._labware_to_cores(labware)
-            )
+                self._labware_to_cores(labware), stacking_offset_z
+            ),
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_current_storable_labware_from_list(
         self, labware: list[Labware]
     ) -> list[Labware]:
-        """Limit a list of labware instances to the number that the Flex Stacker currently has space for.
+        """Limit a list of labware instances to the number that the Flex Stacker currently has space for,
+        based on the labware that is already stored in the Flex Stacker.
+        Items will be taken from the head of the list.
 
-        You can use this function to take a list of labware and return the elements that the
-        stacker can currently store from it. The returned list is then guaranteed to be suitable
-        for passing to :py:meth:`.fill` or :py:meth:`.set_stored_labware_items`.
+        A Flex Stacker has a limited amount of internal space and computes the number of labware that it can store based on the ``z`` height of the labware and the amount they overlap when stacked.
 
-        The number of elements in the returned list will change as labware is added to or removed from
-        the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
-        can store, use :py:meth:`.get_max_storable_labware_from_list`.
+        .. note::
+            The number of elements in the returned list will change as labware is added or removed from
+            the Flex Stacker. To get a list limited to the overall maximum number of labware the Flex Stacker
+            can store, use :py:meth:`.get_max_storable_labware_from_list`.
+
+        :param labware: A list of labware to limit. The returned list takes from the front of the provided list, and it is guaranteed to be suitable
+            for passing to :py:meth:`.fill_items`.
         """
         return self._cores_to_labware(
             self._core.get_current_storable_labware_from_list(
@@ -1213,48 +1398,82 @@ class FlexStackerContext(ModuleContext):
             )
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_max_storable_labware(self) -> int:
-        """Get the number of labware that the Flex Stacker can store with its current stored labware configuration.
+        """Get the maximum number of labware that the Flex Stacker can store.
 
-        You can use this function to get the total number of labware that the Flex Stacker can store. This
-        number is the overall maximum and will not change as labware is added or removed. To get the space
-        currently available in the Flex Stacker, use :py:meth:`.get_current_storable_labware`.
+        Use this function to return the total number of labware that the Flex Stacker can store. A Stacker has a limited amount of internal space and calculates the total number of labware that can be stored based on the ``z`` height of the labware and the amount they overlap when stacked.
+
+        The total number is calculated based on the labware definition for the type of labware the Stacker is currently configured to store using :py:meth:`.set_stored_labware()`. This
+        number is the overall maximum and will not change as labware is added or removed. To get the number of labware that can
+        be stored in the Flex Stacker based on its current conditions, use :py:meth:`.get_current_storable_labware`.
         """
         return self._core.get_max_storable_labware()
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_current_storable_labware(self) -> int:
         """Get the number of labware that the Flex Stacker currently has space for.
 
-        The number will change as labware is added or removed. To get the overall maximum number of labware the
+        Use this function to return the total number of labware that the Flex Stacker can store. A Stacker has a limited amount of internal space and calculates the number of labware that can be stored based on the ``z`` height of the labware and the amount they overlap when stacked.
+
+        The number is calculated based on the labware definition for the type of labware the Stacker is currently configured to store using :py:meth:`.set_stored_labware()`. This function returns a number based on the current storage conditions of the Stacker, and will change as labware is added or removed. To get the overall maximum number of labware the
         Flex Stacker can store, use :py:meth:`.get_max_storable_labware`.
         """
         return self._core.get_current_storable_labware()
 
-    @requires_version(2, 24)
-    def set_stored_labware_items(self, labware: list[Labware]) -> None:
-        """Configure a Flex Stacker by providing an initial list of stored labware objects.
+    @requires_version(2, 25)
+    def set_stored_labware_items(
+        self,
+        labware: list[Labware],
+        stacking_offset_z: float | None = None,
+    ) -> None:
+        """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
+        and the end of the list represents the top of the Stacker.
 
         The kind of labware stored by the Flex Stacker will be calculated from the list of labware
         specified here. You can use this to store labware objects that you have already created
-        so that, for instance, you can set their liquid state or nicknames. There are several
-        restrictions on the values of the ``labware`` argument:
-        - ``labware`` must have at least one element
-        - Elements of ``labware`` will be stored along with their lid, if any, and an adapter they
-          rest on, if any. These must be compatible with the Flex Stacker.
-        - All elements of ``labware`` must be loaded :py:obj:`OFF_DECK`.
-        - All elements of ``labware`` must be the same kind of labware. If any of them have lids, they
-          must all have lids, and the lids must be the same. If any of them are on adapters, they all
-          must be on adapters, and the adapters must be the same.
-        - The number of labware objects must fit in the stacker physically. To make sure the labware
-          will fit, use the return value of :py:method:`.get_max_storable_labware_from_list`.
+        so that, for instance, you can set their liquid state or nicknames.
 
-        :param labware: A list of labware to load into the stacker.
+
+        :param labware: A list of labware to load into the Stacker.
+
+            - The list must have at least one element.
+            - All labware must be loaded :py:obj:`OFF_DECK`.
+            - All labware must be of the same kind. If any of them have lids, they
+              must all have lids, and the lids must be the same.
+              If any of them are on adapters, they all
+              must be on adapters, and the adapters must be the same.
+              All lids and adapters must be compatible with the Stacker.
+            - The number of labware objects must fit in the Stacker physically. To make sure the labware
+              will fit, use the return value of :py:meth:`.get_max_storable_labware_from_list`.
+
+        :param stacking_offset_z: Stacking ``z`` offset in mm of stored labware. If specified, this overrides the
+            calculated value from labware definitions.
+
+        .. note::
+
+            The stacking offset is the amount of vertical overlap (in mm) between the bottom side of a
+            labware unit and the top side of the unit below. This offset is used to determine how many
+            units can fit in the stacker and calculates the ``z`` position of the shuttle when retrieving
+            or storing labware.
+
+            There are four possible stacking configurations, each with a different method of calculating
+            the stacking offset:
+
+                - Bare labware: labware (bottom side) overlaps with the top side of the labware below.
+                - Labware on adapter: the adapter (bottom side) of the upper labware unit overlaps with the top side of the labware below.
+                - Labware with lid: the labware (bottom side) of the upper unit overlaps with the lid (top side) of the unit below.
+                - Labware with lid and adapter: the adapter (bottom side) of the upper unit overlaps with the
+                  lid (top side) of the unit below.
+
         """
-        self._core.set_stored_labware_items(self._labware_to_cores(labware))
+        self._core.set_stored_labware_items(
+            self._labware_to_cores(labware),
+            stacking_offset_z=stacking_offset_z,
+        )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_set_stored_labware)
     def set_stored_labware(
         self,
         load_name: str,
@@ -1263,12 +1482,21 @@ class FlexStackerContext(ModuleContext):
         adapter: str | None = None,
         lid: str | None = None,
         count: int | None = None,
+        stacking_offset_z: float | None = None,
+        *,
+        adapter_namespace: str | None = None,
+        adapter_version: int | None = None,
+        lid_namespace: str | None = None,
+        lid_version: int | None = None,
     ) -> None:
-        """Configure what kind of labware the Flex Stacker will store.
+        """Configure the type and starting quantity of labware the Flex Stacker will store during a protocol. This is the only type of labware you'll be able to store in the Stacker until it's reconfigured.
+
+        You must use this method to load a labware stack stored inside the Stacker before you're able to ``retrieve()`` or ``store()`` additional labware.
 
         :param str load_name: A string to use for looking up a labware definition.
             You can find the ``load_name`` for any Opentrons-verified labware on the
             `Labware Library <https://labware.opentrons.com>`__.
+
         :param str namespace: The namespace that the labware definition belongs to.
             If unspecified, the API will automatically search two namespaces:
 
@@ -1279,92 +1507,160 @@ class FlexStackerContext(ModuleContext):
             You might need to specify an explicit ``namespace`` if you have a custom
             definition whose ``load_name`` is the same as an Opentrons-verified
             definition, and you want to explicitly choose one or the other.
+
         :param version: The version of the labware definition. You should normally
-            leave this unspecified to let ``load_labware()`` choose a version
+            leave this unspecified to let the method choose a version
             automatically.
+
         :param adapter: An adapter to load the labware on top of. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
-            adapter will use the same namespace as the labware, and the API will
-            choose the adapter's version automatically.
+            values as the ``load_name`` parameter of :py:meth:`.load_adapter`.
+
+        :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param adapter_version: Applies to ``adapter`` the same way that ``version``
+            applies to ``load_name``.
+
         :param lid: A lid to load the on top of the main labware. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
+            values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
-        :param count: The number of labware that the Flex Stacker should start the protocol
-            storing. If not specified, this will be the maximum amount of this kind of
+
+        :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
+            applies to ``load_name``.
+
+        :param lid_version: Applies to ``lid`` the same way that ``version``
+            applies to ``load_name``.
+
+        :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
 
+        :param stacking_offset_z: Stacking ``z`` offset in mm of stored labware. If specified, this overrides the
+            calculated value in the labware definition.
+
+        .. note::
+
+            The stacking offset is the amount of vertical overlap (in mm) between the bottom side of a
+            labware unit and the top side of the unit below. This offset is used to determine how many
+            units can fit in the Stacker and calculates the ``z`` position of the shuttle when retrieving
+            or storing labware.
+
+            There are four possible stacking configurations, each with a different method of calculating
+            the stacking offset:
+
+              - Bare labware: labware (bottom side) overlaps with the top side of the labware below.
+              - Labware on adapter: the adapter (bottom side) of the upper labware unit overlaps with the top side of the labware below.
+              - Labware with lid: the labware (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
+              - Labware with lid and adapter: the adapter (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
         """
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            checked_adapter_namespace = namespace
+            checked_adapter_version = version
+            checked_lid_namespace = namespace
+            checked_lid_version = version
+        else:
+            checked_adapter_namespace = adapter_namespace
+            checked_adapter_version = adapter_version
+            checked_lid_namespace = lid_namespace
+            checked_lid_version = lid_version
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=namespace,
-            lid_version=version,
+            lid_namespace=checked_lid_namespace,
+            lid_version=checked_lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=namespace,
-            adapter_version=version,
+            adapter_namespace=checked_adapter_namespace,
+            adapter_version=checked_adapter_version,
             count=count,
+            stacking_offset_z=stacking_offset_z,
         )
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_fill)
     def fill(self, count: int | None = None, message: str | None = None) -> None:
-        """Pause the protocol to add more labware to the Flex Stacker.
+        """Pause the protocol to add labware to the Flex Stacker.
 
-        :param message: A message to display in the Opentrons App to note what kind of labware to add.
+        The labware must be the same type the Stacker is configured to store using :py:meth:`.set_stored_labware()`. If no labware type has been set, the API will raise an error.
+
         :param count: The amount of labware the Flex Stacker should hold after this command is executed.
                       If not specified, the Flex Stacker should be full after this command is executed.
+        :param message: A message to display noting what kind of labware to fill the Stacker with.
         """
-        if self.api_version < APIVersion(2, 24):
-            # politeness: the order of the arguments changed in api 2.24. This wasn't released so it isn't
-            # a problem, but anybody using this probably would not like their protocols suddenly breaking
-            if isinstance(count, str):
-                checked_message = count
-                checked_count = message
-            elif (not isinstance(message, str)) and message is not None:
-                checked_count = message
-                checked_message = count
-            else:
-                checked_count = count
-                checked_message = message
-        else:
-            checked_count = count
-            checked_message = message
+        self._core.fill(count, message)
 
-        self._core.fill(checked_count, checked_message)
-
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def fill_items(self, labware: list[Labware], message: str | None = None) -> None:
         """Pause the protocol to add a specific list of labware to the Flex Stacker.
 
-        The ``labware`` argument must follow certain rules:
-        - It should have at least one item
-        - Its elements should be the same kind of labware previously passed to
-          :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`
-        - Its elements should all be loaded :py:obj:`OFF_DECK`
+        :param labware: The list of labware to add. The list must:
 
-        :param message: A message to display in the Opentrons App.
-        :param labware: The list of labware to add, following the rules above.
+          - Contain at least one labware.
+          - Have labware of the same kind previously passed to
+            :py:meth:`.set_stored_labware_items` or loaded by :py:meth:`.set_stored_labware`.
+          - All labware should be loaded :py:obj:`OFF_DECK`.
+        :param message: A message to display noting the labware to fill the Stacker with.
         """
         self._core.fill_items(self._labware_to_cores(labware), message)
 
-    @requires_version(2, 23)
+    @requires_version(2, 25)
+    @publish(command=cmds.flex_stacker_empty)
     def empty(self, message: str | None = None) -> None:
-        """Pause the protocol to remove labware from the Flex Stacker.
+        """Pause the protocol to remove all labware stored in the Flex Stacker.
 
-        :param message: A message to display in the Opentrons App to note what should be removed from
+        This method sets the location of all labware currently in the stacker to :py:obj:`OFF_DECK`.
+
+        :param message: A message to display to note what should be removed from
                         the Flex Stacker.
         """
         self._core.empty(
             message,
         )
 
-    @requires_version(2, 24)
+    @requires_version(2, 25)
     def get_stored_labware(self) -> list[Labware]:
-        """Get the list of labware currently stored inside the stacker.
+        """Get the list of labware currently stored inside the Stacker.
 
-        The first element of the list is on the bottom and will be the item retrieved by a call to
+        This function returns a list of all labware stored in the Stacker based on the labware intially stored using :py:meth:`.set_stored_labware` and any labware added or removed during the protocol.
+
+        The first element of the list occupies the bottom-most position in the labware stack and would be the labware retrieved by a call to
         :py:meth:`.retrieve`.
         """
         return self._cores_to_labware(self._core.get_stored_labware())

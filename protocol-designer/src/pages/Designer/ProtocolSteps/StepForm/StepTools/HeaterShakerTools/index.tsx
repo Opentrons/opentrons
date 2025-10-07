@@ -14,9 +14,9 @@ import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/components/molecules'
+import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { StepFormProps } from '../../types'
 
@@ -109,7 +109,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           )}
           fieldTitle={t('form:step_edit_form.field.heaterShaker.duration')}
           isSelected={formData.heaterShakerSetTimer === true}
-          units={t('application:units.time')}
+          units={t('application:units.time_hms')}
           toggleElement="checkbox"
         />
       </Flex>

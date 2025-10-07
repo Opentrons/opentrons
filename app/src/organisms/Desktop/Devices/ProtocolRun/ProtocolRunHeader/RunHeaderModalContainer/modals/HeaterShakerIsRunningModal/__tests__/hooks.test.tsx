@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
@@ -17,7 +17,7 @@ import type { State } from '/app/redux/types'
 vi.mock('/app/resources/runs')
 
 describe('useHeaterShakerModuleIdsFromRun', () => {
-  const store: Store<State> = createStore(vi.fn(), {})
+  const store: Store<State> = legacy_createStore(vi.fn(), {})
 
   beforeEach(() => {
     store.dispatch = vi.fn()

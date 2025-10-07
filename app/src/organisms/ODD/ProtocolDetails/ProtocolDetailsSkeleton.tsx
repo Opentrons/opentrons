@@ -13,7 +13,7 @@ export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
   )
 }
 
-export function ProcotolDetailsHeaderTitleSkeleton(): JSX.Element {
+export function ProtocolDetailsHeaderTitleSkeleton(): JSX.Element {
   return (
     <Skeleton
       width="42rem"

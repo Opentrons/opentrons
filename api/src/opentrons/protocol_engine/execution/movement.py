@@ -1,4 +1,5 @@
 """Movement command handling."""
+
 from __future__ import annotations
 
 import logging
@@ -82,9 +83,10 @@ class MovementHandler:
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
         operation_volume: Optional[float] = None,
+        offset_pipette_for_reservoir_subwells: bool = False,
     ) -> Point:
         """Move to a specific well."""
-        self._state_store.labware.raise_if_labware_inaccessible_by_pipette(
+        self._state_store.geometry.raise_if_labware_inaccessible_by_pipette(
             labware_id=labware_id
         )
 
@@ -142,6 +144,7 @@ class MovementHandler:
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
             operation_volume=operation_volume,
+            offset_pipette_for_reservoir_subwells=offset_pipette_for_reservoir_subwells,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(

@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import {
-  ProcotolDetailsHeaderTitleSkeleton,
   ProtocolDetailsHeaderChipSkeleton,
+  ProtocolDetailsHeaderTitleSkeleton,
   ProtocolDetailsSectionContentSkeleton,
 } from '../ProtocolDetailsSkeleton'
 
@@ -16,7 +16,7 @@ describe('ProtocolDetailsSkeleton', () => {
   })
 
   it('renders a Skeleton to replace the title section', () => {
-    render(<ProcotolDetailsHeaderTitleSkeleton />)
+    render(<ProtocolDetailsHeaderTitleSkeleton />)
     const titleSkeleton = screen.getAllByTestId('Skeleton')
     expect(titleSkeleton.length).toEqual(1)
     expect(titleSkeleton[0]).toHaveStyle('background-size: 99rem')

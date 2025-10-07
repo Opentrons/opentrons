@@ -258,7 +258,7 @@ def _subsystems_entry(info: DeviceInfoCache) -> Tuple[SubSystem, SubSystemState]
         current_fw_version=info.version,
         next_fw_version=2,
         current_fw_sha=info.shortsha,
-        pcba_revision="A1",
+        pcba_revision="A1.0",
         update_state=None,
         fw_update_needed=False,
     )
@@ -741,6 +741,7 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_move_group_run: mock.AsyncMock,
     mock_send_stop_threshold: mock.AsyncMock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     fake_max_p_dist = 70
     head_node = axis_to_node(Axis.by_mount(mount))
@@ -750,6 +751,10 @@ async def test_liquid_probe(
     )
     controller._pipettes_to_monitor_pressure = mock.MagicMock(  # type: ignore[method-assign]
         return_value=[sensor_node_for_mount(mount)]
+    )
+    monkeypatch.setattr(
+        "opentrons_hardware.hardware_control.tool_sensors.finalize_logs",
+        mock.AsyncMock(),
     )
     try:
         await controller.liquid_probe(
@@ -864,7 +869,10 @@ async def test_update_motor_estimation(
 @pytest.mark.parametrize(
     argnames=["gantry_load", "expected_call"],
     argvalues=[
-        [GantryLoad.HIGH_THROUGHPUT, [NodeId.pipette_left]],  # this uses the Q motor
+        [
+            GantryLoad.HIGH_THROUGHPUT_1000,
+            [NodeId.pipette_left],
+        ],  # this uses the Q motor
         [GantryLoad.LOW_THROUGHPUT, []],
     ],
 )
@@ -888,7 +896,7 @@ async def test_set_default_currents(
         assert these_current_settings
         for k, v in these_current_settings.items():
             if k == Axis.P_L and (
-                gantry_load == GantryLoad.HIGH_THROUGHPUT
+                gantry_load == GantryLoad.HIGH_THROUGHPUT_1000
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
@@ -914,7 +922,7 @@ async def test_set_default_currents(
         ],
         [
             {Axis.Q: 1.5},
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
             [{NodeId.pipette_left: 1.5}, [NodeId.pipette_left]],
         ],
     ],
@@ -953,7 +961,7 @@ async def test_set_run_current(
         ],
         [
             {Axis.Q: 0.8},
-            GantryLoad.HIGH_THROUGHPUT,
+            GantryLoad.HIGH_THROUGHPUT_1000,
             [{NodeId.pipette_left: 0.8}, [NodeId.pipette_left]],
         ],
     ],
@@ -1289,6 +1297,7 @@ async def test_engage_motors(
         (80, 79, 0, 0, 1, 92, 60, False),
         (80, 45, 40, 0, 1, 92, 60, True),
         (80, 100, 0, 40, 0, 92, 60, True),
+        (95.5, 84, 0, 5, 5, 94, 60, True),
     ],
 )
 def test_grip_error_detection(
@@ -1313,8 +1322,44 @@ def test_grip_error_detection(
             narrower,
             actual_grip_width,
             allowed_error,
-            hard_max,
             hard_min,
+            hard_max,
+        )
+
+
+@pytest.mark.parametrize(
+    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
+    [
+        (95.5, 84, 0, 5, 5, 94, 60, False),
+        (95.5, 60, 0, 5, 5, 94, 60, True),
+        (95.5, 94, 0, 5, 5, 94, 60, True),
+    ],
+)
+def test_grip_error_detection_disable_geometry(
+    controller: OT3Controller,
+    expected_grip_width: float,
+    actual_grip_width: float,
+    wider: float,
+    narrower: float,
+    allowed_error: float,
+    hard_max: float,
+    hard_min: float,
+    raise_error: bool,
+) -> None:
+    context = cast(
+        AbstractContextManager[None],
+        pytest.raises(FailedGripperPickupError) if raise_error else does_not_raise(),
+    )
+    with context:
+        controller.check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error,
+            hard_min,
+            hard_max,
+            True,
         )
 
 
@@ -1421,7 +1466,7 @@ async def test_controller_move(
 ) -> None:
     from copy import deepcopy
 
-    controller.update_constraints_for_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+    controller.update_constraints_for_gantry_load(GantryLoad.HIGH_THROUGHPUT_1000)
 
     run_target_pos = deepcopy(target_pos)
     config = {"run.side_effect": move_group_run_side_effect(controller, run_target_pos)}

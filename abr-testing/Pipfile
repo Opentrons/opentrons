@@ -21,6 +21,7 @@ pandas-stubs = "*"
 paramiko = "*"
 prettier = "*"
 pydantic = "==2.9.0"
+build = "*"
 
 [dev-packages]
 atomicwrites = "==1.4.1"

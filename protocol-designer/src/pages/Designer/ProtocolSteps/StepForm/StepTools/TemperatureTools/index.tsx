@@ -7,14 +7,15 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../components/molecules'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/components/molecules'
+import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { StepFormProps } from '../../types'
 
@@ -44,7 +45,14 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
         }}
       />
       <Box borderBottom={`1px solid ${COLORS.grey30}`} />
-      <Flex padding={`0 ${SPACING.spacing16}`}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        padding={`0 ${SPACING.spacing16}`}
+      >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('form:step_edit_form.temperature.state')}
+        </StyledText>
         <ToggleExpandStepFormField
           {...propsForFields.targetTemperature}
           toggleValue={propsForFields.setTemperature.value}

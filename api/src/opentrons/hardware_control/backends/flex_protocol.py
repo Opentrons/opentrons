@@ -73,12 +73,6 @@ class FlexBackend(Protocol):
     def update_constraints_for_gantry_load(self, gantry_load: GantryLoad) -> None:
         ...
 
-    def update_constraints_for_calibration_with_gantry_load(
-        self,
-        gantry_load: GantryLoad,
-    ) -> None:
-        ...
-
     def update_constraints_for_plunger_acceleration(
         self,
         mount: OT3Mount,
@@ -457,6 +451,7 @@ class FlexBackend(Protocol):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         ...
 

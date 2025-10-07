@@ -101,7 +101,7 @@ export function useRequiredSetupStepsInOrder({
         ),
       })
     )
-  }, [runId, keyFor(protocolAnalysis), dispatch])
+  }, [runId, dispatch, keyFor(protocolAnalysis), noLwOffsetsInRun])
   return protocolAnalysis == null
     ? {
         orderedSteps: NO_ANALYSIS_STEPS_IN_ORDER,

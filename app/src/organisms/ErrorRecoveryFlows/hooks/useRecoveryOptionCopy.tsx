@@ -47,19 +47,28 @@ export function useRecoveryOptionCopy(): (
         return t('manually_move_lw_and_skip')
       case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
         return t('manually_replace_lw_and_retry')
-      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_STORE_RETRY.ROUTE:
+      case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE:
         return t('clear_obstruction_in_stacker_and_retry_step')
-      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE:
         return t('load_labware_into_stacker_and_retry_step')
-      case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case RECOVERY_MAP.HOPPER_MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         return t('manually_load_labware_into_labware_shuttle_and_skip_step')
-      case RECOVERY_MAP.LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE:
+      case RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE:
+        return t('clear_obstruction_in_stacker_and_skip_to_next_step')
+      case RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE:
         return t('load_labware_shuttle_and_retry_step')
-      case RECOVERY_MAP.MANUAL_LOAD_ON_SHUTTLE_AND_SKIP.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         return t('manually_load_labware_into_shuttle_and_skip')
-      case RECOVERY_MAP.REPLACE_LABWARE_IN_HOPPER_AND_RETRY.ROUTE:
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
+        return t('manually_load_labware_into_stacker_and_skip')
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE:
         return t('replace_labware_in_stacker_and_retry')
+      case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
+        return t('load_labware_onto_shuttle_and_retry')
       default:
         return 'Unknown action'
     }

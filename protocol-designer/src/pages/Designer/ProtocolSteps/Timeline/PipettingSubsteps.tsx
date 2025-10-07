@@ -5,14 +5,15 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import { MultichannelSubstep } from './MultichannelSubstep'
 import { Substep } from './Substep'
 
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
-} from '../../../../steplist'
+} from '/protocol-designer/steplist'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem
@@ -54,6 +55,7 @@ export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
       })
     : substeps.rows.map((row, substepIndex) => (
         <Substep
+          isNested={false}
           trashName={trashName}
           key={substepIndex}
           selectSubstep={selectSubstep}

@@ -32,16 +32,10 @@ const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
 
 // NOTE: whenever we add or change any of the action types that indicate
 // "changes to the protocol", those action types need to be updated here.
-const unsavedChanges = (
-  state: boolean = false,
-  action: {
-    type: string
-    payload: any
-  }
-): boolean => {
+const unsavedChanges = (state: boolean = false, action: Action): boolean => {
   switch (action.type) {
     case 'LOAD_FILE': {
-      return action.payload.didMigrate // no unsaved changes unless migration happened
+      return (action as LoadFileAction).payload.didMigrate // no unsaved changes unless migration happened
     }
 
     case 'SAVE_PROTOCOL_FILE':

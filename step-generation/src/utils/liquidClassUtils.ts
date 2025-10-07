@@ -1,8 +1,5 @@
-import last from 'lodash/last'
-
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -15,8 +12,6 @@ import type {
   DistributeArgs,
   InnerMixArgs,
   LabwareEntities,
-  PipetteEntity,
-  RobotState,
   TransferArgs,
 } from '../types'
 
@@ -51,13 +46,17 @@ export const getCustomLiquidClassProperties = (
     },
     flow_rate_by_volume: [[0, args.dispenseFlowRateUlSec ?? 0]],
     delay: {
-      enabled: args.dispenseDelay != null,
-      duration: args.dispenseDelay?.seconds ?? undefined,
+      enabled: !!args.dispenseDelay?.seconds,
+      ...(args.dispenseDelay?.seconds
+        ? { duration: args.dispenseDelay?.seconds }
+        : {}),
     },
     submerge: {
       delay: {
-        enabled: args.dispenseSubmergeDelay != null,
-        duration: args.dispenseSubmergeDelay?.seconds ?? undefined,
+        enabled: !!args.dispenseSubmergeDelay?.seconds,
+        ...(args.dispenseSubmergeDelay?.seconds
+          ? { duration: args.dispenseSubmergeDelay?.seconds }
+          : {}),
       },
       speed: args.dispenseSubmergeSpeed ?? undefined,
       start_position: {
@@ -72,8 +71,10 @@ export const getCustomLiquidClassProperties = (
     retract: {
       air_gap_by_volume: [[0, args.dispenseAirGapVolume ?? 0]],
       delay: {
-        enabled: args.dispenseRetractDelay != null,
-        duration: args.dispenseRetractDelay?.seconds ?? undefined,
+        enabled: !!args.dispenseRetractDelay?.seconds,
+        ...(args.dispenseRetractDelay?.seconds
+          ? { duration: args.dispenseRetractDelay?.seconds }
+          : {}),
       },
       end_position: {
         offset: {
@@ -127,18 +128,26 @@ export const getCustomLiquidClassProperties = (
           correction_by_volume: liquidClassValuesForTip?.aspirate
             .correctionByVolume ?? [[0, 0]], // nullish coalescing for type checks. Should never hit
           delay: {
-            enabled: args.aspirateDelay != null,
-            duration: args.aspirateDelay?.seconds ?? undefined,
+            enabled: !!args.aspirateDelay?.seconds,
+            ...(args.aspirateDelay?.seconds
+              ? { duration: args.aspirateDelay?.seconds }
+              : {}),
           },
           mix: {
-            enabled: aspirateMixArgs != null,
-            repetitions: aspirateMixArgs?.times ?? undefined,
-            volume: aspirateMixArgs?.volume ?? undefined,
+            enabled: !!aspirateMixArgs?.volume,
+            ...(aspirateMixArgs?.times
+              ? { repetitions: aspirateMixArgs.times }
+              : {}),
+            ...(aspirateMixArgs?.volume
+              ? { volume: aspirateMixArgs.volume }
+              : {}),
           },
           submerge: {
             delay: {
-              enabled: args.aspirateSubmergeDelay != null,
-              duration: args.aspirateSubmergeDelay?.seconds ?? undefined,
+              enabled: !!args.aspirateSubmergeDelay?.seconds,
+              ...(args.aspirateSubmergeDelay?.seconds
+                ? { duration: args.aspirateSubmergeDelay?.seconds }
+                : {}),
             },
             speed: args.aspirateSubmergeSpeed ?? undefined,
             start_position: {
@@ -153,8 +162,10 @@ export const getCustomLiquidClassProperties = (
           retract: {
             air_gap_by_volume: [[0, args.aspirateAirGapVolume ?? 0]],
             delay: {
-              enabled: args.aspirateRetractDelay != null,
-              duration: args.aspirateRetractDelay?.seconds ?? undefined,
+              enabled: !!args.aspirateRetractDelay?.seconds,
+              ...(args.aspirateRetractDelay?.seconds
+                ? { duration: args.aspirateRetractDelay?.seconds }
+                : {}),
             },
             end_position: {
               offset: {
@@ -258,33 +269,12 @@ const getBlowoutPythonLocation = (
 }
 
 export const getPythonAssignTipRacksString = (args: {
-  pipetteEntity: PipetteEntity
   labwareEntities: LabwareEntities
-  labwareState: RobotState['labware']
-  tiprackURI: string
+  tiprackIds: string[]
 }): string => {
-  const { pipetteEntity, labwareEntities, labwareState, tiprackURI } = args
-  const { pythonName: pythonPipetteName } = pipetteEntity
-  if (pipetteEntity.tiprackDefURI.length > 1) {
-    const assignedTipRackPythonNames = sortLabwareBySlot(labwareState).reduce(
-      (acc: string[], labwareId) => {
-        const labwareEntity = labwareEntities[labwareId]
-        if (labwareEntity == null) {
-          return acc
-        }
-
-        const isOffDeck = last(labwareState[labwareId].stack) === 'offDeck'
-        if (labwareEntity.labwareDefURI === tiprackURI && !isOffDeck) {
-          acc.push(labwareEntity.pythonName)
-        }
-        return acc
-      },
-      []
-    )
-
-    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
-      ', '
-    )}]\n`
-  }
-  return ''
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

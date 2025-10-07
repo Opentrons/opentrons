@@ -8,4 +8,5 @@ export const SETTING_OPTIONS = {
   ASPIRATE_RETRACT: 'aspirate_retract',
   ASPIRATE_TOUCH_TIP: 'aspirate_touch_tip',
   ASPIRATE_AIR_GAP: 'aspirate_air_gap',
+  ASPIRATE_CONDITION: 'aspirate_condition',
 } as const

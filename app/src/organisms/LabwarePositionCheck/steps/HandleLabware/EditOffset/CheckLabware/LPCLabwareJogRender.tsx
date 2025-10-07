@@ -45,6 +45,7 @@ export function LPCLabwareJogRender({
           <>
             <LabwareRender
               definition={itemLwDef}
+              positioningMode="offsetInSlot"
               wellStroke={{ A1: COLORS.blue50 }}
               wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
               highlightedWellLabels={{ wells: ['A1'] }}

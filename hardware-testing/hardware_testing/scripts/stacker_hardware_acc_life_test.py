@@ -8,11 +8,11 @@ from typing import List, Dict, Any, Union
 from datetime import datetime
 from hardware_testing import data
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.modules.flex_stacker import STACKER_MOTION_CONFIG
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import build_async_ot3_hardware_api
 from opentrons.drivers.flex_stacker.driver import (
     FlexStackerDriver,
-    STACKER_MOTION_CONFIG,
 )
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -329,7 +329,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
         await self.stacker_setup()
         await self.file_setup()
         print("\n-> Starting Stacker Test!\n")
-        self.start_time = time.time()
+        self.start_time = time.monotonic()
 
     async def stacker_setup(self) -> None:
         """Detect Stackers."""

@@ -2,25 +2,26 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
+import { ModalShell, WizardHeader } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 
 interface ModuleWizardScreenProps {
   isRobotMoving: boolean
+  isModuleUpdating: boolean
   handleCleanUpAndClose: () => void
   currentStepIndex: number
   totalStepCount: number
   children: JSX.Element
 }
 
-export const ModuleWizardScreen = (
+export function ModuleWizardScreen(
   props: ModuleWizardScreenProps
-): JSX.Element | null => {
+): JSX.Element {
   const {
     isRobotMoving,
+    isModuleUpdating,
     handleCleanUpAndClose,
     currentStepIndex,
     totalStepCount,
@@ -31,7 +32,7 @@ export const ModuleWizardScreen = (
 
   const wizardHeader = (
     <WizardHeader
-      exitDisabled={isRobotMoving}
+      exitDisabled={isRobotMoving || isModuleUpdating}
       title={t('module_setup')}
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}

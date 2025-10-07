@@ -98,7 +98,11 @@ setup:
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib dist python
+	yarn shx rm -rf lib dist python/install
+
+.PHONY: cleanall
+cleanall: clean
+	yarn shx rm -rf python
 
 # artifacts
 #####################################################################
@@ -134,7 +138,7 @@ dist-posix: clean lib
 
 .PHONY: dist-osx
 dist-osx: clean lib
-	$(builder) --mac --x64
+	$(builder) --mac --universal
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
@@ -160,8 +164,8 @@ dist-macos-latest: dist-osx
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
-.PHONY: dist-ubuntu-22.04
-dist-ubuntu-22.04: dist-linux
+.PHONY: dist-ubuntu-24.04
+dist-ubuntu-24.04: dist-linux
 
 .PHONY: dist-windows-2019
 dist-windows-2019: dist-win

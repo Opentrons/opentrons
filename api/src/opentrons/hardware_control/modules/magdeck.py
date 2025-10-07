@@ -48,13 +48,14 @@ class MagDeck(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: types.ModuleDisconnectedCallback,
+        error_callback: types.ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: types.ModuleDisconnectedCallback = None,
     ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
@@ -73,6 +74,7 @@ class MagDeck(mod_abc.AbstractModule):
             device_info=await driver.get_device_info(),
             driver=driver,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         return mod
 
@@ -80,11 +82,12 @@ class MagDeck(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
         driver: AbstractMagDeckDriver,
         device_info: Dict[str, str],
-        disconnected_callback: types.ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: types.ModuleDisconnectedCallback,
+        error_callback: types.ModuleErrorCallback,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -93,6 +96,7 @@ class MagDeck(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver

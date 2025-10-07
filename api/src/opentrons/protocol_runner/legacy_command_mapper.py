@@ -10,6 +10,8 @@ from opentrons.hardware_control.modules.types import (
     MagneticModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    AbsorbanceReaderModel,
+    FlexStackerModuleModel,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
@@ -78,6 +80,8 @@ _HARDWARE_TO_PE_MODULE: Dict[HardwareModuleModel, pe_types.ModuleModel] = {
     ThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
     ThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
     HeaterShakerModuleModel.HEATER_SHAKER_V1: pe_types.ModuleModel.HEATER_SHAKER_MODULE_V1,
+    AbsorbanceReaderModel.ABSORBANCE_READER_V1: pe_types.ModuleModel.ABSORBANCE_READER_V1,
+    FlexStackerModuleModel.FLEX_STACKER_V1: pe_types.ModuleModel.FLEX_STACKER_MODULE_V1,
 }
 
 _HIGHER_ORDER_COMMAND_TYPES = {
@@ -821,7 +825,6 @@ class LegacyCommandMapper:
             result=pe_commands.LoadModuleResult.model_construct(
                 moduleId=module_id,
                 serialNumber=module_load_info.module_serial,
-                definition=loaded_definition,
                 model=loaded_model,
             ),
         )

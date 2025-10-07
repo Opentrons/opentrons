@@ -80,6 +80,14 @@ class SetStoredLabwareParams(BaseModel):
         None,
         description=INITIAL_STORED_LABWARE_DESCRIPTION,
     )
+    poolOverlapOverride: Optional[float] = Field(
+        None,
+        description=(
+            "Override for the Z stacking overlap of the labware pool. If not "
+            "provided, the protocol engine will calculate the overlap based on "
+            "the stacking offsets provided in the labware definitions."
+        ),
+    )
 
 
 class SetStoredLabwareResult(BaseModel):
@@ -196,25 +204,28 @@ class SetStoredLabwareImpl(
                 version=params.adapterLabware.version,
             )
 
-        self._state_view.labware.raise_if_stacker_labware_pool_is_not_valid(
-            labware_def, lid_def, adapter_def
+        pool_definitions = (
+            self._state_view.labware.stacker_labware_pool_to_ordered_list(
+                labware_def, lid_def, adapter_def
+            )
         )
 
         pool_height = self._state_view.geometry.get_height_of_labware_stack(
-            [x for x in [lid_def, labware_def, adapter_def] if x is not None]
+            pool_definitions
         )
-        pool_definitions = [
-            x for x in [lid_def, labware_def, adapter_def] if x is not None
-        ]
 
-        overlap = self._state_view._labware.get_labware_overlap_offsets(
-            pool_definitions[-1], pool_definitions[0].parameters.loadName
+        pool_overlap = (
+            params.poolOverlapOverride
+            if params.poolOverlapOverride
+            else self._state_view.labware.get_stacker_labware_overlap_offset(
+                pool_definitions
+            ).z
         )
 
         max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
             params.moduleId,
             pool_height,
-            overlap.z,
+            pool_overlap,
         )
         groups_to_load = build_ids_to_fill(
             params.adapterLabware is not None,
@@ -239,7 +250,8 @@ class SetStoredLabwareImpl(
         state_update = state_update.update_flex_stacker_labware_pool_definition(
             params.moduleId,
             max_pool_count,
-            overlap.z,
+            pool_overlap,
+            pool_height,
             labware_def,
             adapter_def,
             lid_def,

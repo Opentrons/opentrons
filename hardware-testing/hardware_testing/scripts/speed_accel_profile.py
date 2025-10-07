@@ -57,7 +57,29 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
     },
-    GantryLoad.HIGH_THROUGHPUT: {
+    GantryLoad.HIGH_THROUGHPUT_1000: {
+        "X": {
+            "SPEED": {"MIN": 275, "MAX": 475, "INC": 100},
+            "ACCEL": {"MIN": 700, "MAX": 900, "INC": 100},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+        },
+        "Y": {
+            "SPEED": {"MIN": 325, "MAX": 425, "INC": 100},
+            "ACCEL": {"MIN": 500, "MAX": 600, "INC": 100},
+            "CURRENT": {"MIN": 1.4, "MAX": 1.4, "INC": 0},
+        },
+        "L": {
+            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
+            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+        },
+        "R": {
+            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
+            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+        },
+    },
+    GantryLoad.HIGH_THROUGHPUT_200: {
         "X": {
             "SPEED": {"MIN": 275, "MAX": 475, "INC": 100},
             "ACCEL": {"MIN": 700, "MAX": 900, "INC": 100},
@@ -131,7 +153,11 @@ AXIS_MAP = {
 
 LOAD = GantryLoad.LOW_THROUGHPUT
 
-GANTRY_LOAD_MAP = {"LOW": GantryLoad.LOW_THROUGHPUT, "HIGH": GantryLoad.HIGH_THROUGHPUT}
+GANTRY_LOAD_MAP = {
+    "LOW": GantryLoad.LOW_THROUGHPUT,
+    "HIGH_1K": GantryLoad.HIGH_THROUGHPUT_1000,
+    "HIGH_2H": GantryLoad.HIGH_THROUGHPUT_200,
+}
 
 DELAY = 0
 

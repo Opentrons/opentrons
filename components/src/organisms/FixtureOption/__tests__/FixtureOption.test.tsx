@@ -18,7 +18,6 @@ describe('FixtureOption', () => {
       onClickHandler: vi.fn(),
       optionName: 'mockOption',
       buttonText: 'mockText',
-      isOnDevice: false,
     }
     render(props)
     screen.getByText('mockOption')
@@ -31,7 +30,6 @@ describe('FixtureOption', () => {
       onClickHandler: vi.fn(),
       optionName: 'mockOption',
       buttonText: 'mockText',
-      isOnDevice: true,
     }
     render(props)
     screen.getByText('mockOption')

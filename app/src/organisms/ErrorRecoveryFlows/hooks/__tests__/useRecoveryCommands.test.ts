@@ -401,7 +401,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'flexStacker/openLatch',
+          commandType: 'unsafe/flexStacker/openLatch',
           params: {
             moduleId: '',
           },
@@ -422,7 +422,7 @@ describe('useRecoveryCommands', () => {
     expect(mockChainRunCommands).toHaveBeenCalledWith(
       [
         {
-          commandType: 'flexStacker/closeLatch',
+          commandType: 'unsafe/flexStacker/closeLatch',
           params: {
             moduleId: '',
           },

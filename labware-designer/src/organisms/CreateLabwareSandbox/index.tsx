@@ -22,20 +22,24 @@ import {
 import {
   createIrregularLabware,
   createRegularLabware,
+  getAddressableAreaFromSlotId,
+  getDeckDefinitions,
+  getDeckSlotOriginToLabwareOrigin,
+  getLabwareViewBox,
   getPositionFromSlotId,
-  ot2StandardDeckV4,
 } from '@opentrons/shared-data'
 
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
 import type {
-  DeckDefinition,
+  AddressableAreaName,
   IrregularLabwareProps,
-  LabwareDefinition2,
+  LabwareDefinition,
   RegularLabwareProps,
 } from '@opentrons/shared-data'
 
-const SLOT_OPTIONS = ot2StandardDeckV4.locations.addressableAreas.map(
+const DECK_DEFINITION = getDeckDefinitions().ot2_standard
+const SLOT_OPTIONS = DECK_DEFINITION.locations.addressableAreas.map(
   slot => slot.id
 )
 const DEFAULT_LABWARE_SLOT = SLOT_OPTIONS[0]
@@ -59,7 +63,7 @@ export function CreateLabwareSandbox(): JSX.Element {
   const [
     labwareToRender,
     setLabwareToRender,
-  ] = React.useState<LabwareDefinition2>(
+  ] = React.useState<LabwareDefinition>(
     createIrregularLabware(IRREGULAR_OPTIONS)
   )
 
@@ -109,6 +113,8 @@ export function CreateLabwareSandbox(): JSX.Element {
       console.log('Failed to parse options as JSON', error)
     }
   }
+
+  const labwareViewBox = getLabwareViewBox(labwareToRender)
 
   return (
     <Flex height="100%" width="100%" flexDirection={DIRECTION_COLUMN}>
@@ -180,7 +186,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                 <SlotSelect
                   defaultValue={labwareSlot}
                   onChange={e => {
-                    setLabwareSlot(e.target.value)
+                    setLabwareSlot(e.target.value as AddressableAreaName)
                   }}
                 >
                   {SLOT_OPTIONS.map(slot => (
@@ -194,26 +200,40 @@ export function CreateLabwareSandbox(): JSX.Element {
           </Flex>
           <Flex maxHeight="84vh">
             {viewOnDeck ? (
-              <RobotWorkSpace
-                deckDef={(ot2StandardDeckV4 as unknown) as DeckDefinition}
-                showDeckLayers
-              >
+              <RobotWorkSpace deckDef={DECK_DEFINITION} showDeckLayers>
                 {() => {
-                  const lwPosition = getPositionFromSlotId(
+                  const slotOrigin = getPositionFromSlotId(
                     labwareSlot,
-                    (ot2StandardDeckV4 as unknown) as DeckDefinition
+                    DECK_DEFINITION
                   )
+                  const slotDefinition = getAddressableAreaFromSlotId(
+                    labwareSlot,
+                    DECK_DEFINITION
+                  )
+
+                  if (slotOrigin == null || slotDefinition == null) {
+                    return null // Should not happen.
+                  }
+
+                  const slotOriginToLabwareOrigin = getDeckSlotOriginToLabwareOrigin(
+                    slotDefinition,
+                    labwareToRender
+                  )
+
                   return (
                     <g
-                      transform={`translate(${lwPosition?.[0] ?? 0}, ${
-                        lwPosition?.[1] ?? 0
-                      })`}
+                      transform={`translate(${slotOrigin[0]}, ${slotOrigin[1]})`}
                       data-testid="lw_on_deck"
                     >
-                      <LabwareRender
-                        definition={labwareToRender}
-                        wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
-                      />
+                      <g
+                        transform={`translate(${slotOriginToLabwareOrigin.x}, ${slotOriginToLabwareOrigin.y})`}
+                      >
+                        <LabwareRender
+                          definition={labwareToRender}
+                          positioningMode="passThrough"
+                          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+                        />
+                      </g>
                     </g>
                   )
                 }}
@@ -222,11 +242,12 @@ export function CreateLabwareSandbox(): JSX.Element {
               <svg
                 data-testid="lw_by_itself"
                 width="100%"
-                viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
+                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
                 style={{ transform: 'scale(1, -1)' }}
               >
                 <LabwareRender
                   definition={labwareToRender}
+                  positioningMode="passThrough"
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
                 />
               </svg>

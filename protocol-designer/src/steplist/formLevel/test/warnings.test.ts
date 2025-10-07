@@ -7,7 +7,6 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  belowPipetteMinimumVolume,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
   mixTipPositionInTube,
@@ -25,48 +24,6 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 
-describe('Below pipette minimum volume', () => {
-  let fieldsWithPipette: {
-    pipette: { spec: { liquids: { default: { minVolume: number } } } }
-  }
-  beforeEach(() => {
-    fieldsWithPipette = {
-      pipette: {
-        spec: {
-          liquids: {
-            default: {
-              minVolume: 100,
-            },
-          },
-        },
-      },
-    }
-  })
-  it('should NOT return a warning when the volume equals the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 100,
-    } as any
-    expect(belowPipetteMinimumVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 101,
-    } as any
-    expect(belowPipetteMinimumVolume(fields)).toBe(null)
-  })
-  it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 99,
-    }
-    // @ts-expect-error(sa, 2021-6-15): belowPipetteMinimumVolume might return null, need to null check before property access
-    expect(belowPipetteMinimumVolume(fields).type).toBe(
-      'BELOW_PIPETTE_MINIMUM_VOLUME'
-    )
-  })
-})
 describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware: any
   beforeEach(() => {
@@ -206,7 +163,7 @@ const MOCK_GLYCEROL = {
   ],
 } as LiquidClass
 const MOCK_WATER = {
-  liquidClassName: 'waterV1',
+  liquidClassName: 'waterV2',
   byPipette: [
     {
       pipetteModel: 'flex_1channel_1000',

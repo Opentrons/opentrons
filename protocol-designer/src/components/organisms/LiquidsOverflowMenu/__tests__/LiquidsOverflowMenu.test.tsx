@@ -2,21 +2,22 @@ import { createRef } from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+
 import { LiquidsOverflowMenu } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import * as labwareIngredActions from '../../../../labware-ingred/actions'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getLiquidEntities } from '../../../../step-forms/selectors'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockLocation = vi.fn()
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-ingred/actions')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

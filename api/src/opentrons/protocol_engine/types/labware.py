@@ -17,6 +17,15 @@ from .labware_offset_vector import LabwareOffsetVector
 from .util import Vec3f
 
 
+@dataclass(frozen=True)
+class GripSpecs:
+    """Data for how a labware should be gripped."""
+
+    uncertaintyWider: float
+    uncertaintyNarrower: float
+    targetY: float
+
+
 class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
@@ -109,3 +118,11 @@ class LoadedLabware(BaseModel):
         None,
         description="A user-specified display name for this labware, if provided.",
     )
+
+
+@dataclass(frozen=True)
+class LabwareWellId:
+    """Designates a well in a labware."""
+
+    labware_id: str
+    well_name: str

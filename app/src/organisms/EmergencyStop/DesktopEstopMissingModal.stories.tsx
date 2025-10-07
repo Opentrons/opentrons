@@ -1,5 +1,5 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 
 import { EstopMissingModal } from '.'
 import { configReducer } from '../../redux/config/reducer'
@@ -19,7 +19,7 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(
+const store: Store<any> = legacy_createStore(
   configReducer,
   dummyConfig as StoreEnhancer
 )

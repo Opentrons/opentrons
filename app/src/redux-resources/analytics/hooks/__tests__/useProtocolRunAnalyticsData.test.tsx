@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
-import { createStore } from 'redux'
+import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -26,7 +26,7 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/transformations/commands')
 
 let wrapper: FunctionComponent<{ children: ReactNode }>
-let store: Store<any> = createStore(vi.fn(), {})
+let store: Store<any> = legacy_createStore(vi.fn(), {})
 
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
@@ -73,7 +73,7 @@ const ROBOT_PROTOCOL_ANALYSIS = {
 
 describe('useProtocolRunAnalyticsData hook', () => {
   beforeEach(() => {
-    store = createStore(vi.fn(), {})
+    store = legacy_createStore(vi.fn(), {})
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>

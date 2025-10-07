@@ -87,7 +87,6 @@ const mockTemperatureModuleDefinition = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: { children: [] },
 }
 
 const TEMPERATURE_MODULE_INFO = {

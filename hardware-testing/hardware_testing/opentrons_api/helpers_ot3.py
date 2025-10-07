@@ -1,5 +1,8 @@
 """Opentrons helper methods."""
 import asyncio
+import atexit
+import logging
+
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -17,7 +20,6 @@ from typing import (
     cast,
     Sequence,
 )
-import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -50,6 +52,23 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+
+# Supress logging.exception messages as they can be confusing when running scripts.
+class StripExceptionMessageHandler(logging.StreamHandler):
+    """Custom StreamHandler to strip logging.exception messages."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, but supress logging.exception logs."""
+        if record.exc_info:
+            # Remove the msg, traceback if it's an exception
+            record.msg = ""
+            record.exc_info = None
+        super().emit(record)
+
+
+logger = logging.getLogger()
+logger.addHandler(StripExceptionMessageHandler())
 
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5
@@ -353,10 +372,13 @@ def set_gantry_per_axis_setting_ot3(
 ) -> None:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        settings.high_throughput[axis_kind] = value
-    else:
-        settings.low_throughput[axis_kind] = value
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_1000[axis_kind] = value
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_200[axis_kind] = value
+        case GantryLoad.LOW_THROUGHPUT:
+            settings.low_throughput[axis_kind] = value
 
 
 def get_gantry_per_axis_setting_ot3(
@@ -364,9 +386,13 @@ def get_gantry_per_axis_setting_ot3(
 ) -> float:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        return settings.high_throughput[axis_kind]
-    return settings.low_throughput[axis_kind]
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            return settings.high_throughput_1000[axis_kind]
+        case GantryLoad.HIGH_THROUGHPUT_200:
+            return settings.high_throughput_200[axis_kind]
+        case GantryLoad.LOW_THROUGHPUT:
+            return settings.low_throughput[axis_kind]
 
 
 async def set_gantry_load_per_axis_current_settings_ot3(

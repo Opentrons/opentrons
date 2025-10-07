@@ -23,6 +23,7 @@ import {
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
+  getLoadLidStacks,
   getLoadLiquidClasses,
   getLoadLiquids,
   getLoadModules,
@@ -36,6 +37,7 @@ import {
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
+  LabwareEntity,
   LabwareLiquidState,
   LiquidEntities,
   ModuleEntities,
@@ -69,6 +71,7 @@ describe('pythonMetadata', () => {
         subcategory: 'PCR Prep',
         tags: ['wombat', 'kangaroo', 'wallaby'],
         source: 'Protocol Designer',
+        protocolDesigner: 'fake_PD_version',
       })
     ).toBe(
       `
@@ -91,11 +94,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "OT-2", "apiLevel": "2.24"}`
+      `requirements = {"robotType": "OT-2", "apiLevel": "2.26"}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "Flex", "apiLevel": "2.24"}`
+      `requirements = {"robotType": "Flex", "apiLevel": "2.26"}`
     )
   })
 })
@@ -128,7 +131,10 @@ const labwareId2 = 'labwareId2'
 const labwareId3 = 'labwareId3'
 const labwareId4 = 'labwareId4'
 const labwareId5 = 'labwareId5'
-
+const labwareId6 = 'labwareId6'
+const labwareId7 = 'labwareId7'
+const labwareId8 = 'labwareId8'
+const deckRiserId = 'deckRiserId'
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
     id: labwareId1,
@@ -160,6 +166,16 @@ const mockLabwareEntities: LabwareEntities = {
     def: fixture96Plate as LabwareDefinition2,
     pythonName: 'well_plate_3',
   },
+  [labwareId6]: {
+    id: labwareId6,
+    labwareDefURI: 'opentrons/mock_lid/1',
+    def: {
+      ...opentrons96Plate,
+      allowedRoles: ['lid'],
+      parameters: { loadName: 'mock_lid' } as any,
+    },
+    pythonName: 'lid_1',
+  },
 }
 
 const labwareRobotState: TimelineFrame['labware'] = {
@@ -173,6 +189,8 @@ const labwareRobotState: TimelineFrame['labware'] = {
   [labwareId4]: { stack: [labwareId4, moduleId3, 'A2'] },
   //  labware on a slot
   [labwareId5]: { stack: [labwareId5, 'C2'] },
+  // lid on labware
+  [labwareId6]: { stack: [labwareId6, labwareId4, moduleId3, 'A2'] },
 }
 
 const mockLabwareNicknames: Record<string, string> = {
@@ -224,8 +242,86 @@ adapter_2 = protocol.load_adapter_from_definition(
   })
 })
 
+describe('getLoadLidStacks', () => {
+  const labwareEntitiesWithLid = {
+    ...mockLabwareEntities,
+    [labwareId6]: {
+      ...mockLabwareEntities[labwareId6],
+      def: {
+        ...mockLabwareEntities[labwareId6].def,
+        allowedRoles: ['lid'],
+      },
+    } as LabwareEntity,
+    [labwareId7]: {
+      ...mockLabwareEntities[labwareId7],
+      id: labwareId7,
+      labwareDefURI: 'opentrons/mock_lid/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['lid'],
+        parameters: { loadName: 'mock_lid' } as any,
+      },
+    } as LabwareEntity,
+    [labwareId8]: {
+      id: labwareId8,
+      labwareDefURI: 'opentrons/mock_lid/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['lid'],
+        parameters: { loadName: 'mock_lid' } as any,
+      },
+    } as LabwareEntity,
+    [deckRiserId]: {
+      id: deckRiserId,
+      labwareDefURI: 'opentrons/opentrons_flex_deck_riser/1',
+      def: {
+        ...opentrons96Plate,
+        allowedRoles: ['adapter'],
+        parameters: { loadName: 'opentrons_flex_deck_riser' } as any,
+      },
+      pythonName: 'mock_adapter_1',
+    } as LabwareEntity,
+  }
+  const labwareRobotStateWithLids = {
+    ...labwareRobotState,
+    [deckRiserId]: {
+      ...labwareRobotState[labwareId6],
+      stack: [deckRiserId, 'B2'],
+    },
+    [labwareId6]: {
+      ...labwareRobotState[labwareId6],
+      stack: [labwareId6, 'D1'],
+    },
+    [labwareId7]: {
+      ...labwareRobotState[labwareId7],
+      stack: [labwareId7, labwareId6, 'D1'],
+    },
+    [labwareId8]: {
+      ...labwareRobotState[labwareId8],
+      stack: [labwareId8, deckRiserId, 'B2'],
+    },
+  }
+
+  it('should generate load_lid_stack for 2 lids in a stack on the deck and 1 lid for a stack on an adapter', () => {
+    expect(
+      getLoadLidStacks(labwareEntitiesWithLid, labwareRobotStateWithLids)
+    ).toBe(
+      `# Load Lid Stacks:
+lid_stack_D1 = protocol.load_lid_stack(
+    load_name="mock_lid",
+    location="D1",
+    quantity=2,
+)
+lid_stack_mock_adapter_1 = protocol.load_lid_stack(
+    load_name="mock_lid",
+    location=mock_adapter_1,
+    quantity=1,
+)`
+    )
+  })
+})
 describe('getLoadLabware', () => {
-  it('should generate loadLabware for 3 labware', () => {
+  it('should generate load_labware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
         mockModuleEntities,
@@ -246,6 +342,9 @@ well_plate_2 = magnetic_block_2.load_labware(
     "fixture_96_plate",
     namespace="opentrons",
     version=1,
+    lid="mock_lid",
+    lid_namespace="opentrons",
+    lid_version=1,
 )
 well_plate_3 = protocol.load_labware_from_definition(
     CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
@@ -283,14 +382,47 @@ well_plate_5 = protocol.load_labware(
       )
     })
   })
+  it('should not generate loadLabware lids in a stack', () => {
+    const labwareRobotStateWithLids = {
+      ...labwareRobotState,
+      [labwareId6]: {
+        ...labwareRobotState[labwareId6],
+        stack: [labwareId6, 'D1'], // lid in stack directly on slot, not on labware
+      },
+    }
+    expect(
+      getLoadLabware(
+        mockModuleEntities,
+        mockLabwareEntities,
+        labwareRobotStateWithLids,
+        mockLabwareNicknames
+      )
+    ).toBe(
+      `
+# Load Labware:
+well_plate_1 = adapter_2.load_labware(
+    "fixture_96_plate",
+    label="reagent plate",
+    namespace="opentrons",
+    version=1,
+)
+well_plate_2 = magnetic_block_2.load_labware(
+    "fixture_96_plate",
+    namespace="opentrons",
+    version=1,
+)
+well_plate_3 = protocol.load_labware_from_definition(
+    CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
+    location="C2",
+    label="sample plate",
+)`.trimStart()
+    )
+  })
 })
 
 describe('getLoadPipettes', () => {
   it('should generate loadPipette for 2 pipettes using the same tipracks and off-deck labware last', () => {
     const mockTiprackDefURI = 'fixture/fixture_flex_96_tiprack_1000ul/1'
-    const tiprack1 = 'tiprack1'
-    const tiprack2 = 'tiprack2'
-    const tiprack3 = 'tiprack3'
     const pipette1 = 'pipette1'
     const pipette2 = 'pipette2'
     const mockPipetteEntities: PipetteEntities = {
@@ -311,52 +443,16 @@ describe('getLoadPipettes', () => {
         tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
       },
     }
-    const mockTiprackEntities: LabwareEntities = {
-      [tiprack1]: {
-        id: tiprack1,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_1',
-      },
-      [tiprack2]: {
-        id: tiprack2,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_2',
-      },
-      [tiprack3]: {
-        id: tiprack3,
-        def: fixtureTiprack1000ul as LabwareDefinition2,
-        labwareDefURI: mockTiprackDefURI,
-        pythonName: 'tip_rack_3',
-      },
-    }
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
       [pipette2]: { mount: 'right' },
     }
-    const labwareRobotState: TimelineFrame['labware'] = {
-      [tiprack1]: { stack: [tiprack1, 'offDeck'] },
-      [tiprack2]: { stack: [tiprack2, '3'] },
-      [tiprack3]: { stack: [tiprack3, '1'] },
-    }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument(
-    "p300_multi_gen2", "left", tip_racks=[tip_rack_3, tip_rack_2, tip_rack_1],
-)
-pipette_left = protocol.load_instrument(
-    "flex_1channel_1000", "right", tip_racks=[tip_rack_3, tip_rack_2, tip_rack_1],
-)`.trimStart()
+pipette_left = protocol.load_instrument("p300_multi_gen2", "left")
+pipette_left = protocol.load_instrument("flex_1channel_1000", "right")`.trimStart()
     )
   })
 
@@ -372,24 +468,14 @@ pipette_left = protocol.load_instrument(
         tiprackLabwareDef: [],
       },
     }
-    const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
     }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette_left = protocol.load_instrument(
-    "p300_multi_gen2", "left",
-)`.trimStart()
+pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
     )
   })
 
@@ -406,24 +492,14 @@ pipette_left = protocol.load_instrument(
       },
     }
 
-    const mockTiprackEntities: LabwareEntities = {}
     const pipetteRobotState: TimelineFrame['pipettes'] = {
       [pipette1]: { mount: 'left' },
     }
 
-    expect(
-      getLoadPipettes(
-        mockPipetteEntities,
-        mockTiprackEntities,
-        labwareRobotState,
-        pipetteRobotState
-      )
-    ).toBe(
+    expect(getLoadPipettes(mockPipetteEntities, pipetteRobotState)).toBe(
       `
 # Load Pipettes:
-pipette = protocol.load_instrument(
-    "flex_96channel_1000",
-)`.trimStart()
+pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
     )
   })
 })

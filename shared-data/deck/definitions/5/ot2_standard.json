@@ -23,6 +23,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -40,6 +44,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -57,6 +65,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -74,6 +86,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -91,6 +107,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -108,6 +128,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -125,6 +149,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 7",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -143,6 +171,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -160,6 +192,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -177,6 +213,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -194,6 +234,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -210,6 +254,10 @@
           "zDimension": 0
         },
         "displayName": "Slot 12",
+        "features": {
+          "springDirectionalForceAsParent": "backLeftBottom"
+        },
+        "orientation": null,
         "compatibleModuleTypes": []
       },
       {
@@ -222,6 +270,8 @@
           "zDimension": 82
         },
         "displayName": "Slot 12/Fixed Trash",
+        "features": {},
+        "orientation": null,
         "ableToDropTips": true
       }
     ],

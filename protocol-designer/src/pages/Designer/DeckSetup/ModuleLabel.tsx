@@ -5,7 +5,7 @@ import { DeckLabelSet } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
-  getModuleDef2,
+  getModuleDef,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
@@ -21,6 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 
 interface ModuleLabelProps {
+  showModuleIcon: boolean
   moduleModel: ModuleModel
   position: CoordinateTuple
   orientation: 'left' | 'right'
@@ -42,6 +43,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     isZoomed = true,
     labelName,
     slot,
+    showModuleIcon = false,
   } = props
   const robotType = useSelector(getRobotType)
   const labelContainerRef = useRef<HTMLDivElement>(null)
@@ -53,7 +55,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     }
   }, [labwareInfos])
 
-  const def = getModuleDef2(moduleModel)
+  const def = getModuleDef(moduleModel)
   const slotTransformKey =
     robotType === FLEX_ROBOT_TYPE ? FLEX_STANDARD_DECKID : OT2_STANDARD_DECKID
   const cornerOffsetsFromSlotFromTransform =
@@ -100,6 +102,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
       }
       width={def?.dimensions.xDimension + 2}
       height={def?.dimensions.yDimension + 2}
+      showModuleIcon={showModuleIcon}
     />
   )
 }

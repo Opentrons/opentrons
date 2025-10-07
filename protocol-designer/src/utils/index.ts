@@ -1,4 +1,3 @@
-import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
 import uuidv1 from 'uuid/v4'
 
@@ -13,7 +12,10 @@ import {
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  PROTOCOL_CONTEXT_NAME,
+} from '@opentrons/step-generation'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -368,28 +370,6 @@ export const getDefaultBlowoutFlowRate = (
   ].defaultBlowOutFlowRate.default
 }
 
-/**
- * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
- *
- * @param {number} transferVolume - The transfer volume for the transfer plan
- * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
- * @returns {number} - The maximum supported push out volume for each dispense
- */
-export const getMaxPushOutVolume = (
-  transferVolume: number,
-  pipetteSpecs: PipetteV2Specs
-): number => {
-  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
-  const isInLowVolumeMode =
-    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const { bottom, blowout } = isInLowVolumeMode
-    ? plungerPositionsConfigurations.lowVolumeDefault ??
-      plungerPositionsConfigurations.default
-    : plungerPositionsConfigurations.default
-  // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
-  return round(Math.abs(blowout - bottom) * shaftULperMM, 1)
-}
-
 export const getDefaultPushOutVolume = (
   transferVolume: number,
   pipetteSpecs: PipetteV2Specs,
@@ -471,13 +451,23 @@ export function getLocationStackTopToBottom(
   return stack
 }
 
-export const getTopmostLabwareOnModuleFromStack = (
+export const getLabwaresOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): string => {
-  return labware
-    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+): { topMostId: string | null; rightBelowTopId: string | null } => {
+  // all stacks involving this module
+  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+  const largestStack = allStacks.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
+  const topMostId = largestStack?.stack[0]
+  const isTopMostIdALid = labware.find(
+    lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
+  )
+  return {
+    topMostId: largestStack?.stack[0],
+    rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+  }
 }
 
 export const getFullStackFromLabwaresOnDeck = (
@@ -520,5 +510,21 @@ export const getHasTrash = (
 ): boolean => {
   return Object.values(additionalEquipment).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
+  )
+}
+
+export const getAllLabwareIdsOfCertainURIOnStack = (
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'],
+  labwareOnDeck: LabwareOnDeck
+): string[] => {
+  return Object.values(deckSetupLabware).reduce<string[]>(
+    (acc, { labwareDefURI, stack, id }) => {
+      return labwareDefURI === labwareOnDeck.labwareDefURI &&
+        getSlotInLocationStack(stack) ===
+          getSlotInLocationStack(labwareOnDeck.stack)
+        ? [...acc, id]
+        : acc
+    },
+    []
   )
 }

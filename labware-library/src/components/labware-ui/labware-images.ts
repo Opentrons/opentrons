@@ -44,6 +44,10 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  corning_96_wellplate_360ul_lid: [
+    new URL('../../images/corning_96_wellplate_360ul_lid.png', import.meta.url)
+      .href,
+  ],
   'corning_48_wellplate_1.6ml_flat': [
     new URL(
       '../../images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.jpg',
@@ -78,6 +82,14 @@ export const labwareImages: Record<string, string[]> = {
       .href,
     new URL('../../images/geb_10ul_tip_side_view.jpg', import.meta.url).href,
   ],
+  milliplex_r_96_well_microtiter_plate: [
+    new URL('../../images/milliplex_microtiter_plate.png', import.meta.url)
+      .href,
+  ],
+  black_96_well_microtiter_plate_lid: [
+    new URL('../../images/milliplex_microtiter_plate_lid.png', import.meta.url)
+      .href,
+  ],
   nest_1_reservoir_195ml: [
     new URL(
       '../../images/nest_1_reservoir_195ml_three_quarters.jpg',
@@ -87,11 +99,20 @@ export const labwareImages: Record<string, string[]> = {
   nest_1_reservoir_290ml: [
     new URL('../../images/nest_1_reservoir_290ml.jpg', import.meta.url).href,
   ],
+  nest_8_reservoir_22ml: [
+    new URL('../../images/nest_8_reservoir_22ml.png', import.meta.url).href,
+  ],
   nest_12_reservoir_15ml: [
     new URL(
       '../../images/nest_12_reservoir_15ml_three_quarters.jpg',
       import.meta.url
     ).href,
+  ],
+  nest_12_reservoir_22ml: [
+    new URL('../../images/nest_12_reservoir_22ml.png', import.meta.url).href,
+  ],
+  'nest_24_wellplate_10.4ml': [
+    new URL('../../images/nest_24_wellplate_10.4ml.png', import.meta.url).href,
   ],
   nest_96_wellplate_100ul_pcr_full_skirt: [
     new URL(
@@ -383,6 +404,12 @@ export const labwareImages: Record<string, string[]> = {
   opentrons_universal_flat_adapter: [
     new URL('../../images/universal_flat_adapter.jpg', import.meta.url).href,
   ],
+  opentrons_universal_flat_adapter_type_b: [
+    new URL(
+      '../../images/opentrons_universal_flat_adapter_type_b.png',
+      import.meta.url
+    ).href,
+  ],
   opentrons_aluminum_flat_bottom_plate: [
     new URL('../../images/flat_bottom_aluminum.png', import.meta.url).href,
   ],
@@ -456,6 +483,10 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  opentrons_flex_tiprack_lid: [
+    new URL('../../images/opentrons_flex_tiprack_lid.png', import.meta.url)
+      .href,
+  ],
   opentrons_96_wellplate_200ul_pcr_full_skirt: [
     new URL(
       '../../images/opentrons_96_wellplate_200ul_pcr_full_skirt.jpg',
@@ -468,11 +499,33 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
+  opentrons_tough_1_reservoir_300ml: [
+    new URL(
+      '../../images/opentrons_tough_1_reservoir_300ml.png',
+      import.meta.url
+    ).href,
+  ],
+  opentrons_tough_4_reservoir_72ml: [
+    new URL(
+      '../../images/opentrons_tough_4_reservoir_72ml.png',
+      import.meta.url
+    ).href,
+  ],
+  opentrons_tough_12_reservoir_22ml: [
+    new URL(
+      '../../images/opentrons_tough_12_reservoir_22ml.png',
+      import.meta.url
+    ).href,
+  ],
   opentrons_tough_pcr_auto_sealing_lid: [
     new URL(
       '../../images/opentrons_tough_pcr_auto_sealing_lid.jpg',
       import.meta.url
     ).href,
+  ],
+  opentrons_tough_universal_lid: [
+    new URL('../../images/opentrons_tough_universal_lid.jpg', import.meta.url)
+      .href,
   ],
   opentrons_flex_deck_riser: [
     new URL('../../images/opentrons_flex_deck_riser.png', import.meta.url).href,
@@ -497,9 +550,8 @@ export const labwareImages: Record<string, string[]> = {
       import.meta.url
     ).href,
   ],
-  axygen_96_well_plate_500_µL: [
-    new URL('../../images/axygen_96_well_plate_500uL.png', import.meta.url)
-      .href,
+  axygen_96_wellplate_500ul: [
+    new URL('../../images/axygen_96_wellplate_500ul.png', import.meta.url).href,
   ],
   smc_384_read_plate: [
     new URL('../../images/smc_384_read_plate.png', import.meta.url).href,
@@ -507,6 +559,12 @@ export const labwareImages: Record<string, string[]> = {
   ibidi_96_square_well_plate_300ul: [
     new URL(
       '../../images/ibidi_96_square_well_plate_300ul.png',
+      import.meta.url
+    ).href,
+  ],
+  ibidi_96_square_well_plate_300ul_lid: [
+    new URL(
+      '../../images/ibidi_96_square_well_plate_300ul_lid.png',
       import.meta.url
     ).href,
   ],

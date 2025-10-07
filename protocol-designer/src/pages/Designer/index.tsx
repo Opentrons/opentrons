@@ -12,7 +12,7 @@ import {
 
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms/constants'
 import { DefineLiquidsModal } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { getFileMetadata } from '../../file-data/selectors'
 import { generateNewProtocol } from '../../labware-ingred/actions'

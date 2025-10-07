@@ -68,7 +68,7 @@ const currentProtocolExists = handleActions(
     CREATE_NEW_PROTOCOL: () => true,
   },
   false
-)
+) as Reducer<boolean, Action>
 
 function newProtocolMetadata(
   state: FileMetadataFields,
@@ -104,7 +104,7 @@ const fileMetadata = handleActions(
     },
   },
   defaultFields
-)
+) as Reducer<FileMetadataFields, Action>
 
 // on which robot type the current protocol file is meant to execute
 const robotTypeReducer = (

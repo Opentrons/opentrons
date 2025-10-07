@@ -1,3 +1,5 @@
+import { getTrashBinAddressableAreaName } from '@opentrons/step-generation'
+
 import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   composeMaskers,
@@ -20,6 +22,7 @@ import type {
   LabwareEntities,
   PipetteEntity,
   StagingAreaEntities,
+  TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type {
@@ -58,7 +61,7 @@ const getLabwareOrAdditionalEquipmentEntity = (
   } else return null
 }
 
-const getIsAdapterLocation = (
+const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
@@ -69,9 +72,11 @@ const getIsAdapterLocation = (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
 }
+
 const getIsAdditionalEquipmentLocation = (
   newLocation: string,
   wasteChuteEntities: WasteChuteEntities,
+  trashBinEntities: TrashBinEntities,
   stagingAreaEntities: StagingAreaEntities
 ): boolean => {
   const stagingAreaCutoutIds = Object.values(stagingAreaEntities).map(
@@ -82,7 +87,9 @@ const getIsAdditionalEquipmentLocation = (
   const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
     stagingAreaCutoutIds as CutoutId[]
   )
-
+  const isNewLocationInTrashBin = Object.values(trashBinEntities).some(
+    trash => trash.location === newLocation
+  )
   const isNewLocationInWasteChute =
     Object.values(wasteChuteEntities)[0]?.location === newLocation
 
@@ -90,7 +97,11 @@ const getIsAdditionalEquipmentLocation = (
     stagingAreaCutoutIds != null &&
     stagingAreaAddressableAreaNames.includes(newLocation as AddressableAreaName)
 
-  return isNewLocationInWasteChute || isNewLocationInStagingArea
+  return (
+    isNewLocationInWasteChute ||
+    isNewLocationInStagingArea ||
+    isNewLocationInTrashBin
+  )
 }
 
 const getLabwareLocation = (
@@ -101,6 +112,10 @@ const getLabwareLocation = (
     Object.values(state.wasteChuteEntities).find(
       aE => aE.location === newLocationString
     ) != null
+  const isTrashBinLocation =
+    Object.values(state.trashBinEntities).find(
+      aE => aE.location === newLocationString
+    ) != null
 
   if (newLocationString === 'offDeck') {
     return 'offDeck'
@@ -108,22 +123,26 @@ const getLabwareLocation = (
     return { moduleId: newLocationString }
   } else if (
     newLocationString != null &&
-    getIsAdapterLocation(newLocationString, state.labwareEntities)
+    getIsStackingLocation(newLocationString, state.labwareEntities)
   ) {
     return { labwareId: newLocationString }
   } else if (
     getIsAdditionalEquipmentLocation(
       newLocationString,
       state.wasteChuteEntities,
+      state.trashBinEntities,
       state.stagingAreaEntities
     )
   ) {
-    return {
-      addressableAreaName: isWasteChuteLocation
-        ? 'gripperWasteChute'
-        : // TODO(bh, 2024-01-02): check new location against addressable areas via the deck definition
-          (newLocationString as AddressableAreaName),
+    let addressableAreaName: AddressableAreaName = newLocationString as AddressableAreaName
+    if (isWasteChuteLocation) {
+      addressableAreaName = 'gripperWasteChute'
+    } else if (isTrashBinLocation) {
+      addressableAreaName = getTrashBinAddressableAreaName(
+        newLocationString as CutoutId
+      )
     }
+    return { addressableAreaName }
   } else {
     return { slotName: newLocationString }
   }
