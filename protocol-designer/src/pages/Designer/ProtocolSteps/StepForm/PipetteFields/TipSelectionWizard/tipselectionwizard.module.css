@@ -9,7 +9,7 @@
   flex-direction: row;
   justify-content: flex-end;
   padding: 0 var(--spacing-24) var(--spacing-24);
-  grid-gap: var(--spacing-4);
+  grid-gap: var(--spacing-8);
 }
 
 .modal_header {
