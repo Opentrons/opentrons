@@ -37,7 +37,7 @@ export const checkLiquidClassCompatibility = (
     return { incompatible: true }
   }
 
-  if (state.volume <= MINIMUM_LIQUID_CLASS_VOLUME) {
+  if (state.volume < MINIMUM_LIQUID_CLASS_VOLUME) {
     return { incompatible: true, volumeIncompatible: true }
   }
 
