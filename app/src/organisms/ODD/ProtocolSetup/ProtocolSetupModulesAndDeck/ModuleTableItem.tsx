@@ -6,11 +6,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -323,7 +323,7 @@ export function ModuleTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <DeckInfoLabel
+          <RobotInfoLabel
             deckLabel={getModuleDeckLabel(
               module.moduleDef.moduleType,
               module.slotName

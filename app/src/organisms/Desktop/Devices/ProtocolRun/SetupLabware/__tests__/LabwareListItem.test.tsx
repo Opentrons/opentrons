@@ -117,7 +117,7 @@ describe('LabwareListItem', () => {
       labwareByLiquidId: {},
     })
     screen.getByText('nickName')
-    screen.getByTestId('DeckInfoLabel_ot-thermocycler')
+    screen.getByTestId('RobotInfoLabel_ot-thermocycler')
     screen.getByTestId('slot_info_7,8,10,11')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
@@ -152,8 +152,8 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText(mockNickName)
-    screen.getByTestId('DeckInfoLabel_ot-thermocycler')
-    screen.getByTestId('DeckInfoLabel_A1+B1')
+    screen.getByTestId('RobotInfoLabel_ot-thermocycler')
+    screen.getByTestId('RobotInfoLabel_A1+B1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
@@ -190,7 +190,7 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText(mockNickName)
-    screen.getByTestId('DeckInfoLabel_ot-magnet-v2')
+    screen.getByTestId('RobotInfoLabel_ot-magnet-v2')
     screen.getByTestId('slot_info_7')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
@@ -230,7 +230,7 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText(mockNickName)
-    screen.getByTestId('DeckInfoLabel_ot-temperature-v2')
+    screen.getByTestId('RobotInfoLabel_ot-temperature-v2')
     screen.getByTestId('slot_info_7')
   })
 
@@ -273,8 +273,8 @@ describe('LabwareListItem', () => {
     })
     screen.getByText(mockNickName)
     screen.getByTestId('slot_info_7')
-    screen.getByTestId('DeckInfoLabel_ot-temperature-v2')
-    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByTestId('RobotInfoLabel_ot-temperature-v2')
+    screen.getByTestId('RobotInfoLabel_stacked')
     screen.getByText(mockAdapterDef.metadata.displayName)
   })
 
@@ -299,8 +299,8 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText('labware nick name')
-    screen.getByTestId('DeckInfoLabel_A2')
-    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByTestId('RobotInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_stacked')
     screen.getByText('mock adapter nick name')
   })
 
@@ -337,7 +337,7 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText(mockNickName)
-    screen.getByTestId('DeckInfoLabel_ot-heater-shaker')
+    screen.getByTestId('RobotInfoLabel_ot-heater-shaker')
     screen.getByTestId('slot_info_7')
     screen.getByText('Labware Latch')
     screen.getByText('Secure')
@@ -390,7 +390,7 @@ describe('LabwareListItem', () => {
     })
     screen.getByText('tiprack displayName')
     screen.getByText('With tiprack lid')
-    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_A2')
   })
   it('renders the correct info for stack of like labware', () => {
     render({
@@ -418,8 +418,8 @@ describe('LabwareListItem', () => {
       onClick: vi.fn(),
     })
     screen.getByText('tc lid')
-    screen.getByTestId('DeckInfoLabel_A2')
-    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByTestId('RobotInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_stacked')
     screen.getByText('Quantity: 3')
   })
   it('renders the correct info for labware with one liquids', () => {
@@ -446,7 +446,7 @@ describe('LabwareListItem', () => {
       },
     })
     screen.getByText('mock wellplate name')
-    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_A2')
     screen.getByText('1 liquid')
   })
   it('renders the correct info for labware with multiple liquids', () => {
@@ -479,7 +479,7 @@ describe('LabwareListItem', () => {
       },
     })
     screen.getByText('mock wellplate name')
-    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_A2')
     screen.getByText('2 liquids')
   })
   it('renders the correct info for stack of varied labware with liquids', () => {
@@ -517,8 +517,8 @@ describe('LabwareListItem', () => {
       },
     })
     screen.getByText('mock wellplate name')
-    screen.getByTestId('DeckInfoLabel_stacked')
-    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('RobotInfoLabel_stacked')
+    screen.getByTestId('RobotInfoLabel_A2')
     screen.getByText('Quantity: 2')
     screen.getByText('Multiple liquid layouts')
   })

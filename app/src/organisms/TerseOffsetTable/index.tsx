@@ -6,11 +6,11 @@ import styled from 'styled-components'
 import {
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   LegacyStyledText,
   MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -59,9 +59,9 @@ export function TerseOffsetTable({
             <TerseTableRow key={index}>
               <TerseTableDatum>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-                  <DeckInfoLabel deckLabel={location.slotName} />
+                  <RobotInfoLabel deckLabel={location.slotName} />
                   {location.moduleModel != null ? (
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[
                           getModuleType(location.moduleModel)

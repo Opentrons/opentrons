@@ -48,6 +48,7 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_JSON_EXPORT'
   | 'OT_PD_ENABLE_BY_VOLUME_BUILDER'
   | 'OT_PD_ENABLE_TIP_SELCTION'
+  | 'OT_PD_ENABLE_CAMERA_SUPPORT'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -67,5 +68,6 @@ export const allFlags: FlagTypes[] = [
   'OT_PD_ENABLE_JSON_EXPORT',
   'OT_PD_ENABLE_BY_VOLUME_BUILDER',
   'OT_PD_ENABLE_TIP_SELCTION',
+  'OT_PD_ENABLE_CAMERA_SUPPORT',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

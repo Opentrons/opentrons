@@ -1537,8 +1537,14 @@ class FlexStackerContext(ModuleContext):
         :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param adapter_version: Applies to ``adapter`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
@@ -1548,8 +1554,17 @@ class FlexStackerContext(ModuleContext):
         :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param lid_version: Applies to ``lid`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
