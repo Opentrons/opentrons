@@ -323,24 +323,12 @@ async def post_live_stream_settings(
 )
 async def get_live_stream_settings() -> LiveStreamSettings:
     """
-    Request the Live Stream settings.
+    Request the Opentrons Live Stream settings.
     """
     return _get_stream_settings()
 
 
 def _get_stream_settings() -> LiveStreamSettings:
-    src = camera.get_stream_configuration_filepath()
-    if not src.exists():
-        # todo(chb, 2025-09-03): Need to introduce a CAMERA_ERROR code for missing stream configuration file, maybe just general?
-        raise LegacyErrorResponse(
-            message=f"Stream Configuration file not found: {src}",
-            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    return _parse_stream_settings(src)
-
-
-def _parse_stream_settings(filename: Path) -> LiveStreamSettings:
     contents = camera.parse_stream_configuration_file_data()
     if contents is None:
         raise LegacyErrorResponse(
