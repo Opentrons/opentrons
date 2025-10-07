@@ -8,8 +8,8 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  grid-gap: var(--spacing-4);
   padding: 0 var(--spacing-24) var(--spacing-24);
+  grid-gap: var(--spacing-4);
 }
 
 .modal_header {
