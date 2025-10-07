@@ -32,6 +32,8 @@ const MIN_COLUMN_WIDTH_PX = 100
 const MAX_COLUMN_WIDTH_PX = 400
 const CONTAINER_PADDING_PX = 32 // 16px * 2
 
+type ResizableColumn = 'left' | 'right'
+
 interface VisualizerContainerProps {
   analysis: ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
@@ -55,7 +57,7 @@ export function VisualizerContainer(
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
   const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
   const containerRef = useRef<HTMLDivElement>(null)
-  const resizingRef = useRef<'left' | 'right' | null>(null)
+  const resizingRef = useRef<ResizableColumn | null>(null)
   const startXRef = useRef<number>(0)
   const startWidthRef = useRef<number>(0)
   const leftWidthRef = useRef<number>(leftWidth)
@@ -143,7 +145,7 @@ export function VisualizerContainer(
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,
-    column: 'left' | 'right'
+    column: ResizableColumn
   ): void => {
     e.preventDefault()
     resizingRef.current = column
