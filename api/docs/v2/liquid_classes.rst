@@ -41,7 +41,7 @@ Use an Opentrons-verified liquid class in your transfers to automatically apply 
 Liquid Class Properties
 ========================
 
-When you select a liquid class to use in transfers on the the Flex, properties like submerge speed, flow rate, touch tip, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
+When you select a liquid class to use in transfers on the the Flex, properties like submerge speed, flow rate, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
 
 Each Opentrons-verified liquid class is defined by a set of properties: 
 
@@ -64,7 +64,7 @@ Each Opentrons-verified liquid class is defined by a set of properties:
         **Delay after submerging**
       - The pipette delays a specified amount of time:
 
-        - before submerging into or retracting from liquid.
+        - after submerging into or retracting from liquid.
         - before or after an aspirate or dispense.
         - after a push out.
     * - .. image:: ../img/lc_icons/mix.png
