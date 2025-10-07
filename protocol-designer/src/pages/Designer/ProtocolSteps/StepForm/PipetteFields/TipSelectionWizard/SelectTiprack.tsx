@@ -15,19 +15,9 @@ import { TiprackSelectHover } from './TiprackSelectHover'
 import styles from './tipselectionwizard.module.css'
 import { getIsTiprackSelectable } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { DeckDefinition } from '@opentrons/shared-data'
-import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
+import type { TipSelectionBaseProps } from './types'
 
-interface SelectTiprackProps {
-  selectedTiprackId: string | null
-  setSelectedTiprackId: Dispatch<SetStateAction<string | null>>
-  formTiprackUri: string
-  activeDeckSetup: AllTemporalPropertiesForTimelineFrame
-  deckDef: DeckDefinition
-}
-
-export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
+export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
   const {
     selectedTiprackId,
     setSelectedTiprackId,
@@ -41,19 +31,20 @@ export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
   const controls = (
     <>
       {Object.values(allLabware).map(labware => {
+        const { id, def, stack } = labware
         if (
-          getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          labware.stack.includes('fixedTrash')
+          getSlotInLocationStack(stack) === 'offDeck' ||
+          stack.includes('fixedTrash')
         ) {
           return null
         }
-        const slot = getSlotInLocationStack(labware.stack)
+        const slot = getSlotInLocationStack(stack)
 
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
           ?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
-          console.warn(`no slot ${slot} for labware ${labware.id}!`)
+          console.warn(`no slot ${slot} for labware ${id}!`)
           return null
         }
         const isTiprackSelectable = getIsTiprackSelectable(
@@ -62,13 +53,13 @@ export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
         )
         return isTiprackSelectable ? (
           <>
-            {labware.id === selectedTiprackId ? (
+            {id === selectedTiprackId ? (
               <LabwareLabel
                 isSelected
                 isLast={true}
                 position={slotPosition}
                 showModuleIcon={false}
-                labwareDef={labware.def}
+                labwareDef={def}
                 labelText={t('selected')}
               />
             ) : null}
@@ -77,7 +68,7 @@ export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
               setHover={setHover}
               slotPosition={slotPosition}
               onClick={() => {
-                setSelectedTiprackId(labware.id)
+                setSelectedTiprackId(id)
               }}
             />
           </>

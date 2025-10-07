@@ -9,28 +9,21 @@ import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import styles from './tipselectionwizard.module.css'
 import { getViewboxFromSelectedLabware } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { DeckDefinition } from '@opentrons/shared-data'
-import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
+import type { TipSelectionBaseProps } from './types'
 
-interface SelectTipsProps {
-  selectedTiprackId: string | null
-  setSelectedTiprackId: Dispatch<SetStateAction<string | null>>
-  formTiprackUri: string
-  activeDeckSetup: AllTemporalPropertiesForTimelineFrame
-  deckDef: DeckDefinition
-}
-
-export function SelectTips(props: SelectTipsProps): JSX.Element {
+export function SelectTips(props: TipSelectionBaseProps): JSX.Element {
   const { t } = useTranslation('tip_selection')
   const { selectedTiprackId, activeDeckSetup, deckDef } = props
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
-  const viewBox = getViewboxFromSelectedLabware(
-    selectedTiprackId ?? '',
-    activeDeckSetup,
-    deckDef
-  )
+  const viewBox =
+    selectedTiprackId != null
+      ? getViewboxFromSelectedLabware(
+          selectedTiprackId,
+          activeDeckSetup,
+          deckDef
+        )
+      : null
 
   if (viewBox == null) {
     console.warn(`no viewbox for selected tiprack ${selectedTiprackId}`)
