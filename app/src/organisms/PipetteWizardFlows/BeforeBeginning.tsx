@@ -95,8 +95,11 @@ export const BeforeBeginning = (
     flowType === FLOWS.ATTACH
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
+    deckConfig?.find(
+      fixture =>
+        fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+        fixture.cutoutFixtureId?.includes('wasteChute')
+    ) ?? false
 
   const pipetteDisplayName = usePipetteNameSpecs(
     requiredPipette?.pipetteName as PipetteName
@@ -274,8 +277,7 @@ export const BeforeBeginning = (
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
-              (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) &&
-              (
+              (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) && (
                 <Banner
                   type="warning"
                   size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}

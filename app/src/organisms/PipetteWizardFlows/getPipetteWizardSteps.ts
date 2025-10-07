@@ -28,7 +28,9 @@ export const getPipetteWizardSteps = (
       if (selectedPipette === NINETY_SIX_CHANNEL) {
         const isWasteChuteOnDeck =
           deckConfig?.data?.find(
-            fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT
+            fixture =>
+              fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+              fixture.cutoutFixtureId?.includes('wasteChute')
           ) ?? false
 
         if (Boolean(isWasteChuteOnDeck)) {
