@@ -42,17 +42,14 @@ export const getViewboxFromSelectedLabware = (
   const ratio = deckYDimension / deckXDimension
 
   // preserve aspect ratio
-  const paddingMMY = PADDING_MM_X * ratio
+  const paddingMmY = PADDING_MM_X * ratio
   const { xDimension, yDimension } = selectedLabware.def.dimensions
   const slot = getSlotInLocationStack(selectedLabware.stack)
-  if (selectedLabwareId == null) {
-    return null
-  }
   const slotPosition = getPositionFromSlotId(slot, deckDef)
   if (slotPosition == null) {
     return null
   }
-  return `${slotPosition[0] - PADDING_MM_X} ${slotPosition[1] - paddingMMY} ${
+  return `${slotPosition[0] - PADDING_MM_X} ${slotPosition[1] - paddingMmY} ${
     xDimension + PADDING_MM_X * 2
-  } ${yDimension + paddingMMY * 2}`
+  } ${yDimension + paddingMmY * 2}`
 }
