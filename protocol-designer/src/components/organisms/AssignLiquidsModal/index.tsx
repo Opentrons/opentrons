@@ -161,14 +161,16 @@ export function AssignLiquidsModal(
               </StyledText>
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
-              <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-                <LabwareButtonBasket
-                  stackOfLabware={labwareStack}
-                  labware={labware}
-                  setSelectedLabware={handleAssignToLabware}
-                  selectedLabware={selectedLabwareArray}
-                />
-              </Flex>
+              {labwareStack.length > 1 ? (
+                <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+                  <LabwareButtonBasket
+                    stackOfLabware={labwareStack}
+                    labware={labware}
+                    setSelectedLabware={handleAssignToLabware}
+                    selectedLabware={selectedLabwareArray}
+                  />
+                </Flex>
+              ) : null}
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}

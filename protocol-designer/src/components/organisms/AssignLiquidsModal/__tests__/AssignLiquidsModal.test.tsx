@@ -25,14 +25,14 @@ vi.mock('react-redux', async () => {
   }
 })
 vi.mock('/protocol-designer/labware-ingred/selectors', async importOriginal => {
-  const actual = await importOriginal()
+  const actual = (await importOriginal()) as any
   return {
     ...actual,
     getSelectedLabwareId: vi.fn(),
   }
 })
 vi.mock('/protocol-designer/step-forms/selectors', async importOriginal => {
-  const actual = await importOriginal()
+  const actual = (await importOriginal()) as any
   return {
     ...actual,
     getInitialDeckSetup: vi.fn(),
