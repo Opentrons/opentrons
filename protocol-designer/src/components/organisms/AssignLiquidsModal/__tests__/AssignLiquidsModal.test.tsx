@@ -109,13 +109,19 @@ describe('AssignLiquidsModal', () => {
   })
 
   it('loads the modal with selectable labware', () => {
-    props.data.labware['mockLabwareId'].stack = ['mockLabwareId', 'A1']
+    props.data.labware['mockLabwareId'].stack = ['mockLabwareId', 'labware2']
+    props.data.labware['labware2'] = {
+      def: fixture96Plate as LabwareDefinition2,
+    }
     render(props)
 
     screen.getByText('Top of stack')
-    screen.getByText('ANSI 96 Standard Microplate')
+    expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
     const firstButton = screen.getByTestId('LabwareButton-1')
-    fireEvent.click(firstButton)
     expect(firstButton).toHaveClass('_button_active_386e4e')
+
+    const scondButton = screen.getByTestId('LabwareButton-0')
+    fireEvent.click(scondButton)
+    expect(scondButton).toHaveClass('_button_active_386e4e')
   })
 })

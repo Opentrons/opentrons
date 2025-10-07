@@ -18,6 +18,9 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   //  but no other way to put it in css modules since its a tag prop
   const [tagHover, setTagHover] = useState<boolean>(false)
 
+  console.log('numberInStack', numberInStack)
+  console.log('isSelected', isSelected)
+
   return (
     <button
       data-testid={`LabwareButton-${numberInStack}`}

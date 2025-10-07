@@ -52,7 +52,6 @@ import { LiquidToolbox } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -131,6 +130,7 @@ export function AssignLiquidsModal(
   }
 
   const labwareStack = labware[labwareId].stack
+  console.log('labwareStack', labwareStack)
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 
