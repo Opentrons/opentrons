@@ -103,9 +103,9 @@ def test_get_deploy_config_with_env_vars():
     # Check that static configuration is returned
     assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
     assert sandbox_labware.cloudfront_id is None  # No CloudFront for sandbox
-    assert production_designer.s3_bucket == "designer.opentrons.com"
-    assert sandbox_designer.s3_bucket == "sandbox.designer.opentrons.com"
-    assert staging_designer.s3_bucket == "staging.designer.opentrons.com"
+    assert production_designer.s3_bucket == "opentrons.production.designer"
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.designer"
+    assert staging_designer.s3_bucket == "opentrons.staging.designer"
 
 
 def test_get_deploy_config_with_defaults():
@@ -118,7 +118,7 @@ def test_get_deploy_config_with_defaults():
     # Check that static configuration values are returned
     assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
     assert sandbox_labware.cloudfront_id is None  # No CloudFront for sandbox
-    assert sandbox_designer.s3_bucket == "sandbox.designer.opentrons.com"
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.designer"
     assert sandbox_designer.cloudfront_id is None  # No CloudFront for sandbox
 
 
