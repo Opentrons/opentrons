@@ -1,24 +1,21 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStep } from '../types'
 
-
-vi.mock('/app/resources/deck_configuration')
-
 describe('getPipetteWizardSteps', () => {
-  vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({ data: undefined } as any)
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
       {
@@ -109,7 +106,7 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.DETACH,
       },
     ] as PipetteWizardStep[]
-    
+
     expect(
       getPipetteWizardSteps(FLOWS.DETACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
@@ -296,13 +293,15 @@ describe('getPipetteWizardSteps', () => {
   })
 
   it('returns the correct array of info for calibrate pipette 96 when a waste chute is in deck config', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+    const mockDeckConfig = ({
       data: [
         {
           cutoutId: 'cutoutD3',
-        } as any,
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
       ],
-    } as any)
+    } as any) as UseQueryResult<DeckConfiguration>
+
     const mockCalibrateFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -335,9 +334,14 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
     ] as PipetteWizardStep[]
-
     expect(
-      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
+      getPipetteWizardSteps(
+        FLOWS.CALIBRATE,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        false,
+        mockDeckConfig
+      )
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
 })

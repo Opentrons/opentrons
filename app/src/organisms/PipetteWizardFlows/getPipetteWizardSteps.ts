@@ -1,4 +1,3 @@
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -7,29 +6,28 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-
 import { FLOWS, SECTIONS } from './constants'
 
-import type { PipetteMount } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration, PipetteMount } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
   PipetteWizardStep,
   SelectablePipettes,
 } from './types'
 
-
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
-  isGantryEmpty: boolean
+  isGantryEmpty: boolean,
+  deckConfig?: UseQueryResult<DeckConfiguration>
 ): PipetteWizardStep[] | null => {
-    const deckConfig = useNotifyDeckConfigurationQuery().data
-    switch (flowType) {
+  switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === NINETY_SIX_CHANNEL) {
         const isWasteChuteOnDeck =
-          deckConfig?.find(
+          deckConfig?.data?.find(
             fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT
           ) ?? false
 

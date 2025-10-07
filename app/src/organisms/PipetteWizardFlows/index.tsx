@@ -21,6 +21,7 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
   useChainMaintenanceCommands,
@@ -71,7 +72,7 @@ export const PipetteWizardFlows = (
   const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-
+  const deckConfig = useNotifyDeckConfigurationQuery()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const memoizedPipetteInfo = useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty = useMemo(
@@ -82,7 +83,13 @@ export const PipetteWizardFlows = (
   const pipetteWizardSteps = useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            deckConfig
+          )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
@@ -431,19 +438,19 @@ export const PipetteWizardFlows = (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
-    ;(onExit = confirmExit)
-      modalContent = showConfirmExit ? (
-        exitModal
-      ) : (
-        <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
-      )
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
+    )
   } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
-    ;(onExit = confirmExit)
-      modalContent = showConfirmExit ? (
-        exitModal
-      ) : (
-        <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
-      )
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
+    )
   }
   const buildWizardOnExit = (): (() => void) => {
     if (isFatalError || showConfirmExit) {
