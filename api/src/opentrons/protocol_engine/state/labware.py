@@ -347,6 +347,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         if isinstance(new_location, AddressableAreaLocation) and (
             fixture_validation.is_trash(new_location.addressableAreaName)
         ):
+            # TODO (RC, 2025-10-07: create a specific trash off deck location)
             # If a labware has been moved into trash and is now technically off deck
             new_location = OFF_DECK_LOCATION
         elif isinstance(
