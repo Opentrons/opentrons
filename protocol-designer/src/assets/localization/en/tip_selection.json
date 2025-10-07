@@ -1,0 +1,11 @@
+{
+  "back": "Go back",
+  "click_and_drag": "Click and drag to select tips in {{labwareName}}",
+  "continue": "Continue",
+  "no_tiprack_selected": "Select a tiprack to continue",
+  "select": "Select",
+  "selected": "Selected",
+  "select_tiprack": "Select a tip rack to pick up tips from",
+  "select_tips": "Select tips",
+  "select_tips_for_tracking": "Select tips for manual tip tracking"
+}

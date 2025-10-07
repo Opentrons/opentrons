@@ -37,10 +37,11 @@ interface SlotHoverProps {
   slotId: DeckSlotId
   slotPosition: CoordinateTuple | null
   robotType: RobotType
+  onClick?: () => void
 }
 
 export function SlotHover(props: SlotHoverProps): JSX.Element | null {
-  const { hover, setHover, slotId, slotPosition, robotType } = props
+  const { hover, setHover, slotId, slotPosition, robotType, onClick } = props
   const deckSetup = useSelector(getInitialDeckSetup)
   const { additionalEquipmentOnDeck, modules } = deckSetup
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [])
@@ -104,6 +105,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
           onMouseLeave: () => {
             setHover(null)
           },
+          onClick,
         }}
       >
         {slotFill}
@@ -134,6 +136,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
           onMouseLeave: () => {
             setHover(null)
           },
+          onClick,
         }}
       >
         {slotFill}

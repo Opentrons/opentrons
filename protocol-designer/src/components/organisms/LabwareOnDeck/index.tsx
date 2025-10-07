@@ -14,10 +14,18 @@ interface LabwareOnDeckProps {
   labwareOnDeck: LabwareOnDeckType
   x: number
   y: number
+  highlight?: boolean
+  showHighlightedWells?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
-  const { labwareOnDeck, x, y } = props
+  const {
+    labwareOnDeck,
+    x,
+    y,
+    highlight = false,
+    showHighlightedWells = true,
+  } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
   )
@@ -47,8 +55,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
           wellContents,
           liquidDisplayColors
         )}
-        highlightedWells={highlightedWells}
+        highlightedWells={showHighlightedWells ? highlightedWells : undefined}
         missingTips={missingTips}
+        highlight={highlight}
       />
     </g>
   )

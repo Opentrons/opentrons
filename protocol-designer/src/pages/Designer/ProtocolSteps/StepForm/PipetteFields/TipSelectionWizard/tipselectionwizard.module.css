@@ -1,0 +1,20 @@
+.modal_body {
+  display: flex;
+  flex-direction: column;
+  grid-gap: var(--spacing-24);
+}
+
+.modal_footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  grid-gap: var(--spacing-4);
+  padding: 0 var(--spacing-24) var(--spacing-24);
+}
+
+.modal_header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  grid-gap: var(--spacing-8);
+}
