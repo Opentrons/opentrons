@@ -69,7 +69,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
 
-
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     const verifyCommands: CreateCommand[] = [
