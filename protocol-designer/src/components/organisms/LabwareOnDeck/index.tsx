@@ -55,7 +55,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
           wellContents,
           liquidDisplayColors
         )}
-        highlightedWells={showHighlightedWells ? highlightedWells : undefined}
+        {...(showHighlightedWells ? { highlightedWells } : {})}
         missingTips={missingTips}
         highlight={highlight}
       />
