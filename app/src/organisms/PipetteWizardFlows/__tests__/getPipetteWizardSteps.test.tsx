@@ -1,18 +1,25 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 
 import type { PipetteWizardStep } from '../types'
 
+
+vi.mock('/app/resources/deck_configuration')
+
 describe('getPipetteWizardSteps', () => {
+  vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({ data: undefined } as any)
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
       {
@@ -103,7 +110,7 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.DETACH,
       },
     ] as PipetteWizardStep[]
-
+    
     expect(
       getPipetteWizardSteps(FLOWS.DETACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
@@ -268,6 +275,42 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
+    ).toStrictEqual(mockCalibrateFlowSteps)
+  })
+
+  it('returns the correct array of info for calibrate pipette 96 when a waste chute is in deck config', () => {
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+        } as any,
+      ],
+    } as any)
+    const mockCalibrateFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
         section: SECTIONS.REMOVE_WASTE_CHUTE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
@@ -283,12 +326,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.RESULTS,
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        section: SECTIONS.RESULTS,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },

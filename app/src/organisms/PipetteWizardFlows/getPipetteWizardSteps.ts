@@ -1,9 +1,12 @@
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
 
 import { FLOWS, SECTIONS } from './constants'
 
@@ -14,52 +17,49 @@ import type {
   SelectablePipettes,
 } from './types'
 
+
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
   isGantryEmpty: boolean
 ): PipetteWizardStep[] | null => {
-  switch (flowType) {
+    const deckConfig = useNotifyDeckConfigurationQuery().data
+    switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === NINETY_SIX_CHANNEL) {
-        return [
-          {
-            section: SECTIONS.BEFORE_BEGINNING,
-            mount,
-            flowType,
-          },
-          { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
-          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
-          { section: SECTIONS.DETACH_PROBE, mount, flowType },
-          {
-            section: SECTIONS.RESULTS,
-            mount,
-            flowType,
-          },
-          {
-            section: SECTIONS.ATTACH_WASTE_CHUTE,
-            mount,
-            flowType,
-          },
-        ]
+        const isWasteChuteOnDeck =
+          deckConfig?.find(
+            fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT
+          ) ?? false
+
+        if (Boolean(isWasteChuteOnDeck)) {
+          return [
+            { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
+            { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
+            { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+            { section: SECTIONS.DETACH_PROBE, mount, flowType },
+            { section: SECTIONS.ATTACH_WASTE_CHUTE, mount, flowType },
+            { section: SECTIONS.RESULTS, mount, flowType },
+          ]
+        } else {
+          return [
+            { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
+            { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+            { section: SECTIONS.DETACH_PROBE, mount, flowType },
+            { section: SECTIONS.RESULTS, mount, flowType },
+          ]
+        }
       } else {
         return [
-          {
-            section: SECTIONS.BEFORE_BEGINNING,
-            mount,
-            flowType,
-          },
+          { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
           { section: SECTIONS.ATTACH_PROBE, mount, flowType },
           { section: SECTIONS.DETACH_PROBE, mount, flowType },
-          {
-            section: SECTIONS.RESULTS,
-            mount,
-            flowType,
-          },
+          { section: SECTIONS.RESULTS, mount, flowType },
         ]
       }
     }
+
     case FLOWS.ATTACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         return [

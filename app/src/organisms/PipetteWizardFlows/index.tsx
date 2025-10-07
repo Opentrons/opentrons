@@ -30,6 +30,7 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { AttachProbe } from './AttachProbe'
+import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
 import { Carriage } from './Carriage'
 import { FLOWS, SECTIONS } from './constants'
@@ -41,6 +42,7 @@ import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProt
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { MountingPlate } from './MountingPlate'
 import { MountPipette } from './MountPipette'
+import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
@@ -428,8 +430,21 @@ export const PipetteWizardFlows = (
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
+  } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
+    ;(onExit = confirmExit),
+      (modalContent = showConfirmExit ? (
+        exitModal
+      ) : (
+        <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
+      ))
+  } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
+    ;(onExit = confirmExit),
+      (modalContent = showConfirmExit ? (
+        exitModal
+      ) : (
+        <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
+      ))
   }
-
   const buildWizardOnExit = (): (() => void) => {
     if (isFatalError || showConfirmExit) {
       return handleCleanUpAndClose
