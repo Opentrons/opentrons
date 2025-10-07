@@ -1,10 +1,10 @@
 import { customViewports } from '../../../../.storybook/preview'
-import { DeckInfoLabel } from './index'
+import { RobotInfoLabel } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof DeckInfoLabel> = {
-  title: 'Helix/Molecules/DeckInfoLabel',
+const meta: Meta<typeof RobotInfoLabel> = {
+  title: 'Helix/Molecules/RobotInfoLabel',
   argTypes: {
     iconName: {
       control: {
@@ -33,7 +33,7 @@ const meta: Meta<typeof DeckInfoLabel> = {
       defaultValue: 'A1',
     },
   },
-  component: DeckInfoLabel,
+  component: RobotInfoLabel,
   parameters: {
     controls: { include: ['highlight', 'iconName', 'deckLabel', 'size'] },
     viewport: {
@@ -50,7 +50,7 @@ const meta: Meta<typeof DeckInfoLabel> = {
   ],
 }
 export default meta
-type Story = StoryObj<typeof DeckInfoLabel>
+type Story = StoryObj<typeof RobotInfoLabel>
 
 export const DisplaySlot: Story = {
   args: {
