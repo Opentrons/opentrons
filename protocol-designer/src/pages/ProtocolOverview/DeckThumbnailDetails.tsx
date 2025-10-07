@@ -91,7 +91,7 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode="offsetToSlot"
+              childrenPositioningMode="passThrough"
             >
               <>
                 {rightBelowTopId != null ? (
