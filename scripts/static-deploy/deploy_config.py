@@ -145,8 +145,8 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.staging.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.staging.designer",
+            cloudfront_id="EO925AKFD33ZG",  # Add CloudFront ID when available
             url="https://staging.protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
@@ -173,8 +173,8 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.production.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.production.designer",
+            cloudfront_id="E2D3NFAZUK9GIG",  # Add CloudFront ID when available
             url="https://protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(

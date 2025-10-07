@@ -1,3 +1,7 @@
+---
+applyTo: 'scripts/static-deploy/**'
+---
+
 # Prompt to use with Copilot/Cursor
 
 **You are writing idiomatic Python 3.10 CLIs for static deploy automation. Follow these rules strictly:**
