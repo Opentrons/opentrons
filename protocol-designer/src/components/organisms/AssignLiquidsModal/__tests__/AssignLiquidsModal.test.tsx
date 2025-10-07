@@ -13,12 +13,13 @@ import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
 const mockNavigate = vi.fn()
-
+const mockDispatch = vi.fn()
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
     ...actual,
     useSelector: vi.fn(),
+    useDispatch: () => mockDispatch,
   }
 })
 vi.mock('/protocol-designer/labware-ingred/selectors', async importOriginal => {
@@ -123,5 +124,15 @@ describe('AssignLiquidsModal', () => {
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton)
     expect(scondButton).toHaveClass('_button_active_386e4e')
+    // expect(mockDispatch).toHaveBeenCalledWith({
+    //   type: 'SELECT_WELLS',
+    //   payload: {
+    //     A1: null,
+    //     A2: null,
+    //     A3: null,
+    //     A4: null,
+    //     A5: null,
+    //   },
+    // })
   })
 })
