@@ -38,30 +38,35 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     totalSteps,
   } = props
   const { t } = useTranslation('tip_selection')
+
+  const titleElement = (
+    <div className={styles.modal_header}>
+      <StyledText desktopStyle="bodyLargeSemiBold">
+        {t('select_tips_for_tracking')}
+      </StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">{`Step ${
+        currentStepIndex + 1
+      }/${totalSteps}`}</StyledText>
+    </div>
+  )
+
+  const footerElement = (
+    <div className={styles.modal_footer}>
+      {showBackButton ? (
+        <SecondaryButton onClick={onBack}>{t('back')}</SecondaryButton>
+      ) : null}
+      <PrimaryButton onClick={onContinue}>{continueText}</PrimaryButton>
+    </div>
+  )
+
   return createPortal(
     <Modal
-      title={
-        <div className={styles.modal_header}>
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('select_tips_for_tracking')}
-          </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">{`Step ${
-            currentStepIndex + 1
-          }/${totalSteps}`}</StyledText>
-        </div>
-      }
+      title={titleElement}
       onClose={onClose}
       closeOnOutsideClick
       width="56.25rem"
       childrenPadding={SPACING.spacing24}
-      footer={
-        <div className={styles.modal_footer}>
-          {showBackButton ? (
-            <SecondaryButton onClick={onBack}>{t('back')}</SecondaryButton>
-          ) : null}
-          <PrimaryButton onClick={onContinue}>{continueText}</PrimaryButton>
-        </div>
-      }
+      footer={footerElement}
     >
       {children}
     </Modal>,
