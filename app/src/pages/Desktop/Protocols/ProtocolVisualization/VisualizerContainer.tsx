@@ -7,7 +7,6 @@ import {
   OVERFLOW_AUTO,
   OVERFLOW_HIDDEN,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -18,6 +17,7 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { LabwareInfoContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareInfoContainer'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -124,7 +124,6 @@ export function VisualizerContainer(
     <Flex
       gridGap={SPACING.spacing16}
       padding={SPACING.spacing16}
-      style={{ outline: '1px solid red' }}
       width="100%"
       height="100vh"
       overflowY={OVERFLOW_HIDDEN}
@@ -191,7 +190,7 @@ export function VisualizerContainer(
         />
       </Flex>
       <Flex>
-        <StyledText>Labware Info</StyledText>
+        <LabwareInfoContainer />
       </Flex>
     </Flex>
   )

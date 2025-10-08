@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  gap: var(--spacing-12);
+  background-color: var(--white);
+  border-radius: var(--border-radius-8);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body {
+  display: flex;
+  width: 100%;
+}
