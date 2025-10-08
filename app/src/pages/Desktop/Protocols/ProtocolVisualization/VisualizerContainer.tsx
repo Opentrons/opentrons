@@ -10,7 +10,7 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
-import { LabwareInfoContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareInfoContainer'
+import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -289,8 +289,9 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
+
+        <StepDetailContainer />
       </div>
-      <LabwareInfoContainer />
     </div>
   )
 }

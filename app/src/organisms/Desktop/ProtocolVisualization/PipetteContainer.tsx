@@ -20,10 +20,10 @@ export function PipetteContainer({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Tag text={t('pipette')} type="default" />
+        <Tag text={t('pipette')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={mount} />
       </div>
-      <div className={styles.body}>
+      <div className={styles.main_content}>
         <StyledText>{pipetteName}</StyledText>
       </div>
     </div>
