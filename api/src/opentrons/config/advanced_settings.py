@@ -230,19 +230,6 @@ settings = [
         ),
         robot_type=[RobotTypeEnum.FLEX],
     ),
-    SettingDefinition(
-        _id="enableCamera",
-        title="Enable OT-2 or Flex Camera",
-        description="This setting enables the use of the OT-2 or Flex Embedded Camera. Disabling this setting also disables the Opentrons Live Stream.",
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-        default_true_on_robot_types=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-    ),
-    SettingDefinition(
-        _id="enableLiveStream",
-        title="Enable Opentrons Live Stream",
-        description="This setting enables the Opentrons Live Stream service.",
-        robot_type=[RobotTypeEnum.FLEX],
-    ),
 ]
 
 
@@ -764,17 +751,6 @@ def _migrate37to38(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-def _migrate38to39(previous: SettingsMap) -> SettingsMap:
-    """Migrate to version 39 of the feature flags file.
-
-    -  Adds the enableCamera and enableLiveStream config elements.
-    """
-    newmap = {k: v for k, v in previous.items()}
-    newmap["enableCamera"] = None
-    newmap["enableLiveStream"] = None
-    return newmap
-
-
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -814,7 +790,6 @@ _MIGRATIONS = [
     _migrate35to36,
     _migrate36to37,
     _migrate37to38,
-    _migrate38to39,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

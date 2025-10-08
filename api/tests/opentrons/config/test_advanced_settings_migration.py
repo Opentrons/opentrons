@@ -31,8 +31,6 @@ def default_file_settings() -> Dict[str, Any]:
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
         "disableFlexStackerLabwareDetection": None,
-        "enableCamera": None,
-        "enableLiveStream": None,
     }
 
 
@@ -453,19 +451,6 @@ def v38_config(v37_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
-@pytest.fixture
-def v39_config(v38_config: Dict[str, Any]) -> Dict[str, Any]:
-    r = v38_config.copy()
-    r.update(
-        {
-            "_version": 39,
-            "enableCamera": None,
-            "enableLiveStream": None,
-        }
-    )
-    return r
-
-
 @pytest.fixture(
     params=[
         lazy_fixture("empty_settings"),
@@ -508,7 +493,6 @@ def v39_config(v38_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v36_config"),
         lazy_fixture("v37_config"),
         lazy_fixture("v38_config"),
-        lazy_fixture("v39_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -600,6 +584,4 @@ def test_ensures_config() -> None:
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
         "disableFlexStackerLabwareDetection": None,
-        "enableCamera": None,
-        "enableLiveStream": None,
     }

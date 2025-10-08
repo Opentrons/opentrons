@@ -329,7 +329,7 @@ async def get_live_stream_settings() -> LiveStreamSettings:
 
 
 def _get_stream_settings() -> LiveStreamSettings:
-    contents = camera.parse_stream_configuration_file_data()
+    contents = camera.load_stream_configuration_file_data()
     if contents is None:
         raise LegacyErrorResponse(
             message="Stream Configuration file data is incorrect or missing.",
