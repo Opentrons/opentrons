@@ -10,7 +10,7 @@
   "attach_pip": "attach pipette",
   "attach_pipette": "attach {{mount}} pipette",
   "attach_probe": "attach calibration probe",
-  "attach_wastechute": "attach waste chute",
+  "attach_wastechute": "Attach waste chute",
   "backmost": "backmost",
   "before_you_begin": "Before you begin",
   "begin_calibration": "Begin calibration",
