@@ -1,3 +1,5 @@
+import styles from './destinationtipscontainer.module.css'
+
 export function DestinationTipsContainer(): JSX.Element {
-  return <div>{'Destination Tips Container'}</div>
+  return <div className={styles.container}>{'Destination Tips Container'}</div>
 }

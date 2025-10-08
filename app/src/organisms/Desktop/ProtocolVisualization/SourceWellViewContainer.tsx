@@ -1,3 +1,5 @@
+import styles from './sourcewellviewcontainer.module.css'
+
 export function SourceWellViewContainer(): JSX.Element {
-  return <div>{'Source Well View Container'}</div>
+  return <div className={styles.container}>{'Source Well View Container'}</div>
 }
