@@ -42,12 +42,6 @@ stages:
             description: !re_search 'Automatically pause protocols when robot door opens'
             restart_required: false
             value: !anything
-          - id: enableCamera
-            old_id: Null
-            title: Enable OT-2 or Flex Camera
-            description: !re_search 'This setting enables the use of the OT-2 or Flex Embedded Camera. Disabling this setting also disables the Opentrons Live Stream.'
-            restart_required: false
-            value: !anything
         links: !anydict
 
 ---

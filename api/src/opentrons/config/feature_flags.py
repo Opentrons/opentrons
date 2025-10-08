@@ -84,11 +84,3 @@ def flex_stacker_tof_sensors_disabled() -> bool:
     return advs.get_setting_with_env_overload(
         "disableFlexStackerLabwareDetection", RobotTypeEnum.FLEX
     )
-
-
-def camera_enabled(robot_type: RobotTypeEnum) -> bool:
-    return advs.get_setting_with_env_overload("enableCamera", robot_type)
-
-
-def live_stream_enabled() -> bool:
-    return advs.get_setting_with_env_overload("enableLiveStream", RobotTypeEnum.FLEX)
