@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { DeckInfoLabel, StyledText, Tag } from '@opentrons/components'
+import { RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 
 import styles from './pipettecontainer.module.css'
 
@@ -21,7 +21,7 @@ export function PipetteContainer({
     <div className={styles.container}>
       <div className={styles.header}>
         <Tag text={t('pipette')} type="default" />
-        <DeckInfoLabel deckLabel={mount} />
+        <RobotInfoLabel deckLabel={mount} />
       </div>
       <div className={styles.body}>
         <StyledText>{pipetteName}</StyledText>
