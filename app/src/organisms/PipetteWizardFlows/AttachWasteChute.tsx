@@ -21,14 +21,7 @@ import type { PipetteWizardStepProps } from './types'
 export const AttachWasteChute = (
   props: PipetteWizardStepProps
 ): JSX.Element => {
-  const {
-    isRobotMoving,
-    errorMessage,
-    proceed,
-    mount,
-    goBack,
-    flowType,
-  } = props
+  const { isRobotMoving, errorMessage, proceed, goBack } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
