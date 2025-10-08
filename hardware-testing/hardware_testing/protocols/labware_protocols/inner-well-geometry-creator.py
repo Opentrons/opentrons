@@ -430,7 +430,6 @@ def generate_frusta(
     else:
         geoID = "defaultWell"
 
-    # annotate wells with geometryDefinitionId
     for well_name in inner_well_json["wells"]:
         inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
 
@@ -471,7 +470,7 @@ def generate_frusta(
                 "bottomHeight": round(h1, 2),
             }
         else:
-            continue  # skip unsupported
+            continue  
 
         frusta_data.append(section)
 
