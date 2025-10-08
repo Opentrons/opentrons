@@ -3,6 +3,7 @@
 This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
 """
+
 import argparse
 import asyncio
 import atexit
@@ -24,6 +25,7 @@ from typing import (
     BinaryIO,
     Optional,
     Union,
+    Iterator,
 )
 from typing_extensions import Literal
 
@@ -82,6 +84,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
+    from opentrons.protocol_engine import ProtocolEngine
 
 
 # See Jira RCORE-535.
@@ -310,6 +313,7 @@ def get_protocol_api(
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
+            clean_up_hardware=(hardware_simulator is None),
         )
     else:
         if bundled_labware is not None:
@@ -327,6 +331,7 @@ def get_protocol_api(
             bundled_data=bundled_data,
             extra_labware=extra_labware,
             use_pe_virtual_hardware=use_virtual_hardware,
+            clean_up_hardware=(hardware_simulator is None),
         )
 
     # Intentional difference from execute.get_protocol_api():
@@ -782,13 +787,15 @@ def _create_live_context_non_pe(
     extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
     bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
     bundled_data: Optional[Dict[str, bytes]],
+    clean_up_hardware: bool,
 ) -> ProtocolContext:
     """Return a live ProtocolContext.
 
     This controls the robot through the older infrastructure, instead of through Protocol Engine.
     """
     assert api_version < ENGINE_CORE_API_VERSION
-    return protocol_api.create_protocol_context(
+
+    ctx = protocol_api.create_protocol_context(
         api_version=api_version,
         deck_type=deck_type,
         hardware_api=hardware_api,
@@ -796,6 +803,17 @@ def _create_live_context_non_pe(
         bundled_data=bundled_data,
         extra_labware=extra_labware,
     )
+    # Hack: we need to hook the protocol context cleanup in a way that isn't safe to put
+    # in the context generally, so we can do it like this and feel sad
+    original_cleanup = ctx.cleanup
+
+    def _cleanup_hook() -> None:
+        if clean_up_hardware:
+            ctx._hw_manager.hardware.clean_up()
+        original_cleanup()
+
+    ctx.cleanup = _cleanup_hook  # type: ignore[method-assign]
+    return ctx
 
 
 def _create_live_context_pe(
@@ -806,27 +824,41 @@ def _create_live_context_pe(
     extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
     use_pe_virtual_hardware: bool = True,
+    clean_up_hardware: bool = True,
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
     hardware_api_wrapped = hardware_api.wrapped()
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
+
+    @contextmanager
+    def _cleanup_hardware_with_engine() -> (
+        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
+    ):
+
+        try:
+            with create_protocol_engine_in_thread(
+                hardware_api=hardware_api_wrapped,
+                config=_get_protocol_engine_config(
+                    robot_type, use_pe_virtual_hardware=use_pe_virtual_hardware
+                ),
+                deck_configuration=None,
+                file_provider=None,
+                error_recovery_policy=error_recovery_policy.never_recover,
+                drop_tips_after_run=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+                load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
+                    api_version
+                ),
+                camera_provider=CameraProvider(),
+            ) as (engine, loop):
+                yield engine, loop
+        finally:
+            if clean_up_hardware:
+                hardware_api.clean_up()
+
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
-        create_protocol_engine_in_thread(
-            hardware_api=hardware_api_wrapped,
-            config=_get_protocol_engine_config(
-                robot_type, use_pe_virtual_hardware=use_pe_virtual_hardware
-            ),
-            deck_configuration=None,
-            file_provider=None,
-            error_recovery_policy=error_recovery_policy.never_recover,
-            drop_tips_after_run=False,
-            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-            load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
-                api_version
-            ),
-            camera_provider=CameraProvider(),
-        )
+        _cleanup_hardware_with_engine()
     )
 
     # `async def` so we can use loop.run_coroutine_threadsafe() to wait for its completion.
@@ -881,6 +913,7 @@ def _run_file_non_pe(
         extra_labware=extra_labware,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
+        clean_up_hardware=False,
     )
 
     scraper = _CommandScraper(logger=logger, level=level, broker=context.broker)

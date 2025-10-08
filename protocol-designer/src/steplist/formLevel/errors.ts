@@ -214,7 +214,7 @@ const SHAKE_TIME_REQUIRED: FormError = {
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: TIME_TITLE,
+  title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
@@ -760,8 +760,10 @@ export const volumeTooHigh = (
   fields: HydratedMixFormData
 ): FormError | null => {
   const { pipette, tipRack } = fields
-  if (!pipette) {
+  if (!pipette || !tipRack) {
     // pipette is null if user deletes pipette
+    // I haven't been able to reproduce when tipRack alone becomes null, but it
+    // probably happens if the user deletes or changes the tip racks somehow.
     return null
   }
   const volume = Number(fields.volume)
@@ -932,18 +934,10 @@ export const shakeTimeRequired = (
   let error = null
   if (heaterShakerSetTimer && !heaterShakerTimer) {
     error = SHAKE_TIME_REQUIRED
-  } else if (
-    heaterShakerSetTimer &&
-    !isTimeFormatMinutesSeconds(heaterShakerTimer)
-  ) {
+  } else if (heaterShakerSetTimer && !isTimeFormat(heaterShakerTimer)) {
     error = SHAKER_TIME_FORMAT
   }
   return error
-}
-
-const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
-  const timeRegex = /^(?:[0-9]?\d):(?:[0-5]\d|[0-9])$/g
-  return value != null && timeRegex.test(value)
 }
 
 export const temperatureRequired = (

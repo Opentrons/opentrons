@@ -54,5 +54,17 @@
   "OT_PD_ENABLE_JSON_EXPORT": {
     "title": "Enable exporting JSON",
     "description": "Enables the ability to export JSON for internal usages only"
+  },
+  "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
+    "title": "Enable by-volume builder",
+    "description": "Enables the ability to build by-volume curves"
+  },
+  "OT_PD_ENABLE_TIP_SELCTION": {
+    "title": "Enable tip selection",
+    "description": "Enables the ability to select tips manually"
+  },
+  "OT_PD_ENABLE_CAMERA_SUPPORT": {
+    "title": "Enable camera support",
+    "description": "Enables developmental camera support"
   }
 }

@@ -7,7 +7,10 @@ import {
   RadioButton,
   SPACING,
 } from '@opentrons/components'
-import { getAllDefinitions } from '@opentrons/shared-data'
+import {
+  getAllDefinitions,
+  LABWAREV2_DO_NOT_LIST,
+} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
@@ -31,9 +34,16 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
+  // (kk:2025-09-30) this should be temporary until fix getAllDefinitions cache issue
+
   const allLabwareDefinition2sByUri = getAllDefinitions()
   const selectedPipetteDefaultTipracks =
-    state.pipette?.liquids.default.defaultTipracks ?? []
+    state.pipette?.liquids.default.defaultTipracks.filter(tiprackUri => {
+      // "opentrons/opentrons_flex_96_tiprack_20ul/1" -> "opentrons_flex_96_tiprack_20ul"
+      const loadName = tiprackUri.split('/')[1]
+      const isBlockedTiprack = LABWAREV2_DO_NOT_LIST.includes(loadName)
+      return !isBlockedTiprack
+    }) ?? []
 
   const [selectedTipRack, setSelectedTipRack] = useState<
     LabwareDefinition2 | undefined

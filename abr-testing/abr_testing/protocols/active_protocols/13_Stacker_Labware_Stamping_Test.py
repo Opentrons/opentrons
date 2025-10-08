@@ -18,7 +18,7 @@ metadata = {
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.25"}
+requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 
 DECK_SLOTS = ["A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]
@@ -128,6 +128,8 @@ def run(ctx: ProtocolContext) -> None:
     if not ctx.is_simulating():
         from abr_testing.protocols import helpers
 
+        helpers.comment_protocol_version(ctx, "02")
+
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     tiprack_adapters = [
@@ -220,5 +222,7 @@ def run(ctx: ProtocolContext) -> None:
         )
     except Exception as e:
         if not ctx.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_log(
+                slack_bot, metadata["protocolName"], str(e)
+            )
         raise (e)

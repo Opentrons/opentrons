@@ -11597,7 +11597,9 @@
         "celsius": 55.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -19100,7 +19102,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 55.0
+        "targetTemperature": 55.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

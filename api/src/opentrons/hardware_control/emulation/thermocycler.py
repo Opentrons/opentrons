@@ -5,8 +5,15 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 
 import logging
 from typing import Optional
-from opentrons.drivers.thermocycler.driver import GCODE
+from opentrons.drivers.thermocycler.driver import (
+    GCODE,
+    TC_GEN2_ACK,
+    TC_GEN2_SERIAL_ACK,
+    TC_ACK as TC_GEN1_ACK,
+    SERIAL_ACK as TC_GEN1_SERIAL_ACK,
+)
 from opentrons.drivers.types import ThermocyclerLidStatus
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 from opentrons.hardware_control.emulation.parser import Parser, Command
 from opentrons.hardware_control.emulation.settings import ThermocyclerSettings
 
@@ -29,13 +36,31 @@ class ThermocyclerEmulator(AbstractEmulator):
     def __init__(self, parser: Parser, settings: ThermocyclerSettings) -> None:
         self._parser = parser
         self._settings = settings
+        # I hate this. These modules do not return anything like this for their actual versions
+        # (gen2 returns "Opentrons-thermocycler-gen2" for instance) and this is not what any of
+        # the settings anywhere use.
+        self._model = (
+            ThermocyclerModuleModel.THERMOCYCLER_V1
+            if settings.model in ["thermocyclerModuleV1", "v1", "v01"]
+            else ThermocyclerModuleModel.THERMOCYCLER_V2
+        )
+        self._terminator = (
+            TC_GEN1_SERIAL_ACK
+            if self._model is ThermocyclerModuleModel.THERMOCYCLER_V1
+            else TC_GEN2_SERIAL_ACK
+        )
+        self._ack = (
+            TC_GEN1_ACK
+            if self._model is ThermocyclerModuleModel.THERMOCYCLER_V1
+            else TC_GEN2_ACK
+        )
         self.reset()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
-        joined = " ".join(r for r in results if r)
-        return None if not joined else joined
+        joined = " ".join(f"{r} {self._ack}" for r in results if r)
+        return self._ack if not joined else joined
 
     def reset(self) -> None:
         self._lid_temperature = Temperature(
@@ -50,6 +75,12 @@ class ThermocyclerEmulator(AbstractEmulator):
         self.plate_volume = util.OptionalValue[float]()
         self.plate_ramp_rate = util.OptionalValue[float]()
 
+    def _pref(self, command: Command) -> str:
+        if self._model is ThermocyclerModuleModel.THERMOCYCLER_V1:
+            return ""
+        else:
+            return f"{command.gcode} "
+
     def _handle(self, command: Command) -> Optional[str]:  # noqa: C901
         """
         Handle a command.
@@ -62,7 +93,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         elif command.gcode == GCODE.CLOSE_LID:
             self.lid_status = ThermocyclerLidStatus.CLOSED
         elif command.gcode == GCODE.GET_LID_STATUS:
-            return f"Lid:{self.lid_status}"
+            return self._pref(command) + f"Lid:{self.lid_status}"
         elif command.gcode == GCODE.SET_LID_TEMP:
             temperature = command.params["S"]
             assert isinstance(
@@ -76,7 +107,7 @@ class ThermocyclerEmulator(AbstractEmulator):
                 f"H:none Total_H:none"
             )
             self._lid_temperature.tick()
-            return res
+            return self._pref(command) + res
         elif command.gcode == GCODE.EDIT_PID_PARAMS:
             pass
         elif command.gcode == GCODE.SET_PLATE_TEMP:
@@ -105,7 +136,7 @@ class ThermocyclerEmulator(AbstractEmulator):
                 f"Total_H:{plate_total_hold_time} "
             )
             self._plate_temperature.tick()
-            return res
+            return self._pref(command) + res
         elif command.gcode == GCODE.SET_RAMP_RATE:
             self.plate_ramp_rate.val = command.params["S"]
         elif command.gcode == GCODE.DEACTIVATE_ALL:
@@ -116,13 +147,34 @@ class ThermocyclerEmulator(AbstractEmulator):
         elif command.gcode == GCODE.DEACTIVATE_BLOCK:
             self._plate_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEVICE_INFO:
-            return (
-                f"serial:{self._settings.serial_number} "
-                f"model:{self._settings.model} "
-                f"version:{self._settings.version}"
-            )
-        return None
+            # the gen2 returns a completely different device info format than the
+            # gen1 which is pretty cool
+            if self._model == ThermocyclerModuleModel.THERMOCYCLER_V1:
+                return (
+                    f"serial:{self._settings.serial_number} "
+                    f"model:{self._settings.model} "
+                    f"version:{self._settings.version}"
+                )
+            else:
+                return (
+                    command.gcode
+                    + " "
+                    + (
+                        f"FW:{self._settings.version} "
+                        f"HW:{self._settings.model} "
+                        f"SerialNo:{self._settings.serial_number}"
+                    )
+                )
+        elif command.gcode == GCODE.GET_ERROR_STATE:
+            if self._model is ThermocyclerModuleModel.THERMOCYCLER_V2:
+                return self._pref(command) + self._ack + self._pref(command)
+        return self._pref(command)
 
-    @staticmethod
-    def get_terminator() -> bytes:
-        return b"\r\n"
+    def get_terminator(self) -> bytes:
+        return self._terminator.encode()
+
+    def get_ack(self) -> bytes:
+        return self._ack.encode()
+
+    def get_autoack(self) -> bool:
+        return False

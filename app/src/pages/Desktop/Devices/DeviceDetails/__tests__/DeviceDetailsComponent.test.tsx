@@ -1,3 +1,4 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -5,12 +6,14 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { InputDevices } from '/app/organisms/Desktop/Devices/InputDevices'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, NOT_PRESENT } from '/app/organisms/EmergencyStop'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
@@ -20,7 +23,9 @@ vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
 vi.mock('/app/organisms/Desktop/Devices/RecentProtocolRuns')
 vi.mock('/app/organisms/Desktop/Devices/RobotOverview')
 vi.mock('/app/organisms/DeviceDetailsDeckConfiguration')
+vi.mock('/app/organisms/Desktop/Devices/InputDevices')
 vi.mock('/app/redux/discovery')
+vi.mock('/app/redux/config')
 
 const ROBOT_NAME = 'otie'
 const mockEstopStatus = {
@@ -43,7 +48,9 @@ const render = () => {
 describe('DeviceDetailsComponent', () => {
   beforeEach(() => {
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEstopStatus } as any)
+    vi.mocked(InputDevices).mockReturnValue(<div>MOCK INPUT DEVICES</div>)
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
   })
 
   it('renders a RobotOverview when a robot is found and syncs clock', () => {
@@ -80,6 +87,12 @@ describe('DeviceDetailsComponent', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
     render()
     expect(vi.mocked(DeviceDetailsDeckConfiguration)).toHaveBeenCalled()
+  })
+
+  it('renders the Input Devices section', () => {
+    render()
+
+    screen.getByText('MOCK INPUT DEVICES')
   })
 
   it.todo('renders EstopBanner when estop is engaged')

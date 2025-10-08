@@ -83,6 +83,8 @@ from .location import (
     NonStackedLocation,
     DeckPoint,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
+    AccessibleByGripperLocation,
     OnLabwareLocationSequenceComponent,
     OnModuleLocationSequenceComponent,
     OnAddressableAreaLocationSequenceComponent,
@@ -92,6 +94,7 @@ from .location import (
     LoadableLabwareLocation,
     labware_location_is_system,
     labware_location_is_off_deck,
+    labware_location_is_in_waste_chute,
 )
 from .labware import (
     OverlapOffset,
@@ -101,6 +104,7 @@ from .labware import (
     LabwareOffsetCreateInternal,
     LoadedLabware,
     LabwareWellId,
+    GripSpecs,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -228,8 +232,10 @@ __all__ = [
     "NonStackedLocation",
     "DeckPoint",
     "OffDeckLocationType",
-    "SystemLocationType",
+    "WasteChuteLocationType" "SystemLocationType",
     "InStackerHopperLocation",
+    "WASTE_CHUTE_LOCATION",
+    "AccessibleByGripperLocation",
     "OnLabwareLocationSequenceComponent",
     "OnModuleLocationSequenceComponent",
     "OnAddressableAreaLocationSequenceComponent",
@@ -239,6 +245,7 @@ __all__ = [
     "LoadableLabwareLocation",
     "labware_location_is_off_deck",
     "labware_location_is_system",
+    "labware_location_is_in_waste_chute",
     # Labware offset location
     "LegacyLabwareOffsetLocation",
     "LabwareOffsetLocationSequence",
@@ -257,6 +264,7 @@ __all__ = [
     "LoadedLabware",
     "LabwareOffsetVector",
     "LabwareWellId",
+    "GripSpecs",
     # Liquids
     "HexColor",
     "EmptyLiquidId",

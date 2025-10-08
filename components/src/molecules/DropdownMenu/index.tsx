@@ -23,8 +23,8 @@ import {
 } from '../../styles'
 import { useHoverTooltip } from '../../tooltips'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { DeckInfoLabel } from '../DeckInfoLabel'
 import { LiquidIcon } from '../LiquidIcon'
+import { RobotInfoLabel } from '../RobotInfoLabel'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { FocusEventHandler } from 'react'
@@ -48,7 +48,7 @@ export interface DropdownOption {
 
 export type DropdownBorder = 'rounded' | 'neutral'
 
-type MenuPlacement = 'auto' | 'top' | 'bottom'
+export type MenuPlacement = 'auto' | 'top' | 'bottom'
 
 export interface DropdownMenuProps {
   /** dropdown options */
@@ -300,7 +300,10 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
               <LiquidIcon color={currentOption.liquidColor} />
             ) : null}
             {currentOption.deckLabel != null ? (
-              <DeckInfoLabel deckLabel={currentOption.deckLabel} svgSize={13} />
+              <RobotInfoLabel
+                deckLabel={currentOption.deckLabel}
+                svgSize={13}
+              />
             ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -356,7 +359,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       <LiquidIcon color={option.liquidColor} />
                     ) : null}
                     {option.deckLabel != null ? (
-                      <DeckInfoLabel
+                      <RobotInfoLabel
                         deckLabel={option.deckLabel}
                         svgSize={13}
                       />

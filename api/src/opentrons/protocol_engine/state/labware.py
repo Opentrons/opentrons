@@ -46,11 +46,13 @@ from ..types import (
     AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
+    GripSpecs,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocationSequence,
     LegacyLabwareOffsetLocation,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
@@ -342,14 +344,18 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self, labware_id: str, new_location: LabwareLocation, new_offset_id: str | None
     ) -> None:
         self._state.labware_by_id[labware_id].offsetId = new_offset_id
-
         if isinstance(new_location, AddressableAreaLocation) and (
-            fixture_validation.is_gripper_waste_chute(new_location.addressableAreaName)
-            or fixture_validation.is_trash(new_location.addressableAreaName)
+            fixture_validation.is_trash(new_location.addressableAreaName)
         ):
-            # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+            # TODO (RC, 2025-10-07: create a specific trash off deck location)
+            # If a labware has been moved into trash and is now technically off deck
             new_location = OFF_DECK_LOCATION
-
+        elif isinstance(
+            new_location, AddressableAreaLocation
+        ) and fixture_validation.is_gripper_waste_chute(
+            new_location.addressableAreaName
+        ):
+            new_location = WASTE_CHUTE_LOCATION
         self._state.labware_by_id[labware_id].location = new_location
 
     def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
@@ -457,13 +463,31 @@ class LabwareView:
                     " another labware stacked on top."
                 )
 
+    def raise_if_not_tip_rack(self, labware_id: str) -> None:
+        """Raise if a labware is not a tip rack."""
+        if not self.is_tiprack(labware_id):
+            raise errors.LabwareIsNotTipRackError(
+                f"Labware {self.get_display_name(labware_id)} is not a tip rack and cannot have its well states set."
+            )
+
+    def raise_if_wells_are_invalid(
+        self, labware_id: str, well_names: List[str]
+    ) -> None:
+        """Raise if given wells do not exist with the given labware ID."""
+        non_existent_wells = set(well_names) - set(
+            self.get_definition(labware_id).wells
+        )
+        if non_existent_wells:
+            raise errors.WellDoesNotExistError(
+                f"Tip rack {self.get_display_name(labware_id)} does not have wells: {', '.join(non_existent_wells)}"
+            )
+
     def get_by_slot(
         self,
         slot_name: Union[DeckSlotName, StagingSlotName],
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = list(self._state.labware_by_id.values())
-
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
@@ -1361,3 +1385,68 @@ class LabwareView:
         ):
             return Dimensions(0, 0, 0)
         return Dimensions(max_x - min_x, max_y - min_y, max_z)
+
+    def _gripper_uncertainty_narrower(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most narrower the gripper can be than the target while still likely gripping successfully.
+
+        This number can't just be the 0, because that is not going to be accurate if the labware is
+        skirted - the dimensions are a full bounding box including the skirt, and the labware is
+        narrower than that at the point where it is gripped. The general heuristic is that we can't
+        get to the wells; but some labware don't have wells, so we need alternate values.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        if well_bbox.y == 0:
+            # This labware has no wells; use a fixed minimum
+            return 5
+        if well_bbox.y > labware_bbox.y:
+            # This labware has a very odd definition with wells outside its dimensions.
+            # Return the smaller value.
+            return 0
+        # An ok heuristic for successful grip is if we don't get all the way to the wells.
+        return target_grip_width - well_bbox.y
+
+    def _gripper_uncertainty_wider(
+        self, labware_bbox: Dimensions, well_bbox: Dimensions, target_grip_width: float
+    ) -> float:
+        """Most wider the gripper can be than the target while still likely gripping successfully.
+
+        This can be a lot closer to 0, since the bounding box of the labware will certainly be the
+        widest point (if it's defined without error), but since there might be error in the
+        definition we allow some slop.
+
+        The number will be interpreted relative to the target width, which is (for now) the labware
+        outer bounding box.
+
+        TODO: This should be a number looked up from the definition.
+        """
+        # This will be 0 unless the wells are wider than the labware
+        return max(well_bbox.y - target_grip_width, 0)
+
+    def get_gripper_width_specs(
+        self, labware_definition: LabwareDefinition
+    ) -> GripSpecs:
+        """Get the target and bounds for a successful grip of this labware."""
+        outer_bounds = self.get_dimensions(labware_definition=labware_definition)
+        well_bounds = self.get_well_bbox(labware_definition=labware_definition)
+        narrower = self._gripper_uncertainty_narrower(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        wider = self._gripper_uncertainty_wider(
+            labware_bbox=outer_bounds,
+            well_bbox=well_bounds,
+            target_grip_width=outer_bounds.y,
+        )
+        return GripSpecs(
+            # TODO: This should be a number looked up from the definition.
+            targetY=outer_bounds.y,
+            uncertaintyNarrower=narrower,
+            uncertaintyWider=wider,
+        )

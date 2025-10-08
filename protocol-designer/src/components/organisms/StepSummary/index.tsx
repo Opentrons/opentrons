@@ -177,7 +177,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilResume':
           stepSummaryContent = (
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:pause.untilResume')}
+              {t('protocol_steps:pause.pausingUntilResume')}
             </StyledText>
           )
           break
@@ -189,7 +189,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               : unknownModule
           stepSummaryContent = (
             <StyledTrans
-              i18nKey="protocol_steps:pause.untilTemperature"
+              i18nKey="protocol_steps:pause.pausingUntilTemperature"
               values={{ module: pauseModuleDisplayName }}
               tagText={`${pauseTemperature}${t('application:units.degrees')}`}
             />
@@ -198,7 +198,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilTime':
           stepSummaryContent = (
             <StyledTrans
-              i18nKey={t('protocol_steps:pause.untilTime')}
+              i18nKey={t('protocol_steps:pause.pausingForDuration')}
               tagText={formatTime(pauseTime as string)}
             />
           )

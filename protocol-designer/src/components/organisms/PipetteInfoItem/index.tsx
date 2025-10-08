@@ -31,7 +31,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
   const { t, i18n } = useTranslation('onboarding')
   const allLabware = useSelector(getLabwareDefsByURI)
-  const is96Channel = pipetteName === 'p1000_96'
+  const is96Channel = ['p1000_96', 'p200_96'].includes(pipetteName)
 
   return (
     <ListItem type="default">

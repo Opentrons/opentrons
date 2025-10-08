@@ -16,7 +16,10 @@ from opentrons.system import camera
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
-from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
+from ..hardware_control.modules import (
+    AbstractModule as HardwareModuleAPI,
+    ModuleModel as HardwareModuleModel,
+)
 from ..protocol_engine import (
     ProtocolEngine,
     CommandCreate,
@@ -88,7 +91,6 @@ class RunOrchestrator:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
-        # todo(mm, 2024-07-05): This hardware_api param looks unused?
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
@@ -121,6 +123,8 @@ class RunOrchestrator:
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
+        # used by SimulatingRunOrchestrator to clean up the simulating hardware controller
+        self._hardware_api = hardware_api
 
     @property
     def run_id(self) -> str:
@@ -392,6 +396,30 @@ class RunOrchestrator:
     def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
+
+    async def asynchronous_module_error(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an asynchronous module error reported by hardware.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.async_module_error(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
+
+    async def module_disconnected(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an unexpected module disconnection.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.module_disconnected(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
 
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]

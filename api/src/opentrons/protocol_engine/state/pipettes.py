@@ -17,7 +17,10 @@ from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
-from opentrons_shared_data.pipette.types import UlPerMmAction
+from opentrons_shared_data.pipette.types import (
+    UlPerMmAction,
+    LiquidClasses as VolumeModes,
+)
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -107,6 +110,7 @@ class StaticPipetteConfig:
     plunger_positions: Dict[str, float]
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
+    volume_mode: VolumeModes
 
 
 @dataclasses.dataclass
@@ -212,7 +216,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         # we identify tip classes - looking things up by volume is not enough.
                         tip_configuration = list(
                             static_config.tip_configuration_lookup_table.values()
-                        )[0]
+                        )[-1]
                     self._state.flow_rates_by_id[pipette_id] = FlowRates(
                         default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -230,7 +234,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     # TODO(seth,9/11/2023): bad way to do defaulting, see above.
                     tip_configuration = list(
                         static_config.tip_configuration_lookup_table.values()
-                    )[0]
+                    )[-1]
                     self._state.flow_rates_by_id[pipette_id] = FlowRates(
                         default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -313,6 +317,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 plunger_positions=config.plunger_positions,
                 shaft_ul_per_mm=config.shaft_ul_per_mm,
                 available_sensors=config.available_sensors,
+                volume_mode=config.volume_mode,
             )
             self._state.flow_rates_by_id[
                 state_update.pipette_config.pipette_id
@@ -866,6 +871,10 @@ class PipetteView:
         ):
             return False
         return True
+
+    def get_is_low_volume_mode(self, pipette_id: str) -> bool:
+        """Determine if the pipette is currently in low volume mode."""
+        return self.get_config(pipette_id).volume_mode == VolumeModes.lowVolumeDefault
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str

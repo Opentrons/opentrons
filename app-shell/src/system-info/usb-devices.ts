@@ -324,7 +324,7 @@ export function getWindowsDriverVersion(
 ): Promise<string | null> {
   console.log('getWindowsDriverVersion', device)
   assert(
-    isWindows() || process.env.NODE_ENV === 'test',
+    isWindows() || _NODE_ENV_ === 'test',
     `getWindowsDriverVersion cannot be called on ${process.platform}`
   )
 

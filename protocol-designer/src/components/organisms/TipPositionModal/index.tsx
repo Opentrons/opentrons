@@ -45,7 +45,7 @@ import * as utils from './utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
-import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 type Offset = 'x' | 'y' | 'z'
@@ -429,14 +429,14 @@ export function TipPositionModal(
                     : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
               />
             ) : (
               <TipPositionTopView
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
-                yPosition={parseInt(yValue ?? '0')}
+                yPosition={parseFloat(yValue ?? '0')}
                 yWidthMm={wellYWidthMm}
               />
             )}

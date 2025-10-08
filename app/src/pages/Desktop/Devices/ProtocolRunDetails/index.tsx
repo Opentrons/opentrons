@@ -26,6 +26,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
@@ -33,6 +34,7 @@ import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/Pro
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
@@ -245,6 +247,10 @@ function PageContents(props: PageContentsProps): JSX.Element {
       ),
       backToTop: null,
     },
+    camera: {
+      content: <ProtocolRunCamera />,
+      backToTop: null,
+    },
   }
   const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? {
     // default to the setup tab if no tab or nonexistent tab is passed as a param
@@ -280,6 +286,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
           protocolRunDetailsTab={protocolRunDetailsTab}
         />
         <RunPreviewTab robotName={robotName} runId={runId} />
+        <CameraTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
@@ -347,7 +354,7 @@ interface ParametersTabProps {
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
-const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
+const ParametersTab = (props: ParametersTabProps): JSX.Element => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -411,7 +418,7 @@ const ModuleControlsTab = (
   )
 }
 
-const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
+const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
 
@@ -422,6 +429,24 @@ const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
       disabled={robotSideAnalysis == null}
       to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       tabName={t('run_preview')}
+    />
+  )
+}
+
+const CameraTab = (props: SetupTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const enableCamera = useFeatureFlag('camera')
+
+  if (!enableCamera) {
+    return null
+  }
+
+  return (
+    <RoundTab
+      disabled={false}
+      to={`/devices/${robotName}/protocol-runs/${runId}/camera`}
+      tabName={t('camera')}
     />
   )
 }

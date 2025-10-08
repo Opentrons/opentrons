@@ -87,7 +87,7 @@ export enum SetupLocators {
   button = 'button',
   svg = 'svg',
   exist = 'exist',
-  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0',
+  StepOptionsTestIDThreeDots = '[data-testid="StepContainer_OverflowBtn"]:visible',
   AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU',
 }
 
@@ -994,7 +994,7 @@ export const SetupVerifications = {
       cy.get('button[data-testid="D3"]').click()
       cy.get('button[data-testid="Modules"]').click()
       cy.contains(SetupContent.PlateReader)
-      cy.get('[data-testid="ModalHeader_icon_close_Add to slot D3"]').click()
+      cy.get('[data-testid="ModalHeader_icon_close_Add to Slot D3"]').click()
     },
   }),
 
@@ -1008,8 +1008,6 @@ export const SetupVerifications = {
       cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
-      cy.contains('Tip management')
-      cy.contains('Tip drop location')
     },
   }),
 

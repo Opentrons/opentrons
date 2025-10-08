@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
+
+// todo(mm, 2025-09-15): This file is used under confusing circumstances.
+// See comments in the global vite.config.mts.
+
 import path from 'path'
 import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
 

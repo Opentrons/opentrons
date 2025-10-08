@@ -151,6 +151,8 @@ export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
 
+export const FLEX_96_CHANNEL_PIPETTES = ['p1000_96', 'p200_96']
+
 //  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
   'p300_single_flex',
@@ -442,6 +444,20 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
   'flexStackerModuleV1C4'
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
+
+export const exactMatchOnlyLoadNames = new Set([
+  'milliplex_microtiter_plate',
+  'milliplex_microtiter_plate_lid',
+  'corning_falcon_384_wellplate_130ul_flat',
+  'corning_falcon_384_wellplate_130ul_flat_lid',
+  'ibidi_96_square_well_plate_300ul',
+  'ibidi_96_square_well_plate_300ul_lid',
+  'opentrons_96_deep_well_adapter',
+  'opentrons_96_filtertiprack_1000ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_universal_flat_adapter',
+  'opentrons_universal_flat_adapter_type_b',
+])
 
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,

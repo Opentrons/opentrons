@@ -19,8 +19,10 @@ async def subject(emulator_settings: Settings) -> AsyncGenerator[SmoothieDriver,
         port=f"socket://127.0.0.1:{emulator_settings.smoothie.port}",
         config=build_config_ot2({}),
     )
-    yield d
-    await d.disconnect()
+    try:
+        yield d
+    finally:
+        await d.disconnect()
 
 
 @pytest.fixture

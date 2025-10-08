@@ -88,7 +88,7 @@ To clean a 1-, 8-, or 96-channel pipette:
     - *Do not* disassemble Flex pipettes for cleaning or attempt to clean their internal electronic components.
     - *Do not* put Flex pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
-### Pipette decontamination
+## Pipette decontamination
 
 The routine cleaning steps described above may not clean your pipette if it becomes contaminated with substances like nucleic acids, proteins, or radioactive material. When a pipette becomes contaminated, try the decontamination steps described in this section. You can also contact support if your pipette gets contaminated and these cleaning procedures do not work.
 
@@ -115,8 +115,28 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
+## Pipette O-ring replacement
 
-## Tip cleaning
+You can replace the O-rings on Flex 1- and 8-channel pipettes if they become worn or broken. Each pipette ships with a set of replacement O-rings and a special two-piece tool to help with this procedure.
+
+You should not try to change the O-rings on a 96-channel pipette. The limited clearance between nozzles can make replacement difficult and may damage the instrument. Contact Opentrons Support if you believe the O-rings on your 96-channel pipette are worn or damaged and need to be replaced.
+
+!!!note
+    Flex and OT-2 pipette O-rings are not interchangeable.
+
+Follow these instructions to replace the O-rings on your Flex 1- and 8-channel pipettes:
+
+1.  Attach the O-ring removal tool to the pipette nozzle.
+
+  ![o-ring removal tool](../images/o-ring-removal-tool.png){width="50%"}
+
+2.  Rotate and pull gently to remove the O-ring. The O-ring may break during removal, which is common.
+
+3.  Place the wide base of the O-ring installation tool against the pipette nozzle and roll the new O-ring onto the nozzle.
+
+  ![o-ring attachment tool](../images/o-ring-attachment-tool.png){width="50%"}
+
+## Pipette tip cleaning
 
 Flex pipette tips are disposable items. You can autoclave and reuse them if your protocol allows it. For best results, we recommend using clean, fresh tips. Discard pipette tips after you no longer need them. You can purchase [replacement tips](https://opentrons.com/products/categories/tips-&-labware) directly from Opentrons.
 
@@ -182,41 +202,6 @@ To set up the Thermocycler with a clean seal:
 
 ![Location of the automation seal on the inside lid of the Thermocycler](../images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
 
-## Autoclave-safe labware
+## Autoclaving labware
 
-The following table lists labware sold by Opentrons that we have verified as autoclave-safe. When you can't determine whether a piece of labware is autoclave-safe, just replace it with new, clean labware. You can [purchase replacement labware](https://opentrons.com/products/categories/tips-&-labware) from the Opentrons shop.
-
-<table>
-  <thead>
-    <tr>
-      <th>Labware type</th>
-      <th>Autoclave-safe items</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Reservoirs</strong></td>
-      <td>NEST 1-well reservoirs</td>
-    </tr>
-    <tr>
-      <td><strong>Sample vials</strong></td>
-      <td>Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)</td>
-    </tr>
-    <tr>
-      <td><strong>Tip racks and tips</strong></td>
-      <td>All Flex tip racks and tips</td>
-    </tr>
-    <tr>
-      <td><strong>Well plates</strong></td>
-      <td>
-        <ul>
-          <li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li>
-          <li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li>
-          <li>USA Scientific 96 Deep Well Plate, 2.4 mL</li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
+Opentrons doesn't recommend re-using autoclaved labware with a Flex. The heat and pressure may cause items to warp or shrink, even if they're considered "autoclave safe." While autoclaved labware may be acceptable for quick, proof-of-concept testing, it's always better to use fresh labware for production runs, which helps ensure the best results. You can find Flex-compatible labware in the [Opentrons Labware Library](https://labware.opentrons.com/) and on the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of our website.

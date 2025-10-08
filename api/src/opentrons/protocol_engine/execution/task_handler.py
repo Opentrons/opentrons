@@ -8,7 +8,7 @@ from ..resources import ModelUtils, ConcurrencyProvider
 from ..types import Task
 import asyncio
 import contextlib
-from ..actions import ActionDispatcher, FinishTaskAction
+from ..actions import ActionDispatcher, FinishTaskAction, StartTaskAction
 from ..errors import ErrorOccurrence
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
 
@@ -83,11 +83,13 @@ class TaskHandler:
                 log.exception("Exception in task finish dispatch.")
 
         asyncio_task.add_done_callback(_done_callback)
-        return Task(
+        task = Task(
             id=task_id,
             createdAt=self._model_utils.get_timestamp(),
             asyncioTask=asyncio_task,
         )
+        self._action_dispatcher.dispatch(StartTaskAction(task))
+        return task
 
     @staticmethod
     def _empty_queue(

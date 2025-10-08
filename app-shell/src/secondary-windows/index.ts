@@ -8,8 +8,9 @@
  * Each "type" of open window requires an associated action and secondary window details, see detailsByActionType.
  */
 
-import { CAMERA_STREAM_OPEN } from '../constants'
+import { CAMERA_PHOTO_OPEN, CAMERA_STREAM_OPEN } from '../constants'
 import { createLogger } from '../log'
+import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 
 import type { BrowserWindow } from 'electron'
@@ -45,7 +46,19 @@ export function registerCameraStream(
 function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
-      return openCameraStream(action.payload.hostname, log)
+      return openCameraStream({
+        robotIp: action.payload.hostname,
+        robotName: action.payload.robotName,
+        log,
+      })
+    case CAMERA_PHOTO_OPEN:
+      return openCameraPhoto({
+        photoUrl: action.payload.photoUrl,
+        robotName: action.payload.robotName,
+        windowTitle: action.payload.windowTitle,
+        dimensions: action.payload.dimensions,
+        log,
+      })
     default:
       return null
   }
@@ -67,6 +80,10 @@ function openWindow(details: SecondaryWindowDetails): void {
     const window = createUi()
     secondaryWindows.set(windowId, window)
 
+    window.webContents.once('did-finish-load', () => {
+      log.debug(`Did finish load for ${type}`)
+      window.webContents.send('window-type', 'secondary')
+    })
     window.once('closed', () => {
       log.debug('Camera stream window closed')
       secondaryWindows.delete(windowId)

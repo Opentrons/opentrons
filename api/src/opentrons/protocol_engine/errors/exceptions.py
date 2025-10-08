@@ -430,6 +430,19 @@ class NoTaskFoundError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class TaskFailedError(ProtocolEngineError):
+    """Raised when waiting on a task that failed."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TaskFailedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class PipetteNotLoadedError(ProtocolEngineError):
     """Raised when referencing a pipette that has not been loaded."""
 

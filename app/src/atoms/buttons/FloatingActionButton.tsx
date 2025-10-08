@@ -35,6 +35,7 @@ export function FloatingActionButton(
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: ${CURSOR_DEFAULT};
+    z-index: 2;
 
     &:active {
       background-color: ${COLORS.purple55};
@@ -72,7 +73,7 @@ export function FloatingActionButton(
             color={contentColor}
             height="3rem"
             name={iconName}
-            width="3.75rem"
+            width="3rem"
           />
         ) : null}
         <StyledText oddStyle="level4HeaderSemiBold">{buttonText}</StyledText>

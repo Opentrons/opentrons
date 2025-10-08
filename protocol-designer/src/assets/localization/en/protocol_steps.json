@@ -26,14 +26,14 @@
   "blowout_position": "Blowout position from top",
   "bottom_of_stack": "Bottom of stack",
   "captions_for_fields": {
-    "blockTargetTemp": "Valid range between 4 and 99˚C",
-    "blockTargetTempHold": "Valid range between 4 and 99˚C",
-    "heaterShakerTimer": "Use the format mm:ss",
-    "lidTargetTemp": "Valid range between 37 and 110˚C",
-    "lidTargetTempHold": "Valid range between 37 and 110˚C",
-    "targetHeaterShakerTemperature": "Valid range between 20 and 95˚C",
+    "blockTargetTemp": "Valid range between 4 and 99 °C",
+    "blockTargetTempHold": "Valid range between 4 and 99 °C",
+    "heaterShakerTimer": "Use the format hh:mm:ss",
+    "lidTargetTemp": "Valid range between 37 and 110 °C",
+    "lidTargetTempHold": "Valid range between 37 and 110 °C",
+    "targetHeaterShakerTemperature": "Valid range between 20 and 95 °C",
     "targetSpeed": "Valid range between 200 and 3000 rpm",
-    "targetTemperature": "Valid range between 4 and 95˚C",
+    "targetTemperature": "Valid range between 4 and 95 °C",
     "volume": "Recommended between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
@@ -64,6 +64,7 @@
   "edit_step": "Edit step",
   "ending_deck": "Ending deck",
   "engage_height": "Engage height",
+  "flow_rate_builder": "Flow rate builder",
   "flow_type_title": "{{type}} flow rate",
   "from": "from",
   "heater_shaker": {
@@ -78,6 +79,17 @@
     "latch": {
       "closed": "closed",
       "open": "open"
+    },
+    "prior_state": {
+      "heater_label": "Heater set to",
+      "heater_value": "{{value}} °C",
+      "heater_value_off": "Off",
+      "latch_label": "Labware latch",
+      "latch_value_closed": "Closed",
+      "latch_value_open": "Open",
+      "shaker_label": "Shaker set to",
+      "shaker_value": "{{value}} rpm",
+      "shaker_value_off": "Off"
     }
   },
   "heater_shaker_state": "Heater-Shaker state",
@@ -112,14 +124,18 @@
   "of": "of",
   "off_deck": "Off-Deck",
   "pause": {
-    "untilResume": "Pausing until manually told to resume",
-    "untilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
-    "untilTime": "<text>Pausing for</text><tag/>"
+    "pausingUntilResume": "Pausing until manually told to resume",
+    "pausingUntilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
+    "pausingForDuration": "<text>Pausing for</text><tag/>",
+    "untilResume": "Until told to resume",
+    "untilTemperature": "Until {{temperature}} °C reached",
+    "forDuration": "For {{duration}}"
   },
   "pipette": "Pipette",
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
+  "prior_state": "Last module state",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
   "reference_positions": {
@@ -160,12 +176,28 @@
   "temperature": "Temperature",
   "temperature_module": {
     "active": "<semiBoldText>{{module}}</semiBoldText><text>set to</text><tag/>",
-    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>"
+    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>",
+    "prior_state": {
+      "temperature_label": "Temperature set to",
+      "temperature_value": "{{value}} °C",
+      "temperature_value_off": "Off"
+    }
   },
   "thermocycler_module": {
     "lid_position": {
       "closed": "closed",
       "open": "open"
+    },
+    "prior_state": {
+      "block_label": "Block set to",
+      "block_value": "{{value}} °C",
+      "block_value_off": "Off",
+      "lid_label": "Lid set to",
+      "lid_value": "{{value}} °C",
+      "lid_value_off": "Off",
+      "lid_position_label": "Lid position",
+      "lid_position_value_open": "Open",
+      "lid_position_value_closed": "Closed"
     },
     "repeat": "Repeat {{repetitions}} times",
     "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
@@ -187,7 +219,7 @@
   "time_in": "{{times}} times in",
   "timeline": "Timeline",
   "tip_handling": {
-    "title": "Tip usage",
+    "title": "Tip handling",
     "tooltip": "Choose tip pickup frequency for aspirations"
   },
   "tip_management": "Tip management",

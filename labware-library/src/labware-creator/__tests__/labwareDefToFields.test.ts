@@ -39,6 +39,7 @@ describe('labwareDefToFields', () => {
       gridOffsetY: '11.24',
 
       homogeneousWells: 'true',
+      hasLpcQuirk: 'false',
       regularRowSpacing: 'true',
       regularColumnSpacing: 'true',
 

@@ -94,6 +94,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   labwareType: requiredString(LABELS.labwareType).oneOf(
     labwareTypeOptions.map(o => o.value)
   ),
+  hasLpcQuirk: requiredString(LABELS.hasLpcQuirk),
   compatibleModules: Yup.object()
     .shape({})
     .test(

@@ -19,6 +19,7 @@ import {
   TouchScreenSleep,
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
+import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
 import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   getLocalRobot,
@@ -204,6 +205,9 @@ export function RobotSettingsDashboard(): JSX.Element {
 
     case 'LanguageSetting':
       return <LanguageSetting setCurrentOption={setCurrentOption} />
+
+    case 'CameraPreferences':
+      return <CameraPreferences setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:
