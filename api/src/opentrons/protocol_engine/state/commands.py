@@ -239,7 +239,10 @@ class CommandState:
     """Whether the run has entered error recovery."""
 
     stopped_by_async_error: bool
-    """If this is set to True, the engine was stopped by an estop event."""
+    """If this is set to True, the engine was stopped by an async event."""
+
+    is_stopping_because_of_async_error: bool
+    """If this is set to True, the engine was stopped by an asynch event and hasn't finished stopping."""
 
     error_recovery_policy: ErrorRecoveryPolicy
     """See `CommandView.get_error_recovery_policy()`."""
@@ -273,6 +276,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_async_error=False,
+            is_stopping_because_of_async_error=False,
             error_recovery_policy=error_recovery_policy,
             has_entered_error_recovery=False,
         )
@@ -474,6 +478,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             if action.from_asynchronous_error:
                 self._state.stopped_by_async_error = True
+                self._state.is_stopping_because_of_async_error = True
                 self._state.run_result = RunResult.FAILED
             else:
                 self._state.run_result = RunResult.STOPPED
@@ -499,14 +504,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     action.error_details.error,
                 )
         else:
-            # HACK(sf): There needs to be a better way to set
-            # an estop error than this else clause
-            if self._state.stopped_by_async_error and action.error_details:
+            # HACK(sf): There needs to be a better way to handle async errors than this logic
+            # which is way too nonlocal. The idea here is that
+            # (1) there's an async error that calls one of the engine async error handlers,
+            # which emits a stop action and then tells the orchestrator to call finish
+            # (2) calling stop normally would lock out the run error field (since the idea is that
+            # stop happens in the handler of the error that stops the run, and thus the failed
+            # command has already set the run error), but here either the command didn't fail or
+            # the command failed with an error that isn't relevant or is duplicative, so we want
+            # to override that
+            # (3) but we don't want to override it twice, because some other error handler might
+            # tell us to finish with the cancelled error that happens because a command was cancelled
+            # in reaction to (2)
+            # So we set and clear this stopped_by_async_error and it's awful. Let's figure out a better
+            # way.
+
+            if self._state.is_stopping_because_of_async_error and action.error_details:
                 self._state.run_error = self._map_run_exception_to_error_occurrence(
                     action.error_details.error_id,
                     action.error_details.created_at,
                     action.error_details.error,
                 )
+                self._state.is_stopping_because_of_async_error = False
+                self._state.stopped_by_async_error = True
 
     def _handle_hardware_stopped_action(self, action: HardwareStoppedAction) -> None:
         self._state.queue_status = QueueStatus.PAUSED

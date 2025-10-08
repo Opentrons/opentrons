@@ -105,7 +105,7 @@ class AbstractModule(abc.ABC):
     def disconnected_callback(self) -> None:
         """Called from within the module object to signify the object is no longer connected"""
         if self._disconnected_callback is not None:
-            self._disconnected_callback(self.port, self.serial_number)
+            self._disconnected_callback(self.model(), self.port, self.serial_number)
 
     def error_callback(self, exc: Exception) -> None:
         """Called from within the module object when an asynchronous hardware error occurrs."""

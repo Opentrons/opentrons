@@ -75,6 +75,7 @@ from .types import (
     ErrorMessageNotification,
     HardwareEvent,
     AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
     HardwareEventHandler,
     HardwareAction,
     HepaFanState,
@@ -371,7 +372,10 @@ class OT3API(
     def _send_module_notification(self, event: HardwareEvent) -> None:
         if not isinstance(
             event,
-            AsynchronousModuleErrorNotification,
+            (
+                AsynchronousModuleErrorNotification,
+                ModuleDisconnectedNotification,
+            ),
         ):
             return
         mod_log.info(
