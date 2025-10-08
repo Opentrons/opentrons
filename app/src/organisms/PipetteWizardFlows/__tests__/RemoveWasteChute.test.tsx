@@ -45,7 +45,7 @@ describe('RemoveWasteChute', () => {
     )
     screen.getByLabelText('icon_error')
     screen.getByText(
-      'Failure to remove the waste chute will result in the pipetting crashing into the waste chute'
+      'If the waste chute isn’t removed, the pipette WILL crash into it.'
     )
     const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
