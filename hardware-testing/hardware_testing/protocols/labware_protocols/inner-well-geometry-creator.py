@@ -23,12 +23,13 @@ import numpy as np
 import json
 from opentrons_shared_data.labware.types import LabwareDefinition3, LabwareDefinition2
 from dataclasses import dataclass, field
+from collections import OrderedDict
 
 ###########################################
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "eppendorf_96_wellplate_500ul" # change to desired labware
+LABWARE = "example_labware" # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -408,13 +409,6 @@ def _get_height_of_liquid_in_well(
         return extract_float(pipette.measure_liquid_height(well))
     else:
         return 0.01
-
-
-import numpy as np
-from collections import OrderedDict
-from typing import List, Union
-from opentrons.protocol_api import ProtocolContext, Labware
-from opentrons_shared_data.labware.types import LabwareDefinition2, LabwareDefinition3
 
 
 def generate_frusta(
