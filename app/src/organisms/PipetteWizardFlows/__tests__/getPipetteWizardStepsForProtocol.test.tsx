@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  RIGHT,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+} from '@opentrons/shared-data'
 
 import {
   mock96ChannelAttachedPipetteInformation,
@@ -10,7 +14,8 @@ import {
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration, LoadedPipette } from '@opentrons/shared-data'
 import type { PipetteWizardStep } from '../types'
 
 const mockPipetteInfo = [
@@ -308,6 +313,88 @@ describe('getPipetteWizardStepsForProtocol', () => {
       )
     ).toStrictEqual(mockFlowSteps)
   })
+  it('returns the correct array of info when the attached pipette on left mount needs to be switched out for 96-channel and a waste chute is present', () => {
+    const mockDeckConfig = ({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: mockAttachedPipetteInformation, right: null },
+        mockPipetteInfo as any,
+        LEFT,
+        mockDeckConfig
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
   it('returns the correct array of info when the attached pipette on right mount needs to be switched out for 96-channel', () => {
     const mockFlowSteps = [
       {
@@ -368,6 +455,88 @@ describe('getPipetteWizardStepsForProtocol', () => {
         { left: null, right: mockAttachedPipetteInformation },
         mockPipetteInfo as any,
         LEFT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
+  it('returns the correct array of info when the attached pipette on right mount needs to be switched out for 96-channel and a waste chute is present', () => {
+    const mockDeckConfig = ({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        { left: null, right: mockAttachedPipetteInformation },
+        mockPipetteInfo as any,
+        LEFT,
+        mockDeckConfig
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -445,6 +614,102 @@ describe('getPipetteWizardStepsForProtocol', () => {
         },
         mockPipetteInfo as any,
         LEFT
+      )
+    ).toStrictEqual(mockFlowSteps)
+  })
+  it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel', () => {
+    const mockDeckConfig = ({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>
+    const mockFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: RIGHT,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+    expect(
+      getPipetteWizardStepsForProtocol(
+        {
+          left: mockAttachedPipetteInformation,
+          right: mockAttachedPipetteInformation,
+        },
+        mockPipetteInfo as any,
+        LEFT,
+        mockDeckConfig
       )
     ).toStrictEqual(mockFlowSteps)
   })

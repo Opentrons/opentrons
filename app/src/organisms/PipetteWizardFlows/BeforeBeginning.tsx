@@ -13,7 +13,6 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WASTE_CHUTE_CUTOUT,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
@@ -35,7 +34,7 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   PIPETTE,
 } from './constants'
-import { getIsGantryEmpty } from './utils'
+import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
 
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction } from 'react-query'
@@ -93,13 +92,7 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useNotifyDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(
-      fixture =>
-        fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
-        fixture.cutoutFixtureId?.includes('wasteChute')
-    ) ?? false
+  const deckConfig = useNotifyDeckConfigurationQuery()
 
   const pipetteDisplayName = usePipetteNameSpecs(
     requiredPipette?.pipetteName as PipetteName
@@ -124,7 +117,7 @@ export const BeforeBeginning = (
       bodyTranslationKey = 'remove_labware_to_get_started'
       if (
         selectedPipette === NINETY_SIX_CHANNEL &&
-        Boolean(isWasteChuteOnDeck)
+        isWasteChuteOnDeck(deckConfig)
       ) {
         equipmentList.push(hexScrewdriverWithSubtitle)
       }

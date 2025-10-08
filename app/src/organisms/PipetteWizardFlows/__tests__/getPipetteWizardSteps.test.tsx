@@ -291,6 +291,95 @@ describe('getPipetteWizardSteps', () => {
       getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
+  it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount and a waste chute on deck', () => {
+    const mockDeckConfig = ({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+    } as any) as UseQueryResult<DeckConfiguration>
+    const mockAttachPipetteFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: RIGHT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.DETACH_PIPETTE,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
+      {
+        section: SECTIONS.CARRIAGE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNTING_PLATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.ATTACH_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardSteps(
+        FLOWS.ATTACH,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        false,
+        mockDeckConfig
+      )
+    ).toStrictEqual(mockAttachPipetteFlowSteps)
+  })
 
   it('returns the correct array of info for calibrate pipette 96 when a waste chute is in deck config', () => {
     const mockDeckConfig = ({

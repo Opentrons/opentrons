@@ -93,7 +93,8 @@ export const PipetteWizardFlows = (
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount
+            mount,
+            deckConfig
           ),
     []
   )

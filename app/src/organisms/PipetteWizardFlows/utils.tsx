@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { AnimationVideo, SPACING } from '@opentrons/components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { LEFT, RIGHT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
@@ -24,6 +24,8 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 
 import { FLOWS, SECTIONS } from './constants'
 
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardFlow, PipetteWizardStep } from './types'
 
@@ -37,6 +39,17 @@ interface PipetteAnimationProps {
   pipetteWizardStep: PipetteWizardStep
   channel?: number
 }
+
+export function isWasteChuteOnDeck(
+  deckConfig?: UseQueryResult<DeckConfiguration>
+): boolean {
+  return !!deckConfig?.data?.find(
+    fixture =>
+      fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+      fixture.cutoutFixtureId?.includes('wasteChute')
+  )
+}
+
 export function getPipetteAnimations(
   props: PipetteAnimationProps
 ): JSX.Element {
