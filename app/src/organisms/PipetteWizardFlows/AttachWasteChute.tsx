@@ -1,6 +1,12 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
@@ -8,31 +14,23 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
+import { BODY_STYLE } from './constants'
 
 import type { PipetteWizardStepProps } from './types'
 
 export const AttachWasteChute = (
   props: PipetteWizardStepProps
-): JSX.Element | null => {
+): JSX.Element => {
   const {
     isRobotMoving,
     errorMessage,
     proceed,
-    attachedPipettes,
     mount,
     goBack,
     flowType,
   } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  const pipetteWizardStep = {
-    mount,
-    flowType,
-    section: SECTIONS.ATTACH_WASTE_CHUTE,
-  }
 
   const handleOnClick = (): void => {
     proceed()
@@ -48,24 +46,18 @@ export const AttachWasteChute = (
     />
   ) : (
     <GenericWizardTile
-      header={i18n.format(t('attach_wastechute'), 'capitalize')}
-      rightHandBody={getPipetteAnimations({
-        pipetteWizardStep,
-        channel: attachedPipettes[mount]?.data.channels,
-      })}
+      header={t('attach_wastechute')}
+      rightHandBody={''}
       bodyText={
-        <Trans
-          t={t}
-          i18nKey="install_waste_chute"
-          components={{
-            block: (
-              <LegacyStyledText
-                css={BODY_STYLE}
-                marginBottom={SPACING.spacing16}
-              />
-            ),
-          }}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+          <Trans
+            t={t}
+            i18nKey="install_waste_chute"
+            components={{
+              block: <LegacyStyledText css={BODY_STYLE} />,
+            }}
+          />
+        </Flex>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleOnClick}

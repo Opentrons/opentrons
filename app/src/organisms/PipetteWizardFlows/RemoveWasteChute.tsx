@@ -3,6 +3,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Banner,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
@@ -13,32 +15,16 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
+import { BODY_STYLE } from './constants'
 
 import type { PipetteWizardStepProps } from './types'
 
 export const RemoveWasteChute = (
   props: PipetteWizardStepProps
-): JSX.Element | null => {
-  const {
-    isRobotMoving,
-    errorMessage,
-    proceed,
-    attachedPipettes,
-    isOnDevice,
-    mount,
-    goBack,
-    flowType,
-  } = props
+): JSX.Element => {
+  const { isRobotMoving, errorMessage, proceed, isOnDevice, goBack } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  const pipetteWizardStep = {
-    mount,
-    flowType,
-    section: SECTIONS.REMOVE_WASTE_CHUTE,
-  }
 
   const handleOnClick = (): void => {
     proceed()
@@ -58,32 +44,26 @@ export const RemoveWasteChute = (
   ) : (
     <GenericWizardTile
       header={t('remove_wastechute')}
-      rightHandBody={getPipetteAnimations({
-        pipetteWizardStep,
-        channel: attachedPipettes[mount]?.data.channels,
-      })}
+      rightHandBody={''}
       bodyText={
         <>
-          <Trans
-            t={t}
-            i18nKey="waste_chute_error"
-            components={{
-              block: (
-                <LegacyStyledText
-                  css={BODY_STYLE}
-                  marginBottom={SPACING.spacing16}
-                />
-              ),
-            }}
-          />
-          <Banner
-            type="error"
-            marginTop={
-              Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-            }
-          >
-            {t('waste_chute_warning')}
-          </Banner>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+            <Trans
+              t={t}
+              i18nKey="waste_chute_error"
+              components={{
+                block: <LegacyStyledText css={BODY_STYLE} />,
+              }}
+            />
+            <Banner
+              type="error"
+              marginTop={
+                Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+              }
+            >
+              {t('waste_chute_warning')}
+            </Banner>
+          </Flex>
         </>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
