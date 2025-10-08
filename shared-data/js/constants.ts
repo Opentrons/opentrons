@@ -448,6 +448,8 @@ export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
 export const exactMatchOnlyLoadNames = new Set([
   'milliplex_microtiter_plate',
   'milliplex_microtiter_plate_lid',
+  'corning_falcon_384_wellplate_130ul_flat',
+  'corning_falcon_384_wellplate_130ul_flat_lid',
   'ibidi_96_square_well_plate_300ul',
   'ibidi_96_square_well_plate_300ul_lid',
   'opentrons_96_deep_well_adapter',

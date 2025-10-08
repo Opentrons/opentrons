@@ -26,7 +26,6 @@ class ProtocolKind(str, Enum):
 class ProtocolFile(BaseModel):
     """A file in a protocol."""
 
-    # TODO(mc, 2021-11-12): add unique ID to file resource
     name: str = Field(..., description="The file's basename, including extension")
     role: ProtocolFileRole = Field(..., description="The file's role in the protocol.")
 

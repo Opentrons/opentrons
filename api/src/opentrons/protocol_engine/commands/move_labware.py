@@ -38,6 +38,7 @@ from ..types import (
     LabwareLocationSequence,
     NotOnDeckLocationSequenceComponent,
     OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
 )
 from ..errors import (
     LabwareMovementNotAllowedError,
@@ -228,9 +229,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 )
                 eventual_destination_location_sequence = [
                     NotOnDeckLocationSequenceComponent(
-                        logicalLocationName=OFF_DECK_LOCATION
+                        logicalLocationName=WASTE_CHUTE_LOCATION
                     )
                 ]
+
             elif fixture_validation.is_trash(area_name):
                 # When dropping labware in the trash bins we want to ensure they are lids
                 # and enforce a y-axis drop offset to ensure they fall within the trash bin
@@ -351,7 +353,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
-
             user_pick_up_offset = (
                 Point.from_xyz_attrs(params.pickUpOffset)
                 if params.pickUpOffset is not None
@@ -464,7 +465,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             new_location=available_new_location,
             new_offset_id=new_offset_id,
         )
-
         if labware_validation.validate_definition_is_lid(
             definition=self._state_view.labware.get_definition(params.labwareId)
         ):
@@ -498,7 +498,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     parent_labware_ids=parent_updates,
                     lid_ids=lid_updates,
                 )
-
         return SuccessData(
             public=MoveLabwareResult(
                 offsetId=new_offset_id,

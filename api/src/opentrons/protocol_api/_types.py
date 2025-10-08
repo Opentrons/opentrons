@@ -11,9 +11,11 @@ class OffDeckType(enum.Enum):
     """
 
     OFF_DECK = "off-deck"
+    WASTE_CHUTE = "waste-chute"
 
 
 OFF_DECK: Final = OffDeckType.OFF_DECK
+WASTE_CHUTE: Final = OffDeckType.WASTE_CHUTE
 
 # Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
 # the constant definition, Sphinx has trouble picking it up.

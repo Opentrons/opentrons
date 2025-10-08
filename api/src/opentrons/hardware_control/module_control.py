@@ -30,6 +30,7 @@ from .types import (
     StatusBarUpdateEvent,
     HardwareEvent,
     AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
 )
 from . import modules
 
@@ -164,13 +165,28 @@ class AttachedModulesControl:
         self.subscribe_to_api_event(mod)
         return mod
 
-    def _disconnected_callback(self, port: str, serial: Optional[str]) -> None:
+    def _disconnected_callback(
+        self, model: str, port: str, serial: Optional[str]
+    ) -> None:
         """Used by the module to indicate that it was disconnected and should be deleted."""
         mod = ModuleAtPort(port=port, serial=serial, name="")
         asyncio.run_coroutine_threadsafe(
             self.unregister_modules([mod]),
             self._api.loop,
         )
+        try:
+            self._api.loop.call_soon(
+                self._event_callback,
+                ModuleDisconnectedNotification(
+                    module_serial=serial,
+                    module_model=modules.module_model_from_string(model),
+                    port=port,
+                ),
+            )
+        except Exception:
+            log.exception(
+                f"Module disconnect callback for module {model} {serial} at {port} failed"
+            )
 
     def _async_error_callback(
         self,
@@ -218,10 +234,15 @@ class AttachedModulesControl:
         for removed_mod in removed_modules:
             try:
                 self._available_modules.remove(removed_mod)
+                # Important: this wants to be after the remove because this may trigger
+                # recursion back to here; we therefore want the module to already be
+                # removed so that the recursion terminates next loop
+                removed_mod.disconnected_callback()
             except ValueError:
-                log.exception(
+                log.warning(
                     f"Removed Module {removed_mod} not found in attached modules"
                 )
+
         for removed_mod in removed_modules:
             log.info(
                 f"Module {removed_mod.name()} detached from port {removed_mod.port}"

@@ -25,7 +25,7 @@ import {
 
 import { FixedTrashText } from '../..'
 import { COLORS } from '../../helix-design-system'
-import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
+import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
 import { SlotLabels } from '../Deck'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
@@ -596,7 +596,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 function StackedBadge(): JSX.Element {
   return (
     <RobotCoordsForeignObject height="2.5rem" width="2.5rem" x={113} y={53}>
-      <DeckInfoLabel
+      <RobotInfoLabel
         height="1.25rem"
         svgSize="0.875rem"
         highlight

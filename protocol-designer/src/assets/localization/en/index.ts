@@ -17,6 +17,7 @@ import protocol_overview from './protocol_overview.json'
 import protocol_steps from './protocol_steps.json'
 import shared from './shared.json'
 import starting_deck_state from './starting_deck_state.json'
+import tip_selection from './tip_selection.json'
 import tooltip from './tooltip.json'
 import well_selection from './well_selection.json'
 
@@ -42,4 +43,5 @@ export const en = {
   starting_deck_state,
   tooltip,
   well_selection,
+  tip_selection,
 }
