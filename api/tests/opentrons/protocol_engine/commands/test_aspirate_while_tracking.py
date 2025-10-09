@@ -74,14 +74,14 @@ def subject(
             "funky-labware",
             "funky-well",
             None,
-            Point(1,2,3),
+            Point(1, 2, 3),
         ),
         (
             CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
             "funky-labware",
             "funky-well",
             None,
-            Point(1,2,3),
+            Point(1, 2, 3),
         ),
         (
             CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
@@ -91,7 +91,7 @@ def subject(
                 origin=WellOrigin.MENISCUS,
                 offset=WellOffset(x=2, y=3, z=4),
             ),
-            Point(7,8,9),
+            Point(7, 8, 9),
         ),
     ],
 )
@@ -207,7 +207,10 @@ async def test_aspirate_while_tracking_implementation(
     if isinstance(location, CurrentWell):
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=expected_location.x, y=expected_location.y, z=expected_location.z)
+                volume=123,
+                position=DeckPoint(
+                    x=expected_location.x, y=expected_location.y, z=expected_location.z
+                ),
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -224,7 +227,10 @@ async def test_aspirate_while_tracking_implementation(
     else:
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=expected_location.x, y=expected_location.y, z=expected_location.z)
+                volume=123,
+                position=DeckPoint(
+                    x=expected_location.x, y=expected_location.y, z=expected_location.z
+                ),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
