@@ -33,7 +33,7 @@ jobs:
           ref: main
           inputs: |
             {
-              "oe-core-ref": "-",
+              "oe-core-ref": "${{ github.ref }}",
               "monorepo-ref": "${{ github.ref }}",
               "infra-stage": "stage-prod"
             }
