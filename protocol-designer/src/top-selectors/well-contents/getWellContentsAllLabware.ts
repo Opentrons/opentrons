@@ -99,7 +99,6 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = c
   labwareIngredSelectors.getSelectedLabwareId,
   getSelectedWells,
   getHighlightedWells,
-
   (
     labwareEntities,
     initialRobotState,
@@ -112,10 +111,11 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = c
     console.log('labwareEntities', labwareEntities)
     console.log('liquidsByLabware', liquidsByLabware)
     console.log('selectedLabwareId', selectedLabwareId)
-    const selectedLabwareStack =
-      initialRobotState.labware[selectedLabwareId].stack
+    const selectedLabwareStack = selectedLabwareId
+      ? initialRobotState.labware[selectedLabwareId].stack
+      : []
     const selectedLabwareDefUri = selectedLabwareId
-      ? initialRobotState.labware[selectedLabwareId].labwareDefUri
+      ? labwareEntities[selectedLabwareId].labwareDefURI
       : null
     console.log('selectedLabwareDefUri', selectedLabwareDefUri)
     const allLabwareIds: string[] = selectedLabwareStack ?? []
