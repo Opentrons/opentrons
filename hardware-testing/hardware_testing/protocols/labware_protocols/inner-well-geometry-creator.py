@@ -29,7 +29,7 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware" # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -411,9 +411,7 @@ def _get_height_of_liquid_in_well(
         return 0.01
 
 
-def generate_frusta(
-    ctx: ProtocolContext, data: List, labware: Labware
-) -> Union[LabwareDefinition2, LabwareDefinition3]:
+def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     """Read geometry creator results and generate frustum dimensions for the IWG."""
 
     inner_well_json = labware._core.get_definition()
@@ -421,7 +419,6 @@ def generate_frusta(
     well_diameter = inner_well_json["wells"]["A1"].get("diameter")
     well_side_length = inner_well_json["wells"]["A1"].get("xDimension")
     well_shape = inner_well_json["wells"]["A1"].get("shape")
-
 
     if well_shape == "circular":
         geoID = "conicalWell"
@@ -470,7 +467,7 @@ def generate_frusta(
                 "bottomHeight": round(h1, 2),
             }
         else:
-            continue  
+            continue
 
         frusta_data.append(section)
 
@@ -508,14 +505,28 @@ def generate_frusta(
     inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
     key_order = [
-        "ordering", "brand", "metadata", "dimensions",
-        "wells", "groups", "parameters",
-        "namespace", "version", "schemaVersion", "innerLabwareGeometry",
+        "ordering",
+        "brand",
+        "metadata",
+        "dimensions",
+        "wells",
+        "groups",
+        "parameters",
+        "namespace",
+        "version",
+        "schemaVersion",
+        "cornerOffsetFromSlot",
+        "stackingOffsetWithLabware",
+        "stackingOffsetWithModule",
+        "allowedRoles",
+        "gripperOffsets",
+        "innerLabwareGeometry",
     ]
-    new_iwg = OrderedDict((k, inner_well_json[k]) for k in key_order if k in inner_well_json)
+    new_iwg = OrderedDict(
+        (k, dict(inner_well_json)[k]) for k in key_order if k in inner_well_json
+    )
 
     return new_iwg
-
 
 
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
