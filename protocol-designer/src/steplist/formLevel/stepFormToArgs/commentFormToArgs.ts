@@ -1,8 +1,9 @@
 import type { CommentArgs } from '@opentrons/step-generation'
 import type { HydratedCommentFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 export const commentFormToArgs = (
-  hydratedFormData: HydratedCommentFormData
+  hydratedFormData: GetCastFormData<HydratedCommentFormData>
 ): CommentArgs => {
   const { message, stepName, stepDetails } = hydratedFormData
 

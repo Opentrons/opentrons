@@ -3,15 +3,18 @@ import type {
   SetTemperatureArgs,
 } from '@opentrons/step-generation'
 import type { HydratedTemperatureFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
-  hydratedFormData: HydratedTemperatureFormData
+  hydratedFormData: GetCastFormData<HydratedTemperatureFormData>
 ): TemperatureArgs => {
   const { moduleId, stepName, stepDetails } = hydratedFormData
   // cast values
   const setTemperature = hydratedFormData.setTemperature === 'true'
   // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
+  // todo(mm, 2025-10-09): Pretty sure targetTemperature is actually non-nullable now,
+  // though it is a number, not a string, and so there is still a type error here.
   const targetTemperature = parseFloat(hydratedFormData.targetTemperature)
   console.assert(
     setTemperature ? !Number.isNaN(targetTemperature) : true,

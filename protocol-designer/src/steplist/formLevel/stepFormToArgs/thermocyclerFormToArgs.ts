@@ -10,6 +10,7 @@ import type {
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
@@ -49,14 +50,18 @@ const _flattenProfileSteps = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  formData: HydratedThermocyclerFormData
-): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
+  formData: GetCastFormData<HydratedThermocyclerFormData>
+): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs => {
   const { thermocyclerFormType, stepDetails } = formData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
-        moduleId: formData.moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: formData.moduleId!,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
           formData.blockIsActive && formData.blockTargetTemp !== null
@@ -66,7 +71,9 @@ export const thermocyclerFormToArgs = (
           formData.lidIsActive && formData.lidTargetTemp !== null
             ? Number(formData.lidTargetTemp)
             : null,
-        lidOpen: formData.lidOpen,
+        // todo(mm, 2025-10-09): Nullability error inherited from prior code. Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lidOpen: formData.lidOpen!,
       }
     }
 
@@ -77,7 +84,11 @@ export const thermocyclerFormToArgs = (
       })
 
       return {
-        moduleId: formData.moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: formData.moduleId!,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         blockTargetTempHold:
           formData.blockIsActiveHold && formData.blockTargetTempHold !== null
@@ -100,7 +111,4 @@ export const thermocyclerFormToArgs = (
       }
     }
   }
-
-  // this should not happen, for Flow only
-  return null
 }

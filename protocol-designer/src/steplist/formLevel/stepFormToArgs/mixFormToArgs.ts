@@ -12,10 +12,11 @@ import { getMixDelayData } from './getDelayData'
 
 import type { MixArgs } from '@opentrons/step-generation'
 import type { HydratedMixFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
-  hydratedFormData: HydratedMixFormData
+  hydratedFormData: GetCastFormData<HydratedMixFormData>
 ): MixStepArgs => {
   const {
     volume: rawVolume,

@@ -1,9 +1,9 @@
-import type { LabwareMovementStrategy } from '@opentrons/shared-data'
 import type { MoveLabwareArgs } from '@opentrons/step-generation'
 import type { HydratedMoveLabwareFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 export const moveLabwareFormToArgs = (
-  hydratedFormData: HydratedMoveLabwareFormData
+  hydratedFormData: GetCastFormData<HydratedMoveLabwareFormData>
 ): MoveLabwareArgs => {
   const {
     labware,
@@ -19,8 +19,6 @@ export const moveLabwareFormToArgs = (
     description: stepDetails,
     labwareId: labware.id,
     newLocation,
-    strategy: useGripper
-      ? 'usingGripper'
-      : ('manualMoveWithPause' as LabwareMovementStrategy),
+    strategy: useGripper ? 'usingGripper' : 'manualMoveWithPause',
   }
 }
