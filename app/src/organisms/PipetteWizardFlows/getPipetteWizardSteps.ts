@@ -1,12 +1,13 @@
 import {
   LEFT,
-  NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+
 import { FLOWS, SECTIONS } from './constants'
-import { isWasteChuteOnDeck } from './utils'
+import { is96Channel, isWasteChuteOnDeck } from './utils'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration, PipetteMount } from '@opentrons/shared-data'
@@ -24,9 +25,12 @@ export const getPipetteWizardSteps = (
   deckConfig?: UseQueryResult<DeckConfiguration>
 ): PipetteWizardStep[] | null => {
   const wasteChute = isWasteChuteOnDeck(deckConfig)
+  const ninetySixChannel = is96Channel(
+    useAttachedPipettesFromInstrumentsQuery()
+  )
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      if (selectedPipette === NINETY_SIX_CHANNEL && wasteChute) {
+      if (ninetySixChannel && wasteChute) {
         return [
           { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
           { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
@@ -115,12 +119,12 @@ export const getPipetteWizardSteps = (
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             ...(wasteChute
               ? [
-                  {
-                    section: SECTIONS.REMOVE_WASTE_CHUTE,
-                    mount: LEFT,
-                    flowType: FLOWS.DETACH,
-                  },
-                ]
+                {
+                  section: SECTIONS.REMOVE_WASTE_CHUTE,
+                  mount: LEFT,
+                  flowType: FLOWS.DETACH,
+                },
+              ]
               : []),
             {
               section: SECTIONS.ATTACH_PROBE,
@@ -134,12 +138,12 @@ export const getPipetteWizardSteps = (
             },
             ...(wasteChute
               ? [
-                  {
-                    section: SECTIONS.ATTACH_WASTE_CHUTE,
-                    mount: LEFT,
-                    flowType: FLOWS.DETACH,
-                  },
-                ]
+                {
+                  section: SECTIONS.ATTACH_WASTE_CHUTE,
+                  mount: LEFT,
+                  flowType: FLOWS.DETACH,
+                },
+              ]
               : []),
             {
               section: SECTIONS.RESULTS,
@@ -178,12 +182,12 @@ export const getPipetteWizardSteps = (
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             ...(wasteChute
               ? [
-                  {
-                    section: SECTIONS.REMOVE_WASTE_CHUTE,
-                    mount: LEFT,
-                    flowType: FLOWS.DETACH,
-                  },
-                ]
+                {
+                  section: SECTIONS.REMOVE_WASTE_CHUTE,
+                  mount: LEFT,
+                  flowType: FLOWS.DETACH,
+                },
+              ]
               : []),
             {
               section: SECTIONS.ATTACH_PROBE,
@@ -197,12 +201,12 @@ export const getPipetteWizardSteps = (
             },
             ...(wasteChute
               ? [
-                  {
-                    section: SECTIONS.ATTACH_WASTE_CHUTE,
-                    mount: LEFT,
-                    flowType: FLOWS.DETACH,
-                  },
-                ]
+                {
+                  section: SECTIONS.ATTACH_WASTE_CHUTE,
+                  mount: LEFT,
+                  flowType: FLOWS.DETACH,
+                },
+              ]
               : []),
             {
               section: SECTIONS.RESULTS,

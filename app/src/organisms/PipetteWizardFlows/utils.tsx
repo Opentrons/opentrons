@@ -50,6 +50,22 @@ export function isWasteChuteOnDeck(
   )
 }
 
+export function is96Channel(
+  instrument: AttachedPipettesFromInstrumentsQuery
+): boolean {
+  const left_instrument = instrument[LEFT]
+  if (
+    left_instrument != null &&
+    left_instrument.ok &&
+    left_instrument.mount !== 'left' &&
+    left_instrument.data?.channels === 96
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function getPipetteAnimations(
   props: PipetteAnimationProps
 ): JSX.Element {
