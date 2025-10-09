@@ -686,9 +686,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             False,
         )
@@ -712,9 +712,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[tip_motor_move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             True,
         )
@@ -939,9 +939,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -976,9 +976,9 @@ class OT3Controller(FlexBackend):
         move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -1763,6 +1763,7 @@ class OT3Controller(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """
         Check if the gripper is at the expected location.
@@ -1777,7 +1778,16 @@ class OT3Controller(FlexBackend):
             expected_grip_width + grip_width_uncertainty_wider
         )
         current_gripper_position = jaw_width
-        if isclose(current_gripper_position, hard_limit_lower):
+        log.info(
+            f"Checking gripper position: current {jaw_width}; max error {max_allowed_grip_error}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
+        )
+        if (
+            isclose(current_gripper_position, hard_limit_lower)
+            # this odd check handles internal backlash that can lead the position to read as if
+            # the gripper has overshot its lower bound; this is physically impossible and an
+            # artifact of the gearing, so it always indicates a hard stop
+            or current_gripper_position < hard_limit_lower
+        ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws all the way closed",
                 details={
@@ -1796,6 +1806,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_min
             < -max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws closed too far",
@@ -1809,6 +1820,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_max
             > max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws could not close far enough",

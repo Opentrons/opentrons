@@ -78,7 +78,12 @@ from .module_core import (
     FlexStackerCore,
 )
 from .exceptions import InvalidModuleLocationError
-from . import load_labware_params, deck_conflict, overlap_versions
+from . import (
+    load_labware_params,
+    deck_conflict,
+    overlap_versions,
+    _default_liquid_class_versions,
+)
 from opentrons.protocol_engine.resources import labware_validation
 
 if TYPE_CHECKING:
@@ -492,13 +497,28 @@ class ProtocolCore(
             )
         # if this is a labware with a lid, we just need to find its lid_id
         else:
-            lid = self._engine_client.state.labware.get_lid_by_labware_id(
-                labware.labware_id
+            # we need to check to see if this labware is hosting a lid stack
+            potential_lid_stack = (
+                self._engine_client.state.labware.get_next_child_labware(
+                    labware.labware_id
+                )
             )
-            if lid is not None:
-                lid_id = lid.id
+            if potential_lid_stack and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            ):
+                lid_id = self._engine_client.state.labware.get_highest_child_labware(
+                    labware.labware_id
+                )
             else:
-                raise ValueError("Cannot move a lid off of a labware with no lid.")
+                lid = self._engine_client.state.labware.get_lid_by_labware_id(
+                    labware.labware_id
+                )
+                if lid is not None:
+                    lid_id = lid.id
+                else:
+                    raise ValueError(
+                        f"Cannot move a lid off of {labware.get_display_name()} because it has no lid."
+                    )
 
         _pick_up_offset = (
             LabwareOffsetVector(
@@ -602,6 +622,9 @@ class ProtocolCore(
         )
 
         # Handle leftover empty lid stack if there is one
+        potential_lid_stack = self._engine_client.state.labware.get_next_child_labware(
+            labware.labware_id
+        )
         if (
             labware_validation.is_lid_stack(labware.load_name)
             and self._engine_client.state.labware.get_highest_child_labware(
@@ -613,6 +636,25 @@ class ProtocolCore(
             self._engine_client.execute_command(
                 cmd.MoveLabwareParams(
                     labwareId=labware.labware_id,
+                    newLocation=SYSTEM_LOCATION,
+                    strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                    pickUpOffset=None,
+                    dropOffset=None,
+                )
+            )
+        elif (
+            potential_lid_stack
+            and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            )
+            and self._engine_client.state.labware.get_highest_child_labware(
+                potential_lid_stack
+            )
+            == potential_lid_stack
+        ):
+            self._engine_client.execute_command(
+                cmd.MoveLabwareParams(
+                    labwareId=potential_lid_stack,
                     newLocation=SYSTEM_LOCATION,
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
@@ -1068,8 +1110,12 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def get_liquid_class(self, name: str, version: int) -> LiquidClass:
+    def get_liquid_class(self, name: str, version: Optional[int]) -> LiquidClass:
         """Get an instance of a built-in liquid class."""
+        if version is None:
+            version = _default_liquid_class_versions.get_liquid_class_version(
+                self._api_version, name
+            )
         try:
             # Check if we have already loaded this liquid class' definition
             liquid_class_def = self._liquid_class_def_cache[(name, version)]

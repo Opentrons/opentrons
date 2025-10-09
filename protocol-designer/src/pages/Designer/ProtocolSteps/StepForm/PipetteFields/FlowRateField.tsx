@@ -8,7 +8,7 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   OT2_ROBOT_TYPE,
-  WATER_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME_V2,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
@@ -53,7 +53,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef =
     allLiquidClassDefs[formData?.liquidClass ?? ''] ??
-    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME]
+    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME_V2]
   const convertedPipetteName =
     pipette != null ? getFlexNameConversion(pipette.spec) : null
   const liquidClassValuesForPipette = liquidClassDef.byPipette.find(

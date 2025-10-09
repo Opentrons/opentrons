@@ -1330,6 +1330,12 @@ class ModuleView:
                     f"Module {module.model} is already present at {location}."
                 )
 
+    def is_column_4_module(self, model: ModuleModel) -> bool:
+        """Determine whether or not a module is a Column 4 Module."""
+        if model in _COLUMN_4_MODULES:
+            return True
+        return False
+
     def get_default_gripper_offsets(
         self, module_id: str
     ) -> Optional[LabwareMovementOffsetData]:

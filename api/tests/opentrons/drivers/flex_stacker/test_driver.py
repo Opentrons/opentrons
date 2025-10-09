@@ -4,6 +4,7 @@ import pytest
 from binascii import Error as BinError
 from decoy import Decoy
 from mock import AsyncMock, MagicMock
+from opentrons.drivers.asyncio.communication.errors import NoResponse
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
@@ -591,7 +592,7 @@ async def test_get_tof_histogram_frame(
     get_measurement = types.GCODE.GET_TOF_MEASUREMENT.build_command().add_element(
         types.TOFSensor.X.name
     )
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test cancel transfer
@@ -611,7 +612,7 @@ async def test_get_tof_histogram_frame(
         .add_element(types.TOFSensor.X.name)
         .add_element("R")
     )
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test invalid index response
@@ -675,7 +676,7 @@ async def test_get_tof_histogram(
         types.TOFSensor.X.name
     )
     connection.send_command.assert_any_call(manage_measurement)
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test invalid frame_id
@@ -699,7 +700,33 @@ async def test_get_tof_histogram(
         types.TOFSensor.X.name
     )
     connection.send_command.assert_any_call(manage_measurement)
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
+    connection.reset_mock()
+
+    # Test resend mechanism
+    get_measurement = (
+        types.GCODE.GET_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_element("R")
+    )
+    payload = [p for p in get_histogram_payload(30)]
+    connection.send_command.side_effect = [
+        "M215 X:1 T:2 M:3",
+        "M225 X K:0 C:1 L:3840",
+        payload[0],
+        payload[1],
+        # We raise NoResponse on frame 3 to simulate a timeout and force a resend
+        NoResponse("", "Timeout"),
+        # After the timeout we expect the same packet to be resent
+        payload[2]
+        # Then the rest of the packets
+    ] + payload[3:]
+
+    response = await subject.get_tof_histogram(types.TOFSensor.X)
+
+    connection.send_command.assert_any_call(manage_measurement)
+    # Assert that the M226 GCODE with `R` (resend) element was sent
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
 

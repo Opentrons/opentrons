@@ -129,6 +129,27 @@ async def test_send_command_with_retry(
     )
 
 
+async def test_send_command_with_zero_retries(
+    mock_serial_port: AsyncMock, async_subject: AsyncResponseSerialConnection, ack: str
+) -> None:
+    """It should a command once"""
+    mock_serial_port.read_until.side_effect = (b"", b"")
+
+    # Set the default number of retries to 1, we want to overide this with
+    # the retries from the subject.send_data(data, retries=0) method call.
+    async_subject._number_of_retries = 1
+
+    with pytest.raises(NoResponse):
+        # We want this to overwrite the internal `_number_of_retries`
+        await async_subject.send_data(data="send data", retries=0)
+
+    mock_serial_port.timeout_override.assert_called_once_with("timeout", None)
+    mock_serial_port.write.assert_called_once_with(data=b"send data")
+    mock_serial_port.read_until.assert_called_once_with(match=ack.encode())
+    mock_serial_port.close.assert_called_once()
+    mock_serial_port.open.assert_called_once()
+
+
 async def test_send_command_with_retry_exhausted(
     mock_serial_port: AsyncMock, subject: SerialKind
 ) -> None:

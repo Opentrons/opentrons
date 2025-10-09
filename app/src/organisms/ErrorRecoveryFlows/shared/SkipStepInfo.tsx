@@ -22,6 +22,9 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     STACKER_STALLED_SKIP,
     STACKER_HOPPER_EMPTY_SKIP,
     STACKER_SHUTTLE_EMPTY_SKIP,
+    STACKER_STALLED_STORE_SKIP,
+    SHUTTLE_FULL_SKIP,
+    STACKER_SHUTTLE_EMPTY_STORE_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
@@ -45,6 +48,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
         case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
         case STACKER_STALLED_SKIP.ROUTE:
+        case SHUTTLE_FULL_SKIP.ROUTE:
           if (
             failedCommand?.byRunRecord.commandType === 'flexStacker/retrieve'
           ) {
@@ -58,6 +62,12 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
               skipFailedCommand()
             })
           }
+          break
+        case STACKER_STALLED_STORE_SKIP.ROUTE:
+        case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
+          void manualStore().then(() => {
+            skipFailedCommand()
+          })
           break
         default:
           skipFailedCommand()
@@ -76,6 +86,9 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case STACKER_STALLED_SKIP.ROUTE:
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case STACKER_STALLED_STORE_SKIP.ROUTE:
+      case SHUTTLE_FULL_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
         return t('skip_to_next_step')
       default:
         console.error(
@@ -96,6 +109,9 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case STACKER_STALLED_SKIP.ROUTE:
       case STACKER_HOPPER_EMPTY_SKIP.ROUTE:
       case STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
+      case STACKER_STALLED_STORE_SKIP.ROUTE:
+      case SHUTTLE_FULL_SKIP.ROUTE:
+      case STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE:
         return 'robot_not_attempt_to_move_lw'
       default:
         console.error(

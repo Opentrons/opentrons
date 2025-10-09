@@ -57,7 +57,7 @@ touchTipAspirate = -(sourceWellHeight - prevTouchTipAspirate)
 touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ```
 
-## [WIP] Version 1.2.0
+## Version 1.2.0
 
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
@@ -110,13 +110,15 @@ export interface QuickTransferSummaryState {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   retractAspirate?: {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   delayAspirate?: {
     // this has been updated - removed positionFromBottom
@@ -134,13 +136,15 @@ export interface QuickTransferSummaryState {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   retractDispense?: {
     // this has been added
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   delayDispense?: {
     // this has been updated - removed positionFromBottom
@@ -168,3 +172,20 @@ export interface QuickTransferSummaryState {
   liquidClassValuesInitialized: boolean // this has been added
 }
 ```
+
+## Version 2.0.0
+
+Introduction of Python protocol generation starting in robot stack v8.7.0.
+
+The shape of the Python file is as follows:
+
+```ts
+imports
+metadata
+requirements
+commands
+```
+
+Note that the `designerApplicationData` is not included in the generated Python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
+
+You can still generate JSON behind a feature flag.

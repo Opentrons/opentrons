@@ -2,6 +2,7 @@
 
 import inspect
 from typing import cast, Dict
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
@@ -62,6 +63,10 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from tests.opentrons.protocol_api import (
+    versions_at_or_above,
+    versions_between,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -743,10 +748,80 @@ def test_load_adapter_on_staging_slot(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 25)])
+def test_load_labware_lid_adapter_namespace_version_requires_new_api_version(
+    subject: ProtocolContext,
+) -> None:
+    """Make sure parameters new to apiLevel 2.26 raise, if given in older apiLevels."""
+    with pytest.raises(APIVersionError, match="adapter_namespace"):
+        subject.load_labware("load_name", "A1", adapter_namespace="foo")
+
+    with pytest.raises(APIVersionError, match="adapter_version"):
+        subject.load_labware("load_name", "A1", adapter_version=123)
+
+    with pytest.raises(APIVersionError, match="lid_namespace"):
+        subject.load_labware("load_name", "A1", lid_namespace="foo")
+
+    with pytest.raises(APIVersionError, match="lid_version"):
+        subject.load_labware("load_name", "A1", lid_version=123)
+
+
+@pytest.mark.parametrize(
+    (
+        "api_version",
+        "input_adapter_namespace",
+        "input_adapter_version",
+        "expected_adapter_namespace",
+        "expected_adapter_version",
+    ),
+    [
+        *[
+            # Old APIVersion: Adapter namespace and version cannot be specified explicitly.
+            # Adapter namespace always follows main labware, and adapter version is always None.
+            (
+                v,
+                None,
+                None,
+                sentinel.input_namespace,
+                None,
+            )
+            for v in versions_between(
+                low_inclusive_bound=APIVersion(2, 15),
+                high_exclusive_bound=APIVersion(2, 26),
+            )
+        ],
+        *[
+            # New APIVersion: Adapter namespace and version are used as-is if specified explicitly.
+            (
+                v,
+                sentinel.input_adapter_namespace,
+                sentinel.input_adapter_version,
+                sentinel.input_adapter_namespace,
+                sentinel.input_adapter_version,
+            )
+            for v in versions_at_or_above(APIVersion(2, 26))
+        ],
+        *[
+            # New APIVersion: Adapter namespace and version default to None if not provided.
+            (
+                v,
+                None,
+                None,
+                None,
+                None,
+            )
+            for v in versions_at_or_above(APIVersion(2, 26))
+        ],
+    ],
+)
 def test_load_labware_on_adapter(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    input_adapter_namespace: str | None,
+    input_adapter_version: int | None,
+    expected_adapter_namespace: str | None,
+    expected_adapter_version: int | None,
     api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
@@ -754,23 +829,25 @@ def test_load_labware_on_adapter(
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_adapter_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
-        "lowercase_labware"
-    )
+    decoy.when(
+        mock_validation.ensure_lowercase_name(sentinel.input_load_name)
+    ).then_return(sentinel.lowercase_input_load_name)
 
-    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
-        "lowercase_adapter"
-    )
+    decoy.when(
+        mock_validation.ensure_lowercase_name(sentinel.input_adapter)
+    ).then_return(sentinel.lowercase_input_adapter)
     decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
-        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
-    ).then_return(DeckSlotName.SLOT_5)
+        mock_validation.ensure_and_convert_deck_slot(
+            sentinel.input_location, api_version, "OT-3 Standard"
+        )
+    ).then_return(sentinel.validated_location)
     decoy.when(
         mock_core.load_adapter(
-            load_name="lowercase_adapter",
-            location=DeckSlotName.SLOT_5,
-            namespace="some_namespace",
-            version=None,
+            load_name=sentinel.lowercase_input_adapter,
+            location=sentinel.validated_location,
+            namespace=expected_adapter_namespace,
+            version=expected_adapter_version,
         )
     ).then_return(mock_adapter_core)
 
@@ -778,11 +855,11 @@ def test_load_labware_on_adapter(
 
     decoy.when(
         mock_core.load_labware(
-            load_name="lowercase_labware",
+            load_name=sentinel.lowercase_input_load_name,
             location=mock_adapter_core,
-            label="some_display_name",
-            namespace="some_namespace",
-            version=1337,
+            label="input_label",
+            namespace=sentinel.input_namespace,
+            version=sentinel.input_version,
         )
     ).then_return(mock_labware_core)
 
@@ -791,12 +868,14 @@ def test_load_labware_on_adapter(
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     result = subject.load_labware(
-        load_name="UPPERCASE_LABWARE",
-        location=42,
-        label="some_display_name",
-        namespace="some_namespace",
-        version=1337,
-        adapter="UPPERCASE_ADAPTER",
+        load_name=sentinel.input_load_name,
+        location=sentinel.input_location,
+        label="input_label",
+        namespace=sentinel.input_namespace,
+        version=sentinel.input_version,
+        adapter=sentinel.input_adapter,
+        adapter_namespace=input_adapter_namespace,
+        adapter_version=input_adapter_version,
     )
 
     assert isinstance(result, Labware)
@@ -805,69 +884,117 @@ def test_load_labware_on_adapter(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+@pytest.mark.parametrize(
+    (
+        "api_version",
+        "input_lid_namespace",
+        "input_lid_version",
+        "expected_lid_namespace",
+        "expected_lid_version",
+    ),
+    [
+        *[
+            # Old APIVersion: Lid namespace and version cannot be specified explicitly.
+            # Lid namespace and version always follow main labware.
+            (
+                v,
+                None,
+                None,
+                sentinel.input_namespace,
+                sentinel.input_version,
+            )
+            for v in versions_between(
+                low_inclusive_bound=APIVersion(2, 23),
+                high_exclusive_bound=APIVersion(2, 26),
+            )
+        ],
+        *[
+            # New APIVersion: Lid namespace and version are used as-is if specified explicitly.
+            (
+                v,
+                sentinel.input_lid_namespace,
+                sentinel.input_lid_version,
+                sentinel.input_lid_namespace,
+                sentinel.input_lid_version,
+            )
+            for v in versions_at_or_above(APIVersion(2, 26))
+        ],
+        *[
+            # New APIVersion: Lid namespace and version default to None if not provided.
+            (
+                v,
+                None,
+                None,
+                None,
+                None,
+            )
+            for v in versions_at_or_above(APIVersion(2, 26))
+        ],
+    ],
+)
 def test_load_labware_with_lid(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    input_lid_namespace: str | None,
+    input_lid_version: int | None,
+    expected_lid_namespace: str | None,
+    expected_lid_version: int | None,
     api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware with a lid on it using its execution core."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
-    mock_lid_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
-        "lowercase_labware"
-    )
+    decoy.when(
+        mock_validation.ensure_lowercase_name(sentinel.input_load_name)
+    ).then_return(sentinel.lowercase_input_load_name)
 
-    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
-        "lowercase_lid"
-    )
     decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
     decoy.when(
-        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
-    ).then_return(DeckSlotName.SLOT_C1)
+        mock_validation.ensure_and_convert_deck_slot(
+            sentinel.input_location, api_version, "OT-3 Standard"
+        )
+    ).then_return(sentinel.validated_location)
 
     decoy.when(
         mock_core.load_labware(
-            load_name="lowercase_labware",
-            location=DeckSlotName.SLOT_C1,
-            label="some_display_name",
-            namespace="some_namespace",
-            version=1337,
+            load_name=sentinel.lowercase_input_load_name,
+            location=sentinel.validated_location,
+            label="input_label",
+            namespace=sentinel.input_namespace,
+            version=sentinel.input_version,
         )
     ).then_return(mock_labware_core)
-    decoy.when(mock_lid_core.get_well_columns()).then_return([])
-
-    decoy.when(
-        mock_core.load_lid(
-            load_name="lowercase_lid",
-            location=mock_labware_core,
-            namespace="some_namespace",
-            version=1337,
-        )
-    ).then_return(mock_lid_core)
 
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
     decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
-    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
-        "lowercase_labware"
-    )
-
     result = subject.load_labware(
-        load_name="UPPERCASE_LABWARE",
-        location=42,
-        label="some_display_name",
-        namespace="some_namespace",
-        version=1337,
-        lid="lowercase_lid",
+        load_name=sentinel.input_load_name,
+        location=sentinel.input_location,
+        label="input_label",
+        namespace=sentinel.input_namespace,
+        version=sentinel.input_version,
+        lid=sentinel.input_lid,
+        lid_namespace=input_lid_namespace,
+        lid_version=input_lid_version,
     )
 
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
+
+    decoy.verify(
+        mock_core.load_lid(
+            # todo(mm, 2025-08-26): We're passing load_name=input_lid directly without lowercasing it,
+            # unlike how we lowercase adapter names. Is this a bug?
+            load_name=sentinel.input_lid,
+            location=mock_labware_core,
+            namespace=expected_lid_namespace,
+            version=expected_lid_version,
+        )
+    )
 
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
@@ -993,6 +1120,112 @@ def test_move_lids_from_stack(
         version=1337,
     )
     assert isinstance(result, Labware)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+def test_move_lids_from_stack_via_stack_parent(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move a lid onto an empty riser, create a stack, and then move the lid back off by referencing the riser."""
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+    mock_riser_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("RISER_LABWARE")).then_return(
+        "riser_labware"
+    )
+    decoy.when(
+        mock_core.load_labware(
+            load_name="riser_labware",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_riser_core)
+
+    decoy.when(mock_riser_core.get_name()).then_return("RISER_LABWARE")
+    decoy.when(mock_riser_core.get_display_name()).then_return("")
+    decoy.when(mock_riser_core.get_well_columns()).then_return([])
+
+    riser_lw = subject.load_labware(
+        load_name="RISER_LABWARE",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(riser_lw, Labware)
+
+    # Load the lid stack on top of the riser
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid",
+            location=riser_lw._core,
+            quantity=1,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    result = subject.load_lid_stack(
+        load_name="UPPERCASE_LID",
+        location=riser_lw,
+        quantity=1,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "STACK_OBJECT"
+
+    # Move the lid, by referencing only the riser itself
+    subject.move_lid(riser_lw, "D3")
+
+    # Load another lid stack where the lidstack once was, verifying its engine object is gone
+    mock_lid_core_2 = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID_2")).then_return(
+        "lowercase_lid_2"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid_2",
+            location=riser_lw._core,
+            quantity=1,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core_2)
+
+    decoy.when(mock_lid_core_2.get_name()).then_return("STACK_OBJECT_2")
+    decoy.when(mock_lid_core_2.get_display_name()).then_return("")
+    decoy.when(mock_lid_core_2.get_well_columns()).then_return([])
+
+    result_2 = subject.load_lid_stack(
+        load_name="UPPERCASE_LID_2",
+        location=riser_lw,
+        quantity=1,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result_2, Labware)
+    assert result_2.name == "STACK_OBJECT_2"
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 22)])
@@ -1416,7 +1649,7 @@ def test_load_trash_bin_raises_for_staging_slot(
         subject.load_trash_bin("bleh")
 
 
-def test_load_wast_chute(
+def test_load_waste_chute(
     decoy: Decoy,
     mock_core: ProtocolCore,
     api_version: APIVersion,
@@ -1849,11 +2082,11 @@ def test_define_liquid_class(
     expected_liquid_class = LiquidClass(
         _name="volatile_100", _display_name="volatile 100%", _by_pipette_setting={}
     )
-    decoy.when(mock_core.get_liquid_class("volatile_90", 1)).then_return(
+    decoy.when(mock_core.get_liquid_class("volatile_90", 123)).then_return(
         expected_liquid_class
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)
-    assert subject.get_liquid_class("volatile_90") == expected_liquid_class
+    assert subject.get_liquid_class("volatile_90", 123) == expected_liquid_class
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])

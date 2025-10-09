@@ -115,6 +115,10 @@ class LabwareRole(str, Enum):
     system = "system"
 
 
+class Quirks(Enum):
+    disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
+
+
 class Metadata(BaseModel):
     displayName: str
     displayCategory: DisplayCategory

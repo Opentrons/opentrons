@@ -1076,6 +1076,7 @@ export type MotorAxis =
   | 'rightPlunger'
   | 'extensionZ'
   | 'extensionJaw'
+  | 'axis96ChannelCam'
 
 export type MotorAxes = MotorAxis[]
 

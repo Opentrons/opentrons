@@ -23,6 +23,15 @@ from .module import ModuleDefinition
 from .deck_configuration import DeckLocationDefinition
 
 
+@dataclass(frozen=True)
+class GripSpecs:
+    """Data for how a labware should be gripped."""
+
+    uncertaintyWider: float
+    uncertaintyNarrower: float
+    targetY: float
+
+
 class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
