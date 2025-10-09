@@ -141,7 +141,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         ...
 
     async def disable_pump(self) -> None:
-        """Disable the vacuum pump, doesn't simply turn it off."""
+        """Disable the vacuum pump, doesn't just turn it off."""
         ...
 
     # Are these register addresses configurable ?? Should I add setters for them too?
@@ -157,8 +157,17 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Get a reading from the pressure sensor."""
         return 0.0
 
+    async def get_guage_pressure_reading(self) -> float:
+        """Read each pressure sensor and return the difference."""
+        return 0.0
+
     # TODO: update the pressure arg with the units when we find out which unit
-    async def set_vacuum_chamber_pressure(self, pressure: float) -> None:
+    async def set_vacuum_chamber_pressure(
+        self,
+        guage_pressure_mbar: float,
+        duration: Optional[float],
+        rate: Optional[float],
+    ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
@@ -167,7 +176,12 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Engage the vacuum without regard to chamber pressure."""
         ...
 
-    async def release_vacuum(self) -> None:
+    async def disengage_vacuum_pump(self) -> None:
+        """Stops the vacuum pump, doesn't vent air or disable the motor."""
+        ...
+
+    # turns off motor, then releases, takes a timeout for buffer between turn off and vent
+    async def vent(self) -> None:
         """Release the vacuum in the module chamber."""
         ...
 

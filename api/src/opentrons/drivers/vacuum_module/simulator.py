@@ -51,14 +51,20 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         return 0.0
 
     # TODO: update the pressure arg with the units when we find out which unit
-    async def set_vacuum_chamber_pressure(self, pressure: float) -> None:
+    async def set_vacuum_chamber_pressure(
+        self,
+        guage_pressure_mbar: float,
+        duration: Optional[float],
+        rate: Optional[float],
+        vent_after: bool = False,
+    ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         pass
 
     async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
         self.vacuum_on = True
 
-    async def release_vacuum(self) -> None:
+    async def vent(self, delay_s: float = 0.0) -> None:
         self.vacuum_on = False
 
     async def set_led(

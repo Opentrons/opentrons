@@ -48,16 +48,29 @@ class AbstractVacuumModuleDriver(Protocol):
         ...
 
     # TODO: update the pressure arg with the units when we find out which unit
-    async def set_vacuum_chamber_pressure(self, pressure: float) -> None:
+    async def set_vacuum_chamber_pressure(
+        self,
+        guage_pressure_mbar: float,
+        duration: Optional[float],
+        rate: Optional[float],
+    ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
+
+    async def get_guage_pressure_reading(self) -> float:
+        """Read each pressure sensor and return the difference."""
+        return 0.0
 
     # TODO: change pump power to be more specific when we find out how were gonna operate that
     async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
         """Engage the vacuum without regard to chamber pressure."""
         ...
 
-    async def release_vacuum(self) -> None:
+    async def disengage_vacuum_pump(self) -> None:
+        """Stops the vacuum pump, doesn't vent air or disable the motor."""
+        ...
+
+    async def vent(self) -> None:
         """Release the vacuum in the module chamber."""
         ...
 
