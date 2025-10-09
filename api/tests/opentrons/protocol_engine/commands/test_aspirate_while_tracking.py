@@ -1,7 +1,7 @@
 """Test aspirate-in-place commands."""
 
 from datetime import datetime
-
+from typing import Optional
 import pytest
 from decoy import Decoy, matchers
 
@@ -63,8 +63,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    # add a well location
-    "location,stateupdateLabware,stateupdateWell",
+    "location,stateupdateLabware,stateupdateWell,end_location, expected_location",
     [
         (
             CurrentWell(
@@ -74,11 +73,25 @@ def subject(
             ),
             "funky-labware",
             "funky-well",
+            None,
+            Point(1,2,3),
         ),
         (
             CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
             "funky-labware",
             "funky-well",
+            None,
+            Point(1,2,3),
+        ),
+        (
+            CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
+            "funky-labware",
+            "funky-well",
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=2, y=3, z=4),
+            ),
+            Point(7,8,9),
         ),
     ],
 )
@@ -94,6 +107,8 @@ async def test_aspirate_while_tracking_implementation(
     location: CurrentPipetteLocation | None,
     stateupdateLabware: str,
     stateupdateWell: str,
+    end_location: Optional[LiquidHandlingWellLocation],
+    expected_location: Point,
 ) -> None:
     """It should aspirate in place."""
     well_location = LiquidHandlingWellLocation(
@@ -105,6 +120,7 @@ async def test_aspirate_while_tracking_implementation(
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
         trackFromLocation=well_location,
+        trackToLocation=end_location,
         volume=123,
         flowRate=1.234,
     )
@@ -124,7 +140,16 @@ async def test_aspirate_while_tracking_implementation(
             operation_volume=-123,
             pipette_id="pipette-id-abc",
         )
-    ).then_return(Point(0, 0, 0))
+    ).then_return(Point(1, 2, 3))
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=end_location,
+            operation_volume=-123,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(7, 8, 9))
 
     decoy.when(
         state_view.geometry.get_wells_covered_by_pipette_with_active_well(
@@ -146,7 +171,7 @@ async def test_aspirate_while_tracking_implementation(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=1.234,
-            end_point=Point(0, 0, 0),
+            end_point=expected_location,
             command_note_adder=mock_command_note_adder,
             labware_id=stateupdateLabware,
             well_name=stateupdateWell,
@@ -154,7 +179,7 @@ async def test_aspirate_while_tracking_implementation(
     ).then_return(123)
 
     decoy.when(await gantry_mover.get_position("pipette-id-abc")).then_return(
-        Point(1, 2, 3)
+        expected_location
     )
 
     decoy.when(state_view.pipettes.get_current_location()).then_return(location)
@@ -182,7 +207,7 @@ async def test_aspirate_while_tracking_implementation(
     if isinstance(location, CurrentWell):
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=1, y=2, z=3)
+                volume=123, position=DeckPoint(x=expected_location.x, y=expected_location.y, z=expected_location.z)
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -199,7 +224,7 @@ async def test_aspirate_while_tracking_implementation(
     else:
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=1, y=2, z=3)
+                volume=123, position=DeckPoint(x=expected_location.x, y=expected_location.y, z=expected_location.z)
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(

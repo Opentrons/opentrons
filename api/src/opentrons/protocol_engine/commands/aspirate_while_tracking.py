@@ -108,7 +108,7 @@ class AspirateWhileTrackingImplementation(
         state_update = StateUpdate()
 
         # if no end position given use the start location with the operation volume to find the end position
-        end_location = params.trackFromLocation or params.trackToLocation
+        end_location = params.trackToLocation or params.trackFromLocation
 
         end_point = self._state_view.geometry.get_well_position(
             labware_id=params.labwareId,
