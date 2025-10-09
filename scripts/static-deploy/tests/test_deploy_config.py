@@ -327,7 +327,7 @@ def test_determine_deploy_config_from_args_staging_mkdocs():
     assert cfg.sandbox_prefix == "staging-mkdocs-v1.2.3"
     assert cfg.bucket == "opentrons.staging.docs"
     assert cfg.url == "https://staging.docs.opentrons.com/"
-    assert cfg.cloudfront_id == "E8IWASMDOWHYP"
+    assert cfg.cloudfront_id == "E2DBE0K9VT8YB9"
 
 
 def test_determine_deploy_config_from_args_sandbox_branch_url_suffix():
