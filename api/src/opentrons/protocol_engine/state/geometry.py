@@ -40,9 +40,7 @@ from ..errors import (
     InvalidLabwarePositionError,
     LabwareNotOnDeckError,
 )
-from ..errors.exceptions import (
-    InvalidLiquidHeightFound,
-)
+from ..errors.exceptions import InvalidLiquidHeightFound, InvalidWellLocationFound
 from ..resources import (
     fixture_validation,
     deck_configuration_provider,
@@ -106,6 +104,8 @@ from .inner_well_math_utils import (
     find_volume_inner_well_geometry,
     find_height_user_defined_volumes,
     find_volume_user_defined_volumes,
+    find_well_radius_at_volume,
+    find_well_width_at_volume,
 )
 from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
 from .labware_origin_math.stackup_origin_to_labware_origin import (
@@ -2147,6 +2147,46 @@ class GeometryView:
             )
         except InvalidLiquidHeightFound as _exception:
             raise InvalidLiquidHeightFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
+
+    def get_well_width_at_volume(
+        self,
+        labware_id: str,
+        well_name: str,
+        volume: LiquidTrackingType,
+    ) -> LiquidTrackingType:
+        """Convert well volume to well width."""
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
+        try:
+            return self.find_well_width_at_volume(
+                volume=volume, well_geometry=well_geometry
+            )
+        except InvalidWellLocationFound as _exception:
+            raise InvalidWellLocationFound(
+                message=_exception.message
+                + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
+            )
+
+    def get_well_radius_at_volume(
+        self,
+        labware_id: str,
+        well_name: str,
+        volume: LiquidTrackingType,
+    ) -> LiquidTrackingType:
+        """Convert well volume to well radius."""
+        well_geometry = self._labware.get_well_geometry(
+            labware_id=labware_id, well_name=well_name
+        )
+        try:
+            return find_well_radius_at_volume(
+                volume=volume, well_geometry=well_geometry
+            )
+        except InvalidWellLocationFound as _exception:
+            raise InvalidWellLocationFound(
                 message=_exception.message
                 + f"for well {well_name} of {self._labware.get_display_name(labware_id)} on slot {self.get_ancestor_slot_name(labware_id)}"
             )

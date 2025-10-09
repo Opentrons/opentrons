@@ -113,6 +113,14 @@ class AbstractWellCore(ABC):
         """Return the volume contained in a well at any height."""
 
     @abstractmethod
+    def radius_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return radius of a circular well at a given volume."""
+
+    @abstractmethod
+    def width_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return width of a rectangular well at a given volume."""
+
+    @abstractmethod
     def has_tracked_liquid(self) -> bool:
         """Return true if liquid has been loaded or probed."""
 

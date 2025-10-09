@@ -362,6 +362,16 @@ class Well:
         """Return the height in a well corresponding to a given volume."""
         return self._core.height_from_volume(volume)
 
+    @requires_version(2, 27)
+    def radius_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the radius of a circular well at a given volume."""
+        return self._core.radius_from_volume(volume)
+
+    @requires_version(2, 27)
+    def width_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the width (X direction) of a rectangular well at a given volume."""
+        return self._core.width_from_volume(volume)
+
     @requires_version(2, 21)
     def estimate_liquid_height_after_pipetting(
         self,

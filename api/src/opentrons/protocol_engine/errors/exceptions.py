@@ -1157,6 +1157,19 @@ class InvalidLiquidHeightFound(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class InvalidWellLocationFound(ProtocolEngineError):
+    """Raised when attempting to estimate well location based on volume fails."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidWellLocationFound error."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LiquidHeightUnknownError(ProtocolEngineError):
     """Raised when attempting to specify WellOrigin.MENISCUS before liquid probing has been done."""
 

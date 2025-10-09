@@ -247,3 +247,19 @@ class WellCore(AbstractWellCore):
         return self._engine_client.state.geometry.get_well_volume_at_height(
             labware_id=labware_id, well_name=well_name, height=height
         )
+
+    def width_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return width of a rectangular well at a given volume."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_width_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )
+
+    def radius_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return radius of a circular well at a given volume."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_well_radius_at_volume(
+            labware_id=labware_id, well_name=well_name, volume=volume
+        )

@@ -155,6 +155,14 @@ class LegacyWellCore(AbstractWellCore):
         """Return true if liquid has been loaded or probed."""
         return False
 
+    def radius_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the radius of the well at the top of the given volume."""
+        return 0.0
+
+    def width_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the width of the well at the top of the given volume."""
+        return 0.0
+
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:
         """Use the well's display name as its repr."""

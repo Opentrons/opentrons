@@ -1,9 +1,13 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
 from typing import List, Tuple
-from numpy import pi, iscomplex, roots, real
+from numpy import pi, iscomplex, roots, real, sqrt
 from math import isclose
 
-from ..errors.exceptions import InvalidLiquidHeightFound, InvalidUserDefinedVolumesError
+from ..errors.exceptions import (
+    InvalidLiquidHeightFound,
+    InvalidUserDefinedVolumesError,
+    InvalidWellLocationFound,
+)
 
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
@@ -482,6 +486,20 @@ def find_volume_inner_well_geometry(
     return partial_volume + closed_section_volume
 
 
+def _find_segment_for_height(
+    volume: LiquidTrackingType, well_geometry: InnerWellGeometry
+) -> WellSegment:
+    """Returns the well segment that the volume is in."""
+    bottom_section_volume = 0.0
+    sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
+    volumetric_capacity = get_well_volumetric_capacity(well_geometry)
+    for section, capacity in zip(sorted_well, volumetric_capacity):
+        section_top_height, section_volume = capacity
+        if volume == section_volume + bottom_section_volume:
+            return section
+    raise InvalidWellLocationFound(f"Target volume {volume}µL was not found in well.")
+
+
 def _find_height_in_partial_frustum(
     sorted_well: List[WellSegment],
     volumetric_capacity: List[Tuple[float, float]],
@@ -546,3 +564,27 @@ def find_height_inner_well_geometry(
         volumetric_capacity=volumetric_capacity,
         target_volume=target_volume,
     )
+
+
+def find_well_radius_at_volume(
+    volume: LiquidTrackingType, well_geometry: InnerWellGeometry
+) -> LiquidTrackingType:
+    """Find the well radius at the height of the known volume."""
+    if isinstance(volume, SimulatedProbeResult):
+        return SimulatedProbeResult
+    height = find_height_inner_well_geometry(volume, well_geometry)
+    radius = sqrt((3 * volume) / (pi * height))
+    return radius
+
+
+def find_well_width_at_volume(
+    volume: LiquidTrackingType, well_geometry: InnerWellGeometry
+) -> LiquidTrackingType:
+    """Find well width at the height of the known volume."""
+    if isinstance(volume, SimulatedProbeResult):
+        return SimulatedProbeResult
+    height = find_height_inner_well_geometry(volume, well_geometry)
+    section = _find_segment_for_height(volume, well_geometry)
+    length = section.topYDimension
+    width = volume / (height * length)
+    return width
