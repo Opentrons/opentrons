@@ -3,9 +3,9 @@ import type { HydratedCommentFormData } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
 export const commentFormToArgs = (
-  hydratedFormData: GetCastFormData<HydratedCommentFormData>
+  formData: GetCastFormData<HydratedCommentFormData>
 ): CommentArgs => {
-  const { message, stepName, stepDetails } = hydratedFormData
+  const { message, stepName, stepDetails } = formData
 
   return {
     commandCreatorFnName: 'comment',

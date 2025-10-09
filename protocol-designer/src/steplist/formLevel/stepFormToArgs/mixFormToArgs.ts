@@ -16,7 +16,7 @@ import type { GetCastFormData } from '../../fieldLevel'
 
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
-  hydratedFormData: GetCastFormData<HydratedMixFormData>
+  formData: GetCastFormData<HydratedMixFormData>
 ): MixStepArgs => {
   const {
     volume: rawVolume,
@@ -36,13 +36,13 @@ export const mixFormToArgs = (
     blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
-  } = hydratedFormData
+  } = formData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
-    hydratedFormData.volume,
-    hydratedFormData.tipRack
+    formData.volume,
+    formData.tipRack
   )
-  const unorderedWells = hydratedFormData.wells || []
+  const unorderedWells = formData.wells || []
   const orderedWells = getOrderedWells(
     unorderedWells,
     labware.def,
@@ -55,27 +55,27 @@ export const mixFormToArgs = (
   const volume = rawVolume || 0
   const times = rawTimes || 0
   const aspirateFlowRateUlSec =
-    hydratedFormData.aspirate_flowRate ||
+    formData.aspirate_flowRate ||
     matchingTipLiquidSpecs?.defaultAspirateFlowRate.default
   const dispenseFlowRateUlSec =
-    hydratedFormData.dispense_flowRate ||
+    formData.dispense_flowRate ||
     matchingTipLiquidSpecs?.defaultDispenseFlowRate.default
 
   const offsetFromBottomMm =
-    hydratedFormData.mix_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM
+    formData.mix_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
   console.assert(
-    hydratedFormData.changeTip,
+    formData.changeTip,
     'mixFormToArgs expected non-falsey changeTip option'
   )
-  const changeTip = hydratedFormData.changeTip || DEFAULT_CHANGE_TIP_OPTION
-  const blowoutLocation = hydratedFormData.blowout_checkbox
-    ? hydratedFormData.blowout_location
+  const changeTip = formData.changeTip || DEFAULT_CHANGE_TIP_OPTION
+  const blowoutLocation = formData.blowout_checkbox
+    ? formData.blowout_location
     : null
   // Blowout settings
   const blowoutFlowRateUlSec =
-    hydratedFormData.blowout_flowRate ??
+    formData.blowout_flowRate ??
     matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
 
   const blowoutOffsetFromTopMm = blowoutLocation
@@ -83,19 +83,19 @@ export const mixFormToArgs = (
     : 0
   // Delay settings
   const aspirateDelaySeconds = getMixDelayData(
-    hydratedFormData,
+    formData,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds'
   )
   const dispenseDelaySeconds = getMixDelayData(
-    hydratedFormData,
+    formData,
     'dispense_delay_checkbox',
     'dispense_delay_seconds'
   )
   return {
     commandCreatorFnName: 'mix',
-    name: hydratedFormData.stepName,
-    description: hydratedFormData.stepDetails,
+    name: formData.stepName,
+    description: formData.stepDetails,
     labware: labware.id,
     wells: orderedWells,
     volume,
@@ -111,7 +111,7 @@ export const mixFormToArgs = (
     offsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
-    tipRack: hydratedFormData.tipRack,
+    tipRack: formData.tipRack,
     dispenseDelaySeconds,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,

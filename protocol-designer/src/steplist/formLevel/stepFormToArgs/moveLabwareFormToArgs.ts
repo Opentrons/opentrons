@@ -3,15 +3,9 @@ import type { HydratedMoveLabwareFormData } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
 export const moveLabwareFormToArgs = (
-  hydratedFormData: GetCastFormData<HydratedMoveLabwareFormData>
+  formData: GetCastFormData<HydratedMoveLabwareFormData>
 ): MoveLabwareArgs => {
-  const {
-    labware,
-    useGripper,
-    newLocation,
-    stepName,
-    stepDetails,
-  } = hydratedFormData
+  const { labware, useGripper, newLocation, stepName, stepDetails } = formData
 
   return {
     commandCreatorFnName: 'moveLabware',
