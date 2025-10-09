@@ -6,6 +6,7 @@ import { StyledText } from '@opentrons/components'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
+import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
 import { getViewboxFromSelectedLabware } from './utils'
 
@@ -37,11 +38,16 @@ export function SelectTips(props: TipSelectionBaseProps): JSX.Element {
       <StyledText desktopStyle="headingSmallBold">
         {t('click_and_drag', { labwareName })}
       </StyledText>
-      <BaseDeckTipSelection
-        viewBox={viewBox}
-        showSlotLabels={false}
-        controls={controls}
-      />
+      <div className={styles.modal_body_select_tips}>
+        <div className={styles.select_tips_deck_container}>
+          <BaseDeckTipSelection
+            viewBox={viewBox}
+            showSlotLabels={false}
+            controls={controls}
+          />
+        </div>
+        <TipLegend />
+      </div>
     </div>
   )
 }
