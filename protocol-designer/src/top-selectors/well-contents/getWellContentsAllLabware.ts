@@ -1,6 +1,8 @@
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
+import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
+
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
@@ -16,7 +18,6 @@ import type {
   WellContentsByLabware,
 } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
-import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
@@ -55,6 +56,44 @@ const _getWellContents = (
 
 export const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
   stepFormSelectors.getLabwareEntities,
+  labwareIngredSelectors.getLiquidsByLabwareId,
+  labwareIngredSelectors.getSelectedLabwareId,
+  getSelectedWells,
+  getHighlightedWells,
+
+  (
+    labwareEntities,
+    liquidsByLabware,
+    selectedLabwareId,
+    selectedWells,
+    highlightedWells
+  ) => {
+    const allLabwareIds: string[] = Object.keys(labwareEntities)
+    return allLabwareIds.reduce(
+      (
+        acc: WellContentsByLabware,
+        labwareId: string
+      ): WellContentsByLabware => {
+        const liquidsForLabware = liquidsByLabware[labwareId]
+        const isSelectedLabware = selectedLabwareId === labwareId
+
+        const wellContents = _getWellContents(
+          labwareEntities[labwareId].def,
+          liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
+          isSelectedLabware ? selectedWells : null,
+          isSelectedLabware ? highlightedWells : null
+        )
+
+        // Skip labware ids with no liquids
+        return wellContents ? { ...acc, [labwareId]: wellContents } : acc
+      },
+      {}
+    )
+  }
+)
+
+export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = createSelector(
+  stepFormSelectors.getLabwareEntities,
   getInitialRobotState,
   labwareIngredSelectors.getLiquidsByLabwareId,
   labwareIngredSelectors.getSelectedLabwareId,
@@ -73,22 +112,26 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
     console.log('labwareEntities', labwareEntities)
     console.log('liquidsByLabware', liquidsByLabware)
     console.log('selectedLabwareId', selectedLabwareId)
-    const selectedLabwareDefUri = selectedLabwareId ? initialRobotState.labware[selectedLabwareId].labwareDefURI : null
+    const selectedLabwareStack =
+      initialRobotState.labware[selectedLabwareId].stack
+    const selectedLabwareDefUri = selectedLabwareId
+      ? initialRobotState.labware[selectedLabwareId].labwareDefUri
+      : null
     console.log('selectedLabwareDefUri', selectedLabwareDefUri)
-    const allLabwareIds: string[] = Object.keys(labwareEntities)
+    const allLabwareIds: string[] = selectedLabwareStack ?? []
     return allLabwareIds.reduce(
       (
         acc: WellContentsByLabware,
         labwareId: string
       ): WellContentsByLabware => {
         const liquidsForLabware = liquidsByLabware[labwareId]
-        const isSelectedLabware = selectedLabwareId === labwareId
+        // const isSelectedLabware = selectedLabwareId === labwareId
 
         const wellContents = _getWellContents(
           labwareEntities[labwareId].def,
           liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? selectedWells : null,
-          isSelectedLabware ? highlightedWells : null
+          selectedWells,
+          highlightedWells
         )
 
         // Skip labware ids with no liquids

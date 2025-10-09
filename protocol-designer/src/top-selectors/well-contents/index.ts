@@ -13,13 +13,16 @@ import { getSelectedWells } from '../../well-selection/selectors'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
-import { getWellContentsAllLabware } from './getWellContentsAllLabware'
+import {
+  getWellContentsAllLabware,
+  getWellContentsForLabwareStack,
+} from './getWellContentsAllLabware'
 
 import type * as StepGeneration from '@opentrons/step-generation'
 import type { WellContentsByLabware } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
 
-export { getWellContentsAllLabware }
+export { getWellContentsAllLabware, getWellContentsForLabwareStack }
 export type { WellContentsByLabware }
 
 export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | null> = createSelector(
