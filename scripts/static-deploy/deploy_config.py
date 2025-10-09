@@ -117,7 +117,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="sandbox.designer.opentrons.com",
+            s3_bucket="opentrons.sandbox.designer",
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.designer.opentrons.com/",
         ),
