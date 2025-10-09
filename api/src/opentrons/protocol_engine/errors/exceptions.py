@@ -1361,3 +1361,15 @@ class InvalidModuleOrientation(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+class CameraCaptureError(ProtocolEngineError):
+    """Raised when an Camera Capture attempt fails."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CameraCaptureError."""
+        super().__init__(ErrorCodes.CAMERA_CAPTURE_ERROR, message, details, wrapping)

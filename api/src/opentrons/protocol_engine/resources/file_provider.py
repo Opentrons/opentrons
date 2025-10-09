@@ -15,6 +15,7 @@ class MimeType(str, Enum):
     """File mime types."""
 
     TEXT_CSV = "text/csv"
+    IMAGE_JPEG = "image/jpeg"
 
 
 class ReadCmdFileNameMetadata(BaseModel):
@@ -23,8 +24,12 @@ class ReadCmdFileNameMetadata(BaseModel):
     base_filename: str
     wavelength: int
 
+class ImageJpegFileNameMetadata(BaseModel):
+    """Data from an image capture by a camera used to build the finalized file name and detail the metadata in the file."""
 
-CommandFileNameMetadata = ReadCmdFileNameMetadata | None
+    base_filename: str
+
+CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageJpegFileNameMetadata | None
 
 
 class FileData:

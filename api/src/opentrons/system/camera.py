@@ -7,10 +7,16 @@ from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider, ImageParameters
 
 
 log = logging.getLogger(__name__)
+
+# Default System Cameras
+FLEX_EMBEDDED_CAMERA = "/dev/ot_system_camera"
+OT2_CAMERA = "/dev/video0"
+
+# Stream Globals
 STREAM_CONF_FILE = "opentrons-live-stream.conf"
 STREAM_CONF_FILE_KEYS = [
     "BOOT_ID",
@@ -21,6 +27,19 @@ STREAM_CONF_FILE_KEYS = [
     "BITRATE",
 ]
 
+# Camera Parameter Globals
+ZOOM_MIN = 1.0
+ZOOM_MAX = 2.0
+ZOOM_DEFAULT = 1.0
+CONTRAST_MIN = 0.0
+CONTRAST_MAX = 2.0
+CONTRAST_DEFAULT = 1.0
+BRIGHTNESS_MIN = -128.0
+BRIGHTNESS_MAX = 128.0
+BRIGHTNESS_DEFAULT = 0.0
+SATURATION_MIN = 0.0
+SATURATION_MAX = 2.0
+SATURATION_DEFAULT = 1.0
 
 class StreamConfigurationKeys(str, Enum):
     """The Configuration Key Types."""
@@ -43,7 +62,7 @@ class CameraException(CommunicationError):
 
 
 async def take_picture(filename: Path) -> None:
-    """Take a picture and save it to filename
+    """Legacy method to take a picture and save it to filename
 
     :param filename: Name of file to save picture to
     :param loop: optional loop to use
@@ -112,6 +131,22 @@ async def update_live_stream_status(
     write_stream_configuration_file_data(contents)
     await restart_live_stream()
 
+
+async def stop_live_stream() -> None:
+    """Attempt to stop the Opentrons Live Stream service."""
+    command = ["systemctl", "stop", "opentrons-live-stream"]
+    subprocess = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await subprocess.communicate()
+    if subprocess.returncode == 0:
+        log.info("Stopped the opentrons-live-stream service.")
+    else:
+        log.error(
+            f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+        )
 
 async def restart_live_stream() -> None:
     """Attempt to restart the Opentrons Live Stream service."""
@@ -189,3 +224,68 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
             f"{StreamConfigurationKeys.BITRATE}={data[StreamConfigurationKeys.BITRATE]}\n",
         ]
         fd.writelines(file_lines)
+
+async def image_capture(parameters: ImageParameters) -> bytes | None:
+    """Process an Image Capture request with a Camera utilizing a given set of parameters."""
+    if parameters.zoom < ZOOM_MIN or parameters.zoom > ZOOM_MAX:
+        potential_invalid_param = "Zoom"
+    elif parameters.contrast < CONTRAST_MIN or parameters.contrast > CONTRAST_MAX:
+        potential_invalid_param = "Contrast"
+    elif parameters.brightness < BRIGHTNESS_MIN or parameters.brightness > BRIGHTNESS_MAX:
+        potential_invalid_param = "Brightness"
+    elif parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX:
+        potential_invalid_param = "Saturation"
+    else:
+        potential_invalid_param = None
+    if potential_invalid_param is not None:
+        # If a parameter is invalid log it and return without capturing an image
+        log.error(
+            f"{potential_invalid_param} parameter of {parameters.contrast} is outside the boundaries allowed for image capture."
+        )
+        return None
+
+    # Always stop the live stream service to ensure the Camera is always free
+    await stop_live_stream()
+    zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
+    contrast = parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
+    brightness = parameters.brightness if parameters.brightness is not None else BRIGHTNESS_DEFAULT
+    saturation = parameters.saturation if parameters.saturation is not None else SATURATION_DEFAULT
+    resolution = parameters.resolution if parameters.resolution is not None else (1920, 1080)
+
+    filters : str = f"-vf \"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
+    + f"scale={resolution[0]}:{resolution[1]},"
+    + f"lut=y='(val-128)*{contrast}+128-{brightness}',"
+    + f"hue=s={saturation},"
+    + "format=nv12\""
+
+    command = [
+        "ffmpeg",
+        "-hwaccel", "auto",
+        "-video_size", f"{resolution[0]}x{resolution[1]}"
+        "-i", f"{FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA}",
+        "-vf", filters,
+        "-frames:v", "1",
+        "-f", "image2pipe",
+        "-vcodec", "mjpeg",
+        "-"
+    ]
+    subprocess = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await subprocess.communicate()
+    if subprocess.returncode == 0:
+        log.info("Successfully captured an image with camera.")
+        # Upon success, dump our byte stream to the result
+        result = stdout
+    else:
+        log.error(
+            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+        )
+        result = None
+
+    # Restart the live stream service
+    await restart_live_stream()
+    # Return the process result
+    return result

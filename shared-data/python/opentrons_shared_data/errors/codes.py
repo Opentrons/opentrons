@@ -99,6 +99,7 @@ class ErrorCodes(Enum):
     RUNTIME_PARAMETER_VALUE_REQUIRED = _code_from_dict_entry("4010")
     INCORRECT_API_VERSION = _code_from_dict_entry("4011")
     LABWARE_LOCATING_FEATURE_ERROR = _code_from_dict_entry("4012")
+    CAMERA_CAPTURE_ERROR = _code_from_dict_entry("4013")
 
     @classmethod
     @lru_cache(25)

@@ -1,6 +1,7 @@
 """Camera interaction resource provider."""
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 from pydantic import BaseModel, Field
+from ..errors import CameraCaptureError
 
 
 class CameraSettings(BaseModel):
@@ -16,6 +17,20 @@ class CameraSettings(BaseModel):
         ..., description="Enablement status for camera usage with Error Recovery."
     )
 
+class ImageParameters(BaseModel):
+    """Parameters for an Image Capture to determine filters. These are the inputs as expected by FFMPEG."""
+    resolution: Optional[Tuple[int, int]]= Field(
+        None,
+        description="Width by height resolution in pixels for the image to be captured with."
+    )
+    zoom: Optional[float] = Field(1.0, description="Multiplier to use when cropping and scaling a captured Image.")
+    pan: Optional[Tuple[int, int]] = Field(
+        None,
+        description="Position to pan to for a given zoom. Format is X and Y coordinates (in pixels) to the bottom left of a frame."
+    )
+    contrast: Optional[float] = Field(1.0, description="The contrast to use when processing an image.")
+    brightness: Optional[float] = Field(0.0, description="The brightness to use when processing an image.")
+    saturation: Optional[float] = Field(1.0, description="The brightness to use when processing an image.")
 
 class CameraProvider:
     """Provider class to wrap camera interactions between the server and the engine."""
@@ -23,13 +38,16 @@ class CameraProvider:
     def __init__(
         self,
         camera_settings_callback: Optional[Callable[[], CameraSettings]] = None,
+        image_capture_callback: Optional[Callable[[ImageParameters], bytes | None]] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
 
         Params:
             camera_settings_callback: Callback to query the Camera Enablement settings from the Boolean Settings table.
+            image_capture_callback: Callback to process an image capture request and return a bytestream of image data in response.
         """
         self._camera_settings_callback = camera_settings_callback
+        self._image_capture_callback = image_capture_callback
 
     async def get_camera_settings(self) -> CameraSettings:
         """Query the Robot Server for the current Camera Enablement settings."""
@@ -39,3 +57,17 @@ class CameraProvider:
         return CameraSettings(
             camera_enabled=True, live_stream_enabled=True, error_recovery_enabled=True
         )
+    
+    async def capture_image(self, parameters: ImageParameters) -> bytes | None:
+        """
+        Process through the Camera Executor on robot server an image capture request with a given set of filters.
+        Returns a bytesteam of image data upon success. Raises an error if an error occurred during capture.
+        Conditionally returns None if an image capture callback does not exist (simulation).
+        """
+        if self._image_capture_callback is not None:
+            capture_result = self._image_capture_callback(parameters)
+            if capture_result is not None:
+                return capture_result
+            else:
+                raise CameraCaptureError(message="Camera capture has failed to return an image.")
+        return None

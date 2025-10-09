@@ -92,6 +92,7 @@ from .exceptions import (
     FlexStackerNotLogicallyEmptyError,
     InvalidLabwarePositionError,
     InvalidModuleOrientation,
+    CameraCaptureError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -192,4 +193,5 @@ __all__ = [
     "StorageLimitReachedError",
     "LiquidClassDoesNotExistError",
     "LiquidClassRedefinitionError",
+    "CameraCaptureError",
 ]
