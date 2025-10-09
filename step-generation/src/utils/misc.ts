@@ -991,13 +991,15 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
-  return Object.values(labware)
-    .filter(
-      lw =>
-        lw.stack.includes(slot) &&
-        (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
-    )
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+  return (
+    Object.values(labware)
+      .filter(
+        lw =>
+          lw.stack.includes(slot) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+      )
+      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+  )
 }
 
 export const getTopmostLabwareOnModuleFromStackRobotState = (
