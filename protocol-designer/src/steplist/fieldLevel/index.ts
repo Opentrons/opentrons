@@ -26,9 +26,11 @@ import type {
   WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type {
+  HydratedFormData,
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
+import type { AmalgamateUnion } from '../../utils/utilityTypes'
 import type { ValueCaster, ValueMasker } from './processing'
 
 export type { StepFieldName }
@@ -438,11 +440,19 @@ const stepFieldHelperMap = {
     castValue: numberOrNull,
   }),
 }
-export const castField = (name: StepFieldName, value: unknown): unknown => {
+
+export function castField<
+  FieldNameT extends string | number | symbol,
+  UncastValueT
+>(name: FieldNameT, value: UncastValueT): GetCastFieldType<FieldNameT> {
   const fieldCaster =
+    // @ts-expect-error - TS doesn't want to let us index stepFieldHelperMap with a
+    // name that it doesn't necessarily contain. It's OK here because it'll just
+    // return undefined in the worst case, which this line handles.
     stepFieldHelperMap[name] && stepFieldHelperMap[name].castValue
   return fieldCaster ? fieldCaster(value) : value
 }
+
 export const maskField = (name: StepFieldName, value: unknown): unknown => {
   const fieldMasker =
     // @ts-expect-error - TS doesn't want to let us index stepFieldHelperMap with a
@@ -451,6 +461,7 @@ export const maskField = (name: StepFieldName, value: unknown): unknown => {
     stepFieldHelperMap[name] && stepFieldHelperMap[name].maskValue
   return fieldMasker ? fieldMasker(value) : value
 }
+
 export const hydrateField = (
   state: InvariantContext,
   name: StepFieldName,
@@ -462,4 +473,37 @@ export const hydrateField = (
     // return undefined in the worst case, which this line handles.
     stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
   return hydrator ? hydrator(state, value) : value
+}
+
+/**
+ * Returns the type that a field would have in `HydratedFormData`,
+ * assuming that field is being accessed on a form type where it actually exists.
+ */
+type GetHydratedFieldType<
+  FieldNameT extends string | number | symbol
+> = AmalgamateUnion<HydratedFormData> extends {
+  [Key in FieldNameT]: infer HydratedValueT
+}
+  ? HydratedValueT
+  : never // This should only happen if FieldNameT is an unrecognized field.
+
+/**
+ * Returns the type that a field would have after being passed through `castField`.
+ */
+export type GetCastFieldType<
+  FieldNameT extends string | number | symbol
+> = typeof stepFieldHelperMap extends {
+  [Key in FieldNameT]: {
+    castValue: (hydratedValue: any) => infer CastValueT
+  }
+}
+  ? CastValueT
+  : GetHydratedFieldType<FieldNameT>
+
+/**
+ * Returns what a given `HydratedFormData` type would be transformed to
+ * after running `castField` on all of its fields.
+ */
+export type GetCastFormData<HydratedFormDataT extends HydratedFormData> = {
+  [Key in keyof HydratedFormDataT]: GetCastFieldType<Key>
 }
