@@ -63,6 +63,12 @@ class ThermocyclerEmulator(AbstractEmulator):
             self.lid_status = ThermocyclerLidStatus.CLOSED
         elif command.gcode == GCODE.GET_LID_STATUS:
             return f"Lid:{self.lid_status}"
+        elif command.gcode == GCODE.GET_LIMIT_SWITCH_STATUS:
+            res = (
+                f"C:{1 if self.lid_status == ThermocyclerLidStatus.CLOSED else 0} "
+                "O:0 E:0 R:0"
+            )
+            return res
         elif command.gcode == GCODE.SET_LID_TEMP:
             temperature = command.params["S"]
             assert isinstance(

@@ -229,12 +229,24 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
         return ThermocyclerLidStatus.OPEN
 
-    async def close(self) -> str:
+    async def close(self, retry: bool = False) -> str:
         """Close the lid if it is open"""
         await self.wait_for_is_running()
         await self._driver.close_lid()
         await self._wait_for_lid_status(ThermocyclerLidStatus.CLOSED)
+        await self._ensure_lid_closed(retry)
         return ThermocyclerLidStatus.CLOSED
+    
+    async def _ensure_lid_closed(self, retry: bool = False) -> None:
+        """Ensure the lid is fully closed, retrying once if necessary."""
+        switch_status = await self._driver.check_lid_status_for_real_this_time()
+        if switch_status != ThermocyclerLidStatus.CLOSED:
+            if retry:
+                raise RuntimeError("Failed to close lid after retry")
+            log.warning("Lid not fully closed, retrying...")
+            await self.open()
+            await self.close(retry = True)
+
 
     async def lift_plate(self) -> str:
         """If the lid is open, lift the plate.
