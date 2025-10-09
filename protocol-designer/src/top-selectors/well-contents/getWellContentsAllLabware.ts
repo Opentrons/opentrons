@@ -125,8 +125,6 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = c
         labwareId: string
       ): WellContentsByLabware => {
         const liquidsForLabware = liquidsByLabware[labwareId]
-        // const isSelectedLabware = selectedLabwareId === labwareId
-
         const wellContents = _getWellContents(
           labwareEntities[labwareId].def,
           liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container

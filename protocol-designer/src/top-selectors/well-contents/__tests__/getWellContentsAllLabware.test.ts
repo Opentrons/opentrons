@@ -33,6 +33,7 @@ const labwareEntities = {
   container1Id: { def: fixture_96_plate as LabwareDefinition2 },
   container2Id: { def: fixture_96_plate as LabwareDefinition2 },
   container3Id: { def: fixture_24_tuberack as LabwareDefinition2 },
+  mockDestLabware: { def: fixture_96_plate as LabwareDefinition2 },
 }
 
 const defaultWellContents = {
@@ -132,14 +133,14 @@ describe('getWellContentsForLabwareStack', () => {
       },
     },
     labware: {
-      mockSourceLabware: {
-        stack: ['mockSourceLabware', 'A1'],
-      },
       mockDestLabware: {
         stack: ['mockDestLabware', 'C2'],
       },
       mockTiprack: {
         stack: ['mockTiprack', 'B1'],
+      },
+      container1Id: {
+        stack: ['container1Id', 'mockDestLabware'],
       },
     },
     modules: {},
@@ -178,20 +179,6 @@ describe('getWellContentsForLabwareStack', () => {
     },
   }
 
-  const locationsState = {
-    myTrough: {
-      A1: { ingred3: { volume: 101 } },
-      A2: { ingred3: { volume: 102 } },
-      A3: { ingred3: { volume: 103 } },
-    },
-    otherContainer: {
-      D4: { ingred3: { volume: 201 } },
-      E4: { ingred3: { volume: 202 } },
-      A4: { ingred4: { volume: 301 } },
-      B4: { ingred4: { volume: 302 } },
-    },
-  }
-
   const ingredsByLabwareXXSingleIngredStack = {
     container1Id: {
       0: {
@@ -215,38 +202,16 @@ describe('getWellContentsForLabwareStack', () => {
     FIXED_TRASH_ID: {},
   }
 
-  const mockLabwareIngred = {
+  // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
+  const singleIngredResultStack = getWellContentsForLabwareStack.resultFunc(
     labwareEntities,
-    liquidsByLabware: ingredsByLabwareXXSingleIngredStack,
-    ingredLocations: locationsState,
-    selectedLabwareId: 'container1Id', // selected labware id
-    selectedWells: { A1: 'A1', B1: 'B1' }, // selected
-    highlightedWells: { A3: 'A3' }, // highlighted
-  }
-
-  const mockBaseState = {
-    analytics: {},
-    dismiss: {},
-    fileData: {},
-    featureFlags: {},
-    labwareIngred: mockLabwareIngred,
-    loadFile: {},
-    navigation: {},
-    stepForms: {},
-    tutorial: {},
-    ui: {},
-    wellSelection: {},
-  }
-
-  const singleIngredResultStack = getWellContentsForLabwareStack(mockBaseState)
+    mockRobotState,
+    ingredsByLabwareXXSingleIngredStack,
+    'container1Id', // selected labware id
+    { A1: 'A1', B1: 'B1' }, // selected
+    { A3: 'A3' } // highlighted
+  )
   console.log('singleIngredResultStack', singleIngredResultStack)
-  //   labwareEntities,
-  //   mockRobotState,
-  //   ingredsByLabwareXXSingleIngredStack,
-  //   'container1Id', // selected labware id
-  //   { A1: 'A1', B1: 'B1' }, // selected
-  //   { A3: 'A3' } // highlighted
-  // )
 
   it('selects well contents of all labware in stack (for Plate props)', () => {
     expect(singleIngredResultStack).toMatchObject({
