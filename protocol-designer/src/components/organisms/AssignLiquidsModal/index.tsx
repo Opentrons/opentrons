@@ -264,9 +264,16 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsAllLabware
   )
+  console.log('allWellContents', allWellContents)
+  // const labwareIds = labware[labwareId].stack
+  // const allWellContents = labwareIds.reduce((acc, id) => {
+  //   return { ...acc, ...allWellContents[id] }
+  // }, {})
+
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 

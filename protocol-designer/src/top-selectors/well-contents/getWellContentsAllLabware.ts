@@ -16,6 +16,7 @@ import type {
   WellContentsByLabware,
 } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
+import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
@@ -54,17 +55,26 @@ const _getWellContents = (
 
 export const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
   stepFormSelectors.getLabwareEntities,
+  getInitialRobotState,
   labwareIngredSelectors.getLiquidsByLabwareId,
   labwareIngredSelectors.getSelectedLabwareId,
   getSelectedWells,
   getHighlightedWells,
+
   (
     labwareEntities,
+    initialRobotState,
     liquidsByLabware,
     selectedLabwareId,
     selectedWells,
     highlightedWells
   ) => {
+    console.log('getInitialRobotState', initialRobotState)
+    console.log('labwareEntities', labwareEntities)
+    console.log('liquidsByLabware', liquidsByLabware)
+    console.log('selectedLabwareId', selectedLabwareId)
+    const selectedLabwareDefUri = selectedLabwareId ? initialRobotState.labware[selectedLabwareId].labwareDefURI : null
+    console.log('selectedLabwareDefUri', selectedLabwareDefUri)
     const allLabwareIds: string[] = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (

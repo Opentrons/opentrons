@@ -134,4 +134,7 @@ describe('AssignLiquidsModal', () => {
     //   },
     // })
   })
+
+  // test that when selecting labware with different liquids shows modal
+  // test that different labware does not render the left side of the modal
 })
