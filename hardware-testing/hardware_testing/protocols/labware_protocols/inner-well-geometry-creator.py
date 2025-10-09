@@ -28,7 +28,7 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "greiner_384_wellplate_240ul"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -533,7 +533,7 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         dispense_offset = ts.corrected_height + state.target_height + 10
         state.liq_pipette.flow_rate.blow_out = 200
     else:
-        dispense_offset = ts.corrected_height + state.target_height + 5
+        dispense_offset = ts.corrected_height + state.target_height + 3
         state.liq_pipette.flow_rate.blow_out = 50
 
     wb = "well-bottom"
@@ -569,7 +569,7 @@ def get_alpha_for_height(state: SetupState, ts: TrialState) -> float:
     elif state.max_volume >= 3000:
         alpha_low, alpha_high = 0.35, 0.6
     elif state.max_volume >= 350:
-        alpha_low, alpha_high = 0.2, 0.2
+        alpha_low, alpha_high = 0.5, 0.8
     elif state.max_volume >= 90:
         alpha_low, alpha_high = 0.8, 1.0
     else:
@@ -588,13 +588,13 @@ def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
     elif ts.hdelta < state.lower_bound and ts.hdelta > 0:
         error = state.target_height - ts.hdelta
         new_volume = ts.step_volume * min(
-            1.2, 1 + alpha * error
+            1.5, 1 + alpha * error
         )  # increase clamped to 150% of previous step volume
 
     elif ts.hdelta > state.upper_bound:
         error = ts.hdelta - state.target_height
         new_volume = ts.step_volume * max(
-            0.8, 1 - alpha * error
+            0.5, 1 - alpha * error
         )  # decrease clamped to 50% of previous step volume
     else:
         new_volume = ts.step_volume
