@@ -96,12 +96,22 @@ async def test_dispense_while_tracking_implementation(
         volume=123,
         flowRate=456,
     )
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=well_location,
+            operation_volume=123,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(0, 0, 0))
 
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=456,
+            end_point=Point(0, 0, 0),
             push_out=None,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
@@ -266,11 +276,23 @@ async def test_overpressure_error(
     decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(50)
 
     decoy.when(pipetting.get_state_view()).then_return(state_view)
+
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=well_location,
+            operation_volume=50,
+            pipette_id="pipette-id",
+        )
+    ).then_return(Point(0, 0, 0))
+
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id=pipette_id,
             volume=50,
             flow_rate=1.23,
+            end_point=Point(0, 0, 0),
             push_out=10,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,

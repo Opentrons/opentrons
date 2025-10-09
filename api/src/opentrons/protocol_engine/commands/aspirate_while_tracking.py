@@ -107,6 +107,16 @@ class AspirateWhileTrackingImplementation(
             )
         state_update = StateUpdate()
 
+        # if no end position given use the start location with the operation volume to find the end position
+        end_location = params.trackFromLocation or params.trackToLocation
+
+        end_point = self._state_view.geometry.get_well_position(
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=end_location,
+            operation_volume=-params.volume,
+            pipette_id=params.pipetteId,
+        )
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -114,7 +124,6 @@ class AspirateWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.trackFromLocation,
-            operation_volume=-params.volume,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
@@ -128,6 +137,7 @@ class AspirateWhileTrackingImplementation(
             well_name=params.wellName,
             volume=params.volume,
             flow_rate=params.flowRate,
+            end_point=end_point,
             location_if_error={
                 "retryLocation": (
                     move_result.public.position.x,

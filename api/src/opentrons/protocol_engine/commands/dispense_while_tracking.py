@@ -100,6 +100,18 @@ class DispenseWhileTrackingImplementation(
         # TODO(pbm, 10-15-24): call self._state_view.geometry.validate_dispense_volume_into_well()
 
         state_update = StateUpdate()
+
+        # if no end position given use the start location with the operation volume to find the end position
+        end_location = params.trackFromLocation or params.trackToLocation
+
+        end_point = self._state_view.geometry.get_well_position(
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=end_location,
+            operation_volume=params.volume,
+            pipette_id=params.pipetteId,
+        )
+
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -108,6 +120,7 @@ class DispenseWhileTrackingImplementation(
             well_name=params.wellName,
             well_location=params.trackFromLocation,
         )
+
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
             return DefinedErrorData(
@@ -120,6 +133,7 @@ class DispenseWhileTrackingImplementation(
             well_name=well_name,
             volume=params.volume,
             flow_rate=params.flowRate,
+            end_point=end_point,
             push_out=params.pushOut,
             location_if_error={
                 "retryLocation": (
