@@ -6,9 +6,9 @@ import { UsedTip } from './UsedTip'
 
 import type { TipType } from '../types'
 
-export function Tip(props: {
+export function TipStatus(props: {
   type: TipType
-  size?: string | number
+  size?: string
 }): JSX.Element {
   const { type, size } = props
   switch (type) {

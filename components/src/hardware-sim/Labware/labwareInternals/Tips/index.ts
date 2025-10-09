@@ -1,1 +1,1 @@
-export * from './Tip'
+export * from './TipStatus'
