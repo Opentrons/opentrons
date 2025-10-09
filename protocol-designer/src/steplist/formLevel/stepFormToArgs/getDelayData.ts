@@ -7,7 +7,7 @@ import type {
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
 } from '../../../form-types'
-import { type GetCastFormData } from '../../fieldLevel'
+import type { GetCastFormData } from '../../fieldLevel'
 
 export const getMoveLiquidDelayData = (args: {
   formData: GetCastFormData<HydratedMoveLiquidFormData>
