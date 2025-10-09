@@ -197,6 +197,30 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         )
         return ThermocyclerLidStatus(utils.parse_key_values(value=response)["Lid"])
 
+    async def _get_limit_switch_status(self) -> None:
+        """Send get lid status command"""
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode="M901.D"
+        )
+        response = await self._connection.send_command(
+            command=c, retries=DEFAULT_COMMAND_RETRIES
+        )
+        return response
+    
+    async def check_lid_status_for_real_this_time(self) -> ThermocyclerLidStatus:
+        limit_switch_status = await self._get_limit_switch_status()
+        lid_is_closed = utils.parse_key_values(value=limit_switch_status)["C"] == 1
+        lid_is_open = utils.parse_key_values(value=limit_switch_status)["O"] == 1
+        match (lid_is_closed, lid_is_open):
+            case (True, True):
+                return ThermocyclerLidStatus.UNKNOWN
+            case (True, False):
+                return ThermocyclerLidStatus.CLOSED
+            case (False, True):
+                return ThermocyclerLidStatus.OPEN
+            case (False, False):
+                return ThermocyclerLidStatus.IN_BETWEEN
+
     async def set_lid_temperature(self, temp: float) -> None:
         """Set the lid temperature"""
         temp = min(LID_TARGET_MAX, max(LID_TARGET_MIN, temp))
