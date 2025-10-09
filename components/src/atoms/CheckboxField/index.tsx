@@ -123,7 +123,7 @@ const LABEL_TEXT_STYLE = (padding?: string): FlattenSimpleInterpolation => css`
   line-height: ${TYPOGRAPHY.lineHeight20};
   color: ${COLORS.black90};
   flex: 0 0 auto;
-  padding: ${padding != null ? padding : SPACING.spacing8};
+  padding: ${padding ?? SPACING.spacing8};
 
   &:empty {
     padding: 0;
