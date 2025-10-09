@@ -55,7 +55,7 @@ from robot_server.runs.run_store import (
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from opentrons.protocol_engine.resources import FileProvider
-from robot_server.file_provider.provider import FileProviderWrapper
+from robot_server.file_provider.provider import FileProviderExecutor
 from opentrons.protocol_engine.resources import CameraProvider
 from robot_server.camera.provider import CameraProviderWrapper
 
@@ -171,14 +171,14 @@ def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
 
 
 @pytest.fixture()
-def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderWrapper:
-    """Return a mock FileProviderWrapper."""
-    return decoy.mock(cls=FileProviderWrapper)
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
+    """Return a mock FileProviderExecutor."""
+    return decoy.mock(cls=FileProviderExecutor)
 
 
 @pytest.fixture()
 def mock_file_provider(
-    decoy: Decoy, mock_file_provider_wrapper: FileProviderWrapper
+    decoy: Decoy, mock_file_provider_wrapper: FileProviderExecutor
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
