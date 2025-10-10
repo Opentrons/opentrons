@@ -85,20 +85,6 @@ export function ProtocolDetailsTabs({
           ]}
         />
       )}
-      {mostRecentAnalysis != null && (
-        <Tabs
-          tabs={[
-            {
-              text: i18n.format(t('timeline'), 'capitalize'),
-              isActive: currentTab === 'timeline',
-              disabled: false,
-              onClick: () => {
-                setCurrentTab('timeline')
-              },
-            },
-          ]}
-        />
-      )}
     </Flex>
   )
 }

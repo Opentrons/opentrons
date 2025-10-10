@@ -27,6 +27,7 @@ import protocol_generator from './protocol_generator.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
 import protocol_setup from './protocol_setup.json'
+import protocol_visualization from './protocol_visualization.json'
 import quick_transfer from './quick_transfer.json'
 import robot_calibration from './robot_calibration.json'
 import robot_controls from './robot_controls.json'
@@ -37,18 +38,17 @@ import top_navigation from './top_navigation.json'
 export const en = {
   anonymous,
   app_settings,
-  feature_flags,
-  create_protocol,
   branded,
-  protocol_generator,
   change_pipette,
   command_type_summary,
+  create_protocol,
   deck_configuration,
   device_details,
   device_settings,
   devices_landing,
   drop_tip_wizard,
   error_recovery,
+  feature_flags,
   firmware_update,
   gripper_wizard_flows,
   heater_shaker,
@@ -61,9 +61,11 @@ export const en = {
   pipette_wizard_flows,
   protocol_command_text,
   protocol_details,
+  protocol_generator,
   protocol_info,
   protocol_list,
   protocol_setup,
+  protocol_visualization,
   quick_transfer,
   robot_calibration,
   robot_controls,
