@@ -27,18 +27,18 @@ interface Props {
 export const TextField = (props: Props): JSX.Element => {
   const { label, caption, placeholder, units } = props
   const inputMasks = props.inputMasks ?? []
-  // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange =
+    // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
     ({ field, form }) =>
-    (e: React.FormEvent<HTMLInputElement>) => {
-      const prevValue = field.value
-      const rawValue = e.currentTarget.value
-      const nextValue = inputMasks.reduce(
-        (acc, maskFn) => maskFn(prevValue as string, acc),
-        rawValue
-      )
-      form.setFieldValue(props.name, nextValue)
-    }
+      (e: React.FormEvent<HTMLInputElement>) => {
+        const prevValue = field.value
+        const rawValue = e.currentTarget.value
+        const nextValue = inputMasks.reduce(
+          (acc, maskFn) => maskFn(prevValue as string, acc),
+          rawValue
+        )
+        form.setFieldValue(props.name, nextValue)
+      }
 
   return (
     <Field name={props.name}>

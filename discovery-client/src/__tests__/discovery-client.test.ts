@@ -43,8 +43,8 @@ describe('discovery client', () => {
   }
 
   const emitPollResult = (result: HealthPollerResult): void => {
-    //  @ts-expect-error: mock doesn't exist on type
     const { onPollResult } =
+      //  @ts-expect-error: mock doesn't exist on type
       createHealthPoller.mock.calls[
         //  @ts-expect-error: mock doesn't exist on type
         createHealthPoller.mock.calls.length - 1
@@ -53,11 +53,10 @@ describe('discovery client', () => {
   }
 
   const emitService = (service: MdnsBrowserService): void => {
-    //  @ts-expect-error: mock doesn't exist on type
     const { onService } =
+      //  @ts-expect-error: mock doesn't exist on type
       createMdnsBrowser.mock.calls[
         //  @ts-expect-error: mock doesn't exist on type
-
         createMdnsBrowser.mock.calls.length - 1
       ][0]
     onService(service)
