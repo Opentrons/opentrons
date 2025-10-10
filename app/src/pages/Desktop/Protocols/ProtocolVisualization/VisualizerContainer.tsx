@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
@@ -18,6 +19,7 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -41,6 +43,7 @@ export function VisualizerContainer(
 ): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
+  const dispatch = useDispatch()
   const [showDeckRenders, setShowDeckRenders] = useState<boolean>(false)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
@@ -192,6 +195,13 @@ export function VisualizerContainer(
       </Flex>
       <Flex>
         <StyledText>Labware Info</StyledText>
+        <button
+          onClick={() => {
+            dispatch(stepDetailViewerOpenAction(protocolKey))
+          }}
+        >
+          open step detail viewer
+        </button>
       </Flex>
     </Flex>
   )
