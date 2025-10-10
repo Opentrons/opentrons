@@ -133,12 +133,17 @@ export const MAX_MOAM_MODULES = 7
 //  to be auto-generated
 export const MAX_MAGNETIC_BLOCKS = 10
 
-export const DECK_CONTROLS_STYLE = {
+export const DECK_CONTROLS_STYLE_BASE = {
   position: POSITION_ABSOLUTE,
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
+  cursor: CURSOR_POINTER,
+}
+
+export const DECK_CONTROLS_STYLE = {
+  ...DECK_CONTROLS_STYLE_BASE,
   transform: 'rotate(180deg) scaleX(-1)',
   zIndex: 1,
   backgroundColor: `${COLORS.black90}cc`,
@@ -147,5 +152,4 @@ export const DECK_CONTROLS_STYLE = {
   color: COLORS.white,
   fontSize: PRODUCT.TYPOGRAPHY.fontFamilyBodyDefaultRegular,
   borderRadius: BORDERS.borderRadius8,
-  cursor: CURSOR_POINTER,
 }

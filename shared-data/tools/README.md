@@ -11,8 +11,7 @@
 
    In order to run this script
 
-   - Run brew install uv
-   - From shard-data, then run uv run tools/format_image.py "insert image path here"
+   - From shard-data, then pipenv run python -m tools/format_image.py "insert image path here"
 
 2. **Name the image file**
 

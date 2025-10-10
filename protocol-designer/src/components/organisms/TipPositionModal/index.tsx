@@ -45,7 +45,7 @@ import * as utils from './utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
-import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 type Offset = 'x' | 'y' | 'z'

@@ -240,7 +240,7 @@ const SUBBUTTON_LABEL_STYLE = (
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${buttonSubLabel?.align === 'vertical' ? 2 : 1};
   overflow: hidden;
-  word-break: break-all;
+  word-break: break-word;
   text-overflow: ellipsis;
 `
 

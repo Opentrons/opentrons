@@ -8,10 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
-import {
-  getEnablePartialTipSupport,
-  getEnableTipPickupLocation,
-} from '/protocol-designer/feature-flags/selectors'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getLabwareEntities,
@@ -79,7 +76,6 @@ describe('MixToolFirstStep', () => {
         pythonName: 'mockPythonName',
       },
     })
-    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
     vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
     vi.mocked(FirstStepMixTools).mockReturnValue(

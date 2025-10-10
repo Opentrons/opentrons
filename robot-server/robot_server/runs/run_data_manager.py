@@ -23,6 +23,7 @@ from opentrons.protocol_engine.types import (
 )
 
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
@@ -35,6 +36,7 @@ from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 
@@ -158,6 +160,7 @@ class RunDataManager:
         run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
+        camera_setting_store: CameraSettingStore,
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
     ) -> None:
@@ -165,6 +168,7 @@ class RunDataManager:
         self._run_store = run_store
 
         self._error_recovery_setting_store = error_recovery_setting_store
+        self._camera_setting_store = camera_setting_store
         # todo(mm, 2024-11-22): Storing the list of error recovery rules is outside the
         # responsibilities of this class. It's also clunky for us to store it like this
         # because we need to remember to clear it whenever the current run changes.
@@ -186,6 +190,7 @@ class RunDataManager:
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
@@ -235,6 +240,7 @@ class RunDataManager:
             initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,

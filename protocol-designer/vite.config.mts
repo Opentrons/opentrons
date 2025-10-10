@@ -149,6 +149,8 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
     'OT_PD_ENABLE_JSON_EXPORT',
     'OT_PD_ENABLE_BY_VOLUME_BUILDER',
+    'OT_PD_ENABLE_TIP_SELCTION',
+    'OT_PD_ENABLE_CAMERA_SUPPORT'
   ])
   return Object.fromEntries(
     Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { DeckInfoLabel } from '../../molecules'
+import { RobotInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
@@ -53,7 +53,7 @@ const DeckLabelSetComponent = (
         />
         {showModuleIcon && (
           <IconWrapper leftPosition={width - 16}>
-            <DeckInfoLabel
+            <RobotInfoLabel
               iconName="stacked"
               highlight
               transform="scale(0.75)"

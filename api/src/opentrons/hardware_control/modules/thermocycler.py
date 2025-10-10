@@ -22,6 +22,7 @@ from opentrons.drivers.thermocycler import (
     ThermocyclerDriverV2,
     ThermocyclerDriverFactory,
 )
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 
 
 log = logging.getLogger(__name__)
@@ -711,7 +712,6 @@ class Thermocycler(mod_abc.AbstractModule):
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
         )
-        asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
         self.error_callback(error)
 
 
@@ -764,6 +764,17 @@ class ThermocyclerReader(Reader):
         await self.read_lid_status()
         await self.read_lid_temperature()
         await self.read_block_temperature()
+        await self._read_errors()
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.
 
     async def read_lid_status(self) -> None:
         self.lid_status = await self._driver.get_lid_status()

@@ -33739,7 +33739,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -49048,7 +49048,7 @@
       "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",

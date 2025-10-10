@@ -31,10 +31,6 @@ export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
 )
-export const getEnableTipPickupLocation: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_TIP_PICKUP_LOCATION ?? false
-)
 export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_HOT_KEYS_DISPLAY ?? false
@@ -70,4 +66,13 @@ export const getEnableJsonExport: Selector<boolean> = createSelector(
 export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
+)
+export const getEnableTipSelection: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
+)
+// @ts-expect-error -- Will be utilized in development soon!
+export const getEnableCameraSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CAMERA_SUPPORT
 )

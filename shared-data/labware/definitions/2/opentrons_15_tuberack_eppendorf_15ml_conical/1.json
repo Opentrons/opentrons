@@ -1,0 +1,314 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+    ["A4", "B4", "C4"],
+    ["A5", "B5", "C5"]
+  ],
+  "brand": { "brand": "Opentrons", "brandId": ["EP0030122194"] },
+  "metadata": {
+    "displayName": "Opentrons 15 Tube Rack with Eppendorf 15 mL",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "yDimension": 85.48,
+    "zDimension": 125,
+    "xDimension": 127.76
+  },
+  "wells": {
+    "A1": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "z": 7.5,
+      "y": 67.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "B1": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "z": 7.5,
+      "y": 42.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "C1": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "z": 7.5,
+      "y": 17.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "A2": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "z": 7.5,
+      "y": 67.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "B2": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "z": 7.5,
+      "y": 42.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "C2": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "z": 7.5,
+      "y": 17.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "A3": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "z": 7.5,
+      "y": 67.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "B3": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "z": 7.5,
+      "y": 42.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "C3": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "z": 7.5,
+      "y": 17.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "A4": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "z": 7.5,
+      "y": 67.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "B4": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "z": 7.5,
+      "y": 42.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "C4": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "z": 7.5,
+      "y": 17.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "A5": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "z": 7.5,
+      "y": 67.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "B5": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "z": 7.5,
+      "y": 42.74,
+      "geometryDefinitionId": "conicalWell"
+    },
+    "C5": {
+      "shape": "circular",
+      "diameter": 15.2,
+      "depth": 117.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "z": 7.5,
+      "y": 17.74,
+      "geometryDefinitionId": "conicalWell"
+    }
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "A2",
+        "B2",
+        "C2",
+        "A3",
+        "B3",
+        "C3",
+        "A4",
+        "B4",
+        "C4",
+        "A5",
+        "B5",
+        "C5"
+      ],
+      "metadata": { "displayCategory": "tubeRack", "wellBottomShape": "flat" }
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "loadName": "opentrons_15_tuberack_eppendorf_15ml_conical",
+    "isMagneticModuleCompatible": false
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
+  "stackingOffsetWithLabware": {},
+  "stackingOffsetWithModule": {},
+  "allowedRoles": [],
+  "gripperOffsets": {},
+  "innerLabwareGeometry": {
+    "conicalWell": {
+      "sections": [
+        {
+          "shape": "conical",
+          "topDiameter": 15.2,
+          "bottomDiameter": 15.2,
+          "topHeight": 117.5,
+          "bottomHeight": 96.56
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.74,
+          "topDiameter": 14.74,
+          "topHeight": 96.56,
+          "bottomHeight": 88.37
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.82,
+          "topDiameter": 14.82,
+          "topHeight": 88.37,
+          "bottomHeight": 80.64
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.7,
+          "topDiameter": 14.7,
+          "topHeight": 80.64,
+          "bottomHeight": 72.64
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.78,
+          "topDiameter": 14.78,
+          "topHeight": 72.64,
+          "bottomHeight": 64.74
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.1,
+          "topDiameter": 14.1,
+          "topHeight": 64.74,
+          "bottomHeight": 56.85
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 14.32,
+          "topDiameter": 14.32,
+          "topHeight": 56.85,
+          "bottomHeight": 49.18
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 13.64,
+          "topDiameter": 13.64,
+          "topHeight": 49.18,
+          "bottomHeight": 41.21
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 13.92,
+          "topDiameter": 13.92,
+          "topHeight": 41.21,
+          "bottomHeight": 33.57
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 13.34,
+          "topDiameter": 13.34,
+          "topHeight": 33.57,
+          "bottomHeight": 25.79
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 13.26,
+          "topDiameter": 13.26,
+          "topHeight": 25.79,
+          "bottomHeight": 17.92
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 10.54,
+          "topDiameter": 10.54,
+          "topHeight": 17.92,
+          "bottomHeight": 10.25
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 6.62,
+          "topDiameter": 6.62,
+          "topHeight": 10.25,
+          "bottomHeight": 2.53
+        },
+        {
+          "shape": "conical",
+          "bottomDiameter": 4.48,
+          "topDiameter": 4.48,
+          "topHeight": 2.53,
+          "bottomHeight": 0
+        }
+      ]
+    }
+  }
+}

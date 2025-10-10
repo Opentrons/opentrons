@@ -9,7 +9,6 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -21,6 +20,7 @@ import {
   OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -332,9 +332,9 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
             <TerseTableRow key={index}>
               <TerseTableDatum>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-                  <DeckInfoLabel deckLabel={location.slotName} />
+                  <RobotInfoLabel deckLabel={location.slotName} />
                   {location.moduleModel != null ? (
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[
                           getModuleType(location.moduleModel)

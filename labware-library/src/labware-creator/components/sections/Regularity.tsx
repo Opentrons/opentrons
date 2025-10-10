@@ -31,6 +31,11 @@ export const Regularity = (): JSX.Element | null => {
             <RadioField name="homogeneousWells" options={yesNoOptions} />
           </div>
         </div>
+        <div className={styles.flex_row}>
+          <div className={styles.homogenous_wells_section}>
+            <RadioField name="hasLpcQuirk" options={yesNoOptions} />
+          </div>
+        </div>
       </>
     </SectionBody>
   )
