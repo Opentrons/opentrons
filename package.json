@@ -36,7 +36,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*module.css": "yarn stylelint --fix",
+    "**/*.css": "yarn stylelint --fix",
     "*.{js,ts,tsx,json,md,yml}": "prettier --write"
   },
   "devDependencies": {
