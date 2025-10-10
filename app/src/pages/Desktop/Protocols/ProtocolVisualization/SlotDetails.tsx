@@ -1,9 +1,9 @@
 import {
   COLORS,
   CommandText,
-  DeckInfoLabel,
   Divider,
   Icon,
+  RobotInfoLabel,
   StyledText,
 } from '@opentrons/components'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
@@ -99,7 +99,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
             <StyledText desktopStyle="bodyLargeSemiBold">Slot</StyledText>
-            <DeckInfoLabel
+            <RobotInfoLabel
               deckLabel={
                 moduleOnSlot != null
                   ? getModuleDeckLabel(

@@ -16,3 +16,5 @@ export interface HighlightedWellLabels {
   wells: string[]
   color?: string
 }
+
+export type TipType = 'new' | 'used' | 'selected' | 'no' | 'inaccessible'

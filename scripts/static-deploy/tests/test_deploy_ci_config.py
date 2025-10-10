@@ -220,3 +220,87 @@ def test_resolve_ci_config_missing_relative_artifact_dir():
     with patch.dict(os.environ, env, clear=True):  # Clear environment
         with pytest.raises(ValueError, match="CI mode requires RELATIVE_ARTIFACT_DIR environment variable"):
             resolve_ci_config()
+
+
+def test_resolve_ci_config_mixed_case_staging_tag():
+    """Test CI config resolution handles mixed case staging tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/Staging-Protocol-Designer-v1.0.0",
+        "GITHUB_REF_NAME": "Staging-Protocol-Designer-v1.0.0",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/pd",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "protocol_designer"
+    assert config.environment == "staging"
+    assert config.sandbox_prefix == "Staging-Protocol-Designer-v1.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/pd"
+
+
+def test_resolve_ci_config_mixed_case_production_tag():
+    """Test CI config resolution handles mixed case production tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/Labware-Library-v2.0.0",
+        "GITHUB_REF_NAME": "Labware-Library-v2.0.0",
+        "GITHUB_WORKFLOW": "Labware Library test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/ll",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "labware_library"
+    assert config.environment == "production"
+    assert config.sandbox_prefix == "Labware-Library-v2.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/ll"
+
+
+def test_resolve_ci_config_uppercase_tag():
+    """Test CI config resolution handles fully uppercase tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/STAGING-MKDOCS-V1.0.0",
+        "GITHUB_REF_NAME": "STAGING-MKDOCS-V1.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/build/docs",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "mkdocs"
+    assert config.environment == "staging"
+    assert config.sandbox_prefix == "STAGING-MKDOCS-V1.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/build/docs"
+
+
+def test_resolve_ci_config_lowercase_tag():
+    """Test CI config resolution handles fully lowercase tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/docs-v3.0.0",
+        "GITHUB_REF_NAME": "docs-v3.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/docs",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "docs"
+    assert config.environment == "production"
+    assert config.sandbox_prefix == "docs-v3.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/docs"

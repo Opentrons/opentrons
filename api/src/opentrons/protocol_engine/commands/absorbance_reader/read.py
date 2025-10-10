@@ -14,7 +14,9 @@ from ...errors.error_occurrence import ErrorOccurrence
 from ...resources.file_provider import (
     PlateReaderData,
     ReadData,
-    MAXIMUM_CSV_FILE_LIMIT,
+    MAXIMUM_FILE_LIMIT,
+    MimeType,
+    ReadCmdFileNameMetadata,
 )
 from ...resources import FileProvider
 from ...state import update_types
@@ -102,10 +104,10 @@ class ReadAbsorbanceImpl(
             if (
                 self._state_view.files.get_filecount()
                 + len(abs_reader_substate.configured_wavelengths)
-                > MAXIMUM_CSV_FILE_LIMIT
+                > MAXIMUM_FILE_LIMIT
             ):
                 raise StorageLimitReachedError(
-                    message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_CSV_FILE_LIMIT} files."
+                    message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
                 )
 
         asbsorbance_result: Dict[int, Dict[str, float]] = {}
@@ -174,11 +176,16 @@ class ReadAbsorbanceImpl(
             if isinstance(plate_read_result, PlateReaderData):
                 # Write a CSV file for each of the measurements taken
                 for measurement in plate_read_result.read_results:
-                    file_id = await self._file_provider.write_csv(
-                        write_data=plate_read_result.build_generic_csv(
-                            filename=params.fileName,
-                            measurement=measurement,
-                        )
+                    csv_bytes = plate_read_result.build_csv_bytes(
+                        measurement=measurement,
+                    )
+                    file_id = await self._file_provider.write_file(
+                        data=csv_bytes,
+                        mime_type=MimeType.TEXT_CSV,
+                        command_metadata=ReadCmdFileNameMetadata.model_construct(
+                            base_filename=params.fileName,
+                            wavelength=measurement.wavelength,
+                        ),
                     )
                     file_ids.append(file_id)
 
