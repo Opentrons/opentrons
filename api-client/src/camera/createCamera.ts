@@ -1,22 +1,15 @@
-import { GET, request } from '../request'
+import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { CameraData, CameraMeta } from './types'
+import type { CameraData, CameraResponse } from './types'
 
-export interface CreateCameraResponse {
-  data: CameraData[]
-  meta: CameraMeta
-}
-
-export type CreateCameraData = CameraData
-
-export function CreateCamera(
+export function createCamera(
   config: HostConfig,
-  data: CreateCameraData
-): ResponsePromise<CreateCameraResponse> {
-  return request<CreateCameraResponse, { data: CameraData }>(
-    GET,
+  data: CameraData
+): ResponsePromise<CameraResponse> {
+  return request<CameraResponse, { data: CameraData }>(
+    POST,
     `/camera`,
     { data },
     config

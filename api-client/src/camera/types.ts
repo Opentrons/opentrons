@@ -1,14 +1,11 @@
 export interface CameraData {
-  data: {
-    cameraEnabled: boolean
-    liveStreamEnabled: boolean
-    errorRecoveryCameraEnabled: boolean
-  }
+  cameraEnabled: boolean
+  liveStreamEnabled: boolean
+  errorRecoveryCameraEnabled: boolean
 }
 
-export interface CameraMeta {
-  cursor: number
-  totalLength: number
+export interface CreateCameraData {
+  data: CameraData
 }
 
-export type CreateCameraData = CameraData
+export type CameraResponse = CameraData
