@@ -10,6 +10,7 @@
     "used_tip": "Used tip"
   },
   "no_tiprack_selected": "Select a tiprack to continue",
+  "pickups_remaining": "{{count}} pickups remaining",
   "select": "Select",
   "selected": "Selected",
   "select_tiprack": "Select a tip rack to pick up tips from",

@@ -60,3 +60,7 @@
   align-items: center;
   grid-gap: var(--spacing-4);
 }
+
+.shadow_overlay {
+  pointer-events: none;
+}

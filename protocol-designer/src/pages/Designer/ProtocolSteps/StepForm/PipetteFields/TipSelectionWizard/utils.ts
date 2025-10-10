@@ -4,7 +4,7 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import type { DeckDefinition } from '@opentrons/shared-data'
+import type { DeckDefinition, PipetteV2Specs } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
@@ -52,4 +52,47 @@ export const getViewboxFromSelectedLabware = (
   return `${slotPosition[0] - PADDING_MM_X} ${slotPosition[1] - paddingMmY} ${
     xDimension + PADDING_MM_X * 2
   } ${yDimension + paddingMmY * 2}`
+}
+
+export const getHoveredOffsetFromWell = (args: {
+  selectedTiprackId: string
+  labwareState: AllTemporalPropertiesForTimelineFrame['labware']
+  wellName: string | null
+  pipetteSpec: PipetteV2Specs
+  primaryNozzle: string
+}) => {
+  const {
+    selectedTiprackId,
+    labwareState,
+    wellName,
+    pipetteSpec,
+    primaryNozzle,
+  } = args
+  const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpec
+  const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
+  const [xNozzleOffset, yNozzleOffset] = nozzleMap[primaryNozzle] ?? [0, 0]
+  const leftBound = backLeftCorner[0]
+  const frontBound = frontRightCorner[1]
+
+  const xOffset = leftBound - xNozzleOffset
+  const yOffset = frontBound - yNozzleOffset
+
+  if (wellName == null) {
+    return {
+      x: 0,
+      y: 0,
+    }
+  }
+  const labware = labwareState[selectedTiprackId ?? '']
+  const well = labware.def.wells[wellName]
+  return {
+    x:
+      well.x +
+      xOffset -
+      (well.shape === 'circular' ? well.diameter : well.xDimension) / 2,
+    y:
+      well.y +
+      yOffset -
+      (well.shape === 'circular' ? well.diameter : well.yDimension) / 2,
+  }
 }

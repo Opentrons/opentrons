@@ -17,6 +17,7 @@ import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
+  TipType,
   WellFill,
   WellGroup,
   WellMouseEvent,
@@ -109,6 +110,9 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   showBorder?: boolean
   strokeColor?: string
+  tipStatusByWellName?: Record<string, TipType>
+  handleClickWell?: (wellName: string) => void
+  selectedTips?: string[]
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -174,6 +178,9 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         highlight={props.highlight}
         highlightShadow={props.highlightShadow}
         wellStroke={props.wellStroke}
+        tipStatusByWellName={props.tipStatusByWellName}
+        handleClickWell={props.handleClickWell}
+        selectedTips={props.selectedTips}
       />
       {props.wellStroke != null ? (
         <StrokedWells

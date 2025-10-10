@@ -99,6 +99,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
         <TipSelectionWizard
           setShowTipSelectionModal={setShowTipSelectionModal}
           formTiprackUri={propsForFields.tipRack.value as string}
+          pipetteId={propsForFields.pipette.value as string}
         />
       )}
     </Flex>

@@ -15,21 +15,27 @@ import { TipSelectionModal } from './TipSelectionModal'
 import type { Dispatch, SetStateAction } from 'react'
 
 const NUM_TOTAL_STEPS = 2
+const STUBBED_NUM_PICKUPS = 10
 
 interface TipSelectionWizardProps {
   formTiprackUri: string
   setShowTipSelectionModal: Dispatch<SetStateAction<boolean>>
+  pipetteId: string
 }
 
 export function TipSelectionWizard(
   props: TipSelectionWizardProps
 ): JSX.Element {
-  const { setShowTipSelectionModal, formTiprackUri } = props
+  const { setShowTipSelectionModal, formTiprackUri, pipetteId } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
     null
   )
+  const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] = useState(
+    false
+  )
+  const [selectedTips, setSelectedTips] = useState<string[]>([])
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
@@ -39,7 +45,11 @@ export function TipSelectionWizard(
     if (selectedTiprackId == null) {
       makeSnackbar(t('no_tiprack_selected') as string)
     } else if (currentStepIndex === NUM_TOTAL_STEPS - 1) {
-      setShowTipSelectionModal(false)
+      if (selectedTips.length !== STUBBED_NUM_PICKUPS) {
+        setShowPickupsRequiredBanner(true)
+      } else {
+        setShowTipSelectionModal(false)
+      }
     } else {
       setCurrentStepIndex(prevStepIndex => prevStepIndex + 1)
     }
@@ -67,7 +77,16 @@ export function TipSelectionWizard(
       currentComponent = <SelectTiprack {...baseProps} />
       break
     case 1:
-      currentComponent = <SelectTips {...baseProps} />
+      currentComponent = (
+        <SelectTips
+          {...baseProps}
+          selectedTips={selectedTips}
+          setSelectedTips={setSelectedTips}
+          setShowPickupsRequiredBanner={setShowPickupsRequiredBanner}
+          numTotalPickups={STUBBED_NUM_PICKUPS}
+          pipetteId={pipetteId}
+        />
+      )
       break
     default:
       // protective, should not hit
@@ -89,6 +108,8 @@ export function TipSelectionWizard(
       }
       currentStepIndex={currentStepIndex}
       totalSteps={NUM_TOTAL_STEPS}
+      showPickupsRequiredBanner={showPickupsRequiredBanner}
+      numPickupsRemaining={STUBBED_NUM_PICKUPS - selectedTips.length}
     >
       {currentComponent}
     </TipSelectionModal>

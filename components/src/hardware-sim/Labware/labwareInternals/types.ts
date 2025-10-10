@@ -1,3 +1,5 @@
+import { INACCESSIBLE, NEW, NO, SELECTED, USED } from './Tips/constants'
+
 import type { MouseEvent } from 'react'
 
 export interface WellMouseEvent {
@@ -17,4 +19,9 @@ export interface HighlightedWellLabels {
   color?: string
 }
 
-export type TipType = 'new' | 'used' | 'selected' | 'no' | 'inaccessible'
+export type TipType =
+  | typeof NEW
+  | typeof USED
+  | typeof SELECTED
+  | typeof NO
+  | typeof INACCESSIBLE
