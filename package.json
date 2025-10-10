@@ -32,9 +32,12 @@
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
   },
+  "scripts": {
+    "prepare": "husky"
+  },
   "lint-staged": {
-    "*.{css}": "make format-css",
-    "*": "prettier --write"
+    "*.css": "yarn stylelint --fix",
+    "*.{js,ts,tsx,json,md,yml}": "prettier --write"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.582.0",
