@@ -139,6 +139,17 @@ export async function getCurrentBranchName() {
   }
 }
 
+export async function getShortSha() {
+  try {
+    const sha = (
+      await monorepoGit().raw(['rev-parse', '--short', 'HEAD'])
+    ).trim()
+    return sha
+  } catch (error) {
+    return null
+  }
+}
+
 export async function latestTagForProject(project) {
   // First, try to get tags pointing at the current commit (HEAD)
   const tagsAtHead = await getTagsPointingAtHead(project)
@@ -193,9 +204,11 @@ export async function latestTagForProject(project) {
   // No tags at HEAD, try to get branch name
   const branchName = await getCurrentBranchName()
   if (branchName) {
-    // Use the full branch name as the version
+    // Use the full branch name with short SHA as the version
+    const shortSha = await getShortSha()
+    const versionString = shortSha ? `${branchName}-${shortSha}` : branchName
     // Return a synthetic tag format that can be parsed by detailsFromTag
-    return `${prefixForProject(project)}${branchName}`
+    return `${prefixForProject(project)}${versionString}`
   }
   
   // No tags at HEAD and no branch, throw error

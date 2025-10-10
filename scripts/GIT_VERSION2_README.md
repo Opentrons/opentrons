@@ -7,7 +7,7 @@
 ### Key Changes
 
 1. **Tags must be at HEAD**: Only returns tags that are pointing at the current commit (`git tag --points-at HEAD`)
-2. **Branch name fallback**: If no tag exists at HEAD, uses the branch name to derive a version
+2. **Branch name fallback**: If no tag exists at HEAD, uses the branch name + short SHA to derive a version
 3. **Prefix priority**: When multiple tags exist on the same commit, prefers `protocol-designer@` over `staging-protocol-designer@`
 4. **Semver selection**: When multiple tags with the same prefix exist, selects the highest semantic version
 
@@ -36,10 +36,10 @@ For protocol-designer project:
 
 2. **Fallback to branch name** if no tags at HEAD
 
-   - Constructs a synthetic tag using the full branch name:
-     - `chore_release-pd-8.6.0` → `protocol-designer@chore_release-pd-8.6.0`
-     - `edge` → `protocol-designer@edge`
-     - `feature-branch` → `protocol-designer@feature-branch`
+   - Constructs a synthetic tag using the full branch name + short SHA:
+     - `chore_release-pd-8.6.0` (at commit `a1b2c3d`) → `protocol-designer@chore_release-pd-8.6.0-a1b2c3d`
+     - `edge` (at commit `abc123f`) → `protocol-designer@edge-abc123f`
+     - `feature-branch` (at commit `def456a`) → `protocol-designer@feature-branch-def456a`
 
 3. **Error fallback**: Returns `0.0.0-dev` if nothing works
 
@@ -57,13 +57,13 @@ For protocol-designer project:
 
 ### Test Case 3: Branch build with no tag
 
-- Branch: `chore_release-pd-8.6.0`
-- Result: ✅ Returns synthetic tag `protocol-designer@chore_release-pd-8.6.0`
+- Branch: `chore_release-pd-8.6.0` at commit `5c1ad1a883`
+- Result: ✅ Returns synthetic tag `protocol-designer@chore_release-pd-8.6.0-5c1ad1a883`
 
 ### Test Case 4: Edge branch build
 
-- Branch: `edge`
-- Result: ✅ Returns synthetic tag `protocol-designer@edge`
+- Branch: `edge` at commit `abc123def4`
+- Result: ✅ Returns synthetic tag `protocol-designer@edge-abc123def4`
 
 ### Test Case 5: Multiple staging tags (semver selection)
 
