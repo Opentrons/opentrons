@@ -1,10 +1,10 @@
-
 export interface CameraData {
   data: {
-    cameraEnabled: boolean,
+    cameraEnabled: boolean
     liveStreamEnabled: boolean
     errorRecoveryCameraEnabled: boolean
-  }}
+  }
+}
 
 export interface CameraMeta {
   cursor: number
