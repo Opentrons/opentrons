@@ -1,40 +1,15 @@
-import styled from 'styled-components'
+import { Button } from './Button'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, styleProps } from '../../primitives'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import type { ButtonProps } from './Button'
 
-export const PrimaryButton = styled(Btn)`
-  color: ${COLORS.white};
-  background-color: ${COLORS.blue50};
-  border-radius: ${BORDERS.borderRadius8};
-  box-shadow: none;
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  font-size: ${TYPOGRAPHY.fontSizeH3};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: ${TYPOGRAPHY.lineHeight20};
+/**
+ * PrimaryButton component - default blue button variant.
+ * This is a convenience wrapper around the Button component.
+ *
+ * @deprecated Consider using Button component directly with variant="default"
+ */
+export type PrimaryButtonProps = Omit<ButtonProps, 'variant'>
 
-  ${styleProps}
-
-  &:hover,
-  &:focus {
-    background-color: ${COLORS.blue55};
-    box-shadow: none;
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${COLORS.blue50};
-    outline-offset: 0.25rem;
-  }
-
-  &:active {
-    background-color: ${COLORS.blue60};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey30};
-    color: ${COLORS.grey40};
-  }
-`
+export function PrimaryButton(props: PrimaryButtonProps): JSX.Element {
+  return <Button variant="default" {...props} />
+}

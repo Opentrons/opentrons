@@ -1,37 +1,15 @@
-import styled from 'styled-components'
+import { Button } from './Button'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, styleProps } from '../../primitives'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import type { ButtonProps } from './Button'
 
-export const AltPrimaryButton = styled(Btn)`
-  background-color: ${COLORS.grey30};
-  color: ${COLORS.black90};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadius8};
-  box-shadow: none;
-  font-size: ${TYPOGRAPHY.fontSizeH3};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: ${TYPOGRAPHY.lineHeight20};
+/**
+ * AltPrimaryButton component - alternative grey button variant.
+ * This is a convenience wrapper around the Button component.
+ *
+ * @deprecated Consider using Button component directly with variant="alt"
+ */
+export type AltPrimaryButtonProps = Omit<ButtonProps, 'variant'>
 
-  ${styleProps}
-
-  &:focus {
-    background-color: ${COLORS.grey35};
-    box-shadow: none;
-  }
-
-  &:active {
-    background-color: ${COLORS.grey40};
-  }
-
-  &:hover {
-    box-shadow: 0 0 0;
-    background-color: ${COLORS.grey35};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey30};
-    color: ${COLORS.grey40};
-  }
-`
+export function AltPrimaryButton(props: AltPrimaryButtonProps): JSX.Element {
+  return <Button variant="alt" {...props} />
+}

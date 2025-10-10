@@ -1,5 +1,7 @@
 export * from './AlertPrimaryButton'
+export * from './AltPrimaryButton'
 export * from './BasicButton'
+export * from './Button'
 export * from './EmptySelectorButton'
 export * from './LargeButton'
 export * from './PrimaryButton'

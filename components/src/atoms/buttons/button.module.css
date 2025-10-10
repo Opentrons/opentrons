@@ -1,0 +1,112 @@
+/* Base button styles with CSS Modules */
+
+.button {
+  /* Common styling */
+  padding: var(--spacing-8) var(--spacing-16);
+  border: none;
+  border-radius: var(--border-radius-8); /* default 8px */
+
+  /* Reset and base styles */
+  appearance: none;
+  box-shadow: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem; /* 14px - fontSizeH3 */
+  font-weight: 600; /* fontWeightSemiBold */
+  line-height: 1.25rem; /* 20px - lineHeight20 */
+  text-align: center;
+  text-transform: none;
+
+  /* Transition for smooth state changes */
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Default variant - Blue */
+.button.variant_default {
+  background-color: var(--blue-50);
+  color: #fff;
+}
+
+.button.variant_default:hover,
+.button.variant_default:focus {
+  background-color: var(--blue-55);
+}
+
+.button.variant_default:focus-visible {
+  outline: 2px solid var(--blue-50);
+  outline-offset: 0.25rem;
+}
+
+.button.variant_default:active {
+  background-color: var(--blue-60);
+}
+
+.button.variant_default:disabled,
+.button.variant_default[aria-disabled='true'] {
+  background-color: var(--grey-30);
+  color: var(--grey40);
+  cursor: default;
+}
+
+/* Alert variant - Red */
+.button.variant_alert {
+  background-color: var(--red-50);
+  color: var(--white);
+}
+
+.button.variant_alert:hover {
+  background-color: var(--red-55);
+}
+
+.button.variant_alert:focus-visible {
+  outline: 2px solid var(--red-50);
+  outline-offset: 0.25rem;
+}
+
+.button.variant_alert:active {
+  background-color: var(--red-60);
+}
+
+.button.variant_alert:disabled,
+.button.variant_alert[aria-disabled='true'] {
+  background-color: var(--grey-30);
+  color: var(--grey-40);
+  cursor: default;
+}
+
+/* Alt variant - Grey */
+.button.variant_alt {
+  background-color: var(--grey-30);
+  color: var(--black-90);
+}
+
+.button.variant_alt:focus,
+.button.variant_alt:hover {
+  background-color: var(--grey-35);
+}
+
+.button.variant_alt:focus-visible {
+  outline: 2px solid var(--grey-30);
+  outline-offset: 0.25rem;
+}
+
+.button.variant_alt:active {
+  background-color: var(--grey-40);
+}
+
+.button.variant_alt:disabled,
+.button.variant_alt[aria-disabled='true'] {
+  background-color: var(--grey-30);
+  color: var(--grey-40);
+  cursor: default;
+}
+
+/* Disabled state removes pointer events */
+.button:disabled {
+  pointer-events: none;
+}
+
+/* aria-disabled keeps button focusable but prevents interaction via JS */
+.button[aria-disabled='true'] {
+  pointer-events: none;
+}

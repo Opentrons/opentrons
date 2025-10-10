@@ -1,27 +1,17 @@
-import styled from 'styled-components'
+import { Button } from './Button'
 
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Btn, styleProps } from '../../primitives'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import type { ButtonProps } from './Button'
 
-export const AlertPrimaryButton = styled(Btn)`
-  color: ${COLORS.white};
-  background-color: ${COLORS.red50};
-  border-radius: ${BORDERS.borderRadius8};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  box-shadow: 0 0 0;
-  ${TYPOGRAPHY.pSemiBold}
+/**
+ * AlertPrimaryButton component - alert red button variant.
+ * This is a convenience wrapper around the Button component.
+ *
+ * @deprecated Consider using Button component directly with variant="alert"
+ */
+export type AlertPrimaryButtonProps = Omit<ButtonProps, 'variant'>
 
-  ${styleProps}
-
-  &:hover {
-    box-shadow: 0 0 0;
-    background-color: ${COLORS.red55};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.grey30};
-    color: ${COLORS.grey40};
-  }
-`
+export function AlertPrimaryButton(
+  props: AlertPrimaryButtonProps
+): JSX.Element {
+  return <Button variant="alert" {...props} />
+}

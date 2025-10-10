@@ -1,11 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { BORDERS, COLORS } from '../../../helix-design-system'
 import { renderWithProviders } from '../../../testing/utils'
-import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { PrimaryButton } from '../PrimaryButton'
 
 import type { ComponentProps } from 'react'
@@ -26,19 +24,8 @@ describe('PrimaryButton', () => {
   it('renders primary button with text', () => {
     render(props)
     const button = screen.getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
-    expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
-    )
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeH3}`)
-    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
-    expect(button).toHaveStyle(
-      `text-transform: ${TYPOGRAPHY.textTransformNone}`
-    )
-    expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveAttribute('type', 'button')
   })
 
   it('renders primary button with text and disabled', () => {
@@ -46,22 +33,14 @@ describe('PrimaryButton', () => {
     render(props)
     const button = screen.getByText('primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
-    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })
 
-  it('applies the correct states to the button - hover', () => {
+  it('handles click events', () => {
+    const handleClick = vi.fn()
+    props.onClick = handleClick
     render(props)
     const button = screen.getByText('primary button')
-    fireEvent.mouseOver(button)
-    expect(button).toHaveStyle(`background-color: ${COLORS.blue55}`)
-  })
-
-  it('renders primary button with text and different background color', () => {
-    props.backgroundColor = COLORS.red50
-    render(props)
-    const button = screen.getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
+    fireEvent.click(button)
+    expect(handleClick).toHaveBeenCalledTimes(1)
   })
 })

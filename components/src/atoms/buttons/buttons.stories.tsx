@@ -5,6 +5,7 @@ import { SPACING } from '../../ui-style-constants'
 import { AlertPrimaryButton as AlertPrimaryButtonComponent } from './AlertPrimaryButton'
 import { AltPrimaryButton as AltPrimaryButtonComponent } from './AltPrimaryButton'
 import { BasicButton as BasicButtonComponent } from './BasicButton'
+import { Button as ButtonComponent } from './Button'
 import { PrimaryButton as PrimaryButtonComponent } from './PrimaryButton'
 import { SecondaryButton as SecondaryButtonComponent } from './SecondaryButton'
 
@@ -39,6 +40,109 @@ const meta: Meta = {
 
 export default meta
 
+/**
+ * Button is the unified button component using CSS Modules.
+ * It supports three variants (default, alert, alt) and customizable border radius.
+ * Prefer using this component directly instead of the legacy wrapper components.
+ */
+export const Button: StoryObj<typeof ButtonComponent> = {
+  args: {
+    children: 'button',
+    variant: 'default',
+    borderRadius: '8px',
+    disabled: false,
+    'aria-disabled': false,
+  },
+  argTypes: {
+    variant: {
+      control: {
+        type: 'select',
+      },
+      options: ['default', 'alert', 'alt'],
+      description: 'Visual style variant of the button',
+    },
+    borderRadius: {
+      control: {
+        type: 'select',
+      },
+      options: ['8px', '12px', '16px', '200px', '1rem'],
+      description: 'Border radius of the button (supports any CSS value)',
+    },
+    disabled: {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Native HTML disabled (removes from tab order)',
+    },
+    'aria-disabled': {
+      control: {
+        type: 'boolean',
+      },
+      description: 'Accessible disabled (keeps in tab order)',
+    },
+  },
+  render: args => (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <ButtonComponent {...args} />
+    </Flex>
+  ),
+}
+
+/**
+ * All button variants displayed side by side for comparison.
+ */
+export const ButtonVariants: StoryObj<typeof ButtonComponent> = {
+  render: () => (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <ButtonComponent variant="default">Default</ButtonComponent>
+      <ButtonComponent variant="alert">Alert</ButtonComponent>
+      <ButtonComponent variant="alt">Alt</ButtonComponent>
+    </Flex>
+  ),
+}
+
+/**
+ * Button with pill shape (fully rounded borders).
+ */
+export const ButtonPillShape: StoryObj<typeof ButtonComponent> = {
+  render: () => (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <ButtonComponent variant="default" borderRadius="200px">
+        Default Pill
+      </ButtonComponent>
+      <ButtonComponent variant="alert" borderRadius="200px">
+        Alert Pill
+      </ButtonComponent>
+      <ButtonComponent variant="alt" borderRadius="200px">
+        Alt Pill
+      </ButtonComponent>
+    </Flex>
+  ),
+}
+
+/**
+ * Disabled button states for all variants.
+ */
+export const ButtonDisabled: StoryObj<typeof ButtonComponent> = {
+  render: () => (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <ButtonComponent variant="default" disabled>
+        Default Disabled
+      </ButtonComponent>
+      <ButtonComponent variant="alert" disabled>
+        Alert Disabled
+      </ButtonComponent>
+      <ButtonComponent variant="alt" disabled>
+        Alt Disabled
+      </ButtonComponent>
+    </Flex>
+  ),
+}
+
+/**
+ * Legacy PrimaryButton component (wraps Button with variant="default").
+ * @deprecated Use Button component directly with variant="default"
+ */
 export const PrimaryButton: StoryObj<typeof PrimaryButtonComponent> = {
   args: {
     children: 'primary button',
@@ -61,6 +165,10 @@ export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
   ),
 }
 
+/**
+ * Legacy AlertPrimaryButton component (wraps Button with variant="alert").
+ * @deprecated Use Button component directly with variant="alert"
+ */
 export const AlertPrimaryButton: StoryObj<
   typeof AlertPrimaryButtonComponent
 > = {
@@ -74,6 +182,10 @@ export const AlertPrimaryButton: StoryObj<
   ),
 }
 
+/**
+ * Legacy AltPrimaryButton component (wraps Button with variant="alt").
+ * @deprecated Use Button component directly with variant="alt"
+ */
 export const AltPrimaryButton: StoryObj<typeof AltPrimaryButtonComponent> = {
   args: {
     children: 'alt primary button',
