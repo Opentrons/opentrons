@@ -1,17 +1,10 @@
+
 export interface CameraData {
   data: {
-    liveVideo: boolean,
-    errorRecovery: boolean
-  }
-  firmwareVersion?: string
-  instrumentName: string
-  instrumentType: 'camera'
-  serialNumber: string
-  state?: {
-    enabled: boolean
-  }
-  ok: true
-}
+    cameraEnabled: boolean,
+    liveStreamEnabled: boolean
+    errorRecoveryCameraEnabled: boolean
+  }}
 
 export interface CameraMeta {
   cursor: number
