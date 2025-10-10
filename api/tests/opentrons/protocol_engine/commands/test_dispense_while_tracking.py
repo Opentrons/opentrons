@@ -1,7 +1,7 @@
 """Test dispense-in-place commands."""
 
 from datetime import datetime
-from typing import Optional
+
 import pytest
 from decoy import Decoy, matchers
 
@@ -54,7 +54,7 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    "location,stateupdateLabware,stateupdateWell,end_location, expected_location",
+    "location,stateupdateLabware,stateupdateWell",
     [
         (
             CurrentWell(
@@ -64,25 +64,16 @@ def subject(
             ),
             "funky-labware",
             "funky-well",
-            None,
-            Point(1, 2, 3),
         ),
         (
             CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
             "funky-labware",
             "funky-well",
-            None,
-            Point(1, 2, 3),
         ),
         (
             CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
             "funky-labware",
             "funky-well",
-            LiquidHandlingWellLocation(
-                origin=WellOrigin.MENISCUS,
-                offset=WellOffset(x=2, y=3, z=4),
-            ),
-            Point(7, 8, 9),
         ),
     ],
 )
@@ -96,8 +87,6 @@ async def test_dispense_while_tracking_implementation(
     location: CurrentPipetteLocation | None,
     stateupdateLabware: str,
     stateupdateWell: str,
-    end_location: Optional[LiquidHandlingWellLocation],
-    expected_location: Point,
 ) -> None:
     """It should dispense in place."""
     well_location = LiquidHandlingWellLocation(
@@ -109,7 +98,7 @@ async def test_dispense_while_tracking_implementation(
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
         trackFromLocation=well_location,
-        trackToLocation=end_location,
+        trackToLocation=well_location,
         volume=123,
         flowRate=456,
     )
@@ -122,22 +111,13 @@ async def test_dispense_while_tracking_implementation(
             pipette_id="pipette-id-abc",
         )
     ).then_return(Point(1, 2, 3))
-    decoy.when(
-        state_view.geometry.get_well_position(
-            labware_id=stateupdateLabware,
-            well_name=stateupdateWell,
-            well_location=end_location,
-            operation_volume=123,
-            pipette_id="pipette-id-abc",
-        )
-    ).then_return(Point(7, 8, 9))
 
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=456,
-            end_point=expected_location,
+            end_point=Point(1, 2, 3),
             push_out=None,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
@@ -171,7 +151,7 @@ async def test_dispense_while_tracking_implementation(
         )
     ).then_return(["A3", "A4"])
     decoy.when(await gantry_mover.get_position("pipette-id-abc")).then_return(
-        expected_location
+        Point(1, 2, 3)
     )
     _well_location = LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS, offset=WellOffset(x=0.0, y=0.0, z=1.0)
@@ -197,9 +177,7 @@ async def test_dispense_while_tracking_implementation(
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=42,
-                position=DeckPoint(
-                    x=expected_location.x, y=expected_location.y, z=expected_location.z
-                ),
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
@@ -220,9 +198,7 @@ async def test_dispense_while_tracking_implementation(
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=42,
-                position=DeckPoint(
-                    x=expected_location.x, y=expected_location.y, z=expected_location.z
-                ),
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
@@ -287,6 +263,7 @@ async def test_overpressure_error(
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
         trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=50,
         flowRate=1.23,
         pushOut=10,

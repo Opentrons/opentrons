@@ -263,12 +263,29 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
             if dynamic_liquid_tracking:
+                # TODO replace this declaration with an argument, leaving it like this until I do that ticket
+                end_location: Optional[Location] = None
+                # Keep this part when above TODO is done
+                if end_location is None:
+                    end_location = location
+                (
+                    end_well_location,
+                    _,
+                ) = self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=end_location.point,
+                    location_type=WellLocationFunction.LIQUID_HANDLING,
+                    meniscus_tracking=meniscus_tracking,
+                )
+                assert isinstance(end_well_location, LiquidHandlingWellLocation)
                 self._engine_client.execute_command(
                     cmd.AspirateWhileTrackingParams(
                         pipetteId=self._pipette_id,
                         labwareId=labware_id,
                         wellName=well_name,
                         trackFromLocation=well_location,
+                        trackToLocation=end_well_location,
                         volume=volume,
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
@@ -376,12 +393,29 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_location=well_location,
             )
             if dynamic_liquid_tracking:
+                # TODO replace this declaration with an argument, leaving it like this until I do that ticket
+                end_location: Optional[Location] = None
+                # Keep this part when above TODO is done
+                if end_location is None:
+                    end_location = location
+                (
+                    end_well_location,
+                    _,
+                ) = self._engine_client.state.geometry.get_relative_well_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    absolute_point=end_location.point,
+                    location_type=WellLocationFunction.LIQUID_HANDLING,
+                    meniscus_tracking=meniscus_tracking,
+                )
+                assert isinstance(end_well_location, LiquidHandlingWellLocation)
                 self._engine_client.execute_command(
                     cmd.DispenseWhileTrackingParams(
                         pipetteId=self._pipette_id,
                         labwareId=labware_id,
                         wellName=well_name,
                         trackFromLocation=well_location,
+                        trackToLocation=end_well_location,
                         volume=volume,
                         flowRate=flow_rate,
                         pushOut=push_out,

@@ -433,8 +433,7 @@
         },
         "trackToLocation": {
           "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to end the operation",
-          "title": "Tracktolocation"
+          "description": "Relative well location at which to end the operation"
         },
         "volume": {
           "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
@@ -1700,8 +1699,7 @@
         },
         "trackToLocation": {
           "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to end the operation",
-          "title": "Tracktolocation"
+          "description": "Relative well location at which to end the operation"
         },
         "volume": {
           "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
