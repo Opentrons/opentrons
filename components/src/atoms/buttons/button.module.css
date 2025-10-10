@@ -11,9 +11,9 @@
   box-shadow: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.875rem; /* 14px - fontSizeH3 */
-  font-weight: 600; /* fontWeightSemiBold */
-  line-height: 1.25rem; /* 20px - lineHeight20 */
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-20);
   text-align: center;
   text-transform: none;
 
@@ -24,7 +24,7 @@
 /* Default variant - Blue */
 .button.variant_default {
   background-color: var(--blue-50);
-  color: #fff;
+  color: var(--white);
 }
 
 .button.variant_default:hover,
@@ -34,7 +34,7 @@
 
 .button.variant_default:focus-visible {
   outline: 2px solid var(--blue-50);
-  outline-offset: 0.25rem;
+  outline-offset: var(--spacing-4);
 }
 
 .button.variant_default:active {
@@ -87,7 +87,7 @@
 
 .button.variant_alt:focus-visible {
   outline: 2px solid var(--grey-30);
-  outline-offset: 0.25rem;
+  outline-offset: var(--spacing-4);
 }
 
 .button.variant_alt:active {
