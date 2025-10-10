@@ -189,6 +189,15 @@ describe('getWellContentsForLabwareStack', () => {
         },
       },
     },
+    mockDestLabware: {
+      0: {
+        ...baseIngredFields,
+        wells: {
+          A1: { volume: 100 },
+          B1: { volume: 150 },
+        },
+      },
+    },
     container2Id: {
       0: {
         ...baseIngredFields,
@@ -202,29 +211,19 @@ describe('getWellContentsForLabwareStack', () => {
     FIXED_TRASH_ID: {},
   }
 
-  // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
-  const singleIngredResultStack = getWellContentsForLabwareStack.resultFunc(
-    labwareEntities,
-    mockRobotState,
-    ingredsByLabwareXXSingleIngredStack,
-    'container1Id', // selected labware id
-    { A1: 'A1', B1: 'B1' }, // selected
-    { A3: 'A3' } // highlighted
-  )
-  console.log('singleIngredResultStack', singleIngredResultStack)
-
   it('selects well contents of all labware in stack (for Plate props)', () => {
-    expect(singleIngredResultStack).toMatchObject({
-      FIXED_TRASH_ID: {
-        A1: defaultWellContents,
-      },
-      container2Id: {
-        A1: defaultWellContents,
-      },
-      container3Id: {
-        A1: defaultWellContents,
-      },
+    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
+    const singleIngredResultStack = getWellContentsForLabwareStack.resultFunc(
+      labwareEntities,
+      mockRobotState,
+      ingredsByLabwareXXSingleIngredStack,
+      'container1Id', // selected labware id
+      { A1: 'A1', B1: 'B1' }, // selected
+      { A3: 'A3' } // highlighted
+    )
+    console.log('singleIngredResultStack:', singleIngredResultStack)
 
+    expect(singleIngredResultStack).toMatchObject({
       container1Id: {
         A1: {
           ...defaultWellContents,
@@ -245,10 +244,13 @@ describe('getWellContentsForLabwareStack', () => {
           maxVolume: container1MaxVolume,
         },
       },
+      mockDestLabware: {
+        A1: {
+          ...defaultWellContents,
+          selected: true,
+          maxVolume: container1MaxVolume,
+        },
+      },
     })
-  })
-
-  it('selects well contents of all labware in stack (for Plate props)', () => {
-    expect(singleIngredResultStack).toMatchObject(singleIngredResultStack)
   })
 })

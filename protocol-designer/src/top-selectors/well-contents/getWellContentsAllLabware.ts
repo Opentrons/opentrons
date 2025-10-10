@@ -107,17 +107,10 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = c
     selectedWells,
     highlightedWells
   ) => {
-    console.log('getInitialRobotState', initialRobotState)
-    console.log('labwareEntities', labwareEntities)
-    console.log('liquidsByLabware', liquidsByLabware)
-    console.log('selectedLabwareId', selectedLabwareId)
     const selectedLabwareStack = selectedLabwareId
       ? initialRobotState.labware[selectedLabwareId].stack
       : []
-    const selectedLabwareDefUri = selectedLabwareId
-      ? labwareEntities[selectedLabwareId].labwareDefURI
-      : null
-    console.log('selectedLabwareDefUri', selectedLabwareDefUri)
+
     const allLabwareIds: string[] = selectedLabwareStack ?? []
     return allLabwareIds.reduce(
       (
@@ -130,7 +123,7 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = c
         }
         const wellContents = _getWellContents(
           labwareEntities[labwareId].def,
-          liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
+          liquidsForLabware,
           selectedWells,
           highlightedWells
         )
