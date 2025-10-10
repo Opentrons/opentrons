@@ -15,8 +15,8 @@
 }
 
 .nav_link {
-  color: var(--white);
   text-decoration: none;
+  color: var(--white);
 }
 
 .hidden_input {

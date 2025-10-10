@@ -32,6 +32,10 @@
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
   },
+  "lint-staged": {
+    "*.{css}": "make format-css",
+    "*": "prettier --write"
+  },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.582.0",
     "@aws-sdk/client-dynamodb": "^3.582.0",
@@ -109,9 +113,11 @@
     "handlebars": "^4.2.0",
     "handlebars-loader": "^1.7.1",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "9.1.7",
     "i18next": "^19.8.3",
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "26.1.0",
+    "lint-staged": "^16.2.3",
     "lost": "^8.3.1",
     "madge": "^3.6.0",
     "mime": "^2.4.4",
