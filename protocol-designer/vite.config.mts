@@ -12,7 +12,7 @@ import { analyzer } from 'vite-bundle-analyzer'
 import {
   latestLabwareVersions,
   versionForProject,
-} from '../scripts/git-version.mjs'
+} from '../scripts/git-version2.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
