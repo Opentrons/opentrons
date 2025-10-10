@@ -1,19 +1,5 @@
 'use strict'
 
-// Determines versions for projects from git tags.
-//
-// A "project" is a coherent built application or applications that serve a purpose, that are versioned together.
-// For instance, protocol-designer is a project; so is the robot stack for OT-2; so is the robot stack for OT-3.
-// A project is made of packages in subdirectories of this monorepo. A version of a project is the the contents
-// of the monorepo and the packages in the project at a specific git commit, pointed to by a specific git tag.
-//
-// That means that at any given git commit, the version of a package might be different depending on the project
-// it's in. For instance, if you're looking at a commit that has in its history a tag for protocol-designer version
-// 6.1.0, and a tag for labware-library 0.5.0, then that package is at both protocol-designer 6.1.0 (+some commits)
-// and labware-library 0.5.0 (+some commits). A "version" only exists in context with the project it defines.
-//
-// What that all boils down to is that we need, and this module provides, an interface to get the version of a
-// given project that currently exists in the monorepo.
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import git from 'simple-git'
@@ -91,10 +77,16 @@ export async function getTagsPointingAtHead(project) {
 }
 
 export async function getCurrentBranchName() {
+    const isCI = process.env.CI === 'true'
+
     try {
         const branch = (
             await monorepoGit().raw(['rev-parse', '--abbrev-ref', 'HEAD'])
         ).trim()
+
+        if (isCI) {
+            console.log(`[git-version2] git rev-parse result: ${branch}`)
+        }
 
         // Don't return 'HEAD' if we're in detached HEAD state
         if (branch === 'HEAD') {
@@ -114,29 +106,55 @@ export async function getCurrentBranchName() {
                 ciBranch = null
             }
 
+            if (isCI) {
+                console.log(`[git-version2] Resolved CI branch: ${ciBranch}`)
+            }
+
             return ciBranch || null
         }
 
         return branch
     } catch (error) {
         // Try to get from environment as fallback
-        return process.env.GITHUB_HEAD_REF ||
+        const fallbackBranch = process.env.GITHUB_HEAD_REF ||
             process.env.GITHUB_REF_NAME ||
             process.env.CI_COMMIT_REF_NAME ||
             process.env.CIRCLE_BRANCH ||
             null
+
+        if (isCI) {
+            console.log(`[git-version2] git command failed, using fallback: ${fallbackBranch}`)
+        }
+
+        return fallbackBranch
     }
 }
 
-export async function getShortSha() {
-    try {
-        const sha = (
-            await monorepoGit().raw(['rev-parse', '--short', 'HEAD'])
-        ).trim()
-        return sha
-    } catch (error) {
-        return null
+export function getTimestamp() {
+    // Return ISO 8601 timestamp in compact format: YYYYMMDD-HHMMSS
+    // e.g., "20251010-143022"
+    const now = new Date()
+    const year = now.getUTCFullYear()
+    const month = String(now.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(now.getUTCDate()).padStart(2, '0')
+    const hours = String(now.getUTCHours()).padStart(2, '0')
+    const minutes = String(now.getUTCMinutes()).padStart(2, '0')
+    const seconds = String(now.getUTCSeconds()).padStart(2, '0')
+    return `${year}${month}${day}-${hours}${minutes}${seconds}`
+}
+
+export function getBuildIdentifier() {
+    // In CI, include the GitHub run ID for traceability
+    // Format: timestamp-runId (e.g., "20251010-143022-1234567890")
+    // In local dev, just use timestamp
+    const timestamp = getTimestamp()
+    const runId = process.env.GITHUB_RUN_ID
+
+    if (runId) {
+        return `${timestamp}-RUN_ID-${runId}`
     }
+
+    return timestamp
 }
 
 export async function latestTagForProject(project) {
@@ -211,12 +229,25 @@ export async function latestTagForProject(project) {
 
     // No tags at HEAD, try to get branch name
     const branchName = await getCurrentBranchName()
+    if (isCI) {
+        console.log(`[git-version2] Branch name from getCurrentBranchName: ${branchName}`)
+    }
+
     if (branchName) {
-        // Use the full branch name with short SHA as the version
-        const shortSha = await getShortSha()
-        const versionString = shortSha ? `${branchName}-${shortSha}` : branchName
+        // Use the full branch name with build identifier as the version
+        // In CI, we use timestamp + run ID instead of SHA because the SHA would be the merge commit's SHA,
+        // not the actual branch commit SHA
+        const buildId = getBuildIdentifier()
+        const versionString = `${branchName}-${buildId}`
+        const fullVersion = `${prefixForProject(project)}${versionString}`
+
+        if (isCI) {
+            console.log(`[git-version2] Build identifier: ${buildId}`)
+            console.log(`[git-version2] Final version string: ${fullVersion}`)
+        }
+
         // Return a synthetic tag format that can be parsed by detailsFromTag
-        return `${prefixForProject(project)}${versionString}`
+        return fullVersion
     }
 
     // Last resort: try git describe to get any nearby tag + offset
@@ -240,10 +271,8 @@ export async function latestTagForProject(project) {
     }
 
     // No tags at HEAD and no branch, throw error with debugging info
-    const sha = await getShortSha()
     throw new Error(
         `No tags found at HEAD for project ${project} and no branch name available. ` +
-        `SHA: ${sha || 'unknown'}, ` +
         `Env vars: GITHUB_REF_NAME=${process.env.GITHUB_REF_NAME}, ` +
         `GITHUB_HEAD_REF=${process.env.GITHUB_HEAD_REF}, ` +
         `CI_COMMIT_REF_NAME=${process.env.CI_COMMIT_REF_NAME}`
