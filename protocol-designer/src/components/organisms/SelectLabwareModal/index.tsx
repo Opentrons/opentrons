@@ -73,7 +73,7 @@ const STANDARD_Y_DIMENSION = 85.48
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 const UNIVERSAL_LID_LOADNAME = 'opentrons_tough_universal_lid'
-const STACK_LIMIT = 5
+const STACK_LIMIT = 1
 
 interface SelectLabwareModalProps {
   slot: DeckSlotId
