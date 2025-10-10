@@ -84,7 +84,6 @@ export type ProtocolDetailsTab =
   | 'liquids'
   | 'stats'
   | 'parameters'
-  | 'timeline'
 
 export interface ProtocolDetailsProps extends StoredProtocolData {
   groupedCommands: GroupedCommands | null
