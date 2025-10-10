@@ -10,11 +10,11 @@ import type {
 import type { GetCastFormData } from '../../fieldLevel'
 
 export const getMoveLiquidDelayData = (args: {
-  formData: GetCastFormData<HydratedMoveLiquidFormData>
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>
   secondsField: DelaySecondsMoveLiquidFields
   checkboxField?: DelayCheckboxMoveLiquidFields
 }): InnerDelayArgs | null => {
-  const { formData: hydratedFormData, checkboxField, secondsField } = args
+  const { castFormData: hydratedFormData, checkboxField, secondsField } = args
   const checkbox =
     checkboxField != null ? hydratedFormData[checkboxField] ?? false : true
   const seconds = hydratedFormData[secondsField] ?? 0
@@ -29,12 +29,12 @@ export const getMoveLiquidDelayData = (args: {
 }
 
 export const getMixDelayData = (
-  formData: GetCastFormData<HydratedMixFormData>,
+  castFormData: GetCastFormData<HydratedMixFormData>,
   checkboxField: DelayCheckboxBaseFields,
   secondsField: DelaySecondsBaseFields
 ): number | null => {
-  const checkbox = formData[checkboxField]
-  const seconds = formData[secondsField]
+  const checkbox = castFormData[checkboxField]
+  const seconds = castFormData[secondsField]
 
   if (checkbox && typeof seconds === 'number' && seconds > 0) {
     return seconds

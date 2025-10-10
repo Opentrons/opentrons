@@ -9,7 +9,7 @@ import type { HydratedAbsorbanceReaderFormData } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
 export const absorbanceReaderFormToArgs = (
-  formData: GetCastFormData<HydratedAbsorbanceReaderFormData>
+  castFormData: GetCastFormData<HydratedAbsorbanceReaderFormData>
 ): AbsorbanceReaderArgs | null => {
   const {
     absorbanceReaderFormType,
@@ -22,7 +22,7 @@ export const absorbanceReaderFormToArgs = (
     wavelengths,
     stepDetails,
     stepName,
-  } = formData
+  } = castFormData
 
   const baseValues = { description: stepDetails, name: stepName }
   const lidAction = lidOpen

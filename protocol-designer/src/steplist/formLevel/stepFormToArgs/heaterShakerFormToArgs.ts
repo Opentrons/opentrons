@@ -5,7 +5,7 @@ import type { HydratedHeaterShakerFormData } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
 export const heaterShakerFormToArgs = (
-  formData: GetCastFormData<HydratedHeaterShakerFormData>
+  castFormData: GetCastFormData<HydratedHeaterShakerFormData>
 ): HeaterShakerArgs => {
   const {
     moduleId,
@@ -16,7 +16,7 @@ export const heaterShakerFormToArgs = (
     latchOpen,
     stepDetails,
     stepName,
-  } = formData
+  } = castFormData
   console.assert(
     setHeaterShakerTemperature
       ? !Number.isNaN(targetHeaterShakerTemperature)
@@ -28,7 +28,7 @@ export const heaterShakerFormToArgs = (
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )
   const { hours, minutes, seconds } = getTimeFromForm(
-    formData.heaterShakerTimer
+    castFormData.heaterShakerTimer
   )
   const isNullTime = hours === 0 && minutes === 0 && seconds === 0
 

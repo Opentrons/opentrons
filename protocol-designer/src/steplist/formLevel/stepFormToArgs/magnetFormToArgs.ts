@@ -7,12 +7,12 @@ import type { GetCastFormData } from '../../fieldLevel'
 
 type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 export const magnetFormToArgs = (
-  formData: GetCastFormData<HydratedMagnetFormData>
+  castFormData: GetCastFormData<HydratedMagnetFormData>
 ): MagnetArgs => {
-  const { magnetAction, moduleId, stepDetails, stepName } = formData
+  const { magnetAction, moduleId, stepDetails, stepName } = castFormData
   // @ts-expect-error - todo(2025-10-09): Type error inherited from prior code.
   // engageHeight seems to already be a float. Confirm that and remove this if it's safe.
-  const engageHeight = parseFloat(formData.engageHeight)
+  const engageHeight = parseFloat(castFormData.engageHeight)
   console.assert(
     magnetAction === 'engage' ? !Number.isNaN(engageHeight) : true,
     'magnetFormToArgs expected (hydrated) engageHeight to be non-NaN if magnetAction is "engage"'

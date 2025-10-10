@@ -7,15 +7,15 @@ import type { GetCastFormData } from '../../fieldLevel'
 
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
-  formData: GetCastFormData<HydratedTemperatureFormData>
+  castFormData: GetCastFormData<HydratedTemperatureFormData>
 ): TemperatureArgs => {
-  const { moduleId, stepName, stepDetails } = formData
+  const { moduleId, stepName, stepDetails } = castFormData
   // cast values
-  const setTemperature = formData.setTemperature === 'true'
+  const setTemperature = castFormData.setTemperature === 'true'
   // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
   // todo(mm, 2025-10-09): Pretty sure targetTemperature is actually non-nullable now,
   // though it is a number, not a string, and so there is still a type error here.
-  const targetTemperature = parseFloat(formData.targetTemperature)
+  const targetTemperature = parseFloat(castFormData.targetTemperature)
   console.assert(
     setTemperature ? !Number.isNaN(targetTemperature) : true,
     'temperatureFormToArgs expected (hydrated) targetTemperature to be a number when setTemperature is "true"'
