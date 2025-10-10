@@ -15,6 +15,7 @@ import { LocalizationProvider } from '/app/LocalizationProvider'
 import { CameraPhotoViewer } from '/app/pages/Desktop/CameraPhotoViewer'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
+// eslint-disable-next-line opentrons/no-imports-across-applications
 import { StepDetailViewer } from '/app/pages/Desktop/StepDetailViewer'
 import { useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
