@@ -12,6 +12,7 @@ import { analyzer } from 'vite-bundle-analyzer'
 import {
   latestLabwareVersions,
   versionForProject,
+  generateBuildInfoHtml,
 } from '../scripts/git-version2.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
@@ -70,6 +71,13 @@ export default defineConfig(
               mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
+        {
+          name: 'build-info-generator',
+          closeBundle: async () => {
+            const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
+            await generateBuildInfoHtml('protocol-designer', outputPath)
+          },
+        },
         ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
       ],
       optimizeDeps: {
