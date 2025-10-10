@@ -61,13 +61,11 @@ function createStepDetailViewerUi({
 
   const url = STEP_DETAIL_VIEWER_URL(protocolKey)
   log.info(`Loading step detail viewer from ${url}`)
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   stepDetailViewerWindow.loadURL(url, {
     extraHeaders: 'pragma: no-cache\n',
   })
 
   stepDetailViewerWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // eslint-disable-next-line no-void
     void shell.openExternal(url)
     return { action: 'deny' }
   })
