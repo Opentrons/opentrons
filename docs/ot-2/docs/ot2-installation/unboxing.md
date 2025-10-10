@@ -6,38 +6,21 @@ Congratulations! Your OT-2 has arrived and you've prepared a space for it in you
 
 ## Effort and time required
 
-You'll want to ask a lab partner to assist with the unboxing, lifting, moving, and assembly process. You'll need to budget about 30 minutes to an hour for this effort.
+You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before you begin, ask a lab partner to assist with the unboxing, lifting, moving, and assembly process.
 
-## Product elements
-
-
-## Box contents
-
-- (1) OT-2
-- (2) Side Window Panels
-- (1) Rear Window Panel
-- (1) Power Supply (36V/6A)
-- (1) Regional IEC Power Cable
-- (1) Ethernet Cable
-- (1) Ethernet-to-USB Dongle (connects the OT-2 to a laptop)
-- (1) 2.5 mm Hex Screwdriver
-- (1) 14 mm Wrench
-- (1) T10 Torx
-- (4) L-keys (1.5 mm, 2 mm, 2.5 mm, 3 mm)
-- (1) Super Lube (silicone-based lubricant)
-- (2) M3 Hex Nut
-- (2) M4 Square Nut
-
-## Unboxing
+## Unboxing and assembly
 
 <div class="instruction-list" markdown>
 
-1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present.
-2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any machine components inside.
-3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box.
+1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present. <!-- too much border or padding around these images -->
+    ![image shows padding removal](../images/remove-padding.png)
 
-    !!!Note
-        The OT-2 weighs about 40 kg (88 lbs). Get help from a lab partner to remove the robot from the box.
+2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any machine components inside.
+    ![cutting the shipping bag](../images/cut-shipping-bag.png)
+
+3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 40 kg (88 lbs). Get help from a lab partner to remove the robot from the box.
+    ![lifting points on frame](../images/lift-points.png)
+
 
 4. Place the robot on a secure and stable surface.
 5. Cut the zip ties supporting the customer kit and place the kit aside.

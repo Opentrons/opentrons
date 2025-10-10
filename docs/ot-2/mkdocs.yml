@@ -4,6 +4,7 @@ nav:
   - OT-2 Instruction Manual: index.md
   - Introduction: introduction.md
   - Safety and Regulatory Information: regulatory.md
+  - Product Elements: box-contents.md
   - Installation and Relocation:
       - Installation Requirements: ot2-installation/requirements.md
       - Unboxing and Assembly: ot2-installation/unboxing.md
