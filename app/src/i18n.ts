@@ -1,7 +1,9 @@
 import { initReactI18next } from 'react-i18next'
-import i18n, { InitOptions } from 'i18next'
+import i18n from 'i18next'
 
 import { baseI18nConfig } from '@opentrons/shared-data'
+
+import type { InitOptions } from 'i18next'
 
 export const US_ENGLISH = 'en-US'
 export const SIMPLIFIED_CHINESE = 'zh-CN'

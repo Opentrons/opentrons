@@ -4,8 +4,8 @@ import { resources } from '..'
 
 describe('branded copy', () => {
   it('branded and anonymous resources contain the same translation keys', () => {
-    const brandedKeys = Object.keys(resources.en['branded'])
-    const anonymousKeys = Object.keys(resources.en['anonymous'])
+    const brandedKeys = Object.keys(resources.en.branded)
+    const anonymousKeys = Object.keys(resources.en.anonymous)
 
     brandedKeys.forEach((brandedKey, i) => {
       const anonymousKey = anonymousKeys[i]
@@ -15,7 +15,14 @@ describe('branded copy', () => {
 
   it('non-branded copy does not contain "Opentrons" or "Flex"', () => {
     const nonBrandedResources = Object.entries(resources.en).filter(
-      resource => resource[0] !== 'branded' && resource[0] !== 'anonymous'
+      resource =>
+        resource[0] !== 'branded' &&
+        resource[0] !== 'anonymous' &&
+        //  NOTE: since the json files are all in shared-data, we need to filter out
+        //  the opentrons branded json files that are used for other projects.
+        // 'create_protocol' and 'protocol_generator' are used in OpentronsAI
+        resource[0] !== 'create_protocol' &&
+        resource[0] !== 'protocol_generator'
     )
 
     const nonBrandedCopy = nonBrandedResources

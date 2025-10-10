@@ -7,13 +7,22 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getLabwareDisplayLocation } from '../../getLabwareDisplayLocation'
-import {
-  getFlexStackerCommandText,
-  KEYS_BY_COMMAND_TYPE,
-} from '../getFlexStackerCommandText'
+import { getFlexStackerCommandText } from '../getFlexStackerCommandText'
+
+import type { FlexStackerCommand } from '../getFlexStackerCommandText'
 
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareDisplayLocation')
+
+const STRINGS_BY_COMMAND_TYPE: {
+  [commandType in FlexStackerCommand['commandType']]: string
+} = {
+  'flexStacker/retrieve': 'Retrieve from Flex Stacker',
+  'flexStacker/store': 'Store into Flex Stacker',
+  'flexStacker/setStoredLabware': 'Set stored labware in Flex Stacker',
+  'flexStacker/empty': 'Manually empty all labware from Flex Stacker',
+  'flexStacker/fill': 'Fill Flex Stacker',
+}
 
 const baseCommandData = {
   allRunDefs: [
@@ -65,7 +74,7 @@ describe('getPipettingCommandText', () => {
     }
 
     render(command)
-    screen.getByText('retrieve_labware_from_stacker_to')
+    screen.getByText('Retrieve tip rack from Flex Stacker to Slot 1')
   })
 
   it('should render store command text correctly', () => {
@@ -84,7 +93,7 @@ describe('getPipettingCommandText', () => {
     }
 
     render(command)
-    screen.getByText('store_labware_from_slot_to_stacker')
+    screen.getByText('Store tip rack from Slot 1 to Flex Stacker')
   })
 
   it('should render setStoredLabware command text correctly', () => {
@@ -108,9 +117,7 @@ describe('getPipettingCommandText', () => {
     }
 
     render(command)
-    screen.getByText(
-      'flex_stacker_set_stored_labware_with_quantity_and_location'
-    )
+    screen.getByText('Configure Flex Slot 1 with dummy def')
   })
 
   it('should render fill command text correctly', () => {
@@ -134,7 +141,7 @@ describe('getPipettingCommandText', () => {
     }
 
     render(command)
-    screen.getByText('flex_stacker_fill_with_quantity_and_labware')
+    screen.getByText('Fill Flex Slot 1 with tip rack')
   })
 
   it('should render empty command text correctly', () => {
@@ -157,13 +164,13 @@ describe('getPipettingCommandText', () => {
       },
     }
     render(command)
-    screen.getByText('flex_stacker_empty_from_location')
+    screen.getByText('Manually empty all labware from Flex Slot 1')
   })
 })
 
-describe.each(Object.entries(KEYS_BY_COMMAND_TYPE))(
+describe.each(Object.entries(STRINGS_BY_COMMAND_TYPE))(
   'Default fallback for %s',
-  (commandType, expectedKey) => {
+  (commandType, expectedString) => {
     it(`should render default text for ${commandType} when result is missing`, () => {
       const command = {
         id: 'cmd-1',
@@ -173,7 +180,7 @@ describe.each(Object.entries(KEYS_BY_COMMAND_TYPE))(
         },
       }
       render(command)
-      screen.getByText(expectedKey)
+      screen.getByText(expectedString)
     })
   }
 )
