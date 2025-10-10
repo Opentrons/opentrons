@@ -8,7 +8,7 @@ Congratulations! Your OT-2 has arrived and you've prepared a space for it in you
 
 You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before you begin, ask a lab partner to assist with the unboxing, lifting, moving, and assembly process.
 
-## Unboxing and assembly
+## Assembly instructions
 
 <div class="instruction-list" markdown>
 
@@ -21,17 +21,36 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 40 kg (88 lbs). Get help from a lab partner to remove the robot from the box.
     ![lifting points on frame](../images/lift-points.png)
 
-
 4. Place the robot on a secure and stable surface.
+    ![robot shown on a workbench](../images/workbench-placement.png)
+
 5. Cut the zip ties supporting the customer kit and place the kit aside.
+    ![cut zip ties image](../images/zip-ties.png)
+
 6. Pull the remaining zip tie ends and remove completely from the deck.
-7. Remove the tape from the calibration switch cover.
-8. Remove the plastic cover completely.
+    ![remove zip ties image](../images/zip-ties-remove.png)
+
+7. Remove the tape from the calibration switch cover and remove the plastic cover.  
+    ![remove calibration switch cover](../images/switch-cover.png)
+
 9. Put the trash bin in place.
-10. Remove the 3 transport fasteners. ADD SUB OL OR UL HERE TO MATCH IMAGE
+    ![trash bin placement](../images/trash-bin.png)
+
+10. Use a 3 mm hex screwdriver to remove the red transport bracket screws, and then remove the brackets.
+    ![removing transport brackets](../images/transport-brackets.png)
+
 11. Remove the protective film from the window panels.
+    ![removing the window protective film](../images/window-film.png)
+
 12. Install the top window panel and fasten the corner screws using the 2.5 mm hex screwdriver and 4 top window screws.
+
+<figure class="side-by-side" markdown>
+![installing top window panel](../images/top-window.png)
+![fastening top window panel to frame](../images/top-fasteners.png)
+</figure> <!-- too much border or padding for side by side -->
+
 13. Install the window covers.
+    ![installing window covers](../images/window-covers.png)
 
 ## Post-assembly checklist
 
