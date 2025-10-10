@@ -42,9 +42,9 @@ vi.mock('@opentrons/react-api-client', async () => {
   return {
     ...actual,
     useRobotSettingsQuery: () =>
-      (({
+      ({
         data: { settings: [] },
-      } as unknown) as UseQueryResult<RobotSettingsResponse>),
+      }) as unknown as UseQueryResult<RobotSettingsResponse>,
   }
 })
 vi.mock('../../LocalizationProvider')
@@ -108,11 +108,9 @@ describe('OnDeviceDisplayApp', () => {
       },
     } as any)
     // TODO(bh, 2024-03-27): implement testing of branded and anonymous i18n, but for now pass through
-    vi.mocked(
-      LocalizationProvider
-    ).mockImplementation((props: LocalizationProviderProps) => (
-      <>{props.children}</>
-    ))
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
+    )
   })
   afterEach(() => {
     vi.resetAllMocks()

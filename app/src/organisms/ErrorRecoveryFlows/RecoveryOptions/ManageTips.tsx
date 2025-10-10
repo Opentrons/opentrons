@@ -66,11 +66,8 @@ export function BeginRemoval({
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { aPipetteWithTip } = tipStatusUtils
-  const {
-    proceedNextStep,
-    handleMotionRouting,
-    proceedToRouteAndStep,
-  } = routeUpdateActions
+  const { proceedNextStep, handleMotionRouting, proceedToRouteAndStep } =
+    routeUpdateActions
   const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
@@ -388,11 +385,8 @@ export function useDropTipFlowUtils({
 // Handle cases in which there is no pipette that could be used for drop tip wizard by routing
 // to the next step or to option selection, if no special routing is provided.
 function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
-  const {
-    routeUpdateActions,
-    currentRecoveryOptionUtils,
-    tipStatusUtils,
-  } = props
+  const { routeUpdateActions, currentRecoveryOptionUtils, tipStatusUtils } =
+    props
   const { proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {

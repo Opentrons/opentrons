@@ -9,11 +9,8 @@ export const migrateFile = (
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const {
-    savedStepForms,
-    pipetteTiprackAssignments,
-    labware,
-  } = designerApplication.data
+  const { savedStepForms, pipetteTiprackAssignments, labware } =
+    designerApplication.data
 
   const savedStepsWithUpdatedPipettingFields = Object.entries(
     savedStepForms

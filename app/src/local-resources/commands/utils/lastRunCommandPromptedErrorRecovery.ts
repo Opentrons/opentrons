@@ -9,5 +9,5 @@ export function lastRunCommandPromptedErrorRecovery(
     command => command.intent !== 'fixit' && command.error != null
   )
   // All recoverable protocol commands have defined errors.
-  return isEREnabled ? lastProtocolCommand?.error?.isDefined ?? false : false
+  return isEREnabled ? (lastProtocolCommand?.error?.isDefined ?? false) : false
 }

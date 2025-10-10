@@ -15,7 +15,7 @@ export const pauseFormToArgs = (
   formData: HydratedPauseFormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
   const { hours, minutes, seconds } = getTimeFromForm(
-    'pauseTime' in formData ? formData.pauseTime ?? null : null
+    'pauseTime' in formData ? (formData.pauseTime ?? null) : null
   )
   const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)

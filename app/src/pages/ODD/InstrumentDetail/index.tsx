@@ -52,8 +52,8 @@ export const InstrumentDetail = (): JSX.Element => {
   const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
   const pipetteModelSpecs =
     instrument != null
-      ? getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ??
-        null
+      ? (getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ??
+        null)
       : null
 
   const displayName =

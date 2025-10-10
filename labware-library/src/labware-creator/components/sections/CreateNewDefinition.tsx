@@ -26,19 +26,10 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
     'aluminumBlockType',
     'aluminumBlockChildType',
   ]
-  const {
-    disabled,
-    onClick,
-    showDropDownOptions,
-    labwareTypeChildFields,
-  } = props
-  const {
-    values,
-    errors,
-    touched,
-    setValues,
-    setTouched,
-  } = useFormikContext<LabwareFields>()
+  const { disabled, onClick, showDropDownOptions, labwareTypeChildFields } =
+    props
+  const { values, errors, touched, setValues, setTouched } =
+    useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
     return null

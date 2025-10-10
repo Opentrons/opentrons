@@ -115,10 +115,8 @@ export function UpdatedProtocolDetails(
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
   ] = useState<boolean>(false)
-  const [
-    showSendProtocolToFlexSlideout,
-    setShowSendProtocolToFlexSlideout,
-  ] = useState<boolean>(false)
+  const [showSendProtocolToFlexSlideout, setShowSendProtocolToFlexSlideout] =
+    useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = useState(false)
 
   const isAnalyzing = useSelector((state: State) =>

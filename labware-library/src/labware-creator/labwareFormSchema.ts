@@ -337,8 +337,8 @@ export const labwareFormSchemaBaseObject = Yup.object({
 })
 
 // @ts-expect-error(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
-export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareFormSchemaBaseObject.transform(
-  (currentValue, _originalValue) => {
+export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> =
+  labwareFormSchemaBaseObject.transform((currentValue, _originalValue) => {
     // "form-level" transforms
     // NOTE: the currentValue does NOT have field-level transforms applied :(
     // TODO: these results are not validated, ideally I could do these transforms in the fields
@@ -368,5 +368,4 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
       loadName,
       displayName,
     }
-  }
-)
+  })

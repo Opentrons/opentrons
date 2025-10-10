@@ -119,7 +119,8 @@ export const makeTimelineMiddleware = (): Middleware => {
           next(computeRobotStateTimelineRequest())
 
           if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
-            const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
+            const timelineArgs: GenerateRobotStateTimelineArgs =
+              prevTimelineArgs
             const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
             worker.postMessage({
               needsTimeline: true,

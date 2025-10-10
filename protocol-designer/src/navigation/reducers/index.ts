@@ -22,7 +22,6 @@ export const _allReducers = {
 export interface RootState {
   newProtocolModal: boolean
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)
 export const rootSelector = (state: BaseState): RootState => state.navigation

@@ -198,8 +198,7 @@ const SPECS: ReducerSpec[] = [
     },
   },
   {
-    name:
-      'handles sessions:FETCH_ALL_SESSIONS_SUCCESS overwriting existing sessions',
+    name: 'handles sessions:FETCH_ALL_SESSIONS_SUCCESS overwriting existing sessions',
     action: {
       type: 'sessions:FETCH_ALL_SESSIONS_SUCCESS',
       payload: {

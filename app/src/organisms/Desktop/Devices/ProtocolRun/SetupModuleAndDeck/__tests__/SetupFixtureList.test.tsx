@@ -31,7 +31,8 @@ vi.mock(
 const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
   {
     cutoutId: 'cutoutD3',
-    cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    cutoutFixtureId:
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     requiredAddressableAreas: ['D4'],
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -39,16 +40,17 @@ const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
   },
 ]
 
-const mockNotConfiguredDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
-  {
-    cutoutId: 'cutoutD3',
-    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-    requiredAddressableAreas: ['D4'],
-    compatibleCutoutFixtureIds: [
-      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-    ],
-  },
-]
+const mockNotConfiguredDeckConfigCompatibility: CutoutConfigAndCompatibility[] =
+  [
+    {
+      cutoutId: 'cutoutD3',
+      cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+      requiredAddressableAreas: ['D4'],
+      compatibleCutoutFixtureIds: [
+        STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      ],
+    },
+  ]
 
 const mockConflictDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
   {

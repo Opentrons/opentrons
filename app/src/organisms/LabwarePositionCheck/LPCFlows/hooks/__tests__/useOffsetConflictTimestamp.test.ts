@@ -52,9 +52,9 @@ describe('useOffsetConflictTimestamp', () => {
       type: 'UPDATE_CONFLICT_TIMESTAMP',
     } as any)
 
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => false)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(
+      (runId: string) => (state: any) => false
+    )
 
     vi.mocked(selectConflictTimestampInfo).mockImplementation(
       (runId: string) => (state: any) => ({
@@ -63,13 +63,13 @@ describe('useOffsetConflictTimestamp', () => {
       })
     )
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => []
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => []
+    )
 
     vi.mocked(useSelector).mockImplementation(selector => {
       if (typeof selector === 'function') {
@@ -115,9 +115,9 @@ describe('useOffsetConflictTimestamp', () => {
   })
 
   it('should do nothing when offsets are already applied', () => {
-    vi.mocked(
-      selectAreOffsetsApplied
-    ).mockImplementation((runId: string) => (state: any) => true)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(
+      (runId: string) => (state: any) => true
+    )
 
     renderHook(() => {
       useOffsetConflictTimestamp(true, RUN_ID, {
@@ -155,13 +155,13 @@ describe('useOffsetConflictTimestamp', () => {
       vector: { x: 1, y: 2, z: 3 },
     }
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [runRecordOffset])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => [runRecordOffset]
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [databaseOffset])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => [databaseOffset]
+    )
 
     renderHook(() => {
       useOffsetConflictTimestamp(true, RUN_ID, {
@@ -204,13 +204,13 @@ describe('useOffsetConflictTimestamp', () => {
       vector: { x: 4, y: 5, z: 6 },
     }
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [runRecordOffset])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => [runRecordOffset]
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [databaseOffset])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => [databaseOffset]
+    )
 
     renderHook(() => {
       useOffsetConflictTimestamp(true, RUN_ID, {
@@ -251,15 +251,13 @@ describe('useOffsetConflictTimestamp', () => {
       vector: { x: 4, y: 5, z: 6 },
     }
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [runRecordOffset])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => [runRecordOffset]
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [
-      defaultDatabaseOffset,
-    ])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => [defaultDatabaseOffset]
+    )
 
     renderHook(() => {
       useOffsetConflictTimestamp(true, RUN_ID, {
@@ -300,13 +298,13 @@ describe('useOffsetConflictTimestamp', () => {
       vector: { x: 4, y: 5, z: 6 },
     }
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [runRecordOffset])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => [runRecordOffset]
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [databaseOffset])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => [databaseOffset]
+    )
 
     renderHook(() =>
       useOffsetConflictTimestamp(true, RUN_ID, {
@@ -350,13 +348,13 @@ describe('useOffsetConflictTimestamp', () => {
       vector: { x: 4, y: 5, z: 6 },
     }
 
-    vi.mocked(
-      selectInitialRunRecordOffsets
-    ).mockImplementation((runId: string) => (state: any) => [runRecordOffset])
+    vi.mocked(selectInitialRunRecordOffsets).mockImplementation(
+      (runId: string) => (state: any) => [runRecordOffset]
+    )
 
-    vi.mocked(
-      selectInitialDatabaseOffsets
-    ).mockImplementation((runId: string) => (state: any) => [databaseOffset])
+    vi.mocked(selectInitialDatabaseOffsets).mockImplementation(
+      (runId: string) => (state: any) => [databaseOffset]
+    )
 
     renderHook(() =>
       useOffsetConflictTimestamp(true, RUN_ID, {

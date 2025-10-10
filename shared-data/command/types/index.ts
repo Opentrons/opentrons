@@ -50,7 +50,7 @@ export interface CommandNote {
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export type CommandIntent = 'protocol' | 'setup' | 'fixit'
 export interface CommonCommandRunTimeInfo<
-  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError
+  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError,
 > {
   key?: string
   id: string

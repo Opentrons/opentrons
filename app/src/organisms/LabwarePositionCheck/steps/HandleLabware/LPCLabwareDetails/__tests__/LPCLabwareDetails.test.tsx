@@ -143,21 +143,22 @@ describe('LPCLabwareDetails', () => {
 
     vi.mocked(getIsOnDevice).mockReturnValue(false)
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
+    )
     vi.mocked(selectSelectedLwOverview).mockImplementation(() => () => ({
       uri: 'labware-uri-1',
       id: 'labware-1',
       offsetLocationDetails: null,
     }))
-    vi.mocked(selectSelectedLwDisplayName).mockImplementation(() => () =>
-      'Test Labware'
+    vi.mocked(selectSelectedLwDisplayName).mockImplementation(
+      () => () => 'Test Labware'
     )
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
-      ({
-        test: {},
-      } as any)
+    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(
+      () => () =>
+        ({
+          test: {},
+        }) as any
     )
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => false)
     vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => false)
@@ -227,8 +228,8 @@ describe('LPCLabwareDetails', () => {
   })
 
   it('calls make success snackbar if the snackbar status is not null', () => {
-    vi.mocked(selectSnackbarStatus).mockImplementation(() => () =>
-      'locationSpecificAdjusted'
+    vi.mocked(selectSnackbarStatus).mockImplementation(
+      () => () => 'locationSpecificAdjusted'
     )
 
     render(props)

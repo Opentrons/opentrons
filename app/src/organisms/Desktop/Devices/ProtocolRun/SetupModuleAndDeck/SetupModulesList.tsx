@@ -85,13 +85,10 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId, deckConfigCompatibility } = props
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
-  )
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = useUnmatchedModulesForProtocol(robotName, runId)
+  const moduleRenderInfoForProtocolById =
+    useModuleRenderInfoForProtocolById(runId)
+  const { missingModuleIds, remainingAttachedModules } =
+    useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
   const { robotModel } = useRobot(robotName) ?? {}
@@ -236,10 +233,8 @@ export function ModulesListItem({
   const [showModuleSetupModal, setShowModuleSetupModal] = useState<
     string | null
   >(null)
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const { parseModuleUSBPort } = useModuleUSBPort()
 

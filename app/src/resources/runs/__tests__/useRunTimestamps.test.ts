@@ -31,9 +31,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the start time of the current run', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.startedAt).toBe('2021-10-25T12:54:53.366581+00:00')
@@ -42,9 +42,9 @@ describe('useRunTimestamps hook', () => {
   it('returns null when pause is not the last action', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.pausedAt).toBe(null)
@@ -53,9 +53,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the pause time of the current run when pause is the last action', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockPausedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.pausedAt).toBe('2021-10-25T13:23:31.366581+00:00')
@@ -64,9 +64,9 @@ describe('useRunTimestamps hook', () => {
   it('returns stopped time null when stop is not the last action', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.stoppedAt).toBe(null)
@@ -75,9 +75,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the stop time of the current run when stop is the last action', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockStoppedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.stoppedAt).toBe('2021-10-25T13:58:22.366581+00:00')
@@ -86,9 +86,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the complete time of a successful current run', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockSucceededRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.completedAt).toBe('noon thirty')
@@ -97,9 +97,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the complete time of a failed current run', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockFailedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.completedAt).toBe('noon forty-five')
@@ -108,9 +108,9 @@ describe('useRunTimestamps hook', () => {
   it('returns the complete time of a stopped current run', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockStoppedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunTimestamps(RUN_ID_2))
     expect(result.current.completedAt).toBe('2021-10-25T13:58:22.366581+00:00')

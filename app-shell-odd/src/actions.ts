@@ -151,10 +151,11 @@ export const customLabwareListFailure = (
   meta: { source },
 })
 
-export const changeCustomLabwareDirectory = (): ChangeCustomLabwareDirectoryAction => ({
-  type: CHANGE_CUSTOM_LABWARE_DIRECTORY,
-  meta: { shell: true },
-})
+export const changeCustomLabwareDirectory =
+  (): ChangeCustomLabwareDirectoryAction => ({
+    type: CHANGE_CUSTOM_LABWARE_DIRECTORY,
+    meta: { shell: true },
+  })
 
 export const addCustomLabware = (
   overwrite: DuplicateLabwareFile | null = null
@@ -188,9 +189,10 @@ export const addCustomLabwareFailure = (
   payload: { labware, message },
 })
 
-export const clearAddCustomLabwareFailure = (): ClearAddCustomLabwareFailureAction => ({
-  type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
-})
+export const clearAddCustomLabwareFailure =
+  (): ClearAddCustomLabwareFailureAction => ({
+    type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
+  })
 
 export const addNewLabwareName = (
   filename: string
@@ -203,10 +205,11 @@ export const clearNewLabwareName = (): ClearNewLabwareNameAction => ({
   type: CLEAR_NEW_LABWARE_NAME,
 })
 
-export const openCustomLabwareDirectory = (): OpenCustomLabwareDirectoryAction => ({
-  type: OPEN_CUSTOM_LABWARE_DIRECTORY,
-  meta: { shell: true },
-})
+export const openCustomLabwareDirectory =
+  (): OpenCustomLabwareDirectoryAction => ({
+    type: OPEN_CUSTOM_LABWARE_DIRECTORY,
+    meta: { shell: true },
+  })
 
 // request a config value reset to default
 export const resetConfigValue = (path: string): ResetConfigValueAction => ({

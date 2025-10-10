@@ -106,12 +106,10 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const {
-    mutateAsync: resumeRunFromRecovery,
-  } = useResumeRunFromRecoveryMutation()
-  const {
-    mutateAsync: resumeRunFromRecoveryAssumingFalsePositive,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+  const { mutateAsync: resumeRunFromRecovery } =
+    useResumeRunFromRecoveryMutation()
+  const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
+    useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
@@ -253,10 +251,8 @@ export function useRecoveryCommands({
 
   // Pick up the user-selected tips
   const pickUpTips = useCallback((): Promise<CommandData[]> => {
-    const {
-      selectedTipLocations,
-      relevantPickUpTipLabware,
-    } = failedLabwareUtils
+    const { selectedTipLocations, relevantPickUpTipLabware } =
+      failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
       selectedTipLocations,

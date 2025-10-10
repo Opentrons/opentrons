@@ -134,7 +134,8 @@ const getLabwareLocation = (
       state.stagingAreaEntities
     )
   ) {
-    let addressableAreaName: AddressableAreaName = newLocationString as AddressableAreaName
+    let addressableAreaName: AddressableAreaName =
+      newLocationString as AddressableAreaName
     if (isWasteChuteLocation) {
       addressableAreaName = 'gripperWasteChute'
     } else if (isTrashBinLocation) {

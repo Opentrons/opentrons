@@ -162,9 +162,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-  const isTouchTipDisabled = labwareEntities[
-    sourceLabware
-  ]?.def.parameters.quirks?.includes('touchTipDisabled')
+  const isTouchTipDisabled =
+    labwareEntities[sourceLabware]?.def.parameters.quirks?.includes(
+      'touchTipDisabled'
+    )
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   const disposalVolume =
@@ -657,7 +658,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: dispenseAirGapDispenseFlowRate,
                 ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                   ? {
-                      correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                      correctionVolume:
+                        dispenseCorrectionVolumeForDispenseAirGap,
                     }
                   : {}),
                 pushOut: 0,
@@ -798,7 +800,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                   ? {
-                      correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                      correctionVolume:
+                        aspirateCorrectionVolumeForAspirateAirGap,
                     }
                   : {}),
               }),
@@ -1061,7 +1064,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                   }),
@@ -1126,9 +1130,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...getAirGapAfterDispenseCommands(true),
             ]
           } else if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-            const finalAirGapAfterDispenseCommands = getAirGapAfterDispenseCommands(
-              true
-            )
+            const finalAirGapAfterDispenseCommands =
+              getAirGapAfterDispenseCommands(true)
             advancedDispenseArgsCommands = [
               ...getTouchTipAfterDispenseRetractCommands(false),
               ...getAirGapAfterDispenseCommands(false),

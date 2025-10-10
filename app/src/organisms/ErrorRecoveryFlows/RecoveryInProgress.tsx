@@ -112,17 +112,11 @@ export function useReleaseLabware({
   doorStatusUtils,
   recoveryMap,
 }: useReleaseLabwareProps): number {
-  const {
-    releaseGripperJaws,
-    releaseLabwareLatch,
-    homeExceptPlungers,
-  } = recoveryCommands
+  const { releaseGripperJaws, releaseLabwareLatch, homeExceptPlungers } =
+    recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    proceedToRouteAndStep,
-    proceedNextStep,
-    handleMotionRouting,
-  } = routeUpdateActions
+  const { proceedToRouteAndStep, proceedNextStep, handleMotionRouting } =
+    routeUpdateActions
   const { isDoorOpen } = doorStatusUtils
   const {
     MANUAL_MOVE_AND_SKIP,

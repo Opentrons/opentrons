@@ -28,17 +28,20 @@ export function getRequiredLabwareDetailsFromLoadCommands(
   commands: RunTimeCommand[]
 ): RequiredLabwareDetails[] {
   const loadLabwareCommands =
-    commands.filter((command): command is
-      | LoadLabwareRunTimeCommand
-      | LoadLidRunTimeCommand
-      | LoadLidStackRunTimeCommand
-      | FlexStackerSetStoredLabwareRunTimeCommand =>
-      [
-        'loadLabware',
-        'loadLid',
-        'loadLidStack',
-        'flexStacker/setStoredLabware',
-      ].includes(command.commandType)
+    commands.filter(
+      (
+        command
+      ): command is
+        | LoadLabwareRunTimeCommand
+        | LoadLidRunTimeCommand
+        | LoadLidStackRunTimeCommand
+        | FlexStackerSetStoredLabwareRunTimeCommand =>
+        [
+          'loadLabware',
+          'loadLid',
+          'loadLidStack',
+          'flexStacker/setStoredLabware',
+        ].includes(command.commandType)
     ) ?? []
   const labwareSetupItems = loadLabwareCommands.reduce((acc, command) => {
     if (command.commandType === 'flexStacker/setStoredLabware') {

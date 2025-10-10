@@ -68,9 +68,8 @@ export const TestShakeSlideout = (
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = useState<number | null>(null)
-  const [showModuleSetupModal, setShowModuleSetupModal] = useState<boolean>(
-    false
-  )
+  const [showModuleSetupModal, setShowModuleSetupModal] =
+    useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {

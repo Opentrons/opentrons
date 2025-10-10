@@ -13,7 +13,9 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { UpdateModuleAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdateModuleAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  UpdateModuleAction
+> = action => ({
   method: POST,
   path: `${Constants.MODULES_PATH}/${action.payload.moduleId}/${Constants.MODULE_UPDATE_PATH_EXT}`,
 })

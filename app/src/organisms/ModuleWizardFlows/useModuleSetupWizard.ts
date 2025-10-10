@@ -79,12 +79,8 @@ export function useModuleSetupWizard(
     stepsInFlow: [],
     attachedModule: attachedModuleOnLaunch ?? null,
   })
-  const {
-    currentStepIndex,
-    currentStep,
-    totalStepCount,
-    attachedModule,
-  } = state
+  const { currentStepIndex, currentStep, totalStepCount, attachedModule } =
+    state
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette =
     attachedPipettes.left?.data.calibratedOffset?.last_modified != null
@@ -100,23 +96,19 @@ export function useModuleSetupWizard(
   }
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
 
-  const {
-    chainRunCommands,
-    isCommandMutationLoading,
-  } = useChainMaintenanceCommands()
-  const {
-    chainLiveCommands,
-    isCommandMutationLoading: isLiveCommandLoading,
-  } = useChainLiveCommands()
+  const { chainRunCommands, isCommandMutationLoading } =
+    useChainMaintenanceCommands()
+  const { chainLiveCommands, isCommandMutationLoading: isLiveCommandLoading } =
+    useChainLiveCommands()
 
-  const {
-    createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
-  } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: (response: { data: { id: SetStateAction<string | null> } }) => {
-      setMaintenanceRunId(response.data.id)
-    },
-  })
+  const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
+    useCreateTargetedMaintenanceRunMutation({
+      onSuccess: (response: {
+        data: { id: SetStateAction<string | null> }
+      }) => {
+        setMaintenanceRunId(response.data.id)
+      },
+    })
 
   useMonitorMaintenanceRunForDeletion({
     maintenanceRunId,

@@ -23,9 +23,8 @@ let invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
-  invariantContext
-)
+const prevRobotState: RobotState =
+  getInitialRobotStateStandard(invariantContext)
 
 describe('delayLocationHelper', () => {
   it('moves to waste chute and delays', () => {

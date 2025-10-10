@@ -5,13 +5,8 @@ import type { HydratedMoveLabwareFormData } from '../../../form-types'
 export const moveLabwareFormToArgs = (
   hydratedFormData: HydratedMoveLabwareFormData
 ): MoveLabwareArgs => {
-  const {
-    labware,
-    useGripper,
-    newLocation,
-    stepName,
-    stepDetails,
-  } = hydratedFormData
+  const { labware, useGripper, newLocation, stepName, stepDetails } =
+    hydratedFormData
 
   return {
     commandCreatorFnName: 'moveLabware',

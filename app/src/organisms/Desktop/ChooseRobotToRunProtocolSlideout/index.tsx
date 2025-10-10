@@ -73,12 +73,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const isFlex =
     useRobotType(selectedRobot?.displayName ?? '') === FLEX_ROBOT_TYPE
   const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
-  const {
-    protocolKey,
-    srcFileNames,
-    srcFiles,
-    mostRecentAnalysis,
-  } = storedProtocolData
+  const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
+    storedProtocolData
   const [currentPage, setCurrentPage] = useState<number>(1)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData,
@@ -87,9 +83,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
 
-  const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
-    RunTimeParameter[]
-  >(runTimeParameters)
+  const [runTimeParametersOverrides, setRunTimeParametersOverrides] =
+    useState<RunTimeParameter[]>(runTimeParameters)
   const [hasParamError, setHasParamError] = useState<boolean>(false)
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
@@ -180,9 +175,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     })
   }
 
-  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
-    selectedRobot?.name ?? ''
-  )
+  const isSelectedRobotOnDifferentSoftwareVersion =
+    useIsRobotOnWrongVersionOfSoftware(selectedRobot?.name ?? '')
 
   const hasRunTimeParameters = runTimeParameters.length > 0
 
@@ -207,7 +201,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   // intentionally show both robot types if analysis fails
   const robotType =
     mostRecentAnalysis != null && mostRecentAnalysis.result !== 'not-ok'
-      ? mostRecentAnalysis?.robotType ?? null
+      ? (mostRecentAnalysis?.robotType ?? null)
       : null
 
   const singlePageButton = (

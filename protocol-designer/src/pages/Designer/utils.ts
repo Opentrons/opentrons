@@ -100,7 +100,7 @@ export const getSlotInformation = (
   const offDeckLabware = deckSetupLabware[slot]
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? getPositionFromSlotId(slot, deckDef) ?? null
+      ? (getPositionFromSlotId(slot, deckDef) ?? null)
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
@@ -200,8 +200,8 @@ export const getSlotInformation = (
       slot === 'offDeck'
         ? []
         : offDeckLabware != null
-        ? [offDeckLabware.id]
-        : remainingLabwareIds,
+          ? [offDeckLabware.id]
+          : remainingLabwareIds,
     createdLidForSlot:
       lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined,
   }

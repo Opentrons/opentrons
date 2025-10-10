@@ -58,11 +58,8 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedTopLabware,
-    selectedAdapterDefURI,
-    selectedLidLabware,
-  } = zoomedInSlotInfo
+  const { selectedTopLabware, selectedAdapterDefURI, selectedLidLabware } =
+    zoomedInSlotInfo
   const lidLoadNames = Object.values(defs)
     .filter(
       def =>
@@ -154,9 +151,8 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                               )
                             },
                             checkboxCaption: t('with_lid', {
-                              name:
-                                defs[stackingLabwareDefUris[0]].metadata
-                                  .displayName,
+                              name: defs[stackingLabwareDefUris[0]].metadata
+                                .displayName,
                             }),
                             checked: selectedLidLabware != null,
                             onCheckboxChange: () => {

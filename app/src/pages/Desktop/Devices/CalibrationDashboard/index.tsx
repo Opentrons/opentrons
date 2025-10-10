@@ -18,14 +18,10 @@ export function CalibrationDashboard(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
-  const [
-    dashboardOffsetCalLauncher,
-    DashboardOffsetCalWizard,
-  ] = useDashboardCalibratePipOffset(robotName)
-  const [
-    dashboardTipLengthCalLauncher,
-    DashboardTipLengthCalWizard,
-  ] = useDashboardCalibrateTipLength(robotName)
+  const [dashboardOffsetCalLauncher, DashboardOffsetCalWizard] =
+    useDashboardCalibratePipOffset(robotName)
+  const [dashboardTipLengthCalLauncher, DashboardTipLengthCalWizard] =
+    useDashboardCalibrateTipLength(robotName)
   const [
     dashboardDeckCalLauncher,
     DashboardDeckCalWizard,

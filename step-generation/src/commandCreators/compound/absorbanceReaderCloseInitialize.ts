@@ -10,11 +10,9 @@ import type {
   CurriedCommandCreator,
 } from '../../types'
 
-export const absorbanceReaderCloseInitialize: CommandCreator<AbsorbanceReaderInitializeArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const absorbanceReaderCloseInitialize: CommandCreator<
+  AbsorbanceReaderInitializeArgs
+> = (args, invariantContext, prevRobotState) => {
   const { moduleId, measureMode, sampleWavelengths, referenceWavelength } = args
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,

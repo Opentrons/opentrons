@@ -130,15 +130,13 @@ export function ProtocolSteps({
   const isOffDeck = deckView === rightString
   const isZoomedIn = zoomedInSlot != null
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(saveProtocolFile())
-    },
-  })
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(saveProtocolFile())
+      },
+    })
 
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
@@ -273,8 +271,8 @@ export function ProtocolSteps({
                   robotType === OT2_ROBOT_TYPE)
                   ? '90%'
                   : isZoomedIn && isOffDeck
-                  ? '100%'
-                  : CONTENT_MAX_WIDTH
+                    ? '100%'
+                    : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
               paddingTop={

@@ -11,10 +11,10 @@ vi.mock('@opentrons/react-api-client')
 
 describe('useIsLegacySessionInProgress', () => {
   beforeEach(() => {
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [],
       links: null,
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -26,7 +26,7 @@ describe('useIsLegacySessionInProgress', () => {
   })
 
   it('returns  true when sessions are not empty', () => {
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: {
         data: {
           id: 'id',
@@ -35,7 +35,7 @@ describe('useIsLegacySessionInProgress', () => {
         },
       },
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const result = useIsLegacySessionInProgress()
     expect(result).toStrictEqual(true)
   })

@@ -11,7 +11,7 @@ export const INIT_STATUS = {
 } as const
 
 export type RobotInitializationStatus =
-  | typeof INIT_STATUS[keyof typeof INIT_STATUS]
+  | (typeof INIT_STATUS)[keyof typeof INIT_STATUS]
   | null
 
 export function useRobotInitializationStatus(): RobotInitializationStatus {

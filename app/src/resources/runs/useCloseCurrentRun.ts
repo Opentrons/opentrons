@@ -14,10 +14,8 @@ export function useCloseCurrentRun(): {
 } {
   const currentRunId = useCurrentRunId()
 
-  const {
-    dismissCurrentRun,
-    isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  const { dismissCurrentRun, isLoading: isDismissing } =
+    useDismissCurrentRunMutation()
 
   const closeCurrentRun = (
     options?: UseDismissCurrentRunMutationOptions

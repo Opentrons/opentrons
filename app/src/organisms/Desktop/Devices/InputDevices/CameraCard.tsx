@@ -34,11 +34,8 @@ export function CameraCard({
   robotName,
 }: CameraCardProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const {
-    handleOverflowClick,
-    showOverflowMenu,
-    setShowOverflowMenu,
-  } = useMenuHandleClickOutside()
+  const { handleOverflowClick, showOverflowMenu, setShowOverflowMenu } =
+    useMenuHandleClickOutside()
   const [isStubbedEnabled, setStubbedEnabled] = useState(true)
   const [showControls, setShowControls] = useState(false)
   const navigate = useNavigate()

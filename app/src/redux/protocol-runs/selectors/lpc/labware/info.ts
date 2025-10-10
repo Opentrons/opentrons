@@ -47,11 +47,12 @@ export const selectAllLabwareInfoAndDefaultStatusSorted = (
 
       return Object.entries(labwareInfo)
         .map(([uri, info]) => {
-          const isMissingNecessaryDefaultOffset = getAreAnyLocationSpecificOffsetsMissing(
-            info.locationSpecificOffsetDetails
-          )
-            ? getIsDefaultOffsetAbsent(info)
-            : false
+          const isMissingNecessaryDefaultOffset =
+            getAreAnyLocationSpecificOffsetsMissing(
+              info.locationSpecificOffsetDetails
+            )
+              ? getIsDefaultOffsetAbsent(info)
+              : false
 
           return {
             uri,
@@ -193,11 +194,10 @@ export const selectSelectedLwAdapterDef = (
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareDefs,
     (state: State) => state.protocolRuns[runId]?.lpc?.protocolData.labware,
     (selectedLabware, labwareDefs, loadedLabware) => {
-      const {
-        closestBeneathAdapterId,
-      } = selectedLabware?.offsetLocationDetails ?? {
-        closestBeneathAdapterId: null,
-      }
+      const { closestBeneathAdapterId } =
+        selectedLabware?.offsetLocationDetails ?? {
+          closestBeneathAdapterId: null,
+        }
 
       if (
         selectedLabware == null ||

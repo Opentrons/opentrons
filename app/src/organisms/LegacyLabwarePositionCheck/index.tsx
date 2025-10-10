@@ -88,12 +88,8 @@ class ErrorBoundary extends Component<
   }
 
   render(): ErrorBoundaryProps['children'] | JSX.Element {
-    const {
-      ErrorComponent,
-      children,
-      shouldUseMetalProbe,
-      isOnDevice,
-    } = this.props
+    const { ErrorComponent, children, shouldUseMetalProbe, isOnDevice } =
+      this.props
     const { error } = this.state
     if (error != null)
       return (

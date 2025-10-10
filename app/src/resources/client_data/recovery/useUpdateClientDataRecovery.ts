@@ -26,10 +26,8 @@ export type UseUpdateClientDataRecoveryResult = Omit<
 export function useUpdateClientDataRecovery(
   options: UseUpdateClientDataMutationOptions<ClientDataRecovery> = {}
 ): UseUpdateClientDataRecoveryResult {
-  const {
-    updateClientData,
-    ...mutate
-  } = useUpdateClientData<ClientDataRecovery>(KEYS.ERROR_RECOVERY, options)
+  const { updateClientData, ...mutate } =
+    useUpdateClientData<ClientDataRecovery>(KEYS.ERROR_RECOVERY, options)
   const thisUserId = useSelector(getUserId)
 
   const updateWithIntent = (intent: ClientDataRecovery['intent']): void => {

@@ -108,8 +108,7 @@ export const applicationLinkProps: Submenu = {
     },
     {
       name: 'Nucleic Acid Purification',
-      url:
-        'https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification',
+      url: 'https://protocols.opentrons.com/categories/Molecular%20Biology/Nucleic%20Acid%20Purification',
       gtm: { action: 'click', category: 'l-header', label: 'nap' },
     },
     {
@@ -183,8 +182,7 @@ export const protocolLinkProps: ProtocolLinks = {
 export const supportLinkProps: SupportLinks = {
   start: {
     name: 'OT-2 Start guide',
-    url:
-      'https://support.opentrons.com/guide-for-getting-started-with-the-ot-2',
+    url: 'https://support.opentrons.com/guide-for-getting-started-with-the-ot-2',
     description: "You received your robot, here's what's next",
     gtm: { action: 'click', category: 'l-header', label: 'start-guide' },
   },
@@ -202,8 +200,7 @@ export const supportLinkProps: SupportLinks = {
   },
   labware: {
     name: 'Labware Library',
-    url:
-      'https://support.opentrons.com/en/articles/4168651-opentrons-standard-labware',
+    url: 'https://support.opentrons.com/en/articles/4168651-opentrons-standard-labware',
     description: 'Understand what labware is compatible with the OT-2',
     gtm: { action: 'click', category: 'l-header', label: 'labware-library' },
   },
@@ -215,8 +212,7 @@ export const supportLinkProps: SupportLinks = {
   warranty: {
     name: 'Warranty & Returns',
     description: '100% risk free returns and a quality-backed warranty',
-    url:
-      'https://support.opentrons.com/shipping-and-handling-return-policy/what-is-your-return-warranty-policy',
+    url: 'https://support.opentrons.com/shipping-and-handling-return-policy/what-is-your-return-warranty-policy',
     gtm: { action: 'click', category: 'l-header', label: 'return-policy' },
   },
   support: {

@@ -75,8 +75,8 @@ export function RunFailedModal({
       commandErrorList == null || commandErrorList?.length === 0
         ? t('run_failed_modal_title')
         : runStatus === RUN_STATUS_SUCCEEDED
-        ? t('warning_details')
-        : t('error_details'),
+          ? t('warning_details')
+          : t('error_details'),
     onClose: () => {
       toggleModal()
     },
@@ -104,8 +104,8 @@ export function RunFailedModal({
             highestPriorityError != null
               ? [highestPriorityError]
               : commandErrorList != null && commandErrorList.length > 0
-              ? commandErrorList
-              : []
+                ? commandErrorList
+                : []
           }
           isSingleError={!!highestPriorityError}
           runStatus={runStatus}

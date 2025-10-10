@@ -36,7 +36,7 @@ export interface CategorizedStepContentProps {
   bottomCategoryCommands: readonly [
     CommandWithIndex | null,
     CommandWithIndex | null,
-    ...Array<CommandWithIndex | null>
+    ...Array<CommandWithIndex | null>,
   ]
 }
 

@@ -46,10 +46,8 @@ export function useActionBtnDisabledUtils(
     isClosingCurrentRun,
   } = props
 
-  const {
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-  } = protocolRunControls
+  const { isPlayRunActionLoading, isPauseRunActionLoading } =
+    protocolRunControls
   const doorStatus = useIsDoorOpen(robotName)
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
