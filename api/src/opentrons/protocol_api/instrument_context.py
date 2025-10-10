@@ -199,6 +199,7 @@ class InstrumentContext(publisher.CommandPublisher):
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
         flow_rate: Optional[float] = None,
+        end_location: Optional[types.Location] = None,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -291,6 +292,22 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
+        end_target: Optional[validation.ValidTarget] = None
+        if end_location is not None:
+            if location is None:
+                raise ValueError("Location must be supplied if using an End Location.")
+            end_target = validation.validate_location(
+                location=end_location, last_location=None
+            )
+            if isinstance(end_target, validation.DisposalTarget):
+                raise ValueError(
+                    "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
+                )
+            (
+                end_move_to_location,
+                end_well,
+                end_meniscus_tracking,
+            ) = self._handle_aspirate_target(target=end_target)
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -346,6 +363,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
         push_out: Optional[float] = None,
         flow_rate: Optional[float] = None,
+        end_location: Optional[types.Location] = None,
     ) -> InstrumentContext:
         """
         Dispense liquid from a pipette tip.
@@ -507,6 +525,22 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
+        end_target: Optional[validation.ValidTarget] = None
+        if end_location is not None:
+            if location is None:
+                raise ValueError("Location must be supplied if using an End Location.")
+            end_target = validation.validate_location(
+                location=end_location, last_location=None
+            )
+            if isinstance(end_target, validation.DisposalTarget):
+                raise ValueError(
+                    "Trash Bin and Waste Chute are not acceptable location parameters for dynamic pipetting commands."
+                )
+            (
+                end_move_to_location,
+                end_well,
+                end_meniscus_tracking,
+            ) = self._handle_dispense_target(target=end_target)
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -534,6 +568,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 in_place=target.in_place,
                 push_out=push_out,
                 meniscus_tracking=meniscus_tracking,
+                end_location=end_move_to_location,
+                end_meniscus_tracking=end_meniscus_tracking,
             )
 
         return self
