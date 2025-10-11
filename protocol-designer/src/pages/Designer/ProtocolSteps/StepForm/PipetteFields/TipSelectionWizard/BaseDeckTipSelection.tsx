@@ -95,7 +95,7 @@ export function BaseDeckTipSelection(
       height="100%"
       width="100%"
       deckDef={deckDef}
-      viewBox={viewBox}
+      viewBox={viewBox ?? undefined}
       zoomed={viewBox != null}
     >
       {() => (
