@@ -1,7 +1,6 @@
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   DIRECTION_ROW,
   Flex,
