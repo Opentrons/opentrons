@@ -115,7 +115,8 @@
       "title": "Pause until Thermocycler Lid reaches {{temperature}}\u00a0˚C"
     },
     "thermocycler_profile": {
-      "body": "<p>The protocol will wait for the Thermocycler profile to complete before continuing to the next step.</p><p>You can insert steps between the start profile and wait for profile to complete check points to run them in-parallel while the profile executes.</p>"
+      "body": "<p>The protocol will wait for the Thermocycler profile to complete before continuing to the next step.</p><p>You can insert steps between the start profile and wait for profile to complete check points to run them in-parallel while the profile executes.</p>",
+      "title": "Wait until Thermocycler profile completes"
     }
   },
   "browse_labware": {

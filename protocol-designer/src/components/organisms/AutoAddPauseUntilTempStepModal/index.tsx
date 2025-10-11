@@ -104,15 +104,15 @@ export const AutoAddPauseUntilTempStepModal = (
     const titleKey: string = (() => {
       switch (modalType) {
         case 'temperatureModule':
-          return 'modal:auto_add_pause_until_temp_step.temperature_module:title'
+          return 'modal:auto_add_pause_until_temp_step.temperature_module.title'
         case 'heaterShaker':
-          return 'modal:auto_add_pause_until_temp_step.heater_shaker:title'
+          return 'modal:auto_add_pause_until_temp_step.heater_shaker.title'
         case 'thermocyclerBlock':
-          return 'modal:auto_add_pause_until_temp_step.thermocycler_block:title'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_block.title'
         case 'thermocyclerLid':
-          return 'modal:auto_add_pause_until_temp_step.thermocycler_lid:title'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.title'
         case 'thermocyclerProfile':
-          return 'modal:auto_add_pause_until_temp_step.thermocycler_profile:title'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.title'
         // default omitted, for exhaustiveness checking.
       }
     })()
@@ -121,15 +121,15 @@ export const AutoAddPauseUntilTempStepModal = (
     const bodyParagraphsKey: string = (() => {
       switch (modalType) {
         case 'temperatureModule':
-          return 'modal:auto_add_pause_until_temp_step.temperature_module:body'
+          return 'modal:auto_add_pause_until_temp_step.temperature_module.body'
         case 'heaterShaker':
-          return 'modal:auto_add_pause_until_temp_step.heater_shaker:body'
+          return 'modal:auto_add_pause_until_temp_step.heater_shaker.body'
         case 'thermocyclerBlock':
-          return 'modal:auto_add_pause_until_temp_step.thermocycler_block:body'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_block.body'
         case 'thermocyclerLid':
-          return 'modal:auto_add_pause_until_temp_step.thermocycler_lid:body'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.body'
         case 'thermocyclerProfile':
-          return 'modal:auto_add_pause_until_temp_step.thermocycled_profile:body'
+          return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.body'
         // default omitted, for exhaustiveness checking.
       }
     })()
