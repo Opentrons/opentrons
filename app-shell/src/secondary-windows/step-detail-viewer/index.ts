@@ -55,7 +55,7 @@ function createStepDetailViewerUi({
     minHeight: 200,
   }).once('ready-to-show', () => {
     log.debug('Step detail viewer window ready to show')
-    stepDetailViewerWindow.setTitle('Protocol Visualization')
+    stepDetailViewerWindow.setTitle('Slot Spotlight')
     stepDetailViewerWindow.show()
   })
 
