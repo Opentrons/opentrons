@@ -19,7 +19,9 @@ vi.mock('../SourceWellViewContainer')
 vi.mock('../TipPickupContainer')
 
 const render = () => {
-  return renderWithProviders(<StepDetailContainer />)
+  return renderWithProviders(
+    <StepDetailContainer protocolKey="mockProtocolKey" />
+  )
 }
 
 describe('StepDetailContainer', () => {

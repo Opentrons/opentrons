@@ -279,7 +279,6 @@ export function VisualizerContainer(
           showDeckRenders={showDeckRenders}
         />
       </div>
-
       {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
         {/* Right column resizer */}
@@ -289,8 +288,7 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-
-        <StepDetailContainer />
+        <StepDetailContainer protocolKey={protocolKey} />
       </div>
     </div>
   )
