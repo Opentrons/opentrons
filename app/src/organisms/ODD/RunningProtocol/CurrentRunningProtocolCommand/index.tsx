@@ -4,6 +4,7 @@ import {
   CommandText,
   getCommandTextData,
   LegacyStyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { RunTimer } from '/app/molecules/RunTimer'
@@ -106,7 +107,15 @@ export function CurrentRunningProtocolCommand({
         </div>
         <div className={styles.timer_info}>
           <RunTimer {...runTimerInfo} style={styles.run_timer} />
-          <LegacyStyledText as="h4SemiBold">{stepCounterCopy}</LegacyStyledText>
+          <LegacyStyledText
+            style={{
+              fontSize: TYPOGRAPHY.fontSize28,
+              lineHeight: TYPOGRAPHY.lineHeight36,
+              fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+            }}
+          >
+            {stepCounterCopy}
+          </LegacyStyledText>
         </div>
       </div>
 

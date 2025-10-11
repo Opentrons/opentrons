@@ -5,6 +5,7 @@ import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import styles from './iconbutton.module.css'
 
+import type { CSSProperties } from 'react'
 import type { IconName } from '../../icons'
 
 /**
@@ -85,11 +86,11 @@ export function NewIconButton({
 
   const buttonClassName = clsx(styles.icon_button, styles[`variant_${variant}`])
 
-  const buttonStyle = {
+  const buttonStyle: Record<string, string> = {
     '--variant-default': colors.default, // color for background and outline
     '--variant-active': colors.active, // color for background when clicked
     '--variant-hover': colors.hover, // color for background when hovered
-  } as const
+  }
 
   return (
     <Btn

@@ -33,7 +33,7 @@ export function StepFormStatus(props: StepFormStatusProps): JSX.Element {
       borderRadius={BORDERS.borderRadius4}
       backgroundColor={COLORS.grey20}
     >
-      <Box as="dt">
+      <dt>
         <StyledText
           as="span"
           desktopStyle="bodyDefaultRegular"
@@ -41,10 +41,10 @@ export function StepFormStatus(props: StepFormStatusProps): JSX.Element {
         >
           {label}
         </StyledText>
-      </Box>
-      <Box as="dd">
+      </dt>
+      <dd>
         <Tag type="default" text={value} />
-      </Box>
+      </dd>
     </Flex>
   )
 }
