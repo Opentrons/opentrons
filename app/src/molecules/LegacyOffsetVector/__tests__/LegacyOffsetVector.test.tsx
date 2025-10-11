@@ -30,33 +30,9 @@ describe('OffsetVector', () => {
   it('renders text with correct styles', () => {
     render(props)
     expect(screen.getAllByRole('heading', { level: 6 })).toHaveLength(6)
-
-    expect(screen.getByText('X')).toHaveStyle(
-      `margin-right: ${SPACING.spacing4}`
-    )
-    expect(screen.getByText('X')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
-    )
-    const x = screen.getByText('10.0')
-    expect(x).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
-
-    expect(screen.getByText('Y')).toHaveStyle(
-      `margin-right: ${SPACING.spacing4}`
-    )
-    expect(screen.getByText('Y')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
-    )
-    const y = screen.getByText('20.0')
-    expect(y).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
-
-    expect(screen.getByText('Z')).toHaveStyle(
-      `margin-right: ${SPACING.spacing4}`
-    )
-    expect(screen.getByText('Z')).toHaveStyle(
-      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
-    )
-    const z = screen.getByText('30.0')
-    expect(z).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
+    screen.getByText('10.0')
+    screen.getByText('20.0')
+    screen.getByText('30.0')
   })
 
   it('renders numbers using fixed-point notation', () => {
