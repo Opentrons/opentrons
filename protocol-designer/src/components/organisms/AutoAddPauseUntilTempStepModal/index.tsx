@@ -26,7 +26,7 @@ interface HandleClickProps {
 
 type AutoAddPauseUntilTempStepModalProps =
   | ({
-      type:
+      modalType:
         | 'temperatureModule'
         | 'heaterShaker'
         | 'thermocyclerBlock'
@@ -34,12 +34,12 @@ type AutoAddPauseUntilTempStepModalProps =
       displayTemperature: string
     } & HandleClickProps)
   | ({
-      type: 'thermocyclerProfile'
+      modalType: 'thermocyclerProfile'
       displayTemperature?: null
     } & HandleClickProps)
   | ({
       // todo(mm, 2025-09-26): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-      type: 'legacy'
+      modalType: 'legacy'
       displayTemperature: string
       displayModule: string
     } & HandleClickProps)
@@ -51,12 +51,12 @@ type AutoAddPauseUntilTempStepModalProps =
 export const AutoAddPauseUntilTempStepModal = (
   props: AutoAddPauseUntilTempStepModalProps
 ): JSX.Element => {
-  const { type, handleSkipPauseClick, handleAddPauseClick } = props
+  const { modalType, handleSkipPauseClick, handleAddPauseClick } = props
   const { t } = useTranslation()
   const [rememberDismissal, setRememberDismissal] = useState(false)
 
   // todo(mm, 2025-09-29): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-  if (type === 'legacy') {
+  if (modalType === 'legacy') {
     const { displayModule, displayTemperature } = props
     return (
       <Modal
@@ -104,7 +104,7 @@ export const AutoAddPauseUntilTempStepModal = (
     )
   } else {
     const titleKey: string = (() => {
-      switch (type) {
+      switch (modalType) {
         case 'temperatureModule':
           return 'modal:auto_add_pause_until_temp_step.temperature_module:title'
         case 'heaterShaker':
@@ -121,7 +121,7 @@ export const AutoAddPauseUntilTempStepModal = (
     const title = t(titleKey, { temperature: props.displayTemperature })
 
     const bodyParagraphsKey: string = (() => {
-      switch (type) {
+      switch (modalType) {
         case 'temperatureModule':
           return 'modal:auto_add_pause_until_temp_step.temperature_module:body'
         case 'heaterShaker':
