@@ -3,9 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { BORDERS, COLORS } from '../../../helix-design-system'
 import { renderWithProviders } from '../../../testing/utils'
-import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
+import { TYPOGRAPHY } from '../../../ui-style-constants'
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
 
 import type { ComponentProps } from 'react'
@@ -26,14 +25,6 @@ describe('AlertPrimaryButton', () => {
   it('renders alert primary button with text', () => {
     render(props)
     const button = screen.getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
-    expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
-    )
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
-    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )

@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
-import { act, fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -8,15 +8,24 @@ import { i18n } from '/app/i18n'
 import { PinnedTransfer } from '../PinnedTransfer'
 
 import type { NavigateFunction } from 'react-router-dom'
+import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
+const mockUseLongPress = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+  }
+})
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof import('@opentrons/components')>()
+  return {
+    ...actual,
+    useLongPress: () => mockUseLongPress(),
   }
 })
 
@@ -57,7 +66,23 @@ const render = () => {
 }
 
 describe('Pinned Transfer', () => {
+  let mockLongPress: UseLongPressResult
   vi.useFakeTimers()
+
+  beforeEach(() => {
+    mockLongPress = {
+      isLongPressed: false,
+      isTapped: false,
+      isEnabled: true,
+      ref: { current: null },
+      style: { touchAction: 'none' },
+      setIsLongPressed: vi.fn(),
+      setIsTapped: vi.fn(),
+      enable: vi.fn(),
+      disable: vi.fn(),
+    }
+    mockUseLongPress.mockReturnValue(mockLongPress)
+  })
 
   it('should redirect to quick transfer details after short click', () => {
     render()
@@ -67,14 +92,10 @@ describe('Pinned Transfer', () => {
   })
 
   it('should display modal after long click', async () => {
-    vi.useFakeTimers()
+    mockLongPress.isLongPressed = true
     render()
-    const name = screen.getByText('yay mock transfer')
-    fireEvent.mouseDown(name)
-    act(() => {
-      vi.advanceTimersByTime(1005)
-    })
-    expect(props.longPress).toHaveBeenCalled()
+
+    expect(props.longPress).toHaveBeenCalledWith(true)
     screen.getByText('Run quick transfer')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render
     // call so the longpress modal can see the pinned ids.
