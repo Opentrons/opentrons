@@ -20,6 +20,7 @@ export interface RouteProps {
 export type RobotSettingsTab =
   | 'calibration'
   | 'networking'
+  | 'camera'
   | 'advanced'
   | 'feature-flags'
 
@@ -47,6 +48,7 @@ export interface DesktopRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+  runCreatedAtTimestamp: string
 }
 
 /**

@@ -5,12 +5,12 @@ import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
   LINE_CLAMP_TEXT_STYLE,
   ListItem,
+  RobotInfoLabel,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -134,7 +134,7 @@ export function DropdownStepFormField(
               padding={SPACING.spacing12}
             >
               {options[0].deckLabel != null ? (
-                <DeckInfoLabel deckLabel={options[0].deckLabel} svgSize={13} />
+                <RobotInfoLabel deckLabel={options[0].deckLabel} svgSize={13} />
               ) : null}
               <Flex
                 flexDirection={DIRECTION_COLUMN}

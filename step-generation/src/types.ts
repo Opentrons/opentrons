@@ -1,6 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   LabwareLocation,
@@ -20,9 +21,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AUTOMATIC,
   CLEAN,
   DIRTY,
   EMPTY,
+  MANUAL,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -101,6 +104,11 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
+export interface FlexStackerState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+  //  TODO: extend this state
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -108,6 +116,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
+  | FlexStackerState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -812,3 +821,5 @@ export interface WellContents {
 export interface WellContentsByNumber {
   [wellName: string]: number
 }
+
+export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL

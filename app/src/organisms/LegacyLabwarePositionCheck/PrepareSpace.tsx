@@ -20,6 +20,7 @@ import {
 import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration/getStandardDeckViewLayerBlockList'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -104,6 +105,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         >
           <BaseDeck
             robotType={robotType}
+            deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
             modulesOnDeck={protocolData.modules.map(mod => ({
               moduleModel: mod.model,
               moduleLocation: mod.location,

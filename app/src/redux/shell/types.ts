@@ -191,6 +191,16 @@ export interface CameraPhotoOpenAction {
   }
 }
 
+export interface StepDetailViewerOpenAction {
+  type: 'shell:STEP_DETAIL_VIEWER_OPEN'
+  payload: {
+    protocolKey: string
+  }
+  meta: {
+    shell: true
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -208,6 +218,7 @@ export type ShellAction =
   | SystemLanguageAction
   | CameraStreamOpenAction
   | CameraPhotoOpenAction
+  | StepDetailViewerOpenAction
 
 export type IPCSafeFormDataEntry =
   | {

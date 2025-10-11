@@ -32,6 +32,14 @@ from .set_and_wait_for_shake_speed import (
     SetAndWaitForShakeSpeedCommandType,
 )
 
+from .set_shake_speed import (
+    SetShakeSpeed,
+    SetShakeSpeedCreate,
+    SetShakeSpeedParams,
+    SetShakeSpeedResult,
+    SetShakeSpeedCommandType,
+)
+
 from .deactivate_shaker import (
     DeactivateShaker,
     DeactivateShakerCreate,
@@ -81,6 +89,12 @@ __all__ = [
     "SetAndWaitForShakeSpeedParams",
     "SetAndWaitForShakeSpeedResult",
     "SetAndWaitForShakeSpeedCommandType",
+    # heaterShaker/setShakeSpeed
+    "SetShakeSpeed",
+    "SetShakeSpeedCreate",
+    "SetShakeSpeedParams",
+    "SetShakeSpeedResult",
+    "SetShakeSpeedCommandType",
     # heaterShaker/deactivateShaker
     "DeactivateShaker",
     "DeactivateShakerCreate",

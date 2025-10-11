@@ -8,7 +8,6 @@ import {
   Box,
   Btn,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -18,6 +17,7 @@ import {
   LabwareRender,
   ListButton,
   MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
   SIZE_AUTO,
   SPACING,
   StyledText,
@@ -235,7 +235,7 @@ export function LabwareListItem(
     >
       <Flex gridGap={SPACING.spacing2} flexWrap="wrap" width="6.25rem">
         {isFlex ? (
-          <DeckInfoLabel deckLabel={slotInfo} />
+          <RobotInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
@@ -245,9 +245,9 @@ export function LabwareListItem(
           </StyledText>
         )}
         {moduleType != null ? (
-          <DeckInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]} />
+          <RobotInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]} />
         ) : null}
-        {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
+        {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

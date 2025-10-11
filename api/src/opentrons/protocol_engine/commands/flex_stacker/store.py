@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareError,
 )
 
 from ..command import (
@@ -22,6 +23,7 @@ from ..command import (
 from ..flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerLabwareStoreError,
     labware_locations_for_group,
     labware_location_base_sequence,
     primary_location_sequence,
@@ -115,7 +117,8 @@ class StoreResult(BaseModel):
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
-    | DefinedErrorData[FlexStackerShuttleError],
+    | DefinedErrorData[FlexStackerShuttleError]
+    | DefinedErrorData[FlexStackerLabwareStoreError],
 ]
 
 
@@ -180,7 +183,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 )
             return labware_ids[0], None, lid_id
 
-    async def execute(self, params: StoreParams) -> _ExecuteReturn:
+    async def execute(self, params: StoreParams) -> _ExecuteReturn:  # noqa: C901
         """Execute the labware storage command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -238,6 +241,21 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             except FlexStackerShuttleMissingError as e:
                 return DefinedErrorData(
                     public=FlexStackerShuttleError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
+            except FlexStackerShuttleLabwareError as e:
+                return DefinedErrorData(
+                    public=FlexStackerLabwareStoreError(
                         id=self._model_utils.generate_id(),
                         createdAt=self._model_utils.get_timestamp(),
                         wrappedErrors=[

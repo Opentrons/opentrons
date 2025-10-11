@@ -55,7 +55,8 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
   resolve: {

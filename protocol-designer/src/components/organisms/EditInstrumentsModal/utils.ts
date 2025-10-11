@@ -1,4 +1,5 @@
 import {
+  FLEX_96_CHANNEL_PIPETTES,
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
@@ -43,27 +44,33 @@ export const getSectionsFromPipetteName = (
 
 export const getShouldShowPipetteType = (
   type: PipetteType,
-  has96Channel: boolean,
   leftPipette?: PipetteOnDeck | null,
   rightPipette?: PipetteOnDeck | null,
-  currentEditingMount?: PipetteMount | null
+  currentEditingMount?: PipetteMount | null,
+  temporarilyDeletedPipettes?: string[] | null
 ): boolean => {
   if (type === '96') {
-    // if a protocol has 96-Channel, no 96-Channel button
-    if (has96Channel) {
-      return false
-    }
+    const effectiveLeftPipette =
+      leftPipette != null &&
+      !temporarilyDeletedPipettes?.includes(leftPipette.id)
+        ? leftPipette
+        : null
+    const effectiveRightPipette =
+      rightPipette != null &&
+      !temporarilyDeletedPipettes?.includes(rightPipette.id)
+        ? rightPipette
+        : null
 
     // If no mount is being edited (adding a new pipette)
     if (currentEditingMount == null) {
       // Only show if both mounts are empty
-      return leftPipette == null && rightPipette == null
+      return effectiveLeftPipette == null && effectiveRightPipette == null
     }
 
     // Only show if the opposite mount of the one being edited is empty
     return currentEditingMount === 'left'
-      ? rightPipette == null
-      : leftPipette == null
+      ? effectiveRightPipette == null
+      : effectiveLeftPipette == null
   }
 
   // Always show 1-Channel and Multi-Channel options
@@ -95,7 +102,9 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
 
   const isFlexPipette =
     selectedPipetteDisplayCategory === 'FLEX' ||
-    selectedPipetteName === 'p1000_96'
+    (selectedPipetteName != null &&
+      FLEX_96_CHANNEL_PIPETTES.includes(selectedPipetteName))
+
   const tiprackOptions = allLabware
     ? Object.values(allLabware)
         .filter(def => def.metadata.displayCategory === 'tipRack')

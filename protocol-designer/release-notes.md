@@ -8,6 +8,56 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.6.0
+
+**Welcome to Protocol Designer 8.6.0!**
+
+This release adds support for new instruments, labware, and hardware,enables limited return tip support in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
+- Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
+- Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.
+- Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing. Return tip settings in version 8.6.0 are limited to a single return, and you won't be able to pick up these tips again in the same protocol.
+
+### Improved Features
+
+- Add a time in hours for the Heater-Shaker Module to heat or shake samples.
+- Exported protocols include step names and details added in Protocol Designer. Each appear as comments above individual steps in the Python protocol file.
+- Hover over wells in a labware to view final volumes on the ending deck.
+- Protocol Designer includes a warning when deleting a liquid added to labware in your protocol.
+
+### Bug Fixes
+
+- Protocol Designer now raises an error when moving labware to a deleted module.
+
+## Opentrons Protocol Designer Changes in 8.5.6
+
+**Welcome to Protocol Designer 8.5.6!**
+
+This hotfix release addresses a bug when dispensing into a trash bin or waste chute.
+
+## Opentrons Protocol Designer Changes in 8.5.5
+
+**Welcome to Protocol Designer 8.5.5!**
+
+This hotfix release addresses a bug to allow full use of pipettes and tip racks during liquid class transfers.
+
+## Opentrons Protocol Designer Changes in 8.5.4
+
+**Welcome to Protocol Designer 8.5.4!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Set a custom aspirate tip position for any dispense location.
+- Protocol Designer correctly reassigns default tip settings when changing pipettes in your protocol.
+- Protocol Designer no longer crashes when encountering missing tip rack errors in imported protocols.
+- Aspirate and dispense tip positions default to 1 mm above the well bottom if unspecified in your protocols.
+
 ## Opentrons Protocol Designer Changes in 8.5.3
 
 **Welcome to Protocol Designer 8.5.3!**

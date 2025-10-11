@@ -11,6 +11,7 @@ import * as Yup from 'yup'
 
 import { Box, COLORS } from '@opentrons/components'
 import {
+  FLEX_96_CHANNEL_PIPETTES,
   FLEX_ROBOT_TYPE,
   getAreSlotsAdjacent,
   HEATERSHAKER_MODULE_TYPE,
@@ -298,7 +299,10 @@ export function Onboarding(): JSX.Element | null {
               ? FLEX_MIDDLE_SLOTS[index]
               : modifiedOt2Slots[index],
           labwareDefURIStack: [
-            ...(values.pipettesByMount.left.pipetteName === 'p1000_96'
+            ...(values.pipettesByMount.left.pipetteName != null &&
+            FLEX_96_CHANNEL_PIPETTES.includes(
+              values.pipettesByMount.left.pipetteName
+            )
               ? [adapter96ChannelDefUri]
               : []),
             tiprackDefURI,

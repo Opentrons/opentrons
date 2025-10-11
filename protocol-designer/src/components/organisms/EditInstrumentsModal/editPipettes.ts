@@ -3,8 +3,14 @@ import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
+import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
-import { createContainer } from '/protocol-designer/labware-ingred/actions'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import {
+  createContainer,
+  deleteContainer,
+} from '/protocol-designer/labware-ingred/actions'
 import { actions as stepFormActions } from '/protocol-designer/step-forms'
 import { actions as steplistActions } from '/protocol-designer/steplist'
 import { uuid } from '/protocol-designer/utils'
@@ -12,10 +18,13 @@ import { uuid } from '/protocol-designer/utils'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { StepIdType } from '/protocol-designer/form-types'
-import type { PipetteOnDeck } from '/protocol-designer/step-forms'
+import type {
+  LabwareOnDeck,
+  PipetteOnDeck,
+} from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
-const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
+const ADAPTER_96_CHANNEL_TIPRACK_LOADNAME = 'opentrons_flex_96_tiprack_adapter'
 
 type PipetteFieldsData = Omit<
   PipetteOnDeck,
@@ -28,9 +37,26 @@ export const editPipettes = (
   mount: PipetteMount,
   selectedPip: PipetteName,
   selectedTips: string[],
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  },
   leftPip?: PipetteOnDeck,
   rightPip?: PipetteOnDeck
 ): void => {
+  const onlyLatestDefs = getOnlyLatestDefs()
+  const adapter96ChannelDef = Object.values(onlyLatestDefs).find(
+    labware =>
+      labware.parameters.loadName === ADAPTER_96_CHANNEL_TIPRACK_LOADNAME
+  )
+  const adapter96ChannelDefUri =
+    adapter96ChannelDef != null
+      ? `${adapter96ChannelDef.namespace}/${adapter96ChannelDef.parameters.loadName}/${adapter96ChannelDef.version}`
+      : ''
+
+  if (adapter96ChannelDef == null) {
+    console.error('expected to find the adapter 96 channel def but could not')
+  }
+
   const oppositePipette = mount === 'left' ? rightPip : leftPip
   const otherPipFields: PipetteFieldsData | null =
     oppositePipette != null
@@ -83,8 +109,8 @@ export const editPipettes = (
 
   // Create new tipracks that are not in previous tiprackURIs
   newTiprackUris.forEach(tiprackDefUri => {
-    const adapterUnderLabwareDefURI = newPipetteArray.some(
-      pipette => pipette.name === 'p1000_96'
+    const adapterUnderLabwareDefURI = newPipetteArray.some(pipette =>
+      FLEX_96_CHANNEL_PIPETTES.includes(pipette.name)
     )
       ? adapter96ChannelDefUri
       : null
@@ -186,6 +212,11 @@ export const editPipettes = (
     ...pipettesWithNewTiprackIdentityMap,
   }
 
+  const newTiprackUriArray = Array.from(newTiprackUris)
+
+  const oldEntities = Object.values(labware).filter(
+    ({ labwareDefURI }) => !newTiprackUriArray.includes(labwareDefURI)
+  )
   // substitute deleted pipettes with new pipettes on the same mount, if any
   if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
     // NOTE: using start/end here is meant to future-proof this action for multi-step editing
@@ -194,6 +225,7 @@ export const editPipettes = (
         substitutionMap,
         startStepId: orderedStepIds[0],
         endStepId: last(orderedStepIds) ?? '',
+        newTiprackURI: newTiprackUriArray[0],
       })
     )
   }
@@ -202,4 +234,7 @@ export const editPipettes = (
   if (pipetteIdsToDelete.length > 0) {
     dispatch(stepFormActions.deletePipettes(pipetteIdsToDelete))
   }
+  oldEntities.forEach(entity =>
+    dispatch(deleteContainer({ labwareId: entity.id }))
+  )
 }

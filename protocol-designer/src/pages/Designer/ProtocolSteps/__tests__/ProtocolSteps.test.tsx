@@ -45,6 +45,9 @@ vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('../Timeline/utils')
 vi.mock('/protocol-designer/components/organisms/StepSummary')
 vi.mock('/protocol-designer/resources/hooks')
+vi.mock('react-plotly.js', () => ({
+  default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
+}))
 
 const render = () => {
   return renderWithProviders(

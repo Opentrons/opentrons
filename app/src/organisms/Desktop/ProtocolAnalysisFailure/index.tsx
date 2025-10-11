@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -13,6 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Modal,
+  OVERFLOW_AUTO,
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -20,6 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { CodeBlock } from '/app/atoms/CodeBlock'
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
 import type { MouseEventHandler } from 'react'
@@ -96,11 +97,13 @@ export function ProtocolAnalysisFailure(
               title={t('protocol_analysis_failure')}
               onClose={handleClickHideDetails}
             >
-              <Flex css={SCROLL_LONG}>
+              <Flex
+                overflow={OVERFLOW_AUTO}
+                width="inherit"
+                maxHeight="11.75rem"
+              >
                 {errors.map((error, index) => (
-                  <LegacyStyledText key={index} as="p">
-                    {error}
-                  </LegacyStyledText>
+                  <CodeBlock key={`error-${index}`}>{error}</CodeBlock>
                 ))}
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>
@@ -119,9 +122,3 @@ export function ProtocolAnalysisFailure(
     </Banner>
   )
 }
-
-const SCROLL_LONG = css`
-  overflow: auto;
-  width: inherit;
-  max-height: 11.75rem;
-`

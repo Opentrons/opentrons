@@ -102,6 +102,19 @@ def thermocycler_execute_profile(
     }
 
 
+def thermocycler_start_execute_profile(
+    steps: List[ThermocyclerStep], repetitions: int
+) -> command_types.ThermocyclerStartExecuteProfileCommand:
+    text = (
+        f"In the background, thermocycler starting to run {repetitions} repetitions "
+        f" of cycle composed of the following steps: {steps}"
+    )
+    return {
+        "name": command_types.THERMOCYCLER_START_EXECUTE_PROFILE,
+        "payload": {"text": text, "steps": steps},
+    }
+
+
 def thermocycler_wait_for_hold() -> command_types.ThermocyclerWaitForHoldCommand:
     text = "Waiting for hold time duration"
     return {"name": command_types.THERMOCYCLER_WAIT_FOR_HOLD, "payload": {"text": text}}
@@ -179,6 +192,16 @@ def heater_shaker_set_and_wait_for_shake_speed(
     text = f"Setting Heater-Shaker to Shake at {rpm} RPM and waiting until reached"
     return {
         "name": command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_set_shake_speed(
+    rpm: int,
+) -> command_types.HeaterShakerSetShakeSpeedCommand:
+    text = f"Setting Heater-Shaker to Shake at {rpm} RPM"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_SHAKE_SPEED,
         "payload": {"text": text},
     }
 

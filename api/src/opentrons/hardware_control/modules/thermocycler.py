@@ -22,6 +22,7 @@ from opentrons.drivers.thermocycler import (
     ThermocyclerDriverV2,
     ThermocyclerDriverFactory,
 )
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 
 
 log = logging.getLogger(__name__)
@@ -36,6 +37,8 @@ DFU_PID = "df11"
 
 _TC_PLATE_LIFT_OPEN_DEGREES = 20
 _TC_PLATE_LIFT_RETURN_DEGREES = 23
+
+_TC_RAMP_RATE_ADDED_VERSION = (1, 0, 8)  # v1.0.8
 
 
 class ThermocyclerError(Exception):
@@ -273,6 +276,19 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.open()
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
+    def can_use_ramp_rate(self) -> bool:
+        version_string = self._device_info.get("version", "v")
+        if version_string.startswith("v"):
+            version_string = version_string[1:]
+        try:
+            version_tuple = tuple(int(c) for c in version_string.split("."))
+            return version_tuple >= _TC_RAMP_RATE_ADDED_VERSION
+        except (ValueError, IndexError):
+            log.error(
+                f"Invalid version from device: {self._device_info.get('version', '')}"
+            )
+            return False
+
     async def set_temperature(
         self,
         temperature: float,
@@ -298,6 +314,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Returns: None
         """
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
+
         await self.wait_for_is_running()
         await self._set_temperature_no_pause(
             temperature=temperature,
@@ -319,6 +340,11 @@ class Thermocycler(mod_abc.AbstractModule):
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
+
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
 
         await self._driver.set_plate_temperature(
             temp=temperature, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
@@ -434,6 +460,11 @@ class Thermocycler(mod_abc.AbstractModule):
             celsius: The target block temperature, in degrees celsius.
         """
         await self.wait_for_is_running()
+
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
 
         await self._driver.set_plate_temperature(
             temp=celsius,
@@ -681,7 +712,6 @@ class Thermocycler(mod_abc.AbstractModule):
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
         )
-        asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
         self.error_callback(error)
 
 
@@ -734,6 +764,17 @@ class ThermocyclerReader(Reader):
         await self.read_lid_status()
         await self.read_lid_temperature()
         await self.read_block_temperature()
+        await self._read_errors()
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.
 
     async def read_lid_status(self) -> None:
         self.lid_status = await self._driver.get_lid_status()

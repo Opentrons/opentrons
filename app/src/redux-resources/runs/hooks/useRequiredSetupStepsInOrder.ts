@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useFeatureFlag } from '/app/redux/config'
 import {
+  CAMERA_SETUP_STEP_KEY,
   getSetupStepsRequired,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -37,20 +39,26 @@ const ALL_STEPS_IN_ORDER = [
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  CAMERA_SETUP_STEP_KEY,
 ] as const
 
 const NO_ANALYSIS_STEPS_IN_ORDER = [
   ROBOT_CALIBRATION_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  CAMERA_SETUP_STEP_KEY,
 ]
 
 const keysInOrder = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null,
-  noLwOffsetsInRun: boolean
+  noLwOffsetsInRun: boolean,
+  isCameraEnabled: boolean
 ): UseRequiredSetupStepsInOrderReturn => {
   const orderedSteps =
     protocolAnalysis == null ? NO_ANALYSIS_STEPS_IN_ORDER : ALL_STEPS_IN_ORDER
+  const orderedFinalizedSteps = !isCameraEnabled
+    ? orderedSteps
+    : orderedSteps.filter(step => step !== CAMERA_SETUP_STEP_KEY)
 
   const orderedApplicableSteps =
     protocolAnalysis == null
@@ -63,11 +71,16 @@ const keysInOrder = (
             return false
           } else if (stepKey === LPC_STEP_KEY && noLwOffsetsInRun) {
             return false
+          } else if (stepKey === CAMERA_SETUP_STEP_KEY && !isCameraEnabled) {
+            return false
           } else {
             return true
           }
         })
-  return { orderedSteps: orderedSteps as StepKey[], orderedApplicableSteps }
+  return {
+    orderedSteps: orderedFinalizedSteps as StepKey[],
+    orderedApplicableSteps,
+  }
 }
 
 const keyFor = (
@@ -85,9 +98,14 @@ export function useRequiredSetupStepsInOrder({
   )
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
+  const isCameraEnabled = useFeatureFlag('camera')
 
   useEffect(() => {
-    const applicable = keysInOrder(protocolAnalysis, noLwOffsetsInRun)
+    const applicable = keysInOrder(
+      protocolAnalysis,
+      noLwOffsetsInRun,
+      isCameraEnabled
+    )
     dispatch(
       updateRunSetupStepsRequired(runId, {
         ...ALL_STEPS_IN_ORDER.reduce<

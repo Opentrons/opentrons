@@ -87,6 +87,10 @@ from robot_server.file_provider.fastapi_dependencies import (
     get_file_provider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from robot_server.camera.fastapi_dependencies import (
+    get_camera_provider,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -203,6 +207,7 @@ async def create_run(  # noqa: C901
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     file_provider: Annotated[FileProvider, Depends(get_file_provider)],
+    camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
@@ -223,6 +228,7 @@ async def create_run(  # noqa: C901
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
         file_provider: Dependency to provide access to file Reading and Writing to Protocol engine.
+        camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
@@ -278,6 +284,7 @@ async def create_run(  # noqa: C901
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,

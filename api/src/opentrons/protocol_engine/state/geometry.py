@@ -68,6 +68,8 @@ from ..types import (
     CurrentPipetteLocation,
     TipGeometry,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
+    AccessibleByGripperLocation,
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
@@ -198,6 +200,7 @@ class GeometryView:
             if isinstance(loc, InStackerHopperLocation) or isinstance(
                 loc, NotOnDeckLocationSequenceComponent
             ):
+
                 return False
         return True
 
@@ -268,12 +271,20 @@ class GeometryView:
             try:
                 labware_id = self._labware.get_id_by_module(module_id=module_id)
             except LabwareNotLoadedOnModuleError:
-                return self._modules.get_module_highest_z(
-                    module_id=module_id,
-                    addressable_areas=self._addressable_areas,
-                )
+                # For the time being we will ignore column 4 modules in this check to avoid conflating results
+                if self._modules.is_column_4_module(slot_item.model) is False:
+                    return self._modules.get_module_highest_z(
+                        module_id=module_id,
+                        addressable_areas=self._addressable_areas,
+                    )
             else:
-                return self.get_highest_z_of_labware_stack(labware_id)
+                # For the time being we will ignore column 4 modules in this check to avoid conflating results
+                if self._modules.is_column_4_module(slot_item.model) is False:
+                    return self.get_highest_z_of_labware_stack(labware_id)
+            # todo (cb, 2025-09-15): For now we skip column 4 modules and handle them seperately in
+            # get_highest_z_of_column_4_module, so this will return 0. In the future we may want to consolidate
+            # this to make it more apparently at this point in the query process.
+            return 0
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
@@ -294,6 +305,26 @@ class GeometryView:
         except LabwareNotLoadedOnLabwareError:
             return self.get_labware_highest_z(labware_id)
         return self.get_highest_z_of_labware_stack(stacked_labware_id)
+
+    def get_highest_z_of_column_4_module(self, module: LoadedModule) -> float:
+        """Get the highest Z-point of the topmost labware in the stack of labware on the given column 4 module.
+
+        If there is no labware on the given module, returns highest z of the module.
+        """
+        if self._modules.is_column_4_module(module.model):
+            try:
+                labware_id = self._labware.get_id_by_module(module_id=module.id)
+            except LabwareNotLoadedOnModuleError:
+                return self._modules.get_module_highest_z(
+                    module_id=module.id,
+                    addressable_areas=self._addressable_areas,
+                )
+            else:
+                return self.get_highest_z_of_labware_stack(labware_id)
+        else:
+            raise ValueError(
+                "Module must be a Column 4 Module to determine maximum z height."
+            )
 
     def get_min_travel_z(
         self,
@@ -368,6 +399,11 @@ class GeometryView:
                 "Labware does not have a slot or module associated with it"
                 " since it is no longer on the deck."
             )
+        elif location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is in the waste chute."
+            )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the deck coordinates of a labware's origin.
@@ -431,7 +467,6 @@ class GeometryView:
                 current_definition = self._labware.get_definition(current_labware_id)
             else:
                 break
-
         return definitions_locations_top_to_bottom
 
     def _get_stackup_module_parent_to_child_offset(
@@ -463,7 +498,6 @@ class GeometryView:
     ) -> LabwareStackupAncestorDefinition:
         """Traverse the stackup to find the first non-labware definition."""
         current_location = top_most_lw_location
-
         while True:
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId
@@ -472,6 +506,7 @@ class GeometryView:
             else:
                 if isinstance(current_location, ModuleLocation):
                     return self._modules.get_definition(current_location.moduleId)
+
                 elif isinstance(current_location, AddressableAreaLocation):
                     return self._addressable_areas.get_addressable_area(
                         current_location.addressableAreaName
@@ -479,6 +514,10 @@ class GeometryView:
                 elif isinstance(current_location, DeckSlotLocation):
                     return self._addressable_areas.get_slot_definition(
                         current_location.slotName.id
+                    )
+                elif current_location == WASTE_CHUTE_LOCATION:
+                    return self._addressable_areas.get_addressable_area(
+                        "gripperWasteChute"
                     )
                 else:
                     raise errors.InvalidLabwarePositionError(
@@ -494,6 +533,8 @@ class GeometryView:
             return self._modules.get_provided_addressable_area(location.moduleId)
         elif isinstance(location, OnLabwareLocation):
             return self.get_ancestor_addressable_area_name(location.labwareId)
+        elif location == WASTE_CHUTE_LOCATION:
+            return "gripperWasteChute"
         else:
             raise errors.InvalidLabwarePositionError(
                 f"Cannot get ancestor slot of location {location}"
@@ -652,6 +693,9 @@ class GeometryView:
         return well_def.depth
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        if lw_data.location == WASTE_CHUTE_LOCATION:
+            # Returns 0 so that the waste chute height is not added to the height of the lbw
+            return 0
         labware_pos = self.get_labware_position(lw_data.id)
         z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
         height_over_labware: float = 0
@@ -804,6 +848,11 @@ class GeometryView:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
                 f" since it is no longer on the deck."
+            )
+        elif labware.location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
+                f" since it is in the waste chute."
             )
         else:
             _LOG.error(
@@ -990,9 +1039,7 @@ class GeometryView:
     def get_labware_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
         user_additional_offset: Point | None,
     ) -> Point:
@@ -1019,9 +1066,7 @@ class GeometryView:
     def _get_aa_origin_to_nominal_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
     ) -> Point:
         """Get the nominal grip point of a labware.
@@ -1412,9 +1457,16 @@ class GeometryView:
     def ensure_valid_gripper_location(
         location: LabwareLocation,
     ) -> Union[
-        DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+        DeckSlotLocation,
+        ModuleLocation,
+        OnLabwareLocation,
+        AddressableAreaLocation,
     ]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareMovementNotAllowedError(
+                "Labware movements out of the waste chute are not supported using the gripper."
+            )
         if not isinstance(
             location,
             (
@@ -1423,6 +1475,28 @@ class GeometryView:
                 OnLabwareLocation,
                 AddressableAreaLocation,
             ),
+        ):
+            raise errors.LabwareMovementNotAllowedError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location
+
+    @staticmethod
+    def ensure_valid_new_gripper_location(
+        location: LabwareLocation,
+    ) -> AccessibleByGripperLocation:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if (
+            not isinstance(
+                location,
+                (
+                    DeckSlotLocation,
+                    ModuleLocation,
+                    OnLabwareLocation,
+                    AddressableAreaLocation,
+                ),
+            )
+            and location != WASTE_CHUTE_LOCATION
         ):
             raise errors.LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
@@ -1649,6 +1723,12 @@ class GeometryView:
             return self._recurse_labware_location_from_stacker_hopper(
                 labware_location, building
             )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return [
+                NotOnDeckLocationSequenceComponent(
+                    logicalLocationName=WASTE_CHUTE_LOCATION
+                )
+            ]
         else:
             _LOG.warn(f"Unhandled labware location kind: {labware_location}")
             return building
@@ -1838,6 +1918,15 @@ class GeometryView:
             return liquid_height_after
         else:
             return initial_handling_height
+
+    def well_has_tracked_liquid(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> bool:
+        """Returns true if this well has had a liquid loaded or a probe result."""
+        last_updated = self._wells.get_last_liquid_update(labware_id, well_name)
+        return last_updated is not None
 
     def get_current_well_volume(
         self,
@@ -2224,6 +2313,10 @@ class GeometryView:
         ):
             raise errors.LocationNotAccessibleByPipetteError(
                 f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in waste chute."
             )
         elif isinstance(labware_location, ModuleLocation):
             module = self._modules.get(labware_location.moduleId)

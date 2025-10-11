@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_runner import RunResult, RunOrchestrator
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_engine.resources import FileProvider
+from opentrons.protocol_engine.resources import CameraProvider
 
 from robot_server.runs.run_orchestrator_store import (
     RunOrchestratorStore,
@@ -92,6 +93,7 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
         initial_error_recovery_policy=never_recover,
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
     )
@@ -122,6 +124,7 @@ async def test_create_engine_uses_robot_type(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -145,6 +148,7 @@ async def test_create_engine_with_labware_offsets(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -175,6 +179,7 @@ async def test_archives_state_if_engine_already_exists(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -186,6 +191,7 @@ async def test_archives_state_if_engine_already_exists(
             deck_configuration=[],
             protocol=None,
             file_provider=FileProvider(),
+            camera_provider=CameraProvider(),
             notify_publishers=mock_notify_publishers,
         )
 
@@ -204,6 +210,7 @@ async def test_create_does_not_store_orchestrator_on_load_failure(
             deck_configuration=[],
             protocol=bad_python_protocol_source,
             file_provider=FileProvider(),
+            camera_provider=CameraProvider(),
             notify_publishers=mock_notify_publishers,
         )
     assert subject.current_run_id is None
@@ -218,6 +225,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -244,6 +252,7 @@ async def test_clear_engine_not_stopped_or_idle(subject: RunOrchestratorStore) -
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -261,6 +270,7 @@ async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -314,6 +324,7 @@ async def test_get_default_orchestrator_current_unstarted(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -330,6 +341,7 @@ async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) 
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     subject.play()
@@ -349,6 +361,7 @@ async def test_get_default_orchestrator_run_stopped(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     await subject.finish(error=None)

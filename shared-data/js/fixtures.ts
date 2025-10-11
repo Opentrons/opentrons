@@ -1562,7 +1562,10 @@ export const replaceCutoutFixtureWithComboFixture = (
           }
         }
       } else {
-        console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
+        console.log(
+          'Invalid deck config match for:',
+          aaCutoutItem.cutoutFixtureId
+        )
         continue
       }
     }

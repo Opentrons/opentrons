@@ -66,7 +66,7 @@ export function Landing(): JSX.Element {
       hasOptedIn != null
     ) {
       const toastId = bakeToast(
-        t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
+        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
         INFO_TOAST,
         {
           heading: t('updated_protocol_designer'),

@@ -393,6 +393,8 @@ async def create_protocol(  # noqa: C901
         return await _get_cached_protocol_analysis()
 
     try:
+        # todo(mm, 2025-10-06): ProtocolStore should encapsulate protocol storage;
+        # this router function should not write directly into protocol_directory.
         source = await protocol_reader.save(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
@@ -404,6 +406,8 @@ async def create_protocol(  # noqa: C901
         ) from e
 
     if source.robot_type != robot_type:
+        # fixme(mm, 2025-10-06): Since `source` has already been saved to the filesystem,
+        # this will leave permanent stray files inside `protocol_directory`.
         raise ProtocolRobotTypeMismatch(
             detail=(
                 f"This protocol is for {user_facing_robot_type(source.robot_type)} robots."

@@ -10,7 +10,6 @@ import {
   BORDERS,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   InfoScreen,
@@ -18,6 +17,7 @@ import {
   LegacyStyledText,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_HIDDEN,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -267,12 +267,12 @@ export function HistoricalProtocolRunDrawer(
                   gridGap={SPACING.spacing4}
                   alignItems={ALIGN_CENTER}
                 >
-                  <DeckInfoLabel deckLabel={slotName} />
+                  <RobotInfoLabel deckLabel={slotName} />
                   {offset.locationSequence?.some(
                     seq => seq.kind === 'onLabware'
-                  ) && <DeckInfoLabel iconName="stacked" key="stacked-icon" />}
+                  ) && <RobotInfoLabel iconName="stacked" key="stacked-icon" />}
                   {offset.location.moduleModel && (
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[
                           getModuleType(offset.location.moduleModel)

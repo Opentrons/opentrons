@@ -318,6 +318,7 @@ class FixtureSettings:
             trials=trials,
             name=name,
             run_id=run_id,
+            runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
         )
         os.makedirs(f"{test_report.parent}", exist_ok=True)
@@ -370,6 +371,11 @@ class FixtureSettings:
         test_report.set_operator(operator_name)
         test_report.set_version(git_description)
         test_report.set_firmware(fw_version)
+
+        # store the runtime params now.
+        for param in csv_params:
+            test_report("RUNTIME_PARAMS", param[0], param[1:])
+
         t50_str = f"{ctx.params.cavity_50}"  # type: ignore [attr-defined]
         if ctx.params.cavity_50 != "Unused":  # type: ignore [attr-defined]
             t50_str += f"{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
@@ -863,9 +869,14 @@ def override_retract_discontinuity(fixture_settings: FixtureSettings) -> None:
     if _should_alter_discontinuity(fixture_settings):
         hw_api = fixture_settings.ctx._core.get_hardware()
         if fixture_settings.pipette_channels == 96:
-            hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-                OT3AxisKind.Z
-            ] = fixture_settings.retract_discontinuity
+            if fixture_settings.pipette_volume == 200:
+                hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_200[
+                    OT3AxisKind.Z
+                ] = fixture_settings.retract_discontinuity
+            else:
+                hw_api.config.motion_settings.max_speed_discontinuity.high_throughput_1000[
+                    OT3AxisKind.Z
+                ] = fixture_settings.retract_discontinuity
         else:
             hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
                 OT3AxisKind.Z

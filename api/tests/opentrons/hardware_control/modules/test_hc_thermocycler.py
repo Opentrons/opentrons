@@ -14,8 +14,11 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.poller import Poller
-from opentrons.hardware_control.modules.thermocycler import ThermocyclerReader
-from opentrons.drivers.asyncio.communication.errors import ErrorResponse
+from opentrons.hardware_control.modules.thermocycler import (
+    ThermocyclerReader,
+    ThermocyclerError,
+)
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
 
 
 POLL_PERIOD = 1.0
@@ -229,6 +232,21 @@ def simulator_set_plate_spy(
 
 
 @pytest.fixture
+def get_error_state_spy(simulator: SimulatingDriver) -> mock.AsyncMock:
+    """Build a spy for get error state."""
+    return mock.AsyncMock(wraps=simulator.get_error_state)
+
+
+@pytest.fixture
+def simulator_get_error_spy(
+    simulator: SimulatingDriver, get_error_state_spy: mock.AsyncMock
+) -> SimulatingDriver:
+    """Fixture that attaches a get error spy to the simulator."""
+    simulator.get_error_state = get_error_state_spy  # type: ignore[method-assign]
+    return simulator
+
+
+@pytest.fixture
 async def set_temperature_subject(
     usb_port: USBPort,
     simulator_set_plate_spy: SimulatingDriver,
@@ -253,6 +271,34 @@ async def set_temperature_subject(
         disconnected_callback=module_disconnected_callback,
     )
 
+    await poller.start()
+    yield hw_tc
+    await hw_tc.cleanup()
+
+
+@pytest.fixture
+async def get_error_subject(
+    usb_port: USBPort,
+    simulator_get_error_spy: SimulatingDriver,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> AsyncGenerator[modules.Thermocycler, None]:
+    """Fixture that spys on get error."""
+    reader = ThermocyclerReader(driver=simulator_get_error_spy)
+    poller = Poller(reader=reader, interval=0.01)
+    hw_tc = modules.Thermocycler(
+        port="/dev/ot_module_sim_thermocycler0",
+        usb_port=usb_port,
+        hw_control_loop=asyncio.get_running_loop(),
+        driver=simulator_get_error_spy,
+        reader=reader,
+        poller=poller,
+        device_info={},
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
     await poller.start()
     yield hw_tc
     await hw_tc.cleanup()
@@ -318,10 +364,28 @@ async def test_set_temperature_with_ramp_rate(
     set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
 ) -> None:
     """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.8",
+    }
     await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
     set_plate_temp_spy.assert_called_once_with(
         temp=30, hold_time=0, volume=35, ramp_rate=5.0
     )
+
+
+async def test_set_temperature_with_ramp_rate_with_old_firmware(
+    set_temperature_subject: modules.Thermocycler, set_plate_temp_spy: mock.AsyncMock
+) -> None:
+    """It should call set_plate_temperature with volume param"""
+    set_temperature_subject._device_info = {
+        "serial": "dummySerialTC",
+        "model": "dummyModelTC",
+        "version": "v1.0.7",
+    }
+    with pytest.raises(ThermocyclerError):
+        await set_temperature_subject.set_temperature(30, volume=35, ramp_rate=5.0)
 
 
 async def test_set_temperature_mixed_hold(
@@ -496,5 +560,54 @@ async def test_async_error_response_to_poller(
             "some-model",
             "/dev/ot_module_sim_thermocycler0",
             "dummySerialTC",
+        )
+    )
+
+
+def test_can_use_ramp_rate(subject: modules.Thermocycler) -> None:
+    """It should handle various malformed versions without failing."""
+    subject._device_info["version"] = "v1.0.9"
+    assert subject.can_use_ramp_rate()
+    subject._device_info["version"] = "v1.0.7"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = "asdasvasd"
+    assert subject.can_use_ramp_rate() is False
+    subject._device_info["version"] = ""
+    assert subject.can_use_ramp_rate() is False
+    del subject._device_info["version"]
+    assert subject.can_use_ramp_rate() is False
+
+
+async def test_reader_ignores_get_error_state_not_available(
+    get_error_state_spy: mock.AsyncMock,
+    simulator_get_error_spy: SimulatingDriver,
+) -> None:
+    """It should not raise if the module does not support get-error-state."""
+    reader = ThermocyclerReader(driver=simulator_get_error_spy)
+    get_error_state_spy.side_effect = UnhandledGcode(
+        "/dev/ot_module_sim_thermocycler0", "ERR001:unhandled gcode", "M411"
+    )
+    await reader.read()
+
+
+async def test_reader_raises_error_from_get_error(
+    get_error_subject: modules.Thermocycler,
+    get_error_state_spy: mock.AsyncMock,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+) -> None:
+    """It should put the error all the way out to the error callback from the reader."""
+    error_state_response = ErrorResponse(
+        "/dev/ot_module_sim_thermocycler0", "ERR:666:you know what it is", "M411"
+    )
+    get_error_state_spy.side_effect = error_state_response
+    with pytest.raises(ErrorResponse):
+        await get_error_subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            error_state_response,
+            model="thermocyclerModuleV1",
+            port="/dev/ot_module_sim_thermocycler0",
+            serial=None,
         )
     )
