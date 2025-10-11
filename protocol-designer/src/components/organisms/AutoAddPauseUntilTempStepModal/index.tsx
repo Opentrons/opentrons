@@ -192,7 +192,7 @@ export const AutoAddPauseUntilTempStepModal = (
 
 function P({ children }: PropsWithChildren): JSX.Element {
   return (
-    <StyledText as="p" desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
+    <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
       {children}
     </StyledText>
   )
