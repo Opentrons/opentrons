@@ -61,13 +61,11 @@ export const AutoAddPauseUntilTempStepModal = (
     return (
       <Modal
         marginLeft="0"
+        type="warning"
         title={t('modal:auto_add_pause_until_temp_step.legacy.title', {
           module: displayModule,
           temp: displayTemperature,
         })}
-        titleElement1={
-          <Icon name="alert-circle" size="1.25rem" color={COLORS.yellow50} />
-        }
         childrenPadding={SPACING.spacing24}
         footer={
           <Flex
@@ -148,10 +146,8 @@ export const AutoAddPauseUntilTempStepModal = (
     return (
       <Modal
         marginLeft="0"
+        type="warning"
         title={title}
-        titleElement1={
-          <Icon name="alert-circle" size="1.25rem" color={COLORS.yellow50} />
-        }
         childrenPadding={SPACING.spacing24}
         footer={
           <Flex
