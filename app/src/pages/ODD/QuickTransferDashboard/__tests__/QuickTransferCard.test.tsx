@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -15,10 +15,13 @@ import { QuickTransferCard } from '../QuickTransferCard'
 
 import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
+import type { UseLongPressResult } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
+
+const mockUseLongPress = vi.hoisted(() => vi.fn())
 
 const mockNavigate = vi.fn()
 
@@ -31,6 +34,13 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 vi.mock('@opentrons/react-api-client')
 vi.mock('../LongPressModal')
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    useLongPress: () => mockUseLongPress(),
+  }
+})
 
 const mockTransfer: ProtocolResource = {
   protocolKind: 'quick-transfer',
@@ -69,9 +79,22 @@ const render = () => {
 }
 
 describe('QuickTransferCard', () => {
+  let mockLongPress: UseLongPressResult
   vi.useFakeTimers()
 
   beforeEach(() => {
+    mockLongPress = {
+      isLongPressed: false,
+      isTapped: false,
+      isEnabled: true,
+      ref: { current: null },
+      style: { touchAction: 'none' },
+      setIsLongPressed: vi.fn(),
+      setIsTapped: vi.fn(),
+      enable: vi.fn(),
+      disable: vi.fn(),
+    }
+    mockUseLongPress.mockReturnValue(mockLongPress)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
@@ -109,31 +132,21 @@ describe('QuickTransferCard', () => {
   })
 
   it('should display modal after long click', async () => {
-    vi.useFakeTimers()
+    mockLongPress.isLongPressed = true
     render()
-    const name = screen.getByText('yay mock transfer')
-    fireEvent.mouseDown(name)
-    act(() => {
-      vi.advanceTimersByTime(1005)
-    })
     expect(props.longPress).toHaveBeenCalled()
     expect(vi.mocked(LongPressModal)).toHaveBeenCalled()
   })
 
   it('should display the analysis failed error modal when clicking on the transfer when doing a long pressing', async () => {
-    vi.useFakeTimers()
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'not-ok', errors: ['some analysis error'] } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    mockLongPress.isLongPressed = true
     render()
-    const name = screen.getByText('yay mock transfer')
-    fireEvent.mouseDown(name)
-    act(() => {
-      vi.advanceTimersByTime(1005)
-    })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('failedAnalysis_icon')
     screen.getByText('Failed analysis')
@@ -152,12 +165,8 @@ describe('QuickTransferCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    mockLongPress.isLongPressed = true
     render()
-    const name = screen.getByText('yay mock transfer')
-    fireEvent.mouseDown(name)
-    act(() => {
-      vi.advanceTimersByTime(1005)
-    })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('Transfer is loading')
     fireEvent.click(screen.getByText('yay mock transfer'))

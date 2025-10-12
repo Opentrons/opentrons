@@ -339,6 +339,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                   event.currentTarget.blur()
                 }} // prevent value change with scrolling
                 type={props.type}
+                disabled={disabled}
                 ref={ref}
               />
               {props.units != null ? (
