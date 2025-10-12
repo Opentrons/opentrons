@@ -83,6 +83,8 @@ export interface DropdownMenuProps {
   onEnter?: (id: string) => void
   /** optional exit handler */
   onExit?: () => void
+  /** optional test id */
+  testId?: string
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -105,6 +107,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     onEnter,
     onExit,
     menuPlacement = 'auto',
+    testId,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false)
@@ -292,7 +295,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           onFocus={onFocus}
           onBlur={onBlur}
           css={DROPDOWN_STYLE}
-          data-testid="dropdownMenu"
+          data-testid={
+            testId != null ? `${testId}_dropdownMenu` : 'dropdownMenu'
+          }
           tabIndex={tabIndex}
         >
           <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>

@@ -97,16 +97,17 @@ enum MixLocators {
   CancelAspSettings = 'button:contains("Back to overview")',
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
-  YpositionInput = '[id="TipPositionModal_y_custom_input"]',
-  ZpositionInput = '[id="TipPositionModal_z_custom_input"]',
+  YpositionInput = '[data-testid="TipPositionModal_y_custom_input"]',
+  ZpositionInput = '[data-testid="TipPositionModal_z_custom_input"]',
   SwapView = 'button:contains("Swap view")',
-  Checkbox = '[class="Flex-sc-1qhp8l7-0 Checkbox___StyledFlex3-sc-1mvp7vt-0 gZwGCw btdgeU"]',
+  Checkbox = '[data-testid="delay_checkbox"]',
   AspirateDelaySecondsInput = '[name="aspirate_delay_seconds"]',
   DispenseDelaySecondsInput = '[name="dispense_delay_seconds"]',
   DispFlowRate = '[name="dispense_flowRate"]',
-  BlowoutLtnDropdown = '[data-testid="dropdownMenu"]',
+  BlowoutLtnDropdown = '[data-testid="blowout_checkbox"]',
+  BlowoutLocationDropdown = '[data-testid="blowout_location_dropdownMenu"]',
   BlowoutFlowRate = '[name="blowout_flowRate"]',
-  BlowoutPos = '[id="TipPositionField_blowout_z_offset"]',
+  BlowoutPos = '[data-testid="TipPositionField_blowout_z_offset"]',
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
@@ -328,8 +329,11 @@ export const MixSteps = {
         .should('be.visible')
         .eq(0)
         .click()
-      cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
       cy.get(MixLocators.BlowoutLtnDropdown)
+        .should('exist')
+        .should('be.visible')
+        .click()
+      cy.get(MixLocators.BlowoutLocationDropdown)
         .should('exist')
         .should('be.visible')
         .click()
