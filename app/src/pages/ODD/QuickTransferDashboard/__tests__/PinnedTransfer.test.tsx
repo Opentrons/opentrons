@@ -22,7 +22,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof import('@opentrons/components')>()
+  const actual = await importOriginal<UseLongPressResult>()
   return {
     ...actual,
     useLongPress: () => mockUseLongPress(),

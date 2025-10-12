@@ -5,8 +5,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import '@testing-library/jest-dom/vitest'
 
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-
 import { TertiaryButton } from '..'
 
 import type { ComponentProps } from 'react'

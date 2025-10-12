@@ -5,7 +5,6 @@ import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import styles from './iconbutton.module.css'
 
-import type { CSSProperties } from 'react'
 import type { IconName } from '../../icons'
 
 /**
