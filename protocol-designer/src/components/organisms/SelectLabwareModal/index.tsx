@@ -18,6 +18,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   Modal,
+  OVERFLOW_SCROLL,
   PrimaryButton,
   SecondaryButton,
   SPACING,
@@ -418,8 +419,8 @@ export function SelectLabwareModal(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          overflowY="scroll"
-          maxHeight="15.5rem"
+          overflowY={OVERFLOW_SCROLL}
+          maxHeight="29.5rem"
           paddingTop={SPACING.spacing8}
         >
           <SelectCustomLabware
