@@ -15,7 +15,6 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
-import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { DECK_CONTROLS_STYLE } from '../constants'
 
