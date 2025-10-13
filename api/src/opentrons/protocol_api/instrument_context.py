@@ -292,8 +292,10 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
-        end_target: Optional[validation.ValidTarget] = None
+        end_move_to_location: Optional[types.Location] = None
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
+            end_target: Optional[validation.ValidTarget] = None
             if location is None:
                 raise ValueError("Location must be supplied if using an End Location.")
             end_target = validation.validate_location(
@@ -349,6 +351,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 flow_rate=flow_rate,
                 in_place=target.in_place,
                 meniscus_tracking=meniscus_tracking,
+                end_location=end_move_to_location,
+                end_meniscus_tracking=end_meniscus_tracking,
             )
 
         return self
@@ -519,14 +523,18 @@ class InstrumentContext(publisher.CommandPublisher):
                     in_place=target.in_place,
                     push_out=push_out,
                     meniscus_tracking=None,
+                    end_location=None,
+                    end_meniscus_tracking=None,
                 )
             return self
 
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
-        end_target: Optional[validation.ValidTarget] = None
+        end_move_to_location: Optional[types.Location] = None
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
+            end_target: Optional[validation.ValidTarget] = None
             if location is None:
                 raise ValueError("Location must be supplied if using an End Location.")
             end_target = validation.validate_location(
