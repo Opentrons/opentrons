@@ -10,7 +10,7 @@ describe('getMoveLiquidDelayData', () => {
     }
     expect(
       getMoveLiquidDelayData({
-        hydratedFormData: fields,
+        castFormData: fields,
         secondsField: 'aspirate_delay_seconds',
         checkboxField: 'aspirate_delay_checkbox',
       })
@@ -28,7 +28,7 @@ describe('getMoveLiquidDelayData', () => {
       }
       expect(
         getMoveLiquidDelayData({
-          hydratedFormData: fields,
+          castFormData: fields,
           secondsField: 'aspirate_delay_seconds',
           checkboxField: 'aspirate_delay_checkbox',
         })
@@ -45,7 +45,7 @@ describe('getMoveLiquidDelayData', () => {
     }
     expect(
       getMoveLiquidDelayData({
-        hydratedFormData: fields,
+        castFormData: fields,
         secondsField: 'aspirate_delay_seconds',
         checkboxField: 'aspirate_delay_checkbox',
       })
@@ -61,7 +61,7 @@ describe('getMoveLiquidDelayData', () => {
     }
     expect(
       getMoveLiquidDelayData({
-        hydratedFormData: fields,
+        castFormData: fields,
         secondsField: 'aspirate_delay_seconds',
         checkboxField: 'aspirate_delay_checkbox',
       })
