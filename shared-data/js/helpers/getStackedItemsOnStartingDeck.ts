@@ -140,7 +140,7 @@ export function getStackedItemsOnStartingDeck(
             const offDeckItem = {
               labwareId: labwareId,
               definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition
+                command.result?.definition!
               ),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
@@ -279,7 +279,7 @@ export function getStackedItemsOnStartingDeck(
             return {
               labwareId: lidId,
               definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition
+                command.result?.definition!
               ),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',

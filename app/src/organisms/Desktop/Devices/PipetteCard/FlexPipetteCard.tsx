@@ -66,7 +66,7 @@ export function FlexPipetteCard({
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =
     useState<boolean>(false)

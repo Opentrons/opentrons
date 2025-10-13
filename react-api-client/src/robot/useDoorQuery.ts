@@ -17,8 +17,8 @@ export function useDoorQuery<TError = Error>(
 ): UseQueryResult<DoorStatus, TError> {
   const host = useHost()
   const query = useQuery<DoorStatus, TError>(
-    [host as HostConfig, '/robot/door/status'],
-    () => getDoorStatus(host as HostConfig).then(response => response.data),
+    [host!, '/robot/door/status'],
+    () => getDoorStatus(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

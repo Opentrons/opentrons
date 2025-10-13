@@ -49,7 +49,7 @@ export function useCreateLiveCommandMutation(): UseCreateLiveCommandMutationResu
     unknown,
     CreateLiveCommandMutateParams
   >(({ command, waitUntilComplete, timeout }) =>
-    createLiveCommand(host as HostConfig, command, {
+    createLiveCommand(host!, command, {
       waitUntilComplete,
       timeout,
     }).then(response => {

@@ -50,7 +50,7 @@ export function useCreateMaintenanceCommandMutation(): UseCreateMaintenanceComma
     unknown,
     CreateMaintenanceCommandMutateParams
   >(({ maintenanceRunId, command, waitUntilComplete, timeout }) =>
-    createMaintenanceCommand(host as HostConfig, maintenanceRunId, command, {
+    createMaintenanceCommand(host!, maintenanceRunId, command, {
       waitUntilComplete,
       timeout,
     })

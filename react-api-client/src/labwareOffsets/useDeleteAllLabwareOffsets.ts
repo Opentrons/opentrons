@@ -20,7 +20,7 @@ export function useDeleteAllLabwareOffsetsMutation(): UseDeleteAllLabwareOffsets
   const queryClient = useQueryClient()
 
   const mutation = useMutation<null, unknown>(() =>
-    deleteAllLabwareOffsets(host as HostConfig).then(response => {
+    deleteAllLabwareOffsets(host!).then(response => {
       queryClient
         .invalidateQueries([host, 'labwareOffsets'])
         .catch((e: Error) => {

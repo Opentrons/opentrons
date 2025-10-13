@@ -68,7 +68,7 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
     }
 
     case Constants.ROBOTUPDATE_CHECKING_FOR_UPDATE: {
-      const session = state.session as RobotUpdateSession
+      const session = state.session!
       const target = action.payload
 
       return {

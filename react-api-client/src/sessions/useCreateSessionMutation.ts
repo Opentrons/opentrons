@@ -24,7 +24,7 @@ export function useCreateSessionMutation(
 ): UseCreateSessionMutationResult {
   const host = useHost()
   const mutation = useMutation<Session, Error>(['session', host], () =>
-    createSession(host as HostConfig, createSessionData)
+    createSession(host!, createSessionData)
       .then(response => response.data)
       .catch((e: Error) => {
         throw e

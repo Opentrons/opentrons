@@ -13,7 +13,7 @@ export function useConnectionsQuery(
   const host = useHost()
   const query = useQuery<ActiveConnections>(
     [host, 'connections'],
-    () => getConnections(host as HostConfig).then(response => response.data),
+    () => getConnections(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

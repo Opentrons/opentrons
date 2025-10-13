@@ -18,7 +18,7 @@ export function useSubsystemUpdateQuery<TError = Error>(
   const query = useQuery<SubsystemUpdateProgressData, TError>(
     [host, 'subsystems/updates/all/', updateId],
     () =>
-      getSubsystemUpdate(host as HostConfig, updateId as string).then(
+      getSubsystemUpdate(host!, updateId!).then(
         response => response.data
       ),
     {

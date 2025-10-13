@@ -225,7 +225,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')

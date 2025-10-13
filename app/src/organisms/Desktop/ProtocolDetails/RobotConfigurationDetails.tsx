@@ -96,7 +96,7 @@ export const RobotConfigurationDetails = (
 
   const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
-    getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
+    getPipetteNameSpecs(leftMountPipetteName!)?.displayName ??
     null
   const leftMountItem =
     leftMountPipetteDisplayName != null ? (
@@ -106,7 +106,7 @@ export const RobotConfigurationDetails = (
     )
 
   const rightMountPipetteDisplayName =
-    getPipetteNameSpecs(rightMountPipetteName as PipetteName)?.displayName ??
+    getPipetteNameSpecs(rightMountPipetteName!)?.displayName ??
     null
   const rightMountItem =
     rightMountPipetteDisplayName != null ? (

@@ -11,7 +11,7 @@ export function useAllProtocolsQuery(): UseQueryResult<Protocols> {
   const host = useHost()
   const query = useQuery(
     [host, 'protocols'],
-    () => getProtocols(host as HostConfig).then(response => response.data),
+    () => getProtocols(host!).then(response => response.data),
     { enabled: host !== null }
   )
 

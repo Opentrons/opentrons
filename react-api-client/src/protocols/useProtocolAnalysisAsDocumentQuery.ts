@@ -18,9 +18,9 @@ export function useProtocolAnalysisAsDocumentQuery(
     [host, 'protocols', protocolId, 'analyses', analysisId],
     () =>
       getProtocolAnalysisAsDocument(
-        host as HostConfig,
-        protocolId as string,
-        analysisId as string
+        host!,
+        protocolId!,
+        analysisId!
       ).then(response => response.data),
     options
   )

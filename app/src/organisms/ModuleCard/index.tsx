@@ -115,7 +115,7 @@ interface ModuleCardProps {
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const {
     module,

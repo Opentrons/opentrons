@@ -99,7 +99,7 @@ export const BeforeBeginning = (
     false
 
   const pipetteDisplayName = usePipetteNameSpecs(
-    requiredPipette?.pipetteName as PipetteName
+    requiredPipette?.pipetteName!
   )?.displayName
 
   if (

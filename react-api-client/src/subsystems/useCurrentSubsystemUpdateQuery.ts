@@ -21,7 +21,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
     [host, '/subsystems/updates/current', subsystem],
     () =>
       getCurrentSubsystemUpdate(
-        host as HostConfig,
+        host!,
         subsystem as Subsystem
       ).then(response => response.data),
     {

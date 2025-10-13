@@ -106,7 +106,7 @@ function getDisplayNameFromUri({
 }: GetLPCLabwareInfoForURI): string {
   const matchedDef = labwareDefs?.find(
     def => getLabwareDefURI(def) === uri
-  ) as LabwareDefinition
+  )!
 
   if (!!!matchedDef) {
     console.warn(

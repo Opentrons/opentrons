@@ -14,7 +14,7 @@ export function useAllSessionsQuery(
   const query = useQuery<Sessions, Error>(
     ['session', host],
     () =>
-      getSessions(host as HostConfig)
+      getSessions(host!)
         .then(response => response.data)
         .catch((e: Error) => {
           throw e

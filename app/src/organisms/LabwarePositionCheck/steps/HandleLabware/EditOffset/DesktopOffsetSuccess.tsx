@@ -46,15 +46,15 @@ export function DesktopOffsetSuccess(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(props.runId)
   )
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[props.runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[props.runId]?.lpc!
   )
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
-  ) as SelectedLwOverview
+  )!
   const moduleModel =
     selectedLwInfo.offsetLocationDetails?.closestBeneathModuleModel
   const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+    selectedLwInfo.offsetLocationDetails!
   const labwareDisplayName = useSelector(
     selectSelectedLwDisplayName(props.runId)
   )

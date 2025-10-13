@@ -33,7 +33,7 @@ export const usePauseRunMutation = (
   const mutation = useMutation<RunAction, AxiosError, string>(
     [host, 'runs', RUN_ACTION_TYPE_PAUSE],
     (runId: string) =>
-      createRunAction(host as HostConfig, runId, {
+      createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_PAUSE,
       })
         .then(response => response.data)

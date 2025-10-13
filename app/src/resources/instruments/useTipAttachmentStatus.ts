@@ -76,9 +76,9 @@ export function useTipAttachmentStatus(
 
   const determineTipStatus = useCallback((): Promise<PipetteWithTip[]> => {
     return Promise.all([
-      getInstruments(host as HostConfig),
-      getRunCurrentState(host as HostConfig, runId),
-      getCommands(host as HostConfig, runId, {
+      getInstruments(host!),
+      getRunCurrentState(host!, runId),
+      getCommands(host!, runId, {
         includeFixitCommands: false,
         pageLength: 1,
       }),

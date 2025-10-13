@@ -17,7 +17,7 @@ export function useModulesQuery(
   const query = useQuery<Modules>(
     [host, 'modules'],
     () =>
-      getModules(host as HostConfig).then(response => {
+      getModules(host!).then(response => {
         const modules = response.data?.data ?? []
         // this check will determine if the module response is v3 or v2
         // if v2, we will return an empty array

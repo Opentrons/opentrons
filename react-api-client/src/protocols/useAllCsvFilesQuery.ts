@@ -23,7 +23,7 @@ export function useAllCsvFilesQuery(
   const query = useQuery<UploadedCsvFilesResponse>(
     [host, `protocols/${protocolId}/dataFiles`],
     () =>
-      getCsvFiles(host as HostConfig, protocolId as string).then(
+      getCsvFiles(host!, protocolId!).then(
         response => response.data
       ),
     allOptions

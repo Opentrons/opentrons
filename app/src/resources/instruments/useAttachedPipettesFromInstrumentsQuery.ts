@@ -23,10 +23,10 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
   const rightPipette = okPipettes.find(({ mount }) => mount === RIGHT) ?? null
 
   const leftDisplayName =
-    usePipetteModelSpecs(leftPipette?.instrumentModel as PipetteModel)
+    usePipetteModelSpecs(leftPipette?.instrumentModel!)
       ?.displayName ?? ''
   const rightDisplayName =
-    usePipetteModelSpecs(rightPipette?.instrumentModel as PipetteModel)
+    usePipetteModelSpecs(rightPipette?.instrumentModel!)
       ?.displayName ?? ''
 
   return {

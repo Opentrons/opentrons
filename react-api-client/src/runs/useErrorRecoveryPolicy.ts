@@ -19,7 +19,7 @@ export function useErrorRecoveryPolicy(
   const query = useQuery<ErrorRecoveryPolicyResponse, Error>(
     [host, 'runs', runId, 'errorRecoveryPolicy'],
     () =>
-      getErrorRecoveryPolicy(host as HostConfig, runId)
+      getErrorRecoveryPolicy(host!, runId)
         .then(response => response.data)
         .catch(e => {
           throw e

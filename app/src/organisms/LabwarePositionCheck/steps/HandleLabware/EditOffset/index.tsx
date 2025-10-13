@@ -83,10 +83,10 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
-  ) as SelectedLwOverview
+  )!
   const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const pipette = useSelector(selectActivePipette(props.runId)) as LoadedPipette
+    selectedLwInfo.offsetLocationDetails!
+  const pipette = useSelector(selectActivePipette(props.runId))!
 
   const handleAddConfirmedWorkingVector = (): void => {
     void toggleRobotMoving(true)

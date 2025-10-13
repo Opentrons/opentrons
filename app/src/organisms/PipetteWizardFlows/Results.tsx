@@ -79,7 +79,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
 
   const requiredPipDisplayName =
-    usePipetteNameSpecs(requiredPipette?.pipetteName as PipetteName)
+    usePipetteNameSpecs(requiredPipette?.pipetteName!)
       ?.displayName ?? null
 
   const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)

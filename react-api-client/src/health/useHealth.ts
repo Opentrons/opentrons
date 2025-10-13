@@ -15,7 +15,7 @@ export function useHealthQuery(
   const queryKey = ['health', host]
   const query = useQuery<AxiosResponse<Health>, AxiosError>(
     queryKey,
-    () => getHealth(host as HostConfig),
+    () => getHealth(host!),
     {
       ...options,
       enabled: host !== null && options.enabled !== false,

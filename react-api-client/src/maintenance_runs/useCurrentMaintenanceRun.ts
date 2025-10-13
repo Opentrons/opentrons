@@ -16,7 +16,7 @@ export function useCurrentMaintenanceRun<TError = Error>(
   const query = useQuery<MaintenanceRun, TError>(
     [host, 'maintenance_runs', 'current_run'],
     () =>
-      getCurrentMaintenanceRun(host as HostConfig).then(
+      getCurrentMaintenanceRun(host!).then(
         response => response.data
       ),
     {

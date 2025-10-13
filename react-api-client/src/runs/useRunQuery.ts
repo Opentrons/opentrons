@@ -21,7 +21,7 @@ export function useRunQuery<TError = Error>(
   const query = useQuery<Run, TError>(
     [host, 'runs', runId, 'details'],
     () =>
-      getRun(host as HostConfig, runId as string).then(
+      getRun(host!, runId!).then(
         response => response.data
       ),
     {

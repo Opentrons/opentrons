@@ -36,7 +36,7 @@ export function LPCLabwareJogRender({
 }: EditOffsetContentProps): JSX.Element {
   const pipetteName =
     useSelector(selectActivePipette(runId))?.pipetteName ?? 'p1000_single'
-  const itemLwDef = useSelector(selectSelectedLwDef(runId)) as LabwareDefinition
+  const itemLwDef = useSelector(selectSelectedLwDef(runId))!
 
   return (
     <Flex css={RENDER_CONTAINER_STYLE}>

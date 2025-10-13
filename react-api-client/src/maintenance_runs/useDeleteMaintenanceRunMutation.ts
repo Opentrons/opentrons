@@ -33,7 +33,7 @@ export function useDeleteMaintenanceRunMutation(
 
   const mutation = useMutation<EmptyResponse, unknown, string>(
     (maintenanceRunId: string) =>
-      deleteMaintenanceRun(host as HostConfig, maintenanceRunId).then(
+      deleteMaintenanceRun(host!, maintenanceRunId).then(
         response => {
           queryClient.removeQueries([
             host,

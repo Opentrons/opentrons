@@ -45,7 +45,7 @@ export function useUpdateSubsystemMutation(
     Subsystem
   >(
     (subsystem: Subsystem) =>
-      updateSubsystem(host as HostConfig, subsystem).then(response => {
+      updateSubsystem(host!, subsystem).then(response => {
         queryClient.removeQueries([host, 'subsystems/updates'])
         queryClient
           .invalidateQueries([host, 'subsystems/updates'])

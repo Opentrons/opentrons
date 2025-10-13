@@ -20,7 +20,7 @@ export function useLabwareOffsets(
   const query = useQuery<LabwareOffsetsResponse, AxiosError>(
     [host, 'labwareOffsets', params],
     () =>
-      getLabwareOffsets(host as HostConfig, params)
+      getLabwareOffsets(host!, params)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

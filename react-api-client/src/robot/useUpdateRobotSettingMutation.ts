@@ -52,7 +52,7 @@ export function useUpdateRobotSettingMutation(
   >(
     [host, 'robot_settings'],
     ({ id, value }) =>
-      updateRobotSetting(host as HostConfig, id, value).then(response => {
+      updateRobotSetting(host!, id, value).then(response => {
         // TODO: investigate ODD top level behavior when invalidating this query
         // queryClient
         //   .invalidateQueries([host, 'robot_settings'])

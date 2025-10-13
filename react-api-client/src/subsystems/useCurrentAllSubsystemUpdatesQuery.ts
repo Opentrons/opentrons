@@ -15,7 +15,7 @@ export function useCurrentAllSubsystemUpdatesQuery<TError = Error>(
   const query = useQuery<CurrentSubsystemUpdates, TError>(
     [host, '/subsystems/updates/current'],
     () =>
-      getCurrentAllSubsystemUpdates(host as HostConfig).then(
+      getCurrentAllSubsystemUpdates(host!).then(
         response => response.data
       ),
     {

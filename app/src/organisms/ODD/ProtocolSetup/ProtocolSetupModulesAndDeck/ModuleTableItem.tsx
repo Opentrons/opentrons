@@ -126,7 +126,7 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 

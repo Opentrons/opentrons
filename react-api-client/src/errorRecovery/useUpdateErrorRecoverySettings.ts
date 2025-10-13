@@ -39,7 +39,7 @@ export function useUpdateErrorRecoverySettings(
   const mutation = useMutation(
     [host, 'errorRecovery', 'settings'],
     (settings: ErrorRecoverySettingsRequest) =>
-      updateErrorRecoverySettings(host as HostConfig, settings)
+      updateErrorRecoverySettings(host!, settings)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

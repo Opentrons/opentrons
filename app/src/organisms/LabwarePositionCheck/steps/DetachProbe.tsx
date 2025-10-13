@@ -31,7 +31,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
     commandUtils
 
   const currentSubstep = useSelector(selectCurrentSubstep(runId))
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const pipette = useSelector(selectActivePipette(runId))!
   const pipetteId = pipette.id
   const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const mostRecentVectorOffset = useSelector(

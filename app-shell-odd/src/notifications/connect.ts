@@ -66,7 +66,7 @@ export function connectAsync(brokerURL: string): Promise<mqtt.Client> {
 }
 
 export function establishListeners(): void {
-  const client = connectionStore.client as mqtt.MqttClient
+  const client = connectionStore.client!.MqttClient
   const { ip, robotName } = connectionStore
 
   client.on(

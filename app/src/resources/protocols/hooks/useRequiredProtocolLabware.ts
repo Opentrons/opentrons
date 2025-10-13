@@ -26,7 +26,7 @@ export const useRequiredProtocolLabware = (
     { enabled: protocolData != null }
   )
   const commands =
-    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+    (mostRecentAnalysis)?.commands ?? []
   const labwareDetails = getRequiredLabwareDetailsFromLoadCommands(commands)
   return labwareDetails
 }

@@ -65,21 +65,21 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
 
   const isOnDevice = useSelector(getIsOnDevice)
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[runId]?.lpc!
   )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
-  )?.initialPosition as VectorOffset
+  )?.initialPosition!
   const mostRecentVector = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
+  )!
   const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+    selectedLwInfo.offsetLocationDetails!
+  const pipette = useSelector(selectActivePipette(runId))!
 
   const [joggedPosition, setJoggedPosition] =
     useState<VectorOffset>(workingInitialOffset)

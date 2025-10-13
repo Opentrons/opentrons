@@ -67,8 +67,8 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
     { enabled: protocolData != null }
   )
   const liquidsInOrder = parseLiquidsInLoadOrder(
-    (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
-    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
+    (mostRecentAnalysis!).liquids ?? [],
+    (mostRecentAnalysis!).commands ?? []
   )
   const { t, i18n } = useTranslation('protocol_details')
 

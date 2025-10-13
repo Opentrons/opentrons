@@ -144,7 +144,7 @@ export function useRouteUpdateActions(
           const route = robotMovingRoute ?? ROBOT_IN_MOTION.ROUTE
           const step =
             robotMovingRoute != null
-              ? (head(STEP_ORDER[robotMovingRoute]) as RouteStep)
+              ? (head(STEP_ORDER[robotMovingRoute])!)
               : ROBOT_IN_MOTION.STEPS.IN_MOTION
           setRecoveryMap({ route, step })
         } else {

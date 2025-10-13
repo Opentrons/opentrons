@@ -20,7 +20,7 @@ export function useClientData<T = DefaultClientData>(
   const query = useQuery<ClientDataResponse<T>, AxiosError>(
     [host, 'client_data', key],
     () =>
-      getClientData<T>(host as HostConfig, key).then(response => response.data),
+      getClientData<T>(host!, key).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

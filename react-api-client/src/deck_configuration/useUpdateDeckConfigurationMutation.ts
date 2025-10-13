@@ -44,7 +44,7 @@ export function useUpdateDeckConfigurationMutation(
   >(
     [host, 'deck_configuration'],
     (deckConfig: DeckConfiguration) =>
-      updateDeckConfiguration(host as HostConfig, deckConfig).then(response => {
+      updateDeckConfiguration(host!, deckConfig).then(response => {
         queryClient
           .invalidateQueries([host, 'deck_configuration'])
           .catch((e: Error) => {

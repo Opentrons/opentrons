@@ -46,7 +46,7 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const {
     menuOverlay,

@@ -32,7 +32,7 @@ export function useCreateLabwareOffsetsMutation(): UseCreateLabwareOffsetsMutati
     unknown,
     CreateLabwareOffsetData
   >(data =>
-    createLabwareOffsets(host as HostConfig, data).then(response => {
+    createLabwareOffsets(host!, data).then(response => {
       queryClient
         .invalidateQueries([host, 'labwareOffsets'])
         .catch((e: Error) => {

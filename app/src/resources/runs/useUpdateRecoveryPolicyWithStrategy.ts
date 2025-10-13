@@ -36,7 +36,7 @@ export function useUpdateRecoveryPolicyWithStrategy(
     newPolicy: UpdateErrorRecoveryPolicyWithStrategy['newPolicy'],
     strategy: UpdateErrorRecoveryPolicyWithStrategy['strategy']
   ) =>
-    getErrorRecoveryPolicy(host as HostConfig, runId).then(res => {
+    getErrorRecoveryPolicy(host!, runId).then(res => {
       const existingPolicyRules = res.data.data.policyRules.map(rule => ({
         commandType: rule.matchCriteria.command.commandType,
         errorType: rule.matchCriteria.command.error.errorType,

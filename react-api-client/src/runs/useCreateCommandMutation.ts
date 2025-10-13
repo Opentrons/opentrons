@@ -39,7 +39,7 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
     params => {
       const { runId, command, ...rest } = params
 
-      return createCommand(host as HostConfig, runId, command, {
+      return createCommand(host!, runId, command, {
         ...rest,
       }).then(response => {
         queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {

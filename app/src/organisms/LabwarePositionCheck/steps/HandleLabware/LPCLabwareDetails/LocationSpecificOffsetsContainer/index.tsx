@@ -30,7 +30,7 @@ export function LocationSpecificOffsetsContainer(
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const { uri } = useSelector(
     selectSelectedLwOverview(props.runId)
-  ) as SelectedLwOverview
+  )!
   const sortedDetailsBySlot = useSelector(
     selectSortedLSOffsetDetailsWithCopy(
       props.runId,

@@ -48,7 +48,7 @@ export function useCreateMaintenanceRunLabwareDefinitionMutation(): UseCreateLab
     CreateMaintenanceRunLabwareDefinitionMutateParams
   >(({ maintenanceRunId, labwareDef }) =>
     createMaintenanceRunLabwareDefinition(
-      host as HostConfig,
+      host!,
       maintenanceRunId,
       labwareDef
     ).then(response => {

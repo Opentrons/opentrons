@@ -15,8 +15,8 @@ export function useRobotSettingsQuery(
 ): UseQueryResult<RobotSettingsResponse> {
   const host = useHost()
   const query = useQuery<RobotSettingsResponse>(
-    [host as HostConfig, 'robot_settings'],
-    () => getRobotSettings(host as HostConfig).then(response => response.data),
+    [host!, 'robot_settings'],
+    () => getRobotSettings(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

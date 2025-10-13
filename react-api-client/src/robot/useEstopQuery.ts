@@ -17,8 +17,8 @@ export function useEstopQuery<TError = Error>(
 ): UseQueryResult<EstopStatus, TError> {
   const host = useHost()
   const query = useQuery<EstopStatus, TError>(
-    [host as HostConfig, 'robot/control/estopStatus'],
-    () => getEstopStatus(host as HostConfig).then(response => response.data),
+    [host!, 'robot/control/estopStatus'],
+    () => getEstopStatus(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

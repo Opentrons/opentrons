@@ -26,7 +26,7 @@ export function useDeleteLabwareOffsetMutation(): UseDeleteLabwareOffsetMutation
 
   const mutation = useMutation<StoredLabwareOffset, unknown, string>(
     (id: string) =>
-      deleteLabwareOffset(host as HostConfig, id).then(response => {
+      deleteLabwareOffset(host!, id).then(response => {
         queryClient
           .invalidateQueries([host, 'labwareOffsets'])
           .catch((e: Error) => {

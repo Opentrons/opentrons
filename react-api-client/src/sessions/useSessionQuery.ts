@@ -12,7 +12,7 @@ export function useSessionQuery(sessionId: string): UseQueryResult<Session> {
   const query = useQuery(
     ['session', sessionId, host],
     () =>
-      getSession(host as HostConfig, sessionId).then(response => response.data),
+      getSession(host!, sessionId).then(response => response.data),
     { enabled: host !== null }
   )
 

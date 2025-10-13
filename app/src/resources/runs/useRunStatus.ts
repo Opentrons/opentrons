@@ -23,9 +23,9 @@ export function useRunStatus(
     ...options,
   })
 
-  const runStatus = data?.data?.status as RunStatus
+  const runStatus = data?.data?.status!
 
-  const actions = data?.data?.actions as RunAction[]
+  const actions = data?.data?.actions![]
   const firstPlay = actions?.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )

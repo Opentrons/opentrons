@@ -20,7 +20,7 @@ export function useRunCurrentState(
   return useQuery<RunCurrentState, AxiosError>(
     [host, 'runs', runId, 'currentState'],
     () =>
-      getRunCurrentState(host as HostConfig, runId as string).then(
+      getRunCurrentState(host!, runId!).then(
         response => response.data
       ),
     {

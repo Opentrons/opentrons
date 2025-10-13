@@ -18,7 +18,7 @@ export function repeatCall(options: RepeatCallOptions): RepeatCallResult {
 
   const getNextInterval = (): number =>
     intervalQueue.length > 1
-      ? (intervalQueue.shift() as number)
+      ? (intervalQueue.shift()!)
       : intervalQueue[0]
 
   const setNextTimeout = (): void => {

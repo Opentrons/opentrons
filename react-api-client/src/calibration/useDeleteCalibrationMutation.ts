@@ -40,7 +40,7 @@ export function useDeleteCalibrationMutation(
 
   const mutation = useMutation<EmptyResponse, unknown, DeleteCalRequestParams>(
     (requestParams: DeleteCalRequestParams) =>
-      deleteCalibration(host as HostConfig, requestParams).then(
+      deleteCalibration(host!, requestParams).then(
         response => response.data
       ),
     options

@@ -33,8 +33,8 @@ export function useAllCommandsQuery<TError = Error>(
     [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
     () => {
       return getCommands(
-        host as HostConfig,
-        runId as string,
+        host!,
+        runId!,
         finalizedParams
       ).then(response => response.data)
     },

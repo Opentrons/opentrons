@@ -29,7 +29,7 @@ export function useProtocolQuery(
   const query = useQuery<Protocol>(
     [host, 'protocols', protocolId],
     () =>
-      getProtocol(host as HostConfig, protocolId as string).then(
+      getProtocol(host!, protocolId!).then(
         response => response.data
       ),
     allOptions

@@ -24,7 +24,7 @@ export function useAllProtocolIdsQuery(
   }
   const query = useQuery<ProtocolsIds>(
     [host, 'protocols', 'ids'],
-    () => getProtocolIds(host as HostConfig).then(response => response.data),
+    () => getProtocolIds(host!).then(response => response.data),
     allOptions
   )
 

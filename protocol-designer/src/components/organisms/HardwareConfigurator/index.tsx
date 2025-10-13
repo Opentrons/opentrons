@@ -69,7 +69,7 @@ export function HardwareConfigurator(
         cutoutId: getCutoutIdFromAddressableArea(
           module.slot,
           deckDef
-        ) as CutoutId,
+        )!,
         cutoutFixtureId: hasThermocycler
           ? THERMOCYCLER_V2_FRONT_FIXTURE
           : 'cutoutFixtureId' in module

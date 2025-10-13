@@ -230,7 +230,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
           )
           const removedDefaultFixture = removedFixtureIdByCutoutIds[
             cc.cutoutId
-          ] as CutoutFixtureId // we know there is a match by the condition
+          ]! // we know there is a match by the condition
           const aa = getAAForModuleFixture(
             anchorCutoutId,
             removedDefaultFixture,

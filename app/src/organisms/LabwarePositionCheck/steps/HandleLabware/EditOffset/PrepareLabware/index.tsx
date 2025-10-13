@@ -27,16 +27,16 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const dispatch = useDispatch()
 
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const pipette = useSelector(selectActivePipette(runId))!
   const pipetteId = pipette.id
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
+  )!
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
   const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+    selectedLwInfo.offsetLocationDetails!
 
   const handleConfirmPlacement = (): void => {
     void toggleRobotMoving(true)

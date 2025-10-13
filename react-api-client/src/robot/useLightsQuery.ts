@@ -21,8 +21,8 @@ export function useLightsQuery<TError = Error>(
     enabled: host !== null && options.enabled !== false,
   }
   const query = useQuery<Lights, TError>(
-    [host as HostConfig, 'lights'],
-    () => getLights(host as HostConfig).then(response => response.data),
+    [host!, 'lights'],
+    () => getLights(host!).then(response => response.data),
     allOptions
   )
 

@@ -33,7 +33,7 @@ export const usePlayRunMutation = (
   const mutation = useMutation<RunAction, AxiosError, string>(
     [host, 'runs', RUN_ACTION_TYPE_PLAY],
     (runId: string) =>
-      createRunAction(host as HostConfig, runId, {
+      createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_PLAY,
       })
         .then(response => response.data)

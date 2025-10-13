@@ -33,8 +33,8 @@ export function useRunCommandErrors<TError = Error>(
     [host, 'runs', runId, 'commandErrors', cursor, pageLength],
     () => {
       return getRunCommandErrors(
-        host as HostConfig,
-        runId as string,
+        host!,
+        runId!,
         finalizedParams
       ).then(response => response.data)
     },

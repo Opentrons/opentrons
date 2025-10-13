@@ -15,7 +15,7 @@ export function useSessionsByTypeQuery(args: {
   const query = useQuery<Sessions, Error>(
     ['session', sessionType, host],
     () =>
-      getSessions(host as HostConfig, {
+      getSessions(host!, {
         session_type: sessionType,
       })
         .then(response => response.data)

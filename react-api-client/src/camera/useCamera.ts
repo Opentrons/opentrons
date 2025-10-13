@@ -13,7 +13,7 @@ export function useCamera(): UseQueryResult<CameraResponse, AxiosError> {
   const query = useQuery<CameraResponse, AxiosError>(
     [useHost, 'camera'],
     () =>
-      getCamera(host as HostConfig)
+      getCamera(host!)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

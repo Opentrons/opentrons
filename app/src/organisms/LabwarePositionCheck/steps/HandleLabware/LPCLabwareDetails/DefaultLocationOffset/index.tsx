@@ -38,7 +38,7 @@ export function DefaultLocationOffset(
   const dispatch = useDispatch()
   const defaultOffsetDetails = useSelector(
     selectSelectedLwDefaultOffsetDetails(runId)
-  ) as DefaultOffsetDetails
+  )!
   const mostRecentOffset = useSelector(
     selectMostRecentVectorOffsetForLwWithOffsetDetails(
       runId,

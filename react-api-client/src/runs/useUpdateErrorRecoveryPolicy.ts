@@ -47,7 +47,7 @@ export function useUpdateErrorRecoveryPolicy(
   >(
     [host, 'runs', runId, 'errorRecoveryPolicy'],
     (policyRules: RecoveryPolicyRulesParams) =>
-      updateErrorRecoveryPolicy(host as HostConfig, runId, policyRules)
+      updateErrorRecoveryPolicy(host!, runId, policyRules)
         .then(response => response.data)
         .catch(e => {
           throw e

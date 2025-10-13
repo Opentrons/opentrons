@@ -48,8 +48,8 @@ export function useAllCommandsAsPreSerializedList<TError = Error>(
     ],
     () => {
       return getCommandsAsPreSerializedList(
-        host as HostConfig,
-        runId as string,
+        host!,
+        runId!,
         finalizedParams
       ).then(response => {
         const responseData = response.data

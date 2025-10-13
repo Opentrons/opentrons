@@ -18,7 +18,7 @@ export function useErrorRecoverySettings(
   const query = useQuery<ErrorRecoverySettingsResponse, AxiosError>(
     [host, 'errorRecovery', 'settings'],
     () =>
-      getErrorRecoverySettings(host as HostConfig)
+      getErrorRecoverySettings(host!)
         .then(response => response.data)
         .catch((e: AxiosError) => {
           throw e

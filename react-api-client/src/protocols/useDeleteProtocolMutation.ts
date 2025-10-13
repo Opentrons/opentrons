@@ -22,7 +22,7 @@ export function useDeleteProtocolMutation(
   const queryClient = useQueryClient()
 
   const mutation = useMutation<EmptyResponse, unknown>(() =>
-    deleteProtocol(host as HostConfig, protocolId).then(response => {
+    deleteProtocol(host!, protocolId).then(response => {
       queryClient.invalidateQueries([host, 'protocols'])
       return response.data
     })
