@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import {
-  getLabwareDefinitionsFromCommands,
-  StyledText,
-} from '@opentrons/components'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -13,6 +10,7 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -281,7 +279,6 @@ export function VisualizerContainer(
           showDeckRenders={showDeckRenders}
         />
       </div>
-
       {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
         {/* Right column resizer */}
@@ -291,7 +288,7 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StyledText>Labware Info</StyledText>
+        <StepDetailContainer protocolKey={protocolKey} />
       </div>
     </div>
   )

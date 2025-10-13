@@ -27,15 +27,16 @@ import type {
   TransferArgs,
 } from '@opentrons/step-generation'
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
-  hydratedFormData: HydratedMoveLiquidFormData,
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>,
   checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
   volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
 ): number | null {
-  const checkbox = hydratedFormData[checkboxField]
-  const volume = hydratedFormData[volumeField]
+  const checkbox = castFormData[checkboxField]
+  const volume = castFormData[volumeField]
 
   if (checkbox && typeof volume === 'number' && volume > 0) {
     return volume
@@ -44,14 +45,14 @@ export function getAirGapData(
   return null
 }
 export function getMixData(
-  hydratedFormData: any,
-  checkboxField: any,
-  volumeField: any,
-  timesField: any
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>,
+  checkboxField: 'aspirate_mix_checkbox' | 'dispense_mix_checkbox',
+  volumeField: 'aspirate_mix_volume' | 'dispense_mix_volume',
+  timesField: 'aspirate_mix_times' | 'dispense_mix_times'
 ): InnerMixArgs | null | undefined {
-  const checkbox = hydratedFormData[checkboxField]
-  const volume = hydratedFormData[volumeField]
-  const times = hydratedFormData[timesField]
+  const checkbox = castFormData[checkboxField]
+  const volume = castFormData[volumeField]
+  const times = castFormData[timesField]
 
   if (
     checkbox &&
@@ -70,11 +71,11 @@ export function getMixData(
 }
 
 const getCheckedPath = (
-  hydratedFormData: HydratedMoveLiquidFormData,
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>,
   contextualState: InvariantContext,
   path: PathOption
 ): PathOption => {
-  const { pipette, tipRack, volume } = hydratedFormData
+  const { pipette, tipRack, volume } = castFormData
   const { spec: pipetteSpecs } = pipette
   const tiprackEntity = Object.values(contextualState.labwareEntities).find(
     lw => lw.labwareDefURI === tipRack
@@ -87,10 +88,10 @@ const getCheckedPath = (
   const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
-    hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
-    hydratedFormData.liquidClass == null
+    castFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
+    castFormData.liquidClass == null
       ? WATER_LIQUID_CLASS_NAME
-      : hydratedFormData.liquidClass ?? null
+      : castFormData.liquidClass ?? null
   ]?.byPipette
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
@@ -117,8 +118,8 @@ const getCheckedPath = (
           tiprackDefinition: tiprackDef,
           volume,
           path,
-          numAspirateWells: hydratedFormData.aspirate_wells.length,
-          numDispenseWells: hydratedFormData.dispense_wells.length,
+          numAspirateWells: castFormData.aspirate_wells.length,
+          numDispenseWells: castFormData.dispense_wells.length,
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,
           conditioningByVolume: null,
@@ -129,8 +130,8 @@ const getCheckedPath = (
           tiprackDefinition: tiprackDef,
           volume,
           path,
-          numAspirateWells: hydratedFormData.aspirate_wells.length,
-          numDispenseWells: hydratedFormData.dispense_wells.length,
+          numAspirateWells: castFormData.aspirate_wells.length,
+          numDispenseWells: castFormData.dispense_wells.length,
           aspirateAirGapByVolume: liquidClassValuesForTip.aspirate.retract
             .airGapByVolume as Array<[number, number]>,
           conditioningByVolume:
@@ -152,14 +153,14 @@ const getCheckedPath = (
 }
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 export const moveLiquidFormToArgs = (
-  hydratedFormData: HydratedMoveLiquidFormData,
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>,
   contextualState: InvariantContext
 ): MoveLiquidStepArgs => {
   console.assert(
-    hydratedFormData.stepType === 'moveLiquid',
-    `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
+    castFormData.stepType === 'moveLiquid',
+    `moveLiquidFormToArgs called with stepType ${castFormData.stepType}, expected "moveLiquid"`
   )
-  const pipetteId = hydratedFormData.pipette.id
+  const pipetteId = castFormData.pipette.id
   const {
     volume,
     aspirate_labware: sourceLabware,
@@ -176,12 +177,12 @@ export const moveLiquidFormToArgs = (
     dispense_y_position,
     pushOut_checkbox,
     pushOut_volume,
-  } = hydratedFormData
+  } = castFormData
   let sourceWells = getOrderedWells(
-    hydratedFormData.aspirate_wells,
+    castFormData.aspirate_wells,
     sourceLabware.def,
-    hydratedFormData.aspirate_wellOrder_first,
-    hydratedFormData.aspirate_wellOrder_second
+    castFormData.aspirate_wellOrder_first,
+    castFormData.aspirate_wellOrder_second
   )
 
   const isDispensingIntoDisposalLocation =
@@ -200,8 +201,8 @@ export const moveLiquidFormToArgs = (
       ? getOrderedWells(
           dispWells,
           def,
-          hydratedFormData.dispense_wellOrder_first,
-          hydratedFormData.dispense_wellOrder_second
+          castFormData.dispense_wellOrder_first,
+          castFormData.dispense_wellOrder_second
         )
       : null
 
@@ -217,96 +218,92 @@ export const moveLiquidFormToArgs = (
     }
   }
 
-  const disposalVolume = hydratedFormData.disposalVolume_checkbox
-    ? hydratedFormData.disposalVolume_volume
+  const disposalVolume = castFormData.disposalVolume_checkbox
+    ? castFormData.disposalVolume_volume
     : null
-  const touchTipAfterAspirate = Boolean(
-    hydratedFormData.aspirate_touchTip_checkbox
-  )
+  const touchTipAfterAspirate = Boolean(castFormData.aspirate_touchTip_checkbox)
   const touchTipAfterAspirateOffsetMmFromTop =
-    hydratedFormData.aspirate_touchTip_mmFromTop ??
+    castFormData.aspirate_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterAspirateSpeed =
-    hydratedFormData.aspirate_touchTip_speed ?? null
+    castFormData.aspirate_touchTip_speed ?? null
   const touchTipAfterAspirateMmFromEdge =
-    hydratedFormData.aspirate_touchTip_mmFromEdge ?? null
-  const touchTipAfterDispense = Boolean(
-    hydratedFormData.dispense_touchTip_checkbox
-  )
+    castFormData.aspirate_touchTip_mmFromEdge ?? null
+  const touchTipAfterDispense = Boolean(castFormData.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromTop =
-    hydratedFormData.dispense_touchTip_mmFromTop ??
+    castFormData.dispense_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const touchTipAfterDispenseSpeed =
-    hydratedFormData.dispense_touchTip_speed ?? null
+    castFormData.dispense_touchTip_speed ?? null
   const touchTipAfterDispenseMmFromEdge =
-    hydratedFormData.dispense_touchTip_mmFromEdge ?? null
+    castFormData.dispense_touchTip_mmFromEdge ?? null
 
   const mixBeforeAspirate = getMixData(
-    hydratedFormData,
+    castFormData,
     'aspirate_mix_checkbox',
     'aspirate_mix_volume',
     'aspirate_mix_times'
   )
   const mixInDestination = getMixData(
-    hydratedFormData,
+    castFormData,
     'dispense_mix_checkbox',
     'dispense_mix_volume',
     'dispense_mix_times'
   )
   const aspirateDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'aspirate_delay_seconds',
     checkboxField: 'aspirate_delay_checkbox',
   })
   const dispenseDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'dispense_delay_seconds',
     checkboxField: 'dispense_delay_checkbox',
   })
   const aspirateSubmergeDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'aspirate_submerge_delay_seconds',
   })
   const dispenseSubmergeDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'dispense_submerge_delay_seconds',
   })
   const aspirateRetractDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'aspirate_retract_delay_seconds',
   })
   const dispenseRetractDelay = getMoveLiquidDelayData({
-    hydratedFormData,
+    castFormData: castFormData,
     secondsField: 'dispense_retract_delay_seconds',
   })
   const blowoutLocation =
-    (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||
-    (hydratedFormData.disposalVolume_checkbox &&
+    (castFormData.blowout_checkbox && castFormData.blowout_location) ||
+    (castFormData.disposalVolume_checkbox &&
       path === 'multiDispense' &&
-      hydratedFormData.disposalVolume_volume &&
-      hydratedFormData.blowout_location) ||
+      castFormData.disposalVolume_volume &&
+      castFormData.blowout_location) ||
     null
 
   const aspirateAirGapVolume = getAirGapData(
-    hydratedFormData,
+    castFormData,
     'aspirate_airGap_checkbox',
     'aspirate_airGap_volume'
   )
   const dispenseAirGapVolume = getAirGapData(
-    hydratedFormData,
+    castFormData,
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    hydratedFormData.pipette,
-    hydratedFormData.volume,
+    castFormData.pipette,
+    castFormData.volume,
     tipRack
   )
   const conditioningVolume =
-    hydratedFormData.conditioning_checkbox === true &&
-    hydratedFormData.conditioning_volume != null &&
-    hydratedFormData.conditioning_volume > 0
-      ? hydratedFormData.conditioning_volume
+    castFormData.conditioning_checkbox === true &&
+    castFormData.conditioning_volume != null &&
+    castFormData.conditioning_volume > 0
+      ? castFormData.conditioning_volume
       : 0
 
   const commonFields = {
@@ -314,22 +311,22 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack: tipRack,
+    tipRack,
     aspirateFlowRateUlSec:
-      hydratedFormData.aspirate_flowRate ||
+      castFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      hydratedFormData.dispense_flowRate ||
+      castFormData.dispense_flowRate ||
       matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
-      hydratedFormData.aspirate_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
+      castFormData.aspirate_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispenseOffsetFromBottomMm:
-      hydratedFormData.dispense_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
+      castFormData.dispense_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     blowoutFlowRateUlSec:
-      hydratedFormData.blowout_flowRate ||
+      castFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
-    changeTip: hydratedFormData.changeTip,
-    preWetTip: Boolean(hydratedFormData.preWetTip),
+    changeTip: castFormData.changeTip,
+    preWetTip: Boolean(castFormData.preWetTip),
     aspirateDelay,
     dispenseDelay,
     aspirateSubmergeDelay,
@@ -346,52 +343,50 @@ export const moveLiquidFormToArgs = (
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
     touchTipAfterDispenseMmFromEdge,
-    description: hydratedFormData.stepDetails,
-    name: hydratedFormData.stepName,
+    description: castFormData.stepDetails,
+    name: castFormData.stepName,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation,
     nozzles,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,
     aspirateZOffset:
-      hydratedFormData.aspirate_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
-    aspiratePositionReference: hydratedFormData.aspirate_position_reference,
+      castFormData.aspirate_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
+    aspiratePositionReference: castFormData.aspirate_position_reference,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
     dispenseZOffset:
-      hydratedFormData.dispense_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
-    dispensePositionReference: hydratedFormData.dispense_position_reference,
-    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed ?? null,
-    aspirateSubmergeXOffset: hydratedFormData.aspirate_submerge_x_position ?? 0,
-    aspirateSubmergeYOffset: hydratedFormData.aspirate_submerge_y_position ?? 0,
-    aspirateSubmergeZOffset:
-      hydratedFormData.aspirate_submerge_mmFromBottom ?? 0,
+      castFormData.dispense_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
+    dispensePositionReference: castFormData.dispense_position_reference,
+    aspirateSubmergeSpeed: castFormData.aspirate_submerge_speed ?? null,
+    aspirateSubmergeXOffset: castFormData.aspirate_submerge_x_position ?? 0,
+    aspirateSubmergeYOffset: castFormData.aspirate_submerge_y_position ?? 0,
+    aspirateSubmergeZOffset: castFormData.aspirate_submerge_mmFromBottom ?? 0,
     aspirateSubmergePositionReference:
-      hydratedFormData.aspirate_submerge_position_reference,
-    aspirateRetractSpeed: hydratedFormData.aspirate_retract_speed ?? null,
-    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position ?? 0,
-    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position ?? 0,
-    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom ?? 0,
+      castFormData.aspirate_submerge_position_reference,
+    aspirateRetractSpeed: castFormData.aspirate_retract_speed ?? null,
+    aspirateRetractXOffset: castFormData.aspirate_retract_x_position ?? 0,
+    aspirateRetractYOffset: castFormData.aspirate_retract_y_position ?? 0,
+    aspirateRetractZOffset: castFormData.aspirate_retract_mmFromBottom ?? 0,
     aspirateRetractPositionReference:
-      hydratedFormData.aspirate_retract_position_reference,
-    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed ?? null,
-    dispenseSubmergeXOffset: hydratedFormData.dispense_submerge_x_position ?? 0,
-    dispenseSubmergeYOffset: hydratedFormData.dispense_submerge_y_position ?? 0,
-    dispenseSubmergeZOffset:
-      hydratedFormData.dispense_submerge_mmFromBottom ?? 0,
+      castFormData.aspirate_retract_position_reference,
+    dispenseSubmergeSpeed: castFormData.dispense_submerge_speed ?? null,
+    dispenseSubmergeXOffset: castFormData.dispense_submerge_x_position ?? 0,
+    dispenseSubmergeYOffset: castFormData.dispense_submerge_y_position ?? 0,
+    dispenseSubmergeZOffset: castFormData.dispense_submerge_mmFromBottom ?? 0,
     dispenseSubmergePositionReference:
-      hydratedFormData.dispense_submerge_position_reference,
-    dispenseRetractSpeed: hydratedFormData.dispense_retract_speed ?? null,
-    dispenseRetractYOffset: hydratedFormData.dispense_retract_y_position ?? 0,
-    dispenseRetractZOffset: hydratedFormData.dispense_retract_mmFromBottom ?? 0,
+      castFormData.dispense_submerge_position_reference,
+    dispenseRetractSpeed: castFormData.dispense_retract_speed ?? null,
+    dispenseRetractYOffset: castFormData.dispense_retract_y_position ?? 0,
+    dispenseRetractZOffset: castFormData.dispense_retract_mmFromBottom ?? 0,
     dispenseRetractPositionReference:
-      hydratedFormData.dispense_retract_position_reference,
-    dispenseRetractXOffset: hydratedFormData.dispense_retract_x_position ?? 0,
+      castFormData.dispense_retract_position_reference,
+    dispenseRetractXOffset: castFormData.dispense_retract_x_position ?? 0,
     pushOut: pushOut_checkbox ? pushOut_volume : 0,
     liquidClass:
-      hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
+      castFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
         ? null
-        : hydratedFormData.liquidClass ?? null,
+        : castFormData.liquidClass ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -414,7 +409,7 @@ export const moveLiquidFormToArgs = (
     'cannot distribute when destWells is null'
   )
 
-  const checkedPath = getCheckedPath(hydratedFormData, contextualState, path)
+  const checkedPath = getCheckedPath(castFormData, contextualState, path)
 
   switch (checkedPath) {
     case 'single': {
