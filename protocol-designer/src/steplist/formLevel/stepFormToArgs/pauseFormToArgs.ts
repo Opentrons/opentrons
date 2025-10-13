@@ -16,7 +16,7 @@ export const pauseFormToArgs = (
   castFormData: GetCastFormData<HydratedPauseFormData>
 ): PauseArgs | WaitForTemperatureArgs | null => {
   const { hours, minutes, seconds } = getTimeFromForm(
-    'pauseTime' in castFormData ? castFormData.pauseTime ?? null : null
+    'pauseTime' in castFormData ? (castFormData.pauseTime ?? null) : null
   )
   const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
   // @ts-expect-error - todo(mm, 2025-10-09): Type error inherited from prior code.

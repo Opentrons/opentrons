@@ -79,7 +79,7 @@ export const mixFormToArgs = (
     matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
 
   const blowoutOffsetFromTopMm = blowoutLocation
-    ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+    ? (blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP)
     : 0
   // Delay settings
   const aspirateDelaySeconds = getMixDelayData(

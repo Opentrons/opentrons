@@ -37,7 +37,7 @@ export function RunTimer({
   const endTime =
     runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
       ? stoppedAt
-      : completedAt ?? now
+      : (completedAt ?? now)
 
   const runTime =
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP

@@ -88,7 +88,7 @@ describe('mix: change tip', () => {
       times,
       wells: ['A1', 'B1', 'C1'],
       changeTip,
-    } as MixArgs)
+    }) as MixArgs
   it('changeTip="always" with no advanced settings', () => {
     const args = makeArgs('always')
     const result = mix(args, invariantContext, robotStateWithTip)

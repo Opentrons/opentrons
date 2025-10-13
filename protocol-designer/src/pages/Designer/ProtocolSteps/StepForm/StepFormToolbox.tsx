@@ -147,9 +147,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const { makeSnackbar } = useKitchen()
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const [analyticsStartTime] = useState<Date>(new Date())
-  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(
-    false
-  )
+  const [showConfirmationModal, setShowConfirmationModal] =
+    useState<boolean>(false)
 
   const handleChangeFormInput = (name: string, value: unknown): void => {
     const maskedValue = maskField(name, value)
@@ -187,16 +186,15 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     Record<string, any>
   >({})
 
-  const fieldsChangedRequiringConfirmation = FIELDS_REQUIRING_CONFIRMATION.filter(
-    field => {
+  const fieldsChangedRequiringConfirmation =
+    FIELDS_REQUIRING_CONFIRMATION.filter(field => {
       // if field has been updated and confirmed in modal, check its most recent confirmed value
       const referenceObjectForField =
         field in confirmedFieldUpdates
           ? confirmedFieldUpdates
-          : savedStepForm ?? {}
+          : (savedStepForm ?? {})
       return formData[field] !== referenceObjectForField[field]
-    }
-  )
+    })
 
   const moduleId = formData.moduleId
   const enableReadOrInitialization = useAbsorbanceReaderCommandType(
@@ -207,10 +205,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
 
   // state used to determine if user has seen advanced settings page (relevant for presaved forms)
-  const [
-    hasSeenAdvancedSettings,
-    setHasSeenAdvancedSettings,
-  ] = useState<boolean>(false)
+  const [hasSeenAdvancedSettings, setHasSeenAdvancedSettings] =
+    useState<boolean>(false)
   useEffect(() => {
     if (toolboxStep === 2 && !hasSeenAdvancedSettings) {
       setHasSeenAdvancedSettings(true)
@@ -249,10 +245,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const [isRename, setIsRename] = useState<boolean>(false)
   const icon = stepIconsByType[formData.stepType]
 
-  const ToolsComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
-    STEP_FORM_MAP,
-    formData.stepType
-  )
+  const ToolsComponent: (typeof STEP_FORM_MAP)[keyof typeof STEP_FORM_MAP] =
+    get(STEP_FORM_MAP, formData.stepType)
 
   const isAspirateError = formLevelErrorsForUnsavedForm.some(
     error => error.tab === 'aspirate' && error.page === toolboxStep

@@ -97,9 +97,8 @@ export function useTipAttachmentStatus(
           pipetteInfoById,
           commandsData.data.data as RunCommandSummary[]
         )
-        const pipettesWithTipAndSpecs = filterPipettesWithTips(
-          pipettesWithTipsData
-        )
+        const pipettesWithTipAndSpecs =
+          filterPipettesWithTips(pipettesWithTipsData)
 
         setPipettesWithTip(pipettesWithTipAndSpecs)
 

@@ -16,7 +16,7 @@ export const getMoveLiquidDelayData = (args: {
 }): InnerDelayArgs | null => {
   const { castFormData: hydratedFormData, checkboxField, secondsField } = args
   const checkbox =
-    checkboxField != null ? hydratedFormData[checkboxField] ?? false : true
+    checkboxField != null ? (hydratedFormData[checkboxField] ?? false) : true
   const seconds = hydratedFormData[secondsField] ?? 0
 
   if (checkbox && seconds > 0) {

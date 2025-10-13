@@ -13,10 +13,8 @@ export interface UseInfoBannersResult {
 
 // Holds state & functionality for managing banners that require persistent state for this LPC session only.
 export function useInfoBanners(): UseInfoBannersResult {
-  const [
-    showDefaultOffsetInfoBanner,
-    setShowDefaultOffsetInfoBanner,
-  ] = useState(true)
+  const [showDefaultOffsetInfoBanner, setShowDefaultOffsetInfoBanner] =
+    useState(true)
 
   const toggleDefaultOffsetInfoBanner = (): void => {
     setShowDefaultOffsetInfoBanner(!showDefaultOffsetInfoBanner)

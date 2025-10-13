@@ -114,8 +114,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       ...inputProps
     } = props
     const hasError = props.error != null
-    const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
-    const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
+    const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
+    const placeHolder =
+      (props.isIndeterminate ?? false) ? '-' : props.placeholder
     const [targetProps, tooltipProps] = useHoverTooltip()
 
     const OUTER_CSS = css`
@@ -273,7 +274,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={props.disabled ?? false ? 0.5 : ''}
+        opacity={(props.disabled ?? false) ? 0.5 : ''}
       >
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (

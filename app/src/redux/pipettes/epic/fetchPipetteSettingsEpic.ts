@@ -12,15 +12,16 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { FetchPipetteSettingsAction, PipetteSettings } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchPipetteSettingsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchPipetteSettingsAction
+> = action => ({
   method: GET,
   path: Constants.PIPETTE_SETTINGS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchPipetteSettingsAction> = (
-  response,
-  originalAction
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  FetchPipetteSettingsAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 

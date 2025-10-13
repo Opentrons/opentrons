@@ -89,9 +89,8 @@ export function AddStepButton({
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const { modules } = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
-    false
-  )
+  const [showStepOverflowMenu, setShowStepOverflowMenu] =
+    useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowStepOverflowMenu(false)

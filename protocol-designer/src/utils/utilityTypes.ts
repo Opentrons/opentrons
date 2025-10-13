@@ -34,7 +34,7 @@ export type AllKeysOfUnion<UnionT> = UnionT extends any ? keyof UnionT : never
  */
 export type PickValuesFromUnion<
   UnionT,
-  KeyT extends string | number | symbol
+  KeyT extends string | number | symbol,
 > = UnionT extends {
   [Key in KeyT]?: unknown
 }

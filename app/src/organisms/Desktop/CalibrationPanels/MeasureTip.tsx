@@ -116,9 +116,8 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   let titleText =
     calBlock != null ? t('calibrate_tip_on_block') : t('calibrate_tip_on_trash')

@@ -61,10 +61,10 @@ describe('TimelineToolbox', () => {
   beforeEach(() => {
     props = { stepId: THERMOCYCLER_STEP_ID }
     vi.mocked(getSavedStepForms).mockReturnValue({
-      [THERMOCYCLER_STEP_ID]: ({
+      [THERMOCYCLER_STEP_ID]: {
         orderedProfileItems: MOCK_THERMOCYCLER_ORDERED_SUBSTEP_IDS,
         profileItemsById: MOCK_THERMOCYCLER_SUBSTEP_ITEMS,
-      } as unknown) as FormData,
+      } as unknown as FormData,
     })
   })
   it('renders all profile steps, including cycles and steps', () => {

@@ -58,10 +58,8 @@ export function DeckSetupToolbox(
 ): JSX.Element | null {
   const { onCloseClick, position = POSITION_FIXED } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
-  const [
-    showDeleteEntityInUseModal,
-    setShowDeleteEntityInUseModal,
-  ] = useState<boolean>(false)
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
+    useState<boolean>(false)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -74,9 +72,8 @@ export function DeckSetupToolbox(
     selectedLidLabware,
   } = selectedSlotInfo
   const { slot } = selectedSlot
-  const [showSelectLabwareModal, setShowSelectLabwareModal] = useState<boolean>(
-    false
-  )
+  const [showSelectLabwareModal, setShowSelectLabwareModal] =
+    useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
 
   const {

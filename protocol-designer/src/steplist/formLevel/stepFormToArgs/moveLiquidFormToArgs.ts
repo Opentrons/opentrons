@@ -91,7 +91,7 @@ const getCheckedPath = (
     castFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
     castFormData.liquidClass == null
       ? WATER_LIQUID_CLASS_NAME
-      : castFormData.liquidClass ?? null
+      : (castFormData.liquidClass ?? null)
   ]?.byPipette
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
@@ -386,7 +386,7 @@ export const moveLiquidFormToArgs = (
     liquidClass:
       castFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
         ? null
-        : castFormData.liquidClass ?? null,
+        : (castFormData.liquidClass ?? null),
   }
   console.assert(
     sourceWellsUnordered.length > 0,

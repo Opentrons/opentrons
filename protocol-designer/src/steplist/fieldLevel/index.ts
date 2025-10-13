@@ -136,7 +136,8 @@ const getLabwareLocation = (
       state.stagingAreaEntities
     )
   ) {
-    let addressableAreaName: AddressableAreaName = newLocationString as AddressableAreaName
+    let addressableAreaName: AddressableAreaName =
+      newLocationString as AddressableAreaName
     if (isWasteChuteLocation) {
       addressableAreaName = 'gripperWasteChute'
     } else if (isTrashBinLocation) {
@@ -443,7 +444,7 @@ const stepFieldHelperMap = {
 
 export function castField<
   FieldNameT extends string | number | symbol,
-  UncastValueT
+  UncastValueT,
 >(name: FieldNameT, value: UncastValueT): GetCastFieldType<FieldNameT> {
   const fieldCaster =
     // @ts-expect-error - TS doesn't want to let us index stepFieldHelperMap with a
@@ -479,26 +480,24 @@ export const hydrateField = (
  * Returns the type that a field would have in `HydratedFormData`,
  * assuming that field is being accessed on a form type where it actually exists.
  */
-type GetHydratedFieldType<
-  FieldNameT extends string | number | symbol
-> = AmalgamateUnion<HydratedFormData> extends {
-  [Key in FieldNameT]: infer HydratedValueT
-}
-  ? HydratedValueT
-  : never // This should only happen if FieldNameT is an unrecognized field.
+type GetHydratedFieldType<FieldNameT extends string | number | symbol> =
+  AmalgamateUnion<HydratedFormData> extends {
+    [Key in FieldNameT]: infer HydratedValueT
+  }
+    ? HydratedValueT
+    : never // This should only happen if FieldNameT is an unrecognized field.
 
 /**
  * Returns the type that a field would have after being passed through `castField`.
  */
-export type GetCastFieldType<
-  FieldNameT extends string | number | symbol
-> = typeof stepFieldHelperMap extends {
-  [Key in FieldNameT]: {
-    castValue: (hydratedValue: any) => infer CastValueT
+export type GetCastFieldType<FieldNameT extends string | number | symbol> =
+  typeof stepFieldHelperMap extends {
+    [Key in FieldNameT]: {
+      castValue: (hydratedValue: any) => infer CastValueT
+    }
   }
-}
-  ? CastValueT
-  : GetHydratedFieldType<FieldNameT>
+    ? CastValueT
+    : GetHydratedFieldType<FieldNameT>
 
 /**
  * Returns what a given `HydratedFormData` type would be transformed to

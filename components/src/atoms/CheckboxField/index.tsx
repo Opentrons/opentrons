@@ -43,11 +43,11 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
     tabIndex = 0,
     isIndeterminate,
   } = props
-  const indeterminate = isIndeterminate ?? false ? 'true' : undefined
+  const indeterminate = (isIndeterminate ?? false) ? 'true' : undefined
 
   return (
     <label css={OUTER_STYLE(value ?? false)}>
-      {props.isIndeterminate ?? false ? (
+      {(props.isIndeterminate ?? false) ? (
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
@@ -63,8 +63,8 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         </Flex>
       ) : (
         <Icon
-          css={value ?? false ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
-          name={value ?? false ? 'ot-checkbox' : 'checkbox-blank-outline'}
+          css={(value ?? false) ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
+          name={(value ?? false) ? 'ot-checkbox' : 'checkbox-blank-outline'}
           width="1.25rem"
           data-testid="CheckboxField_icon"
         />

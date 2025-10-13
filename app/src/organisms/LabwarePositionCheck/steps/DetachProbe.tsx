@@ -27,11 +27,8 @@ import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
   const { proceedStep, goBackLastStep, commandUtils, runId } = props
   const { t } = useTranslation('labware_position_check')
-  const {
-    toggleRobotMoving,
-    handleMoveToInitialOffsetPosition,
-    home,
-  } = commandUtils
+  const { toggleRobotMoving, handleMoveToInitialOffsetPosition, home } =
+    commandUtils
 
   const currentSubstep = useSelector(selectCurrentSubstep(runId))
   const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette

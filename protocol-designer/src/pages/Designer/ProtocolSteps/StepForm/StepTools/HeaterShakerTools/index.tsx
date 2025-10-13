@@ -130,7 +130,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           toggleValue={propsForFields.latchOpen.value}
           tooltipContent={
             propsForFields.latchOpen.disabled
-              ? propsForFields.latchOpen.tooltipContent ?? null
+              ? (propsForFields.latchOpen.tooltipContent ?? null)
               : null
           }
         />

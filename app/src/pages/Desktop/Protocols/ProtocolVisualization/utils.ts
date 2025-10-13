@@ -341,7 +341,7 @@ export const getTipSvgInfo = (
     .filter(liquid => ingredIds.includes(liquid.id))
     ?.map(liquid => liquid.displayColor)
   const tipColor =
-    colorsInTip.length > 1 ? COLORS.grey40 : colorsInTip[0] ?? COLORS.grey40
+    colorsInTip.length > 1 ? COLORS.grey40 : (colorsInTip[0] ?? COLORS.grey40)
   const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
     (sum, { volume }) => sum + volume,
     0

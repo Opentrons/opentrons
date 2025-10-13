@@ -123,9 +123,9 @@ describe('SelectLocation', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
   })
 
   vi.restoreAllMocks()
@@ -186,9 +186,9 @@ describe('handleAddFixture', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
   })
 
   vi.restoreAllMocks()

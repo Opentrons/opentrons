@@ -79,26 +79,25 @@ function useCreateDropTipMaintenanceRun({
 }: UseCreateDropTipMaintenanceRunParams): void {
   const { chainRunCommands } = useChainMaintenanceCommands()
 
-  const {
-    createTargetedMaintenanceRun,
-  } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
-      // The type assertions here are safe, since we only use this command after asserting these
-      const loadPipetteCommand = buildLoadPipetteCommand(
-        instrumentModelName as string,
-        mount as PipetteData['mount']
-      )
+  const { createTargetedMaintenanceRun } =
+    useCreateTargetedMaintenanceRunMutation({
+      onSuccess: response => {
+        // The type assertions here are safe, since we only use this command after asserting these
+        const loadPipetteCommand = buildLoadPipetteCommand(
+          instrumentModelName as string,
+          mount as PipetteData['mount']
+        )
 
-      chainRunCommands(response.data.id, [loadPipetteCommand], false)
-        .then(() => {
-          setCreatedMaintenanceRunId(response.data.id)
-        })
-        .catch((error: Error) => error)
-    },
-    onError: (error: Error) => {
-      setErrorDetails({ message: error.message })
-    },
-  })
+        chainRunCommands(response.data.id, [loadPipetteCommand], false)
+          .then(() => {
+            setCreatedMaintenanceRunId(response.data.id)
+          })
+          .catch((error: Error) => error)
+      },
+      onError: (error: Error) => {
+        setErrorDetails({ message: error.message })
+      },
+    })
 
   useEffect(() => {
     if (

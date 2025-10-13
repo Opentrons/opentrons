@@ -177,21 +177,18 @@ function PrepareToRun({
     ''
 
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [
-    isPollingForCompletedAnalysis,
-    setIsPollingForCompletedAnalysis,
-  ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
+    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
-  const {
-    data: mostRecentAnalysis = null,
-  } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    {
-      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-      refetchInterval: ANALYSIS_POLL_MS,
-    }
-  )
+  const { data: mostRecentAnalysis = null } =
+    useProtocolAnalysisAsDocumentQuery(
+      protocolId,
+      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+      {
+        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+        refetchInterval: ANALYSIS_POLL_MS,
+      }
+    )
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -216,9 +213,8 @@ function PrepareToRun({
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
 
-  const { requiredProtocolHardware } = useRequiredProtocolHardwareFromAnalysis(
-    mostRecentAnalysis
-  )
+  const { requiredProtocolHardware } =
+    useRequiredProtocolHardwareFromAnalysis(mostRecentAnalysis)
 
   const requiredFixtures = requiredProtocolHardware.filter(
     (hardware): hardware is ProtocolFixture => {
@@ -257,9 +253,8 @@ function PrepareToRun({
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
 
-  const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(
-    false
-  )
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -293,10 +288,8 @@ function PrepareToRun({
 
   const locationConflictSlots = requiredDeckConfigCompatibility.map(
     fixtureCompatibility => {
-      const {
-        compatibleCutoutFixtureIds,
-        cutoutFixtureId,
-      } = fixtureCompatibility
+      const { compatibleCutoutFixtureIds, cutoutFixtureId } =
+        fixtureCompatibility
       const isCurrentFixtureCompatible =
         cutoutFixtureId != null &&
         compatibleCutoutFixtureIds.includes(cutoutFixtureId)
@@ -732,10 +725,8 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
-  const [
-    showAnalysisFailedModal,
-    setShowAnalysisFailedModal,
-  ] = useState<boolean>(true)
+  const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
+    useState<boolean>(true)
   const robotType = useRobotType(robotName)
   const attachedModules =
     useAttachedModules({
@@ -746,10 +737,8 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
   })
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [
-    isPollingForCompletedAnalysis,
-    setIsPollingForCompletedAnalysis,
-  ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
+    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
@@ -766,16 +755,15 @@ export function ProtocolSetup(): JSX.Element {
     setCameraSettingsConfirmed(!cameraSettingsConfirmed)
   }
 
-  const {
-    data: mostRecentAnalysis = null,
-  } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    {
-      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-      refetchInterval: ANALYSIS_POLL_MS,
-    }
-  )
+  const { data: mostRecentAnalysis = null } =
+    useProtocolAnalysisAsDocumentQuery(
+      protocolId,
+      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+      {
+        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+        refetchInterval: ANALYSIS_POLL_MS,
+      }
+    )
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {

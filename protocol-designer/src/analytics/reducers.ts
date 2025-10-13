@@ -40,6 +40,5 @@ const _allReducers = {
 export interface RootState {
   hasOptedIn: OptInState
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

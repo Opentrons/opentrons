@@ -80,16 +80,13 @@ export function ProtocolOverview(): JSX.Element {
     'modules',
   ])
   const navigate = useNavigate()
-  const [
-    showEditInstrumentsModal,
-    setShowEditInstrumentsModal,
-  ] = useState<boolean>(false)
+  const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
+    useState<boolean>(false)
   const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const enableCameraSupport = useSelector(getEnableCameraSupport)
-  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
-    false
-  )
+  const [showEditMetadataModal, setShowEditMetadataModal] =
+    useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -100,9 +97,8 @@ export function ProtocolOverview(): JSX.Element {
   const hasCommands = timeline.length > 0
 
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
-    false
-  )
+  const [showMaterialsListModal, setShowMaterialsListModal] =
+    useState<boolean>(false)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -123,24 +119,17 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(loadFileActions.saveProtocolFile())
+      },
+    })
 
   const pipettesOnDeck = Object.values(pipettes)
-  const {
-    protocolName,
-    description,
-    created,
-    lastModified,
-    author,
-  } = formValues
+  const { protocolName, description, created, lastModified, author } =
+    formValues
   const metaDataInfo = [
     { description },
     { author },

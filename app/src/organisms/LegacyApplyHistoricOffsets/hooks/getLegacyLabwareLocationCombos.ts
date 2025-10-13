@@ -54,14 +54,12 @@ export function getLegacyLabwareLocationCombos(
                 moduleId,
               })
         } else if ('labwareId' in command.params.location) {
-          const {
-            adapterOffsetLocation,
-            moduleIdUnderAdapter,
-          } = resolveAdapterLocation(
-            labware,
-            modules,
-            command.params.location.labwareId
-          )
+          const { adapterOffsetLocation, moduleIdUnderAdapter } =
+            resolveAdapterLocation(
+              labware,
+              modules,
+              command.params.location.labwareId
+            )
           return adapterOffsetLocation == null
             ? acc
             : appendLocationComboIfUniq(acc, {
@@ -112,14 +110,12 @@ export function getLegacyLabwareLocationCombos(
                 moduleId: command.params.newLocation.moduleId,
               })
         } else if ('labwareId' in command.params.newLocation) {
-          const {
-            adapterOffsetLocation,
-            moduleIdUnderAdapter,
-          } = resolveAdapterLocation(
-            labware,
-            modules,
-            command.params.newLocation.labwareId
-          )
+          const { adapterOffsetLocation, moduleIdUnderAdapter } =
+            resolveAdapterLocation(
+              labware,
+              modules,
+              command.params.newLocation.labwareId
+            )
           return adapterOffsetLocation == null
             ? acc
             : appendLocationComboIfUniq(acc, {
@@ -247,10 +243,8 @@ function resolveAdapterLocation(
     return { adapterOffsetLocation: null }
   } else if ('moduleId' in labwareEntity.location) {
     const moduleId = labwareEntity.location.moduleId
-    const resolvedModuleLocation: LegacyLabwareOffsetLocation | null = resolveModuleLocation(
-      modules,
-      moduleId
-    )
+    const resolvedModuleLocation: LegacyLabwareOffsetLocation | null =
+      resolveModuleLocation(modules, moduleId)
 
     moduleIdUnderAdapter = moduleId
     adapterOffsetLocation =

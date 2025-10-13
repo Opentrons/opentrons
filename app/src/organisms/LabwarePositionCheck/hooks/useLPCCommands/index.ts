@@ -102,9 +102,8 @@ export function useLPCCommands(
     ...props,
     chainLPCCommands,
   })
-  const handleValidMoveToMaintenancePosition = useHandleValidMoveToMaintenancePosition(
-    { ...props, chainLPCCommands }
-  )
+  const handleValidMoveToMaintenancePosition =
+    useHandleValidMoveToMaintenancePosition({ ...props, chainLPCCommands })
 
   return {
     errorMessage,

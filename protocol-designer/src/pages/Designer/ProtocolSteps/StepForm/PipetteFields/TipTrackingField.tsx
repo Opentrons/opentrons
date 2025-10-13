@@ -25,9 +25,8 @@ interface TipTrackingFieldProps {
 export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const { propsForFields } = props
   const { t } = useTranslation('form')
-  const [showTipSelectionModal, setShowTipSelectionModal] = useState<boolean>(
-    false
-  )
+  const [showTipSelectionModal, setShowTipSelectionModal] =
+    useState<boolean>(false)
   const tipTrackingOptions: Array<{
     title: string
     description: string

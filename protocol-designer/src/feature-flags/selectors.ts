@@ -14,9 +14,8 @@ export const getFeatureFlagData: Selector<Flags> = createSelector(
     ...queryParamsFlags,
   })
 )
-export const getEnabledPrereleaseMode: Selector<
-  boolean | null | undefined
-> = createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
+export const getEnabledPrereleaseMode: Selector<boolean | null | undefined> =
+  createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
 export const getDisableModuleRestrictions: Selector<
   boolean | null | undefined
 > = createSelector(
@@ -55,10 +54,11 @@ export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
 )
-export const getEnableConcurrentModuleActions: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
-)
+export const getEnableConcurrentModuleActions: Selector<boolean> =
+  createSelector(
+    getFeatureFlagData,
+    flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
+  )
 export const getEnableJsonExport: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false

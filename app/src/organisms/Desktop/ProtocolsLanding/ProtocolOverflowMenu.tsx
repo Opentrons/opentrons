@@ -47,11 +47,8 @@ interface ProtocolOverflowMenuProps extends StyleProps {
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const {
-    storedProtocolData,
-    handleRunProtocol,
-    handleSendProtocolToFlex,
-  } = props
+  const { storedProtocolData, handleRunProtocol, handleSendProtocolToFlex } =
+    props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
@@ -72,7 +69,7 @@ export function ProtocolOverflowMenu(
   }, true)
 
   const robotType =
-    mostRecentAnalysis != null ? mostRecentAnalysis?.robotType ?? null : null
+    mostRecentAnalysis != null ? (mostRecentAnalysis?.robotType ?? null) : null
 
   const handleClickShowInFolder: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

@@ -63,10 +63,10 @@ const render = () => {
       hoverSlot={null}
       robotType={FLEX_ROBOT_TYPE}
       deckDef={
-        ({
+        {
           ...deckExample,
           locations: { addressableAreas: [{ id: 'cutoutD3' }] },
-        } as any) as OpentronsShared.DeckDefinition
+        } as any as OpentronsShared.DeckDefinition
       }
       setViewBox={vi.fn()}
       viewBox="mockViewBox"

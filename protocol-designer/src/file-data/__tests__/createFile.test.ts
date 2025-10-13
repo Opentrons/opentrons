@@ -323,9 +323,12 @@ describe('getLabwareDefinitionsInUse util', () => {
     }
     const allLabwareDefsByURI: LabwareDefByDefURI = {
       assignedTiprackOnDeckURI: assignedTiprackOnDeckDef as LabwareDefinition2,
-      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef as LabwareDefinition2,
-      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
-      nonTiprackLabwareNotOnDeckURI: nonTiprackLabwareNotOnDeckDef as LabwareDefinition2,
+      assignedTiprackNotOnDeckURI:
+        assignedTiprackNotOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareOnDeckURI:
+        nonTiprackLabwareOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareNotOnDeckURI:
+        nonTiprackLabwareNotOnDeckDef as LabwareDefinition2,
     }
     const pipetteEntities: PipetteEntities = {
       somePipetteId: {

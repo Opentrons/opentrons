@@ -52,9 +52,8 @@ export function getNextAvailableDeckSlot(
     const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
       .filter(ae => ae.name === 'stagingArea')
       .map(ae => ae.location as CutoutId)
-    const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
-      cutoutIds
-    )
+    const stagingAreaAddressableAreaNames =
+      getStagingAreaAddressableAreas(cutoutIds)
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot.id
     )

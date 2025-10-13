@@ -29,11 +29,11 @@ export function forAspirate(
   const labwareId =
     'labwareId' in params
       ? params.labwareId
-      : robotState.pipettes[pipetteId].entityId ?? ''
+      : (robotState.pipettes[pipetteId].entityId ?? '')
   const wellName =
     'wellName' in params
       ? params.wellName
-      : robotState.pipettes[pipetteId].wellName ?? ''
+      : (robotState.pipettes[pipetteId].wellName ?? '')
   const { liquidState } = robotState
   const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -121,8 +121,10 @@ export function forAspirate(
         : volume
 
       // all tips get the same amount of the same liquid added to them, from the source well
-      const newLiquidFromWell = splitLiquid(volumePerTip, sourceLiquidState)
-        .dest
+      const newLiquidFromWell = splitLiquid(
+        volumePerTip,
+        sourceLiquidState
+      ).dest
 
       range(channels).forEach(tipIndex => {
         const pipette = liquidState.pipettes[pipetteId]

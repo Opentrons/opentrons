@@ -44,11 +44,11 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({
+    _store = new Store({
       defaults: DEFAULTS_V12,
       cwd: setUserDataPath(),
-    }) as unknown) as Store<Config>
-    _store.store = migrate((_store.store as unknown) as ConfigV12)
+    }) as unknown as Store<Config>
+    _store.store = migrate(_store.store as unknown as ConfigV12)
   }
   return _store
 }

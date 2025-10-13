@@ -23,11 +23,8 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
   const { ROBOT_PICKING_UP_TIPS } = RECOVERY_MAP
   const { pickUpTips } = recoveryCommands
   const { isPartialTipConfigValid, failedPipetteInfo } = failedPipetteUtils
-  const {
-    goBackPrevStep,
-    handleMotionRouting,
-    proceedNextStep,
-  } = routeUpdateActions
+  const { goBackPrevStep, handleMotionRouting, proceedNextStep } =
+    routeUpdateActions
   const { t } = useTranslation('error_recovery')
   const [showTipSelectModal, setShowTipSelectModal] = useState(false)
 

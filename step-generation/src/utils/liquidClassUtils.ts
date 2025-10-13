@@ -204,11 +204,11 @@ export const getCustomLiquidClassProperties = (
                 : false,
             repetitions:
               'mixInDestination' in args
-                ? args.mixInDestination?.times ?? undefined
+                ? (args.mixInDestination?.times ?? undefined)
                 : undefined,
             volume:
               'mixInDestination' in args
-                ? args.mixInDestination?.volume ?? undefined
+                ? (args.mixInDestination?.volume ?? undefined)
                 : undefined,
           },
         },
@@ -238,10 +238,8 @@ export const getCustomLiquidClassProperties = (
     },
   }
 
-  const stringifiedCustomLiquidClassProperties: Record<
-    string,
-    any
-  > = JSON.parse(JSON.stringify(customLiquidClassProperties))
+  const stringifiedCustomLiquidClassProperties: Record<string, any> =
+    JSON.parse(JSON.stringify(customLiquidClassProperties))
   return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 

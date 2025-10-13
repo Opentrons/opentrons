@@ -178,8 +178,8 @@ const protocolSectionTabOptionsWithoutParameters = [
 ] as const
 
 type TabOption =
-  | typeof protocolSectionTabOptions[number]
-  | typeof protocolSectionTabOptionsWithoutParameters[number]
+  | (typeof protocolSectionTabOptions)[number]
+  | (typeof protocolSectionTabOptionsWithoutParameters)[number]
 
 interface ProtocolSectionTabsProps {
   currentOption: TabOption
@@ -309,10 +309,8 @@ export function ProtocolDetails(): JSX.Element | null {
   const { protocolId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const {
-    missingProtocolHardware,
-    conflictedSlots,
-  } = useMissingProtocolHardware(protocolId)
+  const { missingProtocolHardware, conflictedSlots } =
+    useMissingProtocolHardware(protocolId)
   let chipText = useHardwareStatusText(missingProtocolHardware, conflictedSlots)
 
   const runTimeParameters = useRunTimeParameters(protocolId)
@@ -327,12 +325,10 @@ export function ProtocolDetails(): JSX.Element | null {
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
-  const {
-    data: protocolRecord,
-    isLoading: isProtocolFetching,
-  } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
+  const { data: protocolRecord, isLoading: isProtocolFetching } =
+    useProtocolQuery(protocolId, {
+      staleTime: Infinity,
+    })
 
   // Watch for scrolling to toggle dropshadow
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -340,9 +336,7 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolRecord != null }
@@ -387,10 +381,8 @@ export function ProtocolDetails(): JSX.Element | null {
       ? setShowParameters(true)
       : createRun({ protocolId })
   }
-  const [
-    showConfirmDeleteProtocol,
-    setShowConfirmationDeleteProtocol,
-  ] = useState<boolean>(false)
+  const [showConfirmDeleteProtocol, setShowConfirmationDeleteProtocol] =
+    useState<boolean>(false)
 
   const handleDeleteClick = (): void => {
     setShowConfirmationDeleteProtocol(false)
@@ -420,8 +412,8 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const displayName =
     !isProtocolFetching && protocolRecord != null
-      ? protocolRecord?.data.metadata.protocolName ??
-        protocolRecord?.data.files[0].name
+      ? (protocolRecord?.data.metadata.protocolName ??
+        protocolRecord?.data.files[0].name)
       : null
 
   const deleteModalHeader: OddModalHeaderBaseProps = {

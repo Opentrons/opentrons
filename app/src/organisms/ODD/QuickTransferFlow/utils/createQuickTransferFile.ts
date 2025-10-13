@@ -42,11 +42,8 @@ export function createQuickTransferFile(
   protocolName?: string,
   enableQuickTransferProtocolContentsLog?: boolean
 ): File {
-  const {
-    stepArgs,
-    invariantContext,
-    initialRobotState,
-  } = generateQuickTransferArgs(quickTransferState, deckConfig)
+  const { stepArgs, invariantContext, initialRobotState } =
+    generateQuickTransferArgs(quickTransferState, deckConfig)
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
   const { name, id, spec } = pipetteEntity
 
@@ -111,9 +108,8 @@ export function createQuickTransferFile(
     })
     return acc
   }, [])
-  const {
-    loadName: currentTiprackLoadName,
-  } = quickTransferState.tipRack.parameters
+  const { loadName: currentTiprackLoadName } =
+    quickTransferState.tipRack.parameters
 
   const liquidClass =
     stepArgs?.liquidClass != null && stepArgs.liquidClass !== 'none'

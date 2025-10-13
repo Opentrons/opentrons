@@ -105,11 +105,8 @@ export function SelectLabwareModal(
   )
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedTopLabware,
-    selectedModuleModel,
-    selectedAdapterDefURI,
-  } = zoomedInSlotInfo
+  const { selectedTopLabware, selectedModuleModel, selectedAdapterDefURI } =
+    zoomedInSlotInfo
 
   const hasNoLabware =
     selectedTopLabware == null && selectedAdapterDefURI == null
@@ -119,10 +116,8 @@ export function SelectLabwareModal(
   const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
   const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
 
-  const [
-    areCategoriesExpanded,
-    setAreCategoriesExpanded,
-  ] = useState<CategoryExpand>(allCategoriesCollapsed)
+  const [areCategoriesExpanded, setAreCategoriesExpanded] =
+    useState<CategoryExpand>(allCategoriesCollapsed)
 
   const [searchTerm, setSearchTerm] = useState<string>('')
 
@@ -215,7 +210,7 @@ export function SelectLabwareModal(
       { [category: string]: LabwareDefinition2[] }
     >(
       defs,
-      (acc, def: typeof defs[keyof typeof defs]) => {
+      (acc, def: (typeof defs)[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
         //  filter out non-permitted tipracks
         if (
