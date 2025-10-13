@@ -31,6 +31,12 @@ describe('EditProtocolMetadataModal', () => {
       protocolName: 'mockName',
       author: 'mockAuthor',
       description: 'mockDescription',
+      created: 1676913200000,
+      lastModified: 1676913200000,
+      category: 'mockCategory',
+      subcategory: 'mockSubcategory',
+      tags: ['mockTag1', 'mockTag2'],
+      source: 'mockSource',
     })
   })
 
