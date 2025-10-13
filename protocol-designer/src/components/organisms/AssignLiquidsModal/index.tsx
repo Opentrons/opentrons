@@ -97,6 +97,9 @@ export function AssignLiquidsModal(
   }, [labwareId])
 
   const handleAssignToLabware = (newItem: string) => {
+    if (labwareId && allWellContents[newItem] == allWellContents[labwareId]) {
+      alert('You cannot assign to the same labware')
+    }
     setSelectedLabware(prevItems => [...prevItems, newItem])
   }
 
@@ -269,7 +272,7 @@ export function AssignLiquidsModalContainer(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
   console.log('allWellContents', allWellContents)
-
+  console.log('allWellContents[]:', allWellContents[labwareId])
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
