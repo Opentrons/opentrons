@@ -475,7 +475,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 y={slotPosition[1]}
                 width={labware.def.dimensions.xDimension}
                 height={labware.def.dimensions.yDimension}
-                showModuleIcon={true}
+                showModuleIcon
                 showBorder={false}
               />
             ) : null}
