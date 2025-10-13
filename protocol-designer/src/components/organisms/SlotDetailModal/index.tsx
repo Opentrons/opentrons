@@ -95,7 +95,6 @@ export const SlotDetailModal = (
         }, {})
       : {}
 
-  // Safety check: if stackOfLabware is empty or labware doesn't exist, don't render
   if (stackOfLabware.length === 0 || labwareOnDeck == null) {
     return null
   }
