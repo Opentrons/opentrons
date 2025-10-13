@@ -20,6 +20,7 @@ interface DeckLabelSetProps {
   height: number
   invert?: boolean
   showModuleIcon?: boolean
+  showBorder?: boolean
 }
 
 const DeckLabelSetComponent = (
@@ -34,6 +35,7 @@ const DeckLabelSetComponent = (
     height,
     invert = false,
     showModuleIcon = false,
+    showBorder = true,
   } = props
 
   return (
@@ -50,6 +52,7 @@ const DeckLabelSetComponent = (
           height={height}
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
+          showBorder={showBorder}
         />
         {showModuleIcon && (
           <IconWrapper leftPosition={width - 16}>
@@ -83,12 +86,17 @@ export const DeckLabelSet = forwardRef<HTMLDivElement, DeckLabelSetProps>(
 
 interface StyledBoxProps {
   isZoomed: boolean
+  showBorder: boolean
 }
 
 const StyledBox = styled(Box)<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
-  border: ${({ isZoomed }) =>
-    isZoomed ? `1.5px solid ${COLORS.blue50}` : `3px solid ${COLORS.blue50}`};
+  border: ${({ isZoomed, showBorder }) =>
+    !showBorder
+      ? 'none'
+      : isZoomed
+      ? `1.5px solid ${COLORS.blue50}`
+      : `3px solid ${COLORS.blue50}`};
 `
 
 const LabelContainer = styled.div`

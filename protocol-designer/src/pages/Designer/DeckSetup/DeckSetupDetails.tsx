@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
-import { Module } from '@opentrons/components'
+import { DeckLabelSet, Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getModuleDef,
@@ -447,6 +447,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return null
         }
         const slot = getSlotInLocationStack(labware.stack)
+        const labwareAmount = labware.stack.reduce(
+          (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
+          0
+        )
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
           ?.boundingBox
@@ -464,6 +468,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            {labwareAmount > 1 ? (
+              <DeckLabelSet
+                deckLabels={[]}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                width={labware.def.dimensions.xDimension}
+                height={labware.def.dimensions.yDimension}
+                showModuleIcon={true}
+                showBorder={false}
+              />
+            ) : null}
             <HighlightLabware
               labwareOnDeck={labware}
               position={slotPosition}
