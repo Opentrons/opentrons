@@ -8,7 +8,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
   PrimaryButton,
