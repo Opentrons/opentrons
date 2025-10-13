@@ -47,9 +47,7 @@ export function ActiveLabwareControls(
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
   const filteredStack = fullStack.filter(
-    item =>
-      activeDeckSetup.labware[item] != null &&
-      !getIsAdapterFromDef(activeDeckSetup.labware[item].def)
+    item => activeDeckSetup.labware[item] != null
   )
 
   if (
