@@ -269,7 +269,7 @@ const getLabwareInfo = (
   const name = nicknamesById[labwareId]
   let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = t('labware_in_slot', { name, slot: latestSlot })
+    nickName = name
   } else if (latestSlot != null && latestSlot === 'offDeck') {
     nickName = t('labware_offdeck', { name })
   }

@@ -41,8 +41,8 @@
     "moveLabware": "move",
     "moveLiquid": "transfer",
     "pause": "pause",
-    "profile_settings": "profile settings",
     "profile_steps": "profile steps",
+    "profile": "Program a Thermocycler profile",
     "temperature": "temperature",
     "thermocycler": "thermocycler"
   },

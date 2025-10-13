@@ -113,6 +113,7 @@ export function Designer(): JSX.Element {
           showLiquidOverflowMenu={showLiquidOverflowMenu}
           targetWidth={targetWidth}
           setTargetWidth={setTargetWidth}
+          showDefineLiquidModal={showDefineLiquidModal}
         />
       </Flex>
     </>

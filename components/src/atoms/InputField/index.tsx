@@ -136,7 +136,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       border-radius: ${borderRadius != null
         ? borderRadius
         : BORDERS.borderRadius4};
-      padding: ${padding != null ? padding : SPACING.spacing8};
+      padding: ${padding ?? SPACING.spacing8};
       border: ${hasBackgroundError
         ? 'none'
         : `1px ${BORDERS.styleSolid}

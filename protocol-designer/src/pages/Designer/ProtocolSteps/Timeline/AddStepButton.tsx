@@ -110,9 +110,7 @@ export function AddStepButton({
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
-    const isLidOnSlot = Object.values(labwareEntities).some(({ def }) =>
-      getIsLid(def)
-    )
+    const isLidOnSlot = labwareDef != null ? getIsLid(labwareDef) : false
     return (
       labwareDef != null &&
       slot !== OFFDECK &&

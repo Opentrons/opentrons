@@ -11,7 +11,8 @@ interface MoveLabwareFieldProps extends FieldProps {
   useGripper: boolean
 }
 export function MoveLabwareField(props: MoveLabwareFieldProps): JSX.Element {
-  const options = useLabwareDropdownOptions('moveLabware', props.useGripper)
+  const { useGripper } = props
+  const options = useLabwareDropdownOptions('moveLabware', useGripper)
   const dispatch = useDispatch()
   const { t } = useTranslation(['protocol_steps', 'application'])
   return (

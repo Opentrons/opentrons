@@ -7,6 +7,7 @@ import {
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
+  SPACING,
 } from '@opentrons/components'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
@@ -112,6 +113,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
             <ListButton
               key={`ListButton_${category}`}
               type="noActive"
+              padding={SPACING.spacing12}
               onClick={() => {
                 handleCategoryClick(category)
               }}
