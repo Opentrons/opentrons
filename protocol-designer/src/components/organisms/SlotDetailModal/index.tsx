@@ -107,6 +107,7 @@ export const SlotDetailModal = (
 
   return createPortal(
     <Modal
+      zIndexOverlay={1001}
       title={modalTitle}
       hasHeader
       onClose={closeModal}
