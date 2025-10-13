@@ -91,12 +91,13 @@ interface StyledBoxProps {
 
 const StyledBox = styled(Box)<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
-  border: ${({ isZoomed, showBorder }) =>
-    !showBorder
-      ? 'none'
-      : isZoomed
-      ? `1.5px solid ${COLORS.blue50}`
-      : `3px solid ${COLORS.blue50}`};
+  border: ${({ isZoomed, showBorder }) => {
+    if (!showBorder) {
+      return 'none'
+    }
+    const width = isZoomed ? '1.5px' : '3px'
+    return `${width} solid ${COLORS.blue50}`
+  }};
 `
 
 const LabelContainer = styled.div`
