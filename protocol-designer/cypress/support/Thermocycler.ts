@@ -55,7 +55,7 @@ enum ThermoLocators {
   ThermocyclerStepContainer = '[data-testid^="thermocyclerStep"]',
   CycleStep = '[data-testid^="cycleStep"]',
   DeleteCycleStepX = 'path[aria-roledescription="close"]',
-  AddStepInput = '[class^="InputField"]',
+  AddStepInput = 'input',
   ModalContainer = '[aria-label="ModalShell_ModalArea"]',
 }
 
