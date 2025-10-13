@@ -69,7 +69,16 @@ export function VisualizerContainer(
     rightWidthRef.current = rightWidth
   }, [rightWidth])
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   const selectedCommandIndex = commands.findIndex(
+    command => command.id === selectedCommandId
+  )
+  const selectedCommandIndexFiltered = filteredCommands.findIndex(
     command => command.id === selectedCommandId
   )
 
@@ -119,10 +128,9 @@ export function VisualizerContainer(
     srcFileNames,
     analysis
   )
-  const commandLength = analysis.commands.length
   const percentComplete =
-    selectedCommandIndex != null
-      ? (selectedCommandIndex / commandLength) * 100
+    selectedCommandIndexFiltered != null
+      ? (selectedCommandIndexFiltered / filteredCommands.length) * 100
       : 0
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
@@ -256,12 +264,12 @@ export function VisualizerContainer(
         <Controls
           protocolName={protocolDisplayName}
           numErrors={analysis.errors.length}
-          numCommandLength={commands.length}
-          currentCommandIndex={selectedCommandIndex}
+          numCommandLength={filteredCommands.length}
+          currentCommandIndex={selectedCommandIndexFiltered}
           setSelectedCommand={setSelectedCommand}
           handlePlayPause={handlePlayPause}
           isPlaying={isPlaying}
-          commands={commands}
+          commands={filteredCommands}
           groupedCommands={groupedCommands}
           setShowDeckRenders={setShowDeckRenders}
           showDeckRenders={showDeckRenders}
