@@ -7,7 +7,6 @@ import { useHost } from '../api'
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
   CreateLabwareOffsetData,
-  HostConfig,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
 

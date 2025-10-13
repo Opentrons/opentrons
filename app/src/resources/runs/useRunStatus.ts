@@ -8,7 +8,7 @@ import { DEFAULT_STATUS_REFETCH_INTERVAL } from './constants'
 import { useNotifyRunQuery } from './useNotifyRunQuery'
 
 import type { UseQueryOptions } from 'react-query'
-import type { Run, RunAction, RunStatus } from '@opentrons/api-client'
+import type { Run, RunStatus } from '@opentrons/api-client'
 
 /**
  * @deprecated TODO(jh, 05-05-24): Confirming MM's observation, this hook is no longer necessary
@@ -25,7 +25,7 @@ export function useRunStatus(
 
   const runStatus = data?.data?.status!
 
-  const actions = data?.data?.actions![]
+  const actions = data?.data?.actions!
   const firstPlay = actions?.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )

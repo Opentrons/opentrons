@@ -13,13 +13,7 @@ import {
 } from '../constants'
 
 import type { DiscoveryClientRobot } from '../types'
-import type {
-  Address,
-  HealthStatus,
-  HostState,
-  RobotState,
-  State,
-} from './types'
+import type { Address, HostState, RobotState, State } from './types'
 
 export const getRobotStates: (state: State) => RobotState[] = createSelector(
   state => state.robotsByName,

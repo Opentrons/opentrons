@@ -13,7 +13,6 @@ import type {
 import type {
   ClientDataResponse,
   DefaultClientData,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateClientDataMutationResult<T = DefaultClientData> =

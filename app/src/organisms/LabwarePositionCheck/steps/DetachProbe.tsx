@@ -21,7 +21,6 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {

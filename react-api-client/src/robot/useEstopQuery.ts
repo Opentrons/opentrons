@@ -5,7 +5,7 @@ import { getEstopStatus } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { EstopStatus, HostConfig } from '@opentrons/api-client'
+import type { EstopStatus } from '@opentrons/api-client'
 
 export type UseEstopQueryOptions<TError = Error> = UseQueryOptions<
   EstopStatus,

@@ -10,7 +10,6 @@ import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import type {
-  HostConfig,
   Mount,
   PipetteData,
   Run,

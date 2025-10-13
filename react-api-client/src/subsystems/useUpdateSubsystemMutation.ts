@@ -11,7 +11,6 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type {
-  HostConfig,
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'

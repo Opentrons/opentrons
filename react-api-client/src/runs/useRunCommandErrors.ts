@@ -5,11 +5,7 @@ import { getRunCommandErrors } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type {
-  GetCommandsParams,
-  HostConfig,
-  RunCommandErrors,
-} from '@opentrons/api-client'
+import type { GetCommandsParams, RunCommandErrors } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30
 

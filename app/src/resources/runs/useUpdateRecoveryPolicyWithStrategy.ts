@@ -5,7 +5,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import type {
-  HostConfig,
   RecoveryPolicyRulesParams,
   UpdateErrorRecoveryPolicyResponse,
 } from '@opentrons/api-client'

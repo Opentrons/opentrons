@@ -9,7 +9,6 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   CommandsData,
   GetRunCommandsParams,
-  HostConfig,
   RunCommandSummary,
 } from '@opentrons/api-client'
 

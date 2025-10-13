@@ -21,13 +21,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
-import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type {
-  LPCWizardState,
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)

@@ -79,7 +79,6 @@ import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { getModuleCardImage } from './utils'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
 import type {

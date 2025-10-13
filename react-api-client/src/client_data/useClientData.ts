@@ -9,7 +9,6 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   ClientDataResponse,
   DefaultClientData,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export function useClientData<T = DefaultClientData>(

@@ -5,7 +5,7 @@ import { getInstruments } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, Instruments } from '@opentrons/api-client'
+import type { Instruments } from '@opentrons/api-client'
 
 export function useInstrumentsQuery(
   options: UseQueryOptions<Instruments> = {}

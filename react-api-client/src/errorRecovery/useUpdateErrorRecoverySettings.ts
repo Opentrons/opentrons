@@ -13,7 +13,6 @@ import type {
 import type {
   ErrorRecoverySettingsRequest,
   ErrorRecoverySettingsResponse,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateErrorRecoverySettingsMutationResult = UseMutationResult<

@@ -21,16 +21,13 @@ import { OffsetTableHeaders } from './OffsetTableHeaders'
 
 import type { TFunction } from 'i18next'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { SelectedLwOverview } from '/app/redux/protocol-runs'
 
 export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps
 ): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
-  const { uri } = useSelector(
-    selectSelectedLwOverview(props.runId)
-  )!
+  const { uri } = useSelector(selectSelectedLwOverview(props.runId))!
   const sortedDetailsBySlot = useSelector(
     selectSortedLSOffsetDetailsWithCopy(
       props.runId,

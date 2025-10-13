@@ -5,10 +5,7 @@ import { getCsvFileRaw } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type {
-  DownloadedCsvFileResponse,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { DownloadedCsvFileResponse } from '@opentrons/api-client'
 
 export function useCsvFileRawQuery(
   fileId: string,

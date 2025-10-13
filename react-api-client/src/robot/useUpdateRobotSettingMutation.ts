@@ -10,11 +10,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  ErrorResponse,
-  HostConfig,
-  RobotSettings,
-} from '@opentrons/api-client'
+import type { ErrorResponse, RobotSettings } from '@opentrons/api-client'
 
 export interface UpdateRobotSettingVariables {
   id: string

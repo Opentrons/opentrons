@@ -25,7 +25,6 @@ import {
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.

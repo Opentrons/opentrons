@@ -5,11 +5,7 @@ import { createSession } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
-import type {
-  CreateSessionData,
-  HostConfig,
-  Session,
-} from '@opentrons/api-client'
+import type { CreateSessionData, Session } from '@opentrons/api-client'
 
 export type UseCreateSessionMutationResult = UseMutationResult<
   Session,

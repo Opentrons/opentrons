@@ -8,7 +8,6 @@ import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   CommandsData,
   GetRunCommandsParamsRequest,
-  HostConfig,
 } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30

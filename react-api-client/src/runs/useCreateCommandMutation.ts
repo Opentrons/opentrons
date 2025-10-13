@@ -5,11 +5,7 @@ import { createCommand } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
-import type {
-  CommandData,
-  CreateCommandParams,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface CreateCommandMutateParams extends CreateCommandParams {

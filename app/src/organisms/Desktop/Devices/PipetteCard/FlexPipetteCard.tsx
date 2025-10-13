@@ -26,12 +26,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { MouseEventHandler } from 'react'
-import type {
-  BadPipette,
-  HostConfig,
-  Mount,
-  PipetteData,
-} from '@opentrons/api-client'
+import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,

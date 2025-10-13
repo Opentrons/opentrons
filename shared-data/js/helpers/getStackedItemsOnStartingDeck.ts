@@ -25,12 +25,7 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '../../protocol'
-import type {
-  LabwareDefinition,
-  LoadedLabware,
-  LoadedModule,
-  ModuleModel,
-} from '../types'
+import type { LoadedLabware, LoadedModule, ModuleModel } from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {

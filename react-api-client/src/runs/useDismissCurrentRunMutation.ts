@@ -9,7 +9,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { EmptyResponse, HostConfig } from '@opentrons/api-client'
+import type { EmptyResponse } from '@opentrons/api-client'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
   EmptyResponse,

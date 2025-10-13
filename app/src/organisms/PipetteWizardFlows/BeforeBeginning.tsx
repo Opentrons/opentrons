@@ -43,11 +43,7 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type {
-  CreateCommand,
-  LoadedPipette,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {

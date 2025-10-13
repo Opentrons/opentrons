@@ -25,7 +25,6 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { FixitCommandTypeUtils } from '/app/organisms/DropTipWizardFlows'
-import type { PipetteWithTip } from '/app/resources/instruments'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.

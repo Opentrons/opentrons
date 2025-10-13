@@ -6,7 +6,6 @@ import { useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
-  HostConfig,
   LabwareOffset,
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,

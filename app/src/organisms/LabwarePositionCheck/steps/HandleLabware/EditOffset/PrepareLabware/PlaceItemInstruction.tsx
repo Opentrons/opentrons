@@ -28,8 +28,6 @@ import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
   LabwareStackupDetail,
-  LPCWizardState,
-  OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
@@ -46,11 +44,8 @@ export function PlaceItemInstruction(
   const isActivePipette96ch =
     useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  )!
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails!
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
   const isDefaultOffset = offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
 
   const buildHeader = (): string =>
