@@ -78,7 +78,7 @@ export function VisualizerContainer(
   const selectedCommandIndex = commands.findIndex(
     command => command.id === selectedCommandId
   )
-  const selectedCommandIndexFiltered = filteredCommands.findIndex(
+  const filteredSelectedCommandIndex = filteredCommands.findIndex(
     command => command.id === selectedCommandId
   )
 
@@ -129,8 +129,8 @@ export function VisualizerContainer(
     analysis
   )
   const percentComplete =
-    selectedCommandIndexFiltered != null
-      ? (selectedCommandIndexFiltered / filteredCommands.length) * 100
+    filteredSelectedCommandIndex != null
+      ? (filteredSelectedCommandIndex / filteredCommands.length) * 100
       : 0
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
@@ -265,7 +265,7 @@ export function VisualizerContainer(
           protocolName={protocolDisplayName}
           numErrors={analysis.errors.length}
           numCommandLength={filteredCommands.length}
-          currentCommandIndex={selectedCommandIndexFiltered}
+          currentCommandIndex={filteredSelectedCommandIndex}
           setSelectedCommand={setSelectedCommand}
           handlePlayPause={handlePlayPause}
           isPlaying={isPlaying}
