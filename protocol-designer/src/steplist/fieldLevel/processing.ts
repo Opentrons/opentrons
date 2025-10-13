@@ -1,5 +1,7 @@
 export type ValueMasker = (value: unknown) => unknown
-export type ValueCaster = (value: unknown) => unknown
+export type ValueCaster<HydratedValueT, CastValueT> = (
+  value: HydratedValueT
+) => CastValueT
 
 /*********************
  **  Value Casters   **
@@ -35,7 +37,7 @@ export const maskToFloat = (rawValue: unknown): string =>
     ? rawValue.replace(/[^-/.0-9]/g, '')
     : String(rawValue)
 export const trimDecimals =
-  (decimals: number = DEFAULT_DECIMAL_PLACES): ValueCaster =>
+  (decimals: number = DEFAULT_DECIMAL_PLACES): ValueCaster<unknown, string> =>
   (rawValue: unknown): string => {
     const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
     return String(rawValue).replace(trimRegex, (match, group1) => group1)

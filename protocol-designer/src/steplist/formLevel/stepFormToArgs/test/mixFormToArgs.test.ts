@@ -13,17 +13,18 @@ import { mixFormToArgs } from '../mixFormToArgs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMixFormData } from '/protocol-designer/form-types'
+import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
 vi.mock('../../../utils')
 
-let hydratedForm: HydratedMixFormData
+let castForm: GetCastFormData<HydratedMixFormData>
 const labwareDef = fixture_96_plate as LabwareDefinition2
 const labwareType = getLabwareDefURI(labwareDef)
 
 beforeEach(() => {
   vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
-  hydratedForm = {
+  castForm = {
     id: 'stepId',
     stepType: 'mix',
     stepName: 'Cool Mix Step',
@@ -65,8 +66,12 @@ beforeEach(() => {
     mix_touchTip_checkbox: false,
     mix_touchTip_mmFromTop: null,
     aspirate_delay_checkbox: false,
+    // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type hints, this should be a number.
+    // Clarify the expected input and change this to a number if it's safe.
     aspirate_delay_seconds: null,
     dispense_delay_checkbox: false,
+    // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type hints, this should be a number.
+    // Clarify the expected input and change this to a number if it's safe.
     dispense_delay_seconds: null,
   }
 })
@@ -77,7 +82,7 @@ afterEach(() => {
 
 describe('mix step form -> command creator args', () => {
   it('mixFormToArgs propagates form fields to MixStepArgs', () => {
-    const args = mixFormToArgs(hydratedForm)
+    const args = mixFormToArgs(castForm)
     expect(args).toMatchObject({
       commandCreatorFnName: 'mix',
       name: 'Cool Mix Step', // make sure name and description are present
@@ -107,11 +112,11 @@ describe('mix step form -> command creator args', () => {
   })
 
   it('mixFormToArgs calls getOrderedWells correctly', () => {
-    mixFormToArgs(hydratedForm)
+    mixFormToArgs(castForm)
 
     expect(getOrderedWells).toHaveBeenCalledTimes(1)
     expect(getOrderedWells).toHaveBeenCalledWith(
-      hydratedForm.wells,
+      castForm.wells,
       labwareDef,
       'l2r',
       't2b'
@@ -183,7 +188,7 @@ describe('mix step form -> command creator args', () => {
       it(`${checkboxField} toggles dependent fields`, () => {
         expect(
           mixFormToArgs({
-            ...hydratedForm,
+            ...castForm,
             [checkboxField]: false,
             ...formFields,
           })
@@ -191,7 +196,7 @@ describe('mix step form -> command creator args', () => {
 
         expect(
           mixFormToArgs({
-            ...hydratedForm,
+            ...castForm,
             [checkboxField]: true,
             ...formFields,
           })

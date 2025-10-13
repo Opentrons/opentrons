@@ -2,6 +2,13 @@
   "click_and_drag": "Click and drag to select tips in {{labwareName}}",
   "continue": "Continue",
   "go_back": "Go back",
+  "legend": {
+    "inaccessible_tip": "Inaccessible tip",
+    "new_tip": "New tip",
+    "no_tip": "No tip",
+    "selected_tip": "Selected tip",
+    "used_tip": "Used tip"
+  },
   "no_tiprack_selected": "Select a tiprack to continue",
   "select": "Select",
   "selected": "Selected",

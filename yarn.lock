@@ -3330,6 +3330,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
+"@fontsource-variable/reddit-mono@5.2.8":
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/reddit-mono/-/reddit-mono-5.2.8.tgz#68bbc591a1b93a40d5df59a5bddf4417dc452e73"
+  integrity sha512-+iWznfj13b+3FD3hAAsoh9YRDsfNsz3wXooAE3+9YA3ux3B/n7z9KF7rCPapi1k0O6e+kM7LepkhVC6f3/J08Q==
+
 "@fontsource/dejavu-sans@5.0.3":
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/@fontsource/dejavu-sans/-/dejavu-sans-5.0.3.tgz#32fad6738b228a2e6f490f1fa6983393997f9d4b"
@@ -3783,6 +3788,7 @@
   version "0.0.0-dev"
   dependencies:
     "@ebay/nice-modal-react" "1.2.13"
+    "@fontsource-variable/reddit-mono" "5.2.8"
     "@fontsource/dejavu-sans" "5.0.3"
     "@fontsource/public-sans" "5.0.3"
     "@opentrons/api-client" "link:api-client"

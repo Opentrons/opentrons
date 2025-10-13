@@ -82,7 +82,7 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
 )
-from robot_server.file_provider.provider import FileProviderWrapper
+from robot_server.file_provider.provider import FileProviderExecutor
 from opentrons.protocol_engine.state.module_substates import (
     FlexStackerSubState,
     FlexStackerId,
@@ -133,7 +133,7 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LegacyLabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider_wrapper: FileProviderExecutor,
     mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,

@@ -13,7 +13,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
-from robot_server.file_provider.provider import FileProviderWrapper
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.camera.provider import CameraProviderWrapper
 
 from opentrons.protocol_engine import ProtocolEngine
@@ -71,14 +71,14 @@ def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
 
 
 @pytest.fixture()
-def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderWrapper:
-    """Return a mock FileProviderWrapper."""
-    return decoy.mock(cls=FileProviderWrapper)
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
+    """Return a mock FileProviderExecutor."""
+    return decoy.mock(cls=FileProviderExecutor)
 
 
 @pytest.fixture()
 def mock_file_provider(
-    decoy: Decoy, mock_file_provider_wrapper: FileProviderWrapper
+    decoy: Decoy, mock_file_provider_wrapper: FileProviderExecutor
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
