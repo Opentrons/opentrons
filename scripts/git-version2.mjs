@@ -38,8 +38,7 @@ export function prefixesForProject(project) {
     if (project === 'robot-stack') {
         return ['v']
     } else if (project === 'protocol-designer') {
-        // Support both old and new tag patterns for protocol-designer
-        // Order matters: protocol-designer takes precedence over staging-protocol-designer
+        // Order matters: protocol-designer@ tags take precedence over staging-protocol-designer@ tags
         return [`${project}@`, `staging-${project}@`]
     } else {
         return [`${project}@`]
@@ -50,7 +49,6 @@ export async function getTagsPointingAtHead(project) {
     const prefixes = prefixesForProject(project)
     const allTags = []
 
-    // Get all tags pointing at HEAD for each prefix
     for (const prefix of prefixes) {
         try {
             const tags = (
@@ -58,17 +56,15 @@ export async function getTagsPointingAtHead(project) {
                     'tag',
                     '--points-at',
                     'HEAD',
-                    `--list`,
+                    '--list',
                     `${prefix}*`,
                 ])
             ).trim()
 
             if (tags) {
-                // Can return multiple tags, one per line
                 allTags.push(...tags.split('\n').filter(t => t.length > 0))
             }
         } catch (error) {
-            // Continue to next prefix if this one doesn't match any tags
             continue
         }
     }
@@ -88,19 +84,11 @@ export async function getCurrentBranchName() {
             console.log(`[git-version2] git rev-parse result: ${branch}`)
         }
 
-        // Don't return 'HEAD' if we're in detached HEAD state
         if (branch === 'HEAD') {
-            // Try to get branch from environment variables (common in CI)
-            // GitHub Actions: 
-            //   - GITHUB_HEAD_REF: branch name for PRs (e.g., "my-feature-branch")
-            //   - GITHUB_REF_NAME: simplified ref name (e.g., "edge", "my-branch", "v1.0.0")
-            //   - GITHUB_REF: full ref (e.g., "refs/heads/edge", "refs/tags/v1.0.0")
+            // Detached HEAD state - try CI environment variables
+            let ciBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
 
-            let ciBranch = process.env.GITHUB_HEAD_REF || // PR branch
-                process.env.GITHUB_REF_NAME // Branch or tag name
-
-            // If GITHUB_REF_NAME is a tag (from GITHUB_REF_TYPE), skip it
-            // We want branch names, not tag names here
+            // Skip if this is a tag ref, not a branch
             if (ciBranch === process.env.GITHUB_REF_NAME &&
                 process.env.GITHUB_REF_TYPE === 'tag') {
                 ciBranch = null
@@ -115,7 +103,6 @@ export async function getCurrentBranchName() {
 
         return branch
     } catch (error) {
-        // Try to get from environment as fallback
         const fallbackBranch = process.env.GITHUB_HEAD_REF ||
             process.env.GITHUB_REF_NAME ||
             process.env.CI_COMMIT_REF_NAME ||
@@ -131,8 +118,6 @@ export async function getCurrentBranchName() {
 }
 
 export function getTimestamp() {
-    // Return ISO 8601 timestamp in compact format: YYYYMMDD-HHMMSS
-    // e.g., "20251010-143022"
     const now = new Date()
     const year = now.getUTCFullYear()
     const month = String(now.getUTCMonth() + 1).padStart(2, '0')
@@ -144,9 +129,6 @@ export function getTimestamp() {
 }
 
 export function getBuildIdentifier() {
-    // In CI, include the GitHub run ID for traceability
-    // Format: timestamp-runId (e.g., "20251010-143022-1234567890")
-    // In local dev, just use timestamp
     const timestamp = getTimestamp()
     const runId = process.env.GITHUB_RUN_ID
 
@@ -158,7 +140,6 @@ export function getBuildIdentifier() {
 }
 
 export async function latestTagForProject(project) {
-    // Debug logging for CI environments
     const isCI = process.env.CI === 'true'
     if (isCI) {
         console.log(`[git-version2] Running in CI environment`)
@@ -168,20 +149,15 @@ export async function latestTagForProject(project) {
         console.log(`[git-version2] GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF}`)
     }
 
-    // First, try to get tags pointing at the current commit (HEAD)
     const tagsAtHead = await getTagsPointingAtHead(project)
 
     if (tagsAtHead.length > 0) {
-        // If we have multiple tags, prefer non-staging tags, then select highest semver
         const prefixes = prefixesForProject(project)
-
-        // Group tags by prefix
         const tagsByPrefix = {}
+
         for (const prefix of prefixes) {
-            // Match tags that start with prefix (without @ in the comparison)
             const prefixWithoutAt = prefix.replace(/@$/, '')
             const matchingTags = tagsAtHead.filter(tag => {
-                // Check if tag starts with the prefix pattern
                 return tag.startsWith(prefixWithoutAt + '@') || tag.startsWith(prefixWithoutAt) && !tag.includes('@')
             })
             if (matchingTags.length > 0) {
@@ -189,54 +165,42 @@ export async function latestTagForProject(project) {
             }
         }
 
-        // Check tags in order of preference (protocol-designer@ before staging-protocol-designer@)
+        // Iterate prefixes in priority order
         for (const prefix of prefixes) {
             const matchingTags = tagsByPrefix[prefix]
             if (matchingTags && matchingTags.length > 0) {
-                // If multiple tags with same prefix, select the one with highest semver
                 if (matchingTags.length === 1) {
                     return matchingTags[0]
                 }
 
-                // Parse versions and sort by semver
                 const taggedVersions = matchingTags.map(tag => {
-                    const [_, version] = detailsFromTag(tag)
+                    const [, version] = detailsFromTag(tag)
                     return {
                         tag,
                         version,
-                        // Try to parse as valid semver (supports prerelease tags)
-                        // If that fails, try coerce (more lenient)
                         parsed: semver.valid(version) ? version : semver.coerce(version)
                     }
                 })
 
-                // Sort by semver (highest first)
-                // Filter out any that couldn't be parsed, then sort valid ones
                 const validVersions = taggedVersions.filter(tv => tv.parsed !== null)
                 if (validVersions.length > 0) {
                     validVersions.sort((a, b) => semver.rcompare(a.parsed, b.parsed))
                     return validVersions[0].tag
                 }
 
-                // If no valid semver versions, just return first tag
                 return taggedVersions[0].tag
             }
         }
 
-        // Fallback to first tag if no preferred match (shouldn't happen)
         return tagsAtHead[0]
     }
 
-    // No tags at HEAD, try to get branch name
     const branchName = await getCurrentBranchName()
     if (isCI) {
         console.log(`[git-version2] Branch name from getCurrentBranchName: ${branchName}`)
     }
 
     if (branchName) {
-        // Use the full branch name with build identifier as the version
-        // In CI, we use timestamp + run ID instead of SHA because the SHA would be the merge commit's SHA,
-        // not the actual branch commit SHA
         const buildId = getBuildIdentifier()
         const versionString = `${branchName}-${buildId}`
         const fullVersion = `${prefixForProject(project)}${versionString}`
@@ -246,11 +210,9 @@ export async function latestTagForProject(project) {
             console.log(`[git-version2] Final version string: ${fullVersion}`)
         }
 
-        // Return a synthetic tag format that can be parsed by detailsFromTag
         return fullVersion
     }
 
-    // Last resort: try git describe to get any nearby tag + offset
     try {
         const prefix = prefixForProject(project)
         const described = (
@@ -267,10 +229,9 @@ export async function latestTagForProject(project) {
             return described
         }
     } catch (error) {
-        // git describe failed, continue to final error
+        // Ignore - will throw below
     }
 
-    // No tags at HEAD and no branch, throw error with debugging info
     throw new Error(
         `No tags found at HEAD for project ${project} and no branch name available. ` +
         `Env vars: GITHUB_REF_NAME=${process.env.GITHUB_REF_NAME}, ` +
@@ -281,7 +242,7 @@ export async function latestTagForProject(project) {
 
 export async function versionForProject(project) {
     return latestTagForProject(project)
-        .then(tag => tag) // Return the full tag, not just the parsed version
+        .then(tag => tag)
         .catch(error => {
             console.error(
                 `Could not find a version for project ${project} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
@@ -291,12 +252,10 @@ export async function versionForProject(project) {
 }
 
 export async function generateBuildInfoHtml(project, outputPath) {
-    // Gather all build information
     const version = await versionForProject(project)
     const timestamp = getTimestamp()
     const isCI = process.env.CI === 'true'
-    
-    // Git information
+
     let gitInfo = {}
     try {
         const branch = await getCurrentBranchName()
@@ -306,7 +265,7 @@ export async function generateBuildInfoHtml(project, outputPath) {
         const commitMessage = (await monorepoGit().raw(['log', '-1', '--pretty=%B'])).trim()
         const commitAuthor = (await monorepoGit().raw(['log', '-1', '--pretty=%an'])).trim()
         const commitDate = (await monorepoGit().raw(['log', '-1', '--pretty=%ci'])).trim()
-        
+
         gitInfo = {
             branch,
             tags: tags.length > 0 ? tags : ['(none)'],
@@ -319,35 +278,34 @@ export async function generateBuildInfoHtml(project, outputPath) {
     } catch (error) {
         gitInfo = { error: error.message }
     }
-    
-    // GitHub Actions information
+
     const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com'
     const repository = process.env.GITHUB_REPOSITORY || 'N/A'
     const runId = process.env.GITHUB_RUN_ID
     const headRef = process.env.GITHUB_HEAD_REF
     const baseRef = process.env.GITHUB_BASE_REF
-    
+
     const githubInfo = {
         // Run information
         runId: runId || 'N/A',
         runNumber: process.env.GITHUB_RUN_NUMBER || 'N/A',
         runAttempt: process.env.GITHUB_RUN_ATTEMPT || 'N/A',
         job: process.env.GITHUB_JOB || 'N/A',
-        
+
         // Workflow information
         workflow: process.env.GITHUB_WORKFLOW || 'N/A',
         workflowRef: process.env.GITHUB_WORKFLOW_REF || 'N/A',
         workflowSha: process.env.GITHUB_WORKFLOW_SHA || 'N/A',
-        
+
         // Actor information
         actor: process.env.GITHUB_ACTOR || 'N/A',
         actorId: process.env.GITHUB_ACTOR_ID || 'N/A',
         triggeringActor: process.env.GITHUB_TRIGGERING_ACTOR || 'N/A',
-        
+
         // Event information
         event: process.env.GITHUB_EVENT_NAME || 'N/A',
         eventPath: process.env.GITHUB_EVENT_PATH || 'N/A',
-        
+
         // Ref information
         ref: process.env.GITHUB_REF || 'N/A',
         refName: process.env.GITHUB_REF_NAME || 'N/A',
@@ -355,27 +313,24 @@ export async function generateBuildInfoHtml(project, outputPath) {
         refProtected: process.env.GITHUB_REF_PROTECTED || 'N/A',
         headRef: headRef || 'N/A',
         baseRef: baseRef || 'N/A',
-        
+
         // Repository information
         repository: repository,
         repositoryId: process.env.GITHUB_REPOSITORY_ID || 'N/A',
         repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER || 'N/A',
         repositoryOwnerId: process.env.GITHUB_REPOSITORY_OWNER_ID || 'N/A',
-        
+
         // Environment
         environment: process.env.GITHUB_ENV || 'N/A',
-        
+
         // URLs
         serverUrl: serverUrl,
         apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
         graphqlUrl: process.env.GITHUB_GRAPHQL_URL || 'https://api.github.com/graphql',
-        
+
         // Constructed links
-        runUrl: runId && repository 
+        runUrl: runId && repository
             ? `${serverUrl}/${repository}/actions/runs/${runId}`
-            : null,
-        jobUrl: runId && repository && process.env.GITHUB_JOB
-            ? `${serverUrl}/${repository}/actions/runs/${runId}/job/${process.env.GITHUB_JOB}`
             : null,
         compareUrl: headRef && baseRef && repository
             ? `${serverUrl}/${repository}/compare/${baseRef}...${headRef}`
@@ -390,7 +345,7 @@ export async function generateBuildInfoHtml(project, outputPath) {
             ? `${serverUrl}/${repository}/releases/tag/${process.env.GITHUB_REF_NAME}`
             : null
     }
-    
+
     // Build information
     const buildInfo = {
         project,
@@ -402,7 +357,7 @@ export async function generateBuildInfoHtml(project, outputPath) {
         arch: process.arch,
         isCI
     }
-    
+
     // Generate HTML
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -659,15 +614,6 @@ export async function generateBuildInfoHtml(project, outputPath) {
                         </div>
                     </div>
                     ` : ''}
-                    ${githubInfo.jobUrl ? `
-                    <div class="info-item">
-                        <div class="info-label">Job</div>
-                        <div class="info-value">
-                            <a href="${githubInfo.jobUrl}" target="_blank">View Job: ${githubInfo.job}</a>
-                        </div>
-                    </div>
-                    ` : ''}
-
                     ${githubInfo.prUrl ? `
                     <div class="info-item">
                         <div class="info-label">Pull Request</div>
@@ -747,9 +693,9 @@ export async function generateBuildInfoHtml(project, outputPath) {
                     <div class="info-item">
                         <div class="info-label">Actor</div>
                         <div class="info-value">
-                            ${githubInfo.actor !== 'N/A' 
-                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.actor}" target="_blank">${githubInfo.actor}</a>`
-                                : 'N/A'}
+                            ${githubInfo.actor !== 'N/A'
+                ? `<a href="${githubInfo.serverUrl}/${githubInfo.actor}" target="_blank">${githubInfo.actor}</a>`
+                : 'N/A'}
                         </div>
                     </div>
                     <div class="info-item">
@@ -759,9 +705,9 @@ export async function generateBuildInfoHtml(project, outputPath) {
                     <div class="info-item">
                         <div class="info-label">Triggering Actor</div>
                         <div class="info-value">
-                            ${githubInfo.triggeringActor !== 'N/A' 
-                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.triggeringActor}" target="_blank">${githubInfo.triggeringActor}</a>`
-                                : 'N/A'}
+                            ${githubInfo.triggeringActor !== 'N/A'
+                ? `<a href="${githubInfo.serverUrl}/${githubInfo.triggeringActor}" target="_blank">${githubInfo.triggeringActor}</a>`
+                : 'N/A'}
                         </div>
                     </div>
                 </div>
@@ -803,9 +749,9 @@ export async function generateBuildInfoHtml(project, outputPath) {
                     <div class="info-item">
                         <div class="info-label">Repository</div>
                         <div class="info-value">
-                            ${githubInfo.repository !== 'N/A' 
-                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repository}" target="_blank">${githubInfo.repository}</a>`
-                                : 'N/A'}
+                            ${githubInfo.repository !== 'N/A'
+                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repository}" target="_blank">${githubInfo.repository}</a>`
+                : 'N/A'}
                         </div>
                     </div>
                     <div class="info-item">
@@ -815,9 +761,9 @@ export async function generateBuildInfoHtml(project, outputPath) {
                     <div class="info-item">
                         <div class="info-label">Repository Owner</div>
                         <div class="info-value">
-                            ${githubInfo.repositoryOwner !== 'N/A' 
-                                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repositoryOwner}" target="_blank">${githubInfo.repositoryOwner}</a>`
-                                : 'N/A'}
+                            ${githubInfo.repositoryOwner !== 'N/A'
+                ? `<a href="${githubInfo.serverUrl}/${githubInfo.repositoryOwner}" target="_blank">${githubInfo.repositoryOwner}</a>`
+                : 'N/A'}
                         </div>
                     </div>
                     <div class="info-item">
@@ -836,54 +782,19 @@ export async function generateBuildInfoHtml(project, outputPath) {
     </div>
 </body>
 </html>`
-    
+
     // Write the HTML file
     const fs = await import('fs')
     const path = await import('path')
-    
+
     // Ensure output directory exists
     const outputDir = path.dirname(outputPath)
     await fs.promises.mkdir(outputDir, { recursive: true })
-    
+
     // Write the file
     await fs.promises.writeFile(outputPath, html, 'utf-8')
-    
+
     console.log(`✅ Build info HTML generated: ${outputPath}`)
-    
+
     return outputPath
-}
-
-export async function latestLabwareVersions(appVersion) {
-    // Returns a map of {labware load name -> highest available version number}
-    // as of app release `appVersion`.
-
-    // Max says PD only needs to worry about labware schema 2:
-    const labwareDir = 'shared-data/labware/definitions/2/'
-    // Fetch all labware definition files that existed in the app at `version`:
-    const lstreeCmd = ['ls-tree', '-r', '--name-only', '-z']
-    // We will first look for a release tag named `v${version}`.
-    // If that doesn't exist, look for a branch named `chore_release-${version}`.
-    const releaseTag = `v${appVersion}`
-    const choreBranch = `origin/chore_release-${appVersion}`
-    const labwareFiles = (
-        await monorepoGit()
-            .raw([...lstreeCmd, releaseTag, labwareDir])
-            .catch(error =>
-                monorepoGit().raw([...lstreeCmd, choreBranch, labwareDir])
-            )
-    )
-        .split('\0')
-        .slice(0, -1) // git puts an extra '\0' at the end, remove it
-        .map(filename => filename.replace(labwareDir, ''))
-    // labwareFiles is a list like: ['agilent_1_reservoir_290ml/1.json', ...]
-
-    // For each loadname in labwareFiles, return the highest labware version:
-    return labwareFiles.reduce((acc, filename) => {
-        const [loadName, jsonFilename] = filename.split('/')
-        const labwareVersion = Number(jsonFilename.replace('.json', ''))
-        if (!acc[loadName] || labwareVersion > acc[loadName]) {
-            acc[loadName] = labwareVersion
-        }
-        return acc
-    }, {})
 }

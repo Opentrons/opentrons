@@ -9,11 +9,13 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
+import { latestLabwareVersions } from '../scripts/git-version.mjs'
+
 import {
-  latestLabwareVersions,
   versionForProject,
   generateBuildInfoHtml,
 } from '../scripts/git-version2.mjs'
+
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
