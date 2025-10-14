@@ -30,6 +30,7 @@ import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
@@ -53,7 +54,7 @@ export const SlotDetailModal = (
   const { closeModal, stackOfLabware } = props
   const { t } = useTranslation('protocol_steps')
   const [selectedLabware, setSelectedLabware] = useState<string>(
-    stackOfLabware[0]
+    stackOfLabware[0] ?? ''
   )
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const nickNames = useSelector(getLabwareNicknamesById)
@@ -67,6 +68,7 @@ export const SlotDetailModal = (
   )
   const { labware } = activeDeckSetup
   const labwareOnDeck = labware[selectedLabware]
+
   const wellContents =
     allWellContentsForActiveItem != null
       ? allWellContentsForActiveItem[selectedLabware]
@@ -93,6 +95,11 @@ export const SlotDetailModal = (
         }, {})
       : {}
 
+  if (stackOfLabware.length === 0 || labwareOnDeck == null) {
+    return null
+  }
+
+  const isAdapter = getIsAdapterFromDef(labwareOnDeck.def)
   const slotName = getSlotInLocationStack(labwareOnDeck.stack)
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
@@ -170,35 +177,44 @@ export const SlotDetailModal = (
               key={labwareOnDeck.def.parameters.loadName}
               viewBox={`0 0 ${labwareOnDeck.def.dimensions.xDimension} ${labwareOnDeck.def.dimensions.yDimension}`}
             >
-              {() => (
-                <WellTooltip ingredNames={ingredNames}>
-                  {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
-                    <g>
-                      <LabwareRender
-                        onMouseLeaveWell={mouseEventArgs => {
-                          handleMouseLeaveWell(mouseEventArgs)
-                          handleMouseLeaveWell(mouseEventArgs.event)
-                        }}
-                        onMouseEnterWell={({ wellName, event }) => {
-                          if (wellContents !== null) {
-                            makeHandleMouseEnterWell(
-                              wellName,
-                              wellContents[wellName]?.ingreds
-                            )(event)
-                          }
-                        }}
-                        definition={labwareOnDeck.def}
-                        positioningMode="offsetInSlot"
-                        wellFill={allWellFill}
-                        highlightedWells={wellContentsWithLiquidId}
-                      />
-                    </g>
-                  )}
-                </WellTooltip>
-              )}
+              {() =>
+                isAdapter ? (
+                  <g>
+                    <LabwareRender
+                      definition={labwareOnDeck.def}
+                      positioningMode="passThrough"
+                    />
+                  </g>
+                ) : (
+                  <WellTooltip ingredNames={ingredNames}>
+                    {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
+                      <g>
+                        <LabwareRender
+                          onMouseLeaveWell={mouseEventArgs => {
+                            handleMouseLeaveWell(mouseEventArgs)
+                            handleMouseLeaveWell(mouseEventArgs.event)
+                          }}
+                          onMouseEnterWell={({ wellName, event }) => {
+                            if (wellContents !== null) {
+                              makeHandleMouseEnterWell(
+                                wellName,
+                                wellContents[wellName]?.ingreds
+                              )(event)
+                            }
+                          }}
+                          definition={labwareOnDeck.def}
+                          positioningMode="passThrough"
+                          wellFill={allWellFill}
+                          highlightedWells={wellContentsWithLiquidId}
+                        />
+                      </g>
+                    )}
+                  </WellTooltip>
+                )
+              }
             </RobotWorkSpace>
           </Flex>
-          {selectedLiquidId != null ? (
+          {!isAdapter && selectedLiquidId != null ? (
             <LiquidCardList
               selectedLabware={labwareOnDeck}
               selectedLiquidId={selectedLiquidId}
