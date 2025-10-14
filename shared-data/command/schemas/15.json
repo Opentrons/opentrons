@@ -4958,6 +4958,64 @@
       "title": "SetRailLightsParams",
       "type": "object"
     },
+    "SetShakeSpeedCreate": {
+      "description": "A request to create a Heater-Shaker's set shake speed command.",
+      "properties": {
+        "commandType": {
+          "const": "heaterShaker/setShakeSpeed",
+          "default": "heaterShaker/setShakeSpeed",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SetShakeSpeedParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SetShakeSpeedCreate",
+      "type": "object"
+    },
+    "SetShakeSpeedParams": {
+      "description": "Input parameters to set a shake speed for a Heater-Shaker Module.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Heater-Shaker Module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "rpm": {
+          "description": "Target speed in rotations per minute.",
+          "title": "Rpm",
+          "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "rpm"],
+      "title": "SetShakeSpeedParams",
+      "type": "object"
+    },
     "SetStatusBarCreate": {
       "description": "setStatusBar command request model.",
       "properties": {
@@ -5482,6 +5540,79 @@
       },
       "required": ["primaryLabwareId"],
       "title": "StackerStoredLabwareGroup",
+      "type": "object"
+    },
+    "StartRunExtendedProfileCreate": {
+      "description": "A request to execute a Thermocycler profile run.",
+      "properties": {
+        "commandType": {
+          "const": "thermocycler/startRunExtendedProfile",
+          "default": "thermocycler/startRunExtendedProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartRunExtendedProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartRunExtendedProfileCreate",
+      "type": "object"
+    },
+    "StartRunExtendedProfileParams": {
+      "description": "Input parameters to run a Thermocycler profile.",
+      "properties": {
+        "blockMaxVolumeUl": {
+          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "title": "Blockmaxvolumeul",
+          "type": "number"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Thermocycler.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profileElements": {
+          "description": "Elements of the profile. Each can be either a step or a cycle.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProfileStep"
+              },
+              {
+                "$ref": "#/$defs/ProfileCycle"
+              }
+            ]
+          },
+          "title": "Profileelements",
+          "type": "array"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the profile task",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "profileElements"],
+      "title": "StartRunExtendedProfileParams",
       "type": "object"
     },
     "StatusBarAnimation": {
@@ -6985,6 +7116,7 @@
       "heaterShaker/deactivateShaker": "#/$defs/DeactivateShakerCreate",
       "heaterShaker/openLabwareLatch": "#/$defs/OpenLabwareLatchCreate",
       "heaterShaker/setAndWaitForShakeSpeed": "#/$defs/SetAndWaitForShakeSpeedCreate",
+      "heaterShaker/setShakeSpeed": "#/$defs/SetShakeSpeedCreate",
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "home": "#/$defs/HomeCreate",
@@ -7032,6 +7164,7 @@
       "thermocycler/runProfile": "#/$defs/RunProfileCreate",
       "thermocycler/setTargetBlockTemperature": "#/$defs/SetTargetBlockTemperatureCreate",
       "thermocycler/setTargetLidTemperature": "#/$defs/SetTargetLidTemperatureCreate",
+      "thermocycler/startRunExtendedProfile": "#/$defs/StartRunExtendedProfileCreate",
       "thermocycler/waitForBlockTemperature": "#/$defs/WaitForBlockTemperatureCreate",
       "thermocycler/waitForLidTemperature": "#/$defs/WaitForLidTemperatureCreate",
       "touchTip": "#/$defs/TouchTipCreate",
@@ -7221,6 +7354,9 @@
       "$ref": "#/$defs/SetAndWaitForShakeSpeedCreate"
     },
     {
+      "$ref": "#/$defs/SetShakeSpeedCreate"
+    },
+    {
       "$ref": "#/$defs/DeactivateShakerCreate"
     },
     {
@@ -7270,6 +7406,9 @@
     },
     {
       "$ref": "#/$defs/RunProfileCreate"
+    },
+    {
+      "$ref": "#/$defs/StartRunExtendedProfileCreate"
     },
     {
       "$ref": "#/$defs/RunExtendedProfileCreate"

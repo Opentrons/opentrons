@@ -263,6 +263,38 @@ def test_set_and_wait_for_shake_speed(
     )
 
 
+def test_shake_speed(
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: LegacyBroker,
+    subject: HeaterShakerContext,
+    api_version: APIVersion,
+) -> None:
+    """It should set shake speed via the core and return a task."""
+    subject._api_version = api_version
+    mock_task = decoy.mock(cls=Task)
+    decoy.when(mock_core.set_shake_speed(1337)).then_return(mock_task._core)
+    result = subject.set_shake_speed(1337)
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.HEATER_SHAKER_SET_SHAKE_SPEED",
+                }
+            ),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+    assert isinstance(result, Task)
+    assert result._core is mock_task._core
+    assert result._api_version == api_version
+
+
 def test_open_labware_latch(
     decoy: Decoy,
     mock_core: HeaterShakerCore,

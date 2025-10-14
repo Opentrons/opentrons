@@ -1,3 +1,5 @@
+import { basename, extname } from 'path-browserify'
+
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -10,6 +12,7 @@ import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.js
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import labwareSchemaV3 from '../labware/schemas/3.json'
+import { exactMatchOnlyLoadNames } from './constants'
 
 import type {
   LabwareDef2ByDefURI,
@@ -102,7 +105,127 @@ export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
   return schema1DefinitionsByName
 }
 
+// Labware Images Mapping
+
+function getAllImages(): Record<string, string> {
+  const imageModules = import.meta.glob('../labware/images/*.{png,jpg,jpeg}', {
+    eager: true,
+    import: 'default',
+  })
+  const imageKeyToUrl: Record<string, string> = {}
+  for (const imgPath in imageModules) {
+    const filename = basename(imgPath)
+    const ext = extname(filename)
+    const base = basename(filename, ext)
+    const varName = base.replace(/\./g, '_').replace(/-/g, '_')
+    imageKeyToUrl[varName] = imageModules[imgPath] as string
+  }
+  return imageKeyToUrl
+}
+
+const loadNames = Array.from(
+  new Set(
+    Object.keys(getAllLabwareDefs()).map(uri => {
+      const parts = uri.split('/')
+      return parts[1] ?? uri
+    })
+  )
+)
+
+function matchLoadNamestoURL(
+  loadName: string,
+  varName: string,
+  exactMatchOnlyLoadNames: Set<string>
+): boolean {
+  const normalizedLoadName = loadName.replace(/\./g, '_').replace(/-/g, '_')
+  const loadParts = normalizedLoadName.split('_')
+  const normalizedVarName = varName.replace(/\./g, '_').replace(/-/g, '_')
+  const varParts = normalizedVarName.split('_')
+
+  if (exactMatchOnlyLoadNames.has(loadName)) {
+    return normalizedVarName === normalizedLoadName
+  }
+
+  function isConsecutiveSubarray(subarr: string[], arr: string[]): boolean {
+    for (let i = 0; i <= arr.length - subarr.length; i++) {
+      let match = true
+      for (let j = 0; j < subarr.length; j++) {
+        if (arr[i + j] !== subarr[j]) {
+          match = false
+          break
+        }
+      }
+      if (match) return true
+    }
+    return false
+  }
+
+  return (
+    isConsecutiveSubarray(loadParts, varParts) ||
+    normalizedLoadName.includes(normalizedVarName)
+  )
+}
+
+const adapters = ['aluminumblock', 'tuberack']
+
+// Match images to load names
+function buildSortedLabwareImages(
+  loadNames: string[]
+): Record<string, [string, ...string[]]> {
+  const matchedImageVars = new Set<string>()
+  const imageKeyToUrl = getAllImages()
+  const labwareImages: Record<string, [string, ...string[]]> = {}
+
+  for (const loadName of loadNames) {
+    const matchingUrls = Object.entries(imageKeyToUrl)
+      .filter(([varName]) =>
+        matchLoadNamestoURL(loadName, varName, exactMatchOnlyLoadNames)
+      )
+      .map(([varName, url]) => {
+        matchedImageVars.add(varName)
+        return url
+      })
+    if (matchingUrls.length > 0) {
+      labwareImages[loadName] = [matchingUrls[0], ...matchingUrls.slice(1)]
+    }
+  }
+  // Add unmatched images to the object
+  for (const [varName, url] of Object.entries(imageKeyToUrl)) {
+    if (!matchedImageVars.has(varName)) {
+      labwareImages[varName] = [url]
+    }
+  }
+
+  // Sort the image URLs within each entry
+  const sortedLabwareImages = Object.fromEntries(
+    Object.entries(labwareImages).map(([key, urls]) => {
+      const sortedUrls = [...urls].sort((a, b) => {
+        const aMatches = adapters.some(substr => a.includes(substr))
+        const bMatches = adapters.some(substr => b.includes(substr))
+
+        if (aMatches && !bMatches) return -1
+        if (!aMatches && bMatches) return 1
+
+        return a.localeCompare(b)
+      })
+
+      return [key, [sortedUrls[0], ...sortedUrls.slice(1)]]
+    })
+  ) as Record<string, [string, ...string[]]>
+
+  return sortedLabwareImages
+}
+
+let labwareImages: Record<string, string[]> = {}
+
+function initializeLabwareImages(): void {
+  labwareImages = buildSortedLabwareImages(loadNames)
+}
+
+initializeLabwareImages()
+
 export {
+  labwareImages,
   labwareSchemaV2,
   labwareSchemaV3,
   fixture96Plate,

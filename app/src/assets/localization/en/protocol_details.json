@@ -97,5 +97,6 @@
   "value_out_of_range": "Value must be between {{min}}-{{max}}",
   "view_run_details": "View run details",
   "view_unavailable_robots": "View unavailable robots on the Devices page",
+  "visualize": "Visualize",
   "with_lid_name": "with {{lid}}"
 }

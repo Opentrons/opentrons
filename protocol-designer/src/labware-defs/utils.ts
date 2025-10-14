@@ -29,24 +29,30 @@ export function getAllDefinitions(): LabwareDefByDefURI {
   }
   return _definitions
 }
-// filter out all but the latest version of each labware
-// NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
-// has the {labwareDefURI: def} shape, instead of an array of labware defs
+// filter out all but the latest version of each labware according to the latest
+// robot-stack version.
 let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
+  const latestLoadnamesByVersion = _OT_PD_LATEST_LABWARE_VERSIONS_
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
     const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
-      d => `${d.namespace}/${d.parameters.loadName}`
+      d => d.parameters.loadName
     )
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
+        const version = latestLoadnamesByVersion[groupKey]
+
+        //  if the labware is new to a higher up robot-stack version
+        //  do not list it with the labware definition at all
+        if (version == null) {
+          return acc
+        }
+
         const group = labwareDefGroups[groupKey]
-        const allVersions = group.map(d => d.version)
-        const highestVersionNum = Math.max(...allVersions)
-        const resultIdx = group.findIndex(d => d.version === highestVersionNum)
+        const resultIdx = group.findIndex(d => d.version === version)
         const latestDefInGroup = group[resultIdx]
         return {
           ...acc,

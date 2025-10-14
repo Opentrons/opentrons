@@ -59,17 +59,21 @@ export function getInitialSummaryState(
   let path: PathOption = state.path
   // for multiDispense the volume capacity must be at least 3x the volume per well
   // to account for the 1x volume per well disposal volume default
+  // otherwise, we set the path to single
   if (
     state.transferType === 'distribute' &&
-    maxTipCapacity >= state.volume * 3
+    maxTipCapacity < state.volume * 3 &&
+    state.path === 'multiDispense'
   ) {
-    path = 'multiDispense'
+    path = 'single'
     // for multiAspirate the volume capacity must be at least 2x the volume per well
+    // otherwise, we set the path to single
   } else if (
     state.transferType === 'consolidate' &&
-    maxTipCapacity >= state.volume * 2
+    maxTipCapacity < state.volume * 2 &&
+    state.path === 'multiAspirate'
   ) {
-    path = 'multiAspirate'
+    path = 'single'
   }
 
   const trashConfigCutout = deckConfig.find(

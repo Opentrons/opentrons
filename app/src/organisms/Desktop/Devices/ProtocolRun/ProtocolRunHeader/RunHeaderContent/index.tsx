@@ -14,6 +14,7 @@ export type RunHeaderContentProps = ProtocolRunHeaderProps & {
   protocolRunControls: RunControls
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
   isClosingCurrentRun: boolean
+  robotName: string
 }
 
 export function RunHeaderContent(props: RunHeaderContentProps): JSX.Element {
