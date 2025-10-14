@@ -34,7 +34,6 @@ class AbstractVacuumModuleDriver(Protocol):
         """Disable the vacuum pump."""
         ...
 
-    # Are these register addresses configurable ?? Should I add setters for them too?
     async def get_pump_motor_register(self) -> None:
         """Get the register value of the pump motor driver."""
         ...
@@ -50,14 +49,14 @@ class AbstractVacuumModuleDriver(Protocol):
     # TODO: update the pressure arg with the units when we find out which unit
     async def set_vacuum_chamber_pressure(
         self,
-        guage_pressure_mbar: float,
+        gage_pressure_mbar: float,
         duration: Optional[float],
         rate: Optional[float],
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def get_guage_pressure_reading(self) -> float:
+    async def get_gage_pressure_reading(self) -> float:
         """Read each pressure sensor and return the difference."""
         return 0.0
 

@@ -144,7 +144,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Disable the vacuum pump, doesn't just turn it off."""
         ...
 
-    # Are these register addresses configurable ?? Should I add setters for them too?
     async def get_pump_motor_register(self) -> None:
         """Get the register value of the pump motor driver."""
         ...
@@ -157,7 +156,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Get a reading from the pressure sensor."""
         return 0.0
 
-    async def get_guage_pressure_reading(self) -> float:
+    async def get_gage_pressure_reading(self) -> float:
         """Read each pressure sensor and return the difference."""
         return 0.0
 
