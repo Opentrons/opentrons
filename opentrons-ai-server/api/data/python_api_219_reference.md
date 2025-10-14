@@ -491,7 +491,6 @@ Parameters:
 - **labware** – The labware to move. It should be a labware already loaded
   using [`load_labware()`](#opentrons.protocol_api.ProtocolContext.load_labware 'opentrons.protocol_api.ProtocolContext.load_labware').
 - **new_location** – Where to move the labware to. This is either:
-
   - A deck slot like `1`, `"1"`, or `"D1"`. See [Deck Slots](index.html#deck-slots).
   - A hardware module that’s already been loaded on the deck
     with [`load_module()`](#opentrons.protocol_api.ProtocolContext.load_module 'opentrons.protocol_api.ProtocolContext.load_module').
@@ -500,7 +499,6 @@ Parameters:
   - The special constant [`OFF_DECK`](#opentrons.protocol_api.OFF_DECK 'opentrons.protocol_api.OFF_DECK').
 
 - **use_gripper** – Whether to use the Flex Gripper for this movement.
-
   - If `True`, use the gripper to perform an automatic
     movement. This will raise an error in an OT\-2 protocol.
   - If `False`, pause protocol execution until the user
@@ -760,7 +758,6 @@ tips from a tip rack that is in an adapter, the API will raise an error.
 Parameters:
 
 - **style** (`NozzleLayout` or `None`) – The shape of the nozzle layout.
-
   - `SINGLE` sets the pipette to use 1 nozzle. This corresponds to a single of well on labware.
   - `COLUMN` sets the pipette to use 8 nozzles, aligned from front to back
     with respect to the deck. This corresponds to a column of wells on labware.
@@ -846,7 +843,6 @@ See [Dispense](index.html#new-dispense) for more details and examples.
 Parameters:
 
 - **volume** ([_int_](https://docs.python.org/3/library/functions.html#int '(in Python v3.12)') _or_ [_float_](https://docs.python.org/3/library/functions.html#float '(in Python v3.12)')) – The volume to dispense, measured in µL.
-
   - If unspecified or `None`, dispense the [`current_volume`](#opentrons.protocol_api.InstrumentContext.current_volume 'opentrons.protocol_api.InstrumentContext.current_volume').
   - If 0, the behavior of `dispense()` depends on the API level
     of the protocol. In API version 2\.16 and earlier, dispense all
@@ -1371,7 +1367,6 @@ Parameters:
   A negative offset moves the tip lower into the well.
   Default is \-1\.0 mm.
 - **speed** ([_float_](https://docs.python.org/3/library/functions.html#float '(in Python v3.12)')) – The speed for touch tip motion, in mm/s.
-
   - Default: 60\.0 mm/s
   - Maximum: 80\.0 mm/s
   - Minimum: 1\.0 mm/s

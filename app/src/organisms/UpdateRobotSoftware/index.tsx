@@ -37,7 +37,11 @@ export function UpdateRobotSoftware(
   const dispatch = useDispatch<Dispatch>()
 
   const session = useSelector(getRobotUpdateSession)
-  const { step, stage, error: sessionError } = session ?? {
+  const {
+    step,
+    stage,
+    error: sessionError,
+  } = session ?? {
     step: null,
     error: null,
   }

@@ -43,9 +43,11 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
     moduleId as string | null
   )
   const { modules } = robotState ?? {}
-  const absorbanceReaderFormType = formData.absorbanceReaderFormType as AbsorbanceReaderFormType
-  const initialization = (modules?.[moduleId]
-    ?.moduleState as AbsorbanceReaderState)?.initialization
+  const absorbanceReaderFormType =
+    formData.absorbanceReaderFormType as AbsorbanceReaderFormType
+  const initialization = (
+    modules?.[moduleId]?.moduleState as AbsorbanceReaderState
+  )?.initialization
 
   // pre-select radio button on module change if compound command (read/initialize)
   // we useRef to avoid changing data from a previously created form

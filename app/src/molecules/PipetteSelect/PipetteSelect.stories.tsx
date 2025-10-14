@@ -12,9 +12,8 @@ const Template: Story<React.ComponentProps<typeof PipetteSelectComponent>> = ({
   pipetteName,
   ...args
 }) => {
-  const [pipetteNameControlled, setPipetteNameControlled] = React.useState(
-    pipetteName
-  )
+  const [pipetteNameControlled, setPipetteNameControlled] =
+    React.useState(pipetteName)
   const handleChange = (pipName: string): unknown => {
     setPipetteNameControlled(pipName)
   }

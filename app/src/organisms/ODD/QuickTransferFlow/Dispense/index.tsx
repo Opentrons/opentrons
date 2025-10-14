@@ -28,14 +28,10 @@ interface DispenseProps {
 export function Dispense(props: DispenseProps): JSX.Element | null {
   const { state, dispatch, isMultiTransfer } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const [
-    selectedSetting,
-    setSelectedSetting,
-  ] = useState<DispenseSettingOption | null>(null)
-  const [
-    showResetAdvancedSettingsModal,
-    setShowResetAdvancedSettingsModal,
-  ] = useState<boolean>(false)
+  const [selectedSetting, setSelectedSetting] =
+    useState<DispenseSettingOption | null>(null)
+  const [showResetAdvancedSettingsModal, setShowResetAdvancedSettingsModal] =
+    useState<boolean>(false)
   const dispenseSettingsItems = useDispenseSettingsConfig({
     state,
     setSelectedSetting,

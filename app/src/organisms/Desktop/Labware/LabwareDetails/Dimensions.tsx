@@ -21,9 +21,8 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
   const { t } = useTranslation('labware_details')
   const { definition, irregular, insertCategory } = props
   const { displayCategory } = definition.metadata
-  const { xDimension, yDimension, zDimension } = getSchema2Dimensions(
-    definition
-  )
+  const { xDimension, yDimension, zDimension } =
+    getSchema2Dimensions(definition)
   const dimensions = [
     { label: t('length'), value: toFixed(xDimension) },
     { label: t('width'), value: toFixed(yDimension) },

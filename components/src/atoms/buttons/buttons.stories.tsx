@@ -169,18 +169,17 @@ export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
  * Legacy AlertPrimaryButton component (wraps Button with variant="alert").
  * @deprecated Use Button component directly with variant="alert"
  */
-export const AlertPrimaryButton: StoryObj<
-  typeof AlertPrimaryButtonComponent
-> = {
-  args: {
-    children: 'alert tertiary button',
-  },
-  render: args => (
-    <Flex>
-      <AlertPrimaryButtonComponent {...args} />
-    </Flex>
-  ),
-}
+export const AlertPrimaryButton: StoryObj<typeof AlertPrimaryButtonComponent> =
+  {
+    args: {
+      children: 'alert tertiary button',
+    },
+    render: args => (
+      <Flex>
+        <AlertPrimaryButtonComponent {...args} />
+      </Flex>
+    ),
+  }
 
 /**
  * Legacy AltPrimaryButton component (wraps Button with variant="alt").

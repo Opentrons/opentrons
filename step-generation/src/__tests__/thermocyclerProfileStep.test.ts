@@ -311,18 +311,15 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       expectedPython,
     }) => {
       it(testName, () => {
-        const {
-          robotState,
-          invariantContext,
-        } = getStateAndContextTempTCModules({
-          temperatureModuleId,
-          thermocyclerId,
-        })
+        const { robotState, invariantContext } =
+          getStateAndContextTempTCModules({
+            temperatureModuleId,
+            thermocyclerId,
+          })
 
         if (initialThermocyclerModuleState) {
-          robotState.modules[
-            thermocyclerId
-          ].moduleState = initialThermocyclerModuleState
+          robotState.modules[thermocyclerId].moduleState =
+            initialThermocyclerModuleState
         }
 
         const result = thermocyclerProfileStep(

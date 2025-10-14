@@ -33,10 +33,8 @@ export function SelectTipFrequency({
   dispatch,
 }: SelectTipFrequencyProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  const [
-    selectedChangeTipOption,
-    setSelectedChangeTipOption,
-  ] = useState<ChangeTipOptions>()
+  const [selectedChangeTipOption, setSelectedChangeTipOption] =
+    useState<ChangeTipOptions>()
 
   const allowedChangeTipOptions: ChangeTipOptions[] = ['once']
   if (

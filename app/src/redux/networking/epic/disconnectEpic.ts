@@ -13,7 +13,9 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { PostWifiDisconnectAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  PostWifiDisconnectAction
+> = action => ({
   method: POST,
   path: Constants.WIFI_DISCONNECT_PATH,
   body: { ssid: action.payload.ssid },

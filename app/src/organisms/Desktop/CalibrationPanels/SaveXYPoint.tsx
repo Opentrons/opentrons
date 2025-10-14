@@ -152,9 +152,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
     [slotNumber, mount, isMulti]
   )
 
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   if (slotNumber == null) {
     logger.warn(

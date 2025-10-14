@@ -8,7 +8,8 @@ const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'heaterShakerModuleType',
 ] as const
 
-export type ModuleTypesThatRequireExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
+export type ModuleTypesThatRequireExtraAttention =
+  (typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION)[number]
 
 const doesModuleRequireExtraAttention = (
   moduleType: ModuleType

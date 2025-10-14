@@ -15,9 +15,7 @@ import type { DeckCalibrationData } from '@opentrons/api-client'
  * @returns {DeckCalibrationData | null, boolean, boolean}
  *
  */
-export function useDeckCalibrationData(
-  robotName: string | null = null
-): {
+export function useDeckCalibrationData(robotName: string | null = null): {
   deckCalibrationData: DeckCalibrationData | null
   isDeckCalibrated: boolean
   markedBad?: boolean

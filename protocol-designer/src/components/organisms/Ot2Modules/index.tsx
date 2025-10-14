@@ -109,9 +109,8 @@ export function Ot2Modules(): JSX.Element {
   const [entityToDelete, setDeleteEntityInUseModal] = useState<string | null>(
     null
   )
-  const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
-    false
-  )
+  const [changeModuleWarningInfo, displayModuleWarning] =
+    useState<boolean>(false)
   const { modules, pipettes, labware } = initialDeckSetup
   const hasMagneticModuleSteps = Object.values(savedSteps).find(
     step => step.stepType === 'magnet'
@@ -120,14 +119,12 @@ export function Ot2Modules(): JSX.Element {
     module => module.type === MAGNETIC_MODULE_TYPE
   )?.model
 
-  const [
-    magnetModuleModel,
-    setMagnetModuleModel,
-  ] = useState<MagneticModuleModels | null>(
-    hasMagneticModuleSteps && magModModel
-      ? (magModModel as MagneticModuleModels)
-      : null
-  )
+  const [magnetModuleModel, setMagnetModuleModel] =
+    useState<MagneticModuleModels | null>(
+      hasMagneticModuleSteps && magModModel
+        ? (magModModel as MagneticModuleModels)
+        : null
+    )
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const hasThermocycler = Object.values(modules).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
@@ -287,9 +284,10 @@ export function Ot2Modules(): JSX.Element {
   const showGen1MultichannelCollisionWarnings =
     !disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? getSlotsWithCollisions(deckDef, Object.values(modules))
-    : []
+  const multichannelWarningSlotIds: AddressableAreaName[] =
+    showGen1MultichannelCollisionWarnings
+      ? getSlotsWithCollisions(deckDef, Object.values(modules))
+      : []
 
   //  for switch magnetic module models since the units are 1/2mm and mm
   const changeModuleWarning = useBlockingHint({

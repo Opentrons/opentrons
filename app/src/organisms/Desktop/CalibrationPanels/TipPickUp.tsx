@@ -47,9 +47,8 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       },
     })
   }
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   return (
     crashRecoveryConfirmation ?? (

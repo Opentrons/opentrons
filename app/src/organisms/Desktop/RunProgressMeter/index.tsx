@@ -81,11 +81,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const analysis = useMostRecentCompletedAnalysis(runId)
   const analysisCommands = analysis?.commands ?? []
 
-  const {
-    currentStepNumber,
-    totalStepCount,
-    hasRunDiverged,
-  } = useRunningStepCounts(runId, mostRecentCommandData)
+  const { currentStepNumber, totalStepCount, hasRunDiverged } =
+    useRunningStepCounts(runId, mostRecentCommandData)
 
   const downloadIsDisabled =
     runStatus === RUN_STATUS_RUNNING ||
@@ -100,33 +97,28 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     e.stopPropagation()
     downloadRunLog()
   }
-  const {
-    showModal: showIntervention,
-    modalProps: interventionProps,
-  } = useInterventionModal({
-    robotName,
-    runStatus,
-    runData,
-    analysis,
-    lastRunCommand,
-    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  })
+  const { showModal: showIntervention, modalProps: interventionProps } =
+    useInterventionModal({
+      robotName,
+      runStatus,
+      runData,
+      analysis,
+      lastRunCommand,
+      doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+    })
 
-  const {
-    progressPercentage,
-    stepCountStr,
-    currentStepContents,
-  } = useRunProgressCopy({
-    runId,
-    runStatus,
-    robotType,
-    currentStepNumber,
-    totalStepCount,
-    analysis,
-    analysisCommands,
-    runCommandDetails: runCommandDetails ?? null,
-    hasRunDiverged,
-  })
+  const { progressPercentage, stepCountStr, currentStepContents } =
+    useRunProgressCopy({
+      runId,
+      runStatus,
+      robotType,
+      currentStepNumber,
+      totalStepCount,
+      analysis,
+      analysisCommands,
+      runCommandDetails: runCommandDetails ?? null,
+      hasRunDiverged,
+    })
 
   return (
     <>

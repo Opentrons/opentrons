@@ -390,9 +390,8 @@ const ModuleControlsTab = (
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
-  )
+  const moduleRenderInfoForProtocolById =
+    useModuleRenderInfoForProtocolById(runId)
   const { isRunStill } = useRunStatuses()
   const navigate = useNavigate()
 

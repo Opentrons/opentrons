@@ -60,7 +60,7 @@ export function MultichannelSubstep(
   const firstChannelDest = rowGroup[0].dest
   const lastChannelDest = rowGroup[rowGroup.length - 1].dest
   const destWellRange = `${
-    firstChannelDest ? firstChannelDest.well ?? t('shared:trash') : ''
+    firstChannelDest ? (firstChannelDest.well ?? t('shared:trash')) : ''
   }:${lastChannelDest ? lastChannelDest.well : ''}`
 
   let titleCopy = t('protocol_steps:aspirated')

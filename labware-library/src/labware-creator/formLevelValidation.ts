@@ -82,11 +82,11 @@ const partialCast = <TKey extends keyof LabwareFields>(
   values: LabwareFields,
   keys: TKey[]
 ): Pick<
-  ReturnType<typeof labwareFormSchemaBaseObject['cast']>,
+  ReturnType<(typeof labwareFormSchemaBaseObject)['cast']>,
   TKey
 > | null => {
   const partialSchema = labwareFormSchemaBaseObject.pick(keys)
-  let castFields: ReturnType<typeof partialSchema['cast']> | null = null
+  let castFields: ReturnType<(typeof partialSchema)['cast']> | null = null
   try {
     castFields = partialSchema.cast(values)
   } catch (error) {

@@ -39,4 +39,5 @@ export type LPCFlowType = 'default' | 'location-specific'
 
 export type LPCSubstep = HandleLwSubstepType
 
-export type HandleLwSubstepType = typeof HANDLE_LW_SUBSTEP[keyof typeof HANDLE_LW_SUBSTEP]
+export type HandleLwSubstepType =
+  (typeof HANDLE_LW_SUBSTEP)[keyof typeof HANDLE_LW_SUBSTEP]

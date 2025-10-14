@@ -29,10 +29,8 @@ export function ReleaseLabware({
 }: RecoveryContentProps): JSX.Element {
   const { handleMotionRouting, goBackPrevStep } = routeUpdateActions
   const { route } = recoveryMap
-  const {
-    STACKER_SHUTTLE_EMPTY_RETRY,
-    STACKER_SHUTTLE_EMPTY_SKIP,
-  } = RECOVERY_MAP
+  const { STACKER_SHUTTLE_EMPTY_RETRY, STACKER_SHUTTLE_EMPTY_SKIP } =
+    RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
 
   const buildPrimaryOnClick = (): void => {

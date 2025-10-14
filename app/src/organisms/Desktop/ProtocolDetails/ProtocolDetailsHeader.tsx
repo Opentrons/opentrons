@@ -99,15 +99,15 @@ export function ProtocolDetailsHeader({
 
   const creationMethod =
     mostRecentAnalysis != null
-      ? getCreationMethod(
+      ? (getCreationMethod(
           mostRecentAnalysis.config,
           mostRecentAnalysis.metadata
-        ) ?? t('shared:no_data')
+        ) ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const author =
     mostRecentAnalysis != null
-      ? mostRecentAnalysis?.metadata?.author ?? t('shared:no_data')
+      ? (mostRecentAnalysis?.metadata?.author ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const lastAnalyzed =

@@ -51,13 +51,13 @@ export function Mix(props: MixProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [mixVolume, setMixVolume] = useState<number | null>(
     kind === 'aspirate'
-      ? state.mixOnAspirate?.mixVolume ?? null
-      : state.mixOnDispense?.mixVolume ?? null
+      ? (state.mixOnAspirate?.mixVolume ?? null)
+      : (state.mixOnDispense?.mixVolume ?? null)
   )
   const [mixReps, setMixReps] = useState<number | null>(
     kind === 'aspirate'
-      ? state.mixOnAspirate?.repetitions ?? null
-      : state.mixOnDispense?.repetitions ?? null
+      ? (state.mixOnAspirate?.repetitions ?? null)
+      : (state.mixOnDispense?.repetitions ?? null)
   )
 
   const mixAction =

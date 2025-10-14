@@ -30,13 +30,8 @@ export interface DisabledChangeTipArgs {
 export const getDisabledChangeTipOptions = (
   args: DisabledChangeTipArgs
 ): Set<ChangeTipOptions> | null | undefined => {
-  const {
-    path,
-    aspirateWells,
-    dispenseWells,
-    stepType,
-    isDisposalLocation,
-  } = args
+  const { path, aspirateWells, dispenseWells, stepType, isDisposalLocation } =
+    args
 
   switch (stepType) {
     case 'moveLiquid': {

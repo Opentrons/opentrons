@@ -6,11 +6,17 @@ import { SourceWellViewContainer } from './SourceWellViewContainer'
 import styles from './stepdetailcontainer.module.css'
 import { TipPickupContainer } from './TipPickupContainer'
 
-export function StepDetailContainer(): JSX.Element {
+interface StepDetailContainerProps {
+  protocolKey: string
+}
+
+export function StepDetailContainer({
+  protocolKey,
+}: StepDetailContainerProps): JSX.Element {
   return (
     <div className={styles.container}>
       <PipetteContainer mount="LEFT MOUNT" pipetteName="Flex 1-Channel 50 µL" />
-      <TipPickupContainer />
+      <TipPickupContainer protocolKey={protocolKey} />
       <SourceWellViewContainer />
       <SourceLabwareContainer />
       <DestinationLabwareContainer />
