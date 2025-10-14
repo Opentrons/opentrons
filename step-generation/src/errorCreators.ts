@@ -343,7 +343,7 @@ export const closingThermocyclerWithInvalidLid = (args: {
 }): CommandCreatorError => {
   return {
     type: 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID',
-    message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
+    message: `Closing the Thermocycler lid with ${args.lidDisplayName} in place will cause damage`,
   }
 }
 
