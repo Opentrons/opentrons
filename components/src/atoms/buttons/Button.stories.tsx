@@ -1,4 +1,3 @@
-import { BORDERS } from '../../helix-design-system'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import { DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
