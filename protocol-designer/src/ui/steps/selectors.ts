@@ -4,7 +4,6 @@ import { createSelector } from 'reselect'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { getLabwareOnModule } from '../modules/utils'
 import {
   initialSelectedItemState,
@@ -188,34 +187,6 @@ export const getActiveItem: Selector<HoverableItem | null> = createSelector(
   }
 )
 
-interface StepTitleInfo {
-  stepName: string
-  stepType: StepType
-}
-
-const _stepToTitleInfo = (stepForm: FormData): StepTitleInfo => ({
-  stepName: stepForm.stepName,
-  stepType: stepForm.stepType,
-})
-
-export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> =
-  createSelector(
-    stepFormSelectors.getUnsavedForm,
-    stepFormSelectors.getSavedStepForms,
-    getSelectedStepId,
-    getSelectedTerminalItemId,
-    (unsavedForm, savedStepForms, selectedStepId, terminalItemId) => {
-      if (unsavedForm != null && terminalItemId === PRESAVED_STEP_ID) {
-        return _stepToTitleInfo(unsavedForm)
-      }
-
-      if (selectedStepId == null) {
-        return null
-      }
-
-      return _stepToTitleInfo(savedStepForms[selectedStepId])
-    }
-  )
 export const getWellSelectionLabwareKey: Selector<string | null> =
   createSelector(
     rootSelector,
