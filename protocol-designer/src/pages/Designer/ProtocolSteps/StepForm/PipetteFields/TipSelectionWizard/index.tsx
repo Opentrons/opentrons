@@ -36,9 +36,8 @@ export function TipSelectionWizard(
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
     null
   )
-  const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] = useState(
-    false
-  )
+  const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] =
+    useState(false)
   const [selectedTips, setSelectedTips] = useState<string[][]>([])
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { pipetteEntities } = useSelector(getInvariantContext)

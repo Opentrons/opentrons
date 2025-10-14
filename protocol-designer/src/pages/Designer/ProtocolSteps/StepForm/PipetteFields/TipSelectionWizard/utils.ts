@@ -120,21 +120,17 @@ export function getIsTiprackSelectable(args: {
   labwareEntities: LabwareEntities
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const {
-    labware,
-    formTiprackUri,
-    pipetteSpecs,
-    nozzles,
-    labwareEntities,
-  } = args
+  const { labware, formTiprackUri, pipetteSpecs, nozzles, labwareEntities } =
+    args
   const { channels } = pipetteSpecs
   const { def, labwareDefURI, stack } = labware
-  const isPickupCompatibleWithPossibleAdapter = _getIsPickupCompatibleWithPossibleAdapter(
-    stack,
-    labwareEntities,
-    nozzles,
-    channels
-  )
+  const isPickupCompatibleWithPossibleAdapter =
+    _getIsPickupCompatibleWithPossibleAdapter(
+      stack,
+      labwareEntities,
+      nozzles,
+      channels
+    )
   const slot = getSlotInLocationStack(stack)
   return (
     getIsTiprack(def) &&
