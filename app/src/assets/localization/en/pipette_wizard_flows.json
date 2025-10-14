@@ -87,8 +87,9 @@
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",
-  "waste_chute_error": "Remove the waste chute from the deck plate adapter before proceeding.",
-  "waste_chute_warning": "If the waste chute isn’t removed, the pipette WILL crash into it.",
+  "waste_chute_error": "Remove waste chute before calibrating.",
+  "waste_chute_warning": "A collision will occur with the pipette if the waste chute remains on deck.",
+  "waste_chute_attach_warning": "Attach waste chute to match current deck configuration.",
   "wrong_pip": "wrong instrument installed",
   "z_axis_still_attached": "z-axis screw still secure"
 }

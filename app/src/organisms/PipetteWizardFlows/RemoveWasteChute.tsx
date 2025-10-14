@@ -1,28 +1,30 @@
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
-  Banner,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
   COLORS,
-  DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-
-import { BODY_STYLE } from './constants'
 
 import type { PipetteWizardStepProps } from './types'
 
 export const RemoveWasteChute = (
   props: PipetteWizardStepProps
 ): JSX.Element => {
-  const { isRobotMoving, errorMessage, proceed, isOnDevice, goBack } = props
+  const { isRobotMoving, errorMessage, proceed, goBack } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -42,33 +44,51 @@ export const RemoveWasteChute = (
       subHeader={errorMessage}
     />
   ) : (
-    <GenericWizardTile
-      header={t('remove_wastechute')}
-      rightHandBody={''}
-      bodyText={
-        <>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
-            <Trans
-              t={t}
-              i18nKey="waste_chute_error"
-              components={{
-                block: <LegacyStyledText css={BODY_STYLE} />,
-              }}
-            />
-            <Banner
-              type="error"
-              marginTop={
-                Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-              }
-            >
-              {t('waste_chute_warning')}
-            </Banner>
-          </Flex>
-        </>
-      }
-      proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-      proceed={handleOnClick}
-      back={goBack}
-    />
+    <SimpleWizardBody
+      header={t('waste_chute_error')}
+      subHeader={t('waste_chute_warning')}
+      iconColor={COLORS.red50}
+      isSuccess={false}
+    >
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        css={ALIGN_BUTTONS}
+        gridGap={SPACING.spacing8}
+      >
+        <Btn onClick={goBack}>
+          <span css={GO_BACK_BUTTON_STYLE}>{t('shared:go_back')}</span>
+        </Btn>
+        <PrimaryButton onClick={handleOnClick}>
+          {i18n.format(t('shared:continue'), 'capitalize')}
+        </PrimaryButton>
+      </Flex>
+    </SimpleWizardBody>
   )
 }
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
+  }
+`
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.grey50};
+  padding-left: ${SPACING.spacing32};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+    padding-left: 0rem;
+    &:hover {
+      opacity: 100%;
+    }
+  }
+`

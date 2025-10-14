@@ -39,18 +39,14 @@ describe('RemoveWasteChute', () => {
   })
   it('returns the correct information, buttons work as expected for attach flow', async () => {
     render(props)
-    screen.getByText('Remove waste chute')
+    screen.getByText('Remove waste chute before calibrating.')
     screen.getByText(
-      'Remove the waste chute from the deck plate adapter before proceeding.'
+      'A collision will occur with the pipette if the waste chute remains on deck.'
     )
-    screen.getByLabelText('icon_error')
-    screen.getByText(
-      'If the waste chute isn’t removed, the pipette WILL crash into it.'
-    )
-    const proceedBtn = screen.getByRole('button', { name: 'Continue' })
+    const proceedBtn = screen.getByRole('button', { name: /continue/i })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = screen.getByLabelText('back')
+    const backBtn = screen.getByRole('button', { name: /go back/i })
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })

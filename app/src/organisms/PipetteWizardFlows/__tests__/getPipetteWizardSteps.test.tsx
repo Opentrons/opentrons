@@ -111,8 +111,7 @@ describe('getPipetteWizardSteps', () => {
       getPipetteWizardSteps(FLOWS.DETACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
-
-  it('returns the corect array of info for attach pipette 96 channel', () => {
+  it('returns the correct array of info for attach pipette 96 channel', () => {
     const mockAttachPipetteFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -166,7 +165,7 @@ describe('getPipetteWizardSteps', () => {
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
 
-  it('returns the corect array of info for detach pipette 96 channel', () => {
+  it('returns the correct array of info for detach pipette 96 channel', () => {
     const mockDetachPipetteFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -352,7 +351,6 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
-
       {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
