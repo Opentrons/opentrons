@@ -33,12 +33,7 @@ import type {
 import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 import type { Selection } from './actions/types'
-import type {
-  CollapsedStepsState,
-  HoverableItem,
-  SelectableItem,
-  StepsState,
-} from './reducers'
+import type { HoverableItem, SelectableItem, StepsState } from './reducers'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // ======= Selectors ===============================================
@@ -192,11 +187,7 @@ export const getActiveItem: Selector<HoverableItem | null> = createSelector(
     }
   }
 )
-// TODO: BC 2018-12-17 refactor as react state
-export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
-  rootSelector,
-  (state: StepsState) => state.collapsedSteps
-)
+
 interface StepTitleInfo {
   stepName: string
   stepType: StepType
