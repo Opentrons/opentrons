@@ -3,11 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
-import {
-  END_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-  START_TERMINAL_ITEM_ID,
-} from '../../../steplist/types'
 import * as utils from '../../modules/utils'
 import {
   MULTI_STEP_SELECTION_TYPE,
