@@ -282,8 +282,7 @@ describe('discovery selectors', () => {
       expected: false,
     },
     {
-      name:
-        'getDiscoveredRobots assigns status based on healthStatus and serverHealthStatus',
+      name: 'getDiscoveredRobots assigns status based on healthStatus and serverHealthStatus',
       selector: discovery.getDiscoveredRobots,
       state: MOCK_STATE,
       expected: [
@@ -335,8 +334,7 @@ describe('discovery selectors', () => {
       ],
     },
     {
-      name:
-        'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
+      name: 'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
       selector: discovery.getDiscoveredRobots,
       state: {
         discovery: {
@@ -475,8 +473,7 @@ describe('discovery selectors', () => {
       expected: '4.5.6',
     },
     {
-      name:
-        'getRobotFirmwareVersion returns serverHealth.smoothieVersion if no health',
+      name: 'getRobotFirmwareVersion returns serverHealth.smoothieVersion if no health',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: { serverHealth: { smoothieVersion: '4.5.6' }, health: null },
       selector: discovery.getRobotFirmwareVersion,
@@ -490,8 +487,7 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
-      name:
-        'getRobotProtocolApiVersion returns first health.protocol_api_version',
+      name: 'getRobotProtocolApiVersion returns first health.protocol_api_version',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: {},
@@ -501,8 +497,7 @@ describe('discovery selectors', () => {
       expected: { min: '1.0', max: '2.1' },
     },
     {
-      name:
-        'getRobotProtocolApiVersion returns minimum and maximum protocol versions',
+      name: 'getRobotProtocolApiVersion returns minimum and maximum protocol versions',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: {},
@@ -515,8 +510,7 @@ describe('discovery selectors', () => {
       expected: { min: '2.0', max: '2.8' },
     },
     {
-      name:
-        'getRobotProtocolApiVersion returns default protocol versions when none exists',
+      name: 'getRobotProtocolApiVersion returns default protocol versions when none exists',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: {},
@@ -568,8 +562,7 @@ describe('discovery selectors', () => {
       expected: EXPECTED_BAZ,
     },
     {
-      name:
-        'getDiscoverableRobotByName returns discoverable robot by name if robot is not connectable',
+      name: 'getDiscoverableRobotByName returns discoverable robot by name if robot is not connectable',
       selector: discovery.getDiscoverableRobotByName,
       state: MOCK_STATE,
       args: ['fizz'],

@@ -263,8 +263,7 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
   version: 20,
   robotSystemUpdate: {
     manifestUrls: {
-      OT2:
-        'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+      OT2: 'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
     },
   },
 }

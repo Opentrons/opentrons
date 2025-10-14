@@ -123,7 +123,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     dropdown={
                       shouldShowAdapterOptions
                         ? {
-                            title: (null as unknown) as string,
+                            title: null as unknown as string,
                             width: '13rem',
                             currentOption: {
                               name:

@@ -24,7 +24,7 @@ describe('form casting', () => {
       stepName: 'transfer',
       stepDetails: 'some details',
       aspirate_airGap_checkbox: false,
-      aspirate_airGap_volume: 1,
+      aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: 1,
       aspirate_flowRate: 50,
@@ -54,7 +54,7 @@ describe('form casting', () => {
       dispense_wellOrder_second: 'l2r',
       dispense_wells: ['A1'],
       disposalVolume_checkbox: true,
-      disposalVolume_volume: 1,
+      disposalVolume_volume: '1',
       path: 'single',
       pipette: {} as PipetteEntity,
       preWetTip: false,
@@ -83,10 +83,8 @@ describe('form casting', () => {
     }
     expect(_castForm(input)).toEqual({
       ...input,
-      aspirate_mix_times: 0,
-      aspirate_mix_volume: 0,
-      dispense_mix_times: 0,
-      dispense_mix_volume: 0,
+      aspirate_airGap_volume: 1,
+      disposalVolume_volume: 1,
     })
   })
 

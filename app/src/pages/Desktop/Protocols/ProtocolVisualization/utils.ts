@@ -237,12 +237,10 @@ export const getBackgroundColor = (
 }
 
 interface ActiveLayer {
-  copy: string
   isActiveLayerVisible: boolean
 }
 
 export const getActiveLayer = (
-  isTiprack: boolean,
   pipettes: PipetteTemporalProperties[],
   id: string,
   selectedRunTimeCommand?: RunTimeCommand
@@ -259,46 +257,13 @@ export const getActiveLayer = (
     selectedRunTimeCommand.commandType === 'moveLabware' &&
     'labwareId' in selectedRunTimeCommand.params &&
     selectedRunTimeCommand.params.labwareId === id
-  const isLoadStepAssosciatedWithLabwareId =
-    selectedRunTimeCommand != null &&
-    'labwareId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.labwareId === id &&
-    selectedRunTimeCommand.commandType === 'loadLabware'
 
   const isStepAssosciatedWithLabware =
     isStepAssosciatedWithLabwareState ||
     isStepAssosciatedWithLabwareId ||
     isMoveStepAssosciatedWithLabwareId
 
-  let activeCopy = isTiprack
-    ? 'Tiprack used in pipetting step'
-    : 'Labware used in pipetting step'
-  if (isLoadStepAssosciatedWithLabwareId) {
-    activeCopy = 'Loading labware'
-  } else if (isMoveStepAssosciatedWithLabwareId) {
-    activeCopy = 'Moving plate'
-  } else if (
-    isTiprack &&
-    isStepAssosciatedWithLabwareId &&
-    selectedRunTimeCommand?.commandType === 'pickUpTip'
-  ) {
-    activeCopy = 'Picking up tips'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'aspirateInPlace'
-  ) {
-    activeCopy = 'Aspirating'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'dispenseInPlace'
-  ) {
-    activeCopy = 'Dispensing'
-  }
-
   return {
-    copy: activeCopy,
     isActiveLayerVisible: isStepAssosciatedWithLabware,
   }
 }
@@ -341,7 +306,7 @@ export const getTipSvgInfo = (
     .filter(liquid => ingredIds.includes(liquid.id))
     ?.map(liquid => liquid.displayColor)
   const tipColor =
-    colorsInTip.length > 1 ? COLORS.grey40 : colorsInTip[0] ?? COLORS.grey40
+    colorsInTip.length > 1 ? COLORS.grey40 : (colorsInTip[0] ?? COLORS.grey40)
   const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
     (sum, { volume }) => sum + volume,
     0

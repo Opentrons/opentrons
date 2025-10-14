@@ -53,10 +53,8 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
   const runId = useCurrentRunId({ enabled: robot.status === CONNECTABLE })
-  const [
-    showChooseProtocolSlideout,
-    setShowChooseProtocolSlideout,
-  ] = useState<boolean>(false)
+  const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =
+    useState<boolean>(false)
   const [
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
@@ -74,7 +72,9 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     setShowChooseProtocolSlideout(true)
     setShowOverflowMenu(false)
   }
-  const handleClickConnectionTroubleshooting: MouseEventHandler<HTMLButtonElement> = e => {
+  const handleClickConnectionTroubleshooting: MouseEventHandler<
+    HTMLButtonElement
+  > = e => {
     e.preventDefault()
     e.stopPropagation()
     setShowConnectionTroubleshootingModal(true)

@@ -12,6 +12,5 @@ export interface RootState {
 export const _uiSubReducers = {
   steps: stepsReducer,
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _uiSubReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_uiSubReducers)

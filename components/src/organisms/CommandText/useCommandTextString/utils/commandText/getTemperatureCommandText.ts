@@ -43,7 +43,7 @@ export const getTemperatureCommandText = ({
         : t('target_temperature'),
     hold_time_seconds:
       'holdTimeSeconds' in command.params
-        ? command.params.holdTimeSeconds ?? '0'
+        ? (command.params.holdTimeSeconds ?? '0')
         : '0',
   })
 }

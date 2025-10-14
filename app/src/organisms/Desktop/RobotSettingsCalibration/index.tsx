@@ -81,10 +81,8 @@ export function RobotSettingsCalibration({
   const createRequestId = useRef<string | null>(null)
   const jogRequestId = useRef<string | null>(null)
 
-  const [
-    showHowCalibrationWorksModal,
-    setShowHowCalibrationWorksModal,
-  ] = useState(false)
+  const [showHowCalibrationWorksModal, setShowHowCalibrationWorksModal] =
+    useState(false)
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
@@ -100,7 +98,7 @@ export function RobotSettingsCalibration({
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
@@ -109,7 +107,7 @@ export function RobotSettingsCalibration({
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -119,7 +117,7 @@ export function RobotSettingsCalibration({
       ) {
         trackedRequestId.current =
           'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       }
     }
@@ -201,7 +199,8 @@ export function RobotSettingsCalibration({
     return null
   })
 
-  const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
+  const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
+    []
 
   if (!isFlex && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({

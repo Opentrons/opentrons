@@ -29,7 +29,7 @@ export function getBuildrootAnalyticsData(
   const robot =
     robotName === null
       ? getRobotUpdateRobot(state)
-      : getViewableRobots(state).find(r => r.name === robotName) ?? null
+      : (getViewableRobots(state).find(r => r.name === robotName) ?? null)
 
   if (robot === null) return null
 

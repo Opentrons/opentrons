@@ -61,9 +61,7 @@ const TableDatum = styled('td')`
 export const Liquids = (props: { protocolId: string }): JSX.Element => {
   const { protocolId } = props
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }

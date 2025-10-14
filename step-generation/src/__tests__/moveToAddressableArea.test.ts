@@ -25,9 +25,8 @@ let invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
-  invariantContext
-)
+const prevRobotState: RobotState =
+  getInitialRobotStateStandard(invariantContext)
 
 describe('moveToAddressableArea', () => {
   it('should call moveToAddressableArea with correct params for trash bin', () => {

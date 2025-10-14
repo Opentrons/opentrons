@@ -47,8 +47,10 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
         const slot = getSlotInLocationStack(stack)
 
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${slot} for labware ${id}!`)
           return null

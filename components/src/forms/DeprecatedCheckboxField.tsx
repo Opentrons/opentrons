@@ -63,8 +63,8 @@ export function DeprecatedCheckboxField(
             props.isIndeterminate
               ? 'minus-box'
               : props.value
-              ? 'ot-checkbox'
-              : 'checkbox-blank-outline'
+                ? 'ot-checkbox'
+                : 'checkbox-blank-outline'
           }
           width="100%"
         />

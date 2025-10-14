@@ -64,12 +64,13 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   )
   const selectedAdapterDef =
     selectedAdapterDefURI != null
-      ? defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
+      ? (defs[selectedAdapterDefURI] ??
+        customLabwareDefs[selectedAdapterDefURI])
       : null
   const selectedTopLabwareDef =
     selectedTopLabware.labwareDefURI != null
-      ? defs[selectedTopLabware.labwareDefURI] ??
-        customLabwareDefs[selectedTopLabware.labwareDefURI]
+      ? (defs[selectedTopLabware.labwareDefURI] ??
+        customLabwareDefs[selectedTopLabware.labwareDefURI])
       : null
 
   const orientation =

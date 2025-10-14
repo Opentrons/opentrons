@@ -71,7 +71,9 @@ interface IconButtonProps {
  * @param {IconButtonProps} props The props for the component.
  * @returns {JSX.Element} The rendered IconButton component.
  */
-export function IconButton({
+
+// ToDo: (kk: 2022-10-04) Rename this to IconButton when remove IconButton from components
+export function NewIconButton({
   variant,
   iconName,
   iconSize,

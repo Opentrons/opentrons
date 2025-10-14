@@ -230,8 +230,9 @@ export const LegacyLabwarePositionCheckComponent = (
     location: LegacyLabwareOffsetLocation
   ): Promise<void> => {
     if (initialPosition != null && finalPosition != null) {
-      const definitionUri = protocolData?.labware.find(l => l.id === labwareId)
-        ?.definitionUri
+      const definitionUri = protocolData?.labware.find(
+        l => l.id === labwareId
+      )?.definitionUri
 
       if (definitionUri) {
         const existingOffset =
@@ -270,13 +271,10 @@ export const LegacyLabwarePositionCheckComponent = (
   }
 
   const [isExiting, setIsExiting] = useState(false)
-  const {
-    createMaintenanceCommand: createSilentCommand,
-  } = useCreateMaintenanceCommandMutation()
-  const {
-    chainRunCommands,
-    isCommandMutationLoading: isCommandChainLoading,
-  } = useChainMaintenanceCommands()
+  const { createMaintenanceCommand: createSilentCommand } =
+    useCreateMaintenanceCommandMutation()
+  const { chainRunCommands, isCommandMutationLoading: isCommandChainLoading } =
+    useChainMaintenanceCommands()
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {

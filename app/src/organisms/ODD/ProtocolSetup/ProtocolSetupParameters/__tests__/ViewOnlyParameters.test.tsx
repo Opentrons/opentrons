@@ -36,9 +36,9 @@ describe('ViewOnlyParameters', () => {
       } as any)
     when(useToaster)
       .calledWith()
-      .thenReturn(({
+      .thenReturn({
         makeSnackbar: mockMakeSnackBar,
-      } as unknown) as any)
+      } as unknown as any)
   })
   it('renders the parameters labels and mock data', () => {
     render(props)

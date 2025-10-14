@@ -47,21 +47,17 @@ const maskTo2Decimal = makeMaskToDecimal(2)
 
 export function StackingOffsets(): JSX.Element | null {
   const labwareDefinitions = getAllDefinitions()
-  const adapterDefinitions = Object.values(
-    labwareDefinitions
-  ).filter(definition => definition.allowedRoles?.includes('adapter'))
+  const adapterDefinitions = Object.values(labwareDefinitions).filter(
+    definition => definition.allowedRoles?.includes('adapter')
+  )
 
   const fieldList: Array<keyof LabwareFields> = [
     'compatibleAdapters',
     'compatibleModules',
     'stackedLabwareZDimension',
   ]
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-  } = useFormikContext<LabwareFields>()
+  const { values, errors, touched, setFieldValue } =
+    useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
     return null
@@ -251,10 +247,8 @@ export function StackingOffsets(): JSX.Element | null {
                                 ...values.compatibleAdapters,
                               }
                               if (isChecked) {
-                                const {
-                                  [key]: _,
-                                  ...newCompatibleAdapters
-                                } = compatibleAdaptersCopy
+                                const { [key]: _, ...newCompatibleAdapters } =
+                                  compatibleAdaptersCopy
                                 setFieldValue(
                                   'compatibleAdapters',
                                   newCompatibleAdapters
@@ -336,10 +330,8 @@ export function StackingOffsets(): JSX.Element | null {
                                 ...values.compatibleModules,
                               }
                               if (isChecked) {
-                                const {
-                                  [model]: _,
-                                  ...newCompatibleModules
-                                } = compatibleModulesCopy
+                                const { [model]: _, ...newCompatibleModules } =
+                                  compatibleModulesCopy
                                 setFieldValue(
                                   'compatibleModules',
                                   newCompatibleModules

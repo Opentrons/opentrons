@@ -85,12 +85,11 @@ export function DefineLiquidsModal(
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
-  const volumePerWell = Object.values(
-    allLabwareWellContents
-  ).flatMap(labwareWithIngred =>
-    Object.values(labwareWithIngred).map(ingred =>
-      liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
-    )
+  const volumePerWell = Object.values(allLabwareWellContents).flatMap(
+    labwareWithIngred =>
+      Object.values(labwareWithIngred).map(ingred =>
+        liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
+      )
   )
   const liquidHasAssignedWell = volumePerWell.some(volume => volume > 0)
 
@@ -127,18 +126,12 @@ export function DefineLiquidsModal(
     liquidGroupId: liquidGroupId ?? nextGroupId,
   }
 
-  const {
-    handleSubmit,
-    formState,
-    control,
-    watch,
-    setValue,
-    register,
-  } = useForm<Ingredient>({
-    defaultValues: initialValues,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    resolver: yupResolver(liquidEditFormSchema),
-  })
+  const { handleSubmit, formState, control, watch, setValue, register } =
+    useForm<Ingredient>({
+      defaultValues: initialValues,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      resolver: yupResolver(liquidEditFormSchema),
+    })
   const name = watch('displayName')
   const color = watch('displayColor')
   const liquidClass = watch('liquidClass')
@@ -149,7 +142,9 @@ export function DefineLiquidsModal(
       displayName: values.displayName,
       displayColor: values.displayColor,
       liquidClass:
-        values.liquidClass !== '' ? values.liquidClass ?? undefined : undefined,
+        values.liquidClass !== ''
+          ? (values.liquidClass ?? undefined)
+          : undefined,
       description: values.description !== '' ? values.description : null,
       liquidGroupId: values.liquidGroupId,
     })

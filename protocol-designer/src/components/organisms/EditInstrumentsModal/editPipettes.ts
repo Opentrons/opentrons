@@ -133,7 +133,7 @@ export const editPipettes = (
           id,
           name,
           tiprackDefURI,
-        }: typeof nextPipettes[keyof typeof nextPipettes]): NormalizedPipette => ({
+        }: (typeof nextPipettes)[keyof typeof nextPipettes]): NormalizedPipette => ({
           id,
           name,
           tiprackDefURI,
@@ -181,7 +181,7 @@ export const editPipettes = (
 
   const pipettesWithNewTipracks: string[] = filter(
     nextPipettes,
-    (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
+    (nextPipette: (typeof nextPipettes)[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
       const nextTips = nextPipette.tiprackDefURI
       const oldTips =
@@ -197,15 +197,16 @@ export const editPipettes = (
   // this will be used so that handleFormChange gets called even though the
   // pipette id itself has not changed (only it's tiprack)
 
-  const pipettesWithNewTiprackIdentityMap: SubstitutionMap = pipettesWithNewTipracks.reduce(
-    (acc: SubstitutionMap, id: string): SubstitutionMap => {
-      return {
-        ...acc,
-        ...{ [id]: id },
-      }
-    },
-    {}
-  )
+  const pipettesWithNewTiprackIdentityMap: SubstitutionMap =
+    pipettesWithNewTipracks.reduce(
+      (acc: SubstitutionMap, id: string): SubstitutionMap => {
+        return {
+          ...acc,
+          ...{ [id]: id },
+        }
+      },
+      {}
+    )
 
   const substitutionMap = {
     ...pipetteReplacementMap,

@@ -101,9 +101,9 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         },
         { staleTime: Infinity }
       )
-      .thenReturn(({
+      .thenReturn({
         data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
-      } as unknown) as UseQueryResult<CommandsData>)
+      } as unknown as UseQueryResult<CommandsData>)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
       runId: RUN_ID,

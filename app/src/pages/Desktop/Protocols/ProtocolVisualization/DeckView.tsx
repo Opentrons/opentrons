@@ -1,7 +1,9 @@
 import { Fragment, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
+  Flex,
   FlexTrash,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
@@ -79,6 +81,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     liquids,
     commands,
   } = props
+  const { t } = useTranslation('protocol_visualization')
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const {
@@ -120,10 +123,20 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
+  const selectedCommandIndex =
+    selectedRunTimeCommand != null
+      ? commands.findIndex(command => command.id === selectedRunTimeCommand.id)
+      : 0
+
   return (
     <div className={styles.deck_view_padding}>
       <div className={styles.deck_view_container}>
-        <StyledText desktopStyle="bodyLargeSemiBold">Deck View</StyledText>
+        <Flex justifyContent="space-between" with="100%">
+          <StyledText desktopStyle="bodyLargeSemiBold">Deck View</StyledText>
+          <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
+            {t('step', { number: selectedCommandIndex })}
+          </StyledText>
+        </Flex>
         <RobotCoordinateSpaceWithRef
           height="100%"
           width="100%"
@@ -141,14 +154,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   ([_, lw]) =>
                     getSlotInLocationStack(lw.stack) === addressableArea.id
                 )
-                const isTiprack =
-                  labwareOnSlot != null
-                    ? labwareEntities[labwareOnSlot[0]].def.parameters.isTiprack
-                    : false
                 const { isActiveLayerVisible } =
                   labwareOnSlot != null
                     ? getActiveLayer(
-                        isTiprack,
                         Object.values(pipettes),
                         labwareOnSlot[0],
                         selectedRunTimeCommand

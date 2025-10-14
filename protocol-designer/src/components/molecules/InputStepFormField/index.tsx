@@ -46,7 +46,7 @@ export function InputStepFormField(
       <InputField
         {...otherProps}
         tooltipText={
-          showTooltip ? t(`${tooltipContent}`) ?? undefined : undefined
+          showTooltip ? (t(`${tooltipContent}`) ?? undefined) : undefined
         }
         type={type}
         title={title}

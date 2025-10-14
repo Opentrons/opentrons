@@ -83,6 +83,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   let commandNumber = 0
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = analysis.commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   return (
     <div className={styles.annotated_steps_container}>
       <div className={styles.annotated_steps_wrap}>
@@ -130,7 +136,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 )
               }
             })
-          : analysis.commands.map((command, index) => {
+          : filteredCommands.map((command, index) => {
               const currentCommandNumber = ++commandNumber
 
               return (

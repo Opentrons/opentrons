@@ -55,10 +55,10 @@ const modifiedSimpleAnalysisFileFixture = {
 const mockStoredProtocolDataFixture = [
   {
     ...storedProtocolDataFixture,
-    mostRecentAnalysis: ({
+    mostRecentAnalysis: {
       ...modifiedSimpleAnalysisFileFixture,
       runTimeParameters: [],
-    } as any) as ProtocolAnalysisOutput,
+    } as any as ProtocolAnalysisOutput,
   },
 ]
 

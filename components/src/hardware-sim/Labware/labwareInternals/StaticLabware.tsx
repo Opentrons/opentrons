@@ -155,6 +155,5 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   )
 }
 
-export const StaticLabware: MemoExoticComponent<
-  typeof StaticLabwareComponent
-> = memo(StaticLabwareComponent)
+export const StaticLabware: MemoExoticComponent<typeof StaticLabwareComponent> =
+  memo(StaticLabwareComponent)

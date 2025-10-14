@@ -413,8 +413,8 @@ export function getLabwareDisplayNamesFromFailedCmd(
 
   const labwareNickname =
     protocolAnalysis != null
-      ? getLoadedLabware(protocolAnalysis.labware, labwareId)?.displayName ??
-        null
+      ? (getLoadedLabware(protocolAnalysis.labware, labwareId)?.displayName ??
+        null)
       : null
   const failedLWURI = runRecord?.data.labware.find(
     labware => labware.id === labwareId

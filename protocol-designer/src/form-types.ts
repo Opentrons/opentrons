@@ -285,7 +285,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
-  aspirate_airGap_volume?: number | null
+  aspirate_airGap_volume?: string | null
   aspirate_delay_seconds?: number | null
   aspirate_flowRate?: number | null
   aspirate_mix_times?: number | null
@@ -314,7 +314,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_location?: string | null
   conditioning_checkbox: boolean | null
   conditioning_volume: number | null
-  dispense_airGap_volume?: number | null
+  dispense_airGap_volume?: string | null
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dispense_mix_times?: number | null
@@ -338,7 +338,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_x_position?: number | null
   dispense_y_position?: number | null
   dispense_position_reference: PositionReference
-  disposalVolume_volume?: number | null
+  disposalVolume_volume?: string | null
   dropTip_wellNames?: string[] | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null

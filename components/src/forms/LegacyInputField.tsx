@@ -97,7 +97,7 @@ export function LegacyInputField(props: LegacyInputFieldProps): JSX.Element {
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
 function Input(props: LegacyInputFieldProps): JSX.Element {
   const error = props.error != null
-  const value = props.isIndeterminate ? '' : props.value ?? ''
+  const value = props.isIndeterminate ? '' : (props.value ?? '')
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder
 
   return (

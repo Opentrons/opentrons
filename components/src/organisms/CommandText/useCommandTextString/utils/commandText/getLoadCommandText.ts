@@ -35,7 +35,7 @@ export const getLoadCommandText = ({
       return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
-            ? getPipetteSpecsV2(pipetteModel)?.displayName ?? ''
+            ? (getPipetteSpecsV2(pipetteModel)?.displayName ?? '')
             : '',
         mount_name: command.params.mount === 'left' ? t('left') : t('right'),
       })

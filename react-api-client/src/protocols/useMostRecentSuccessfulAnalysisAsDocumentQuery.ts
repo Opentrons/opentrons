@@ -41,11 +41,8 @@ export function useMostRecentSuccessfulAnalysisAsDocumentQuery<TError = Error>(
     async () => {
       const analysisIds = analysisSummaries.map(summary => summary.id)
 
-      const mostRecentSuccessfulAnalysis = await getMostRecentSuccessfulAnalysisId(
-        analysisIds,
-        host,
-        protocolId
-      )
+      const mostRecentSuccessfulAnalysis =
+        await getMostRecentSuccessfulAnalysisId(analysisIds, host, protocolId)
 
       return mostRecentSuccessfulAnalysis
     },

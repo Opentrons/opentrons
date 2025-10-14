@@ -19,14 +19,12 @@ export type ModalContentMixedType =
 
 export type ModalContentMixedIcons = 'error' | 'caution' | 'neutral'
 
-export const MODAL_CONTENT_MIXED_ICONS: Record<
-  ModalContentMixedIcons,
-  string
-> = {
-  neutral: COLORS.grey50,
-  caution: COLORS.yellow50,
-  error: COLORS.red50,
-}
+export const MODAL_CONTENT_MIXED_ICONS: Record<ModalContentMixedIcons, string> =
+  {
+    neutral: COLORS.grey50,
+    caution: COLORS.yellow50,
+    error: COLORS.red50,
+  }
 
 interface ModalContentMixedIconProps {
   type: 'icon'

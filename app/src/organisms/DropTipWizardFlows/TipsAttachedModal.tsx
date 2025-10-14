@@ -39,12 +39,8 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const {
-      aPipetteWithTip,
-      host,
-      setTipStatusResolved,
-      ...homePipetteProps
-    } = props
+    const { aPipetteWithTip, host, setTipStatusResolved, ...homePipetteProps } =
+      props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 

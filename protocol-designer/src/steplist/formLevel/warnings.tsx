@@ -39,8 +39,7 @@ export type FormWarning = FormError & {
 const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
   title: `Disposal volume is below recommended minimum (${min} uL)`,
-  body:
-    'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
+  body: 'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
   dependentFields: ['pipette', 'volume'],
   location: 'form',
 })
@@ -336,10 +335,12 @@ type ComposeWarnings = <T extends HydratedFormData>(
   ...warningCheckers: Array<(fields: T) => FormWarning | null>
 ) => (arg: T) => FormWarning[]
 
-export const composeWarnings: ComposeWarnings = <T extends HydratedFormData>(
-  ...warningCheckers: Array<(fields: T) => FormWarning | null>
-) => (formData: T) =>
-  warningCheckers.reduce<FormWarning[]>((acc, checker) => {
-    const possibleWarning = checker(formData)
-    return possibleWarning ? [...acc, possibleWarning] : acc
-  }, [])
+export const composeWarnings: ComposeWarnings =
+  <T extends HydratedFormData>(
+    ...warningCheckers: Array<(fields: T) => FormWarning | null>
+  ) =>
+  (formData: T) =>
+    warningCheckers.reduce<FormWarning[]>((acc, checker) => {
+      const possibleWarning = checker(formData)
+      return possibleWarning ? [...acc, possibleWarning] : acc
+    }, [])

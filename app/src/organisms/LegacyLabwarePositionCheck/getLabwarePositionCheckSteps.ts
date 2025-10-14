@@ -18,14 +18,14 @@ export const getLabwarePositionCheckSteps = (
     if (shouldUseMetalProbe) return getProbeBasedLPCSteps(protocolData)
 
     // filter out any pipettes that are not being used in the protocol
-    const pipettesUsedInProtocol: CompletedProtocolAnalysis['pipettes'] = protocolData.pipettes.filter(
-      ({ id }) =>
+    const pipettesUsedInProtocol: CompletedProtocolAnalysis['pipettes'] =
+      protocolData.pipettes.filter(({ id }) =>
         protocolData.commands.some(
           command =>
             command.commandType === 'pickUpTip' &&
             command.params.pipetteId === id
         )
-    )
+      )
     const { labware, modules, commands } = protocolData
     if (pipettesUsedInProtocol.length === 0) {
       throw new Error(
