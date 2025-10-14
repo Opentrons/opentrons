@@ -1,5 +1,6 @@
 import { COLORS } from '../../../../helix-design-system'
 import { DEFAULT_TIP_SIZE } from './constants'
+import styles from './tips.module.css'
 
 export function SelectedTip(props: {
   size?: string
@@ -25,7 +26,8 @@ export function SelectedTip(props: {
           dominantBaseline="middle"
           fill={COLORS.white}
           transform="scale(1, -1)"
-          transform-origin="10 10"
+          // needed to refactor `transform-origin` to CSS modules for passing lint checks
+          className={styles.selected_tip_text}
         >
           {text}
         </text>

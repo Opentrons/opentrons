@@ -1,0 +1,9 @@
+.selected_tip_text {
+  transform-origin: center;
+  x: 10;
+  y: 11;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  fill: var(--c-white);
+  transform: scale(1, -1);
+}

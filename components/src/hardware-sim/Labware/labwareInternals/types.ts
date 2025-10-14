@@ -1,6 +1,5 @@
-import { INACCESSIBLE, NEW, NO, SELECTED, USED } from './Tips/constants'
-
 import type { MouseEvent } from 'react'
+import type { INACCESSIBLE, NEW, NO, SELECTED, USED } from './Tips/constants'
 
 export interface WellMouseEvent {
   wellName: string
