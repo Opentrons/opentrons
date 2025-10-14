@@ -36,8 +36,8 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*.css": "yarn stylelint --fix",
-    "*.{js,ts,tsx,json,md,yml}": "prettier --write"
+    "*.css": "yarn stylelint --fix",
+    "*.{js,ts,tsx,json,md,yml}": "prettier --write --ignore-path .eslintignore"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.582.0",
