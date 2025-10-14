@@ -8,7 +8,7 @@ import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
-import type { TipType } from '@opentrons/components'
+import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
@@ -19,9 +19,9 @@ interface LabwareOnDeckProps {
   showHighlightedWells?: boolean
   handleClickWell?: (wellName: string) => void
   tipStatusByWellName?: Record<string, TipType>
-  selectedTips?: string[]
-  onMouseEnterWell?: (wellName: string) => void
-  onMouseLeaveWell?: () => void
+  onMouseEnterWell?: (e: WellMouseEvent) => void
+  onMouseLeaveWell?: (e: WellMouseEvent) => void
+  selectedTipsByIndex?: Record<string, number>
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -33,9 +33,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     showHighlightedWells = true,
     tipStatusByWellName,
     handleClickWell,
-    selectedTips,
     onMouseEnterWell,
     onMouseLeaveWell,
+    selectedTipsByIndex,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -71,9 +71,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
         missingTips={missingTips}
         highlight={highlight}
         tipStatusByWellName={tipStatusByWellName}
-        selectedTips={selectedTips}
         onMouseEnterWell={onMouseEnterWell}
         onMouseLeaveWell={onMouseLeaveWell}
+        selectedTipsByIndex={selectedTipsByIndex}
       />
     </g>
   )

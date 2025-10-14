@@ -1,11 +1,10 @@
-import { CoordinateTuple, PipetteV2Specs } from '@opentrons/shared-data'
-
-import { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
-
 import { getHoveredOffsetFromWell } from '../utils'
 import { EightChannelFlexShadow } from './EightChannelFlexShadow'
 import { NinetySixFlexShadow } from './NinetySixFlexShadow'
 import { SingleChannelFlexShadow } from './SingleChannelShadow'
+
+import type { CoordinateTuple, PipetteV2Specs } from '@opentrons/shared-data'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 // TODO: adjust once partial tip selection is enabled
 const PRIMARY_NOZZLE = 'A1'

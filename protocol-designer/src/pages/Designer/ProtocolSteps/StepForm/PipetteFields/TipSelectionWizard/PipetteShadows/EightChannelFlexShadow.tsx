@@ -21,9 +21,9 @@ export function EightChannelFlexShadow(props: {
       <path
         d="M1.70703 4.61404C1.70703 2.91471 3.08462 1.53711 4.78395 1.53711H152.476C154.176 1.53711 155.553 2.91469 155.553 4.61403V293.845H1.70703V4.61404Z"
         fill="#16212D"
-        fill-opacity="0.2"
+        fillOpacity="0.2"
         stroke="#006CFA"
-        stroke-width="2.7881"
+        strokeWidth="2.7881"
       />
     </svg>
   )

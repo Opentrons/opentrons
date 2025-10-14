@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -10,18 +10,17 @@ import {
   NEW,
   NO,
   StyledText,
-  TipType,
   USED,
 } from '@opentrons/components'
-import { getPositionFromSlotId } from '@opentrons/shared-data'
 import {
-  getSlotInLocationStack,
-  getTipColumn,
-  TipState,
-} from '@opentrons/step-generation'
+  ALL,
+  COLUMN,
+  getPositionFromSlotId,
+  SINGLE,
+} from '@opentrons/shared-data'
+import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
-import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
@@ -29,31 +28,34 @@ import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { PipetteShadow } from './PipetteShadows/PipetteFlexShadow'
 import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
-import { getViewboxFromSelectedLabware } from './utils'
+import { getColumnFromWellName, getViewboxFromSelectedLabware } from './utils'
 
+import type { Dispatch, SetStateAction } from 'react'
+import type { TipType, WellMouseEvent } from '@opentrons/components'
+import type {
+  LabwareDefinition,
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
+import type { TipState } from '@opentrons/step-generation'
 import type { TipSelectionBaseProps } from './types'
 
 export function SelectTips(
   props: TipSelectionBaseProps & {
-    pipetteId: string
+    pipetteSpecs: PipetteV2Specs
+    nozzles: NozzleConfigurationStyle
     numTotalPickups: number
-    selectedTips: string[]
-    setSelectedTips: Dispatch<SetStateAction<string[]>>
+    selectedTips: string[][]
+    setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
   }
 ): JSX.Element {
-  const { pipetteId } = props
+  const { pipetteSpecs, nozzles } = props
 
   const { t } = useTranslation('tip_selection')
-  const invariantContext = useSelector(getInvariantContext)
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const [hoveredWell, setHoveredWell] = useState<string | null>(null)
 
-  const { pipetteEntities } = invariantContext
-  const { spec } = pipetteEntities[pipetteId]
-  const { backLeftCorner, frontRightCorner } = spec.pipetteBoundingBoxOffsets
-  const shadowWidth = frontRightCorner[0] - backLeftCorner[0]
-  const shadowHeight = backLeftCorner[1] - frontRightCorner[1]
   const {
     selectedTiprackId,
     activeDeckSetup,
@@ -82,35 +84,88 @@ export function SelectTips(
   const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
 
-  const handleClickWell = (wellName: string) => {
+  const getAllWellsInColumn = (
+    wellName: string,
+    labwareDef: LabwareDefinition
+  ): string[] => {
+    const column = getColumnFromWellName(wellName)
+    return Object.keys(labwareDef.wells).filter(
+      well => getColumnFromWellName(well) === column
+    )
+  }
+
+  const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
+  const { channels } = pipetteSpecs
+
+  // TODO: handle partial configurations for 8 and 96 channel pipettes
+  const handleClickWell = (wellName: string): void => {
     if (tipState?.[wellName] === 'EMPTY') {
       return
     }
     setShowPickupsRequiredBanner(false)
-    setSelectedTips(prevTips => {
-      const newTips = [...prevTips]
-      if (newTips.includes(wellName)) {
-        newTips.splice(newTips.indexOf(wellName), 1)
-      } else if (numPickupsRemaining > 0) {
-        newTips.push(wellName)
-      }
-      return newTips
-    })
-  }
-  const { channels } = spec
 
-  const handleHoverWell = (wellName: string) => {
+    const prevSelectedTipsByIndex = selectedTips.reduce<Record<string, number>>(
+      (acc, tipList, index) => {
+        const innerAcc = tipList.reduce((acc, tip) => {
+          return { ...acc, [tip]: index }
+        }, {})
+        return { ...acc, ...innerAcc }
+      },
+      {}
+    )
+
+    if (channels === 1 || nozzles === SINGLE) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        setSelectedTips(
+          selectedTips.filter((_, index) => index !== indexToUnselect)
+        )
+      } else if (numPickupsRemaining > 0) {
+        setSelectedTips(prevTips => [...prevTips, [wellName]])
+      }
+    } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        setSelectedTips(
+          selectedTips.filter((_, index) => index !== indexToUnselect)
+        )
+      } else if (numPickupsRemaining > 0) {
+        const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
+        setSelectedTips(prevTips => {
+          const newTips = [...prevTips]
+          newTips.push(allWellsInColumn)
+          return newTips
+        })
+      }
+    } else if (channels === 96) {
+      const allWells = Object.keys(labwareDef.wells)
+      if (wellName in prevSelectedTipsByIndex) {
+        const indexToUnselect = prevSelectedTipsByIndex[wellName]
+        setSelectedTips(
+          selectedTips.filter((_, index) => index !== indexToUnselect)
+        )
+      } else if (numPickupsRemaining > 0) {
+        setSelectedTips(prevTips => [...prevTips, allWells])
+      }
+    }
+  }
+
+  const handleHoverWell = (e: WellMouseEvent): void => {
+    const { wellName } = e
     let transformedWellName = wellName
-    if (channels === 8) {
+    if (
+      (channels === 8 && nozzles === ALL) ||
+      (channels === 96 && nozzles === COLUMN)
+    ) {
       const column = wellName.slice(1, wellName.length)
       transformedWellName = `A${column}`
-    } else if (channels === 96) {
+    } else if (channels === 96 && nozzles === ALL) {
       transformedWellName = 'A1'
     }
     setHoveredWell(transformedWellName)
   }
 
-  const handleLeaveWell = () => {
+  const handleLeaveWell = (_: WellMouseEvent): void => {
     setHoveredWell(null)
   }
 
@@ -124,14 +179,24 @@ export function SelectTips(
     controls = <></>
   } else {
     const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
+    const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
+      (acc, tipList, index) => {
+        const innerAcc = tipList.reduce<Record<string, number>>((acc, tip) => {
+          return { ...acc, [tip]: index }
+        }, {})
+        return { ...acc, ...innerAcc }
+      },
+      {}
+    )
     const tipStatusByWellName =
       tipState != null
-        ? Object.entries(tipState).reduce(
+        ? Object.entries(tipState).reduce<Record<string, TipType>>(
             (acc, [wellName, state]) => ({
               ...acc,
-              [wellName]: selectedTips.includes(wellName)
-                ? 'selected'
-                : tipStateToTipType[state],
+              [wellName]:
+                wellName in selectedWellsByIndex
+                  ? 'selected'
+                  : tipStateToTipType[state],
             }),
             {}
           )
@@ -147,7 +212,7 @@ export function SelectTips(
           handleClickWell={handleClickWell}
           onMouseEnterWell={handleHoverWell}
           onMouseLeaveWell={handleLeaveWell}
-          selectedTips={selectedTips}
+          selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
                 tipStatusByWellName,
@@ -156,7 +221,7 @@ export function SelectTips(
         />
         {hoveredWell != null ? (
           <PipetteShadow
-            pipetteSpec={spec}
+            pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
             selectedTiprackId={selectedTiprackId}
@@ -202,10 +267,3 @@ const tipStateToTipType: Record<TipState, TipType> = {
   DIRTY: USED,
   EMPTY: NO,
 }
-
-type SelectedTipData = Array<{
-  [selectedTip: string]: {
-    wells: string[]
-    index: number
-  }
-}>

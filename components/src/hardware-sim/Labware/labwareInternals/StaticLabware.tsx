@@ -34,7 +34,7 @@ export interface StaticLabwareProps {
   showBorder?: boolean
   tipStatusByWellName?: Record<string, TipType>
   handleClickWell?: (wellName: string) => void
-  selectedTips?: string[]
+  selectedTipsByIndex?: Record<string, number>
 }
 
 const TipDecoration = memo(function TipDecoration(props: {
@@ -75,9 +75,8 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     showBorder = true,
     tipStatusByWellName,
     handleClickWell,
-    selectedTips,
+    selectedTipsByIndex,
   } = props
-
   const { isTiprack } = definition.parameters
   return (
     <g onClick={onLabwareClick}>
@@ -124,24 +123,26 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     </>
                   ) : (
                     <svg
-                      transform="scale(1, -1)"
-                      transform-origin={`${well.x} ${well.y}`} // translations for preserving number readability
                       x={well.x - wellWidth / 2}
                       y={well.y - wellHeight / 2}
-                      onMouseEnter={() => onMouseEnterWell?.(wellName)} // TODO: add hover logic
-                      onMouseLeave={() => onMouseLeaveWell?.(wellName)}
+                      onMouseEnter={e =>
+                        onMouseEnterWell?.({ wellName, event: e })
+                      }
+                      onMouseLeave={e =>
+                        onMouseLeaveWell?.({ wellName, event: e })
+                      }
                       onClick={() => handleClickWell?.(wellName)} // TODO: add select logic
                     >
                       <TipStatus
                         type={tipStatusByWellName[wellName]}
                         text={
-                          selectedTips?.includes(wellName)
-                            ? (selectedTips.indexOf(wellName) + 1).toString()
+                          selectedTipsByIndex != null &&
+                          wellName in selectedTipsByIndex
+                            ? (selectedTipsByIndex[wellName] + 1).toString()
                             : undefined
                         }
                         size={`${wellWidth}px`} // wellWidth for tips will equal wellHeight, so using width here is arbitrary
                       />
-                      <div>1</div>
                     </svg>
                   )}
                 </Fragment>

@@ -23,9 +23,9 @@ export function NinetySixFlexShadow(props: {
       <path
         d="M2.09863 338.737H497.549V48.9296C497.549 23.4361 476.883 2.76959 451.389 2.76959H48.2586C22.7651 2.76959 2.09863 23.4361 2.09863 48.9296V338.737Z"
         fill="#16212D"
-        fill-opacity="0.2"
+        fillOpacity="0.2"
         stroke={COLORS.blue50}
-        stroke-width="2.5"
+        strokeWidth="2.5"
       />
     </svg>
   )

@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getIsTiprack, getPositionFromSlotId } from '@opentrons/shared-data'
+import {
+  ALL,
+  getIsTiprack,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getIsTiprackSelectable, getViewboxFromSelectedLabware } from '../utils'
 
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 vi.mock(import('@opentrons/step-generation'), async importOriginal => {
@@ -46,21 +51,53 @@ describe('getIsTiprackSelectable', () => {
   })
 
   it('returns true when the labware is a matching tiprack and in a pipettable slot', () => {
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(true)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+      })
+    ).toBe(true)
   })
 
   it('returns false when the labware is not a matching tiprack', () => {
-    expect(getIsTiprackSelectable(labware, MOCK_NON_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_NON_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+      })
+    ).toBe(false)
   })
 
   it('returns false when the labware is matching but in a non-pipettable slot', () => {
     vi.mocked(getSlotInLocationStack).mockReturnValue('A4')
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+      })
+    ).toBe(false)
   })
 
   it('returns false when the labware not a tiprack', () => {
     vi.mocked(getIsTiprack).mockReturnValue(false)
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+      })
+    ).toBe(false)
   })
 })
 

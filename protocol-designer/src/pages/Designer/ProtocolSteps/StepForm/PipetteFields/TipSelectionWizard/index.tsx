@@ -6,6 +6,7 @@ import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { SelectTiprack } from './SelectTiprack'
@@ -13,6 +14,8 @@ import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { TipSelectionBaseProps } from './types'
 
 const NUM_TOTAL_STEPS = 2
 const STUBBED_NUM_PICKUPS = 10
@@ -21,12 +24,13 @@ interface TipSelectionWizardProps {
   formTiprackUri: string
   setShowTipSelectionModal: Dispatch<SetStateAction<boolean>>
   pipetteId: string
+  nozzles: NozzleConfigurationStyle
 }
 
 export function TipSelectionWizard(
   props: TipSelectionWizardProps
 ): JSX.Element {
-  const { setShowTipSelectionModal, formTiprackUri, pipetteId } = props
+  const { setShowTipSelectionModal, formTiprackUri, pipetteId, nozzles } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
@@ -35,8 +39,10 @@ export function TipSelectionWizard(
   const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] = useState(
     false
   )
-  const [selectedTips, setSelectedTips] = useState<string[]>([])
+  const [selectedTips, setSelectedTips] = useState<string[][]>([])
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const { pipetteEntities } = useSelector(getInvariantContext)
+  const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -63,12 +69,14 @@ export function TipSelectionWizard(
     setShowTipSelectionModal(false)
   }
 
-  const baseProps = {
+  const baseProps: TipSelectionBaseProps = {
     selectedTiprackId,
     setSelectedTiprackId,
     formTiprackUri,
     activeDeckSetup,
     deckDef,
+    pipetteSpecs,
+    nozzles,
   }
 
   let currentComponent: JSX.Element
@@ -84,7 +92,7 @@ export function TipSelectionWizard(
           setSelectedTips={setSelectedTips}
           setShowPickupsRequiredBanner={setShowPickupsRequiredBanner}
           numTotalPickups={STUBBED_NUM_PICKUPS}
-          pipetteId={pipetteId}
+          nozzles={nozzles}
         />
       )
       break

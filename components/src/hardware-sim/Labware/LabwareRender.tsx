@@ -112,7 +112,7 @@ export interface LabwareRenderProps {
   strokeColor?: string
   tipStatusByWellName?: Record<string, TipType>
   handleClickWell?: (wellName: string) => void
-  selectedTips?: string[]
+  selectedTipsByIndex?: Record<string, number>
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -180,7 +180,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         wellStroke={props.wellStroke}
         tipStatusByWellName={props.tipStatusByWellName}
         handleClickWell={props.handleClickWell}
-        selectedTips={props.selectedTips}
+        selectedTipsByIndex={props.selectedTipsByIndex}
       />
       {props.wellStroke != null ? (
         <StrokedWells

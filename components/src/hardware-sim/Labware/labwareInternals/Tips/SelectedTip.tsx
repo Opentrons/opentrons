@@ -24,6 +24,8 @@ export function SelectedTip(props: {
           textAnchor="middle"
           dominantBaseline="middle"
           fill={COLORS.white}
+          transform="scale(1, -1)"
+          transform-origin="10 10"
         >
           {text}
         </text>

@@ -1,28 +1,24 @@
-import { getIsTiprack, getPositionFromSlotId } from '@opentrons/shared-data'
+import {
+  ALL,
+  getIsTiprack,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
-import type { DeckDefinition, PipetteV2Specs } from '@opentrons/shared-data'
+import type {
+  DeckDefinition,
+  NozzleConfigurationStyle,
+  PipetteChannels,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
+import type { LabwareEntities } from '@opentrons/step-generation'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
 } from '../../../../../../step-forms'
-
-export const getIsTiprackSelectable = (
-  labware: LabwareOnDeck,
-  formTiprackUri: string
-): boolean => {
-  // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const { def, labwareDefURI, stack } = labware
-  const slot = getSlotInLocationStack(stack)
-  return (
-    getIsTiprack(def) &&
-    labwareDefURI === formTiprackUri &&
-    !COLUMN_4_SLOTS.includes(slot)
-  )
-}
 
 // arbitrary constant to show slots surrounding the selected tiprack
 // TODO: confirm this padding with Design
@@ -60,7 +56,7 @@ export const getHoveredOffsetFromWell = (args: {
   wellName: string | null
   pipetteSpec: PipetteV2Specs
   primaryNozzle: string
-}) => {
+}): { x: number; y: number } => {
   const {
     selectedTiprackId,
     labwareState,
@@ -95,4 +91,55 @@ export const getHoveredOffsetFromWell = (args: {
       yOffset -
       (well.shape === 'circular' ? well.diameter : well.yDimension) / 2,
   }
+}
+
+export const getColumnFromWellName = (wellName: string): string =>
+  wellName.slice(1, wellName.length)
+
+const _getIsPickupCompatibleWithPossibleAdapter = (
+  stack: string[],
+  labwareEntities: LabwareEntities,
+  nozzles: NozzleConfigurationStyle,
+  channels: PipetteChannels
+): boolean => {
+  const isAdapterNeeded = nozzles === ALL && channels === 96
+  const isAdapterInStack = stack.some(stackElementId => {
+    return (
+      labwareEntities[stackElementId]?.labwareDefURI ===
+      'opentrons/opentrons_flex_96_tiprack_adapter/1'
+    )
+  })
+  return isAdapterNeeded === isAdapterInStack
+}
+
+export function getIsTiprackSelectable(args: {
+  labware: LabwareOnDeck
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+}): boolean {
+  // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+  } = args
+  const { channels } = pipetteSpecs
+  const { def, labwareDefURI, stack } = labware
+  const isPickupCompatibleWithPossibleAdapter = _getIsPickupCompatibleWithPossibleAdapter(
+    stack,
+    labwareEntities,
+    nozzles,
+    channels
+  )
+  const slot = getSlotInLocationStack(stack)
+  return (
+    getIsTiprack(def) &&
+    labwareDefURI === formTiprackUri &&
+    !COLUMN_4_SLOTS.includes(slot) &&
+    isPickupCompatibleWithPossibleAdapter
+  )
 }
