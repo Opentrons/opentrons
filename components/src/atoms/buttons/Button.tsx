@@ -10,8 +10,8 @@ export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
   /** The visual style variant of the button */
   variant?: ButtonVariant
-  /** Custom border radius (default: '8px') */
-  borderRadius?: string
+  /** Custom border radius (default: 8px, rounded: 200px) */
+  rounded?: boolean
   /** Button content */
   children: ReactNode
   /** Click handler */
@@ -33,7 +33,7 @@ export interface ButtonProps
  */
 export function Button({
   variant = 'default',
-  borderRadius = '8px',
+  rounded = false,
   children,
   onClick,
   disabled = false,
@@ -54,13 +54,9 @@ export function Button({
   const buttonClassName = clsx(
     styles.button,
     styles[`variant_${variant}`],
+    rounded && styles.rounded,
     className
   )
-
-  const buttonStyle: React.CSSProperties = {
-    // @ts-expect-error CSS custom properties are not in CSSProperties type
-    '--button-border-radius': borderRadius,
-  }
 
   return (
     <button
@@ -69,7 +65,6 @@ export function Button({
       disabled={disabled}
       {...(ariaDisabled ? { 'aria-disabled': true } : {})}
       type={type}
-      style={buttonStyle}
       {...restProps}
     >
       {children}

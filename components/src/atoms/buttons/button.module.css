@@ -18,7 +18,9 @@
   text-transform: none;
 
   /* Transition for smooth state changes */
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 /* Default variant - Blue */
@@ -99,6 +101,11 @@
   background-color: var(--grey-30);
   color: var(--grey-40);
   cursor: default;
+}
+
+/* Rounded variant - full border radius */
+.button.rounded {
+  border-radius: var(--border-radius-200);
 }
 
 /* Disabled state removes pointer events */

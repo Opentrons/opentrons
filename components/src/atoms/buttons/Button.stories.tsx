@@ -21,9 +21,9 @@ const meta: Meta = {
         options: ['default', 'alert', 'alt'],
       },
     },
-    borderRadius: {
+    rounded: {
       control: {
-        type: 'text',
+        type: 'boolean',
       },
     },
     children: {
@@ -49,7 +49,7 @@ export default meta
 export const DefaultButton: StoryObj<typeof ButtonComponent> = {
   args: {
     variant: 'default',
-    borderRadius: BORDERS.borderRadius8,
+    rounded: false,
     children: 'primary button',
   },
   render: args => (
@@ -62,7 +62,7 @@ export const DefaultButton: StoryObj<typeof ButtonComponent> = {
 export const AlertButton: StoryObj<typeof ButtonComponent> = {
   args: {
     variant: 'alert',
-    borderRadius: BORDERS.borderRadiusFull,
+    rounded: true,
     children: 'alert tertiary button',
   },
   render: args => (
@@ -75,7 +75,7 @@ export const AlertButton: StoryObj<typeof ButtonComponent> = {
 export const AltButton: StoryObj<typeof ButtonComponent> = {
   args: {
     variant: 'alt',
-    borderRadius: BORDERS.borderRadius8,
+    rounded: false,
     children: 'alt primary button',
   },
   render: args => (
