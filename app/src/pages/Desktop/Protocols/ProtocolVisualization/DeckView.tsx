@@ -74,7 +74,6 @@ interface DeckViewProps {
   robotType: RobotType
   selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
-  showDeckRenders: boolean
   liquids: Liquid[]
   selectedRunTimeCommand?: RunTimeCommand
 }
@@ -90,7 +89,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,
-    showDeckRenders,
     liquids,
     commands,
   } = props
@@ -186,16 +184,16 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                           )
                         : { isActiveLayerVisible: false }
                     let fixtureBaseColor = lightFill
-                    if (showDeckRenders) {
-                      if (isActiveLayerVisible) {
-                        fixtureBaseColor = COLORS.purple30
-                      } else if (
-                        !isActiveLayerVisible &&
-                        selectedSlot === addressableArea.id
-                      ) {
-                        fixtureBaseColor = COLORS.grey40
-                      }
+
+                    if (isActiveLayerVisible) {
+                      fixtureBaseColor = COLORS.purple30
+                    } else if (
+                      !isActiveLayerVisible &&
+                      selectedSlot === addressableArea.id
+                    ) {
+                      fixtureBaseColor = COLORS.grey40
                     }
+
                     return cutoutId != null ? (
                       <SingleSlotFixture
                         key={addressableArea.id}
@@ -205,9 +203,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         fixtureBaseColor={fixtureBaseColor}
                         slotClipColor={darkFill}
                         stroke={
-                          showDeckRenders &&
-                          (hoveredSlot === addressableArea.id ||
-                            selectedSlot === addressableArea.id)
+                          hoveredSlot === addressableArea.id ||
+                          selectedSlot === addressableArea.id
                             ? COLORS.purple50
                             : 'none'
                         }
@@ -293,7 +290,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
               <DeckViewDetails
                 labwareEntitiesExtended={labwareEntitiesExtended}
                 liquids={liquids}
-                showDeckRenders={showDeckRenders}
                 hoveredSlot={hoveredSlot}
                 setHoveredSlot={setHoveredSlot}
                 robotType={robotType}
