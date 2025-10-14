@@ -148,11 +148,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const tempInnerProps = getModuleInnerProps(moduleState)
         const isActive = selectedSlot === slot || hoveredSlot === slot
-
         const innerTCProps = {
           ...tempInnerProps,
           lidMotorState:
-            (tempInnerProps as ThermocyclerVizProps).lidMotorState !== 'open'
+            (tempInnerProps as ThermocyclerVizProps)?.lidMotorState !== 'open'
               ? 'closed'
               : 'open',
         }
