@@ -42,12 +42,12 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 11. Remove the protective film from the window panels.
     ![removing the window protective film](../images/window-film.png)
 
-12. Install the top window panel and fasten the corner screws using the 2.5 mm hex screwdriver and 4 top window screws.
+12. Install the top window panel. Use the provided 2.5 mm hex screwdriver and 4 top window screws to fasten the top window panel to the robot.
 
 <figure class="side-by-side" markdown>
 ![installing top window panel](../images/top-window.png)
 ![fastening top window panel to frame](../images/top-fasteners.png)
-</figure> <!-- too much border or padding for side by side -->
+</figure>
 
 13. Install the window covers.
     ![installing window covers](../images/window-covers.png)
@@ -63,7 +63,7 @@ At this point you should have an assembled robot, but it isn't time to power it 
     - Visually check the gantry; if it is uneven or slanted, contact Customer Support.
     - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Customer Support.
 
-15. Clean and sanitize the robot.
+15. Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
 
     !!!note
         When during cleaning or other maintenance, be sure to turn off the machine and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
@@ -72,12 +72,14 @@ At this point you should have an assembled robot, but it isn't time to power it 
 
 16. Download and install the Opentrons App, which is available at <https://opentrons.com/ot-app>.
 
-USE LAPTOP IMAGE HERE
-
 17. Connect the Ethernet cable to the OT-2 and laptop. If your computer does not have an Ethernet port, use the provided Ethernet-to-USB dongle.
+    ![laptop USB-Ethernet connection](../images/computer-connection.png)
+
 18. Connect the external power supply to the OT-2 and then connect the main power cable to a wall outlet.
+    ![external power supply connection](../images/OT2-power.png)
+
 19. Turn on the power by pressing the power button on the OT-2. It may take up to 45 seconds before the OT-2 starts running. After starting up, the robot will move the gantry to its home position.
 
-At this point your OT-2 is ready for use. You can attach pipettes to the gantry, add modules to the deck, and create protocols in for the robot using the Opentrons App.
-
 </div>
+
+At this point your OT-2 is ready for use. You can attach pipettes to the gantry, add modules to the deck, and create protocols in for the robot using the Opentrons App.

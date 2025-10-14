@@ -8,14 +8,15 @@ Before setting up your OT-2, make sure that your installation site meets all of 
 
 The workspace for your OT-2 should meet the following requirements.
 
-- **Operating space:** The OT2-2 needs a working area with minimum width, depth, and height of 63 cm x 57 cm x 66 cm (25" x 22.5" x 26"). Also, be sure to leave extra side and back clearance for cables, USB connections, and to dissipate exhaust from modules that heat and cool.
-- **Weight rating:** The OT-2 weighs 42 kg (93 lbs). Place the robot on a surface that can support its weight plus the weight of any modules, labware, liquids, or other lab equipment that may be used in your work.
+- **Weight bearing:** The OT-2 weighs 42 kg (93 lbs). Place the robot on a surface that can support its weight plus the weight of any modules, labware, liquids, or other lab equipment that may be used in your work.
+
 - **Bench surface:** A good workspace is stationary, sturdy, level, and liquid-resistant. Tables or benches with wheels (even locking wheels) are not recommended. OT-2 gantry movements can shake light weight or moveable tables.
 
-!!!warning
-    _Do not_ position the sides or back of the OT-2 flush against a wall.
+- **Operating space:** The OT2-2 needs a working area with minimum height, depth, and width of 66 cm x 57 cm x 63 cm (25" x 22.5" x 26").
 
-PLACEHOLDER FOR DIMENSIONAL OT-2 IMAGE HERE (manual p. 21)
+![OT2 length, width, height](../images/OT2-dimensions.png)
+
+Also, leave extra side and back clearance for cables, USB connections, and to help dissipate exhaust from modules that heat and cool.
 
 ## Power consumption
 
