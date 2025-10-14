@@ -15,7 +15,6 @@ from opentrons.legacy_commands import publisher
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.pipette.types import PipetteNameType
 
 from . import validation
 from .core.common import ProtocolCore, RobotCore

@@ -99,9 +99,11 @@ class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
 
 
-def is_pipette_96_channel(pipette: PipetteNameType) -> bool:
+def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
     """Return if this pipette type is a 96 channel."""
-    return pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]
+    if pipette is not None:
+        return pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]
+    return False
 
 
 def ensure_mount_for_pipette(
