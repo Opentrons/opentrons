@@ -1,7 +1,10 @@
 """Camera interaction resource provider."""
-from typing import Optional, Callable, Tuple
+from typing import Optional, Callable, Tuple, Awaitable
 from pydantic import BaseModel, Field
 from ..errors import CameraCaptureError
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class CameraSettings(BaseModel):
@@ -17,20 +20,32 @@ class CameraSettings(BaseModel):
         ..., description="Enablement status for camera usage with Error Recovery."
     )
 
+
 class ImageParameters(BaseModel):
     """Parameters for an Image Capture to determine filters. These are the inputs as expected by FFMPEG."""
-    resolution: Optional[Tuple[int, int]]= Field(
+
+    resolution: Optional[Tuple[int, int]] = Field(
         None,
-        description="Width by height resolution in pixels for the image to be captured with."
+        description="Width by height resolution in pixels for the image to be captured with.",
     )
-    zoom: Optional[float] = Field(1.0, description="Multiplier to use when cropping and scaling a captured Image.")
+    zoom: Optional[float] = Field(
+        None,
+        description="Multiplier to use when cropping and scaling a captured Image.",
+    )
     pan: Optional[Tuple[int, int]] = Field(
         None,
-        description="Position to pan to for a given zoom. Format is X and Y coordinates (in pixels) to the bottom left of a frame."
+        description="Position to pan to for a given zoom. Format is X and Y coordinates (in pixels) to the bottom left of a frame.",
     )
-    contrast: Optional[float] = Field(1.0, description="The contrast to use when processing an image.")
-    brightness: Optional[float] = Field(0.0, description="The brightness to use when processing an image.")
-    saturation: Optional[float] = Field(1.0, description="The brightness to use when processing an image.")
+    contrast: Optional[float] = Field(
+        None, description="The contrast to use when processing an image."
+    )
+    brightness: Optional[float] = Field(
+        None, description="The brightness to use when processing an image."
+    )
+    saturation: Optional[float] = Field(
+        None, description="The brightness to use when processing an image."
+    )
+
 
 class CameraProvider:
     """Provider class to wrap camera interactions between the server and the engine."""
@@ -38,7 +53,9 @@ class CameraProvider:
     def __init__(
         self,
         camera_settings_callback: Optional[Callable[[], CameraSettings]] = None,
-        image_capture_callback: Optional[Callable[[ImageParameters], bytes | None]] = None,
+        image_capture_callback: Optional[
+            Callable[[ImageParameters], Awaitable[bytes | None]]
+        ] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
 
@@ -57,7 +74,7 @@ class CameraProvider:
         return CameraSettings(
             camera_enabled=True, live_stream_enabled=True, error_recovery_enabled=True
         )
-    
+
     async def capture_image(self, parameters: ImageParameters) -> bytes | None:
         """
         Process through the Camera Executor on robot server an image capture request with a given set of filters.
@@ -65,9 +82,13 @@ class CameraProvider:
         Conditionally returns None if an image capture callback does not exist (simulation).
         """
         if self._image_capture_callback is not None:
-            capture_result = self._image_capture_callback(parameters)
+            log.info("TAKING PICTURE")
+            capture_result = await self._image_capture_callback(parameters)
             if capture_result is not None:
                 return capture_result
             else:
-                raise CameraCaptureError(message="Camera capture has failed to return an image.")
+                raise CameraCaptureError(
+                    message="Camera capture has failed to return an image."
+                )
+        # Return None if the image capture callback is unavailable (simulation)
         return None

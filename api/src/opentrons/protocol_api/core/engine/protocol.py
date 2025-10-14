@@ -1173,6 +1173,40 @@ class ProtocolCore(
             return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
 
+    def capture_image(
+        self,
+        home_before: Optional[bool] = False,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using a camera.
+        Args:
+            home_before: Home the gantry before taking a photo. Defaults to False.
+            resolution: Width by height resolution in pixels for the image to be captured with.
+            zoom: Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.
+            contrast: The contrast to use when processing an image. Scale is 0% to 100%
+            brightness: The brightness to use when processing an image. Scale is 0% to 100%.
+            saturation: The saturation to use when processing an image. Scale is 0% to 100%.
+        """
+        if home_before:
+            self._engine_client.execute_command(cmd.HomeParams(axes=None))
+
+        # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
+        self._engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=filename,
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
+            )
+        )
+
     def _convert_labware_location(
         self,
         location: Union[

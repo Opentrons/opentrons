@@ -17,6 +17,7 @@ from robot_server.data_files.data_files_store import (
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
+    ImageJpegFileNameMetadata,
 )
 
 
@@ -85,6 +86,15 @@ class FileProviderExecutor:
                 base_name = base_name[:-4]
 
             return base_name + str(metadata.wavelength) + "nm.csv"
+        elif isinstance(file_data.command_metadata, ImageJpegFileNameMetadata):
+            metadata = file_data.command_metadata
+            base_name = metadata.base_filename
+
+            if base_name.endswith(".jpg"):
+                base_name
+            elif base_name.endswith(".jpeg"):
+                base_name = base_name[:-5]
+            return base_name +".jpg"
         else:
             return f"{file_id}.dat"
 

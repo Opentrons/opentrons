@@ -5,7 +5,10 @@ from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
 )
-from opentrons.protocol_engine.resources.camera_provider import CameraSettings, ImageParameters
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraSettings,
+    ImageParameters,
+)
 from opentrons.system import camera
 
 
@@ -32,6 +35,7 @@ class CameraProviderWrapper:
             live_stream_enabled=self._camera_settings_store.get_live_stream_enabled(),
             error_recovery_enabled=self._camera_settings_store.get_error_recovery_camera_enabled(),
         )
+
     async def process_image_capture(self, parameters: ImageParameters) -> bytes | None:
         """Process and image capture request for a Camera utilizing a given set of parameters. Returns None if an error occurred."""
         return await camera.image_capture(parameters=parameters)

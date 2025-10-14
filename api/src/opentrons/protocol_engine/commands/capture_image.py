@@ -1,13 +1,24 @@
 """Command models to capture an image with a camera."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Tuple, Any
+import logging
 
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from opentrons.system.camera import (
+    ZOOM_MIN,
+    ZOOM_MAX,
+    CONTRAST_MIN,
+    CONTRAST_MAX,
+    SATURATION_MIN,
+    SATURATION_MAX,
+    BRIGHTNESS_MIN,
+    BRIGHTNESS_MAX,
+)
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors import  StorageLimitReachedError
+from ..errors import StorageLimitReachedError, CameraCaptureError
 from ..errors.error_occurrence import ErrorOccurrence
 
 from ..resources.file_provider import (
@@ -23,6 +34,8 @@ from ..state import update_types
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
 
+
+log = logging.getLogger(__name__)
 
 
 def _remove_default(s: dict[str, Any]) -> None:
@@ -40,11 +53,30 @@ class CaptureImageParams(BaseModel):
         description="Optional file name to use when storing the results of an Image Capture, PD only.",
         json_schema_extra=_remove_default,
     )
-    zoom: Optional[float] = Field(1.0, description="Multiplier to use when cropping and scaling a captured Image. Scale is 0.0 to 2.0, default is 1.0.")
-    pan: Optional[Tuple[int, int]] = Field(None, description="X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.")
-    contrast: Optional[float] = Field(0.0, description="The contrast to use when processing an image. Scale is -100% to 100%.")
-    brightness: Optional[float] = Field(0.0, description="The brightness to use when processing an image. Scale is -100% to 100%.")
-    saturation: Optional[float] = Field(0.0, description="The saturation to use when processing an image. Scale is -100% to 100%.")
+    resolution: Optional[Tuple[int, int]] = Field(
+        None,
+        description="Width by height resolution in pixels for the image to be captured with.",
+    )
+    zoom: Optional[float] = Field(
+        None,
+        description="Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.",
+    )
+    pan: Optional[Tuple[int, int]] = Field(
+        None,
+        description="X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.",
+    )
+    contrast: Optional[float] = Field(
+        None,
+        description="The contrast to use when processing an image. Scale is 0% to 100%.",
+    )
+    brightness: Optional[float] = Field(
+        None,
+        description="The brightness to use when processing an image. Scale is 0% to 100%.",
+    )
+    saturation: Optional[float] = Field(
+        None,
+        description="The saturation to use when processing an image. Scale is 0% to 100%.",
+    )
 
 
 class CaptureImageResult(BaseModel):
@@ -54,6 +86,55 @@ class CaptureImageResult(BaseModel):
         ...,
         description="File ID for image files output as a result of an image capture action.",
     )
+
+
+def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
+    def _error_response(
+        category: str, provided_value: float, range_min: float, range_max: float
+    ) -> None:
+        raise CameraCaptureError(
+            message=f"Provided {category} of {provided_value} is invalid, must be valued through {range_min} and {range_max}"
+        )
+
+    image_parameters = ImageParameters()
+    if params.zoom is not None and (params.zoom < ZOOM_MIN or params.zoom > ZOOM_MAX):
+        _error_response("Zoom", params.zoom, ZOOM_MIN, ZOOM_MAX)
+    image_parameters.zoom = params.zoom
+
+    if params.brightness is not None:
+        scaled_brightness = (((params.brightness / 100) * 256) - 128) * -1
+        if scaled_brightness is not None and (
+            scaled_brightness < BRIGHTNESS_MIN or scaled_brightness > BRIGHTNESS_MAX
+        ):
+            _error_response("Brightness", params.brightness, 0, 100)
+        image_parameters.brightness = scaled_brightness
+    else:
+        image_parameters.brightness = None
+
+    if params.contrast is not None:
+        scaled_contrast = (params.contrast / 100) * 2.0
+        if scaled_contrast is not None and (
+            scaled_contrast < CONTRAST_MIN or scaled_contrast > CONTRAST_MAX
+        ):
+            _error_response("Contrast", params.contrast, 0, 100)
+        image_parameters.contrast = scaled_contrast
+    else:
+        image_parameters.contrast = None
+
+    if params.saturation is not None:
+        scaled_saturation = (params.saturation / 100) * 2.0
+        if scaled_saturation is not None and (
+            scaled_saturation < SATURATION_MIN or scaled_saturation > SATURATION_MAX
+        ):
+            _error_response("Saturation", params.saturation, 0, 100)
+        image_parameters.saturation = scaled_saturation
+    else:
+        image_parameters.saturation = None
+
+    # todo(chb, 2025-10-13): Validate the resolution and that the pan coordinates exist within the image limits
+    image_parameters.resolution = params.resolution
+    image_parameters.pan = params.pan
+    return image_parameters
 
 
 class CaptureImageImpl(
@@ -77,52 +158,46 @@ class CaptureImageImpl(
     ) -> SuccessData[CaptureImageResult]:
         """Initiate an image capture with a camera."""
         state_update = update_types.StateUpdate()
-        
-        if (
-            params.fileName is not None
-        ):
-            # Validate that the amount of files we are about to generate does not put us higher than the limit
-            if (
-                self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT
-            ):
+
+        if params.fileName is not None:
+            # Validate that the file we are about to generate does not put us higher than the limit
+            if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
                 raise StorageLimitReachedError(
                     message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
                 )
-        
+
         # Handle capturing an image with the CameraUtility
-        # TODO: CASEY NOTE - CONVERT ALL THE VALUES FROM PERCENTAGES TO FFMPEG VALUES
+        camera_settings = await self._camera_provider.get_camera_settings()
+        if camera_settings.camera_enabled is False:
+            raise CameraCaptureError("Cannot capture image because Camera is disabled.")
 
-        parameters = ImageParameters(
-            zoom=params.zoom,
-            pan=params.pan,
-            contrast= 
-        )
-        camera_data = self._camera_provider.capture_image()
-        
+        parameters = _converted_image_params(params=params)
+        camera_data = await self._camera_provider.capture_image(parameters)
 
-        # Begin interfacing with the file provider
-        if params.fileName is not None:
-            filename = params.fileName
-        else:
-            # TODO: determine file name generation behavior
-            filename = "TEMPORARY"
-            
+        # Conditionally save file if camera data was returned - in simulation we don't return anything.
+        file_id: str | None = None
+        if camera_data:
+            # Begin interfacing with the file provider
+            if params.fileName is not None:
+                filename = params.fileName
+            else:
+                # TODO: determine file name generation behavior and replace this
+                file_count = self._state_view.files.get_filecount() + 1
+                filename = "TEMPORARY" + str(file_count)
 
-        file_id = await self._file_provider.write_file(
-            data=camera_data,
-            mime_type=MimeType.IMAGE_JPEG,
-            command_metadata=ImageJpegFileNameMetadata.model_construct(
-                base_filename=filename,
-            ),
-        )
+            file_id = await self._file_provider.write_file(
+                data=camera_data,
+                mime_type=MimeType.IMAGE_JPEG,
+                command_metadata=ImageJpegFileNameMetadata.model_construct(
+                    base_filename=filename,
+                ),
+            )
 
-        state_update.files_added = update_types.FilesAddedUpdate(
-            file_ids=[file_id]
-        )
+            state_update.files_added = update_types.FilesAddedUpdate(file_ids=[file_id])
 
         return SuccessData(
             public=CaptureImageResult(
-                fileIds=file_id,
+                fileId=file_id,
             ),
             state_update=state_update,
         )

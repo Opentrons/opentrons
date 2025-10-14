@@ -24,10 +24,12 @@ class ReadCmdFileNameMetadata(BaseModel):
     base_filename: str
     wavelength: int
 
+
 class ImageJpegFileNameMetadata(BaseModel):
     """Data from an image capture by a camera used to build the finalized file name and detail the metadata in the file."""
 
     base_filename: str
+
 
 CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageJpegFileNameMetadata | None
 

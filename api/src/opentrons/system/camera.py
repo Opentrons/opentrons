@@ -7,13 +7,16 @@ from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider, ImageParameters
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    ImageParameters,
+)
 
 
 log = logging.getLogger(__name__)
 
 # Default System Cameras
-FLEX_EMBEDDED_CAMERA = "/dev/ot_system_camera"
+FLEX_EMBEDDED_CAMERA = "/dev/video2"
 OT2_CAMERA = "/dev/video0"
 
 # Stream Globals
@@ -40,6 +43,7 @@ BRIGHTNESS_DEFAULT = 0.0
 SATURATION_MIN = 0.0
 SATURATION_MAX = 2.0
 SATURATION_DEFAULT = 1.0
+
 
 class StreamConfigurationKeys(str, Enum):
     """The Configuration Key Types."""
@@ -148,6 +152,7 @@ async def stop_live_stream() -> None:
             f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
+
 async def restart_live_stream() -> None:
     """Attempt to restart the Opentrons Live Stream service."""
     command = ["systemctl", "restart", "opentrons-live-stream"]
@@ -225,15 +230,24 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
         ]
         fd.writelines(file_lines)
 
+
 async def image_capture(parameters: ImageParameters) -> bytes | None:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
-    if parameters.zoom < ZOOM_MIN or parameters.zoom > ZOOM_MAX:
+    if parameters.zoom is not None and (
+        parameters.zoom < ZOOM_MIN or parameters.zoom > ZOOM_MAX
+    ):
         potential_invalid_param = "Zoom"
-    elif parameters.contrast < CONTRAST_MIN or parameters.contrast > CONTRAST_MAX:
+    elif parameters.contrast is not None and (
+        parameters.contrast < CONTRAST_MIN or parameters.contrast > CONTRAST_MAX
+    ):
         potential_invalid_param = "Contrast"
-    elif parameters.brightness < BRIGHTNESS_MIN or parameters.brightness > BRIGHTNESS_MAX:
+    elif parameters.brightness is not None and (
+        parameters.brightness < BRIGHTNESS_MIN or parameters.brightness > BRIGHTNESS_MAX
+    ):
         potential_invalid_param = "Brightness"
-    elif parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX:
+    elif parameters.saturation is not None and (
+        parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX
+    ):
         potential_invalid_param = "Saturation"
     else:
         potential_invalid_param = None
@@ -244,31 +258,64 @@ async def image_capture(parameters: ImageParameters) -> bytes | None:
         )
         return None
 
-    # Always stop the live stream service to ensure the Camera is always free
+    # Always stop the live stream service to ensure the Camera is always free when attempting an image capture
     await stop_live_stream()
+
     zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
-    contrast = parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
-    brightness = parameters.brightness if parameters.brightness is not None else BRIGHTNESS_DEFAULT
-    saturation = parameters.saturation if parameters.saturation is not None else SATURATION_DEFAULT
-    resolution = parameters.resolution if parameters.resolution is not None else (1920, 1080)
+    contrast = (
+        parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
+    )
+    brightness = (
+        parameters.brightness
+        if parameters.brightness is not None
+        else BRIGHTNESS_DEFAULT
+    )
+    saturation = (
+        parameters.saturation
+        if parameters.saturation is not None
+        else SATURATION_DEFAULT
+    )
+    resolution = (
+        parameters.resolution if parameters.resolution is not None else (1920, 1080)
+    )
 
-    filters : str = f"-vf \"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
-    + f"scale={resolution[0]}:{resolution[1]},"
-    + f"lut=y='(val-128)*{contrast}+128-{brightness}',"
-    + f"hue=s={saturation},"
-    + "format=nv12\""
+    ### FFMPEG Filter Details ###
+    # The following filters are utilized via the '-vf' flag to manipulate the final image returned:
+    # 'crop' = [output_width]:[output_height]:x:y
+    #   The crop is composed of a desired output width and height for the image, and
+    #   an X/Y position to begin the crop at (becomes the top left of the new image).
+    # 'scale' = [width]:[height]
+    #   The resolution of the final image to export, scales up or down based on configuration.
+    # 'lut' (Look-Up Table) = 'y' (Luminance) = 'val' (Current value of a given pixel from 0-255)
+    #   The equation on the Look up table takes the current luminance value of an image per pixel
+    #   and manipulates it using Contrast and Brightness settings. This is applied to the whole image.
+    # 'hue' (Image color range) = 's' (Saturation) = [range]
+    #   The hue flag uses the 's' (saturation) modifier to scale image color intensity, default is 1.
 
+    # todo(chb, 2025-10-13): Right now we're just zooming towards the center of the frame. The 'pan'
+    # setting should be used on the latter half of 'crop' to determine our cropping location instead.
     command = [
         "ffmpeg",
-        "-hwaccel", "auto",
-        "-video_size", f"{resolution[0]}x{resolution[1]}"
-        "-i", f"{FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA}",
-        "-vf", filters,
-        "-frames:v", "1",
-        "-f", "image2pipe",
-        "-vcodec", "mjpeg",
-        "-"
+        "-hwaccel",
+        "auto",
+        "-video_size",
+        f"{resolution[0]}x{resolution[1]}",
+        "-i",
+        f"{FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA}",
+        "-vf",
+        f"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
+        f"scale={resolution[0]}:{resolution[1]},"
+        f"lut=y=(val-128)*{contrast}+128-{brightness},"
+        f"hue=s={saturation},format=nv12",
+        "-frames:v",
+        "1",
+        "-f",
+        "image2pipe",
+        "-vcodec",
+        "mjpeg",
+        "-",
     ]
+    
     subprocess = await asyncio.create_subprocess_exec(
         *command,
         stdout=asyncio.subprocess.PIPE,
@@ -281,11 +328,10 @@ async def image_capture(parameters: ImageParameters) -> bytes | None:
         result = stdout
     else:
         log.error(
-            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to capture an image with camera, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
         result = None
 
     # Restart the live stream service
     await restart_live_stream()
-    # Return the process result
     return result

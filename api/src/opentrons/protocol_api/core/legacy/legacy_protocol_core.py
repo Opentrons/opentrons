@@ -613,6 +613,19 @@ class LegacyProtocolCore(
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"
 
+    def capture_image(
+        self,
+        home_before: Optional[bool] = False,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        "Capture an image using a camera."
+        assert False, "capture_image only supported on engine core"
+
     def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
         """Wait for list of tasks to complete before executing subsequent commands."""
         assert False, "wait_for_tasks only supported on engine core"

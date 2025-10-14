@@ -1362,6 +1362,7 @@ class InvalidModuleOrientation(ProtocolEngineError):
     ) -> None:
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
+
 class CameraCaptureError(ProtocolEngineError):
     """Raised when an Camera Capture attempt fails."""
 
