@@ -16,11 +16,9 @@ export function useProtocolAnalysisAsDocumentQuery(
   const query = useQuery<CompletedProtocolAnalysis>(
     [host, 'protocols', protocolId, 'analyses', analysisId],
     () =>
-      getProtocolAnalysisAsDocument(
-        host!,
-        protocolId!,
-        analysisId!
-      ).then(response => response.data),
+      getProtocolAnalysisAsDocument(host!, protocolId!, analysisId!).then(
+        response => response.data
+      ),
     options
   )
 

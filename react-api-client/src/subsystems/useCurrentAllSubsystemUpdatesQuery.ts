@@ -14,10 +14,7 @@ export function useCurrentAllSubsystemUpdatesQuery<TError = Error>(
   const queryClient = useQueryClient()
   const query = useQuery<CurrentSubsystemUpdates, TError>(
     [host, '/subsystems/updates/current'],
-    () =>
-      getCurrentAllSubsystemUpdates(host!).then(
-        response => response.data
-      ),
+    () => getCurrentAllSubsystemUpdates(host!).then(response => response.data),
     {
       enabled: host !== null,
       onError: () => {

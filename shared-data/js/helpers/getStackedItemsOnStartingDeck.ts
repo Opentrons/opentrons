@@ -134,9 +134,7 @@ export function getStackedItemsOnStartingDeck(
           command.result.labwareIds.forEach(labwareId => {
             const offDeckItem = {
               labwareId: labwareId,
-              definitionUri: getLabwareDefURI(
-                command.result?.definition!
-              ),
+              definitionUri: getLabwareDefURI(command.result?.definition!),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
             }
@@ -273,9 +271,7 @@ export function getStackedItemsOnStartingDeck(
           command.result.labwareIds.toReversed().map(lidId => {
             return {
               labwareId: lidId,
-              definitionUri: getLabwareDefURI(
-                command.result?.definition!
-              ),
+              definitionUri: getLabwareDefURI(command.result?.definition!),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
             }

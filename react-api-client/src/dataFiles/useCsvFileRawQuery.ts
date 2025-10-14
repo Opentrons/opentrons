@@ -19,8 +19,7 @@ export function useCsvFileRawQuery(
 
   const query = useQuery<DownloadedCsvFileResponse>(
     [host, 'dataFiles', fileId, 'download'],
-    () =>
-      getCsvFileRaw(host!, fileId).then(response => response.data),
+    () => getCsvFileRaw(host!, fileId).then(response => response.data),
     allOptions
   )
   return query

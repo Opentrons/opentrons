@@ -28,11 +28,9 @@ export function useRunCommandErrors<TError = Error>(
   const query = useQuery<RunCommandErrors, TError>(
     [host, 'runs', runId, 'commandErrors', cursor, pageLength],
     () => {
-      return getRunCommandErrors(
-        host!,
-        runId!,
-        finalizedParams
-      ).then(response => response.data)
+      return getRunCommandErrors(host!, runId!, finalizedParams).then(
+        response => response.data
+      )
     },
     allOptions
   )

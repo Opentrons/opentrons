@@ -18,8 +18,7 @@ export function useClientData<T = DefaultClientData>(
   const host = useHost()
   const query = useQuery<ClientDataResponse<T>, AxiosError>(
     [host, 'client_data', key],
-    () =>
-      getClientData<T>(host!, key).then(response => response.data),
+    () => getClientData<T>(host!, key).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

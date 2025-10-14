@@ -31,11 +31,9 @@ export function useAllCommandsQuery<TError = Error>(
   const query = useQuery<CommandsData, TError>(
     [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
     () => {
-      return getCommands(
-        host!,
-        runId!,
-        finalizedParams
-      ).then(response => response.data)
+      return getCommands(host!, runId!, finalizedParams).then(
+        response => response.data
+      )
     },
     allOptions
   )
