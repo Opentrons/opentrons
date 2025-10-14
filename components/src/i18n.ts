@@ -23,12 +23,15 @@ export const LANGUAGES: Array<{ name: string; value: Language }> = [
   { name: SIMPLIFIED_CHINESE_DISPLAY_NAME, value: SIMPLIFIED_CHINESE },
 ]
 
+/** base i18n config to be used in all other projects in the monorepo
+ *  that use i18n
+ */
 export const baseI18nConfig: InitOptions = {
   lng: 'en',
   fallbackLng: 'en',
   defaultNS: 'shared',
   interpolation: {
-    escapeValue: false,
+    escapeValue: false, // not needed for react as it escapes by default
     format: function (value: string, format) {
       if (format === 'upperCase') return value.toUpperCase()
       if (format === 'lowerCase') return value.toLowerCase()

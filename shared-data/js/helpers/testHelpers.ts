@@ -1,5 +1,5 @@
 // used to test useCommandTypeSummaries
-export async function getHighestCommandSchema(): Promise<any> {
+export function getHighestCommandSchema(): any {
   const modules = import.meta.glob('../../command/schemas/*.json', {
     eager: true,
   })

@@ -36,6 +36,8 @@ export const en = {
   app_settings,
   branded,
   change_pipette,
+  command_type_summary: shared_en_resources.command_type_summary,
+  deck_configuration: shared_en_resources.deck_configuration,
   device_details,
   device_settings,
   devices_landing,
@@ -51,6 +53,7 @@ export const en = {
   labware_position_check,
   module_wizard_flows,
   pipette_wizard_flows,
+  protocol_command_text: shared_en_resources.protocol_command_text,
   protocol_details,
   protocol_info,
   protocol_list,
@@ -62,5 +65,4 @@ export const en = {
   run_details,
   shared,
   top_navigation,
-  ...shared_en_resources,
 }

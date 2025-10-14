@@ -35,8 +35,8 @@ describe('useCommandTypeSummaries', () => {
     expect(result.current).toBe('Unknown')
   })
 
-  it('returns translations for all command types in the latest schema', async () => {
-    const commandTypes = await getLatestCommandTypeList()
+  it('returns translations for all command types in the latest schema', () => {
+    const commandTypes = getLatestCommandTypeList()
     for (const cmd of commandTypes) {
       const { result } = renderHook(() => useCommandTypeSummaries(cmd), {
         wrapper: ({ children }) => (

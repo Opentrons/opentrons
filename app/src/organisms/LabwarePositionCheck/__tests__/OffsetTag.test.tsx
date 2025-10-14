@@ -7,9 +7,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
-vi.mock('@opentrons/components', async importActual => {
-  const actual = await importActual<typeof import('@opentrons/components')>()
+import type * as Components from '@opentrons/components'
 
+vi.mock('@opentrons/components', async importActual => {
+  const actual = await importActual<typeof Components>()
   return {
     ...actual,
     Tag: vi.fn(({ iconName, type, iconPosition, text }) => (
