@@ -2,20 +2,16 @@ import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { i18n } from '../../localization'
+import { shared_en_resources } from '../../assets'
+import { baseI18nConfig, i18n } from '../../i18n'
 import { getLatestCommandTypeList } from '../testHelpers'
 import { useCommandTypeSummaries } from '../useCommandTypeSummaries'
 
 describe('useCommandTypeSummaries', () => {
   beforeAll(async () => {
     await i18n.init({
-      lng: 'en',
-      fallbackLng: 'en',
-      resources: i18n.options.resources,
-      ns: ['command_type_summary'],
-      defaultNS: 'command_type_summary',
-      interpolation: i18n.options.interpolation,
-      saveMissing: false, // prevent setPath errors in tests
+      ...baseI18nConfig,
+      resources: { en: shared_en_resources },
     })
   })
   it('returns translation when key exists', () => {
@@ -39,8 +35,8 @@ describe('useCommandTypeSummaries', () => {
     expect(result.current).toBe('Unknown')
   })
 
-  it('returns translations for all command types in the latest schema', async () => {
-    const commandTypes = await getLatestCommandTypeList()
+  it('returns translations for all command types in the latest schema', () => {
+    const commandTypes = getLatestCommandTypeList()
     for (const cmd of commandTypes) {
       const { result } = renderHook(() => useCommandTypeSummaries(cmd), {
         wrapper: ({ children }) => (

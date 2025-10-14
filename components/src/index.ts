@@ -39,3 +39,7 @@ export * from './molecules'
 
 // Atoms
 export * from './atoms'
+
+//  for i18n
+export { baseI18nConfig } from './i18n'
+export { shared_en_resources, shared_zh_resources } from './assets'
