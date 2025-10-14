@@ -310,6 +310,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_well,
                 end_meniscus_tracking,
             ) = self._handle_aspirate_target(target=end_target)
+        elif (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # Preserve the old behavior
+            meniscus_tracking = types.MeniscusTrackingTarget.START
+            end_move_to_location = move_to_location
+            end_meniscus_tracking = types.MeniscusTrackingTarget.END
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -549,6 +557,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_well,
                 end_meniscus_tracking,
             ) = self._handle_dispense_target(target=end_target)
+        elif (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # Preserve the old behavior
+            meniscus_tracking = types.MeniscusTrackingTarget.START
+            end_move_to_location = move_to_location
+            end_meniscus_tracking = types.MeniscusTrackingTarget.END
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
