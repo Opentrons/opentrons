@@ -1,8 +1,9 @@
+import { shared_en_resources } from '@opentrons/components'
+
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
 import change_pipette from './change_pipette.json'
-import deck_configuration from './deck_configuration.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
@@ -18,7 +19,6 @@ import labware_landing from './labware_landing.json'
 import labware_position_check from './labware_position_check.json'
 import module_wizard_flows from './module_wizard_flows.json'
 import pipette_wizard_flows from './pipette_wizard_flows.json'
-import protocol_command_text from './protocol_command_text.json'
 import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
@@ -51,7 +51,6 @@ export const en = {
   labware_position_check,
   module_wizard_flows,
   pipette_wizard_flows,
-  protocol_command_text,
   protocol_details,
   protocol_info,
   protocol_list,
@@ -63,5 +62,5 @@ export const en = {
   run_details,
   shared,
   top_navigation,
-  deck_configuration,
+  ...shared_en_resources,
 }

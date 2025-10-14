@@ -154,14 +154,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   ([_, lw]) =>
                     getSlotInLocationStack(lw.stack) === addressableArea.id
                 )
-                const isTiprack =
-                  labwareOnSlot != null
-                    ? labwareEntities[labwareOnSlot[0]].def.parameters.isTiprack
-                    : false
                 const { isActiveLayerVisible } =
                   labwareOnSlot != null
                     ? getActiveLayer(
-                        isTiprack,
                         Object.values(pipettes),
                         labwareOnSlot[0],
                         selectedRunTimeCommand
