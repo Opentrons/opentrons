@@ -291,14 +291,14 @@ describe('getPipetteWizardSteps', () => {
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
   it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount and a waste chute on deck', () => {
-    const mockDeckConfig = ({
+    const mockDeckConfig = {
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>
+    } as any as UseQueryResult<DeckConfiguration>
     const mockAttachPipetteFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -380,14 +380,14 @@ describe('getPipetteWizardSteps', () => {
   })
 
   it('returns the correct array of info for calibrate pipette 96 when a waste chute is in deck config', () => {
-    const mockDeckConfig = ({
+    const mockDeckConfig = {
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>
+    } as any as UseQueryResult<DeckConfiguration>
 
     const mockCalibrateFlowSteps = [
       {

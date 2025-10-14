@@ -314,14 +314,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on left mount needs to be switched out for 96-channel and a waste chute is present', () => {
-    const mockDeckConfig = ({
+    const mockDeckConfig = {
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>
+    } as any as UseQueryResult<DeckConfiguration>
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -459,14 +459,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on right mount needs to be switched out for 96-channel and a waste chute is present', () => {
-    const mockDeckConfig = ({
+    const mockDeckConfig = {
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>
+    } as any as UseQueryResult<DeckConfiguration>
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -618,14 +618,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel', () => {
-    const mockDeckConfig = ({
+    const mockDeckConfig = {
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>
+    } as any as UseQueryResult<DeckConfiguration>
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
