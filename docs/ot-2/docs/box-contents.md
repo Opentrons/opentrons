@@ -3,10 +3,8 @@ title: "Opentrons OT-2: Product Elements"
 ---
 
 ## Product elements
-
-<font color="red">TEMPORARY PLACEHOLDER IMAGE</font>
-
-![OT-2 temporary isometric image .ai screenshot](images/TEMP-ot2.png){width="80%"}
+<!-- looks good enough -->
+![OT-2 isometric image front oblique](images/TEMP-ot2.png){width="80%"}
 
 ## Box contents
 

@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Unboxing and Assembly"
 ---
 
-Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides a parts list and instructions that walk you through the steps required to get the OT-2 unboxed, set up, and ready for use.
+Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides instructions that walk you through the steps required to get the OT-2 unboxed, set up, and ready for use.
 
 ## Effort and time required
 
@@ -18,7 +18,7 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any machine components inside.
     ![cutting the shipping bag](../images/cut-shipping-bag.png)
 
-3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 40 kg (88 lbs). Get help from a lab partner to remove the robot from the box.
+3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 42 kg (93 lbs). Get help from a lab partner to remove the robot from the box.
     ![lifting points on frame](../images/lift-points.png)
 
 4. Place the robot on a secure and stable surface.
@@ -30,7 +30,10 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 6. Pull the remaining zip tie ends and remove completely from the deck.
     ![remove zip ties image](../images/zip-ties-remove.png)
 
-7. Remove the tape from the calibration switch cover and remove the plastic cover.  
+7. Remove the tape from the calibration switch cover.
+    ![remove tape from switch cover](../images/switch-cover-tape.png)
+
+8. Remove the plastic calibration switch cover.
     ![remove calibration switch cover](../images/switch-cover.png)
 
 9. Put the trash bin in place.
