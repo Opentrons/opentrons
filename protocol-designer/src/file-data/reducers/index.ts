@@ -135,6 +135,5 @@ const _allReducers = {
   timelineIsBeingComputed,
   robotType: robotTypeReducer,
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

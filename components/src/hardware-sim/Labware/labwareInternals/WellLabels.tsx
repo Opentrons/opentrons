@@ -71,7 +71,7 @@ const Labels = (props: {
             textAnchor="middle"
             dominantBaseline={props.isLetterColumn === true ? 'middle' : 'auto'}
             fill={
-              highlightedWellLabels?.wells.includes(wellName) ?? false
+              (highlightedWellLabels?.wells.includes(wellName) ?? false)
                 ? highlightColor
                 : fillColor
             }
@@ -88,12 +88,8 @@ const Labels = (props: {
 }
 
 export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
-  const {
-    definition,
-    wellLabelOption,
-    highlightedWellLabels,
-    wellLabelColor,
-  } = props
+  const { definition, wellLabelOption, highlightedWellLabels, wellLabelColor } =
+    props
   const letterColumn = definition.ordering[0] ?? []
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
 
@@ -118,6 +114,5 @@ export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
   )
 }
 
-export const WellLabels: MemoExoticComponent<typeof WellLabelsComponent> = memo(
-  WellLabelsComponent
-)
+export const WellLabels: MemoExoticComponent<typeof WellLabelsComponent> =
+  memo(WellLabelsComponent)

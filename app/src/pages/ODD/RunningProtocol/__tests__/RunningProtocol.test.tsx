@@ -144,7 +144,8 @@ describe('RunningProtocol', () => {
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
       resumeRunFromRecovery: mockResumeRunFromRecovery,
-      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
+      resumeRunFromRecoveryAssumingFalsePositive:
+        mockResumeRunFromRecoveryAssumingFalsePositive,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,

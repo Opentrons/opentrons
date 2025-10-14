@@ -405,6 +405,39 @@ class ProtocolEngine:
         await self._do_hardware_stop()
         return True
 
+    async def module_disconnected(
+        self, module_model: ModuleModel, serial: str | None
+    ) -> bool:
+        """Signal to the engine that a module has disconnected.
+
+        The return value of this function signals whether the module was relevant to this
+        protocol or not. If the function returns True, the module was relevant. The engine
+        will stop, and the caller should call `finish()` with an appropriate error to indicate
+        the missing module. If the function returns False, the error is not relevant. The engine
+        will not stop, and the caller should not call `finish()`.
+
+        Module disconnects are signaled when a hardware module's status poller indicates that the
+        module is no logner connected - for instance, someone unplugs the module, or it crashes.
+        These errors are not related to a particular command, even a currently-happening module
+        control command for the module in the error state.
+
+        Similar to an estop error, the error can occur at any time relative to the lifecycle
+        of the engine run or of any particular command.
+
+        Unlike an estop, the motion control hardware will not be raising an error and will not
+        stop on its own; the stop action derived from this call will do that.
+        """
+        if not self._state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        ):
+            return False
+        self._stop_from_asynchronous_error()
+        # like self.request_stop, and unlike self.estop(), we must explicitly request that the
+        # hardware stops execution, since not all asynchronous errors will cause the hardware
+        # to know that it should stop.
+        await self._do_hardware_stop()
+        return True
+
     async def _do_hardware_stop(self) -> None:
         """Make the hardware stop now."""
         if self._hardware_api.is_movement_execution_taskified():

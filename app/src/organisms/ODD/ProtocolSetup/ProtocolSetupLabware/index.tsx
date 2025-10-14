@@ -9,7 +9,6 @@ import {
   Box,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -18,6 +17,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ListButton,
   MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -247,10 +247,8 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const {
-    createLiveCommand,
-    isLoading: isLiveCommandLoading,
-  } = useCreateLiveCommandMutation()
+  const { createLiveCommand, isLoading: isLiveCommandLoading } =
+    useCreateLiveCommandMutation()
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -447,7 +445,7 @@ function RowLabware({
       : null
 
   const location: JSX.Element = (
-    <DeckInfoLabel
+    <RobotInfoLabel
       deckLabel={
         slotName === 'offDeck'
           ? i18n.format(t('off_deck'), 'upperCase')
@@ -468,13 +466,13 @@ function RowLabware({
       <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
         {matchedModule != null ? (
-          <DeckInfoLabel
+          <RobotInfoLabel
             iconName={
               MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
             }
           />
         ) : null}
-        {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
+        {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}

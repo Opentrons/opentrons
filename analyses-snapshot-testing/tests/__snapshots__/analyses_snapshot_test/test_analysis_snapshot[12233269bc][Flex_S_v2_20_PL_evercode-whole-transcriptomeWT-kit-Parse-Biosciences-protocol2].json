@@ -36728,7 +36728,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -37837,7 +37837,7 @@
       "displayName": "Reservoir",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",

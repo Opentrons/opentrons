@@ -61,18 +61,17 @@ export const SecondaryButton: StoryObj<typeof SecondaryButtonComponent> = {
   ),
 }
 
-export const AlertPrimaryButton: StoryObj<
-  typeof AlertPrimaryButtonComponent
-> = {
-  args: {
-    children: 'alert tertiary button',
-  },
-  render: args => (
-    <Flex>
-      <AlertPrimaryButtonComponent {...args} />
-    </Flex>
-  ),
-}
+export const AlertPrimaryButton: StoryObj<typeof AlertPrimaryButtonComponent> =
+  {
+    args: {
+      children: 'alert tertiary button',
+    },
+    render: args => (
+      <Flex>
+        <AlertPrimaryButtonComponent {...args} />
+      </Flex>
+    ),
+  }
 
 export const AltPrimaryButton: StoryObj<typeof AltPrimaryButtonComponent> = {
   args: {

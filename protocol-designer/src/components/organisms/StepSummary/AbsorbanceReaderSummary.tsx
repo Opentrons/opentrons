@@ -35,10 +35,9 @@ export function AbsorbanceReaderSummary(
     referenceWavelengthActive,
     wavelengths,
   } = currentStep
-  const labwareOnAbsorbanceReaderId = Object.values(
-    labwareState
-  ).find(({ stack }) => stack.includes(absorbanceReaderModuleId as string))
-    ?.stack[0] // top element of stack including absorbance reader
+  const labwareOnAbsorbanceReaderId = Object.values(labwareState).find(
+    ({ stack }) => stack.includes(absorbanceReaderModuleId as string)
+  )?.stack[0] // top element of stack including absorbance reader
   const labwareOnAbsorbanceReaderNickname =
     labwareOnAbsorbanceReaderId != null
       ? labwareNicknamesById[labwareOnAbsorbanceReaderId]

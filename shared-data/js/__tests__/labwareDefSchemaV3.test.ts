@@ -70,11 +70,8 @@ const checkExtents = (labwareDef: LabwareDefinition3): void => {
   })
   test('extents.footprint should be contained inside extents.total', () => {
     if (labwareDef.features.slotFootprintAsChild) {
-      const {
-        backLeft,
-        frontRight,
-        z,
-      } = labwareDef.features.slotFootprintAsChild
+      const { backLeft, frontRight, z } =
+        labwareDef.features.slotFootprintAsChild
       const {
         total: { backLeftBottom, frontRightTop },
       } = labwareDef.extents
@@ -125,10 +122,8 @@ describe(`test labware definitions with schema v3`, () => {
 
     test('slotFootprintAsChild properly uses back-left bottom origin with quadrant IV coordinates', () => {
       if (labwareDef.features.slotFootprintAsChild) {
-        const {
-          backLeft,
-          frontRight,
-        } = labwareDef.features.slotFootprintAsChild
+        const { backLeft, frontRight } =
+          labwareDef.features.slotFootprintAsChild
 
         expect(backLeft.x).toBe(0)
         expect(backLeft.y).toBe(0)

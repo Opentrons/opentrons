@@ -94,14 +94,12 @@ describe('PrepareLabware', () => {
       } as any,
     } as any
 
-    vi.mocked(
-      selectActivePipette
-    ).mockImplementation((runId: string) => (state: any) => mockActivePipette)
+    vi.mocked(selectActivePipette).mockImplementation(
+      (runId: string) => (state: any) => mockActivePipette
+    )
 
-    vi.mocked(
-      selectSelectedLwOverview
-    ).mockImplementation((runId: string) => (state: any) =>
-      mockSelectedLwOverview
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      (runId: string) => (state: any) => mockSelectedLwOverview
     )
 
     vi.mocked(
@@ -180,9 +178,7 @@ describe('PrepareLabware', () => {
     expect(mockToggleRobotMoving).toHaveBeenCalledWith(true)
 
     await vi.waitFor(() => {
-      expect(
-        mockHandleConfirmLwModulePlacement
-      ).toHaveBeenCalledWith(
+      expect(mockHandleConfirmLwModulePlacement).toHaveBeenCalledWith(
         mockSelectedLwOverview.offsetLocationDetails,
         mockActivePipette.id,
         { x: 1, y: 2, z: 3 }

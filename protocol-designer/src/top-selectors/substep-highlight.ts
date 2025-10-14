@@ -266,76 +266,75 @@ function _getSelectedWellsForSubstep(
   return wells
 }
 
-export const wellHighlightsByLabwareId: Selector<
-  Record<string, WellGroup>
-> = createSelector(
-  fileDataSelectors.getRobotStateTimeline,
-  stepFormSelectors.getInvariantContext,
-  stepFormSelectors.getArgsAndErrorsByStepId,
-  getHoveredStepId,
-  getHoveredSubstep,
-  fileDataSelectors.getSubsteps,
-  stepFormSelectors.getOrderedStepIds,
-  getSelectedStepId,
-  (
-    robotStateTimeline,
-    invariantContext,
-    allStepArgsAndErrors,
-    hoveredStepId,
-    hoveredSubstep,
-    substepsById,
-    orderedStepIds,
-    selectedStepId
-  ) => {
-    const timeline = robotStateTimeline.timeline
-    const stepId = hoveredStepId || selectedStepId
-    const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
-    const frame = timeline[timelineIndex]
-    const robotState = frame && frame.robotState
-    const stepArgs =
-      stepId != null &&
-      allStepArgsAndErrors[stepId] &&
-      allStepArgsAndErrors[stepId].stepArgs
+export const wellHighlightsByLabwareId: Selector<Record<string, WellGroup>> =
+  createSelector(
+    fileDataSelectors.getRobotStateTimeline,
+    stepFormSelectors.getInvariantContext,
+    stepFormSelectors.getArgsAndErrorsByStepId,
+    getHoveredStepId,
+    getHoveredSubstep,
+    fileDataSelectors.getSubsteps,
+    stepFormSelectors.getOrderedStepIds,
+    getSelectedStepId,
+    (
+      robotStateTimeline,
+      invariantContext,
+      allStepArgsAndErrors,
+      hoveredStepId,
+      hoveredSubstep,
+      substepsById,
+      orderedStepIds,
+      selectedStepId
+    ) => {
+      const timeline = robotStateTimeline.timeline
+      const stepId = hoveredStepId || selectedStepId
+      const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
+      const frame = timeline[timelineIndex]
+      const robotState = frame && frame.robotState
+      const stepArgs =
+        stepId != null &&
+        allStepArgsAndErrors[stepId] &&
+        allStepArgsAndErrors[stepId].stepArgs
 
-    if (!robotState || stepId == null || !stepArgs) {
-      // nothing hovered, or no stepArgs for step
-      return {}
-    }
+      if (!robotState || stepId == null || !stepArgs) {
+        // nothing hovered, or no stepArgs for step
+        return {}
+      }
 
-    // replace value of each labware with highlighted wells info
-    return mapValues(
-      robotState.liquidState.labware,
-      (
-        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-        labwareId: string
-      ) => {
-        let selectedWells: string[] = []
+      // replace value of each labware with highlighted wells info
+      return mapValues(
+        robotState.liquidState.labware,
+        (
+          labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+          labwareId: string
+        ) => {
+          let selectedWells: string[] = []
 
-        if (hoveredSubstep != null) {
-          // wells for hovered substep
-          selectedWells = _getSelectedWellsForSubstep(
-            stepArgs,
-            labwareId,
-            substepsById[stepId],
-            hoveredSubstep.substepIndex,
-            invariantContext
-          )
-        } else {
-          // wells for step overall
-          selectedWells = _getSelectedWellsForStep(
-            stepArgs,
-            labwareId,
-            frame,
-            invariantContext
+          if (hoveredSubstep != null) {
+            // wells for hovered substep
+            selectedWells = _getSelectedWellsForSubstep(
+              stepArgs,
+              labwareId,
+              substepsById[stepId],
+              hoveredSubstep.substepIndex,
+              invariantContext
+            )
+          } else {
+            // wells for step overall
+            selectedWells = _getSelectedWellsForStep(
+              stepArgs,
+              labwareId,
+              frame,
+              invariantContext
+            )
+          }
+
+          // return selected wells eg {A1: null, B4: null}
+          return selectedWells.reduce(
+            (acc, well) => ({ ...acc, [well]: null }),
+            {}
           )
         }
-
-        // return selected wells eg {A1: null, B4: null}
-        return selectedWells.reduce(
-          (acc, well) => ({ ...acc, [well]: null }),
-          {}
-        )
-      }
-    )
-  }
-)
+      )
+    }
+  )

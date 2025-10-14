@@ -13,15 +13,16 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { CalibrationStatus, FetchCalibrationStatusAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchCalibrationStatusAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchCalibrationStatusAction
+> = action => ({
   method: GET,
   path: Constants.CALIBRATION_STATUS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchCalibrationStatusAction> = (
-  response,
-  originalAction
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  FetchCalibrationStatusAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 

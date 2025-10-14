@@ -169,55 +169,57 @@ export const mockBadPipetteOffsetCalibrations: PipetteOffsetCalibration[] = [
   },
 ]
 
-export const mockCompletePipetteOffsetCalibrations: PipetteOffsetCalibration[] = [
-  {
-    pipette: 'test-left',
-    mount: 'left',
-    offset: [0, 0, 0],
-    tiprack: 'test-tip-rack',
-    tiprackUri: 'test/tiprack/uri',
-    lastModified: '2022-01-04T12:00:00,000000+00:00',
-    source: 'user',
-    status: { markedBad: false, markedAt: null, source: null },
-    id: 'test-offset-id-1',
-  },
-  {
-    pipette: 'test-right',
-    mount: 'right',
-    offset: [0, 0, 0],
-    tiprack: 'test-tip-rack',
-    tiprackUri: 'test/tiprack/uri',
-    lastModified: '2022-01-05T12:00:00,000000+00:00',
-    source: 'user',
-    status: { markedBad: false, markedAt: null, source: null },
-    id: 'test-offset-id-2',
-  },
-]
+export const mockCompletePipetteOffsetCalibrations: PipetteOffsetCalibration[] =
+  [
+    {
+      pipette: 'test-left',
+      mount: 'left',
+      offset: [0, 0, 0],
+      tiprack: 'test-tip-rack',
+      tiprackUri: 'test/tiprack/uri',
+      lastModified: '2022-01-04T12:00:00,000000+00:00',
+      source: 'user',
+      status: { markedBad: false, markedAt: null, source: null },
+      id: 'test-offset-id-1',
+    },
+    {
+      pipette: 'test-right',
+      mount: 'right',
+      offset: [0, 0, 0],
+      tiprack: 'test-tip-rack',
+      tiprackUri: 'test/tiprack/uri',
+      lastModified: '2022-01-05T12:00:00,000000+00:00',
+      source: 'user',
+      status: { markedBad: false, markedAt: null, source: null },
+      id: 'test-offset-id-2',
+    },
+  ]
 
-export const mockIncompletePipetteOffsetCalibrations: PipetteOffsetCalibration[] = [
-  {
-    pipette: 'test-left',
-    mount: 'left',
-    offset: [0, 0, 0],
-    tiprack: 'test-tip-rack',
-    tiprackUri: 'test/tiprack/uri',
-    lastModified: '2022-01-04T12:00:00,000000+00:00',
-    source: 'user',
-    status: { markedBad: false, markedAt: null, source: null },
-    id: 'test-offset-id-1',
-  },
-  {
-    pipette: 'test-right',
-    mount: 'right',
-    offset: [0, 0, 0],
-    tiprack: 'test-tip-rack',
-    tiprackUri: 'test/tiprack/uri',
-    lastModified: '2022-01-05T12:00:00,000000+00:00',
-    source: 'user',
-    status: { markedBad: true, markedAt: null, source: null },
-    id: 'test-offset-id-2',
-  },
-]
+export const mockIncompletePipetteOffsetCalibrations: PipetteOffsetCalibration[] =
+  [
+    {
+      pipette: 'test-left',
+      mount: 'left',
+      offset: [0, 0, 0],
+      tiprack: 'test-tip-rack',
+      tiprackUri: 'test/tiprack/uri',
+      lastModified: '2022-01-04T12:00:00,000000+00:00',
+      source: 'user',
+      status: { markedBad: false, markedAt: null, source: null },
+      id: 'test-offset-id-1',
+    },
+    {
+      pipette: 'test-right',
+      mount: 'right',
+      offset: [0, 0, 0],
+      tiprack: 'test-tip-rack',
+      tiprackUri: 'test/tiprack/uri',
+      lastModified: '2022-01-05T12:00:00,000000+00:00',
+      source: 'user',
+      status: { markedBad: true, markedAt: null, source: null },
+      id: 'test-offset-id-2',
+    },
+  ]
 
 export const mockDeckCalLauncher: Mock = vi.fn()
 export const mockTipLengthCalLauncher: Mock = vi.fn()

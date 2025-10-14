@@ -227,8 +227,8 @@ export const mixInPlaceUtil = (args: {
           ...(i < times - 1
             ? { pushOut: 0 }
             : finalPushOut == null
-            ? {}
-            : { pushOut: finalPushOut }), // only push out if final repetition
+              ? {}
+              : { pushOut: finalPushOut }), // only push out if final repetition
           ...(correctionVolumeDispense > 0
             ? { correctionVolume: correctionVolumeDispense }
             : {}),
@@ -379,14 +379,15 @@ export const mix: CommandCreator<MixArgs> = (
   const shouldConfigureForVolume = LOW_VOLUME_PIPETTES.includes(
     invariantContext.pipetteEntities[pipette].name
   )
-  const configureForVolumeCommand: CurriedCommandCreator[] = shouldConfigureForVolume
-    ? [
-        curryCommandCreator(configureForVolume, {
-          pipetteId: pipette,
-          volume,
-        }),
-      ]
-    : []
+  const configureForVolumeCommand: CurriedCommandCreator[] =
+    shouldConfigureForVolume
+      ? [
+          curryCommandCreator(configureForVolume, {
+            pipetteId: pipette,
+            volume,
+          }),
+        ]
+      : []
 
   // Command generation
   const commandCreators = flatMap(

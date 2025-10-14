@@ -65,14 +65,14 @@ export function RobotSettingsDashboard(): JSX.Element {
   const networkConnection = useNetworkConnection(robotName)
   const { activeSsid } = networkConnection
   const list = useWifiList(robotName)
-  const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
-    ?.securityType
+  const connectedWifiAuthType = list.find(
+    wifi => wifi.ssid === activeSsid
+  )?.securityType
 
   // LOCAL STATE MANAGEMENT for wi-fi user input
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
-    'wpa-psk'
-  )
+  const [selectedAuthType, setSelectedAuthType] =
+    useState<WifiSecurityType>('wpa-psk')
   const [password, setPassword] = useState<string>('')
 
   // REQUESTS

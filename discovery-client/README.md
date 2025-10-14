@@ -189,6 +189,7 @@ If you need access to the `DiscoveryClient` class itself for some reason:
 
 ```js
 import { DiscoveryClient } from '@opentrons/discovery-client'
+
 const client = new DiscoveryClient({})
 ```
 

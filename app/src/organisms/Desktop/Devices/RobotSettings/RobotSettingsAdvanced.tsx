@@ -69,21 +69,14 @@ export function RobotSettingsAdvanced({
   robotName,
   updateRobotStatus,
 }: RobotSettingsAdvancedProps): JSX.Element {
-  const [
-    showRenameRobotSlideout,
-    setShowRenameRobotSlideout,
-  ] = useState<boolean>(false)
-  const [
-    showDeviceResetSlideout,
-    setShowDeviceResetSlideout,
-  ] = useState<boolean>(false)
-  const [showDeviceResetModal, setShowDeviceResetModal] = useState<boolean>(
-    false
-  )
-  const [
-    showFactoryModeSlideout,
-    setShowFactoryModeSlideout,
-  ] = useState<boolean>(false)
+  const [showRenameRobotSlideout, setShowRenameRobotSlideout] =
+    useState<boolean>(false)
+  const [showDeviceResetSlideout, setShowDeviceResetSlideout] =
+    useState<boolean>(false)
+  const [showDeviceResetModal, setShowDeviceResetModal] =
+    useState<boolean>(false)
+  const [showFactoryModeSlideout, setShowFactoryModeSlideout] =
+    useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)

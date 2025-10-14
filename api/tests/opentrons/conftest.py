@@ -360,6 +360,7 @@ def _make_ot3_pe_ctx(
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
         #   this be False
         load_fixed_trash=True,
+        camera_provider=None,
     ) as (
         engine,
         loop,

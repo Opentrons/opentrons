@@ -50,11 +50,8 @@ export function ThermocyclerProfileSubsteps(
                 gridGap={SPACING.spacing12}
               >
                 {substep.steps.map((profileStep: ProfileStepItem) => {
-                  const {
-                    temperature,
-                    durationMinutes,
-                    durationSeconds,
-                  } = profileStep
+                  const { temperature, durationMinutes, durationSeconds } =
+                    profileStep
                   return (
                     <ThermocyclerSubstep
                       key={profileStep.id}

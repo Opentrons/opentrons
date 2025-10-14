@@ -163,25 +163,21 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const {
-    chainRunCommands,
-    isCommandMutationLoading,
-  } = useChainMaintenanceCommands()
+  const { chainRunCommands, isCommandMutationLoading } =
+    useChainMaintenanceCommands()
 
-  const {
-    createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
-  } = useCreateTargetedMaintenanceRunMutation(
-    {
-      onSuccess: response => {
-        setCreatedMaintenanceRunId(response.data.id)
+  const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
+    useCreateTargetedMaintenanceRunMutation(
+      {
+        onSuccess: response => {
+          setCreatedMaintenanceRunId(response.data.id)
+        },
+        onError: error => {
+          setShowErrorMessage(error.message)
+        },
       },
-      onError: error => {
-        setShowErrorMessage(error.message)
-      },
-    },
-    host
-  )
+      host
+    )
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
@@ -228,17 +224,15 @@ export const PipetteWizardFlows = (
     }
   }
 
-  const {
-    deleteMaintenanceRun,
-    isLoading: isDeleteLoading,
-  } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      closeFlow()
-    },
-    onError: () => {
-      closeFlow()
-    },
-  })
+  const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
+    useDeleteMaintenanceRunMutation({
+      onSuccess: () => {
+        closeFlow()
+      },
+      onError: () => {
+        closeFlow()
+      },
+    })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()

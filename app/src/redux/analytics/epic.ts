@@ -40,13 +40,12 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
       const event$ = from(makeEvent(action, state))
       return zip(event$, of(getAnalyticsConfig(state)))
     }),
-    filter<TrackEventArgs, [AnalyticsEvent, AnalyticsConfig]>((args): args is [
-      AnalyticsEvent,
-      AnalyticsConfig
-    ] => {
-      const [maybeEvent, maybeConfig] = args
-      return Boolean(maybeEvent != null && maybeConfig)
-    }),
+    filter<TrackEventArgs, [AnalyticsEvent, AnalyticsConfig]>(
+      (args): args is [AnalyticsEvent, AnalyticsConfig] => {
+        const [maybeEvent, maybeConfig] = args
+        return Boolean(maybeEvent != null && maybeConfig)
+      }
+    ),
     tap(([event, config]: [AnalyticsEvent, AnalyticsConfig]) => {
       trackEvent(event, config)
     }),

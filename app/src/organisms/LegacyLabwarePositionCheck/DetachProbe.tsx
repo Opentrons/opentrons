@@ -70,7 +70,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
   const pipetteChannels =
-    pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+    pipetteName != null ? (getPipetteNameSpecs(pipetteName)?.channels ?? 1) : 1
   let probeVideoSrc = detachProbe1
   if (pipetteChannels === 8) {
     probeVideoSrc = detachProbe8

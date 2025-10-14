@@ -39,31 +39,31 @@ export const getModuleDef = (moduleModel: ModuleModel): ModuleDefinition => {
       return magneticModuleV1 as ModuleDefinition
 
     case MAGNETIC_MODULE_V2:
-      return (magneticModuleV2 as unknown) as ModuleDefinition
+      return magneticModuleV2 as unknown as ModuleDefinition
 
     case TEMPERATURE_MODULE_V1:
       return temperatureModuleV1 as ModuleDefinition
 
     case TEMPERATURE_MODULE_V2:
-      return (temperatureModuleV2 as unknown) as ModuleDefinition
+      return temperatureModuleV2 as unknown as ModuleDefinition
 
     case THERMOCYCLER_MODULE_V1:
       return thermocyclerModuleV1 as ModuleDefinition
 
     case THERMOCYCLER_MODULE_V2:
-      return (thermocyclerModuleV2 as unknown) as ModuleDefinition
+      return thermocyclerModuleV2 as unknown as ModuleDefinition
 
     case HEATERSHAKER_MODULE_V1:
-      return (heaterShakerModuleV1 as unknown) as ModuleDefinition
+      return heaterShakerModuleV1 as unknown as ModuleDefinition
 
     case MAGNETIC_BLOCK_V1:
-      return (magneticBlockV1 as unknown) as ModuleDefinition
+      return magneticBlockV1 as unknown as ModuleDefinition
 
     case ABSORBANCE_READER_V1:
-      return (absorbanceReaderV1 as unknown) as ModuleDefinition
+      return absorbanceReaderV1 as unknown as ModuleDefinition
 
     case FLEX_STACKER_MODULE_V1:
-      return (flexStackerModuleV1 as unknown) as ModuleDefinition
+      return flexStackerModuleV1 as unknown as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)

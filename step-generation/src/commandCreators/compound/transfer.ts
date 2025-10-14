@@ -175,9 +175,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     args.destLabware
   )
 
-  const isTouchTipDisabled = labwareEntities[
-    sourceLabware
-  ]?.def.parameters.quirks?.includes('touchTipDisabled')
+  const isTouchTipDisabled =
+    labwareEntities[sourceLabware]?.def.parameters.quirks?.includes(
+      'touchTipDisabled'
+    )
 
   if (
     (trashOrLabware === 'labware' &&
@@ -302,9 +303,8 @@ export const transfer: CommandCreator<TransferArgs> = (
   const chunksPerSubTransfer = Math.ceil(volume / effectiveTransferVol)
   const subTransferVol = volume / chunksPerSubTransfer
   // volume of each chunk in a sub-transfer
-  const subTransferVolumes: number[] = Array(chunksPerSubTransfer).fill(
-    subTransferVol
-  )
+  const subTransferVolumes: number[] =
+    Array(chunksPerSubTransfer).fill(subTransferVol)
 
   const aspirateSubmergeLocation: WellLocation = {
     origin:
@@ -694,7 +694,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseAirGapDispenseFlowRate,
                     ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                     pushOut: 0,
@@ -834,7 +835,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForAspirateAirGap,
                         }
                       : {}),
                   }),
@@ -848,7 +850,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               flowRate: aspirateFlowRateUlSec,
               ...(aspirateCorrectionVolumeForSubtransferTarget > 0
                 ? {
-                    correctionVolume: aspirateCorrectionVolumeForSubtransferTarget,
+                    correctionVolume:
+                      aspirateCorrectionVolumeForSubtransferTarget,
                   }
                 : {}),
             }),
@@ -903,7 +906,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                           pushOut: 0,
                           ...(dispenseCorrectionVolumeForAspirateAirGap > 0
                             ? {
-                                correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                                correctionVolume:
+                                  dispenseCorrectionVolumeForAspirateAirGap,
                               }
                             : {}),
                         }),
@@ -963,7 +967,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                 : {}),
               ...(dispenseCorrectionVolumeForSubtransferTarget > 0
                 ? {
-                    correctionVolume: dispenseCorrectionVolumeForSubtransferTarget,
+                    correctionVolume:
+                      dispenseCorrectionVolumeForSubtransferTarget,
                   }
                 : {}),
             }),
@@ -1049,7 +1054,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                   }),

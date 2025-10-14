@@ -32850,7 +32850,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -48253,7 +48253,7 @@
       "displayName": "Sample Plate 1",
       "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",

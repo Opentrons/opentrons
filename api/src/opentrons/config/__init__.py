@@ -307,6 +307,13 @@ CONFIG_ELEMENTS = (
         ConfigElementType.DIR,
         "The dir where performance metrics are stored",
     ),
+    ConfigElement(
+        "live_stream_configuration_file",
+        "Live Stream Configuration",
+        Path("opentrons-live-stream.conf"),
+        ConfigElementType.FILE,
+        "The file storing the Opentrons Live Stream Configuration values.",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,

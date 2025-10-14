@@ -125,7 +125,7 @@ class LiquidHandler(
     async def aspirate_while_tracking(
         self,
         mount: MountArgType,
-        z_distance: float,
+        end_point: Point,
         volume: float,
         flow_rate: float = 1.0,
     ) -> None:
@@ -164,7 +164,7 @@ class LiquidHandler(
     async def dispense_while_tracking(
         self,
         mount: MountArgType,
-        z_distance: float,
+        end_point: Point,
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,

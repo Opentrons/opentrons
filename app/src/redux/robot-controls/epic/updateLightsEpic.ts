@@ -13,7 +13,9 @@ import type { RobotApiRequestMeta } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { UpdateLightsAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdateLightsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  UpdateLightsAction
+> = action => ({
   method: POST,
   path: Constants.LIGHTS_PATH,
   body: { on: action.payload.lightsOn },

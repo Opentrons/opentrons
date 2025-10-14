@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { RobotCoordsForeignDiv } from '../../hardware-sim'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { DeckInfoLabel } from '../../molecules'
+import { RobotInfoLabel } from '../../molecules'
 import { DeckLabel } from '../../molecules/DeckLabel'
 import { Box } from '../../primitives'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
@@ -20,6 +20,7 @@ interface DeckLabelSetProps {
   height: number
   invert?: boolean
   showModuleIcon?: boolean
+  showBorder?: boolean
 }
 
 const DeckLabelSetComponent = (
@@ -34,6 +35,7 @@ const DeckLabelSetComponent = (
     height,
     invert = false,
     showModuleIcon = false,
+    showBorder = true,
   } = props
 
   return (
@@ -50,10 +52,11 @@ const DeckLabelSetComponent = (
           height={height}
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
+          showBorder={showBorder}
         />
         {showModuleIcon && (
           <IconWrapper leftPosition={width - 16}>
-            <DeckInfoLabel
+            <RobotInfoLabel
               iconName="stacked"
               highlight
               transform="scale(0.75)"
@@ -83,12 +86,18 @@ export const DeckLabelSet = forwardRef<HTMLDivElement, DeckLabelSetProps>(
 
 interface StyledBoxProps {
   isZoomed: boolean
+  showBorder: boolean
 }
 
 const StyledBox = styled(Box)<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
-  border: ${({ isZoomed }) =>
-    isZoomed ? `1.5px solid ${COLORS.blue50}` : `3px solid ${COLORS.blue50}`};
+  border: ${({ isZoomed, showBorder }) => {
+    if (!showBorder) {
+      return 'none'
+    }
+    const width = isZoomed ? '1.5px' : '3px'
+    return `${width} solid ${COLORS.blue50}`
+  }};
 `
 
 const LabelContainer = styled.div`

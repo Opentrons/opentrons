@@ -29,9 +29,7 @@ import type {
 
 const EMPTY_MOUNTS = { left: null, right: null }
 
-export function useRunPipetteInfoByMount(
-  runId: string
-): {
+export function useRunPipetteInfoByMount(runId: string): {
   [mount in Mount]: PipetteInfo | null
 } {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)

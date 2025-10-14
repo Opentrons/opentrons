@@ -98,31 +98,33 @@ export const mockTipRackDefinition: LabwareDefinition = {
   groups: [],
 }
 
-export const mockCircularLabwareWellGroupProperties: LabwareWellGroupProperties = {
-  shape: { shape: 'circular', diameter: 1 },
-  depth: 1,
-  metadata: { wellBottomShape: 'flat' },
-  xOffsetFromLeft: 1,
-  xSpacing: 1,
-  yOffsetFromBack: 1,
-  ySpacing: 1,
-  wellCount: 1,
-  totalLiquidVolume: 10,
-  brand: { brand: 'Opentrons' },
-}
+export const mockCircularLabwareWellGroupProperties: LabwareWellGroupProperties =
+  {
+    shape: { shape: 'circular', diameter: 1 },
+    depth: 1,
+    metadata: { wellBottomShape: 'flat' },
+    xOffsetFromLeft: 1,
+    xSpacing: 1,
+    yOffsetFromBack: 1,
+    ySpacing: 1,
+    wellCount: 1,
+    totalLiquidVolume: 10,
+    brand: { brand: 'Opentrons' },
+  }
 
-export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperties = {
-  shape: { shape: 'rectangular', xDimension: 1, yDimension: 2 },
-  depth: 1,
-  metadata: {},
-  xOffsetFromLeft: 1,
-  xSpacing: 1,
-  yOffsetFromBack: 1,
-  ySpacing: 1,
-  wellCount: 1,
-  totalLiquidVolume: 10,
-  brand: { brand: 'Opentrons' },
-}
+export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperties =
+  {
+    shape: { shape: 'rectangular', xDimension: 1, yDimension: 2 },
+    depth: 1,
+    metadata: {},
+    xOffsetFromLeft: 1,
+    xSpacing: 1,
+    yOffsetFromBack: 1,
+    ySpacing: 1,
+    wellCount: 1,
+    totalLiquidVolume: 10,
+    brand: { brand: 'Opentrons' },
+  }
 
 export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition = {
   version: 1,

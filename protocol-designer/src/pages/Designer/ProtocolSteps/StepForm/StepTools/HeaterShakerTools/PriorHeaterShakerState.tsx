@@ -37,7 +37,7 @@ export function PriorHeaterShakerState(props: {
       <StepFormStatus
         label={t('protocol_steps:heater_shaker.prior_state.latch_label')}
         value={
-          latchOpen ?? false
+          (latchOpen ?? false)
             ? t('protocol_steps:heater_shaker.prior_state.latch_value_open')
             : t('protocol_steps:heater_shaker.prior_state.latch_value_closed')
         }

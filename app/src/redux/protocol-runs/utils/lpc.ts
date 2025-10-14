@@ -170,9 +170,9 @@ export function findLocationSpecificOffsetWithFallbacks(
 
   return workingConfirmedVector === RESET_TO_DEFAULT
     ? findDefaultOffsetWithFallbacks(defaultOffsetDetails)
-    : workingConfirmedVector ??
+    : (workingConfirmedVector ??
         relevantDetail.existingOffset?.vector ??
-        findDefaultOffsetWithFallbacks(defaultOffsetDetails)
+        findDefaultOffsetWithFallbacks(defaultOffsetDetails))
 }
 
 export function findDefaultOffsetWithFallbacks(

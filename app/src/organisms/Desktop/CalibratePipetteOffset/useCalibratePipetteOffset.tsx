@@ -44,11 +44,10 @@ export function useCalibratePipetteOffset(
   const spinnerRequestId = useRef<string | null>(null)
   const dispatch = useDispatch()
 
-  const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
-    (state: State) => {
+  const pipOffsetCalSession: PipetteOffsetCalibrationSession | null =
+    useSelector((state: State) => {
       return getPipetteOffsetCalibrationSession(state, robotName)
-    }
-  )
+    })
 
   const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {

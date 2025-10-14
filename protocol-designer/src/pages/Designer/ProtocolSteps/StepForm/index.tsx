@@ -158,7 +158,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           displayTemperature={
             showAddPauseUntilTempStepModal
               ? formData?.targetTemperature
-              : formData?.targetHeaterShakerTemperature ?? '?'
+              : (formData?.targetHeaterShakerTemperature ?? '?')
           }
           displayModule={
             formData.moduleId != null
@@ -193,12 +193,10 @@ const mapStateToProps = (state: BaseState): StateProps => {
     formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
-    isPristineSetHeaterShakerTempForm: stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(
-      state
-    ),
-    isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
-      state
-    ),
+    isPristineSetHeaterShakerTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(state),
+    isPristineSetTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineSetTempForm(state),
     invariantContext: getInvariantContext(state),
   }
 }
