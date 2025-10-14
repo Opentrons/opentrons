@@ -24,16 +24,18 @@ For protocol-designer project:
 2. **Semver selection** (within same prefix):
    - If multiple tags with same prefix: selects highest semantic version
    - Example: `staging-protocol-designer@1.1.2` wins over `staging-protocol-designer@1.1.1`
-   - Example: `protocol-designer@8.6.0-alpha.2` wins over `protocol-designer@8.6.0-alpha.1`
+   - Example: `protocol-designer@8.6.1` wins over `protocol-designer@8.6.0`
 
 ### Version Resolution Logic
 
 1. **Check for tags at HEAD** using `git tag --points-at HEAD`
 
    - If multiple tags exist, prefer non-staging tags based on prefix priority
-   - Return the **full tag** as the version:
-     - `protocol-designer@8.6.0-alpha.1` → `protocol-designer@8.6.0-alpha.1`
-     - `staging-protocol-designer@8.6.0-alpha.4` → `staging-protocol-designer@8.6.0-alpha.4`
+   - **Version string formatting**:
+     - **Production tags** (without "staging-" prefix): Return only the version part after `@`
+       - `protocol-designer@8.6.0` → `8.6.0`
+     - **Staging tags** (with "staging-" prefix): Return the full tag
+       - `staging-protocol-designer@8.6.0-alpha.4` → `staging-protocol-designer@8.6.0-alpha.4`
 
 2. **Fallback to branch name** if no tags at HEAD
 
@@ -85,7 +87,12 @@ The script automatically generates a comprehensive build information page at `di
 ### Test Case 2: Commit with 2 tags having different prefixes
 
 - Commit: Has both `protocol-designer@8.6.0-alpha.1` and `staging-protocol-designer@8.6.0-alpha.2`
-- Result: ✅ Prefers `protocol-designer@8.6.0-alpha.1` (returns full tag `protocol-designer@8.6.0-alpha.1`)
+- Result: ✅ Prefers `protocol-designer@8.6.0-alpha.1` (returns clean version `8.6.0-alpha.1`)
+
+### Test Case 2b: Commit with production tag
+
+- Commit: `protocol-designer@8.6.0`
+- Result: ✅ Returns clean version `8.6.0`
 
 ### Test Case 3: Branch build with no tag (local)
 
@@ -108,7 +115,7 @@ The script automatically generates a comprehensive build information page at `di
 ### Test Case 6: Prefix priority with semver
 
 - Tags at HEAD: `protocol-designer@8.6.0-alpha.1`, `staging-protocol-designer@8.6.0-alpha.2`
-- Result: ✅ Returns `protocol-designer@8.6.0-alpha.1` (prefix priority wins over higher staging version)
+- Result: ✅ Returns `8.6.0-alpha.1` (prefix priority wins over higher staging version, clean version format for production tag)
 
 ## Implementation Notes
 

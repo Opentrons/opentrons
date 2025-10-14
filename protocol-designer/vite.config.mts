@@ -14,7 +14,7 @@ import { latestLabwareVersions } from '../scripts/git-version.mjs'
 import {
   versionForProject,
   generateBuildInfoHtml,
-} from '../scripts/git-version2.mjs'
+} from '../scripts/git-version-protocol-designer.mjs'
 
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 

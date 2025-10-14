@@ -242,7 +242,22 @@ export async function latestTagForProject(project) {
 
 export async function versionForProject(project) {
     return latestTagForProject(project)
-        .then(tag => tag)
+        .then(tag => {
+            const [, version] = detailsFromTag(tag)
+            
+            // For branch builds (contains timestamp or RUN_ID), return full tag
+            if (version.includes('-RUN_ID-') || /\d{8}-\d{6}/.test(version)) {
+                return tag
+            }
+            
+            // For staging tags, return full tag
+            if (tag.startsWith('staging-')) {
+                return tag
+            }
+            
+            // For production tags, return just the version
+            return version
+        })
         .catch(error => {
             console.error(
                 `Could not find a version for project ${project} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
