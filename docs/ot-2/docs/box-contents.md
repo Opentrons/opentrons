@@ -3,8 +3,14 @@ title: "Opentrons OT-2: Product Elements"
 ---
 
 ## Product elements
-<!-- looks good enough -->
-![OT-2 isometric image front oblique](images/TEMP-ot2.png){width="80%"}
+<!-- looks good enough; tried side by side -->
+### OT-2 features
+
+![OT-2 isometric image front oblique](images/ot2-features.png)
+
+### Deck features
+
+![OT-2 deck map](images/ot2-deck-map.png)
 
 ## Box contents
 
