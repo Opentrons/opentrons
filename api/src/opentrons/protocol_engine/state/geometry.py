@@ -637,7 +637,9 @@ class GeometryView:
         if meniscus_tracking:
             location = LiquidHandlingWellLocation(
                 origin=WellOrigin.MENISCUS,
-                offset=WellOffset(x=absolute_point.x, y=absolute_point.y, z=absolute_point.z),
+                offset=WellOffset(
+                    x=absolute_point.x, y=absolute_point.y, z=absolute_point.z
+                ),
             )
             # TODO(cm): handle operationVolume being a float other than 0
             if meniscus_tracking == MeniscusTrackingTarget.END:
