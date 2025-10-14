@@ -107,6 +107,8 @@ export const SlotDetailModal = (
 
   return createPortal(
     <Modal
+      // this z-index should be a temporary fix for 8.6.0
+      zIndexOverlay={1001}
       title={modalTitle}
       hasHeader
       onClose={closeModal}
