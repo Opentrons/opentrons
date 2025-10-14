@@ -9,6 +9,7 @@ i18n.use(initReactI18next).init(
   {
     ...baseI18nConfig,
     resources: { en },
+    keySeparator: '.',
   },
   err => {
     if (err) {

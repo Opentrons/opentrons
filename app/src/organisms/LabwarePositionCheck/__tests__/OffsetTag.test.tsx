@@ -7,18 +7,23 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
-vi.mock('@opentrons/components', () => ({
-  Tag: vi.fn(({ iconName, type, iconPosition, text }) => (
-    <div
-      data-testid="mock-tag"
-      data-icon-name={iconName}
-      data-type={type}
-      data-icon-position={iconPosition}
-    >
-      {text}
-    </div>
-  )),
-}))
+vi.mock('@opentrons/components', async importActual => {
+  const actual = await importActual<typeof import('@opentrons/components')>()
+
+  return {
+    ...actual,
+    Tag: vi.fn(({ iconName, type, iconPosition, text }) => (
+      <div
+        data-testid="mock-tag"
+        data-icon-name={iconName}
+        data-type={type}
+        data-icon-position={iconPosition}
+      >
+        {text}
+      </div>
+    )),
+  }
+})
 
 describe('OffsetTag', () => {
   it('renders with "Default" text and reticle icon when kind is default', () => {
