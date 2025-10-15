@@ -197,8 +197,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
 
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
-        ...
+        command = GCODE.ENTER_BOOTLOADER.build_command()
+        await self._connection.send_dfu_command(command)
+        await self._connection.close()
 
     async def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
-        ...
+        self._connection._serial.reset_input_buffer()
+        self._connection._serial.reset_output_buffer()
