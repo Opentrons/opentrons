@@ -818,6 +818,7 @@ export const getArgsAndErrorsByStepId: Selector<
     )
   }
 )
+
 export const getUnsavedFormIsPristineSetTempForm = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
@@ -840,6 +841,7 @@ export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
     return isPresaved && isSetHsTempForm
   }
 )
+
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]
@@ -857,6 +859,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
+
 export const getFormLevelWarningsPerStep: Selector<
   BaseState,
   Record<string, FormWarning[]>
