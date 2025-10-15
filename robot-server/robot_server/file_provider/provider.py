@@ -79,16 +79,16 @@ class FileProviderExecutor:
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
         """Build the finalized filename."""
         if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
-            metadata = file_data.command_metadata
-            base_name = metadata.base_filename
+            csv_metadata = file_data.command_metadata
+            base_name = csv_metadata.base_filename
 
             if base_name.endswith(".csv"):
                 base_name = base_name[:-4]
 
-            return base_name + str(metadata.wavelength) + "nm.csv"
+            return base_name + str(csv_metadata.wavelength) + "nm.csv"
         elif isinstance(file_data.command_metadata, ImageJpegFileNameMetadata):
-            metadata = file_data.command_metadata
-            base_name = metadata.base_filename
+            img_metadata = file_data.command_metadata
+            base_name = img_metadata.base_filename
             # No matter the file name provided, always save as JPEG
             return base_name + ".jpg"
         else:
