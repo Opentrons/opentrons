@@ -41,16 +41,16 @@ export function StepDetailContainer({
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
 
   const { moduleEntities } = invariantContext
-  const moduleOnSlot = Object.entries(robotState.modules).find(
+  const moduleOnSlot = Object.entries(robotState.modules ?? {}).find(
     ([_, module]) => module.slot === selectedSlot
   )
 
   const leftPipetteId =
-    Object.entries(robotState.pipettes).find(
+    Object.entries(robotState.pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === 'left'
     )?.[0] ?? null
   const rightPipetteId =
-    Object.entries(robotState.pipettes).find(
+    Object.entries(robotState.pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === 'right'
     )?.[0] ?? null
   const isLeftPipetteActive =
@@ -89,7 +89,7 @@ export function StepDetailContainer({
         <ModuleSlotDetails
           moduleId={moduleOnSlot[0]}
           moduleEntities={moduleEntities}
-          moduleRobotState={modules}
+          moduleRobotState={{ [moduleOnSlot[0]]: moduleOnSlot[1] }}
         />
       ) : null}
     </div>

@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -32,10 +32,56 @@ describe('StepDetailContainer', () => {
   beforeEach(() => {
     props = {
       protocolKey: 'mockProtocolKey',
-      commands: [] as RunTimeCommand[],
+      commands: [
+        {
+          commandType: 'loadPipette',
+          params: {
+            pipetteName: 'p300_single',
+            mount: 'left',
+            pipetteId: 'leftPipetteId',
+          },
+          result: { pipetteId: 'leftPipetteId' },
+        },
+        {
+          commandType: 'loadPipette',
+          params: {
+            pipetteName: 'p300_multi',
+            mount: 'right',
+            pipetteId: 'rightPipetteId',
+          },
+          result: { pipetteId: 'rightPipetteId' },
+        },
+      ] as RunTimeCommand[],
       selectedSlot: 'mockSelectedSlot',
-      robotState: {} as RobotState,
-      invariantContext: {} as InvariantContext,
+      robotState: {
+        labware: {},
+        liquidState: {
+          pipettes: {},
+          labware: {},
+          trashBins: {},
+          wasteChute: {},
+        },
+        modules: {},
+        pipettes: {
+          leftPipetteId: {
+            mount: 'left',
+            nozzles: 'ALL',
+            tipWell: 'A1',
+            tiprackId: 'mockTiprackId',
+          },
+          rightPipetteId: {
+            mount: 'right',
+            nozzles: 'ALL',
+            tipWell: 'A1',
+            tiprackId: 'mockTiprackId',
+          },
+        },
+        tipState: {
+          tipracks: {},
+          pipettes: {},
+        },
+      } as RobotState,
+      invariantContext: { moduleEntities: {} } as InvariantContext,
     }
     vi.mocked(PipetteContainer).mockReturnValue(
       <div>mock Pipette Container</div>
@@ -63,7 +109,7 @@ describe('StepDetailContainer', () => {
 
   it('renders the pipette container', () => {
     render(props)
-    screen.getByText('mock Pipette Container')
+    expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
     screen.getByText('mock Destination Labware Container')
     screen.getByText('mock Destination Tips Container')
     screen.getByText('mock Source Labware Container')
