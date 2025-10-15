@@ -48,14 +48,14 @@ class AbstractVacuumModuleDriver(Protocol):
 
     async def set_vacuum_chamber_pressure(
         self,
-        gage_pressure_mbar: float,
+        gage_pressure_mbarg: float,
         duration: Optional[float],
         rate: Optional[float],
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def get_gage_pressure_reading_mbar(self) -> float:
+    async def get_gage_pressure_reading_mbarg(self) -> float:
         """Read each pressure sensor and return the pressure difference."""
         return 0.0
 
