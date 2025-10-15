@@ -384,11 +384,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     robotType === OT2_ROBOT_TYPE && isLiquidHandlingStepType
 
   const strideForContinueOrBack = isToolboxIndexTransformNeeded ? 2 : 1
+  const pageIndexRequiringConfirmation = robotType === FLEX_ROBOT_TYPE ? 1 : 0
 
   // Require confirmation for a liquid handling step, page 1 on OT-2 or page 2 on Flex
   const isOnPageRequiringConfirmation =
-    toolboxStep === (robotType === FLEX_ROBOT_TYPE ? 1 : 0) &&
-    isLiquidHandlingStepType
+    toolboxStep === pageIndexRequiringConfirmation && isLiquidHandlingStepType
 
   const handleContinue = (): void => {
     // Early return for confirmation modal
