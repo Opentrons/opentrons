@@ -1,7 +1,6 @@
 """Command models to capture an image with a camera."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Tuple, Any
-import logging
 
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
@@ -39,9 +38,6 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
 
 
-log = logging.getLogger(__name__)
-
-
 def _remove_default(s: dict[str, Any]) -> None:
     s.pop("default", None)
 
@@ -54,7 +50,7 @@ class CaptureImageParams(BaseModel):
 
     fileName: str | SkipJsonSchema[None] = Field(
         None,
-        description="Optional file name to use when storing the results of an Image Capture, PD only.",
+        description="Optional file name to use when storing the results of an Image Capture.",
         json_schema_extra=_remove_default,
     )
     resolution: Optional[Tuple[int, int]] = Field(
@@ -106,10 +102,8 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
     image_parameters.zoom = params.zoom
 
     if params.brightness is not None:
-        scaled_brightness = (((params.brightness / 100) * 256) - 128) * -1
-        if scaled_brightness is not None and (
-            scaled_brightness < BRIGHTNESS_MIN or scaled_brightness > BRIGHTNESS_MAX
-        ):
+        scaled_brightness: int = int(((params.brightness * 256) // 100) - 128) * -1
+        if scaled_brightness < BRIGHTNESS_MIN or scaled_brightness > BRIGHTNESS_MAX:
             _error_response("brightness", params.brightness, 0, 100)
         image_parameters.brightness = scaled_brightness
     else:
@@ -163,6 +157,8 @@ class CaptureImageImpl(
         """Initiate an image capture with a camera."""
         state_update = update_types.StateUpdate()
 
+        # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
+
         if params.fileName is not None:
             # Validate that the file we are about to generate does not put us higher than the limit
             if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
@@ -194,7 +190,7 @@ class CaptureImageImpl(
             file_id = await self._file_provider.write_file(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
-                command_metadata=ImageJpegFileNameMetadata.model_construct(
+                command_metadata=ImageJpegFileNameMetadata(
                     base_filename=filename,
                 ),
             )

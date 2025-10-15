@@ -89,11 +89,7 @@ class FileProviderExecutor:
         elif isinstance(file_data.command_metadata, ImageJpegFileNameMetadata):
             metadata = file_data.command_metadata
             base_name = metadata.base_filename
-
-            if base_name.endswith(".jpg"):
-                base_name
-            elif base_name.endswith(".jpeg"):
-                base_name = base_name[:-5]
+            # No matter the file name provided, always save as JPEG
             return base_name + ".jpg"
         else:
             return f"{file_id}.dat"

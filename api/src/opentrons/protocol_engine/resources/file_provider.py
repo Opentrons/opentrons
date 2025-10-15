@@ -4,6 +4,7 @@ from enum import Enum
 from io import StringIO
 import csv
 from typing import List, Optional, Callable, Awaitable, Dict
+from dataclasses import dataclass
 from pydantic import BaseModel
 from ..errors import StorageLimitReachedError
 
@@ -18,14 +19,16 @@ class MimeType(str, Enum):
     IMAGE_JPEG = "image/jpeg"
 
 
-class ReadCmdFileNameMetadata(BaseModel):
+@dataclass(frozen=True)
+class ReadCmdFileNameMetadata:
     """Data from a plate reader `read` command used to build the finalized file name."""
 
     base_filename: str
     wavelength: int
 
 
-class ImageJpegFileNameMetadata(BaseModel):
+@dataclass(frozen=True)
+class ImageJpegFileNameMetadata:
     """Data from an image capture by a camera used to build the finalized file name and detail the metadata in the file."""
 
     base_filename: str

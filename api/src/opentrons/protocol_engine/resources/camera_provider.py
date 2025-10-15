@@ -48,7 +48,7 @@ class ImageParameters(BaseModel):
     contrast: Optional[float] = Field(
         None, description="The contrast to use when processing an image."
     )
-    brightness: Optional[float] = Field(
+    brightness: Optional[int] = Field(
         None, description="The brightness to use when processing an image."
     )
     saturation: Optional[float] = Field(

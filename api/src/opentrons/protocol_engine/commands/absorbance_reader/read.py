@@ -182,7 +182,7 @@ class ReadAbsorbanceImpl(
                     file_id = await self._file_provider.write_file(
                         data=csv_bytes,
                         mime_type=MimeType.TEXT_CSV,
-                        command_metadata=ReadCmdFileNameMetadata.model_construct(
+                        command_metadata=ReadCmdFileNameMetadata(
                             base_filename=params.fileName,
                             wavelength=measurement.wavelength,
                         ),

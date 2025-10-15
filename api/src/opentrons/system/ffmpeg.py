@@ -27,7 +27,7 @@ async def ffmpeg_capture_image_bytes(
     zoom: float,
     pan: Tuple[int, int],
     contrast: float,
-    brightness: float,
+    brightness: int,
     saturation: float,
 ) -> bytes | CameraError:
     """Execute an FFMPEG command to capture an image based on various image parameters."""

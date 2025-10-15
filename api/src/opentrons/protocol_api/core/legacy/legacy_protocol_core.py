@@ -615,7 +615,6 @@ class LegacyProtocolCore(
 
     def capture_image(
         self,
-        home_before: Optional[bool] = False,
         filename: Optional[str] = None,
         resolution: Optional[Tuple[int, int]] = None,
         zoom: Optional[float] = None,
