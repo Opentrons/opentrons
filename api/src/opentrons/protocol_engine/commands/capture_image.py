@@ -151,7 +151,7 @@ class CaptureImageImpl(
         self._file_provider = file_provider
         self._camera_provider = camera_provider
 
-    async def execute(  # noqa: C901
+    async def execute(
         self, params: CaptureImageParams
     ) -> SuccessData[CaptureImageResult]:
         """Initiate an image capture with a camera."""

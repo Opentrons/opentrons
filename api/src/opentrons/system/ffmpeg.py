@@ -6,7 +6,7 @@ from opentrons.protocol_engine.resources.camera_provider import CameraError
 
 log = logging.getLogger(__name__)
 
-### FFMPEG Filter Details ###
+# === FFMPEG Filter Details ===
 # The following filters are utilized via the '-vf' flag to manipulate the final image returned:
 # 'crop' = [output_width]:[output_height]:x:y
 #   The crop is composed of a desired output width and height for the image, and
@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 
 # todo(chb, 2025-10-13): Right now we're just zooming towards the center of the frame. The 'pan'
 # setting should be used on the latter half of 'crop' to determine our cropping location instead.
+
+
 async def ffmpeg_capture_image_bytes(
     resolution: Tuple[int, int],
     camera: str,

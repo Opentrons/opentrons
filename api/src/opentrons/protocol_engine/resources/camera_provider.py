@@ -85,8 +85,8 @@ class CameraProvider:
         )
 
     async def capture_image(self, parameters: ImageParameters) -> bytes | None:
-        """
-        Process through the Camera Executor on robot server an image capture request with a given set of filters.
+        """Process through the Camera Executor on robot server an image capture request with a given set of filters.
+
         Returns a bytesteam of image data upon success. Raises an error if an error occurred during capture.
         Conditionally returns None if an image capture callback does not exist (simulation).
         """
