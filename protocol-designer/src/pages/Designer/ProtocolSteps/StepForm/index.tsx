@@ -39,8 +39,8 @@ interface StateProps {
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
-  formData?: FormData | null
   enableConcurrentModuleActions: boolean
+  formData?: FormData | null
 }
 interface DispatchProps {
   deleteStep: (stepId: string) => void
