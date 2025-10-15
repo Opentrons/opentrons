@@ -35,6 +35,5 @@ class VacuumModuleErrorCodes(BaseErrorCode):
 
     UNHANDLED_GCODE = ("ERR003", UnhandledGcode)
     GCODE_CACHE_FULL = ("ERR004", GCodeCacheFull)
-    ESTOP_TRIGGERED = ("ERR006", EStopTriggered)
     TASK_NOT_READY = ("ERR007", TaskNotReady)
     STOP_REQUESTED = ("ERR504", StopRequested)

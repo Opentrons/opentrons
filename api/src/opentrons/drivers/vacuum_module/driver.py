@@ -10,10 +10,6 @@ from .errors import VacuumModuleErrorCodes
 
 VM_BAUDRATE = 115200
 DEFAULT_VM_TIMEOUT = 5
-VM_MOVE_TIMEOUT = 20
-VM_TOF_TIMEOUT = 20
-VM_TOF_FRAME_RETRIES = 1
-VM_TOF_INIT_TIMEOUT = 5
 VM_ACK = "OK\n"
 VM_ERROR_KEYWORD = "err"
 VM_ASYNC_ERROR_ACK = "async"
@@ -50,26 +46,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not match:
             raise ValueError(f"Incorrect Response for reset reason: {response}")
         return int(match.group("R"))
-
-    @classmethod
-    def parse_installation_detected(cls, response: str) -> bool:
-        """Parse install detection."""
-        _RE = re.compile(rf"^{GCODE.GET_INSTALL_DETECTED} I:(\d)$")
-        match = _RE.match(response)
-        if not match:
-            raise ValueError(
-                f"Incorrect Response for installation detected: {response}"
-            )
-        return bool(int(match.group(1)))
-
-    @classmethod
-    def parse_estop_engaged(cls, response: str) -> bool:
-        """Parse estop enagaged."""
-        _RE = re.compile(rf"^{GCODE.GET_ESTOP_ENGAGED} E:(\d)$")
-        match = _RE.match(response)
-        if not match:
-            raise ValueError(f"Incorrect Response for Estop engaged: {response}")
-        return bool(int(match.group(1)))
 
     @classmethod
     async def create(
@@ -126,7 +102,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
 
     async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
-        if not re.match(r"^FST[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
+        if not re.match(r"^VM[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
             raise ValueError(
                 f"Invalid serial number: ({sn}) expected format: VMTA1020250119001"
             )

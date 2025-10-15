@@ -10,8 +10,6 @@ class GCODE(str, Enum):
     GET_RESET_REASON = "M114"
     GET_DEVICE_INFO = "M115"
     SET_SERIAL_NUMBER = "M996"
-    GET_INSTALL_DETECTED = "M123"
-    GET_ESTOP_ENGAGED = "M112"
     ENTER_BOOTLOADER = "dfu"
 
     def build_command(self) -> CommandBuilder:
