@@ -297,6 +297,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -304,6 +305,13 @@ export const useLabwareDropdownOptions = (
         labwareId
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
+      const topId = fullStackFromLabwares[0]
+      const isLabwareLidCombo =
+        (fullStackFromLabwares[1] === labwareId &&
+          labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('adapter')) ??
+        false
       const isLabwareInTrash =
         deckSlot === 'gripperWasteChute' ||
         MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
@@ -325,12 +333,14 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        !isTopOfStack
+        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'labware' && !isTopOfStack)
           ? acc
           : [
               ...acc,
