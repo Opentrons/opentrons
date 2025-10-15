@@ -1,16 +1,16 @@
-import { value useEffect, value useRef, value useState } from 'react'
-import { value useSelector } from 'react-redux'
+import { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 
-import { value DeckLabelSet } from '@opentrons/components'
+import { DeckLabelSet } from '@opentrons/components'
 
-import { value selectors } from '../../labware-ingred/selectors'
-import { value START_TERMINAL_ITEM_ID } from '../../steplist'
-import { value getSelectedTerminalItemId } from '../../ui/steps'
+import { selectors } from '../../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { getSelectedTerminalItemId } from '../../ui/steps'
 
-import type { value DeckLabelProps } from '@opentrons/components'
+import type { DeckLabelProps } from '@opentrons/components'
 import type {
-  value CoordinateTuple,
-  value LabwareDefinition2,
+  CoordinateTuple,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 //  NOTE: the deck riser needs special values because the
