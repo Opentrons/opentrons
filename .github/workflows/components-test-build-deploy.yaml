@@ -234,6 +234,8 @@ jobs:
     needs: [js-unit-test, build-components-storybook, deploy-components, publish-components]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.js-unit-test.result == 'success' && needs.build-components-storybook.result == 'success' && needs.deploy-components.result == 'success' && needs.publish-components.result == 'success'
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -246,6 +248,8 @@ jobs:
     needs: [js-unit-test, build-components-storybook, deploy-components, publish-components]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'failure' || needs.build-components-storybook.result == 'failure' || needs.deploy-components.result == 'failure' || needs.publish-components.result == 'failure')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -280,6 +284,8 @@ jobs:
     needs: [js-unit-test, build-components-storybook, deploy-components, publish-components]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'cancelled' || needs.build-components-storybook.result == 'cancelled' || needs.deploy-components.result == 'cancelled' || needs.publish-components.result == 'cancelled')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:
