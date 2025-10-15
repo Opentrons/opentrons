@@ -1,15 +1,16 @@
+
 import {
   LEFT,
-  NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
-import { isWasteChuteOnDeck } from './utils'
+import { is96Channel, isWasteChuteOnDeck } from './utils'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration, PipetteMount } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type {
   PipetteWizardFlow,
   PipetteWizardStep,
@@ -21,13 +22,17 @@ export const getPipetteWizardSteps = (
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
   isGantryEmpty: boolean,
+  attachedInstruments: AttachedPipettesFromInstrumentsQuery,
   deckConfig?: UseQueryResult<DeckConfiguration>
 ): PipetteWizardStep[] | null => {
-  const wasteChute = isWasteChuteOnDeck(deckConfig)
+  const is96ChannelCalibrateAndWasteChute =
+    (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH) &&
+    (is96Channel(attachedInstruments) || selectedPipette === '96-Channel') &&
+    isWasteChuteOnDeck(deckConfig)
 
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      if (selectedPipette === NINETY_SIX_CHANNEL && wasteChute) {
+      if (is96ChannelCalibrateAndWasteChute) {
         return [
           { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
           { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
@@ -114,7 +119,7 @@ export const getPipetteWizardSteps = (
               flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-            ...(wasteChute && selectedPipette === NINETY_SIX_CHANNEL
+            ...(is96ChannelCalibrateAndWasteChute
               ? [
                   {
                     section: SECTIONS.REMOVE_WASTE_CHUTE,
@@ -133,7 +138,7 @@ export const getPipetteWizardSteps = (
               mount: LEFT,
               flowType,
             },
-            ...(wasteChute && selectedPipette === NINETY_SIX_CHANNEL
+            ...(is96ChannelCalibrateAndWasteChute
               ? [
                   {
                     section: SECTIONS.ATTACH_WASTE_CHUTE,
@@ -177,7 +182,7 @@ export const getPipetteWizardSteps = (
               flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-            ...(wasteChute
+            ...(is96ChannelCalibrateAndWasteChute
               ? [
                   {
                     section: SECTIONS.REMOVE_WASTE_CHUTE,
@@ -196,7 +201,7 @@ export const getPipetteWizardSteps = (
               mount: LEFT,
               flowType,
             },
-            ...(wasteChute
+            ...(is96ChannelCalibrateAndWasteChute
               ? [
                   {
                     section: SECTIONS.ATTACH_WASTE_CHUTE,

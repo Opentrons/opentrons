@@ -16,6 +16,21 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStep } from '../types'
 
 describe('getPipetteWizardSteps', () => {
+  const mockSinglePipette = {
+    left: { id: 'pipette_id', ok: true, model: 'p1000', channels: 1 },
+    right: null,
+  } as any
+  const mock96Pipette = {
+    left: {
+      id: 'pipette_id',
+      ok: true,
+      model: 'p1000',
+      mount: 'left',
+      data: { channels: 96 },
+    },
+    right: null,
+  } as any
+
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
       {
@@ -41,7 +56,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, SINGLE_MOUNT_PIPETTES, false)
+      getPipetteWizardSteps(
+        FLOWS.CALIBRATE,
+        LEFT,
+        SINGLE_MOUNT_PIPETTES,
+        false,
+        mockSinglePipette
+      )
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
   it('returns the correct array of info for attach pipette flow single channel', () => {
@@ -84,7 +105,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
+      getPipetteWizardSteps(
+        FLOWS.ATTACH,
+        LEFT,
+        SINGLE_MOUNT_PIPETTES,
+        false,
+        mockSinglePipette
+      )
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
 
@@ -108,7 +135,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.DETACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
+      getPipetteWizardSteps(
+        FLOWS.DETACH,
+        LEFT,
+        SINGLE_MOUNT_PIPETTES,
+        false,
+        mockSinglePipette
+      )
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
   it('returns the correct array of info for attach pipette 96 channel', () => {
@@ -161,7 +194,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, NINETY_SIX_CHANNEL, true)
+      getPipetteWizardSteps(
+        FLOWS.ATTACH,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        true,
+        mock96Pipette
+      )
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
 
@@ -195,7 +234,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.DETACH, LEFT, NINETY_SIX_CHANNEL, true)
+      getPipetteWizardSteps(
+        FLOWS.DETACH,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        true,
+        mock96Pipette
+      )
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
   it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount', () => {
@@ -259,10 +304,16 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, NINETY_SIX_CHANNEL, false)
+      getPipetteWizardSteps(
+        FLOWS.ATTACH,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        false,
+        mockSinglePipette
+      )
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
-  it('returns the corect array of info for calibrate pipette 96 channel', () => {
+  it('returns the correct array of info for calibrate pipette 96 channel', () => {
     const mockCalibrateFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -287,7 +338,13 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
+      getPipetteWizardSteps(
+        FLOWS.CALIBRATE,
+        LEFT,
+        NINETY_SIX_CHANNEL,
+        false,
+        mock96Pipette
+      )
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
   it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount and a waste chute on deck', () => {
@@ -374,6 +431,7 @@ describe('getPipetteWizardSteps', () => {
         LEFT,
         NINETY_SIX_CHANNEL,
         false,
+        mockSinglePipette,
         mockDeckConfig
       )
     ).toStrictEqual(mockAttachPipetteFlowSteps)
@@ -427,6 +485,7 @@ describe('getPipetteWizardSteps', () => {
         LEFT,
         NINETY_SIX_CHANNEL,
         false,
+        mock96Pipette,
         mockDeckConfig
       )
     ).toStrictEqual(mockCalibrateFlowSteps)

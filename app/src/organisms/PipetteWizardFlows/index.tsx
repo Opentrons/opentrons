@@ -88,6 +88,7 @@ export const PipetteWizardFlows = (
             mount,
             selectedPipette,
             isGantryEmpty,
+            attachedPipettes,
             deckConfig
           )
         : getPipetteWizardStepsForProtocol(

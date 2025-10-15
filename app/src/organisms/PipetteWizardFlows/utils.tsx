@@ -57,7 +57,7 @@ export function is96Channel(
   if (
     left_instrument != null &&
     left_instrument.ok &&
-    left_instrument.mount !== 'left' &&
+    left_instrument.mount === 'left' &&
     left_instrument.data?.channels === 96
   ) {
     return true
