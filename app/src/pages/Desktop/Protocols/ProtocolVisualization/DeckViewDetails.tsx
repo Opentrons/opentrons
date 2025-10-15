@@ -236,8 +236,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas =
-            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
+          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
+            stagingAreaCutoutIds
+          )
 
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
@@ -293,10 +294,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(
-          slot,
-          deckDef
-        )?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
+          ?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(
             `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
@@ -395,22 +394,22 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
   )
 }
 
-const getSlotColorClass = (
-  hoveredSlot: string | null,
-  selectedSlot: string | null,
-  slot: string,
-  isSlotSelected: boolean
-): string => {
-  if (hoveredSlot === slot && isSlotSelected) {
-    return styles.hovered_active_slot_box
-  } else if (hoveredSlot === slot && !isSlotSelected) {
-    return styles.hovered_inactive_slot_box
-  } else if (selectedSlot === slot && isSlotSelected) {
-    return styles.hovered_active_slot_box
-  } else if (selectedSlot === slot && !isSlotSelected) {
-    return styles.hovered_inactive_slot_box
-  } else if (isSlotSelected) {
-    return styles.active_slot_box
-  }
-  return ''
-}
+// const getSlotColorClass = (
+//   hoveredSlot: string | null,
+//   selectedSlot: string | null,
+//   slot: string,
+//   isSlotSelected: boolean
+// ): string => {
+//   if (hoveredSlot === slot && isSlotSelected) {
+//     return styles.hovered_active_slot_box
+//   } else if (hoveredSlot === slot && !isSlotSelected) {
+//     return styles.hovered_inactive_slot_box
+//   } else if (selectedSlot === slot && isSlotSelected) {
+//     return styles.hovered_active_slot_box
+//   } else if (selectedSlot === slot && !isSlotSelected) {
+//     return styles.hovered_inactive_slot_box
+//   } else if (isSlotSelected) {
+//     return styles.active_slot_box
+//   }
+//   return ''
+// }
