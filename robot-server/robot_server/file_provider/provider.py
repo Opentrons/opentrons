@@ -1,11 +1,14 @@
 """Executor for Protocol Engine File Provider callbacks."""
 import os
 import asyncio
+import hashlib
 from pathlib import Path
 from typing import Annotated, Optional
 from fastapi import Depends
 from pydantic import BaseModel
 from datetime import datetime
+
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
@@ -19,6 +22,7 @@ from robot_server.data_files.data_files_store import (
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
+    ImageCaptureCmdFileNameMetadata,
 )
 
 
@@ -37,6 +41,7 @@ class FileProviderExecutor:
     def __init__(
         self,
         data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+        images_directory: Annotated[Path, Depends(get_images_directory)],
         data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     ) -> None:
         """Initialize the file provider executor.
@@ -46,6 +51,7 @@ class FileProviderExecutor:
             data_files_store: The data files store utilized for database interaction when creating files.
         """
         self._data_files_directory = data_files_directory
+        self._images_directory = images_directory
         self._data_files_store = data_files_store
         self._run_metadata: RunFileNameMetadata | None = None
 
@@ -71,6 +77,7 @@ class FileProviderExecutor:
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
             )
+            md5sum = self._get_md5sum(file_data)
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -81,7 +88,7 @@ class FileProviderExecutor:
             file_info = DataFileInfo(
                 id=file_id,
                 name=final_filename,
-                file_hash="",
+                file_hash=md5sum,
                 created_at=created_at,
                 source=DataFileSource.GENERATED,
             )
@@ -105,6 +112,23 @@ class FileProviderExecutor:
                 base_name = base_name[:-4]
 
             return base_name + str(metadata.wavelength) + "nm.csv"
+        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            assert self._run_metadata is not None
+
+            cmd_metadata = file_data.command_metadata
+            base_name = cmd_metadata.base_filename or ""
+            protocol_name = self._run_metadata.protocol_name or ""
+
+            return (
+                base_name
+                + self._run_metadata.robot_name
+                + protocol_name
+                + str(self._run_metadata.run_created_at)
+                + str(cmd_metadata.step_number)
+                + str(cmd_metadata.command_timestamp)
+                + ".jpeg"
+            )
+
         else:
             return f"{file_id}.dat"
 
@@ -112,7 +136,15 @@ class FileProviderExecutor:
         self, filename: str, file_id: str, file_data: FileData
     ) -> Path:
         """Given a finalized filename, return the full filepath for the filename."""
+        assert self._run_metadata is not None
+
         if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
             return self._data_files_directory / file_id / filename
+        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            return self._images_directory / self._run_metadata.run_id / filename
         else:
             return self._data_files_directory / filename
+
+    def _get_md5sum(self, file_data: FileData) -> str:
+        """Returns the md5 checksum of the provided file data."""
+        return hashlib.md5(file_data.data).hexdigest()
