@@ -107,37 +107,34 @@ const getNoLiquidClassValues = (
   const numAspirateWells = state.sourceWells.length
   const numDispenseWells = state.destinationWells.length
 
-  const {
-    referenceVolumes: byVolumeLookup,
-  } = getTransferPlanAndReferenceVolumes({
-    pipetteSpecs: pipette,
-    tiprackDefinition: tipRack,
-    numAspirateWells,
-    volume,
-    path,
-    numDispenseWells,
-    aspirateAirGapByVolume,
-    conditioningByVolume,
-    disposalByVolume,
-  })
+  const { referenceVolumes: byVolumeLookup } =
+    getTransferPlanAndReferenceVolumes({
+      pipetteSpecs: pipette,
+      tiprackDefinition: tipRack,
+      numAspirateWells,
+      volume,
+      path,
+      numDispenseWells,
+      aspirateAirGapByVolume,
+      conditioningByVolume,
+      disposalByVolume,
+    })
 
   const actualConditioningVolume =
     linearInterpolate(volume, conditioningByVolume) ?? 0
   const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
 
   // Calculate extra volumes based on path
-  const {
-    adjustedSourceWells,
-    adjustedDestinationWells,
-  } = calculateAdjustWells({
-    state,
-    tipRack,
-    volume,
-    path,
-    conditioningByVolume,
-    disposalByVolume,
-    aspirateAirGapVolume,
-  })
+  const { adjustedSourceWells, adjustedDestinationWells } =
+    calculateAdjustWells({
+      state,
+      tipRack,
+      volume,
+      path,
+      conditioningByVolume,
+      disposalByVolume,
+      aspirateAirGapVolume,
+    })
   const { correction } = byVolumeLookup
 
   const aspirateCorrectionVolume = linearInterpolate(
@@ -333,34 +330,31 @@ const getLiquidClassValues = (
   const numAspirateWells = state.sourceWells.length
   const numDispenseWells = destinationWells.length
 
-  const {
-    referenceVolumes: byVolumeLookup,
-  } = getTransferPlanAndReferenceVolumes({
-    pipetteSpecs,
-    tiprackDefinition: tipRack,
-    numAspirateWells,
-    volume,
-    path,
-    numDispenseWells,
-    aspirateAirGapByVolume,
-    conditioningByVolume,
-    disposalByVolume,
-  })
+  const { referenceVolumes: byVolumeLookup } =
+    getTransferPlanAndReferenceVolumes({
+      pipetteSpecs,
+      tiprackDefinition: tipRack,
+      numAspirateWells,
+      volume,
+      path,
+      numDispenseWells,
+      aspirateAirGapByVolume,
+      conditioningByVolume,
+      disposalByVolume,
+    })
 
   const aspirateAirGapVolume = aspirate?.retract.airGapByVolume[0][1] ?? 0
 
-  const {
-    adjustedSourceWells,
-    adjustedDestinationWells,
-  } = calculateAdjustWells({
-    state,
-    tipRack,
-    volume,
-    path,
-    conditioningByVolume,
-    disposalByVolume,
-    aspirateAirGapVolume,
-  })
+  const { adjustedSourceWells, adjustedDestinationWells } =
+    calculateAdjustWells({
+      state,
+      tipRack,
+      volume,
+      path,
+      conditioningByVolume,
+      disposalByVolume,
+      aspirateAirGapVolume,
+    })
 
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
     pipetteSpecs,

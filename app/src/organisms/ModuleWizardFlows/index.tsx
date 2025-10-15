@@ -71,9 +71,8 @@ export function ModuleWizardFlows(
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
-  const [showLaunchSetup, setShowLaunchSetup] = useState<boolean>(
-    showSetupLauncher
-  )
+  const [showLaunchSetup, setShowLaunchSetup] =
+    useState<boolean>(showSetupLauncher)
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   const attachedModules =

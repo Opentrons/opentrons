@@ -25,7 +25,7 @@ export const startDiscoveryEpic: Epic = action$ =>
     >(startAction => {
       const timeout =
         'payload' in startAction && startAction.payload != null
-          ? startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS
+          ? (startAction.payload.timeout ?? DISCOVERY_TIMEOUT_MS)
           : DISCOVERY_TIMEOUT_MS
 
       return of(finishDiscovery()).pipe(delay(timeout))

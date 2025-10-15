@@ -69,9 +69,8 @@ export function OverflowMenu({
   ])
 
   const [showDeleteCalModal, setShowDeleteCalModal] = useState(false)
-  const [showPipetteWizardFlows, setShowPipetteWizardFlows] = useState<boolean>(
-    false
-  )
+  const [showPipetteWizardFlows, setShowPipetteWizardFlows] =
+    useState<boolean>(false)
   const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
     SINGLE_MOUNT_PIPETTES
   )
@@ -89,8 +88,8 @@ export function OverflowMenu({
       setShowOverflowMenu(false)
     },
   })
-  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
-    ?.data
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery().data?.data
 
   const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
   const { isRunRunning: isRunning } = useRunStatuses()

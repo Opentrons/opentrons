@@ -49,12 +49,8 @@ export const getAddresses: (state: State) => Address[] = createSelector(
   }
 )
 
-export const getRobots: (
-  state: State
-) => DiscoveryClientRobot[] = createSelector(
-  getRobotStates,
-  getHostStates,
-  (robots, hosts) => {
+export const getRobots: (state: State) => DiscoveryClientRobot[] =
+  createSelector(getRobotStates, getHostStates, (robots, hosts) => {
     return robots.map(robot => ({
       ...robot,
       addresses: hosts
@@ -62,8 +58,7 @@ export const getRobots: (
         .sort(compareHostsByConnectability)
         .map(({ robotName, ...host }) => host),
     }))
-  }
-)
+  })
 
 // ascending priority order, where no match is lowest priority
 const HEALTH_PRIORITY = [

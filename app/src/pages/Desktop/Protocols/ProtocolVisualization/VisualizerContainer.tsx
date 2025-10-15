@@ -69,14 +69,22 @@ export function VisualizerContainer(
     rightWidthRef.current = rightWidth
   }, [rightWidth])
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   const selectedCommandIndex = commands.findIndex(
+    command => command.id === selectedCommandId
+  )
+  const filteredSelectedCommandIndex = filteredCommands.findIndex(
     command => command.id === selectedCommandId
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
-    commands
-  )
+  const invariantContextFromRunCommands =
+    constructInvariantContextFromRunCommands(commands)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromRunCommands
@@ -119,10 +127,9 @@ export function VisualizerContainer(
     srcFileNames,
     analysis
   )
-  const commandLength = analysis.commands.length
   const percentComplete =
-    selectedCommandIndex != null
-      ? (selectedCommandIndex / commandLength) * 100
+    filteredSelectedCommandIndex != null
+      ? (filteredSelectedCommandIndex / filteredCommands.length) * 100
       : 0
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
@@ -256,12 +263,12 @@ export function VisualizerContainer(
         <Controls
           protocolName={protocolDisplayName}
           numErrors={analysis.errors.length}
-          numCommandLength={commands.length}
-          currentCommandIndex={selectedCommandIndex}
+          numCommandLength={filteredCommands.length}
+          currentCommandIndex={filteredSelectedCommandIndex}
           setSelectedCommand={setSelectedCommand}
           handlePlayPause={handlePlayPause}
           isPlaying={isPlaying}
-          commands={commands}
+          commands={filteredCommands}
           groupedCommands={groupedCommands}
           setShowDeckRenders={setShowDeckRenders}
           showDeckRenders={showDeckRenders}
@@ -279,7 +286,6 @@ export function VisualizerContainer(
           showDeckRenders={showDeckRenders}
         />
       </div>
-
       {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
         {/* Right column resizer */}
@@ -289,8 +295,7 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-
-        <StepDetailContainer />
+        <StepDetailContainer protocolKey={protocolKey} />
       </div>
     </div>
   )

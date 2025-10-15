@@ -167,9 +167,8 @@ export function LabwareModal({
                             >
                               {labwareByCategory[category]?.map(
                                 (labwareDef, index) => {
-                                  const labwareURI: string = getLabwareDefURI(
-                                    labwareDef
-                                  )
+                                  const labwareURI: string =
+                                    getLabwareDefURI(labwareDef)
                                   const loadName =
                                     labwareDef.parameters.loadName
                                   const isMatch = searchFilter(

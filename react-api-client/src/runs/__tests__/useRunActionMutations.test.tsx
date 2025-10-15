@@ -50,27 +50,28 @@ describe('useRunActionMutations hook', () => {
     const mockResumeRunFromRecovery = vi.fn()
     const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
-    vi.mocked(usePlayRunMutation).mockReturnValue(({
+    vi.mocked(usePlayRunMutation).mockReturnValue({
       playRun: mockPlayRun,
-    } as unknown) as UsePlayRunMutationResult)
+    } as unknown as UsePlayRunMutationResult)
 
-    vi.mocked(usePauseRunMutation).mockReturnValue(({
+    vi.mocked(usePauseRunMutation).mockReturnValue({
       pauseRun: mockPauseRun,
-    } as unknown) as UsePauseRunMutationResult)
+    } as unknown as UsePauseRunMutationResult)
 
-    vi.mocked(useStopRunMutation).mockReturnValue(({
+    vi.mocked(useStopRunMutation).mockReturnValue({
       stopRun: mockStopRun,
-    } as unknown) as UseStopRunMutationResult)
+    } as unknown as UseStopRunMutationResult)
 
-    vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue(({
+    vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
       resumeRunFromRecovery: mockResumeRunFromRecovery,
-    } as unknown) as UseResumeRunFromRecoveryMutationResult)
+    } as unknown as UseResumeRunFromRecoveryMutationResult)
 
     vi.mocked(
       useResumeRunFromRecoveryAssumingFalsePositiveMutation
-    ).mockReturnValue(({
-      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
-    } as unknown) as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
+    ).mockReturnValue({
+      resumeRunFromRecoveryAssumingFalsePositive:
+        mockResumeRunFromRecoveryAssumingFalsePositive,
+    } as unknown as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
 
     const { result } = renderHook(() => useRunActionMutations(RUN_ID_1), {
       wrapper,

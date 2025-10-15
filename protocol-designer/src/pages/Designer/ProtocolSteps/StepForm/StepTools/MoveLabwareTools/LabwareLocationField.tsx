@@ -73,9 +73,10 @@ export function LabwareLocationField(
     ...unoccupiedLabwareLocationsOptionsSelector,
   ]
   if (useGripper || isLabwareOffDeck) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== 'offDeck'
-    )
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        option => option.value !== 'offDeck'
+      )
   }
 
   if (
@@ -84,15 +85,17 @@ export function LabwareLocationField(
       ae => ae.name === 'wasteChute'
     ) != null
   ) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== WASTE_CHUTE_CUTOUT
-    )
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        option => option.value !== WASTE_CHUTE_CUTOUT
+      )
   }
 
   if (!isLabwareALid) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.name !== 'Trash bin'
-    )
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        option => option.name !== 'Trash bin'
+      )
   }
   const allSlotNames = [
     ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
@@ -101,9 +104,10 @@ export function LabwareLocationField(
   ]
 
   if (isLabwareATiprackLid) {
-    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => !allSlotNames.includes(option.value as AddressableAreaName)
-    )
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        option => !allSlotNames.includes(option.value as AddressableAreaName)
+      )
   }
 
   return (

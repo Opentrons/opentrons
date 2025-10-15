@@ -63,10 +63,8 @@ export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
-  const [
-    showPreviousVersionModal,
-    setShowPreviousVersionModal,
-  ] = useState<boolean>(false)
+  const [showPreviousVersionModal, setShowPreviousVersionModal] =
+    useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
 
   const appLanguage = useSelector(getAppLanguage)
@@ -86,12 +84,10 @@ export function GeneralSettings(): JSX.Element {
     })
   }
 
-  const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
-    updateAvailable
-  )
-  const [showConnectRobotSlideout, setShowConnectRobotSlideout] = useState(
-    false
-  )
+  const [showUpdateBanner, setShowUpdateBanner] =
+    useState<boolean>(updateAvailable)
+  const [showConnectRobotSlideout, setShowConnectRobotSlideout] =
+    useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {

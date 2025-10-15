@@ -21,15 +21,12 @@ interface EstopTakeoverProps {
 
 export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const [isDismissedModal, setIsDismissedModal] = useState<boolean>(false)
-  const [
-    isWaitingForResumeOperation,
-    setIsWatingForResumeOperation,
-  ] = useState<boolean>(false)
+  const [isWaitingForResumeOperation, setIsWatingForResumeOperation] =
+    useState<boolean>(false)
 
   const [estopState, setEstopState] = useState<EstopState>()
-  const [showEmergencyStopModal, setShowEmergencyStopModal] = useState<boolean>(
-    false
-  )
+  const [showEmergencyStopModal, setShowEmergencyStopModal] =
+    useState<boolean>(false)
 
   // TODO: (ba, 2024-10-24): Use notifications instead of polling
   const { data: estopStatus } = useEstopQuery({

@@ -16,15 +16,13 @@ import type {
   HostConfig,
 } from '@opentrons/api-client'
 
-export type UseUpdateClientDataMutationResult<
-  T = DefaultClientData
-> = UseMutationResult<ClientDataResponse<T>, AxiosError, T> & {
-  updateClientData: UseMutateFunction<ClientDataResponse<T>, AxiosError, T>
-}
+export type UseUpdateClientDataMutationResult<T = DefaultClientData> =
+  UseMutationResult<ClientDataResponse<T>, AxiosError, T> & {
+    updateClientData: UseMutateFunction<ClientDataResponse<T>, AxiosError, T>
+  }
 
-export type UseUpdateClientDataMutationOptions<
-  T = DefaultClientData
-> = UseMutationOptions<ClientDataResponse<T>, AxiosError, T>
+export type UseUpdateClientDataMutationOptions<T = DefaultClientData> =
+  UseMutationOptions<ClientDataResponse<T>, AxiosError, T>
 
 export function useUpdateClientData<T = DefaultClientData>(
   key: string,

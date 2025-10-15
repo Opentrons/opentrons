@@ -253,9 +253,8 @@ function transferLikeSubsteps(args: {
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  const substepCommandCreator = getCommandCreatorForTransferlikeSubsteps(
-    stepArgs
-  )
+  const substepCommandCreator =
+    getCommandCreatorForTransferlikeSubsteps(stepArgs)
 
   if (!substepCommandCreator) {
     console.assert(
@@ -276,14 +275,13 @@ function transferLikeSubsteps(args: {
       invariantContext,
       initialRobotState
     )
-    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
-      {
+    const mergedMultiRows: StepItemSourceDestRow[][] =
+      mergeSubstepRowsMultiChannel({
         substepRows,
         isMixStep: stepArgs.commandCreatorFnName === 'mix',
         channels,
         showDispenseVol,
-      }
-    )
+      })
     return {
       substepType: 'sourceDest',
       multichannel: true,

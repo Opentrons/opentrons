@@ -106,35 +106,35 @@ export const setWellSelectionLabwareKey = (
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
-export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyAction => ({
-  type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
-  payload: null,
-})
-export const resetSelectStep = (stepId: StepIdType): ThunkAction<any> => (
-  dispatch: ThunkDispatch<any>,
-  getState: GetState
-) => {
-  const selectStepAction: SelectStepAction = {
-    type: 'SELECT_STEP',
-    payload: stepId,
-  }
-  dispatch(selectStepAction)
-  dispatch({
-    type: 'POPULATE_FORM',
+export const clearWellSelectionLabwareKey =
+  (): ClearWellSelectionLabwareKeyAction => ({
+    type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
     payload: null,
   })
-  dispatch({
-    type: 'SELECT_DROPDOWN_ITEM',
-    payload: {
-      selection: {
-        id: null,
-        text: null,
+export const resetSelectStep =
+  (stepId: StepIdType): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const selectStepAction: SelectStepAction = {
+      type: 'SELECT_STEP',
+      payload: stepId,
+    }
+    dispatch(selectStepAction)
+    dispatch({
+      type: 'POPULATE_FORM',
+      payload: null,
+    })
+    dispatch({
+      type: 'SELECT_DROPDOWN_ITEM',
+      payload: {
+        selection: {
+          id: null,
+          text: null,
+        },
+        mode: 'clear',
       },
-      mode: 'clear',
-    },
-  })
-  resetScrollElements()
-}
+    })
+    resetScrollElements()
+  }
 
 const setSelection = (
   formData: {
@@ -215,133 +215,131 @@ const setSelection = (
   }
 }
 
-export const populateForm = (stepId: StepIdType): ThunkAction<any> => (
-  dispatch: ThunkDispatch<any>,
-  getState: GetState
-) => {
-  const state = getState()
-  const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
-  dispatch({
-    type: 'POPULATE_FORM',
-    payload: formData,
-  })
-  setSelection(formData, dispatch)
-  resetScrollElements()
-}
-export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
-  dispatch: ThunkDispatch<any>,
-  getState: GetState
-) => {
-  const selectStepAction: SelectStepAction = {
-    type: 'SELECT_STEP',
-    payload: stepId,
+export const populateForm =
+  (stepId: StepIdType): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const state = getState()
+    const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+    dispatch({
+      type: 'POPULATE_FORM',
+      payload: formData,
+    })
+    setSelection(formData, dispatch)
+    resetScrollElements()
   }
-  dispatch(selectStepAction)
-  const state = getState()
-  const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
-  dispatch({
-    type: 'POPULATE_FORM',
-    payload: formData,
-  })
-  setSelection(formData, dispatch)
-}
-// NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
-export const selectMultipleSteps = (
-  stepIds: StepIdType[],
-  lastSelected: StepIdType
-): ThunkAction<SelectMultipleStepsAction> => (
-  dispatch: ThunkDispatch<any>,
-  getState: GetState
-) => {
-  const selectStepAction: SelectMultipleStepsAction = {
-    type: 'SELECT_MULTIPLE_STEPS',
-    payload: {
-      stepIds,
-      lastSelected,
-    },
-  }
-  dispatch(selectStepAction)
-}
-export const selectMultipleStepsForGroup = (
-  stepIds: StepIdType[],
-  lastSelected: StepIdType
-): ThunkAction<SelectMultipleStepsForGroupAction> => (
-  dispatch: ThunkDispatch<any>,
-  getState: GetState
-) => {
-  const selectStepAction: SelectMultipleStepsForGroupAction = {
-    type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP',
-    payload: {
-      stepIds,
-      lastSelected,
-    },
-  }
-  dispatch(selectStepAction)
-}
-export const selectAllSteps = (): ThunkAction<
-  SelectMultipleStepsAction | AnalyticsEventAction
-> => (
-  dispatch: ThunkDispatch<SelectMultipleStepsAction | AnalyticsEventAction>,
-  getState: GetState
-) => {
-  const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
-  const selectStepAction: SelectMultipleStepsAction = {
-    type: 'SELECT_MULTIPLE_STEPS',
-    payload: {
-      stepIds: allStepIds,
-      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
-      lastSelected: last(allStepIds),
-    },
-  }
-  dispatch(selectStepAction)
-  // dispatch an analytics event to indicate all steps have been selected
-  // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
-  const selectAllStepsEvent: AnalyticsEvent = {
-    name: SELECT_ALL_STEPS_EVENT,
-    properties: {},
-  }
-  dispatch(analyticsEvent(selectAllStepsEvent))
-}
-export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
-  'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
-export const deselectAllSteps = (
-  meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
-): ThunkAction<SelectStepAction | AnalyticsEventAction> => (
-  dispatch: ThunkDispatch<SelectStepAction | AnalyticsEventAction>,
-  getState: GetState
-) => {
-  const lastSelectedStepId = getMultiSelectLastSelected(getState())
-
-  if (lastSelectedStepId) {
+export const selectStep =
+  (stepId: StepIdType): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
     const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
-      payload: lastSelectedStepId,
+      payload: stepId,
     }
     dispatch(selectStepAction)
-  } else {
-    console.warn(
-      'something went wrong, cannot deselect all steps if not in multi select mode'
-    )
+    const state = getState()
+    const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+    dispatch({
+      type: 'POPULATE_FORM',
+      payload: formData,
+    })
+    setSelection(formData, dispatch)
   }
+// NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
+export const selectMultipleSteps =
+  (
+    stepIds: StepIdType[],
+    lastSelected: StepIdType
+  ): ThunkAction<SelectMultipleStepsAction> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const selectStepAction: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: {
+        stepIds,
+        lastSelected,
+      },
+    }
+    dispatch(selectStepAction)
+  }
+export const selectMultipleStepsForGroup =
+  (
+    stepIds: StepIdType[],
+    lastSelected: StepIdType
+  ): ThunkAction<SelectMultipleStepsForGroupAction> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const selectStepAction: SelectMultipleStepsForGroupAction = {
+      type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP',
+      payload: {
+        stepIds,
+        lastSelected,
+      },
+    }
+    dispatch(selectStepAction)
+  }
+export const selectAllSteps =
+  (): ThunkAction<SelectMultipleStepsAction | AnalyticsEventAction> =>
+  (
+    dispatch: ThunkDispatch<SelectMultipleStepsAction | AnalyticsEventAction>,
+    getState: GetState
+  ) => {
+    const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
+    const selectStepAction: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: {
+        stepIds: allStepIds,
+        // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
+        lastSelected: last(allStepIds),
+      },
+    }
+    dispatch(selectStepAction)
+    // dispatch an analytics event to indicate all steps have been selected
+    // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
+    const selectAllStepsEvent: AnalyticsEvent = {
+      name: SELECT_ALL_STEPS_EVENT,
+      properties: {},
+    }
+    dispatch(analyticsEvent(selectAllStepsEvent))
+  }
+export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
+  'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
+export const deselectAllSteps =
+  (
+    meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
+  ): ThunkAction<SelectStepAction | AnalyticsEventAction> =>
+  (
+    dispatch: ThunkDispatch<SelectStepAction | AnalyticsEventAction>,
+    getState: GetState
+  ) => {
+    const lastSelectedStepId = getMultiSelectLastSelected(getState())
 
-  // dispatch an analytics event to indicate all steps have been deselected
-  // because there is no 'DESELECT_ALL_STEPS'/'EXIT_BATCH_EDIT_MODE' action that middleware can catch
-  if (meta === EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) {
-    // for analytics purposes we want to differentiate between
-    // deselecting all, and using the "exit batch edit mode" button
-    const exitBatchEditModeEvent: AnalyticsEvent = {
-      name: EXIT_BATCH_EDIT_MODE_EVENT,
-      properties: {},
+    if (lastSelectedStepId) {
+      const selectStepAction: SelectStepAction = {
+        type: 'SELECT_STEP',
+        payload: lastSelectedStepId,
+      }
+      dispatch(selectStepAction)
+    } else {
+      console.warn(
+        'something went wrong, cannot deselect all steps if not in multi select mode'
+      )
     }
-    dispatch(analyticsEvent(exitBatchEditModeEvent))
-  } else {
-    const deselectAllStepsEvent: AnalyticsEvent = {
-      name: DESELECT_ALL_STEPS_EVENT,
-      properties: {},
+
+    // dispatch an analytics event to indicate all steps have been deselected
+    // because there is no 'DESELECT_ALL_STEPS'/'EXIT_BATCH_EDIT_MODE' action that middleware can catch
+    if (meta === EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) {
+      // for analytics purposes we want to differentiate between
+      // deselecting all, and using the "exit batch edit mode" button
+      const exitBatchEditModeEvent: AnalyticsEvent = {
+        name: EXIT_BATCH_EDIT_MODE_EVENT,
+        properties: {},
+      }
+      dispatch(analyticsEvent(exitBatchEditModeEvent))
+    } else {
+      const deselectAllStepsEvent: AnalyticsEvent = {
+        name: DESELECT_ALL_STEPS_EVENT,
+        properties: {},
+      }
+      dispatch(analyticsEvent(deselectAllStepsEvent))
     }
-    dispatch(analyticsEvent(deselectAllStepsEvent))
   }
-}
 
 export const toggleViewSubstep = (
   stepId: ViewSubstep

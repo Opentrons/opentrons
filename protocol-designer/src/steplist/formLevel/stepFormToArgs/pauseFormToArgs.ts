@@ -10,33 +10,37 @@ import type {
   WaitForTemperatureArgs,
 } from '@opentrons/step-generation'
 import type { HydratedPauseFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 export const pauseFormToArgs = (
-  formData: HydratedPauseFormData
+  castFormData: GetCastFormData<HydratedPauseFormData>
 ): PauseArgs | WaitForTemperatureArgs | null => {
   const { hours, minutes, seconds } = getTimeFromForm(
-    'pauseTime' in formData ? formData.pauseTime ?? null : null
+    'pauseTime' in castFormData ? (castFormData.pauseTime ?? null) : null
   )
   const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
-  const temperature = parseFloat(formData.pauseTemperature as string)
-  const message = formData.pauseMessage ?? ''
+  // @ts-expect-error - todo(mm, 2025-10-09): Type error inherited from prior code.
+  // targetHeaterShakerTemperature seems to already be a number. Confirm that
+  // and remove this if it's safe.
+  const temperature = parseFloat(castFormData.pauseTemperature)
+  const message = castFormData.pauseMessage ?? ''
 
-  switch (formData.pauseAction) {
+  switch (castFormData.pauseAction) {
     case PAUSE_UNTIL_TEMP:
       return {
         commandCreatorFnName: 'waitForTemperature',
-        name: formData.stepName,
-        description: formData.stepDetails ?? '',
+        name: castFormData.stepName,
+        description: castFormData.stepDetails ?? '',
         celsius: temperature,
-        moduleId: formData.moduleId ?? '',
+        moduleId: castFormData.moduleId ?? '',
         message,
       }
 
     case PAUSE_UNTIL_TIME:
       return {
         commandCreatorFnName: 'delay',
-        name: formData.stepName,
-        description: formData.stepDetails ?? '',
+        name: castFormData.stepName,
+        description: castFormData.stepDetails ?? '',
         seconds: totalSeconds,
         message,
         meta: {
@@ -49,8 +53,8 @@ export const pauseFormToArgs = (
     case PAUSE_UNTIL_RESUME:
       return {
         commandCreatorFnName: 'delay',
-        name: formData.stepName,
-        description: formData.stepDetails ?? '',
+        name: castFormData.stepName,
+        description: castFormData.stepDetails ?? '',
         message,
         meta: {
           hours,

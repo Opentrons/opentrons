@@ -95,10 +95,9 @@ export function ProtocolRunSetup({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const {
-    orderedSteps,
-    orderedApplicableSteps,
-  } = useRequiredSetupStepsInOrder({ runId, protocolAnalysis })
+  const { orderedSteps, orderedApplicableSteps } = useRequiredSetupStepsInOrder(
+    { runId, protocolAnalysis }
+  )
   const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)

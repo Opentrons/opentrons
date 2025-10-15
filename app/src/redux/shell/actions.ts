@@ -9,6 +9,7 @@ import type {
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
   SendLogAction,
+  StepDetailViewerOpenAction,
   UiInitializedAction,
   UpdateBrightnessAction,
   UsbRequestsAction,
@@ -35,6 +36,7 @@ export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
 export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
 export const CAMERA_STREAM_OPEN = 'shell:CAMERA_STREAM_OPEN' as const
 export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
+export const STEP_DETAIL_VIEWER_OPEN = 'shell:STEP_DETAIL_VIEWER_OPEN' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -141,5 +143,13 @@ export const cameraPhotoOpenAction = (
 ): CameraPhotoOpenAction => ({
   type: CAMERA_PHOTO_OPEN,
   payload,
+  meta: { shell: true },
+})
+
+export const stepDetailViewerOpenAction = (
+  protocolKey: string
+): StepDetailViewerOpenAction => ({
+  type: STEP_DETAIL_VIEWER_OPEN,
+  payload: { protocolKey },
   meta: { shell: true },
 })

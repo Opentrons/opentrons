@@ -36,6 +36,5 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
   )
 }
 
-export const FilledWells: MemoExoticComponent<
-  typeof FilledWellsComponent
-> = memo(FilledWellsComponent)
+export const FilledWells: MemoExoticComponent<typeof FilledWellsComponent> =
+  memo(FilledWellsComponent)

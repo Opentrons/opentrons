@@ -10,9 +10,10 @@ export const saveFileMetadata = (
 export interface ComputeRobotStateTimelineRequestAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST'
 }
-export const computeRobotStateTimelineRequest = (): ComputeRobotStateTimelineRequestAction => ({
-  type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST',
-})
+export const computeRobotStateTimelineRequest =
+  (): ComputeRobotStateTimelineRequestAction => ({
+    type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST',
+  })
 export interface ComputeRobotStateTimelineSuccessAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS'
   payload: WorkerResponse

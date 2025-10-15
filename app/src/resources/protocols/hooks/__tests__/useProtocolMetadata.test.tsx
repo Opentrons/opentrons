@@ -44,13 +44,8 @@ describe('useProtocolMetadata', () => {
       children,
     }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useProtocolMetadata, { wrapper })
-    const {
-      author,
-      lastUpdated,
-      creationMethod,
-      description,
-      robotType,
-    } = result.current
+    const { author, lastUpdated, creationMethod, description, robotType } =
+      result.current
 
     expect(author).toBe('AUTHOR')
     expect(lastUpdated).toBe(123456)

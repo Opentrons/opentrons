@@ -67,9 +67,8 @@ export interface CreateProtocolFormData {
 export function CreateProtocol(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const [, setHeaderWithMeterAtom] = useAtom(headerWithMeterAtom)
-  const [{ currentSection }, setCreateProtocolAtom] = useAtom(
-    createProtocolAtom
-  )
+  const [{ currentSection }, setCreateProtocolAtom] =
+    useAtom(createProtocolAtom)
   const [, setCreateProtocolChatAtom] = useAtom(createProtocolChatAtom)
   const [, setUpdateProtocolChatAtom] = useAtom(updateProtocolChatAtom)
   const [, setChatHistoryAtom] = useAtom(chatHistoryAtom)

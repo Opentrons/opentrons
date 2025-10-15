@@ -58,9 +58,8 @@ describe('load and immediately save integrity test', () => {
         ...extraFields,
       }
 
-      const processedFieldValues: ProcessedLabwareFields = labwareFormSchema.cast(
-        rawFieldValues
-      )
+      const processedFieldValues: ProcessedLabwareFields =
+        labwareFormSchema.cast(rawFieldValues)
       const outputDef = fieldsToLabware(processedFieldValues)
 
       // We need to compensate for acceptable differences btw input def & output def.

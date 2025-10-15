@@ -90,23 +90,24 @@ interface TestCase<P> {
 }
 type TestCases<P> = Array<TestCase<P>>
 describe('thermocycler state updaters', () => {
-  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> = [
-    {
-      params: {
-        moduleId,
-        celsius: 42,
+  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> =
+    [
+      {
+        params: {
+          moduleId,
+          celsius: 42,
+        },
+        moduleStateBefore: {
+          blockTargetTemp: null,
+        },
+        expectedUpdate: {
+          blockTargetTemp: 42,
+        },
+        fn: forThermocyclerSetTargetBlockTemperature,
+        testName:
+          'forThermocyclerSetBlockTemperature should update the block temp',
       },
-      moduleStateBefore: {
-        blockTargetTemp: null,
-      },
-      expectedUpdate: {
-        blockTargetTemp: 42,
-      },
-      fn: forThermocyclerSetTargetBlockTemperature,
-      testName:
-        'forThermocyclerSetBlockTemperature should update the block temp',
-    },
-  ]
+    ]
   const temperatureParamsCases: TestCases<TemperatureParams> = [
     {
       params: {

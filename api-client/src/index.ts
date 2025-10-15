@@ -1,6 +1,7 @@
 // api client entry point
 export * from './calibration'
 export * from './client_data'
+export * from './camera'
 export * from './dataFiles'
 export * from './deck_configuration'
 export * from './errorRecovery'

@@ -114,12 +114,8 @@ export function useERUtils({
 
   const analytics = useRecoveryAnalytics()
 
-  const {
-    recoveryMap,
-    setRM,
-    currentRecoveryOptionUtils,
-    ...subMapUtils
-  } = useRecoveryRouting()
+  const { recoveryMap, setRM, currentRecoveryOptionUtils, ...subMapUtils } =
+    useRecoveryRouting()
 
   const doorStatusUtils = useShowDoorInfo(
     runStatus,

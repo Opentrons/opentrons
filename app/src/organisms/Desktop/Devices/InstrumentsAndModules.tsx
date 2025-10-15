@@ -169,8 +169,8 @@ export function InstrumentsAndModules({
                   pipetteId={attachedPipettes.left?.id}
                   pipetteModelSpecs={
                     attachedPipettes.left?.model != null
-                      ? getPipetteModelSpecs(attachedPipettes.left?.model) ??
-                        null
+                      ? (getPipetteModelSpecs(attachedPipettes.left?.model) ??
+                        null)
                       : null
                   }
                   mount={LEFT}
@@ -184,9 +184,9 @@ export function InstrumentsAndModules({
                     attachedPipette={attachedLeftPipette}
                     pipetteModelSpecs={
                       attachedLeftPipette?.instrumentModel != null
-                        ? getPipetteModelSpecs(
+                        ? (getPipetteModelSpecs(
                             attachedLeftPipette.instrumentModel
-                          ) ?? null
+                          ) ?? null)
                         : null
                     }
                     mount={LEFT}
@@ -231,8 +231,8 @@ export function InstrumentsAndModules({
                   pipetteId={attachedPipettes.right?.id}
                   pipetteModelSpecs={
                     attachedPipettes.right?.model != null
-                      ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                        null
+                      ? (getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                        null)
                       : null
                   }
                   mount={RIGHT}
@@ -246,9 +246,9 @@ export function InstrumentsAndModules({
                   attachedPipette={attachedRightPipette}
                   pipetteModelSpecs={
                     attachedRightPipette?.instrumentModel != null
-                      ? getPipetteModelSpecs(
+                      ? (getPipetteModelSpecs(
                           attachedRightPipette.instrumentModel
-                        ) ?? null
+                        ) ?? null)
                       : null
                   }
                   mount={RIGHT}

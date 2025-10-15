@@ -69,7 +69,7 @@ const TIP_LENGTH_CALIBRATIONS = [
 ]
 
 const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition
-const modifiedSimpleV6Protocol = ({
+const modifiedSimpleV6Protocol = {
   ..._uncastedModifiedSimpleV6Protocol,
   labware: [
     {
@@ -103,7 +103,7 @@ const modifiedSimpleV6Protocol = ({
       pipetteName: 'p10_single',
     },
   ],
-} as any) as SharedData.ProtocolAnalysisOutput
+} as any as SharedData.ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
@@ -129,7 +129,7 @@ describe('useRunPipetteInfoByMount hook', () => {
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn(
-        (PROTOCOL_DETAILS as unknown) as SharedData.ProtocolAnalysisOutput
+        PROTOCOL_DETAILS as unknown as SharedData.ProtocolAnalysisOutput
       )
     when(vi.mocked(getPipetteNameSpecs))
       .calledWith('p10_single')
@@ -158,7 +158,7 @@ describe('useRunPipetteInfoByMount hook', () => {
   it('should return run pipette info by mount', () => {
     const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
-      left: ({
+      left: {
         id: 'pipetteId',
         pipetteName: 'p10_single',
         requestedPipetteMatch: 'incompatible',
@@ -173,7 +173,7 @@ describe('useRunPipetteInfoByMount hook', () => {
             tipRackDef: tiprack10ul,
           },
         ],
-      } as unknown) as PipetteInfo,
+      } as unknown as PipetteInfo,
       right: null,
     })
   })

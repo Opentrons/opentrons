@@ -317,9 +317,8 @@ describe('moveLabware', () => {
     })
   })
   it('should return an error for trying to move the labware back onto deck when off deck currently with gripper', () => {
-    robotState = getInitialRobotStateWithOffDeckLabwareStandard(
-      invariantContext
-    )
+    robotState =
+      getInitialRobotStateWithOffDeckLabwareStandard(invariantContext)
     const params = {
       labwareId: SOURCE_LABWARE,
       strategy: 'usingGripper',
@@ -497,10 +496,10 @@ describe('moveLabware', () => {
     })
   })
   it('should return an error for trying to move an aluminum block with a gripper', () => {
-    const aluminumBlockDef = ({
+    const aluminumBlockDef = {
       metadata: { displayCategory: 'aluminumBlock' },
       parameters: { loadName: 'mockAluminumBlockLoadName' },
-    } as any) as LabwareDefinition2
+    } as any as LabwareDefinition2
 
     invariantContext = {
       ...invariantContext,
@@ -702,7 +701,7 @@ describe('moveLabware', () => {
       },
     } as InvariantContext
 
-    const robotStateWithTip = ({
+    const robotStateWithTip = {
       ...robotState,
       tipState: {
         tipracks: {
@@ -712,7 +711,7 @@ describe('moveLabware', () => {
           p10SingleId: false,
         },
       },
-    } as any) as RobotState
+    } as any as RobotState
     const params = {
       labwareId: TIPRACK_1,
       strategy: 'usingGripper',
@@ -745,14 +744,14 @@ describe('moveLabware', () => {
         },
       },
     } as InvariantContext
-    const robotStateWithLiquid = ({
+    const robotStateWithLiquid = {
       ...robotState,
       liquidState: {
         labware: {
           sourcePlateId: { A1: { ingredGroup: { volume: 10 } } },
         },
       },
-    } as any) as RobotState
+    } as any as RobotState
     const params = {
       labwareId: SOURCE_LABWARE,
       strategy: 'usingGripper',
@@ -817,7 +816,7 @@ describe('moveLabware', () => {
     })
   })
   it('should return an error when trying to move a labware with the gripper when a pipette has a tip on it still', () => {
-    const robotStateWithTipOnPip = ({
+    const robotStateWithTipOnPip = {
       ...robotState,
       tipState: {
         tipracks: {
@@ -830,7 +829,7 @@ describe('moveLabware', () => {
           },
         },
       },
-    } as any) as RobotState
+    } as any as RobotState
 
     const params = {
       labwareId: SOURCE_LABWARE,

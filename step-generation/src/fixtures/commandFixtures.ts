@@ -106,17 +106,18 @@ interface FlowRateAndOffsetParamsTransferlike {
   touchTipAfterAspirateOffsetMmFromTop: number
   touchTipAfterDispenseOffsetMmFromTop: number
 }
-export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParamsTransferlike => ({
-  aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-  dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-  blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
-  aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-  blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
-  // for consolidate/distribute/transfer only
-  touchTipAfterAspirateOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
-  touchTipAfterDispenseOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
-})
+export const getFlowRateAndOffsetParamsTransferLike =
+  (): FlowRateAndOffsetParamsTransferlike => ({
+    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
+    // for consolidate/distribute/transfer only
+    touchTipAfterAspirateOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
+    touchTipAfterDispenseOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
+  })
 interface FlowRateAndOffsetParamsMix {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
@@ -126,16 +127,17 @@ interface FlowRateAndOffsetParamsMix {
   blowoutOffsetFromTopMm: number
   touchTipMmFromTop: number
 }
-export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => ({
-  aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-  dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-  blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
-  aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-  blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
-  // for mix only
-  touchTipMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
-})
+export const getFlowRateAndOffsetParamsMix =
+  (): FlowRateAndOffsetParamsMix => ({
+    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
+    // for mix only
+    touchTipMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
+  })
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
@@ -152,52 +154,51 @@ const _defaultAspirateParams = {
   labwareId: SOURCE_LABWARE,
 }
 
-export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
-  commandType: 'aspirate',
-  key: expect.any(String),
-  params: {
-    ..._defaultAspirateParams,
-    ...bakedParams,
-    wellName,
-    volume,
-    wellLocation: {
-      origin: 'bottom',
-      offset: {
-        y: 0,
-        x: 0,
-        z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> =
+  bakedParams => (wellName, volume, params) => ({
+    commandType: 'aspirate',
+    key: expect.any(String),
+    params: {
+      ..._defaultAspirateParams,
+      ...bakedParams,
+      wellName,
+      volume,
+      wellLocation: {
+        origin: 'bottom',
+        offset: {
+          y: 0,
+          x: 0,
+          z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        },
       },
+      flowRate: ASPIRATE_FLOW_RATE,
+      ...params,
     },
-    flowRate: ASPIRATE_FLOW_RATE,
-    ...params,
-  },
-})
+  })
 
 export const makeAspirateInPlaceHelper: MakeAspDispCompoundHelper<
   AspirateInPlaceParams,
   MoveToWellParams
-> = bakedParams => (aspirateInPlaceParams, moveToWellParams, doMove = true) => {
-  const moveCommand: CreateCommand | null =
-    doMove && moveToWellParams != null
-      ? {
-          commandType: 'moveToWell',
-          key: expect.any(String),
-          params: moveToWellParams,
-        }
-      : null
-  return [
-    ...(moveCommand != null ? [moveCommand] : []),
-    {
-      commandType: 'aspirateInPlace',
-      key: expect.any(String),
-      params: aspirateInPlaceParams,
-    },
-  ] as CreateCommand[]
-}
+> =
+  bakedParams =>
+  (aspirateInPlaceParams, moveToWellParams, doMove = true) => {
+    const moveCommand: CreateCommand | null =
+      doMove && moveToWellParams != null
+        ? {
+            commandType: 'moveToWell',
+            key: expect.any(String),
+            params: moveToWellParams,
+          }
+        : null
+    return [
+      ...(moveCommand != null ? [moveCommand] : []),
+      {
+        commandType: 'aspirateInPlace',
+        key: expect.any(String),
+        params: aspirateInPlaceParams,
+      },
+    ] as CreateCommand[]
+  }
 
 export const makeDispenseInPlaceHelper: MakeAspDispCompoundHelper<
   DispenseInPlaceParams,
@@ -990,21 +991,18 @@ const _defaultDispenseParams = {
   },
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
-  commandType: 'dispense',
-  key: expect.any(String),
-  params: {
-    ..._defaultDispenseParams,
-    ...bakedParams,
-    wellName,
-    volume,
-    ...params,
-  },
-})
+export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> =
+  bakedParams => (wellName, volume, params) => ({
+    commandType: 'dispense',
+    key: expect.any(String),
+    params: {
+      ..._defaultDispenseParams,
+      ...bakedParams,
+      wellName,
+      volume,
+      ...params,
+    },
+  })
 export const makeDispenseAirGapHelper = (
   wellName: string,
   volume: number
@@ -1041,14 +1039,12 @@ const _defaultTouchTipParams = {
 type MakeTouchTipHelper = (
   bakedParams?: Partial<TouchTipParams>
 ) => (wellName: string, params?: Partial<TouchTipParams>) => CreateCommand
-export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
-  wellName,
-  params
-) => ({
-  commandType: 'touchTip',
-  key: expect.any(String),
-  params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
-})
+export const makeTouchTipHelper: MakeTouchTipHelper =
+  bakedParams => (wellName, params) => ({
+    commandType: 'touchTip',
+    key: expect.any(String),
+    params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
+  })
 export const delayCommand = (
   seconds: number,
   message?: string

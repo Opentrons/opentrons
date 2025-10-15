@@ -223,7 +223,7 @@ const PipettesDropdown = styled.div<{ isOpentronsOT2Selected?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${props =>
-    props.isOpentronsOT2Selected ?? false
+    (props.isOpentronsOT2Selected ?? false)
       ? SPACING.spacing16
       : SPACING.spacing8};
 `
@@ -232,7 +232,7 @@ const PipettesSection = styled.div<{ isOpentronsOT2Selected?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${props =>
-    props.isOpentronsOT2Selected ?? false
+    (props.isOpentronsOT2Selected ?? false)
       ? SPACING.spacing16
       : SPACING.spacing8};
 `

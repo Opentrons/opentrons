@@ -13,7 +13,8 @@ export interface InconsistentCalibrationFailure {
   limit: number
 }
 
-export type CalibrationReasonabilityCheckFailure = InconsistentCalibrationFailure
+export type CalibrationReasonabilityCheckFailure =
+  InconsistentCalibrationFailure
 
 export interface SharedInstrumentData {
   mount: Mount

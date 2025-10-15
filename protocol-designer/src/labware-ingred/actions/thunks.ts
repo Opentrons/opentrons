@@ -33,9 +33,8 @@ export const renameLabware: (
   CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
 > = args => (dispatch, getState) => {
   const { labwareId } = args
-  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(
-    getState()
-  )
+  const allNicknamesById =
+    uiLabwareSelectors.getLabwareNicknamesById(getState())
   const defaultNickname = allNicknamesById[labwareId]
   const nextNickname = getNextNickname(
     // NOTE: flow won't do Object.values here >:(
@@ -61,9 +60,8 @@ export const createContainer: (
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const labwareDefForOt2HS = labwareDefSelectors.getLabwareDefsByURI(state)[
-    labwareDefURIStack[0]
-  ]
+  const labwareDefForOt2HS =
+    labwareDefSelectors.getLabwareDefsByURI(state)[labwareDefURIStack[0]]
   const availableSlot =
     slot ||
     getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
@@ -71,9 +69,8 @@ export const createContainer: (
     let currentSlot = availableSlot
     labwareDefURIStack.forEach(labwareUri => {
       const id = `${uuid()}:${labwareUri}`
-      const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-        labwareUri
-      ]
+      const labwareDef =
+        labwareDefSelectors.getLabwareDefsByURI(state)[labwareUri]
       const labwareDisplayCategory = labwareDef.metadata.displayCategory
       const isTiprack = getIsTiprack(labwareDef)
 
@@ -110,71 +107,68 @@ export const createContainer: (
 
 export const duplicateLabware: (
   templateLabwareId: string
-) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
-  dispatch,
-  getState
-) => {
-  const state = getState()
-  const robotType = state.fileData.robotType
-  const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
-    templateLabwareId
-  ].labwareDefURI
-  console.assert(
-    templateLabwareDefURI,
-    `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
-  )
-  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const templateLabwareIdIsOffDeck =
-    getSlotInLocationStack(
-      initialDeckSetup.labware[templateLabwareId].stack
-    ) === 'offDeck'
-  const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
-    templateLabwareDefURI
-  ]
-  const displayCategory = labwareDef.metadata.displayCategory
-  const duplicateSlot = getNextAvailableDeckSlot(
-    initialDeckSetup,
-    robotType,
-    labwareDef
-  )
-  if (duplicateSlot == null && !templateLabwareIdIsOffDeck) {
-    console.error('no slots available, cannot duplicate labware')
-  }
-  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
-  const templateNickname = allNicknamesById[templateLabwareId]
-  const duplicateLabwareNickname = getNextNickname(
-    Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
-    templateNickname
-  )
-  const duplicateLabwareId = uuid() + ':' + templateLabwareDefURI
+) => ThunkAction<DuplicateLabwareAction> =
+  templateLabwareId => (dispatch, getState) => {
+    const state = getState()
+    const robotType = state.fileData.robotType
+    const templateLabwareDefURI =
+      stepFormSelectors.getLabwareEntities(state)[templateLabwareId]
+        .labwareDefURI
+    console.assert(
+      templateLabwareDefURI,
+      `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
+    )
+    const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+    const templateLabwareIdIsOffDeck =
+      getSlotInLocationStack(
+        initialDeckSetup.labware[templateLabwareId].stack
+      ) === 'offDeck'
+    const labwareDef =
+      labwareDefSelectors.getLabwareDefsByURI(state)[templateLabwareDefURI]
+    const displayCategory = labwareDef.metadata.displayCategory
+    const duplicateSlot = getNextAvailableDeckSlot(
+      initialDeckSetup,
+      robotType,
+      labwareDef
+    )
+    if (duplicateSlot == null && !templateLabwareIdIsOffDeck) {
+      console.error('no slots available, cannot duplicate labware')
+    }
+    const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+    const templateNickname = allNicknamesById[templateLabwareId]
+    const duplicateLabwareNickname = getNextNickname(
+      Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
+      templateNickname
+    )
+    const duplicateLabwareId = uuid() + ':' + templateLabwareDefURI
 
-  if (templateLabwareDefURI) {
-    if (templateLabwareIdIsOffDeck) {
+    if (templateLabwareDefURI) {
+      if (templateLabwareIdIsOffDeck) {
+        dispatch({
+          type: 'DUPLICATE_LABWARE',
+          payload: {
+            duplicateLabwareNickname,
+            templateLabwareId,
+            duplicateLabwareId,
+            slot: 'offDeck',
+            displayCategory,
+          },
+        })
+      }
+    }
+    if (duplicateSlot != null && !templateLabwareIdIsOffDeck) {
       dispatch({
         type: 'DUPLICATE_LABWARE',
         payload: {
           duplicateLabwareNickname,
           templateLabwareId,
           duplicateLabwareId,
-          slot: 'offDeck',
+          slot: duplicateSlot,
           displayCategory,
         },
       })
     }
   }
-  if (duplicateSlot != null && !templateLabwareIdIsOffDeck) {
-    dispatch({
-      type: 'DUPLICATE_LABWARE',
-      payload: {
-        duplicateLabwareNickname,
-        templateLabwareId,
-        duplicateLabwareId,
-        slot: duplicateSlot,
-        displayCategory,
-      },
-    })
-  }
-}
 
 export interface EditMultipleLabwareAction {
   type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME'
@@ -186,54 +180,51 @@ interface DeleteContainerArgs {
 }
 export const deleteContainer: (
   args: DeleteContainerArgs
-) => ThunkAction<DeleteContainerAction | EditMultipleLabwareAction> = args => (
-  dispatch,
-  getState
-) => {
-  const { labwareId } = args
-  const state = getState()
-  const labwareEntities = getLabwareEntities(state)
-  const displayCategory =
-    labwareEntities[labwareId].def.metadata.displayCategory
-  const labwareOfSameCategory: LabwareEntities = Object.fromEntries(
-    Object.entries(labwareEntities).filter(
-      ([_, labware]) => labware.def.metadata.displayCategory === displayCategory
-    )
-  )
-  const typeCount = Object.keys(labwareOfSameCategory).length
-
-  dispatch({
-    type: 'DELETE_CONTAINER',
-    payload: {
-      labwareId,
-    },
-  })
-
-  if (typeCount > 1) {
-    const {
-      [labwareId]: _,
-      ...remainingLabwareEntities
-    } = labwareOfSameCategory
-
-    const updatedLabwarePythonName: NormalizedLabwareById = Object.keys(
-      remainingLabwareEntities
-    )
-      .sort()
-      .reduce<Record<string, NormalizedLabware>>(
-        (acc: NormalizedLabwareById, oldId, index) => {
-          acc[oldId] = {
-            ...remainingLabwareEntities[oldId],
-            pythonName: getLabwarePythonName(displayCategory, index + 1),
-            displayCategory,
-          }
-          return acc
-        },
-        {}
+) => ThunkAction<DeleteContainerAction | EditMultipleLabwareAction> =
+  args => (dispatch, getState) => {
+    const { labwareId } = args
+    const state = getState()
+    const labwareEntities = getLabwareEntities(state)
+    const displayCategory =
+      labwareEntities[labwareId].def.metadata.displayCategory
+    const labwareOfSameCategory: LabwareEntities = Object.fromEntries(
+      Object.entries(labwareEntities).filter(
+        ([_, labware]) =>
+          labware.def.metadata.displayCategory === displayCategory
       )
+    )
+    const typeCount = Object.keys(labwareOfSameCategory).length
 
     dispatch({
-      type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME',
-      payload: updatedLabwarePythonName,
+      type: 'DELETE_CONTAINER',
+      payload: {
+        labwareId,
+      },
     })
+
+    if (typeCount > 1) {
+      const { [labwareId]: _, ...remainingLabwareEntities } =
+        labwareOfSameCategory
+
+      const updatedLabwarePythonName: NormalizedLabwareById = Object.keys(
+        remainingLabwareEntities
+      )
+        .sort()
+        .reduce<Record<string, NormalizedLabware>>(
+          (acc: NormalizedLabwareById, oldId, index) => {
+            acc[oldId] = {
+              ...remainingLabwareEntities[oldId],
+              pythonName: getLabwarePythonName(displayCategory, index + 1),
+              displayCategory,
+            }
+            return acc
+          },
+          {}
+        )
+
+      dispatch({
+        type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME',
+        payload: updatedLabwarePythonName,
+      })
+    }
   }
-}

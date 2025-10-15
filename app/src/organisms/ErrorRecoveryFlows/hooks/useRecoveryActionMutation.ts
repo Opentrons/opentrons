@@ -15,10 +15,8 @@ export function useRecoveryActionMutation(
   runId: ErrorRecoveryFlowsProps['runId'],
   routeUpdateActions: ERUtilsResults['routeUpdateActions']
 ): RecoveryActionMutationResult {
-  const {
-    mutateAsync,
-    isLoading: isResumeRecoveryLoading,
-  } = usePlayRunMutation()
+  const { mutateAsync, isLoading: isResumeRecoveryLoading } =
+    usePlayRunMutation()
   const { proceedToRouteAndStep } = routeUpdateActions
 
   const resumeRecovery = (): Promise<RunAction> => {

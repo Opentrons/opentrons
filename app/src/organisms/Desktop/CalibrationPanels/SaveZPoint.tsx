@@ -77,9 +77,8 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   let title = t('calibrate_z_axis_on_slot')
   const bodyTranslationKey = 'jog_pipette_to_touch_slot'

@@ -117,7 +117,7 @@ export function getLabwareLocationFromSequence(
           moduleModel:
             moduleModel === FLEX_STACKER_MODULE_V1
               ? undefined
-              : moduleModel ?? undefined,
+              : (moduleModel ?? undefined),
         }
       } else if (sequenceItem.kind === 'onModule') {
         const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
@@ -129,7 +129,7 @@ export function getLabwareLocationFromSequence(
             moduleModel:
               moduleModel === FLEX_STACKER_MODULE_V1
                 ? undefined
-                : moduleModel ?? undefined,
+                : (moduleModel ?? undefined),
           }
         }
       } else if (sequenceItem.kind === 'inStackerHopper') {

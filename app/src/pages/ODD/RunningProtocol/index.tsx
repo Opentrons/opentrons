@@ -82,10 +82,8 @@ export function RunningProtocol(): JSX.Element {
   const [currentOption, setCurrentOption] = useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
-  const [
-    showConfirmCancelRunModal,
-    setShowConfirmCancelRunModal,
-  ] = useState<boolean>(false)
+  const [showConfirmCancelRunModal, setShowConfirmCancelRunModal] =
+    useState<boolean>(false)
   const lastAnimatedCommand = useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -122,17 +120,15 @@ export function RunningProtocol(): JSX.Element {
     runStatus
   )
   const doorStatus = useIsDoorOpen(robotName)
-  const {
-    showModal: showIntervention,
-    modalProps: interventionProps,
-  } = useInterventionModal({
-    runStatus,
-    lastRunCommand,
-    runData: runRecord?.data ?? null,
-    robotName,
-    analysis: robotSideAnalysis,
-    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  })
+  const { showModal: showIntervention, modalProps: interventionProps } =
+    useInterventionModal({
+      runStatus,
+      lastRunCommand,
+      runData: runRecord?.data ?? null,
+      robotName,
+      analysis: robotSideAnalysis,
+      doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+    })
 
   useEffect(() => {
     if (swipeType === '') {

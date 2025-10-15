@@ -66,10 +66,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)
@@ -421,12 +419,8 @@ export interface SwapBlockedModuleArgs {
 }
 
 export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
-  const {
-    hoveredLabware,
-    draggedLabware,
-    modulesById,
-    customLabwareDefs,
-  } = args
+  const { hoveredLabware, draggedLabware, modulesById, customLabwareDefs } =
+    args
 
   if (!hoveredLabware || !draggedLabware) {
     return false

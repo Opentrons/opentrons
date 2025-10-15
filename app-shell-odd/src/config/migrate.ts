@@ -270,7 +270,7 @@ const MIGRATIONS: [
   (prevConfig: ConfigV22) => ConfigV23,
   (prevConfig: ConfigV23) => ConfigV24,
   (prevConfig: ConfigV24) => ConfigV25,
-  (prevConfig: ConfigV25) => ConfigV26
+  (prevConfig: ConfigV25) => ConfigV26,
 ] = [
   toVersion13,
   toVersion14,

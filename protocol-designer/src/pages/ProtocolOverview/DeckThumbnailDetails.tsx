@@ -132,8 +132,10 @@ export const DeckThumbnailDetails = (
         const slot = getSlotInLocationStack(labware.stack)
 
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
@@ -159,9 +161,8 @@ export const DeckThumbnailDetails = (
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
             stagingAreaAddressableAreas.includes(addressableArea.id)

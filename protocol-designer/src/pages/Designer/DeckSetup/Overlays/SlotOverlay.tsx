@@ -39,13 +39,8 @@ interface SlotOverlayProps {
 }
 
 export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
-  const {
-    slotId,
-    slotPosition,
-    slotFillColor,
-    slotFillOpacity,
-    children,
-  } = props
+  const { slotId, slotPosition, slotFillColor, slotFillOpacity, children } =
+    props
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
   const [stableOpacity, setStableOpacity] = useState<string>(slotFillOpacity)

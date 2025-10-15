@@ -46,9 +46,8 @@ export function CalibrationTaskList({
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = useRef<[number, number] | null>(null)
   const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(false)
-  const [showCompletionScreen, setShowCompletionScreen] = useState<boolean>(
-    false
-  )
+  const [showCompletionScreen, setShowCompletionScreen] =
+    useState<boolean>(false)
   const { t } = useTranslation(['robot_calibration', 'device_settings'])
   const navigate = useNavigate()
   const { activeIndex, taskList, taskListStatus } = useCalibrationTaskList(

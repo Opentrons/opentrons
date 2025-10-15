@@ -46,9 +46,8 @@ export function useHandleJog({
 }: UseHandleJogProps): UseHandleJogResult {
   const pipette = useSelector(selectActivePipette(runId))
   const pipetteId = pipette?.id
-  const {
-    createMaintenanceCommand: createSilentCommand,
-  } = useCreateMaintenanceCommandMutation()
+  const { createMaintenanceCommand: createSilentCommand } =
+    useCreateMaintenanceCommandMutation()
 
   const queueRef = useRef<
     Array<{

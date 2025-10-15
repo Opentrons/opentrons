@@ -90,13 +90,13 @@ describe('DefaultLocationOffset', () => {
     vi.mocked(proceedEditOffsetSubstep).mockReturnValue({
       type: 'PROCEED_EDIT_OFFSET_SUBSTEP',
     } as any)
-    vi.mocked(
-      selectSelectedLwDefaultOffsetDetails
-    ).mockImplementation((runId: string) => () => mockDefaultOffsetDetails)
+    vi.mocked(selectSelectedLwDefaultOffsetDetails).mockImplementation(
+      (runId: string) => () => mockDefaultOffsetDetails
+    )
 
-    vi.mocked(
-      selectSelectedLwDisplayName
-    ).mockImplementation((runId: string) => () => 'mock-lw-name')
+    vi.mocked(selectSelectedLwDisplayName).mockImplementation(
+      (runId: string) => () => 'mock-lw-name'
+    )
 
     vi.mocked(
       selectMostRecentVectorOffsetForLwWithOffsetDetails

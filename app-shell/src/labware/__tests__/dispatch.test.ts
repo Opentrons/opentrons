@@ -29,9 +29,9 @@ const flush = (): Promise<void> =>
 
 describe('labware module dispatches', () => {
   const labwareDir = '/path/to/somewhere'
-  const mockMainWindow = ({
+  const mockMainWindow = {
     browserWindow: true,
-  } as unknown) as electron.BrowserWindow
+  } as unknown as electron.BrowserWindow
   let dispatch: Mock
   let handleAction: Dispatch
 
@@ -259,9 +259,8 @@ describe('labware module dispatches', () => {
 
   it('dispatches ADD_CUSTOM_LABWARE_FAILURE if checked file is invalid', () => {
     const mockInvalidFile = CustomLabwareFixtures.mockInvalidLabware
-    const expectedAction = CustomLabware.addCustomLabwareFailure(
-      mockInvalidFile
-    )
+    const expectedAction =
+      CustomLabware.addCustomLabwareFailure(mockInvalidFile)
 
     vi.mocked(Dialogs.showOpenFileDialog).mockResolvedValue(['c.json'])
     vi.mocked(Val.validateNewLabwareFile).mockReturnValueOnce(mockInvalidFile)

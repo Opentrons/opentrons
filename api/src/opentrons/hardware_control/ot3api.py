@@ -3082,7 +3082,7 @@ class OT3API(
     async def aspirate_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
         flow_rate: float = 1.0,
     ) -> None:
@@ -3100,12 +3100,21 @@ class OT3API(
         )
         if not aspirate_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            self.critical_point_for,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             aspirate_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
         )
+
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -3129,7 +3138,7 @@ class OT3API(
     async def dispense_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,
@@ -3149,11 +3158,19 @@ class OT3API(
         )
         if not dispense_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            self.critical_point_for,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             dispense_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
         )
 
         try:
