@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
-import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
+import { FLEX_96_CHANNEL_PIPETTES, getIsTiprack } from '@opentrons/shared-data'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
@@ -215,7 +215,10 @@ export const editPipettes = (
   const newTiprackUriArray = Array.from(newTiprackUris)
 
   const oldEntities = Object.values(labware).filter(
-    ({ labwareDefURI }) => !newTiprackUriArray.includes(labwareDefURI)
+    ({ labwareDefURI, def }) =>
+      !newTiprackUriArray.includes(labwareDefURI) &&
+      (getIsTiprack(def) ||
+        def.parameters.quirks?.includes('tiprackAdapterFor96Channel'))
   )
   // substitute deleted pipettes with new pipettes on the same mount, if any
   if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
