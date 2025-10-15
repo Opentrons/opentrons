@@ -1,9 +1,4 @@
-
-import {
-  LEFT,
-  RIGHT,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
 import { is96Channel, isWasteChuteOnDeck } from './utils'

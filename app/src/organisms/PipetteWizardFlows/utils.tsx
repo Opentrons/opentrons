@@ -54,11 +54,10 @@ export function is96Channel(
   instrument: AttachedPipettesFromInstrumentsQuery
 ): boolean {
   const left_instrument = instrument[LEFT]
+  const right_instrument = instrument[RIGHT]
   if (
-    left_instrument != null &&
-    left_instrument.ok &&
-    left_instrument.mount === 'left' &&
-    left_instrument.data?.channels === 96
+    left_instrument?.data?.channels === 96 ||
+    right_instrument?.data?.channels === 96
   ) {
     return true
   } else {
