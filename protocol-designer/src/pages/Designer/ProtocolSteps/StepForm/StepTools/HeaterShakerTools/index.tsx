@@ -78,7 +78,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           toggleValue={propsForFields.setShake.value}
           toggleUpdateValue={propsForFields.setShake.updateValue}
           title={t('form:step_edit_form.field.heaterShaker.shaker.setShake')}
-          fieldTitle={t('protocol_steps:speed')}
+          fieldTitle={t('protocol_steps:shake_speed')}
           isSelected={formData.setShake === true}
           units={t('units.rpm')}
           onLabel={t('form:step_edit_form.field.heaterShaker.shaker.toggleOn')}
