@@ -366,9 +366,6 @@ function _getPipettesSame(
   return pipettes[0]?.name === pipettes[1]?.name
 }
 
-// TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
-// equipped pipettes per step id instead of always using initial deck setup
-// (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<BaseState, DropdownOption[]> =
   createSelector(getInitialDeckSetup, initialDeckSetup => {
     const pipettes = initialDeckSetup.pipettes
