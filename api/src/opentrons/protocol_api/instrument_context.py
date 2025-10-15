@@ -238,6 +238,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :type rate: float
         :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
                           ``rate`` must not be set.
+
+        :param end_location: Tells the robot to move between location and end_location
+            while aspirating liquid. When this argument is used the location and
+            end_location must both be :py:class:`.Location`.
+        :type end_location::py:class:`.Location`
         :type flow_rate: float
         :returns: This instance.
 
@@ -473,6 +478,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
                           ``rate`` must not be set.
         :type flow_rate: float
+
+        :param end_location: Tells the robot to move between location and end_location
+            while dispensing liquid held in the pipette. When this argument is used
+            the location and end_location must both be :py:class:`.Location`.
+        :type end_location::py:class:`.Location`
 
         :returns: This instance.
 
