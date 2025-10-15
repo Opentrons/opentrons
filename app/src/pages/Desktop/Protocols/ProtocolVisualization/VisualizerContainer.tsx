@@ -218,11 +218,6 @@ export function VisualizerContainer(
     }
   }, [])
 
-  console.log('robotState', robotState)
-  console.log('invariantContext', invariantContext)
-  console.log('commands', commands)
-  console.log('analysis', analysis)
-
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
