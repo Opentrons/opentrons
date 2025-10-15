@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 
 import { useCamera, useUpdateCamera } from '@opentrons/react-api-client'
 
+const CAMERA_POLLING_INTERVAL_MS = 5000
+
 export interface UseCameraUsageSettingsResult {
   /* Whether the camera is generally enabled. No other settings
    * are configurable if this setting is false. */
@@ -15,7 +17,9 @@ export interface UseCameraUsageSettingsResult {
 
 // general camera usage settings.
 export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
-  const { data: cameraData } = useCamera()
+  const { data: cameraData } = useCamera({
+    refetchInterval: CAMERA_POLLING_INTERVAL_MS,
+  })
   const { mutateAsync: updateCamera } = useUpdateCamera()
 
   const [isCameraEnabled, setIsCameraEnabled] = useState(true)
@@ -32,60 +36,56 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
     }
   }, [cameraData])
 
-  const toggleCameraEnabled = async (): Promise<void> => {
-    console.log('🚀 ~ toggleCameraEnabled 1 ~ newValue:', !isCameraEnabled)
-    const newValue = isCameraEnabled
+  const toggleCameraEnabled = (): void => {
+    const newValue = !isCameraEnabled
     setIsCameraEnabled(newValue)
-    try {
-      await updateCamera({
-        cameraEnabled: !newValue,
-        errorRecoveryCameraEnabled:
-          cameraData?.errorRecoveryCameraEnabled ?? true,
-        liveStreamEnabled: cameraData?.liveStreamEnabled ?? true,
-      })
-    } catch (e) {
-      setIsCameraEnabled(!newValue)
-    }
-    console.log('🚀 ~ toggleCameraEnabled 2 ~ newValue:', newValue)
+    void updateCamera(
+      {
+        cameraEnabled: newValue,
+        errorRecoveryCameraEnabled: isRecoveryCaptureEnabled,
+        liveStreamEnabled: isLiveVideoEnabled,
+      },
+      {
+        onError: () => {
+          setIsCameraEnabled(newValue)
+        },
+      }
+    )
   }
 
-  const toggleLiveVideoEnabled = async (): Promise<void> => {
-    console.log(
-      '🚀 ~ toggleLiveVideoEnabled ~ isLiveVideoEnabled:',
-      isLiveVideoEnabled
-    )
-    const newValue = isLiveVideoEnabled
+  const toggleLiveVideoEnabled = (): void => {
+    const newValue = !isLiveVideoEnabled
     setIsLiveVideoEnabled(newValue)
-    try {
-      await updateCamera({
-        cameraEnabled: cameraData?.cameraEnabled ?? true,
-        errorRecoveryCameraEnabled:
-          cameraData?.errorRecoveryCameraEnabled ?? true,
+    void updateCamera(
+      {
+        cameraEnabled: isCameraEnabled,
+        errorRecoveryCameraEnabled: isRecoveryCaptureEnabled,
         liveStreamEnabled: !newValue,
-      })
-    } catch (e) {
-      setIsLiveVideoEnabled(!newValue)
-      console.log('🚀 ~ toggleLiveVideoEnabled ~ newValue:', newValue)
-    }
+      },
+      {
+        onError: () => {
+          setIsLiveVideoEnabled(!newValue)
+        },
+      }
+    )
   }
 
-  const toggleRecoveryCaptureEnabled = async (): Promise<void> => {
-    const newValue = isRecoveryCaptureEnabled
-    console.log(
-      '🚀 ~ toggleRecoveryCaptureEnabled ~ isRecoveryCaptureEnabled:',
-      isRecoveryCaptureEnabled
-    )
+  const toggleRecoveryCaptureEnabled = (): void => {
+    const newValue = !isRecoveryCaptureEnabled
     setIsRecoveryCaptureEnabled(newValue)
-    try {
-      await updateCamera({
+
+    void updateCamera(
+      {
         cameraEnabled: cameraData?.cameraEnabled ?? true,
-        errorRecoveryCameraEnabled: !newValue,
+        errorRecoveryCameraEnabled: newValue,
         liveStreamEnabled: cameraData?.liveStreamEnabled ?? true,
-      })
-    } catch (e) {
-      setIsRecoveryCaptureEnabled(!newValue)
-      console.log('🚀 ~ toggleRecoveryCaptureEnabled ~ newValue:', newValue)
-    }
+      },
+      {
+        onError: () => {
+          setIsRecoveryCaptureEnabled(!newValue)
+        },
+      }
+    )
   }
 
   return {
