@@ -1,7 +1,4 @@
-import {
-  FLEX_ROBOT_TYPE,
-  parseInitialPipetteNamesByMount,
-} from '@opentrons/shared-data'
+import { parseInitialPipetteNamesByMount } from '@opentrons/shared-data'
 
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { ModuleSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/ModuleSlotDetails'
@@ -14,41 +11,25 @@ import { SourceWellViewContainer } from './SourceWellViewContainer'
 import styles from './stepdetailcontainer.module.css'
 import { TipPickupContainer } from './TipPickupContainer'
 
-import type {
-  LabwareDefinition,
-  Liquid,
-  ProtocolAnalysisOutput,
-  RobotType,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 interface StepDetailContainerProps {
   protocolKey: string
   commands: RunTimeCommand[]
   selectedSlot: string | null
-  selectedRunTimeCommand: RunTimeCommand | null
   robotState: RobotState
-  percentComplete: number
-  analysis: ProtocolAnalysisOutput
-  robotType: RobotType
-  allRunDefs: LabwareDefinition[]
   invariantContext: InvariantContext
-  liquids: Liquid[]
+  selectedRunTimeCommand?: RunTimeCommand
 }
 
 export function StepDetailContainer({
   protocolKey,
   commands,
   selectedSlot,
-  selectedRunTimeCommand,
   robotState,
-  percentComplete,
-  analysis,
-  robotType,
-  allRunDefs,
   invariantContext,
-  liquids,
+  selectedRunTimeCommand,
 }: StepDetailContainerProps): JSX.Element {
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -59,17 +40,29 @@ export function StepDetailContainer({
     rightMountPipetteName == null &&
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
 
-  const { labware, modules } = robotState
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-    moduleEntities,
-    pipetteEntities,
-  } = invariantContext
-  const moduleOnSlot = Object.entries(modules).find(
-    ([id, module]) => module.slot === selectedSlot
+  const { moduleEntities } = invariantContext
+  const moduleOnSlot = Object.entries(robotState.modules).find(
+    ([_, module]) => module.slot === selectedSlot
   )
+
+  const leftPipetteId =
+    Object.entries(robotState.pipettes).find(
+      ([_, pipette]) => pipette.mount === 'left'
+    )?.[0] ?? null
+  const rightPipetteId =
+    Object.entries(robotState.pipettes).find(
+      ([_, pipette]) => pipette.mount === 'right'
+    )?.[0] ?? null
+  const isLeftPipetteActive =
+    selectedRunTimeCommand?.params != null &&
+    'pipetteId' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.pipetteId === leftPipetteId
+  const isRightPipetteActive =
+    selectedRunTimeCommand?.params != null &&
+    'pipetteId' in selectedRunTimeCommand.params &&
+    selectedRunTimeCommand.params.pipetteId === rightPipetteId
+
+  console.log('selectedRunTimeCommand', selectedRunTimeCommand)
 
   return (
     <div className={styles.container}>
@@ -77,12 +70,14 @@ export function StepDetailContainer({
         <PipetteContainer
           mount={is96Channel ? 'left_right_mount' : 'left_mount'}
           pipetteName={leftMountPipetteName}
+          selected={isLeftPipetteActive}
         />
       ) : null}
       {rightMountPipetteName != null ? (
         <PipetteContainer
           mount={'right_mount'}
           pipetteName={rightMountPipetteName}
+          selected={isRightPipetteActive}
         />
       ) : null}
       <TipPickupContainer protocolKey={protocolKey} />
@@ -97,17 +92,6 @@ export function StepDetailContainer({
           moduleRobotState={modules}
         />
       ) : null}
-      {/* <SlotDetails
-        slotId={selectedSlot}
-        command={selectedRunTimeCommand}
-        robotState={robotState}
-        percentComplete={percentComplete}
-        analysis={analysis}
-        robotType={robotType ?? FLEX_ROBOT_TYPE}
-        allRunDefs={allRunDefs}
-        invariantContext={invariantContext}
-        liquids={liquids}
-      /> */}
     </div>
   )
 }

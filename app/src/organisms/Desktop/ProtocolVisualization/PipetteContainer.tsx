@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
+import { Chip, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 
@@ -12,12 +12,13 @@ import type { PipetteName } from '@opentrons/shared-data'
 interface PipetteContainerProps {
   mount: string
   pipetteName: PipetteName
-  // onClick: () => void
+  selected: boolean
 }
 
 export function PipetteContainer({
   mount,
   pipetteName,
+  selected,
 }: PipetteContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const pipetteDisplayName = usePipetteNameSpecs(pipetteName)?.displayName ?? ''
@@ -31,6 +32,7 @@ export function PipetteContainer({
       </div>
       <div className={styles.main_content}>
         <StyledText>{pipetteDisplayName}</StyledText>
+        {selected ? <Chip text={t('active')} type="success" /> : null}
       </div>
     </div>
   )

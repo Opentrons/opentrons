@@ -11,6 +11,10 @@ import { SourceWellViewContainer } from '../SourceWellViewContainer'
 import { StepDetailContainer } from '../StepDetailContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
+import type { ComponentProps } from 'react'
+import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+
 vi.mock('../PipetteContainer')
 vi.mock('../DestinationLabwareContainer')
 vi.mock('../DestinationTipsContainer')
@@ -18,14 +22,21 @@ vi.mock('../SourceLabwareContainer')
 vi.mock('../SourceWellViewContainer')
 vi.mock('../TipPickupContainer')
 
-const render = () => {
-  return renderWithProviders(
-    <StepDetailContainer protocolKey="mockProtocolKey" commands={[]} />
-  )
+const render = (props: ComponentProps<typeof StepDetailContainer>) => {
+  return renderWithProviders(<StepDetailContainer {...props} />)
 }
 
 describe('StepDetailContainer', () => {
+  let props: ComponentProps<typeof StepDetailContainer>
+
   beforeEach(() => {
+    props = {
+      protocolKey: 'mockProtocolKey',
+      commands: [] as RunTimeCommand[],
+      selectedSlot: 'mockSelectedSlot',
+      robotState: {} as RobotState,
+      invariantContext: {} as InvariantContext,
+    }
     vi.mocked(PipetteContainer).mockReturnValue(
       <div>mock Pipette Container</div>
     )
@@ -51,7 +62,7 @@ describe('StepDetailContainer', () => {
   })
 
   it('renders the pipette container', () => {
-    render()
+    render(props)
     screen.getByText('mock Pipette Container')
     screen.getByText('mock Destination Labware Container')
     screen.getByText('mock Destination Tips Container')

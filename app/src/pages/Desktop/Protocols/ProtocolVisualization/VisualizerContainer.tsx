@@ -305,12 +305,8 @@ export function VisualizerContainer(
           commands={commands}
           selectedSlot={selectedSlot}
           robotState={robotState}
-          percentComplete={percentComplete}
-          analysis={analysis}
-          robotType={robotType ?? FLEX_ROBOT_TYPE}
-          allRunDefs={allRunDefs}
           invariantContext={invariantContext}
-          liquids={liquids}
+          selectedRunTimeCommand={selectedRunTimeCommand}
         />
       </div>
     </div>
