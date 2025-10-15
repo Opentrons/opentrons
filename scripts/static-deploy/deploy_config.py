@@ -117,7 +117,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="sandbox.designer.opentrons.com",
+            s3_bucket="opentrons.sandbox.designer",
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.designer.opentrons.com/",
         ),
@@ -145,20 +145,20 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.staging.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.staging.designer",
+            cloudfront_id="EO925AKFD33ZG",  # Add CloudFront ID when available
             url="https://staging.protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",
+            cloudfront_id="E2DBE0K9VT8YB9",
             url="https://staging.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",
+            cloudfront_id="E2DBE0K9VT8YB9",
             url="https://staging.docs.opentrons.com/",
         ),
     )
@@ -173,20 +173,20 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.production.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.production.designer",
+            cloudfront_id="E2D3NFAZUK9GIG",  # Add CloudFront ID when available
             url="https://protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",
+            cloudfront_id="E2PSPUXND1RQWG",
             url="https://docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",
+            cloudfront_id="E2PSPUXND1RQWG",
             url="https://docs.opentrons.com/",
         ),
     )

@@ -565,7 +565,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: dispenseAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                   ? {
-                      correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                      correctionVolume:
+                        aspirateCorrectionVolumeForDispenseAirGap,
                     }
                   : {}),
               }),
@@ -692,23 +693,24 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               byVolumeProperty: 'correctionByVolume',
               defaultValue: 0,
             }) ?? 0
-          const configureForVolumeAndPrepareToAspirateCommands: CurriedCommandCreator[] = isFirstWellInChunk
-            ? [
-                ...(LOW_VOLUME_PIPETTES.includes(
-                  invariantContext.pipetteEntities[pipette].name
-                )
-                  ? [
-                      curryWithoutPython(configureForVolume, {
-                        pipetteId: pipette,
-                        volume: totalSampleDispenseVolume,
-                      }),
-                    ]
-                  : []),
-                curryWithoutPython(prepareToAspirate, {
-                  pipetteId: pipette,
-                }),
-              ]
-            : []
+          const configureForVolumeAndPrepareToAspirateCommands: CurriedCommandCreator[] =
+            isFirstWellInChunk
+              ? [
+                  ...(LOW_VOLUME_PIPETTES.includes(
+                    invariantContext.pipetteEntities[pipette].name
+                  )
+                    ? [
+                        curryWithoutPython(configureForVolume, {
+                          pipetteId: pipette,
+                          volume: totalSampleDispenseVolume,
+                        }),
+                      ]
+                    : []),
+                  curryWithoutPython(prepareToAspirate, {
+                    pipetteId: pipette,
+                  }),
+                ]
+              : []
           const voidAirGapAtAspirateWellCommands =
             airGapInTip > 0
               ? [
@@ -718,7 +720,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                     flowRate: airGapDispenseFlowRate,
                     ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                     pushOut: 0,
@@ -836,7 +839,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                     flowRate: aspirateAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForAspirateAirGap,
                         }
                       : {}),
                   }),

@@ -36,28 +36,21 @@ const makeArrowModifier = (arrow: Element): Partial<PopperModifer<{}>> => ({
 })
 
 export function usePopper(options: UsePopperOptions): UsePopperResult {
-  const {
-    target,
-    tooltip,
-    arrow,
-    placement,
-    strategy,
-    offset,
-    onStateUpdate,
-  } = options
+  const { target, tooltip, arrow, placement, strategy, offset, onStateUpdate } =
+    options
 
   const popperRef = useRef<UsePopperResult | null>(null)
 
   // useLayoutEffect instead of useEffect to avoid positioning flash
   useLayoutEffect(() => {
     if (target && tooltip) {
-      const options: Partial<PopperOptions> &
-        Pick<PopperOptions, 'modifiers'> = {
-        modifiers: [
-          DISABLED_APPLY_STYLES_MODIFIER,
-          makeUpdateStateModifier(onStateUpdate),
-        ],
-      }
+      const options: Partial<PopperOptions> & Pick<PopperOptions, 'modifiers'> =
+        {
+          modifiers: [
+            DISABLED_APPLY_STYLES_MODIFIER,
+            makeUpdateStateModifier(onStateUpdate),
+          ],
+        }
 
       if (offset != null) {
         options.modifiers.push(makeOffsetModifier(offset))

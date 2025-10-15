@@ -33,9 +33,8 @@ const invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getRobotStateWithTipStandard(
-  invariantContext
-)
+const prevRobotState: RobotState =
+  getRobotStateWithTipStandard(invariantContext)
 
 describe('dispenseInWasteChute', () => {
   it('returns correct commands for dispensing in waste chute', () => {

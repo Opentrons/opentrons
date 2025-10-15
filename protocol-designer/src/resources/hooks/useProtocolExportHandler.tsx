@@ -24,9 +24,8 @@ export const useProtocolExportHandler = ({
   onConfirmExport,
 }: UseProtocolExportHandlerProps): UseProtocolExportHandlerResult => {
   const { t } = useTranslation(['protocol_overview', 'alert'])
-  const [showModalWithWarning, setShowModalWithWarning] = useState<boolean>(
-    false
-  )
+  const [showModalWithWarning, setShowModalWithWarning] =
+    useState<boolean>(false)
   const argsAndErrorsByStepId = useSelector(getArgsAndErrorsByStepId)
   const timeline = useSelector(getRobotStateTimeline)
   const hasFormErrors = Object.values(argsAndErrorsByStepId).some(

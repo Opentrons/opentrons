@@ -33,13 +33,11 @@ export type WifiScreenOption =
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
-    'wpa-psk'
-  )
+  const [selectedAuthType, setSelectedAuthType] =
+    useState<WifiSecurityType>('wpa-psk')
 
-  const [currentOption, setCurrentOption] = useState<WifiScreenOption>(
-    'WifiList'
-  )
+  const [currentOption, setCurrentOption] =
+    useState<WifiScreenOption>('WifiList')
   const [password, setPassword] = useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'

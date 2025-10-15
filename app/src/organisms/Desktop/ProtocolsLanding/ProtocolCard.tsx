@@ -56,17 +56,10 @@ interface ProtocolCardProps {
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const navigate = useNavigate()
-  const {
-    handleRunProtocol,
-    handleSendProtocolToFlex,
-    storedProtocolData,
-  } = props
-  const {
-    protocolKey,
-    srcFileNames,
-    mostRecentAnalysis,
-    modified,
-  } = storedProtocolData
+  const { handleRunProtocol, handleSendProtocolToFlex, storedProtocolData } =
+    props
+  const { protocolKey, srcFileNames, mostRecentAnalysis, modified } =
+    storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )

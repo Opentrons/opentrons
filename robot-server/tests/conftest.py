@@ -45,6 +45,8 @@ from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.tables import metadata
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.dependencies import get_run_data_manager
 
 test_router = routing.APIRouter()
 
@@ -107,6 +109,11 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
+def run_data() -> MagicMock:
+    return MagicMock(spec=RunDataManager)
+
+
+@pytest.fixture
 def versions() -> MagicMock:
     m = MagicMock(spec=get_versions)
     m.return_value = ComponentVersions(
@@ -161,11 +168,37 @@ def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
+    async def get_run_data_manager_override() -> RunDataManager:
+        """Override for the get_run_data_manager FastAPI dependency."""
+        return run_data
+
+    app.dependency_overrides[get_run_data_manager] = get_run_data_manager_override
+    yield
+    del app.dependency_overrides[get_run_data_manager]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
+) -> TestClient:
+    client = TestClient(app)
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
+    return client
+
+
+@pytest.fixture
+def api_client_camera_overrides(
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
+    _override_version_with_mock: None,
+    _override_ot2_hardware_with_mock: None,
+    _override_run_data_manager_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

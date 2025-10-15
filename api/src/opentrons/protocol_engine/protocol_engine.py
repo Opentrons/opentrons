@@ -391,6 +391,46 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
+
+        if self._state_store.commands.get_is_terminal():
+            # Do not stop multiple times; it will be common for this action to fire
+            # many times when a module enters an error state, and we don't want to do
+            # the stop behavior over and over
+            return False
+
+        self._stop_from_asynchronous_error()
+        # like self.request_stop, and unlike self.estop(), we must explicitly request that the
+        # hardware stops execution, since not all asynchronous errors will cause the hardware
+        # to know that it should stop.
+        await self._do_hardware_stop()
+        return True
+
+    async def module_disconnected(
+        self, module_model: ModuleModel, serial: str | None
+    ) -> bool:
+        """Signal to the engine that a module has disconnected.
+
+        The return value of this function signals whether the module was relevant to this
+        protocol or not. If the function returns True, the module was relevant. The engine
+        will stop, and the caller should call `finish()` with an appropriate error to indicate
+        the missing module. If the function returns False, the error is not relevant. The engine
+        will not stop, and the caller should not call `finish()`.
+
+        Module disconnects are signaled when a hardware module's status poller indicates that the
+        module is no logner connected - for instance, someone unplugs the module, or it crashes.
+        These errors are not related to a particular command, even a currently-happening module
+        control command for the module in the error state.
+
+        Similar to an estop error, the error can occur at any time relative to the lifecycle
+        of the engine run or of any particular command.
+
+        Unlike an estop, the motion control hardware will not be raising an error and will not
+        stop on its own; the stop action derived from this call will do that.
+        """
+        if not self._state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        ):
+            return False
         self._stop_from_asynchronous_error()
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
@@ -475,7 +515,7 @@ class ProtocolEngine:
             # we were paused between two commands, or imagine we were executing a waitForDuration.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
-            if error is None:
+            if error is None and self._state_store.commands.get_error() is None:
                 error = EStopActivatedError()
 
         if error:

@@ -21,13 +21,8 @@ export interface WellDimensionsProps {
 
 export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   const { t } = useTranslation('labware_details')
-  const {
-    labwareParams,
-    wellProperties,
-    wellLabel,
-    labelSuffix,
-    category,
-  } = props
+  const { labwareParams, wellProperties, wellLabel, labelSuffix, category } =
+    props
   const {
     shape,
     depth,

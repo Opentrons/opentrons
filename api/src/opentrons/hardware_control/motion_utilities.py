@@ -195,8 +195,7 @@ def target_position_from_plunger(
 def target_positions_from_plunger_tracking(
     mount: Union[Mount, OT3Mount],
     plunger_delta: float,
-    z_delta: float,
-    current_position: Dict[Axis, float],
+    end_position: OrderedDict[Axis, float],
 ) -> "OrderedDict[Axis, float]":
     """Create a target position for machine axes including plungers for dynamic liquid tracking.
 
@@ -206,10 +205,11 @@ def target_positions_from_plunger_tracking(
     volume to aspirate/dispense.
     z_delta: the distance to move the z axis- should be determined based on volume and well geometry.
     """
-    all_axes_pos = target_position_from_plunger(mount, plunger_delta, current_position)
-    z_ax = Axis.by_mount(mount)
-    all_axes_pos[z_ax] = current_position[z_ax] + z_delta
-    return all_axes_pos
+    plunger_pos = OrderedDict()
+    plunger = Axis.of_main_tool_actuator(mount)
+    plunger_pos[plunger] = plunger_delta
+    end_position.update(plunger_pos)
+    return end_position
 
 
 def deck_point_from_machine_point(

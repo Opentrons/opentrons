@@ -180,10 +180,8 @@ function updateLocationSpecificOffsetDetails(
       lwDetails.locationSpecificOffsetDetails
 
     // Find the matching location (the relevant location-specific offset details).
-    const {
-      index: relevantDetailsIdx,
-      details: relevantDetail,
-    } = findMatchingLocationOffset(locationSpecificOffsetDetails, location)
+    const { index: relevantDetailsIdx, details: relevantDetail } =
+      findMatchingLocationOffset(locationSpecificOffsetDetails, location)
 
     if (relevantDetailsIdx < 0 || relevantDetail == null) {
       console.warn(`No matching location found for ${payload.labwareUri}`)
@@ -262,10 +260,8 @@ function handleResetToDefault(
   const locationSpecificOffsetDetails = lwDetails.locationSpecificOffsetDetails
 
   // Find the relevant offset
-  const {
-    index: relevantDetailsIdx,
-    details: relevantDetail,
-  } = findMatchingLocationOffset(locationSpecificOffsetDetails, location)
+  const { index: relevantDetailsIdx, details: relevantDetail } =
+    findMatchingLocationOffset(locationSpecificOffsetDetails, location)
 
   if (relevantDetailsIdx < 0 || relevantDetail == null) {
     console.warn(`No matching location found for reset operation`)

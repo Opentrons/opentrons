@@ -6,11 +6,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -164,13 +164,10 @@ export function ModuleTableItem({
     calibrationStatus
   )
 
-  const [showHomeStackerWarning, setShowHomeStackerWarning] = useState<boolean>(
-    false
-  )
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showHomeStackerWarning, setShowHomeStackerWarning] =
+    useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const homeStackerWarningModal = (): JSX.Element => {
     return (
@@ -323,7 +320,7 @@ export function ModuleTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <DeckInfoLabel
+          <RobotInfoLabel
             deckLabel={getModuleDeckLabel(
               module.moduleDef.moduleType,
               module.slotName

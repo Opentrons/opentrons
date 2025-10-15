@@ -37,7 +37,8 @@ describe('FixtureTable', () => {
       deckConfigCompatibility: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           requiredAddressableAreas: ['D4'],
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -87,7 +88,8 @@ describe('FixtureTable', () => {
       deckConfigCompatibility: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           requiredAddressableAreas: [MOVABLE_TRASH_D3_ADDRESSABLE_AREA],
           compatibleCutoutFixtureIds: [TRASH_BIN_ADAPTER_FIXTURE],
         },

@@ -29,9 +29,8 @@ export function useUpdateRecoveryPolicyWithStrategy(
 ) => Promise<UpdateErrorRecoveryPolicyResponse> {
   const host = useHost()
 
-  const {
-    mutateAsync: updateErrorRecoveryPolicy,
-  } = useUpdateErrorRecoveryPolicy(runId)
+  const { mutateAsync: updateErrorRecoveryPolicy } =
+    useUpdateErrorRecoveryPolicy(runId)
 
   return (
     newPolicy: UpdateErrorRecoveryPolicyWithStrategy['newPolicy'],

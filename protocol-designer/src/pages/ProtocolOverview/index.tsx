@@ -20,6 +20,8 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { InputDeviceInfo } from '/protocol-designer/pages/ProtocolOverview/InputDeviceInfo'
+
 import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import {
@@ -28,6 +30,7 @@ import {
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
 import {
+  getEnableCameraSupport,
   getEnableJsonExport,
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
@@ -77,15 +80,13 @@ export function ProtocolOverview(): JSX.Element {
     'modules',
   ])
   const navigate = useNavigate()
-  const [
-    showEditInstrumentsModal,
-    setShowEditInstrumentsModal,
-  ] = useState<boolean>(false)
+  const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
+    useState<boolean>(false)
   const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
-  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
-    false
-  )
+  const enableCameraSupport = useSelector(getEnableCameraSupport)
+  const [showEditMetadataModal, setShowEditMetadataModal] =
+    useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -96,9 +97,8 @@ export function ProtocolOverview(): JSX.Element {
   const hasCommands = timeline.length > 0
 
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
-    false
-  )
+  const [showMaterialsListModal, setShowMaterialsListModal] =
+    useState<boolean>(false)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -119,24 +119,17 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(loadFileActions.saveProtocolFile())
+      },
+    })
 
   const pipettesOnDeck = Object.values(pipettes)
-  const {
-    protocolName,
-    description,
-    created,
-    lastModified,
-    author,
-  } = formValues
+  const { protocolName, description, created, lastModified, author } =
+    formValues
   const metaDataInfo = [
     { description },
     { author },
@@ -264,6 +257,9 @@ export function ProtocolOverview(): JSX.Element {
               modules={Object.values(modulesOnDeck)}
               additionalEquipment={additionalEquipmentOnDeck}
             />
+            {enableCameraSupport ? (
+              <InputDeviceInfo robotType={robotType} />
+            ) : null}
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />

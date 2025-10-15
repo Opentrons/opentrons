@@ -115,9 +115,8 @@ beforeEach(() => {
 
   invariantContext = makeContext()
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
-  robotInitialStateNoTipsRemain = getRobotInitialStateNoTipsRemain(
-    invariantContext
-  )
+  robotInitialStateNoTipsRemain =
+    getRobotInitialStateNoTipsRemain(invariantContext)
 })
 
 describe('distribute: minimal example', () => {

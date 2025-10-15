@@ -14,6 +14,7 @@ Style props will pass their value directly into CSS, but for safety, try to use 
 
 ```js static
 import { Box, C_DARK_GRAY, C_WHITE } from '@opentrons/components'
+
 const GrayBox = () => <Box color={C_WHITE} backgroundColor={C_DARK_GRAY} />
 ```
 
@@ -35,6 +36,7 @@ import {
   LINE_HEIGHT_TITLE,
   Text,
 } from '@opentrons/components'
+
 const Heading = () => (
   <Text
     fontSize={FONT_SIZE_HEADER}
@@ -65,6 +67,7 @@ const Heading = () => (
 
 ```js static
 import { Box, SPACING_3, SPACING_AUTO } from '@opentrons/components'
+
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
 
@@ -89,6 +92,7 @@ import {
   BORDER_SOLID_LIGHT,
   Box,
 } from '@opentrons/components'
+
 const Heading = () => (
   <Box border={BORDER_SOLID_LIGHT} borderRadius={BORDER_RADIUS_DEFAULT} />
 )
@@ -110,6 +114,7 @@ import {
   Flex,
   JUSTIFY_CONTENT_CENTER,
 } from '@opentrons/components'
+
 const Heading = () => (
   <Flex
     alignItems={ALIGN_ITEMS_CENTER}
@@ -136,6 +141,7 @@ const Heading = () => (
 
 ```js static
 import { Box, OVERFLOW_HIDDEN, SIZE_4 } from '@opentrons/components'
+
 const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 ```
 
@@ -152,6 +158,7 @@ const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 
 ```js static
 import { Box, POSITION_ABSOLUTE } from '@opentrons/components'
+
 const Fill = () => (
   <Box position={POSITION_ABSOLUTE} top={0} right={0} bottom={0} left={0} />
 )

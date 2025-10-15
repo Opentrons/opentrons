@@ -36,16 +36,12 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 export const useRequiredProtocolHardwareFromAnalysis = (
   analysis: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-  const {
-    data: attachedModulesData,
-    isLoading: isLoadingModules,
-  } = useModulesQuery()
+  const { data: attachedModulesData, isLoading: isLoadingModules } =
+    useModulesQuery()
   const attachedModules = attachedModulesData?.data ?? []
 
-  const {
-    data: attachedInstrumentsData,
-    isLoading: isLoadingInstruments,
-  } = useInstrumentsQuery()
+  const { data: attachedInstrumentsData, isLoading: isLoadingInstruments } =
+    useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   const robotType = FLEX_ROBOT_TYPE
@@ -153,9 +149,8 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       return atLeastOneAA && notOnlySingleSlot
     }
   )
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    requiredDeckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(requiredDeckConfigCompatibility)
 
   const requiredFixtures = filteredDeckConfigCompatibility.map(
     ({

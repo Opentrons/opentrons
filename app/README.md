@@ -64,19 +64,16 @@ When adding any translatable copy strings, follow these conventions:
 Choose a continuous chunk of target copy that composes a translatable unit. This should be all text in a paragraph, or sentence, but might only be one word (e.g. within a button).
 
 1. Does the new copy belong within an existing translation namespace (e.g. 'robot_connection', 'robot_calibration', 'shared'...)?
-
    - If yes, add a new key–value pair to that file. The value should be the English copy string. The key should be a snake-case string that describes this copy's purpose within the namespace.
    - If no, create a new namespace for this area of the application's functionality. Add a file titled `[namespace].json` to `app/src/assets/localization/en/`. Add a new key–value pair to that file. The value should be the English copy string. The key should be a snake-case string that describes this copy's purpose within the namespace. Include the namespace in the i18n instance initialization function at `app/src/i18n.js` under the `ns` key of the options passed to the init function (`{...ns: [ 'new_namespace' ]...}`). Import and export the new `[namespace].json` file from the manifest file at `app/src/assets/localization/en/index.js`.
 
 2. Does the copy include dynamic internal values, or embedded markup (e.g. `Hello {{user}}, click <a>here</a>.`)?
-
    - If yes, use the [`Trans` component](https://react.i18next.com/latest/trans-component) from `react-i18next`.
    - If no, use the [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook) to retrieve the `t` function.
 
 **Note**: If a component utilizes both the `Trans` component and the `useTranslation` hook, be sure to pass the `t` function in as the `t` prop of the `Trans` component. That way the same namespace resolution order is maintained for all translation keys within that component.
 
 3. Does your copy need to be a specific format (e.g. `upperCase`, `capitalize`, `sentenceCase`, `titleCase`)?
-
    - If yes, use [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook) to retrieve the `t` and `i18n` function and specify the format. (e.g. `const { t, i18n } = useTranslation('shared')` `{i18n.format(t('close'), 'upperCase')}`)
    - If no,when using the `useTranslation` hook, only use the `t` function.
 

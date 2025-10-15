@@ -152,20 +152,18 @@ const hoveredItem: Reducer<HoveredItemState, any> = handleActions(
   },
   null
 )
-const hoveredSubstep: Reducer<
-  SubstepIdentifier,
-  HoverOnSubstepAction
-> = handleActions(
-  {
-    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-    HOVER_ON_SUBSTEP: (
-      state: SubstepIdentifier,
-      action: HoverOnSubstepAction
-    ) => action.payload,
-  },
-  null
-)
+const hoveredSubstep: Reducer<SubstepIdentifier, HoverOnSubstepAction> =
+  handleActions(
+    {
+      // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+      // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
+      HOVER_ON_SUBSTEP: (
+        state: SubstepIdentifier,
+        action: HoverOnSubstepAction
+      ) => action.payload,
+    },
+    null
+  )
 const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
   {
     SET_WELL_SELECTION_LABWARE_KEY: (

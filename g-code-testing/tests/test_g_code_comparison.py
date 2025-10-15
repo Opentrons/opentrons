@@ -18,9 +18,9 @@ RESULTS_PATH = Path(__file__).parent.parent / "results"
         for conf in HTTP_CONFIGURATIONS
     ],
 )
-def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
+async def test_http(g_code_configuration: HTTPGCodeConfirmConfig):
     expected_output = g_code_configuration.get_comparison_file()
-    actual_output = g_code_configuration.execute()
+    actual_output = await g_code_configuration.execute()
     assert actual_output == expected_output, GCodeDiffer(
         actual_output, expected_output
     ).get_html_diff()

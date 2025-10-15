@@ -4,7 +4,7 @@ from typing import Annotated
 
 import fastapi
 
-from robot_server.file_provider.provider import FileProviderWrapper
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
@@ -13,12 +13,12 @@ from robot_server.data_files.data_files_store import DataFilesStore
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 
 
-async def get_file_provider_wrapper(
+async def get_file_provider_executor(
     data_files_directory: Annotated[Path, fastapi.Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, fastapi.Depends(get_data_files_store)],
-) -> FileProviderWrapper:
-    """Return the server's singleton `FileProviderWrapper` which provides the engine related callbacks for FileProvider."""
-    file_provider_wrapper = FileProviderWrapper(
+) -> FileProviderExecutor:
+    """Return the server's singleton `FileProviderExecutor` which provides the engine related callbacks for FileProvider."""
+    file_provider_wrapper = FileProviderExecutor(
         data_files_directory=data_files_directory, data_files_store=data_files_store
     )
 
@@ -26,14 +26,14 @@ async def get_file_provider_wrapper(
 
 
 async def get_file_provider(
-    file_provider_wrapper: Annotated[
-        FileProviderWrapper, fastapi.Depends(get_file_provider_wrapper)
+    file_provider_executor: Annotated[
+        FileProviderExecutor, fastapi.Depends(get_file_provider_executor)
     ],
 ) -> FileProvider:
     """Return the engine `FileProvider` which accepts callbacks from FileProviderWrapper."""
     file_provider = FileProvider(
-        data_files_write_csv_callback=file_provider_wrapper.write_csv_callback,
-        data_files_filecount=file_provider_wrapper.csv_filecount_callback,
+        data_files_write_file_cb=file_provider_executor.write_file_cb,
+        data_files_filecount=file_provider_executor.filecount_cb,
     )
 
     return file_provider

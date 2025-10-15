@@ -90,3 +90,6 @@ export const GRIPPER_LOCATION: 'mounted' = 'mounted'
 export const CLEAN: 'CLEAN' = 'CLEAN'
 export const DIRTY: 'DIRTY' = 'DIRTY'
 export const EMPTY: 'EMPTY' = 'EMPTY'
+
+export const AUTOMATIC: 'automatic' = 'automatic'
+export const MANUAL: 'manual' = 'manual'

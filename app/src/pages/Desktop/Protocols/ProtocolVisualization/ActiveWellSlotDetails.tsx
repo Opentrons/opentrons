@@ -46,7 +46,7 @@ export function ActiveWellSlotDetails(
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
   const labwareWellMaxVolume = wells.A1.totalLiquidVolume
-  const zValue = 'wellLocation' in params ? params.wellLocation.z ?? 1 : 1
+  const zValue = 'wellLocation' in params ? (params.wellLocation.z ?? 1) : 1
 
   //  TODO: add support for rest of references
   const reference =

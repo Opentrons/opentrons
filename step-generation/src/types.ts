@@ -21,9 +21,11 @@ import type {
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AUTOMATIC,
   CLEAN,
   DIRTY,
   EMPTY,
+  MANUAL,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -183,7 +185,8 @@ export interface NormalizedAdditionalEquipmentById {
   }
 }
 
-export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export type AdditionalEquipmentEntity =
+  NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
@@ -219,7 +222,8 @@ export interface GripperEntities {
   [gripperId: string]: GripperEntity
 }
 
-export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
+export type NormalizedPipette =
+  NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
 // when they are de-normalized, the definitions they reference are baked in
@@ -819,3 +823,5 @@ export interface WellContents {
 export interface WellContentsByNumber {
   [wellName: string]: number
 }
+
+export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL

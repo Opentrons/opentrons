@@ -57,12 +57,8 @@ interface CheckLabwareProps extends EditOffsetContentProps {
 
 export function CheckLabware(props: CheckLabwareProps): JSX.Element {
   const { runId, commandUtils, contentHeader } = props
-  const {
-    toggleRobotMoving,
-    handleJog,
-    resetJog,
-    handleResetLwModulesOnDeck,
-  } = commandUtils
+  const { toggleRobotMoving, handleJog, resetJog, handleResetLwModulesOnDeck } =
+    commandUtils
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const dispatch = useDispatch()
@@ -81,12 +77,12 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
   ) as SelectedLwOverview
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
 
-  const [joggedPosition, setJoggedPosition] = useState<VectorOffset>(
-    workingInitialOffset
-  )
+  const [joggedPosition, setJoggedPosition] =
+    useState<VectorOffset>(workingInitialOffset)
 
   const liveOffset = getVectorSum(
     mostRecentVector ?? IDENTITY_VECTOR,

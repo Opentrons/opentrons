@@ -16,19 +16,18 @@ const EXPECTED_FETCH_OPTS = {
   headers: { 'Opentrons-Version': '2' },
 }
 
-const stubFetchOnce = (
-  stubUrl: string,
-  stubOptions: RequestInit = EXPECTED_FETCH_OPTS
-) => (response: Partial<Response> | Error) => {
-  vi.mocked(nodeFetch).mockImplementationOnce((url, options) => {
-    expect(url).toBe(stubUrl)
-    expect(options).toEqual(stubOptions)
+const stubFetchOnce =
+  (stubUrl: string, stubOptions: RequestInit = EXPECTED_FETCH_OPTS) =>
+  (response: Partial<Response> | Error) => {
+    vi.mocked(nodeFetch).mockImplementationOnce((url, options) => {
+      expect(url).toBe(stubUrl)
+      expect(options).toEqual(stubOptions)
 
-    return isError(response)
-      ? Promise.reject(response)
-      : Promise.resolve(response as Response)
-  })
-}
+      return isError(response)
+        ? Promise.reject(response)
+        : Promise.resolve(response as Response)
+    })
+  }
 
 const makeMockJsonResponse = (
   body: unknown,

@@ -47,10 +47,8 @@ export function ChooseLocation({
   const { t } = useTranslation('drop_tip_wizard')
   const { moveToAddressableArea, blowoutOrDropTip } = dropTipCommands
 
-  const [
-    selectedLocation,
-    setSelectedLocation,
-  ] = useState<DropTipBlowoutLocationDetails | null>(null)
+  const [selectedLocation, setSelectedLocation] =
+    useState<DropTipBlowoutLocationDetails | null>(null)
 
   // On initial render with values, synchronously set the first option as the selected option.
   useLayoutEffect(() => {

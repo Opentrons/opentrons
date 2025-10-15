@@ -31,6 +31,8 @@ export interface CheckboxFieldProps {
   labelProps?: ComponentProps<'div'>
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean
+  /** optional padding */
+  padding?: string
 }
 
 export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
@@ -41,13 +43,14 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
     label,
     disabled,
     tabIndex = 0,
+    padding,
     isIndeterminate,
   } = props
-  const indeterminate = isIndeterminate ?? false ? 'true' : undefined
+  const indeterminate = (isIndeterminate ?? false) ? 'true' : undefined
 
   return (
     <label css={OUTER_STYLE(value ?? false)}>
-      {props.isIndeterminate ?? false ? (
+      {(props.isIndeterminate ?? false) ? (
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
@@ -63,8 +66,8 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         </Flex>
       ) : (
         <Icon
-          css={value ?? false ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
-          name={value ?? false ? 'ot-checkbox' : 'checkbox-blank-outline'}
+          css={(value ?? false) ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
+          name={(value ?? false) ? 'ot-checkbox' : 'checkbox-blank-outline'}
           width="1.25rem"
           data-testid="CheckboxField_icon"
         />
@@ -80,7 +83,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         /* @ts-expect-error */
         indeterminate={indeterminate}
       />
-      <Box css={LABEL_TEXT_STYLE}>{label}</Box>
+      <Box css={LABEL_TEXT_STYLE(padding)}>{label}</Box>
     </label>
   )
 }
@@ -114,13 +117,13 @@ const OUTER_STYLE = (value?: boolean): FlattenSimpleInterpolation => css`
   }
 `
 
-const LABEL_TEXT_STYLE = css`
+const LABEL_TEXT_STYLE = (padding?: string): FlattenSimpleInterpolation => css`
   font-size: ${TYPOGRAPHY.fontSizeH3};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   line-height: ${TYPOGRAPHY.lineHeight20};
   color: ${COLORS.black90};
   flex: 0 0 auto;
-  padding: ${SPACING.spacing8} ${SPACING.spacing8};
+  padding: ${padding ?? SPACING.spacing8};
 
   &:empty {
     padding: 0;

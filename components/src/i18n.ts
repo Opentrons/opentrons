@@ -23,15 +23,16 @@ export const LANGUAGES: Array<{ name: string; value: Language }> = [
   { name: SIMPLIFIED_CHINESE_DISPLAY_NAME, value: SIMPLIFIED_CHINESE },
 ]
 
-const i18nConfig: InitOptions = {
-  resources,
+/** base i18n config to be used in all other projects in the monorepo
+ *  that use i18n
+ */
+export const baseI18nConfig: InitOptions = {
   lng: 'en',
   fallbackLng: 'en',
-  debug: _NODE_ENV_ === 'development',
   defaultNS: 'shared',
   interpolation: {
     escapeValue: false, // not needed for react as it escapes by default
-    format: function (value: string, format, lng) {
+    format: function (value: string, format) {
       if (format === 'upperCase') return value.toUpperCase()
       if (format === 'lowerCase') return value.toLowerCase()
       if (format === 'capitalize') return capitalize(value)
@@ -40,8 +41,14 @@ const i18nConfig: InitOptions = {
       return value
     },
   },
-  keySeparator: false, // use namespaces and context instead
   saveMissing: true,
+}
+
+const i18nConfig: InitOptions = {
+  ...baseI18nConfig,
+  keySeparator: false,
+  resources,
+  debug: _NODE_ENV_ === 'development',
   missingKeyHandler: (lng, ns, key) => {
     _NODE_ENV_ === 'test'
       ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)

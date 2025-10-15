@@ -65323,7 +65323,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -126182,7 +126182,7 @@
       "displayName": "Sample_plate_1",
       "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_200ul/1",

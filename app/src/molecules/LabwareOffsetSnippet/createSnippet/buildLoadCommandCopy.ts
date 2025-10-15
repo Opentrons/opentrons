@@ -81,9 +81,8 @@ function handleLoadLabwareCommand(
   } else {
     const labwareDefinitions = getLoadedLabwareDefinitionsByUri(allCommands)
 
-    const { loadName } = labwareDefinitions[
-      loadedLabware.definitionUri
-    ].parameters
+    const { loadName } =
+      labwareDefinitions[loadedLabware.definitionUri].parameters
     const loadStatement = buildLoadCopy(
       command,
       labware,

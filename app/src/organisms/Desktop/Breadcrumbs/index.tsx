@@ -84,7 +84,8 @@ function BreadcrumbsComponent(): JSX.Element | null {
     '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
     [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
-    [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestampFromHook,
+    [`/devices/${robotName}/protocol-runs/${runId}`]:
+      runCreatedAtTimestampFromHook,
 
     // for protocol visualization path from protocol setup page and back to protocol setup page
     [`/devices/${robotName}/${runId}/${encodeURIComponent(

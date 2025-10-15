@@ -1,0 +1,8 @@
+{
+  "left_mount": "LEFT MOUNT",
+  "left_right_mount": "LEFT + RIGHT MOUNT",
+  "none_attached": "None attached",
+  "pipette": "Pipette",
+  "right_mount": "RIGHT MOUNT",
+  "step": "Step {{number}}"
+}

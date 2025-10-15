@@ -22,7 +22,7 @@ describe('useUpdateLabware', () => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(updateLPCLabware).mockImplementation(
       (runId: string, labwareInfo: LPCLabwareInfo['labware']) =>
-        ({ type: 'UPDATE_LPC_LABWARE', runId, labwareInfo } as any)
+        ({ type: 'UPDATE_LPC_LABWARE', runId, labwareInfo }) as any
     )
   })
 

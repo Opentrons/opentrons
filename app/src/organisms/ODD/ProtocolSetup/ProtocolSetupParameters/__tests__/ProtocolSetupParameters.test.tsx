@@ -47,10 +47,10 @@ const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const mockCreateProtocolAnalysis = vi.fn()
 const mockUploadCsvFile = vi.fn()
 const mockCreateRun = vi.fn()
-const mockMostRecentAnalysis = ({
+const mockMostRecentAnalysis = {
   commands: [],
   labware: [],
-} as unknown) as CompletedProtocolAnalysis
+} as unknown as CompletedProtocolAnalysis
 const mockMakeSnackbar = vi.fn()
 
 const render = (props: ComponentProps<typeof ProtocolSetupParameters>) => {
@@ -173,11 +173,11 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('render csv file when a protocol requires a csv file and confirm values button has the disabled style', () => {
-    const mockMostRecentAnalysisForCsv = ({
+    const mockMostRecentAnalysisForCsv = {
       commands: [],
       labware: [],
       result: 'parameter-value-required',
-    } as unknown) as CompletedProtocolAnalysis
+    } as unknown as CompletedProtocolAnalysis
     render({
       ...props,
       runTimeParameters: mockRunTimeParameterData,
@@ -191,11 +191,11 @@ describe('ProtocolSetupParameters', () => {
   })
 
   it('when tapping aria-disabled button, snack bar will show up', () => {
-    const mockMostRecentAnalysisForCsv = ({
+    const mockMostRecentAnalysisForCsv = {
       commands: [],
       labware: [],
       result: 'parameter-value-required',
-    } as unknown) as CompletedProtocolAnalysis
+    } as unknown as CompletedProtocolAnalysis
     render({
       ...props,
       runTimeParameters: mockRunTimeParameterData,

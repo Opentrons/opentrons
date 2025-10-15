@@ -44,7 +44,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
+const simpleV6Protocol =
+  _uncastedSimpleV6Protocol as unknown as SharedData.ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
   const store: Store<State> = legacy_createStore(vi.fn(), {})
@@ -61,7 +62,7 @@ describe('useLPCDisabledReason', () => {
       simpleV6Protocol as any
     )
     vi.mocked(useStoredProtocolAnalysis).mockReturnValue(
-      (simpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
+      simpleV6Protocol as unknown as SharedData.ProtocolAnalysisOutput
     )
     vi.mocked(useRunHasStarted).mockReturnValue(false)
     vi.mocked(useRunCalibrationStatus).mockReturnValue({ complete: true })

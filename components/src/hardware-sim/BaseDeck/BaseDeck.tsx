@@ -25,7 +25,7 @@ import {
 
 import { FixedTrashText } from '../..'
 import { COLORS } from '../../helix-design-system'
-import { DeckInfoLabel } from '../../molecules/DeckInfoLabel'
+import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
 import { SlotLabels } from '../Deck'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
@@ -527,10 +527,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 : moduleLocation.slotName,
               deckDef
             )
-            let {
-              x: nestedLabwareOffsetX,
-              y: nestedLabwareOffsetY,
-            } = moduleDef.labwareOffset
+            let { x: nestedLabwareOffsetX, y: nestedLabwareOffsetY } =
+              moduleDef.labwareOffset
             if (moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE) {
               nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
             }
@@ -596,7 +594,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 function StackedBadge(): JSX.Element {
   return (
     <RobotCoordsForeignObject height="2.5rem" width="2.5rem" x={113} y={53}>
-      <DeckInfoLabel
+      <RobotInfoLabel
         height="1.25rem"
         svgSize="0.875rem"
         highlight

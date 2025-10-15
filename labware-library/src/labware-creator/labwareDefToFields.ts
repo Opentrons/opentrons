@@ -145,6 +145,10 @@ export function labwareDefToFields(
     gridOffsetX: String(xOffsetFromLeft),
     gridOffsetY: String(yOffsetFromBack),
 
+    hasLpcQuirk: boolToBoolString(
+      !!def.parameters?.quirks?.includes('noLabwarePositionCheck')
+    ),
+
     homogeneousWells: boolToBoolString(homogeneousWells),
     regularRowSpacing: boolToBoolString(regularRowSpacing),
     regularColumnSpacing: boolToBoolString(regularColumnSpacing),

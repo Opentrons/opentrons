@@ -1,10 +1,11 @@
-"""Wrapper to provide the callbacks utilized by the Protocol Engine File Provider."""
+"""Executor for Protocol Engine File Provider callbacks."""
 import os
 import asyncio
-import csv
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import Depends
+from pydantic import BaseModel
+from datetime import datetime
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
@@ -15,55 +16,70 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
     DataFileInfo,
 )
-from opentrons.protocol_engine.resources.file_provider import GenericCsvTransform
+from opentrons.protocol_engine.resources.file_provider import (
+    FileData,
+    ReadCmdFileNameMetadata,
+)
 
 
-class FileProviderWrapper:
-    """Wrapper to provide File Read and Write capabilities to Protocol Engine."""
+class RunFileNameMetadata(BaseModel):
+    """Data from the run used that may be used to build a finalized file name."""
+
+    robot_name: str
+    run_created_at: datetime
+    protocol_name: Optional[str]
+
+
+class FileProviderExecutor:
+    """Executes file operations for the Protocol Engine File Provider."""
 
     def __init__(
         self,
         data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
         data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     ) -> None:
-        """Provides callbacks for data file manipulation for the Protocol Engine's File Provider class.
+        """Initialize the file provider executor.
 
         Params:
-            data_files_directory: The directory to store engine-create files in during a protocol run.
+            data_files_directory: The directory to store engine-created files in during a protocol run.
             data_files_store: The data files store utilized for database interaction when creating files.
         """
         self._data_files_directory = data_files_directory
         self._data_files_store = data_files_store
+        self._run_metadata: RunFileNameMetadata | None = None
 
-        # dta file store is not generally safe for concurrent access.
+        # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
 
-    async def write_csv_callback(
+    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
+        """Sets metadata specific to the run."""
+        self._run_metadata = metadata
+
+    def clear_run_metadata(self) -> None:
+        """Clears metadata specific to the run."""
+        self._run_metadata = None
+
+    async def write_file_cb(
         self,
-        csv_data: GenericCsvTransform,
+        file_data: FileData,
     ) -> str:
-        """Write the provided data transform to a CSV file. Returns the File ID of the created file."""
+        """Write the provided file data to disk. Returns the File ID of the created file."""
         async with self._lock:
             file_id = await get_unique_id()
-            os.makedirs(
-                os.path.dirname(
-                    self._data_files_directory / file_id / csv_data.filename
-                ),
-                exist_ok=True,
+            final_filename = self._format_filename(file_data, file_id)
+            final_filepath = self._format_filepath(
+                filename=final_filename, file_id=file_id, file_data=file_data
             )
-            with open(
-                file=self._data_files_directory / file_id / csv_data.filename,
-                mode="w",
-                newline="",
-            ) as csvfile:
-                writer = csv.writer(csvfile, delimiter=csv_data.delimiter)
-                writer.writerows(csv_data.rows)
+
+            os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
+
+            with open(file=final_filepath, mode="wb") as f:
+                f.write(file_data.data)
 
             created_at = await get_current_time()
-            # TODO (cb, 10-14-24): Engine created files do not currently get a file_hash, unlike explicitly uploaded files. Do they need one?
             file_info = DataFileInfo(
                 id=file_id,
-                name=csv_data.filename,
+                name=final_filename,
                 file_hash="",
                 created_at=created_at,
                 source=DataFileSource.GENERATED,
@@ -71,9 +87,31 @@ class FileProviderWrapper:
             await self._data_files_store.insert(file_info)
             return file_id
 
-    async def csv_filecount_callback(self) -> int:
+    async def filecount_cb(self) -> int:
         """Return the current count of generated files stored within the data files directory."""
         data_file_usage_info = self._data_files_store.get_usage_info(
             DataFileSource.GENERATED
         )
         return len(data_file_usage_info)
+
+    def _format_filename(self, file_data: FileData, file_id: str) -> str:
+        """Build the finalized filename."""
+        if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
+            metadata = file_data.command_metadata
+            base_name = metadata.base_filename
+
+            if base_name.endswith(".csv"):
+                base_name = base_name[:-4]
+
+            return base_name + str(metadata.wavelength) + "nm.csv"
+        else:
+            return f"{file_id}.dat"
+
+    def _format_filepath(
+        self, filename: str, file_id: str, file_data: FileData
+    ) -> Path:
+        """Given a finalized filename, return the full filepath for the filename."""
+        if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
+            return self._data_files_directory / file_id / filename
+        else:
+            return self._data_files_directory / filename

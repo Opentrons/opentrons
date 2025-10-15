@@ -50,9 +50,8 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
     moduleRenderInfoById,
     ({ moduleDef }) => moduleDef.model
   )
-  const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
-    moduleModels
-  )
+  const moduleTypesThatRequireExtraAttention =
+    getModuleTypesThatRequireExtraAttention(moduleModels)
 
   // TODO(jh, 11-13-24): These disabled tooltips are used throughout setup flows. Let's consolidate them.
   const [targetProps, tooltipProps] = useHoverTooltip()

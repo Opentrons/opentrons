@@ -37,7 +37,8 @@ vi.mock('/app/resources/analysis')
 vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('/app/resources/deck_configuration')
 
-const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
+const heaterShakerCommandsWithResultsKey =
+  heater_shaker_commands_with_results_key as unknown as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
@@ -120,7 +121,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     ])
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
-      .thenReturn((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
+      .thenReturn(PROTOCOL_DETAILS as unknown as ProtocolAnalysisOutput)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
