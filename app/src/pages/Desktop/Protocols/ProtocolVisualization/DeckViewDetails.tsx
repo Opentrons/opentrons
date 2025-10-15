@@ -17,7 +17,6 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from './LabwareOnDeck'
-// import styles from './preview.module.css'
 import {
   getActiveLayer,
   getSlotIdsBlockedBySpanningForThermocycler,
