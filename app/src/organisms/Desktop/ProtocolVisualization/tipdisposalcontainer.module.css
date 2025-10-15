@@ -15,3 +15,11 @@
   justify-content: space-between;
   gap: auto;
 }
+
+.text_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
+}

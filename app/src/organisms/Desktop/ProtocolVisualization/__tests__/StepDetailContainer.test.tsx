@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { DestinationLabwareContainer } from '../DestinationLabwareContainer'
-import { DestinationTipsContainer } from '../DestinationTipsContainer'
 import { PipetteContainer } from '../PipetteContainer'
 import { SourceLabwareContainer } from '../SourceLabwareContainer'
 import { SourceWellViewContainer } from '../SourceWellViewContainer'
 import { StepDetailContainer } from '../StepDetailContainer'
+import { DestinationTipsContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
 vi.mock('../PipetteContainer')

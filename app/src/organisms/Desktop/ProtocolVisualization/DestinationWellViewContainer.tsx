@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next'
 
 import { RobotInfoLabel, Tag } from '@opentrons/components'
 
-import styles from './sourcewellviewcontainer.module.css'
+import styles from './destinationwellviewcontainer.module.css'
 
-export function SourceWellViewContainer(): JSX.Element {
+export function DestinationWellViewContainer(): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Tag text={t('source_well_view')} type="default" shrinkToContent />
+        <Tag text={t('destination_well_view')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={t('well_name', { wellName: 'A1' })} />
       </div>
       <div className={styles.main_content}></div>
