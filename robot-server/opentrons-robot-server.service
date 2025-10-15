@@ -25,7 +25,7 @@ ExecStart=uvicorn robot_server.app:app --uds /run/aiohttp.sock --ws wsproto --li
 Environment=OT_SMOOTHIE_ID=AMA
 Environment=RUNNING_ON_PI=true
 Environment=OT_ROBOT_SERVER_persistence_directory=/data/opentrons_robot_server
-Environment=OT_ROBOT_SERVER_persistence_directory=/data/opentrons_robot_server/images
+Environment=OT_ROBOT_SERVER_persistence_directory=/data/images
 
 Restart=on-failure
 TimeoutStartSec=10min
