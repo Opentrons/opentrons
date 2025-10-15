@@ -59,7 +59,7 @@ UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]
 class ModuleDisconnectedCallback(Protocol):
     """Protocol for the callback when the module should be disconnected."""
 
-    def __call__(self, port: str, serial: str | None) -> None:
+    def __call__(self, model: str, port: str, serial: str | None) -> None:
         ...
 
 

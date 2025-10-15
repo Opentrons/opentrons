@@ -89,9 +89,8 @@ export function AddStepButton({
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const { modules } = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
-    false
-  )
+  const [showStepOverflowMenu, setShowStepOverflowMenu] =
+    useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowStepOverflowMenu(false)
@@ -111,9 +110,7 @@ export function AddStepButton({
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
-    const isLidOnSlot = Object.values(labwareEntities).some(({ def }) =>
-      getIsLid(def)
-    )
+    const isLidOnSlot = labwareDef != null ? getIsLid(labwareDef) : false
     return (
       labwareDef != null &&
       slot !== OFFDECK &&

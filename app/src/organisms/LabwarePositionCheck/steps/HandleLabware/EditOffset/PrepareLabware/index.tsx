@@ -21,13 +21,8 @@ import type {
 } from '/app/redux/protocol-runs'
 
 export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
-  const {
-    runId,
-    commandUtils,
-    proceedSubstep,
-    goBackSubstep,
-    contentHeader,
-  } = props
+  const { runId, commandUtils, proceedSubstep, goBackSubstep, contentHeader } =
+    props
   const { toggleRobotMoving, handleConfirmLwModulePlacement } = commandUtils
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const dispatch = useDispatch()
@@ -40,7 +35,8 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
 
   const handleConfirmPlacement = (): void => {
     void toggleRobotMoving(true)

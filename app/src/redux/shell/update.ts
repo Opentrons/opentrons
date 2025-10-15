@@ -28,8 +28,7 @@ export function getShellUpdateDataFiles(state: State): string[] {
   return state.shell.filePaths
 }
 
-export const getAvailableShellUpdate: (
-  state: State
-) => string | null = createSelector(getShellUpdateState, state =>
-  state.available && state.info ? state.info.version : null
-)
+export const getAvailableShellUpdate: (state: State) => string | null =
+  createSelector(getShellUpdateState, state =>
+    state.available && state.info ? state.info.version : null
+  )

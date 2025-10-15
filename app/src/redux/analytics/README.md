@@ -76,7 +76,6 @@ export default function makeEvent(
 
 - Redux action: `robot:RUN`
 - Payload:
-
   - ...protocol data (see below)
   - ...robot data (see below)
 

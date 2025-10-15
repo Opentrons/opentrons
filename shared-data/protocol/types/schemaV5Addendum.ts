@@ -17,11 +17,10 @@ export type Command =
     }
 
 // NOTE: must be kept in sync with '../schemas/5.json'
-export type ProtocolFile<
-  DesignerApplicationData
-> = V3ProtocolFile<DesignerApplicationData> & {
-  $otSharedSchema: '#/protocol/schemas/5'
-  schemaVersion: 5
-  modules: Record<string, FileModule>
-  commands: Command[]
-}
+export type ProtocolFile<DesignerApplicationData> =
+  V3ProtocolFile<DesignerApplicationData> & {
+    $otSharedSchema: '#/protocol/schemas/5'
+    schemaVersion: 5
+    modules: Record<string, FileModule>
+    commands: Command[]
+  }

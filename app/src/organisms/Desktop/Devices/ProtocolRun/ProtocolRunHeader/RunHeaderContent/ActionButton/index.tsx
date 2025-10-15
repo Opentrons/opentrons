@@ -51,10 +51,8 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     runHeaderModalContainerUtils,
     isClosingCurrentRun,
   } = props
-  const {
-    missingStepsModalUtils,
-    HSConfirmationModalUtils,
-  } = runHeaderModalContainerUtils
+  const { missingStepsModalUtils, HSConfirmationModalUtils } =
+    runHeaderModalContainerUtils
 
   const isFlex = useIsFlex(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -68,9 +66,8 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
-  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
-    robotName
-  )
+  const isRobotOnWrongVersionOfSoftware =
+    useIsRobotOnWrongVersionOfSoftware(robotName)
   const currentRunId = useCurrentRunId()
   const isRequiredOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
@@ -106,22 +103,21 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const validRunAgainButRequiresSetup =
     isValidRunAgain && !isRobotTypeSetupComplete
 
-  const {
-    buttonText,
-    handleButtonClick,
-    buttonIconName,
-  } = useActionButtonProperties({
-    isProtocolNotReady,
-    confirmMissingSteps: missingStepsModalUtils.conditionalConfirmUtils.confirm,
-    confirmAttachment: HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
-    robotAnalyticsData,
-    robotSerialNumber,
-    currentRunId,
-    isValidRunAgain,
-    isOtherRunCurrent,
-    isRobotOnWrongVersionOfSoftware,
-    ...props,
-  })
+  const { buttonText, handleButtonClick, buttonIconName } =
+    useActionButtonProperties({
+      isProtocolNotReady,
+      confirmMissingSteps:
+        missingStepsModalUtils.conditionalConfirmUtils.confirm,
+      confirmAttachment:
+        HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
+      robotAnalyticsData,
+      robotSerialNumber,
+      currentRunId,
+      isValidRunAgain,
+      isOtherRunCurrent,
+      isRobotOnWrongVersionOfSoftware,
+      ...props,
+    })
 
   return (
     <>

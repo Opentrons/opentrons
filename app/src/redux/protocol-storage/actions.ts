@@ -94,9 +94,10 @@ export const addProtocolFailure = (
   payload: { protocol, message },
 })
 
-export const clearAddProtocolFailure = (): Types.ClearAddProtocolFailureAction => ({
-  type: CLEAR_ADD_PROTOCOL_FAILURE,
-})
+export const clearAddProtocolFailure =
+  (): Types.ClearAddProtocolFailureAction => ({
+    type: CLEAR_ADD_PROTOCOL_FAILURE,
+  })
 
 export const openProtocolDirectory = (): Types.OpenProtocolDirectoryAction => ({
   type: OPEN_PROTOCOL_DIRECTORY,

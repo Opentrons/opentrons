@@ -65,12 +65,11 @@ function getLabwareInfoRecords(
       return
     }
 
-    const locationSpecificOffsetDetails = getLocationSpecificOffsetDetailsForLabware(
-      {
+    const locationSpecificOffsetDetails =
+      getLocationSpecificOffsetDetailsForLabware({
         ...params,
         uri,
-      }
-    )
+      })
 
     if (!(uri in labwareDetails)) {
       labwareDetails[uri] = {

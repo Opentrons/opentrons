@@ -85,8 +85,8 @@ export function HistoricalProtocolRunDrawer(
     }
   )
 
-  const deckCalibrationData = useDeckCalibrationData(robotName)
-    .deckCalibrationData
+  const deckCalibrationData =
+    useDeckCalibrationData(robotName).deckCalibrationData
   const lastModifiedDeckCal =
     deckCalibrationData != null && 'lastModified' in deckCalibrationData
       ? deckCalibrationData.lastModified

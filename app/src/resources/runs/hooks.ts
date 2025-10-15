@@ -121,9 +121,10 @@ export function useChainLiveCommands(): {
   }
 }
 
-type CreateTargetedMaintenanceRunMutation = UseCreateMaintenanceRunMutationResult & {
-  createTargetedMaintenanceRun: CreateMaintenanceRunType
-}
+type CreateTargetedMaintenanceRunMutation =
+  UseCreateMaintenanceRunMutationResult & {
+    createTargetedMaintenanceRun: CreateMaintenanceRunType
+  }
 
 // A wrapper around useCreateMaintenanceRunMutation that ensures the ODD TakeoverModal renders, if applicable.
 export function useCreateTargetedMaintenanceRunMutation(

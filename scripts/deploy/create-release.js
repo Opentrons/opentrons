@@ -218,11 +218,8 @@ async function main() {
 
   const deploy = flags.includes('--deploy')
   const allowOld = flags.includes('--allow-old')
-  const [
-    project,
-    currentVersion,
-    previousVersion,
-  ] = await versionDetailsFromGit(tag, allowOld)
+  const [project, currentVersion, previousVersion] =
+    await versionDetailsFromGit(tag, allowOld)
   const prefix = await prefixForProject(project)
   const changelog = await buildChangelog(
     project,

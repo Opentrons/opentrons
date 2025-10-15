@@ -10,8 +10,8 @@ export const getMaxPushOutVolume = (
   const isInLowVolumeMode =
     transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
   const { bottom, blowout } = isInLowVolumeMode
-    ? plungerPositionsConfigurations.lowVolumeDefault ??
-      plungerPositionsConfigurations.default
+    ? (plungerPositionsConfigurations.lowVolumeDefault ??
+      plungerPositionsConfigurations.default)
     : plungerPositionsConfigurations.default
   // absolute value to account for flipped z-axis on OT-2 vs. Flex pipettes
   return round(Math.abs(blowout - bottom) * shaftULperMM, 1)

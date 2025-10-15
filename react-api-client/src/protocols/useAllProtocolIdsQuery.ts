@@ -19,7 +19,7 @@ export function useAllProtocolIdsQuery(
     enabled: host !== null && (enablePolling == null || enablePolling),
     refetchInterval:
       enablePolling != null
-        ? options?.refetchInterval ?? POLLING_INTERVAL
+        ? (options?.refetchInterval ?? POLLING_INTERVAL)
         : false,
   }
   const query = useQuery<ProtocolsIds>(

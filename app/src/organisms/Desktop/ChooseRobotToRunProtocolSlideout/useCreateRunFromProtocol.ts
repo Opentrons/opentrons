@@ -86,11 +86,11 @@ export function useCreateRunFromProtocol(
 
   let error =
     protocolError != null || runError != null
-      ? protocolError?.response?.data?.errors?.[0]?.detail ??
+      ? (protocolError?.response?.data?.errors?.[0]?.detail ??
         protocolError?.response?.data ??
         runError?.response?.data?.errors?.[0]?.detail ??
         runError?.response?.data ??
-        t('protocol_run_general_error_msg')
+        t('protocol_run_general_error_msg'))
       : null
   error != null && console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error

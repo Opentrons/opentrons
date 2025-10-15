@@ -443,8 +443,8 @@ export function getSlotNameAndLwLocFrom(
   const baseSlot =
     onModuleModel != null &&
     getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
-      ? labwareLocationObject?.slotName.charAt(0) ?? null
-      : labwareLocationObject?.slotName ?? null
+      ? (labwareLocationObject?.slotName.charAt(0) ?? null)
+      : (labwareLocationObject?.slotName ?? null)
   if (
     location == null ||
     location === 'offDeck' ||

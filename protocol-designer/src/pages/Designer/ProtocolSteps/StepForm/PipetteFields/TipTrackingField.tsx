@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -10,6 +11,7 @@ import {
 } from '@opentrons/components'
 import { AUTOMATIC, MANUAL } from '@opentrons/step-generation'
 
+import { TipSelectionWizard } from './TipSelectionWizard'
 import styles from './tiptrackingfield.module.css'
 
 import type { TipTrackingOption } from '@opentrons/step-generation'
@@ -23,7 +25,8 @@ interface TipTrackingFieldProps {
 export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const { propsForFields } = props
   const { t } = useTranslation('form')
-
+  const [showTipSelectionModal, setShowTipSelectionModal] =
+    useState<boolean>(false)
   const tipTrackingOptions: Array<{
     title: string
     description: string
@@ -80,7 +83,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
             padding={`${SPACING.spacing20} ${SPACING.spacing12}`}
             type="noActive"
             onClick={() => {
-              console.log('TODO: tip select modal')
+              setShowTipSelectionModal(true)
             }}
           >
             <StyledText desktopStyle="bodyDefaultRegular">
@@ -90,6 +93,12 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
             </StyledText>
           </ListButton>
         </Flex>
+      )}
+      {showTipSelectionModal && (
+        <TipSelectionWizard
+          setShowTipSelectionModal={setShowTipSelectionModal}
+          formTiprackUri={propsForFields.tipRack.value as string}
+        />
       )}
     </Flex>
   )

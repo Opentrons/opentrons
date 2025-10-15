@@ -271,8 +271,7 @@ const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
     robotSystemUpdate: {
       manifestUrls: {
         // do not rely on this value; it is present only for back compatibility
-        OT2:
-          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+        OT2: 'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
         OT3: 'not-used',
       },
     },
@@ -375,8 +374,7 @@ const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
     robotSystemUpdate: {
       manifestUrls: {
         // do not rely on this value; it is present only for back compatibility
-        OT2:
-          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+        OT2: 'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
       },
     },
   }
@@ -480,7 +478,7 @@ const MIGRATIONS: [
   (prevConfig: ConfigV22) => ConfigV23,
   (prevConfig: ConfigV23) => ConfigV24,
   (prevConfig: ConfigV24) => ConfigV25,
-  (prevConfig: ConfigV25) => ConfigV26
+  (prevConfig: ConfigV25) => ConfigV26,
 ] = [
   toVersion1,
   toVersion2,

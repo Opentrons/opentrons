@@ -13,7 +13,9 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { FetchPipettesAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchPipettesAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchPipettesAction
+> = action => ({
   method: GET,
   path: Constants.PIPETTES_PATH,
   query: action.payload.refresh ? { refresh: true } : {},

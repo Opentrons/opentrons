@@ -78,10 +78,11 @@ from robot_server.runs.router.base_router import (
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
 )
-from robot_server.file_provider.provider import FileProviderWrapper
+from robot_server.file_provider.provider import FileProviderExecutor
 from opentrons.protocol_engine.state.module_substates import (
     FlexStackerSubState,
     FlexStackerId,
@@ -132,10 +133,11 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LegacyLabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider_wrapper: FileProviderExecutor,
     mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -169,6 +171,7 @@ async def test_create_run(
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -189,6 +192,7 @@ async def test_create_run(
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
         file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
         check_estop=True,
@@ -208,6 +212,7 @@ async def test_create_protocol_run(
     mock_deck_configuration_store: DeckConfigurationStore,
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -270,6 +275,7 @@ async def test_create_protocol_run(
             labware_offsets=[],
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
@@ -295,6 +301,7 @@ async def test_create_protocol_run(
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
         file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
     )
@@ -314,6 +321,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -331,6 +339,7 @@ async def test_create_protocol_run_bad_protocol_id(
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_id="run-id",
             created_at=datetime.now(),
             run_auto_deleter=mock_run_auto_deleter,
@@ -352,6 +361,7 @@ async def test_create_run_conflict(
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -366,6 +376,7 @@ async def test_create_run_conflict(
             labware_offsets=[],
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -386,6 +397,7 @@ async def test_create_run_conflict(
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
         )

@@ -490,13 +490,8 @@ export const getDispenseAirGapLocation = (args: {
   dispenseAirGapLabware: string
   dispenseAirGapWell: string
 } => {
-  const {
-    blowoutLocation,
-    sourceLabware,
-    destLabware,
-    sourceWell,
-    destWell,
-  } = args
+  const { blowoutLocation, sourceLabware, destLabware, sourceWell, destWell } =
+    args
   return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION &&
     //  note: sourceLabware & sourceWell != null for air gap in a transfer only
     //  since transfer allows you to specify the blowout location as source well
@@ -588,11 +583,9 @@ interface DispenseLocationHelperArgs {
   offsetFromBottomMm?: number
   well?: string
 }
-export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const dispenseLocationHelper: CommandCreator<
+  DispenseLocationHelperArgs
+> = (args, invariantContext, prevRobotState) => {
   const {
     destinationId,
     pipetteId,
@@ -604,11 +597,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     yOffset,
     tipRack,
   } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -676,11 +666,8 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   prevRobotState
 ) => {
   const { destinationId, pipetteId, zOffset, well } = args
-  const {
-    labwareEntities,
-    wasteChuteEntities,
-    trashBinEntities,
-  } = invariantContext
+  const { labwareEntities, wasteChuteEntities, trashBinEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -748,11 +735,8 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
     sourceWell,
     volume,
   } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -762,16 +746,14 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
 
   let commands: CurriedCommandCreator[] = []
   if (trashOrLabware === 'labware' && destWell != null) {
-    const {
-      dispenseAirGapLabware,
-      dispenseAirGapWell,
-    } = getDispenseAirGapLocation({
-      blowoutLocation: blowOutLocation,
-      sourceLabware: sourceId,
-      destLabware: destinationId,
-      sourceWell,
-      destWell: destWell,
-    })
+    const { dispenseAirGapLabware, dispenseAirGapWell } =
+      getDispenseAirGapLocation({
+        blowoutLocation: blowOutLocation,
+        sourceLabware: sourceId,
+        destLabware: destinationId,
+        sourceWell,
+        destWell: destWell,
+      })
     commands = [
       curryCommandCreator(airGapInWell, {
         flowRate,
@@ -819,11 +801,8 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   prevRobotState
 ) => {
   const { pipetteId, destinationId, well, zOffset, seconds } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -991,13 +970,15 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
-  return Object.values(labware)
-    .filter(
-      lw =>
-        lw.stack.includes(slot) &&
-        (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
-    )
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+  return (
+    Object.values(labware)
+      .filter(
+        lw =>
+          lw.stack.includes(slot) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+      )
+      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+  )
 }
 
 export const getTopmostLabwareOnModuleFromStackRobotState = (
@@ -1083,10 +1064,10 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   const minVolumeForMultiAspirateDispense = volume * 2
   const conditioningVolumeForMultiAspirateDispense =
     conditioningByVolume != null
-      ? linearInterpolate(
+      ? (linearInterpolate(
           minVolumeForMultiAspirateDispense,
           conditioningByVolume
-        ) ?? 0
+        ) ?? 0)
       : 0
   const isMultiDispenseAvailable =
     conditioningByVolume != null &&
@@ -1100,10 +1081,10 @@ export const getTransferPlanAndReferenceVolumes = (args: {
         ) ?? 0) +
         // don't take air gap into account if conditioning volume is present
         (conditioningVolumeForMultiAspirateDispense === 0
-          ? linearInterpolate(
+          ? (linearInterpolate(
               minVolumeForMultiAspirateDispense,
               aspirateAirGapByVolume
-            ) ?? 0
+            ) ?? 0)
           : 0)
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense

@@ -42,7 +42,7 @@ export function PriorThermocyclerState(props: {
         )}
         value={
           // todo(mm, 2025-09-22): Is it right to say the lid is closed by default?
-          lidOpen ?? false
+          (lidOpen ?? false)
             ? t(
                 'protocol_steps:thermocycler_module.prior_state.lid_position_value_open'
               )

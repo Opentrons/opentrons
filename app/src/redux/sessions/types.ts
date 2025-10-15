@@ -156,7 +156,8 @@ export type MultiSessionResponse = RobotApiV2ResponseBody<
   SessionResponseModel[]
 >
 
-export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
+export type SessionCommandResponse =
+  RobotApiV2ResponseBody<SessionCommandResponseModel>
 
 export interface CreateSessionAction {
   type: typeof CREATE_SESSION

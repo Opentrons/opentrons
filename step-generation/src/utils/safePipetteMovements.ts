@@ -84,11 +84,8 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   wellTargetPoint: Point,
   primaryNozzle: string
 ): Point[] => {
-  const {
-    nozzleMap,
-    nozzleOffset,
-    pipetteBoundingBoxOffsets,
-  } = pipetteEntity.spec
+  const { nozzleMap, nozzleOffset, pipetteBoundingBoxOffsets } =
+    pipetteEntity.spec
   const primaryNozzlePoint =
     nozzleMap == null || primaryNozzle == null
       ? nozzleOffset
@@ -325,7 +322,7 @@ export const getIsSafePipetteMovement = (args: {
   )
   const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
   // account for tip length if picking up tip
-  const tipLength = pipetteHasTip ? tiprackTipLength ?? 0 : 0
+  const tipLength = pipetteHasTip ? (tiprackTipLength ?? 0) : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
   const addressableAreaOffset = getPositionFromSlotId(
     labwareSlot,
@@ -356,12 +353,13 @@ export const getIsSafePipetteMovement = (args: {
   if (!isWithinPipetteExtents) {
     return false
   } else {
-    const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
-      pipetteEntity,
-      tipLength,
-      wellTargetPoint,
-      primaryNozzle
-    )
+    const pipetteBoundsAtWellLocation =
+      getPipetteBoundsAtSpecifiedMoveToPosition(
+        pipetteEntity,
+        tipLength,
+        wellTargetPoint,
+        primaryNozzle
+      )
     const surroundingSlots = getFlexSurroundingSlots(
       labwareSlot,
       stagingAreaSlots

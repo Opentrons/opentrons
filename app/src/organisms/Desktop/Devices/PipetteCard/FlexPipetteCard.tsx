@@ -68,10 +68,8 @@ export function FlexPipetteCard({
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   const host = useHost() as HostConfig
 
-  const [
-    showAboutPipetteSlideout,
-    setShowAboutPipetteSlideout,
-  ] = useState<boolean>(false)
+  const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =
+    useState<boolean>(false)
   const [showChoosePipette, setShowChoosePipette] = useState(false)
   const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
     SINGLE_MOUNT_PIPETTES

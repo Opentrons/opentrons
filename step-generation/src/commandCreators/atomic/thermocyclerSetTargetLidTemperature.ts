@@ -3,11 +3,9 @@ import { uuid } from '../../utils'
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export const thermocyclerSetTargetLidTemperature: CommandCreator<TemperatureParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const thermocyclerSetTargetLidTemperature: CommandCreator<
+  TemperatureParams
+> = (args, invariantContext, prevRobotState) => {
   const { moduleId, celsius } = args
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   return {

@@ -44,8 +44,8 @@ export function CommandItem({
         index === currentCommandIndex
           ? COLORS.blue35
           : index < currentCommandIndex
-          ? '#00002222'
-          : COLORS.white
+            ? '#00002222'
+            : COLORS.white
       }
       border={
         index === currentCommandIndex

@@ -49,7 +49,8 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as LabwareDefinition
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const {
     closestBeneathModuleModel,
     closestBeneathModuleId,

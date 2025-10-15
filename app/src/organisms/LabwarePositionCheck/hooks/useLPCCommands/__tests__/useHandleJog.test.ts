@@ -50,7 +50,7 @@ describe('useHandleJog', () => {
         ({
           commandType: 'moveRelative',
           params: { pipetteId, axis, dir, step },
-        } as any)
+        }) as any
     )
     vi.mocked(moveToWellCommands).mockImplementation(
       (offsetLocationDetails, pipetteId, offset) => [

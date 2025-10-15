@@ -29,7 +29,22 @@ vi.mock('/app/organisms/ModuleCard/utils')
 vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
+  initReactI18next: vi.fn(),
 }))
+vi.mock('i18next', () => {
+  return {
+    default: {
+      use: () => ({ init: vi.fn() }),
+      createInstance: () => ({
+        use: () => ({ init: vi.fn() }),
+        init: vi.fn(),
+        t: (k: string) => k,
+      }),
+      init: vi.fn(),
+      t: (k: string) => k,
+    },
+  }
+})
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
@@ -66,12 +81,12 @@ describe('Touchscreen AddFixtureModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
-    vi.mocked(useModulesQuery).mockReturnValue(({
+    } as unknown as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
-    } as unknown) as UseQueryResult<Modules>)
+    } as unknown as UseQueryResult<Modules>)
     vi.mocked(useSendIdentifyStacker).mockReturnValue(sendIdentifyStacker)
   })
 
@@ -119,9 +134,9 @@ describe('Desktop AddFixtureModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
@@ -144,9 +159,9 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should not render trash bin text and buttons slot D3 with a stacker in the slot', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     props = { ...props, existingCutoutFixtureId: FLEX_STACKER_V1_FIXTURE }
     render(props)
     screen.getByText('add_to')

@@ -40,6 +40,7 @@ from opentrons.protocol_runner.protocol_runner import (
     LiveRunner,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 
 @pytest.fixture
@@ -85,6 +86,12 @@ def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
+def mock_camera_provider(decoy: Decoy) -> CameraProvider:
+    """Get a mocked out Camera Provider dependency."""
+    return decoy.mock(cls=CameraProvider)
+
+
+@pytest.fixture
 def json_protocol_subject(
     mock_protocol_engine: ProtocolEngine,
     mock_hardware_api: HardwareAPI,
@@ -92,6 +99,7 @@ def json_protocol_subject(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
     mock_protocol_live_runner: LiveRunner,
+    mock_camera_provider: CameraProvider,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a json runner."""
     return RunOrchestrator(
@@ -101,6 +109,7 @@ def json_protocol_subject(
         setup_runner=mock_setup_runner,
         json_or_python_protocol_runner=mock_protocol_json_runner,
         protocol_live_runner=mock_protocol_live_runner,
+        camera_provider=mock_camera_provider,
     )
 
 
@@ -112,6 +121,7 @@ def python_protocol_subject(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
     mock_protocol_live_runner: LiveRunner,
+    mock_camera_provider: CameraProvider,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a python runner."""
     return RunOrchestrator(
@@ -121,6 +131,7 @@ def python_protocol_subject(
         setup_runner=mock_setup_runner,
         json_or_python_protocol_runner=mock_protocol_python_runner,
         protocol_live_runner=mock_protocol_live_runner,
+        camera_provider=mock_camera_provider,
     )
 
 
@@ -131,6 +142,7 @@ def live_protocol_subject(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
     mock_protocol_live_runner: LiveRunner,
+    mock_camera_provider: CameraProvider,
 ) -> RunOrchestrator:
     """Get a RunOrchestrator subject with a live runner."""
     return RunOrchestrator(
@@ -139,6 +151,7 @@ def live_protocol_subject(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         protocol_live_runner=mock_protocol_live_runner,
+        camera_provider=mock_camera_provider,
     )
 
 
@@ -167,6 +180,7 @@ def test_build_run_orchestrator_provider(
     mock_setup_runner: LiveRunner,
     mock_fixit_runner: LiveRunner,
     mock_protocol_runner: Union[PythonAndLegacyRunner, JsonRunner],
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """Should get a RunOrchestrator instance."""
     mock_create_runner_func = decoy.mock(func=protocol_runner.create_protocol_runner)
@@ -186,6 +200,7 @@ def test_build_run_orchestrator_provider(
 
     result = subject.build_orchestrator(
         protocol_engine=mock_protocol_engine,
+        camera_provider=mock_camera_provider,
         hardware_api=mock_hardware_api,
         protocol_config=input_protocol_config,
     )
@@ -414,6 +429,7 @@ def test_get_run_id(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
     mock_protocol_live_runner: LiveRunner,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """Should get run_id if builder was created with a run id."""
     orchestrator = RunOrchestrator(
@@ -423,6 +439,7 @@ def test_get_run_id(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         protocol_live_runner=mock_protocol_live_runner,
+        camera_provider=mock_camera_provider,
     )
     assert orchestrator.run_id == "test-123"
 
@@ -433,6 +450,7 @@ def test_get_run_id_raises(
     mock_fixit_runner: LiveRunner,
     mock_setup_runner: LiveRunner,
     mock_protocol_live_runner: LiveRunner,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """Should get run_id if builder was created with a run id."""
     orchestrator = RunOrchestrator(
@@ -441,6 +459,7 @@ def test_get_run_id_raises(
         fixit_runner=mock_fixit_runner,
         setup_runner=mock_setup_runner,
         protocol_live_runner=mock_protocol_live_runner,
+        camera_provider=mock_camera_provider,
     )
     with pytest.raises(RunNotFound):
         orchestrator.run_id

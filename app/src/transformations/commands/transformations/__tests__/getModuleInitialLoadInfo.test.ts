@@ -9,7 +9,8 @@ import type {
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
+const protocolWithMagTempTC =
+  transfer_settings as unknown as CompletedProtocolAnalysis
 
 describe('getModuleInitialLoadInfo', () => {
   it('should gather protocol module info for tc if id in params', () => {

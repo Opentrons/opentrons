@@ -20,9 +20,7 @@ export const useRequiredProtocolLabware = (
   protocolId: string
 ): RequiredLabwareDetails[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }

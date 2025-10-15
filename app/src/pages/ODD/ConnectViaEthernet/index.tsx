@@ -26,10 +26,8 @@ export function ConnectViaEthernet(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
-  const [
-    showNetworkDetailsModal,
-    setShowNetworkDetailsModal,
-  ] = useState<boolean>(false)
+  const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
+    useState<boolean>(false)
 
   const { ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)

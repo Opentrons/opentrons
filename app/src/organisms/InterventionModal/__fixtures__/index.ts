@@ -140,7 +140,7 @@ export const mockLabwareOffDeck: LoadedLabware = {
   location: 'offDeck',
 }
 
-export const mockLabwareDefinition = ({
+export const mockLabwareDefinition = {
   schemaVersion: 2,
   version: 1,
   namespace: 'opentrons',
@@ -167,7 +167,7 @@ export const mockLabwareDefinition = ({
     zDimension: 15.7,
     xDimension: 127.76,
   },
-} as unknown) as LabwareDefinition
+} as unknown as LabwareDefinition
 
 export const mockLabwareDefinitionsByUri = {
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockLabwareDefinition,

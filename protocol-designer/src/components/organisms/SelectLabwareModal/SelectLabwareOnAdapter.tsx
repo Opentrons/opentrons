@@ -61,11 +61,8 @@ export function SelectLabwareOnAdapter(
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedAdapterDefURI,
-    selectedTopLabware,
-    selectedLidLabware,
-  } = zoomedInSlotInfo
+  const { selectedAdapterDefURI, selectedTopLabware, selectedLidLabware } =
+    zoomedInSlotInfo
 
   const handleSelectLabware = (
     nestedDefUri: string,
@@ -150,8 +147,8 @@ export function SelectLabwareOnAdapter(
                       inputTitle: t('labware_quantity'),
                       errorMessage: t('unsupported_range'),
                       checkboxCaption: t('with_lid', {
-                        name:
-                          defs[stackingLabwareDefUris[0]].metadata.displayName,
+                        name: defs[stackingLabwareDefUris[0]].metadata
+                          .displayName,
                       }),
                       checked: selectedLidLabware != null,
                       onCheckboxChange: () => {

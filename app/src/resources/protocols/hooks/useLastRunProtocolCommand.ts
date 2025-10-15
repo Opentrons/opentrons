@@ -30,6 +30,6 @@ export function useLastRunProtocolCommand(
   )
 
   return !isProtocolIntent && lastRunCommand != null
-    ? lastRunCommandActual.data?.data ?? null
-    : lastRunCommand ?? null
+    ? (lastRunCommandActual.data?.data ?? null)
+    : (lastRunCommand ?? null)
 }

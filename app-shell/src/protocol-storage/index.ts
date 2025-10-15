@@ -124,23 +124,25 @@ export const fetchProtocols = (
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
       const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
-        const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
-          string | null
-        >((acc, analysisFilePath) => {
-          if (acc !== null) {
-            if (
-              getUnixTimeFromAnalysisPath(analysisFilePath) >
-              getUnixTimeFromAnalysisPath(acc)
-            ) {
+        const mostRecentAnalysisFilePath =
+          storedProtocolDir.analysisFilePaths.reduce<string | null>(
+            (acc, analysisFilePath) => {
+              if (acc !== null) {
+                if (
+                  getUnixTimeFromAnalysisPath(analysisFilePath) >
+                  getUnixTimeFromAnalysisPath(acc)
+                ) {
+                  return analysisFilePath
+                }
+                return acc
+              }
               return analysisFilePath
-            }
-            return acc
-          }
-          return analysisFilePath
-        }, null)
+            },
+            null
+          )
         const mostRecentAnalysis =
           mostRecentAnalysisFilePath != null
-            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
+            ? (getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null)
             : null
 
         return {

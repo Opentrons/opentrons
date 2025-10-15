@@ -29,12 +29,8 @@ interface LPCDisabledReasonProps {
 export function useLPCDisabledReason(
   props: LPCDisabledReasonProps
 ): string | null {
-  const {
-    runId,
-    robotName,
-    hasMissingModulesForFlex,
-    hasMissingCalForFlex,
-  } = props
+  const { runId, robotName, hasMissingModulesForFlex, hasMissingCalForFlex } =
+    props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
   const { complete } = useRunCalibrationStatus(robotName ?? '', runId)

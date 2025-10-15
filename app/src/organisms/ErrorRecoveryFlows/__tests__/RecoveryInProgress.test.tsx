@@ -295,15 +295,10 @@ describe('useReleaseLabware', () => {
         })
         await vi.runAllTimersAsync()
 
-        const {
-          releaseGripperJaws,
-          releaseLabwareLatch,
-          homeExceptPlungers,
-        } = props.recoveryCommands
-        const {
-          handleMotionRouting,
-          proceedToRouteAndStep,
-        } = props.routeUpdateActions
+        const { releaseGripperJaws, releaseLabwareLatch, homeExceptPlungers } =
+          props.recoveryCommands
+        const { handleMotionRouting, proceedToRouteAndStep } =
+          props.routeUpdateActions
 
         switch (recoveryOption) {
           case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE:
@@ -348,14 +343,10 @@ describe('useReleaseLabware', () => {
             doorStatusUtils: { isDoorOpen: true },
           }
 
-          const {
-            releaseGripperJaws,
-            homeExceptPlungers,
-          } = props.recoveryCommands
-          const {
-            handleMotionRouting,
-            proceedToRouteAndStep,
-          } = props.routeUpdateActions
+          const { releaseGripperJaws, homeExceptPlungers } =
+            props.recoveryCommands
+          const { handleMotionRouting, proceedToRouteAndStep } =
+            props.routeUpdateActions
 
           renderHook(() => useReleaseLabware(props))
 

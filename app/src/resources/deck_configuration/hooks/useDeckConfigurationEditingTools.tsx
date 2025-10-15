@@ -46,15 +46,11 @@ export function useDeckConfigurationEditingTools(
     }).data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
-  const [
-    addressableAreaId,
-    setAddressableAreaId,
-  ] = useState<AddressableAreaNamesWithFakes | null>(null)
+  const [addressableAreaId, setAddressableAreaId] =
+    useState<AddressableAreaNamesWithFakes | null>(null)
 
-  const [
-    existingCutoutFixtureId,
-    setExistingCutoutFixtureId,
-  ] = useState<CutoutFixtureId | null>(null)
+  const [existingCutoutFixtureId, setExistingCutoutFixtureId] =
+    useState<CutoutFixtureId | null>(null)
 
   const addFixtureToCutout = (
     cutoutId: CutoutId,

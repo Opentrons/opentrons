@@ -7,6 +7,7 @@ import {
   RobotCoordsForeignDiv,
   SingleSlotFixture,
   StyledText,
+  useCommandTypeSummaries,
 } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
@@ -82,6 +83,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
   } = props
   const { labware, modules, pipettes } = robotState
   const { labwareEntities, moduleEntities, trashBinEntities } = invariantContext
+  const commandSummary = useCommandTypeSummaries(
+    selectedRunTimeCommand?.commandType
+  )
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
     moduleEntities,
@@ -107,11 +111,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           selectedRunTimeCommand != null &&
           'moduleId' in selectedRunTimeCommand.params &&
           selectedRunTimeCommand.params.moduleId === id
-
-        const isTiprack =
-          labwareEntities[labwareLoadedOnModuleId]?.def.parameters.isTiprack
-        const { copy, isActiveLayerVisible } = getActiveLayer(
-          isTiprack,
+        const { isActiveLayerVisible } = getActiveLayer(
           Object.values(pipettes),
           labwareLoadedOnModuleId,
           selectedRunTimeCommand
@@ -148,11 +148,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const tempInnerProps = getModuleInnerProps(moduleState)
         const isActive = selectedSlot === slot || hoveredSlot === slot
-
         const innerTCProps = {
           ...tempInnerProps,
           lidMotorState:
-            (tempInnerProps as ThermocyclerVizProps).lidMotorState !== 'open'
+            (tempInnerProps as ThermocyclerVizProps)?.lidMotorState !== 'open'
               ? 'closed'
               : 'open',
         }
@@ -184,11 +183,11 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     color={COLORS.white}
                   >
                     {isActiveLayerVisible
-                      ? copy
-                      : labwareEntitiesExtended[labwareLoadedOnModuleId]
+                      ? commandSummary
+                      : (labwareEntitiesExtended[labwareLoadedOnModuleId]
                           .nickName ??
                         labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                          .metadata.displayName}
+                          .metadata.displayName)}
                   </StyledText>
                 </div>
               </RobotCoordsForeignDiv>
@@ -340,9 +339,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
 
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
@@ -401,17 +399,17 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(
             `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
           )
           return null
         }
-        const isTiprack = labwareEntities[id].def.parameters.isTiprack
-        const { copy, isActiveLayerVisible } = getActiveLayer(
-          isTiprack,
+        const { isActiveLayerVisible } = getActiveLayer(
           Object.values(pipettes),
           id,
           selectedRunTimeCommand
@@ -492,10 +490,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                       desktopStyle="captionSemiBold"
                       color={COLORS.white}
                     >
-                      {/* TODO: for user-testing purposes, only some copy is filled out but
-                  if we decide to keep this concept, we should consider adding each command copy to
-                  the command result or something */}
-                      {copy}
+                      {commandSummary}
                     </StyledText>
                   </DeckViewOverlay>
                 ) : null}
@@ -537,9 +532,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        const isTiprack = labwareEntities[id].def.parameters.isTiprack
-        const { copy, isActiveLayerVisible } = getActiveLayer(
-          isTiprack,
+        const { isActiveLayerVisible } = getActiveLayer(
           Object.values(pipettes),
           id,
           selectedRunTimeCommand
@@ -620,10 +613,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                       desktopStyle="captionRegular"
                       color={COLORS.white}
                     >
-                      {/* TODO: for user-testing purposes, only some copy is filled out but
-                  if we decide to keep this concept, we should consider adding each command copy to
-                  the command result or something */}
-                      {copy}
+                      {commandSummary}
                     </StyledText>
                   </DeckViewOverlay>
                 ) : null}

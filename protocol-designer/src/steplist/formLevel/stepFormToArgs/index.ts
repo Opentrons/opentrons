@@ -16,26 +16,19 @@ import type {
   CommandCreatorArgs,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type {
-  HydratedAbsorbanceReaderFormData,
-  HydratedCommentFormData,
-  HydratedFormData,
-  HydratedHeaterShakerFormData,
-  HydratedMagnetFormData,
-  HydratedMixFormData,
-  HydratedMoveLabwareFormData,
-  HydratedMoveLiquidFormData,
-  HydratedPauseFormData,
-  HydratedTemperatureFormData,
-  HydratedThermocyclerFormData,
-} from '../../../form-types'
+import type { HydratedFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../../steplist/fieldLevel'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 type StepArgs = CommandCreatorArgs | null
-export const _castForm = (hydratedForm: HydratedFormData): any =>
-  mapValues(hydratedForm, (value, name) => castField(name, value))
+export function _castForm<HydratedFormDataT extends HydratedFormData>(
+  hydratedForm: HydratedFormDataT
+): GetCastFormData<HydratedFormDataT> {
+  // @ts-expect-error - todo(mm, 2025-10-09) See if TypeScript can be made to understand this.
+  return mapValues(hydratedForm, (value, name) => castField(name, value))
+}
 
 export const stepFormToArgs = (
   hydratedForm: HydratedFormData,
@@ -43,56 +36,47 @@ export const stepFormToArgs = (
 ): StepArgs => {
   const castForm = _castForm(hydratedForm)
   let stepArgs: StepArgs = null
-  switch (castForm.stepType) {
+  switch (hydratedForm.stepType) {
     case 'moveLiquid': {
-      stepArgs = moveLiquidFormToArgs(
-        castForm as HydratedMoveLiquidFormData,
-        contextualState
-      )
+      stepArgs = moveLiquidFormToArgs(_castForm(hydratedForm), contextualState)
       break
     }
     case 'pause': {
-      stepArgs = pauseFormToArgs(castForm as HydratedPauseFormData)
+      stepArgs = pauseFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'mix': {
-      stepArgs = mixFormToArgs(castForm as HydratedMixFormData)
+      stepArgs = mixFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'magnet': {
-      stepArgs = magnetFormToArgs(castForm as HydratedMagnetFormData)
+      stepArgs = magnetFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'temperature': {
-      stepArgs = temperatureFormToArgs(castForm as HydratedTemperatureFormData)
+      stepArgs = temperatureFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'thermocycler': {
-      stepArgs = thermocyclerFormToArgs(
-        castForm as HydratedThermocyclerFormData
-      )
+      stepArgs = thermocyclerFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'heaterShaker': {
-      stepArgs = heaterShakerFormToArgs(
-        castForm as HydratedHeaterShakerFormData
-      )
+      stepArgs = heaterShakerFormToArgs(_castForm(hydratedForm))
       break
     }
     case 'moveLabware': {
-      stepArgs = moveLabwareFormToArgs(castForm as HydratedMoveLabwareFormData)
+      stepArgs = moveLabwareFormToArgs(_castForm(hydratedForm))
 
       break
     }
     case 'comment': {
-      stepArgs = commentFormToArgs(castForm as HydratedCommentFormData)
+      stepArgs = commentFormToArgs(_castForm(hydratedForm))
 
       break
     }
     case 'absorbanceReader': {
-      stepArgs = absorbanceReaderFormToArgs(
-        castForm as HydratedAbsorbanceReaderFormData
-      )
+      stepArgs = absorbanceReaderFormToArgs(_castForm(hydratedForm))
       break
     }
   }
