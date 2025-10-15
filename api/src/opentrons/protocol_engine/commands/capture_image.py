@@ -18,7 +18,11 @@ from opentrons.system.camera import (
 )
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ..errors import StorageLimitReachedError, CameraCaptureError
+from ..errors import (
+    StorageLimitReachedError,
+    CameraDisabledError,
+    CameraSettingsInvalidError,
+)
 from ..errors.error_occurrence import ErrorOccurrence
 
 from ..resources.file_provider import (
@@ -92,13 +96,13 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
     def _error_response(
         category: str, provided_value: float, range_min: float, range_max: float
     ) -> None:
-        raise CameraCaptureError(
+        raise CameraSettingsInvalidError(
             message=f"Provided {category} of {provided_value} is invalid, must be valued through {range_min} and {range_max}"
         )
 
     image_parameters = ImageParameters()
     if params.zoom is not None and (params.zoom < ZOOM_MIN or params.zoom > ZOOM_MAX):
-        _error_response("Zoom", params.zoom, ZOOM_MIN, ZOOM_MAX)
+        _error_response("zoom", params.zoom, ZOOM_MIN, ZOOM_MAX)
     image_parameters.zoom = params.zoom
 
     if params.brightness is not None:
@@ -106,7 +110,7 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
         if scaled_brightness is not None and (
             scaled_brightness < BRIGHTNESS_MIN or scaled_brightness > BRIGHTNESS_MAX
         ):
-            _error_response("Brightness", params.brightness, 0, 100)
+            _error_response("brightness", params.brightness, 0, 100)
         image_parameters.brightness = scaled_brightness
     else:
         image_parameters.brightness = None
@@ -116,7 +120,7 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
         if scaled_contrast is not None and (
             scaled_contrast < CONTRAST_MIN or scaled_contrast > CONTRAST_MAX
         ):
-            _error_response("Contrast", params.contrast, 0, 100)
+            _error_response("contrast", params.contrast, 0, 100)
         image_parameters.contrast = scaled_contrast
     else:
         image_parameters.contrast = None
@@ -126,7 +130,7 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
         if scaled_saturation is not None and (
             scaled_saturation < SATURATION_MIN or scaled_saturation > SATURATION_MAX
         ):
-            _error_response("Saturation", params.saturation, 0, 100)
+            _error_response("saturation", params.saturation, 0, 100)
         image_parameters.saturation = scaled_saturation
     else:
         image_parameters.saturation = None
@@ -166,10 +170,12 @@ class CaptureImageImpl(
                     message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
                 )
 
-        # Handle capturing an image with the CameraUtility
+        # Handle capturing an image with the CameraProvider
         camera_settings = await self._camera_provider.get_camera_settings()
         if camera_settings.camera_enabled is False:
-            raise CameraCaptureError("Cannot capture image because Camera is disabled.")
+            raise CameraDisabledError(
+                "Cannot capture image because Camera is disabled."
+            )
 
         parameters = _converted_image_params(params=params)
         camera_data = await self._camera_provider.capture_image(parameters)

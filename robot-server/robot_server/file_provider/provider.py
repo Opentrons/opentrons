@@ -94,7 +94,7 @@ class FileProviderExecutor:
                 base_name
             elif base_name.endswith(".jpeg"):
                 base_name = base_name[:-5]
-            return base_name +".jpg"
+            return base_name + ".jpg"
         else:
             return f"{file_id}.dat"
 

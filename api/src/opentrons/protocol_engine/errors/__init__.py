@@ -93,6 +93,8 @@ from .exceptions import (
     InvalidLabwarePositionError,
     InvalidModuleOrientation,
     CameraCaptureError,
+    CameraDisabledError,
+    CameraSettingsInvalidError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -194,4 +196,6 @@ __all__ = [
     "LiquidClassDoesNotExistError",
     "LiquidClassRedefinitionError",
     "CameraCaptureError",
+    "CameraDisabledError",
+    "CameraSettingsInvalidError",
 ]

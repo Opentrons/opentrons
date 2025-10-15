@@ -7,6 +7,15 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class CameraError(BaseModel):
+    """Generic base class for Camera errors that occur on entities handled through the Camera Provider."""
+
+    message: str = Field(..., description="Description of error content.")
+    code: str | None = Field(
+        ..., description="Return code, if any, that was paired with the error."
+    )
+
+
 class CameraSettings(BaseModel):
     """Camera API settings for general enablement and use."""
 
@@ -54,7 +63,7 @@ class CameraProvider:
         self,
         camera_settings_callback: Optional[Callable[[], CameraSettings]] = None,
         image_capture_callback: Optional[
-            Callable[[ImageParameters], Awaitable[bytes | None]]
+            Callable[[ImageParameters], Awaitable[bytes | CameraError]]
         ] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
@@ -82,13 +91,14 @@ class CameraProvider:
         Conditionally returns None if an image capture callback does not exist (simulation).
         """
         if self._image_capture_callback is not None:
-            log.info("TAKING PICTURE")
             capture_result = await self._image_capture_callback(parameters)
-            if capture_result is not None:
+            if not isinstance(capture_result, CameraError):
                 return capture_result
             else:
-                raise CameraCaptureError(
-                    message="Camera capture has failed to return an image."
-                )
+                if capture_result.code is not None:
+                    error_str = f"Camera capture has failed to return an image with return code {capture_result.code}: {capture_result.message}"
+                else:
+                    error_str = f"Camera capture has failed to return an image: {capture_result.message}"
+                raise CameraCaptureError(message=error_str)
         # Return None if the image capture callback is unavailable (simulation)
         return None
