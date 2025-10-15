@@ -377,6 +377,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 flow_rate=flow_rate,
                 rate=rate,
+                end_location=end_move_to_location,
             ),
         ):
             self._core.aspirate(
@@ -637,6 +638,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 rate=rate,
                 flow_rate=flow_rate,
+                end_location=end_move_to_location,
             ),
         ):
             self._core.dispense(
