@@ -152,18 +152,17 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Get the register value of the pressure sensor driver."""
         ...
 
-    async def get_pressure_sensor_reading(self) -> float:
+    async def get_pressure_sensor_reading_psi(self) -> float:
         """Get a reading from the pressure sensor."""
         return 0.0
 
-    async def get_gage_pressure_reading(self) -> float:
-        """Read each pressure sensor and return the difference."""
+    async def get_gage_pressure_reading_mbar(self) -> float:
+        """Read each pressure sensor and return the pressure difference."""
         return 0.0
 
-    # TODO: update the pressure arg with the units when we find out which unit
     async def set_vacuum_chamber_pressure(
         self,
-        guage_pressure_mbar: float,
+        gage_pressure_mbar: float,
         duration: Optional[float],
         rate: Optional[float],
     ) -> None:
