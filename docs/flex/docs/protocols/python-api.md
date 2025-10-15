@@ -21,7 +21,7 @@ Python protocols generally follow the same basic structure:
 
     - Locations of [modules](https://docs.opentrons.com/v2/new_modules.html), [labware](https://docs.opentrons.com/v2/new_labware.html), and [deck fixtures](https://docs.opentrons.com/v2/deck_slots.html#deck-configuration).
 
-    - [Liquid](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-labware) types and locations (optional).
+    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells) (optional).
 
     - Commands the system will physically execute (e.g., [simple](https://docs.opentrons.com/v2/new_atomic_commands.html) or [complex](https://docs.opentrons.com/v2/new_complex_commands.html) liquid
       handling commands, [module](https://docs.opentrons.com/v2/new_modules.html) commands, or [movement](https://docs.opentrons.com/v2/robot_position.html) commands).
@@ -84,6 +84,10 @@ Runtime parameters can customize Boolean, numerical, and string values in your p
 Starting in API version 2.22, you can move individual robot motors like the gantry, pipette plunger, and gripper jaws with [robot motor control commands](https://docs.opentrons.com/v2/advanced_control/motor_control.html#motor-control). Use helper and movement commands to calculate and move robot axes to precise positions on the Flex deck, and gripper commands to open or close the Flex Gripper jaws. 
 
 Unlike other protocol commands, robot motor control commands execute movements independent of labware and hardware positions on the Flex. This lets you complete advanced tasks, like using 3D-printed labware in your protocols, moving the Flex's z-axis carriage without a pipette attached, or simultaneously pipetting and holding labware with the Flex Gripper. 
+
+###  Liquid level detection 
+
+Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
 
 ### Non-blocking commands
 
