@@ -25,8 +25,7 @@ from .persistence_directory import (
     prepare_active_subdirectory,
     prepare_root,
 )
-from .images_directory import prepare_images_directory
-
+from .images_directory import prepare_images_directory, ImagesResetter
 
 _log = logging.getLogger(__name__)
 
@@ -312,7 +311,7 @@ async def initialize_images_directory(
         raise
 
 
-async def get_images_directory(
+async def _get_images_directory(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the path to the server's images directory."""
@@ -321,3 +320,10 @@ async def get_images_directory(
         images_directory is not None
     ), "Forgot to initialize images directory as part of server startup?"
     return images_directory
+
+
+async def get_images_resetter(
+    directory_to_reset: Annotated[Path, Depends(_get_images_directory)],
+) -> ImagesResetter:
+    """Get an `ImagesResetter` to reset the robot-server's stored data."""
+    return ImagesResetter(directory_to_reset)
