@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { value useEffect, value useRef, value useState } from 'react'
+import { value useSelector } from 'react-redux'
 
-import { DeckLabelSet } from '@opentrons/components'
+import { value DeckLabelSet } from '@opentrons/components'
 
-import { selectors } from '../../labware-ingred/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { getSelectedTerminalItemId } from '../../ui/steps'
+import { value selectors } from '../../labware-ingred/selectors'
+import { value START_TERMINAL_ITEM_ID } from '../../steplist'
+import { value getSelectedTerminalItemId } from '../../ui/steps'
 
-import type { DeckLabelProps } from '@opentrons/components'
+import type { value DeckLabelProps } from '@opentrons/components'
 import type {
-  CoordinateTuple,
-  LabwareDefinition2,
+  value CoordinateTuple,
+  value LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 //  NOTE: the deck riser needs special values because the
@@ -29,7 +29,6 @@ interface LabwareLabelProps {
   showModuleIcon: boolean
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
-  showBorder?: boolean
 }
 export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
   const {
@@ -40,7 +39,6 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
     showModuleIcon,
     nestedLabwareInfo = [],
     labelText = labwareDef.metadata.displayName,
-    showBorder = true
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -86,7 +84,6 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
         (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_Z_DIMENSION : 0)
       }
       showModuleIcon={showModuleIcon}
-      showBorder={showBorder}
     />
   )
 }
