@@ -8,12 +8,12 @@ import { PipetteContainer } from '../PipetteContainer'
 import { SourceLabwareContainer } from '../SourceLabwareContainer'
 import { SourceWellViewContainer } from '../SourceWellViewContainer'
 import { StepDetailContainer } from '../StepDetailContainer'
-import { DestinationTipsContainer } from '../TipDisposalContainer'
+import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
 vi.mock('../PipetteContainer')
 vi.mock('../DestinationLabwareContainer')
-vi.mock('../DestinationTipsContainer')
+vi.mock('../TipDisposalContainer')
 vi.mock('../SourceLabwareContainer')
 vi.mock('../SourceWellViewContainer')
 vi.mock('../TipPickupContainer')
@@ -32,8 +32,8 @@ describe('StepDetailContainer', () => {
     vi.mocked(DestinationLabwareContainer).mockReturnValue(
       <div>mock Destination Labware Container</div>
     )
-    vi.mocked(DestinationTipsContainer).mockReturnValue(
-      <div>mock Destination Tips Container</div>
+    vi.mocked(TipDisposalContainer).mockReturnValue(
+      <div>mock Tip Disposal Container</div>
     )
     vi.mocked(SourceLabwareContainer).mockReturnValue(
       <div>mock Source Labware Container</div>
@@ -54,7 +54,7 @@ describe('StepDetailContainer', () => {
     render()
     screen.getByText('mock Pipette Container')
     screen.getByText('mock Destination Labware Container')
-    screen.getByText('mock Destination Tips Container')
+    screen.getByText('mock Tip Disposal Container')
     screen.getByText('mock Source Labware Container')
     screen.getByText('mock Source Well View Container')
     screen.getByText('mock Tip Pickup Container')

@@ -4,7 +4,12 @@ import { RobotInfoLabel, Tag } from '@opentrons/components'
 
 import styles from './sourcewellviewcontainer.module.css'
 
-export function SourceWellViewContainer(): JSX.Element {
+interface SourceWellViewContainerProps {
+  protocolKey: string // the interface will be updated soon
+}
+export function SourceWellViewContainer({
+  protocolKey,
+}: SourceWellViewContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   return (
     <div className={styles.container}>

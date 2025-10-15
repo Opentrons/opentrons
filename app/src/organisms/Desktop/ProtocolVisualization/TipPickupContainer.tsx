@@ -8,7 +8,7 @@ import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import styles from './tippickupcontainer.module.css'
 
 interface TipPickupContainerProps {
-  protocolKey: string
+  protocolKey: string // the interface  will be updated soon
 }
 
 export function TipPickupContainer({

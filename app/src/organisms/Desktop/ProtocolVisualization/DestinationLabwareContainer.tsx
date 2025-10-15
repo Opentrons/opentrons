@@ -4,7 +4,12 @@ import { RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 
 import styles from './destinationlabwarecontainer.module.css'
 
-export function DestinationLabwareContainer(): JSX.Element {
+interface DestinationLabwareContainerProps {
+  protocolKey: string // the interface will be updated soon
+}
+export function DestinationLabwareContainer({
+  protocolKey,
+}: DestinationLabwareContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   return (
     <div className={styles.container}>
