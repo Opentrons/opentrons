@@ -1202,7 +1202,7 @@ export const labwareInvariantProperties: Reducer<
           const latestLabwareId =
             latestDefURI != null
               ? `${labwareIdString}:${latestDefURI}`
-              : labwareDefURI
+              :`${labwareIdString}:${labwareDefURI}`
 
           acc[latestLabwareId] = {
             labwareDefURI: latestDefURI ?? labwareDefURI,
