@@ -21,6 +21,20 @@ jobs:
     if: github.event_name == 'push'
     name: "Start a Flex build for a branch/tag push"
     steps:
+      - name: 'Determine ot3-firmware ref'
+        id: firmware-ref
+        shell: bash
+        run: |
+          # Get the latest internal@ tag from ot3-firmware repository
+          latest_internal_tag=$(git ls-remote --tags https://github.com/Opentrons/ot3-firmware.git | grep 'refs/tags/internal@' | sort -V | tail -1 | sed 's/.*refs\/tags\///')
+        
+          if [[ -n "$latest_internal_tag" ]]; then
+            echo "firmware_ref=$latest_internal_tag" >> $GITHUB_OUTPUT
+            echo "Using latest ot3-firmware tag: $latest_internal_tag"
+          else
+            echo "firmware_ref=-" >> $GITHUB_OUTPUT
+            echo "No internal@ tags found, defaulting to main"
+          fi
       - name: 'start build'
         uses: octokit/request-action@v2.x
         env:
