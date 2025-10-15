@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from typing import Optional, List, Dict
-from unittest.mock import sentinel
+from unittest.mock import sentinel, Mock
 
 import pytest
 from decoy import Decoy, matchers
@@ -22,6 +22,7 @@ from opentrons.protocol_engine import (
     LabwareOffset,
     Liquid,
 )
+from opentrons import config
 from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
 from opentrons.protocol_runner import RunResult
 
@@ -55,7 +56,11 @@ from robot_server.runs.run_store import (
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
 from opentrons.protocol_engine.resources import FileProvider
-from robot_server.file_provider.provider import FileProviderExecutor
+from robot_server.file_provider.provider import (
+    FileProviderExecutor,
+    RunFileNameMetadata,
+)
+from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_engine.resources import CameraProvider
 from robot_server.camera.provider import CameraProviderWrapper
 
@@ -230,6 +235,7 @@ def subject(
     mock_camera_setting_store: CameraSettingStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_file_provider_wrapper: FileProviderExecutor,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
@@ -239,6 +245,7 @@ def subject(
         camera_setting_store=mock_camera_setting_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
+        file_provider_executor=mock_file_provider_wrapper,
     )
 
 
@@ -247,6 +254,7 @@ async def test_create(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_file_provider_wrapper: FileProviderExecutor,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -254,10 +262,19 @@ async def test_create(
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
+    protocol_source = ProtocolSource(
+        directory=sentinel.directory,
+        main_file=sentinel.main_file,
+        content_hash=sentinel.content_hash,
+        files=[Mock()],
+        robot_type=sentinel.robot_type,
+        config=sentinel.config,
+        metadata={"protocolName": "test_protocol"},
+    )
     protocol = ProtocolResource(
         protocol_id=sentinel.protocol_id,
         created_at=datetime(year=2022, month=2, day=2),
-        source=None,  # type: ignore[arg-type]
+        source=protocol_source,
         protocol_key=None,
         protocol_kind=ProtocolKind.STANDARD,
     )
@@ -336,6 +353,15 @@ async def test_create(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=[bool_parameter, file_parameter],
         outputFileIds=engine_state_summary.files,
+    )
+    decoy.verify(
+        mock_file_provider_wrapper.set_run_metadata(
+            RunFileNameMetadata.model_construct(
+                robot_name=config.name(),
+                run_created_at=created_at,
+                protocol_name="test_protocol",
+            )
+        )
     )
     decoy.verify(
         mock_run_store.insert_csv_rtp(
@@ -711,6 +737,7 @@ async def test_update_current(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_runs_publisher: RunsPublisher,
+    mock_file_provider_wrapper: FileProviderExecutor,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
@@ -746,6 +773,10 @@ async def test_update_current(
     )
     decoy.verify(
         mock_runs_publisher.publish_runs_advise_refetch(run_id),
+        times=1,
+    )
+    decoy.verify(
+        mock_file_provider_wrapper.clear_run_metadata(),
         times=1,
     )
     assert result == Run(

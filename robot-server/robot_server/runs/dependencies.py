@@ -13,6 +13,8 @@ from robot_server.camera.settings.store import (
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.file_provider.fastapi_dependencies import get_file_provider_executor
+from robot_server.file_provider.provider import FileProviderExecutor
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.robot.types import RobotType
@@ -172,6 +174,9 @@ async def get_run_data_manager(
     camera_setting_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    file_provider_executor: Annotated[
+        FileProviderExecutor, Depends(get_file_provider_executor)
+    ],
 ) -> RunDataManager:
     """Get a singleton run data manager to keep track of current/historical run data."""
     run_data_manager = _run_data_manager_accessor.get_from(app_state)
@@ -184,6 +189,7 @@ async def get_run_data_manager(
             camera_setting_store=camera_setting_store,
             task_runner=task_runner,
             runs_publisher=runs_publisher,
+            file_provider_executor=file_provider_executor,
         )
         _run_data_manager_accessor.set_on(app_state, run_data_manager)
 
