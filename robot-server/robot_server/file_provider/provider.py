@@ -2,8 +2,10 @@
 import os
 import asyncio
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import Depends
+from pydantic import BaseModel
+from datetime import datetime
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
@@ -18,6 +20,14 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
 )
+
+
+class RunFileNameMetadata(BaseModel):
+    """Data from the run used that may be used to build a finalized file name."""
+
+    robot_name: str
+    run_created_at: datetime
+    protocol_name: Optional[str]
 
 
 class FileProviderExecutor:
@@ -36,9 +46,18 @@ class FileProviderExecutor:
         """
         self._data_files_directory = data_files_directory
         self._data_files_store = data_files_store
+        self._run_metadata: RunFileNameMetadata | None = None
 
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
+
+    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
+        """Sets metadata specific to the run."""
+        self._run_metadata = metadata
+
+    def clear_run_metadata(self) -> None:
+        """Clears metadata specific to the run."""
+        self._run_metadata = None
 
     async def write_file_cb(
         self,

@@ -1866,14 +1866,17 @@ async def test_aspirate_while_tracking(
         if is_ready:
             await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
 
+    cp = ot3_hardware.critical_point_for(mount)
+    mount_offset = Point(*ot3_hardware._config.left_mount_offset)
+    end_position = Point(477.2, 493.8, 261.475) + cp + mount_offset
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
-            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+            await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
     elif not is_ready:
         with pytest.raises(RuntimeError):
-            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+            await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
     else:
-        await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+        await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
         # make sure the move planning math stays the same
         expected_target_pos = {
             Axis.X: 477.2,
@@ -1916,14 +1919,18 @@ async def test_dispense_while_tracking(
     if is_ready:
         pipette.set_current_volume(80.0)
 
+    cp = ot3_hardware.critical_point_for(mount)
+    mount_offset = Point(*ot3_hardware._config.left_mount_offset)
+    end_position = Point(477.2, 493.8, 261.475) + cp + mount_offset
+
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
             await ot3_hardware.dispense_while_tracking(
-                mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready
+                mount, end_position, 80.0, push_out=None, is_full_dispense=is_ready
             )
     else:
         await ot3_hardware.dispense_while_tracking(
-            mount, 8.0, 80.0, push_out=None, is_full_dispense=True
+            mount, end_position, 80.0, push_out=None, is_full_dispense=True
         )
         if is_ready:
             # make sure the move planning math stays the same

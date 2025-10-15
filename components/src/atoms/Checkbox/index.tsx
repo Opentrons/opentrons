@@ -111,6 +111,8 @@ interface CheckProps {
 }
 export function Check(props: CheckProps): JSX.Element {
   const { isChecked, color = COLORS.white, disabled = false } = props
+  // todo(mm, 2025-09-30): For accessibility, keyboard usability, etc., can this be
+  // a real <input type="checkbox"> instead of a div?
   return isChecked ? (
     <Flex css={CHECK_STYLE}>
       <Icon name="ot-checkbox" color={color} />
