@@ -20,7 +20,7 @@ vi.mock('../TipPickupContainer')
 
 const render = () => {
   return renderWithProviders(
-    <StepDetailContainer protocolKey="mockProtocolKey" />
+    <StepDetailContainer protocolKey="mockProtocolKey" commands={[]} />
   )
 }
 

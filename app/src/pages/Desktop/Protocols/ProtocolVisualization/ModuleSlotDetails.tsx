@@ -1,4 +1,4 @@
-import { Chip, Divider, StyledText } from '@opentrons/components'
+import { Chip, Divider, StyledText, Tag } from '@opentrons/components'
 import {
   getModuleDisplayName,
   THERMOCYCLER_MODULE_TYPE,

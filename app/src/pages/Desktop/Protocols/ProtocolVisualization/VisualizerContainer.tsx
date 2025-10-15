@@ -218,6 +218,11 @@ export function VisualizerContainer(
     }
   }, [])
 
+  console.log('robotState', robotState)
+  console.log('invariantContext', invariantContext)
+  console.log('commands', commands)
+  console.log('analysis', analysis)
+
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
@@ -295,7 +300,18 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StepDetailContainer protocolKey={protocolKey} />
+        <StepDetailContainer
+          protocolKey={protocolKey}
+          commands={commands}
+          selectedSlot={selectedSlot}
+          robotState={robotState}
+          percentComplete={percentComplete}
+          analysis={analysis}
+          robotType={robotType ?? FLEX_ROBOT_TYPE}
+          allRunDefs={allRunDefs}
+          invariantContext={invariantContext}
+          liquids={liquids}
+        />
       </div>
     </div>
   )
