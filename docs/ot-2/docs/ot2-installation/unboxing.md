@@ -37,7 +37,7 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
     ![remove calibration switch cover](../images/switch-cover.png)
 
 9. Put the trash bin in place.
-    ![trash bin placement](../images/trash-bin.png)
+    ![trash bin placement](../images/installing-trash-bin.png)
 
 10. Use a 3 mm hex screwdriver to remove the red transport bracket screws, and then remove the brackets.
     ![removing transport brackets](../images/transport-brackets.png)
@@ -53,7 +53,7 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 </figure>
 
 13. Install the window covers.
-    ![installing window covers](../images/window-covers.png)
+    ![installing window covers](../images/install-window-covers.png)
 
 ## Post-assembly checklist
 
