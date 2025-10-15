@@ -18,11 +18,11 @@ export function StepDetailContainer({
     <div className={styles.container}>
       <PipetteContainer mount="LEFT MOUNT" pipetteName="Flex 1-Channel 50 µL" />
       <TipPickupContainer protocolKey={protocolKey} />
-      <SourceWellViewContainer />
-      <SourceLabwareContainer />
-      <DestinationWellViewContainer />
-      <DestinationLabwareContainer />
-      <TipDisposalContainer />
+      <SourceWellViewContainer protocolKey={protocolKey} />
+      <SourceLabwareContainer protocolKey={protocolKey} />
+      <DestinationWellViewContainer protocolKey={protocolKey} />
+      <DestinationLabwareContainer protocolKey={protocolKey} />
+      <TipDisposalContainer protocolKey={protocolKey} />
     </div>
   )
 }
