@@ -29,6 +29,7 @@ interface LabwareLabelProps {
   showModuleIcon: boolean
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
+  showBorder?: boolean
 }
 export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
   const {
@@ -39,6 +40,7 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
     showModuleIcon,
     nestedLabwareInfo = [],
     labelText = labwareDef.metadata.displayName,
+    showBorder = true
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -84,6 +86,7 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
         (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_Z_DIMENSION : 0)
       }
       showModuleIcon={showModuleIcon}
+      showBorder={showBorder}
     />
   )
 }
