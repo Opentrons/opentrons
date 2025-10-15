@@ -138,7 +138,7 @@ export const AutoAddPauseUntilTempStepModal = (
         t={t}
         i18nKey={bodyParagraphsKey}
         values={{ temperature: props.displayTemperature }}
-        components={{ p: <P /> }}
+        components={{ p: <BodyParagraph /> }}
       />
     )
 
@@ -185,7 +185,7 @@ export const AutoAddPauseUntilTempStepModal = (
   }
 }
 
-function P({ children }: PropsWithChildren): JSX.Element {
+function BodyParagraph({ children }: PropsWithChildren): JSX.Element {
   return (
     <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
       {children}
