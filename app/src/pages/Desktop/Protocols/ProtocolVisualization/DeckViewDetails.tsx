@@ -393,23 +393,3 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     </>
   )
 }
-
-// const getSlotColorClass = (
-//   hoveredSlot: string | null,
-//   selectedSlot: string | null,
-//   slot: string,
-//   isSlotSelected: boolean
-// ): string => {
-//   if (hoveredSlot === slot && isSlotSelected) {
-//     return styles.hovered_active_slot_box
-//   } else if (hoveredSlot === slot && !isSlotSelected) {
-//     return styles.hovered_inactive_slot_box
-//   } else if (selectedSlot === slot && isSlotSelected) {
-//     return styles.hovered_active_slot_box
-//   } else if (selectedSlot === slot && !isSlotSelected) {
-//     return styles.hovered_inactive_slot_box
-//   } else if (isSlotSelected) {
-//     return styles.active_slot_box
-//   }
-//   return ''
-// }
