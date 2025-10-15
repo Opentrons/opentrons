@@ -292,6 +292,34 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
+        if (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # we're using the old dynamic pipetting
+            if end_location is not None:
+                raise ValueError(
+                    "Dynamic target is depreciated and you cannot use a dynamic target and and end location."
+                )
+            # re-work the dynamic location as a start and end location
+            new_start_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.START,
+            )
+            target = validation.validate_location(
+                location=new_start_location, last_location=last_location
+            )
+            # Target already checked for this above, this is just for lint
+            assert not isinstance(target, validation.DisposalTarget)
+            move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
+                target=target
+            )
+            end_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.END,
+            )
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
@@ -539,6 +567,34 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
+        if (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # we're using the old dynamic pipetting
+            if end_location is not None:
+                raise ValueError(
+                    "Dynamic target is depreciated and you cannot use a dynamic target and and end location."
+                )
+            # re-work the dynamic location as a start and end location
+            new_start_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.START,
+            )
+            target = validation.validate_location(
+                location=new_start_location, last_location=last_location
+            )
+            # Target already checked for this above, this is just for lint
+            assert not isinstance(target, validation.DisposalTarget)
+            move_to_location, well, meniscus_tracking = self._handle_dispense_target(
+                target=target
+            )
+            end_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.END,
+            )
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
