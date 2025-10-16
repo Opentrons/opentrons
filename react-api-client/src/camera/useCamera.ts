@@ -5,12 +5,14 @@ import { getCamera } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
-import type { UseQueryResult } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CameraResponse, HostConfig } from '@opentrons/api-client'
 
-export function useCamera(): UseQueryResult<CameraResponse, AxiosError> {
+export function useCamera(
+  options: UseQueryOptions<CameraResponse> = {}
+): UseQueryResult<CameraResponse> {
   const host = useHost()
-  const query = useQuery<CameraResponse, AxiosError>(
+  const query = useQuery<CameraResponse>(
     [useHost, 'camera'],
     () =>
       getCamera(host as HostConfig)
@@ -18,7 +20,7 @@ export function useCamera(): UseQueryResult<CameraResponse, AxiosError> {
         .catch((e: AxiosError) => {
           throw e
         }),
-    { enabled: host !== null }
+    { ...options, enabled: host !== null && options?.enabled }
   )
   return query
 }

@@ -8,13 +8,18 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
+import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { CameraCard } from '../CameraCard'
 
+import type { Mock } from 'vitest'
 import type { CameraCardProps } from '../CameraCard'
 
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
+vi.mock(
+  '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+)
 vi.mock('/app/resources/runs')
 
 const mockNavigate = vi.fn()
@@ -37,6 +42,7 @@ const render = (props: CameraCardProps) => {
   )
 }
 
+let mockToggleEnabled: Mock
 describe('CameraCard', () => {
   let mockProps: CameraCardProps
 
@@ -45,10 +51,15 @@ describe('CameraCard', () => {
       isFlex: false,
       robotName: 'test-robot',
     }
+    mockToggleEnabled = vi.fn()
     vi.mocked(CameraControls).mockReturnValue(<div>MOCK_CAMERA_CONTROLS</div>)
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: { status: RUN_STATUS_IDLE } },
+    } as any)
+    vi.mocked(useCameraUsageSettings).mockReturnValue({
+      isCameraEnabled: true,
+      toggleCameraEnabled: mockToggleEnabled,
     } as any)
   })
 
@@ -145,34 +156,28 @@ describe('CameraCard', () => {
     expect(screen.queryByText('Disable camera')).not.toBeInTheDocument()
   })
 
-  it('toggles camera from enabled to disabled when disable option is clicked', async () => {
-    const user = userEvent.setup()
+  it('text shows as disabled when camera is disabled', async () => {
+    userEvent.setup()
+    vi.mocked(useCameraUsageSettings).mockReturnValue({
+      isCameraEnabled: false,
+      toggleCameraEnabled: mockToggleEnabled,
+    } as any)
     render(mockProps)
-
-    screen.getByText('Enabled')
-
-    const overflowButton = screen.getByLabelText('overflow')
-    await user.click(overflowButton)
-
-    const disableOption = screen.getByText('Disable camera')
-    await user.click(disableOption)
-
     screen.getByText('Disabled')
   })
 
-  it('toggles camera from disabled to enabled when enable option is clicked', async () => {
+  it('enable toggle calls update camera ', async () => {
     const user = userEvent.setup()
     render(mockProps)
-
     const overflowButton = screen.getByLabelText('overflow')
     await user.click(overflowButton)
-
     await user.click(screen.getByText('Disable camera'))
-    screen.getByText('Disabled')
+    expect(mockToggleEnabled).toHaveBeenCalledOnce()
+  })
 
-    await user.click(overflowButton)
-    await user.click(screen.getByText('Enable camera'))
-
+  it('text shows as enabled when camera is enabled', async () => {
+    userEvent.setup()
+    render(mockProps)
     screen.getByText('Enabled')
   })
 
