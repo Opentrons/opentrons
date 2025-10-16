@@ -1,4 +1,7 @@
-import { verifyImportProtocolPage } from '../support/Import'
+import {
+  verifyImportProtocolPage,
+  verifyOldProtocolModal,
+} from '../support/Import'
 import { MixSteps, MixVerifications } from '../support/MixSteps'
 import { SetupSteps } from '../support/SetupSteps'
 import { StepExecutor } from '../support/StepBuilder'
@@ -12,6 +15,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     const protocol = getTestFile(TestFilePath.DoItAllV8)
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
+    verifyOldProtocolModal()
     cy.contains('Edit protocol').click()
     cy.get('[id="AddStepButton"]').contains('Add Step').click()
     cy.verifyOverflowBtn()
