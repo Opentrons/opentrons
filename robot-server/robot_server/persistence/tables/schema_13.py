@@ -313,6 +313,11 @@ data_files_table = sqlalchemy.Table(
         nullable=True,
     ),
     sqlalchemy.Column(
+        "mime_type",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
         sqlalchemy.ForeignKey("run.id"),

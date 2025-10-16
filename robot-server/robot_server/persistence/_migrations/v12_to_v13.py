@@ -13,6 +13,7 @@ from .._folder_migrator import Migration
 import sqlalchemy
 from ..database import sql_engine_ctx
 
+from opentrons_shared_data.data_files import MimeType
 from robot_server.persistence.tables import schema_11, schema_13
 from robot_server.persistence.file_and_directory_names import DB_FILE
 
@@ -36,6 +37,14 @@ class Migration12to13(Migration):  # noqa: D101
                 schema_13.data_files_table.name,
                 schema_13.data_files_table.c.run_id,
             )
+
+            add_column(
+                engine,
+                schema_13.data_files_table.name,
+                schema_13.data_files_table.c.mime_type,
+            )
+
+            _populate_mime_type_for_existing_files(transaction)
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
@@ -68,3 +77,27 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
 
     # drop the old boolean settings table
     schema_11.boolean_setting_table.drop(connection)
+
+
+def _populate_mime_type_for_existing_files(
+    connection: sqlalchemy.engine.Connection,
+) -> None:
+    """Populate mime_type for existing data files based on file extension.
+
+    Files ending in .jpeg get IMAGE_JPEG mime type, all others get TEXT_CSV.
+    """
+    connection.execute(
+        sqlalchemy.text(
+            "UPDATE data_files "
+            "SET mime_type = :mime_type "
+            "WHERE mime_type IS NULL AND name LIKE '%.jpeg'"
+        ),
+        {"mime_type": MimeType.IMAGE_JPEG.value},
+    )
+
+    connection.execute(
+        sqlalchemy.text(
+            "UPDATE data_files " "SET mime_type = :mime_type " "WHERE mime_type IS NULL"
+        ),
+        {"mime_type": MimeType.TEXT_CSV.value},
+    )
