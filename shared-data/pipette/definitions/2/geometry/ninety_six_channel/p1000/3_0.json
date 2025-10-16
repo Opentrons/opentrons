@@ -4,7 +4,7 @@
   "nozzleOffset": [-36.0, -25.5, -259.15],
   "pipetteBoundingBoxOffsets": {
     "backLeftCorner": [-67.0, 0.0, -259.15],
-    "frontRightCorner": [94.0, -113.0, -259.15]
+    "frontRightCorner": [94.0, -116.0, -259.15]
   },
   "orderedRows": [
     {
