@@ -13,11 +13,10 @@ from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from robot_server.data_files.models import DataFileSource
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
