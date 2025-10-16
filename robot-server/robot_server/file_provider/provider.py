@@ -115,15 +115,21 @@ class FileProviderExecutor:
             assert self._run_metadata is not None
 
             cmd_metadata = file_data.command_metadata
-            base_name = cmd_metadata.base_filename or ""
+            base_name = (
+                f"{cmd_metadata.base_filename}_" if cmd_metadata.base_filename else ""
+            )
             protocol_name = self._run_metadata.protocol_name or ""
 
             return (
                 base_name
                 + self._run_metadata.robot_name
+                + "_"
                 + protocol_name
+                + "_"
                 + str(self._run_metadata.run_created_at)
+                + "_"
                 + str(cmd_metadata.step_number)
+                + "_"
                 + str(cmd_metadata.command_timestamp)
                 + ".jpeg"
             )
