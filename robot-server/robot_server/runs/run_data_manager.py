@@ -251,6 +251,7 @@ class RunDataManager:
         self._file_provider_executor.set_run_metadata(
             RunFileNameMetadata.model_construct(
                 robot_name=config.name(),
+                run_id=run_id,
                 run_created_at=created_at,
                 protocol_name=protocol_name,
             )

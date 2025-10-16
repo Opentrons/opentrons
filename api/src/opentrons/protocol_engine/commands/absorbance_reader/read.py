@@ -179,7 +179,7 @@ class ReadAbsorbanceImpl(
                     csv_bytes = plate_read_result.build_csv_bytes(
                         measurement=measurement,
                     )
-                    file_id = await self._file_provider.write_file(
+                    file_info = await self._file_provider.write_file(
                         data=csv_bytes,
                         mime_type=MimeType.TEXT_CSV,
                         command_metadata=ReadCmdFileNameMetadata.model_construct(
@@ -187,7 +187,7 @@ class ReadAbsorbanceImpl(
                             wavelength=measurement.wavelength,
                         ),
                     )
-                    file_ids.append(file_id)
+                    file_ids.append(file_info.id)
 
                 state_update.files_added = update_types.FilesAddedUpdate(
                     file_ids=file_ids

@@ -32,9 +32,9 @@ from opentrons.protocol_reader import (
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
-from robot_server.data_files.models import DataFile, DataFileSource
+from robot_server.data_files.models import DataFile
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.analyses_manager import AnalysesManager
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer

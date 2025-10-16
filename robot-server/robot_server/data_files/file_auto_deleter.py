@@ -1,8 +1,8 @@
 """Auto-delete old user data files to make room for new ones."""
 from logging import getLogger
 
+from opentrons_shared_data.data_files import DataFileSource
 from robot_server.data_files.data_files_store import DataFilesStore
-from robot_server.data_files.models import DataFileSource
 from robot_server.deletion_planner import DataFileDeletionPlanner
 
 _log = getLogger(__name__)
