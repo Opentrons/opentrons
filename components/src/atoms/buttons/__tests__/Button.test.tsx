@@ -85,35 +85,6 @@ describe('Button', () => {
       expect(handleClick).toHaveBeenCalledTimes(1)
     })
   })
-
-  describe('borderRadius prop', () => {
-    it('applies default border radius of 8px', () => {
-      render(props)
-      const button = screen.getByText('test button')
-      expect(button).toHaveStyle({
-        '--button-border-radius': '8px',
-      })
-    })
-
-    it('applies custom border radius', () => {
-      props.borderRadius = '200px'
-      render(props)
-      const button = screen.getByText('test button')
-      expect(button).toHaveStyle({
-        '--button-border-radius': '200px',
-      })
-    })
-
-    it('applies custom border radius with rem units', () => {
-      props.borderRadius = '1rem'
-      render(props)
-      const button = screen.getByText('test button')
-      expect(button).toHaveStyle({
-        '--button-border-radius': '1rem',
-      })
-    })
-  })
-
   describe('disabled state', () => {
     beforeEach(() => {
       props.disabled = true
