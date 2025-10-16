@@ -363,8 +363,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'absorbanceReader/read':
       break
     default:
-      assert(
-        false,
+      console.error(
         `unknown command: ${command.commandType} passed to getNextRobotStateAndWarning`
       )
   }
