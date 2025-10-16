@@ -43,7 +43,6 @@ export function VisualizerContainer(
 ): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
-  const [showDeckRenders, setShowDeckRenders] = useState<boolean>(false)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 
@@ -270,8 +269,6 @@ export function VisualizerContainer(
           isPlaying={isPlaying}
           commands={filteredCommands}
           groupedCommands={groupedCommands}
-          setShowDeckRenders={setShowDeckRenders}
-          showDeckRenders={showDeckRenders}
         />
 
         <DeckView
@@ -283,7 +280,6 @@ export function VisualizerContainer(
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
           selectedRunTimeCommand={selectedRunTimeCommand}
-          showDeckRenders={showDeckRenders}
         />
       </div>
       {/* Right Column is resizable */}
