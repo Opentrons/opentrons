@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, StyledText } from '@opentrons/components'
+import { Chip, Flex, SPACING, StyledText } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
 import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
@@ -16,19 +16,21 @@ export function ProtocolRunCamera(): JSX.Element {
     <div className={styles.content_container}>
       <div className={styles.header_container}>
         <div className={styles.camera_status}>
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('camera')}
-          </StyledText>
-          <Chip
-            text={isCameraEnabled ? t('enabled') : t('Disabled')}
-            type={isCameraEnabled ? 'success' : 'neutral'}
-            iconName="connection-status"
-          />
+          <Flex gridGap={SPACING.spacing10}>
+            <StyledText desktopStyle="bodyLargeSemiBold">
+              {t('camera')}
+            </StyledText>
+            <Chip
+              text={isCameraEnabled ? t('enabled') : t('Disabled')}
+              type={isCameraEnabled ? 'success' : 'neutral'}
+              iconName="connection-status"
+            />
+          </Flex>
         </div>
         {isCameraEnabled ? <LaunchLivestreamBtn /> : null}
       </div>
-      {isCameraEnabled ? <Divider width="100%" /> : null}
-      {isCameraEnabled ? <ImageGalleryContainer /> : null}
+      <Divider width="100%" />
+      <ImageGalleryContainer />
     </div>
   )
 }
