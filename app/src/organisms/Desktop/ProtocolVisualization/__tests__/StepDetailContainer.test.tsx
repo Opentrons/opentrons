@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { DestinationLabwareContainer } from '../DestinationLabwareContainer'
-import { DestinationTipsContainer } from '../DestinationTipsContainer'
 import { PipetteContainer } from '../PipetteContainer'
 import { SourceLabwareContainer } from '../SourceLabwareContainer'
 import { SourceWellViewContainer } from '../SourceWellViewContainer'
 import { StepDetailContainer } from '../StepDetailContainer'
+import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
 import type { ComponentProps } from 'react'
@@ -17,7 +17,7 @@ import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../PipetteContainer')
 vi.mock('../DestinationLabwareContainer')
-vi.mock('../DestinationTipsContainer')
+vi.mock('../TipDisposalContainer')
 vi.mock('../SourceLabwareContainer')
 vi.mock('../SourceWellViewContainer')
 vi.mock('../TipPickupContainer')
@@ -89,8 +89,8 @@ describe('StepDetailContainer', () => {
     vi.mocked(DestinationLabwareContainer).mockReturnValue(
       <div>mock Destination Labware Container</div>
     )
-    vi.mocked(DestinationTipsContainer).mockReturnValue(
-      <div>mock Destination Tips Container</div>
+    vi.mocked(TipDisposalContainer).mockReturnValue(
+      <div>mock Tip Disposal Container</div>
     )
     vi.mocked(SourceLabwareContainer).mockReturnValue(
       <div>mock Source Labware Container</div>
@@ -111,7 +111,7 @@ describe('StepDetailContainer', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
     screen.getByText('mock Destination Labware Container')
-    screen.getByText('mock Destination Tips Container')
+    screen.getByText('mock Tip Disposal Container')
     screen.getByText('mock Source Labware Container')
     screen.getByText('mock Source Well View Container')
     screen.getByText('mock Tip Pickup Container')

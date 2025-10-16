@@ -54,8 +54,10 @@ from robot_server.service.legacy.models.settings import (
 )
 from robot_server.persistence.fastapi_dependencies import (
     get_persistence_resetter,
+    get_images_resetter,
 )
 from robot_server.persistence.persistence_directory import PersistenceResetter
+from robot_server.persistence.images_directory import ImagesResetter
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
@@ -248,6 +250,7 @@ async def post_settings_reset_options(
     persistence_resetter: Annotated[
         PersistenceResetter, Depends(get_persistence_resetter)
     ],
+    images_resetter: Annotated[ImagesResetter, Depends(get_images_resetter)],
     deck_configuration_store: Annotated[
         Optional[DeckConfigurationStore], Depends(get_deck_configuration_store_failsafe)
     ],
@@ -274,6 +277,7 @@ async def post_settings_reset_options(
 
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()
+        await images_resetter.mark_directory_reset()
 
     if factory_reset_commands.get(reset_util.ResetOptionId.on_device_display, False):
         await reset_odd.mark_odd_for_reset_next_boot()

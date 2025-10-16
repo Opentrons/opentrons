@@ -1,9 +1,24 @@
 {
   "active": "Active",
+  "destination_labware": "Destination labware",
+  "destination_tips": "Destination tips",
+  "destination_well_view": "Destination well view",
   "left_mount": "LEFT MOUNT",
   "left_right_mount": "LEFT + RIGHT MOUNT",
   "none_attached": "None attached",
   "pipette": "Pipette",
   "right_mount": "RIGHT MOUNT",
-  "step": "Step {{number}}"
+  "source_labware": "Source labware",
+  "source_tips": "Source tips",
+  "source_well_view": "Source well view",
+  "step": "Step {{number}}",
+  "quantity": "Quantity: {{quantity}}",
+  "tipPickup": "Tip pickup",
+  "tip_disposal": "Tip disposal",
+  "remaining_tips": "{{remaining}} tips",
+  "tips_remaining": "Tips remaining",
+  "tips_in_trash": "Tips in trash",
+  "lids_in_trash": "Lids in trash",
+  "trash_bin": "TRASH BIN",
+  "well_name": "Well {{wellName}}"
 }
