@@ -68,8 +68,8 @@ class FileProviderExecutor:
     async def write_file_cb(
         self,
         file_data: FileData,
-    ) -> str:
-        """Write the provided file data to disk. Returns the File ID of the created file."""
+    ) -> DataFileInfo:
+        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
         async with self._lock:
             file_id = await get_unique_id()
             final_filename = self._format_filename(file_data, file_id)
@@ -92,7 +92,7 @@ class FileProviderExecutor:
                 source=DataFileSource.GENERATED,
             )
             await self._data_files_store.insert(file_info)
-            return file_id
+            return file_info
 
     async def filecount_cb(self) -> int:
         """Return the current count of generated files stored within the data files directory."""
