@@ -176,11 +176,8 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data: cameraData } = useCamera()
-  console.log('🚀 ~ AttachedDevices ~ cameraData:', cameraData)
-  const cameraEnabled = cameraData?.cameraEnabled
-
-  return cameraEnabled ? (
+  const { data } = useCamera()
+  return data?.cameraEnabled ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <LegacyStyledText
         as="h6"
