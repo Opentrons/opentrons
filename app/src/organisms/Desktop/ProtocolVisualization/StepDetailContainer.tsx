@@ -1,9 +1,10 @@
 import { DestinationLabwareContainer } from './DestinationLabwareContainer'
-import { DestinationTipsContainer } from './DestinationTipsContainer'
+import { DestinationWellViewContainer } from './DestinationWellViewContainer'
 import { PipetteContainer } from './PipetteContainer'
 import { SourceLabwareContainer } from './SourceLabwareContainer'
 import { SourceWellViewContainer } from './SourceWellViewContainer'
 import styles from './stepdetailcontainer.module.css'
+import { TipDisposalContainer } from './TipDisposalContainer'
 import { TipPickupContainer } from './TipPickupContainer'
 
 interface StepDetailContainerProps {
@@ -17,10 +18,11 @@ export function StepDetailContainer({
     <div className={styles.container}>
       <PipetteContainer mount="LEFT MOUNT" pipetteName="Flex 1-Channel 50 µL" />
       <TipPickupContainer protocolKey={protocolKey} />
-      <SourceWellViewContainer />
-      <SourceLabwareContainer />
-      <DestinationLabwareContainer />
-      <DestinationTipsContainer />
+      <SourceWellViewContainer protocolKey={protocolKey} />
+      <SourceLabwareContainer protocolKey={protocolKey} />
+      <DestinationWellViewContainer protocolKey={protocolKey} />
+      <DestinationLabwareContainer protocolKey={protocolKey} />
+      <TipDisposalContainer protocolKey={protocolKey} />
     </div>
   )
 }

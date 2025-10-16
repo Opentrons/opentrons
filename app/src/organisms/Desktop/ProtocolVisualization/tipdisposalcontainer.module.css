@@ -16,12 +16,10 @@
   gap: auto;
 }
 
-.subheader {
+.text_container {
   display: flex;
   width: 100%;
-}
-
-.main_content {
-  width: 100%;
-  background-color: var(--grey-10);
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
 }
