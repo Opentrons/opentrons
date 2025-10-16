@@ -4,7 +4,7 @@ import {
   COLORS,
   Module,
   SingleSlotFixture,
-  useCommandTypeSummaries,
+  // useCommandTypeSummaries,
 } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
@@ -68,18 +68,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     setHoveredSlot,
     hoveredSlot,
     liquids,
-    labwareEntitiesExtended,
+    // labwareEntitiesExtended,
   } = props
   const { labware, modules, pipettes } = robotState
   const { labwareEntities, moduleEntities, trashBinEntities } = invariantContext
-  const commandSummary = useCommandTypeSummaries(
-    selectedRunTimeCommand?.commandType
-  )
-  console.log(
-    'wire these up in a follow up',
-    labwareEntitiesExtended,
-    commandSummary
-  )
+  // const commandSummary = useCommandTypeSummaries(
+  //   selectedRunTimeCommand?.commandType
+  // )
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
     moduleEntities,
@@ -141,8 +136,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           }
         }
         const tempInnerProps = getModuleInnerProps(moduleState)
-        const isActive = selectedSlot === slot || hoveredSlot === slot
-        console.log('wire this up in a follow up', isActive)
+        // const isActive = selectedSlot === slot || hoveredSlot === slot
         const innerTCProps = {
           ...tempInnerProps,
           lidMotorState:
@@ -301,17 +295,12 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        const { isActiveLayerVisible } = getActiveLayer(
-          Object.values(pipettes),
-          id,
-          selectedRunTimeCommand
-        )
-        const isActive = selectedSlot === slot || hoveredSlot === slot
-        console.log(
-          'wire these up in a follow up',
-          isActiveLayerVisible,
-          isActive
-        )
+        // const { isActiveLayerVisible } = getActiveLayer(
+        //   Object.values(pipettes),
+        //   id,
+        //   selectedRunTimeCommand
+        // )
+        // const isActive = selectedSlot === slot || hoveredSlot === slot
         return (
           <Fragment key={id}>
             <LabwareOnDeck
@@ -360,19 +349,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        const { isActiveLayerVisible } = getActiveLayer(
-          Object.values(pipettes),
-          id,
-          selectedRunTimeCommand
-        )
-        const isActive =
-          selectedSlot === slotForOnTheDeck || hoveredSlot === slotForOnTheDeck
-
-        console.log(
-          'wire these up in a follow up',
-          isActiveLayerVisible,
-          isActive
-        )
+        // const { isActiveLayerVisible } = getActiveLayer(
+        //   Object.values(pipettes),
+        //   id,
+        //   selectedRunTimeCommand
+        // )
+        // const isActive =
+        //   selectedSlot === slotForOnTheDeck || hoveredSlot === slotForOnTheDeck
 
         return (
           <Fragment key={id}>
