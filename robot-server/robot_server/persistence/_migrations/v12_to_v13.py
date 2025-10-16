@@ -23,14 +23,13 @@ class Migration12to13(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 12 to 13."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
-            assert (
-                schema_11.boolean_setting_table.name
-                != schema_13.boolean_setting_table.name
-            )
-            _migrate_boolean_settings_table(transaction)
+        with sql_engine_ctx(dest_dir / DB_FILE) as engine:
+            with engine.begin() as transaction:
+                assert (
+                    schema_11.boolean_setting_table.name
+                    != schema_13.boolean_setting_table.name
+                )
+                _migrate_boolean_settings_table(transaction)
 
             add_column(
                 engine,
@@ -44,7 +43,8 @@ class Migration12to13(Migration):  # noqa: D101
                 schema_13.data_files_table.c.mime_type,
             )
 
-            _populate_mime_type_for_existing_files(transaction)
+            with engine.begin() as transaction:
+                _populate_mime_type_for_existing_files(transaction)
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:

@@ -14,7 +14,7 @@ from robot_server.persistence.tables import (
     run_csv_rtp_table,
 )
 from robot_server.persistence.tables import DataFileSourceSQLEnum
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
 
 from .models import FileIdNotFoundError, FileInUseError
 
