@@ -98,7 +98,7 @@ const mockP1000V2Specs = {
   orderedRows: expect.anything(),
   pipetteBoundingBoxOffsets: {
     backLeftCorner: [-38.0, 0.0, -259.15],
-    frontRightCorner: [11.5, -64.0, -259.15]
+    frontRightCorner: [11.5, -64.0, -259.15],
   },
   lldSettings: {
     t50: {
