@@ -74,6 +74,16 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    images_directory: typing.Optional[Path] = Field(
+        default=None,
+        description=(
+            "A directory for the server to store captured images."
+            " If this directory doesn't already exist, the server will create it."
+            " If no directory is supplied, the server will use a fresh temporary directory"
+            " (effectively not persisting anything)."
+        ),
+    )
+
     maximum_runs: int = Field(
         default=20,
         gt=0,
