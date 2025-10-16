@@ -11,7 +11,7 @@ from sqlalchemy.engine import Engine as SQLEngine
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.deletion_planner import FileUsageInfo
 from robot_server.data_files.models import (
     FileIdNotFoundError,
@@ -114,6 +114,7 @@ async def test_insert_data_file_info_and_fetch_by_hash(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     assert subject.get_file_info_by_hash("abc123") is None
     await subject.insert(data_file_info)
@@ -131,6 +132,7 @@ async def test_insert_file_info_with_existing_id(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     data_file_info2 = DataFileInfo(
         id="file-id",
@@ -139,6 +141,7 @@ async def test_insert_file_info_with_existing_id(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     await subject.insert(data_file_info1)
     with pytest.raises(Exception):
@@ -156,6 +159,7 @@ async def test_insert_data_file_info_and_get_by_id(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     await subject.insert(data_file_info)
     assert subject.get("file-id") == data_file_info
@@ -191,6 +195,7 @@ async def test_get_usage_info(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     data_file_2 = DataFileInfo(
         id="file-id-2",
@@ -199,6 +204,7 @@ async def test_get_usage_info(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     await subject.insert(data_file_1)
     await subject.insert(data_file_2)
@@ -231,6 +237,7 @@ async def test_remove(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     await subject.insert(data_file_info)
     subject.remove(file_id="file-id")
@@ -262,6 +269,7 @@ async def test_remove_raises_in_file_in_use(
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
 
     protocol_resource = _get_sample_protocol_resource("protocol-id")

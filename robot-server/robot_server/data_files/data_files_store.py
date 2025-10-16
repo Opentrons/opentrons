@@ -14,7 +14,7 @@ from robot_server.persistence.tables import (
     run_csv_rtp_table,
 )
 from robot_server.persistence.tables import DataFileSourceSQLEnum
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 
 from .models import FileIdNotFoundError, FileInUseError
 
@@ -47,6 +47,7 @@ class DataFilesStore:
             "created_at": file_info.created_at,
             "file_hash": file_info.file_hash,
             "run_id": file_info.run_id,
+            "mime_type": file_info.mime_type,
         }
         statement = sqlalchemy.insert(data_files_table).values(file_info_dict)
         with self._sql_engine.begin() as transaction:
@@ -170,4 +171,5 @@ def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
         created_at=row.created_at,
         file_hash=row.file_hash,
         run_id=row.run_id,
+        mime_type=row.mime_type,
     )

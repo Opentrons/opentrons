@@ -1,22 +1,14 @@
 """File interaction resource provider."""
 from datetime import datetime
-from enum import Enum
 from io import StringIO
 import csv
 from typing import List, Optional, Callable, Awaitable, Dict
 from pydantic import BaseModel
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 
 from ..errors import StorageLimitReachedError
 
 MAXIMUM_FILE_LIMIT = 400
-
-
-class MimeType(str, Enum):
-    """File mime types."""
-
-    TEXT_CSV = "text/csv"
-    IMAGE_JPEG = "image/jpeg"
 
 
 class ReadCmdFileNameMetadata(BaseModel):
@@ -193,4 +185,5 @@ class FileProvider:
             created_at=datetime.now(),
             source=DataFileSource.GENERATED,
             run_id=None,
+            mime_type=mime_type,
         )

@@ -18,7 +18,7 @@ from robot_server.data_files.models import (
     FileIdNotFoundError,
     FileInUseError,
 )
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.data_files.router import (
     upload_data_file,
     get_data_file_info_by_id,
@@ -107,6 +107,7 @@ async def test_upload_new_data_file(
                 created_at=datetime(year=2024, month=6, day=18),
                 source=DataFileSource.UPLOADED,
                 run_id=None,
+                mime_type=MimeType.TEXT_CSV,
             )
         ),
     )
@@ -139,6 +140,7 @@ async def test_upload_existing_data_file(
             created_at=datetime(year=2023, month=6, day=18),
             source=DataFileSource.UPLOADED,
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
 
@@ -210,6 +212,7 @@ async def test_upload_new_data_file_path(
                 created_at=datetime(year=2024, month=6, day=18),
                 source=DataFileSource.UPLOADED,
                 run_id=None,
+                mime_type=MimeType.TEXT_CSV,
             )
         ),
     )
@@ -288,6 +291,7 @@ async def test_get_data_file_info(
             created_at=datetime(year=2024, month=7, day=15),
             source=DataFileSource.UPLOADED,
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
 
@@ -338,6 +342,7 @@ async def test_get_data_file(
             created_at=datetime(year=2024, month=7, day=15),
             source=DataFileSource.UPLOADED,
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
 
@@ -381,6 +386,7 @@ async def test_get_all_data_file_info(
                 created_at=datetime(year=2024, month=7, day=15),
                 source=DataFileSource.UPLOADED,
                 run_id=None,
+                mime_type=MimeType.TEXT_CSV,
             ),
             DataFileInfo(
                 id="hfhcjdeowjfie",
@@ -389,6 +395,7 @@ async def test_get_all_data_file_info(
                 created_at=datetime(year=2024, month=7, day=22),
                 source=DataFileSource.UPLOADED,
                 run_id=None,
+                mime_type=MimeType.TEXT_CSV,
             ),
         ]
     )

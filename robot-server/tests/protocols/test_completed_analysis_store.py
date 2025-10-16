@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy.engine import Engine
 from decoy import Decoy
 
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.persistence.tables import (
     analysis_table,
     analysis_primitive_type_rtp_table,
@@ -334,6 +334,7 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     await subject.make_room_and_add(
@@ -470,6 +471,7 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     # Set up the database with existing analyses

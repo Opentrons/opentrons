@@ -20,7 +20,7 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.data_files.models import DataFile
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     CompletedAnalysis,
@@ -599,6 +599,7 @@ async def test_get_referenced_data_files(
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     await data_files_store.insert(
@@ -609,6 +610,7 @@ async def test_get_referenced_data_files(
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     await data_files_store.insert(
@@ -619,6 +621,7 @@ async def test_get_referenced_data_files(
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             run_id=None,
+            mime_type=MimeType.TEXT_CSV,
         )
     )
 

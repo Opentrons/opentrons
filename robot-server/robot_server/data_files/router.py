@@ -22,7 +22,7 @@ from .dependencies import (
     get_data_file_auto_deleter,
 )
 from .data_files_store import DataFilesStore
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from .file_auto_deleter import DataFileAutoDeleter
 from .models import (
     DataFile,
@@ -161,6 +161,7 @@ async def upload_data_file(
         created_at=created_at,
         source=DataFileSource.UPLOADED,
         run_id=None,
+        mime_type=MimeType.TEXT_CSV,
     )
     await data_files_store.insert(file_info)
     return await PydanticResponse.create(

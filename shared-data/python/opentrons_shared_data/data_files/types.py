@@ -6,6 +6,13 @@ from enum import Enum
 from typing import Optional
 
 
+class MimeType(str, Enum):
+    """File mime types."""
+
+    TEXT_CSV = "text/csv"
+    IMAGE_JPEG = "image/jpeg"
+
+
 class DataFileSource(Enum):
     """The source this data file is from."""
 
@@ -22,4 +29,5 @@ class DataFileInfo:
     file_hash: str
     created_at: datetime
     source: DataFileSource
+    mime_type: MimeType
     run_id: Optional[str]

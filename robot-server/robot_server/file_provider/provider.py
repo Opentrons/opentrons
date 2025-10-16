@@ -92,7 +92,8 @@ class FileProviderExecutor:
                 file_hash=md5sum,
                 created_at=created_at,
                 source=DataFileSource.GENERATED,
-                run_id=self._run_metadata.run_id
+                run_id=self._run_metadata.run_id,
+                mime_type=file_data.mime_type,
             )
             await self._data_files_store.insert(file_info)
             return file_info
