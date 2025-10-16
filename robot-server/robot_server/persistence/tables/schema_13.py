@@ -325,8 +325,9 @@ data_files_table = sqlalchemy.Table(
         index=True,
     ),
     sqlalchemy.Index(
-        "ix_data_files_run_id_created_at",
+        "ix_data_files_run_id_mime_type_created_at",
         "run_id",
+        "mime_type",
         "created_at",
     ),
 )
