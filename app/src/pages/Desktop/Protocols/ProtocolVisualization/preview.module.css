@@ -83,14 +83,13 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 /* Hide thumb initially */
@@ -344,6 +343,18 @@
   position: absolute;
   right: 0.8rem;
   bottom: 4rem;
+}
+
+.well_details_caption_liquid {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 4rem;
+}
+
+.well_header_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
 }
 
 .well_detail_svg_container {

@@ -11,6 +11,7 @@ import { SourceWellViewContainer } from './SourceWellViewContainer'
 import styles from './stepdetailcontainer.module.css'
 import { TipDisposalContainer } from './TipDisposalContainer'
 import { TipPickupContainer } from './TipPickupContainer'
+import { getSlotIdFromCommand } from './utils/getSlotIdFromCommand'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
@@ -22,6 +23,7 @@ interface StepDetailContainerProps {
   robotState: RobotState
   invariantContext: InvariantContext
   selectedRunTimeCommand?: RunTimeCommand
+  currentCommandIndex: number
 }
 
 export function StepDetailContainer({
@@ -31,6 +33,7 @@ export function StepDetailContainer({
   robotState,
   invariantContext,
   selectedRunTimeCommand,
+  currentCommandIndex,
 }: StepDetailContainerProps): JSX.Element {
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -68,6 +71,22 @@ export function StepDetailContainer({
     rightPipetteId != null &&
     robotState.pipettes[rightPipetteId].entityId != null
 
+  console.log('robotState', robotState)
+  console.log('commands', commands)
+  console.log('invariantContext', invariantContext)
+
+  const isSourceActive =
+    commands[currentCommandIndex]?.commandType === 'aspirate' ||
+    commands[currentCommandIndex]?.commandType === 'aspirateInPlace'
+
+  const isDestinationActive =
+    commands[currentCommandIndex]?.commandType === 'dispense' ||
+    commands[currentCommandIndex]?.commandType === 'dispenseInPlace'
+
+  const slotId = getSlotIdFromCommand(commands[currentCommandIndex], robotState)
+
+  console.log('slotId', slotId)
+
   return (
     <div className={styles.container}>
       {leftMountPipetteName != null || is96Channel ? (
@@ -84,12 +103,26 @@ export function StepDetailContainer({
           selected={isRightPipetteActive}
         />
       ) : null}
+
       <TipPickupContainer protocolKey={protocolKey} />
-      <SourceWellViewContainer protocolKey={protocolKey} />
-      <SourceLabwareContainer protocolKey={protocolKey} />
-      <DestinationWellViewContainer protocolKey={protocolKey} />
-      <DestinationLabwareContainer protocolKey={protocolKey} />
+
+      {isSourceActive ? (
+        <SourceWellViewContainer protocolKey={protocolKey} />
+      ) : null}
+      {isSourceActive ? (
+        <SourceLabwareContainer protocolKey={protocolKey} slotId={slotId} />
+      ) : null}
+      {isDestinationActive ? (
+        <DestinationWellViewContainer protocolKey={protocolKey} />
+      ) : null}
+      {isDestinationActive ? (
+        <DestinationLabwareContainer
+          protocolKey={protocolKey}
+          slotId={slotId}
+        />
+      ) : null}
       <TipDisposalContainer protocolKey={protocolKey} />
+
       {moduleOnSlot != null ? (
         <ModuleSlotDetails
           moduleId={moduleOnSlot[0]}

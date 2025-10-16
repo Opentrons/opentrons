@@ -6,16 +6,18 @@ import styles from './sourcelabwarecontainer.module.css'
 
 interface SourceLabwareContainerProps {
   protocolKey: string // the interface will be updated soon
+  slotId: string | null
 }
 export function SourceLabwareContainer({
   protocolKey,
+  slotId,
 }: SourceLabwareContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <Tag text={t('source_labware')} type="default" shrinkToContent />
-        <RobotInfoLabel deckLabel="slot" />
+        <RobotInfoLabel deckLabel={slotId ?? ''} />
       </div>
       <div className={styles.subheader}>
         <StyledText desktopStyle="captionSemiBold">

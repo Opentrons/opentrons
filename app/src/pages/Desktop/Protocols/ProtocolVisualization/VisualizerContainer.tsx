@@ -298,6 +298,7 @@ export function VisualizerContainer(
           robotState={robotState}
           invariantContext={invariantContext}
           selectedRunTimeCommand={selectedRunTimeCommand}
+          currentCommandIndex={selectedCommandIndex}
         />
       </div>
     </div>
