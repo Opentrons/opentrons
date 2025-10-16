@@ -2,13 +2,12 @@
 title: "Opentrons OT-2: Product Elements"
 ---
 
-## Product elements
 <!-- looks good enough; tried side by side -->
-### OT-2 features
+## OT-2 features
 
 ![OT-2 isometric image front oblique](images/isometric-features.png)
 
-### Deck features
+## Deck features
 
 ![OT-2 deck map](images/ot2-deck-map.png)
 
