@@ -258,6 +258,7 @@ async def test_create_protocol_run(
             file_hash="987",
             created_at=datetime(month=1, day=2, year=2024),
             source=DataFileSource.UPLOADED,
+            run_id=None,
         )
     )
     decoy.when(

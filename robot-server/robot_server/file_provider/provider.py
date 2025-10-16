@@ -71,6 +71,8 @@ class FileProviderExecutor:
     ) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
         async with self._lock:
+            assert self._run_metadata is not None
+
             file_id = await get_unique_id()
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
@@ -90,6 +92,7 @@ class FileProviderExecutor:
                 file_hash=md5sum,
                 created_at=created_at,
                 source=DataFileSource.GENERATED,
+                run_id=self._run_metadata.run_id
             )
             await self._data_files_store.insert(file_info)
             return file_info

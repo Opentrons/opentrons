@@ -168,4 +168,5 @@ def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
         source=DataFileSource(row.source.value),
         created_at=row.created_at,
         file_hash=row.file_hash,
+        run_id=None,
     )

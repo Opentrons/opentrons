@@ -192,4 +192,5 @@ class FileProvider:
             file_hash="",
             created_at=datetime.now(),
             source=DataFileSource.GENERATED,
+            run_id=None,
         )

@@ -333,6 +333,7 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
             file_hash="file-hash",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            run_id=None,
         )
     )
     await subject.make_room_and_add(
@@ -468,6 +469,7 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
             file_hash="file-hash",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            run_id=None,
         )
     )
     # Set up the database with existing analyses
