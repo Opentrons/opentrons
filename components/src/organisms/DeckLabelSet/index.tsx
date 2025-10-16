@@ -42,6 +42,9 @@ const DeckLabelSetComponent = (
     <RobotCoordsForeignDiv
       x={x}
       y={y}
+      //  +15/30 to leave room for the deck info label
+      width={width + 15}
+      height={height + 30}
       innerDivProps={{
         transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
       }}

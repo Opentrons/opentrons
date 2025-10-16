@@ -46,7 +46,7 @@ import type {
 export interface LabwareEntityExtended extends LabwareEntity {
   nickName: string | null
 }
-const POTENTIAL_TRASH_COMMAND_TYPES = [
+export const POTENTIAL_TRASH_COMMAND_TYPES = [
   'moveToAddressableArea',
   'moveToAddressableAreaForDropTip',
   'dropTip',
@@ -101,7 +101,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
-  const { labware, pipettes } = robotState
+  const { labware } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -178,20 +178,14 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                     const { isActiveLayerVisible } =
                       labwareOnSlot != null
                         ? getActiveLayer(
-                            Object.values(pipettes),
                             labwareOnSlot[0],
                             selectedRunTimeCommand
                           )
                         : { isActiveLayerVisible: false }
-                    let fixtureBaseColor = lightFill
+                    let strokeColor = 'none'
 
-                    if (isActiveLayerVisible) {
-                      fixtureBaseColor = COLORS.purple30
-                    } else if (
-                      !isActiveLayerVisible &&
-                      selectedSlot === addressableArea.id
-                    ) {
-                      fixtureBaseColor = COLORS.grey40
+                    if (hoveredSlot === addressableArea.id) {
+                      strokeColor = COLORS.purple50
                     }
 
                     return cutoutId != null ? (
@@ -200,14 +194,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         cutoutId={cutoutId}
                         deckDefinition={deckDef}
                         showExpansion={cutoutId === 'cutoutA1'}
-                        fixtureBaseColor={fixtureBaseColor}
-                        slotClipColor={darkFill}
-                        stroke={
-                          hoveredSlot === addressableArea.id ||
-                          selectedSlot === addressableArea.id
-                            ? COLORS.purple50
-                            : 'none'
+                        fixtureBaseColor={
+                          isActiveLayerVisible ? COLORS.purple30 : lightFill
                         }
+                        slotClipColor={darkFill}
+                        stroke={strokeColor}
                       />
                     ) : null
                   })}

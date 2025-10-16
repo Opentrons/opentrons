@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
 
-import { CURSOR_POINTER, RobotCoordsForeignObject } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  CURSOR_POINTER,
+  RobotCoordsForeignObject,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForAddressableArea,
@@ -71,7 +75,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   }
 
   // TODO: extend for Ot-2
-  const { width, height, x, y } = getFlexHoverDimensions(
+  const { width, x, y } = getFlexHoverDimensions(
     stagingAreaLocations,
     cutoutId,
     slotId,
@@ -83,14 +87,15 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     <RobotCoordsForeignObject
       key={`${robotType.toLowerCase()}_slotOverlay`}
       width={width}
-      height={height}
-      x={x}
-      y={y}
+      height="6%"
+      x={x + (hasTCOnSlot ? 20 : 0)}
+      y={y - (hasTCOnSlot ? 68 : 0)}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{
         opacity: opacity,
         flex: '1',
         cursor: CURSOR_POINTER,
+        textAlign: ALIGN_CENTER,
       }}
       foreignObjectEvents={{
         onClick: () => {

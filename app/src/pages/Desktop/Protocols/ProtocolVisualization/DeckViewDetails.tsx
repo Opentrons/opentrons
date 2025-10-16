@@ -4,7 +4,7 @@ import {
   COLORS,
   Module,
   SingleSlotFixture,
-  // useCommandTypeSummaries,
+  StyledText,
 } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
@@ -16,7 +16,12 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './DeckView'
+import { DeckViewOverlay } from './DeckViewOverlay'
+import { FixtureCommandSummary } from './FixtureCommandSummary'
+import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
+import { ModuleCommandSummary } from './ModuleCommandSummary'
 import {
   getActiveLayer,
   getSlotIdsBlockedBySpanningForThermocycler,
@@ -68,13 +73,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     setHoveredSlot,
     hoveredSlot,
     liquids,
-    // labwareEntitiesExtended,
+    labwareEntitiesExtended,
   } = props
-  const { labware, modules, pipettes } = robotState
+  const { labware, modules } = robotState
   const { labwareEntities, moduleEntities, trashBinEntities } = invariantContext
-  // const commandSummary = useCommandTypeSummaries(
-  //   selectedRunTimeCommand?.commandType
-  // )
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
     moduleEntities,
@@ -83,6 +85,23 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
   const trashSlots = Object.values(trashBinEntities).map(
     trash => trash.location.split('cutout')[1]
   )
+  const trashId = Object.values(robotState.pipettes).find(
+    pipette =>
+      pipette.entityId != null && trashBinEntities[pipette.entityId] != null
+  )?.entityId
+  const isPipetteOverTrash =
+    trashId != null &&
+    selectedRunTimeCommand != null &&
+    POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
+  const trashSlotWherePipetteIsOver =
+    trashId != null ? trashBinEntities[trashId].location : null
+  const trashAddressableArea =
+    trashSlotWherePipetteIsOver != null
+      ? getAddressableAreaFromSlotId(
+          trashSlotWherePipetteIsOver.split('cutout')[1],
+          deckDef
+        )
+      : null
   return (
     <>
       {/* all modules */}
@@ -101,7 +120,6 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           'moduleId' in selectedRunTimeCommand.params &&
           selectedRunTimeCommand.params.moduleId === id
         const { isActiveLayerVisible } = getActiveLayer(
-          Object.values(pipettes),
           labwareLoadedOnModuleId,
           selectedRunTimeCommand
         )
@@ -136,7 +154,6 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           }
         }
         const tempInnerProps = getModuleInnerProps(moduleState)
-        // const isActive = selectedSlot === slot || hoveredSlot === slot
         const innerTCProps = {
           ...tempInnerProps,
           lidMotorState:
@@ -145,18 +162,18 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               : 'open',
         }
 
-        let fixtureBaseColor = COLORS.grey35
+        const fixtureBaseColor =
+          isStepAssosciatedWithModule || isActiveLayerVisible
+            ? COLORS.purple30
+            : COLORS.grey35
+        let strokeColor = 'none'
 
-        if (isStepAssosciatedWithModule || isActiveLayerVisible) {
-          fixtureBaseColor = COLORS.purple30
-        } else if (
-          !isStepAssosciatedWithModule &&
-          !isActiveLayerVisible &&
-          selectedSlot === slot
+        if (
+          hoveredSlot === slot ||
+          (moduleType === THERMOCYCLER_MODULE_TYPE && hoveredSlot === 'B1')
         ) {
-          fixtureBaseColor = COLORS.grey40
+          strokeColor = COLORS.purple50
         }
-
         return (
           <Fragment key={id}>
             {
@@ -169,11 +186,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     showExpansion={true}
                     fixtureBaseColor={fixtureBaseColor}
                     slotClipColor={COLORS.grey60}
-                    stroke={
-                      hoveredSlot === 'B1' || selectedSlot === 'B1'
-                        ? COLORS.purple50
-                        : 'none'
-                    }
+                    stroke={strokeColor}
                   />
                 ) : null}
                 <SingleSlotFixture
@@ -183,11 +196,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   showExpansion={false}
                   fixtureBaseColor={fixtureBaseColor}
                   slotClipColor={COLORS.grey60}
-                  stroke={
-                    hoveredSlot === slot || selectedSlot === slot
-                      ? COLORS.purple50
-                      : 'none'
-                  }
+                  stroke={strokeColor}
                 />
                 <Module
                   key={id}
@@ -209,18 +218,84 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                   setHoveredSlot={setHoveredSlot}
                 >
                   {labwareLoadedOnModuleId != null ? (
-                    <LabwareOnDeck
-                      robotState={robotState}
-                      labwareDef={labwareEntities[labwareLoadedOnModuleId].def}
-                      liquids={liquids}
-                      labwareId={labwareLoadedOnModuleId}
-                      x={0}
-                      y={0}
-                      setSelectedSlot={setSelectedSlot}
-                      setHoveredSlot={setHoveredSlot}
-                    />
+                    <>
+                      <LabwareOnDeck
+                        robotState={robotState}
+                        labwareDef={
+                          labwareEntities[labwareLoadedOnModuleId].def
+                        }
+                        liquids={liquids}
+                        labwareId={labwareLoadedOnModuleId}
+                        x={0}
+                        y={0}
+                        setSelectedSlot={setSelectedSlot}
+                        setHoveredSlot={setHoveredSlot}
+                      />
+                      {hoveredSlot === slot ? (
+                        moduleType === THERMOCYCLER_MODULE_TYPE ? (
+                          <DeckViewOverlay
+                            key={slot}
+                            slotId={slot}
+                            slotPosition={[0, 0, 0]}
+                            opacity={0.9}
+                            slotFillColor={COLORS.purple50}
+                            robotType={robotType}
+                            invariantContext={invariantContext}
+                            robotState={robotState}
+                            setSelectedSlot={setSelectedSlot}
+                            setHoveredSlot={setHoveredSlot}
+                          >
+                            <StyledText
+                              desktopStyle="captionRegular"
+                              color={COLORS.white}
+                            >
+                              {
+                                labwareEntities[labwareLoadedOnModuleId].def
+                                  .metadata.displayName
+                              }
+                            </StyledText>
+                          </DeckViewOverlay>
+                        ) : (
+                          <DeckViewOverlay
+                            key={slot}
+                            slotId={slot}
+                            slotPosition={slotPosition}
+                            opacity={0.9}
+                            slotFillColor={COLORS.purple50}
+                            robotType={robotType}
+                            invariantContext={invariantContext}
+                            robotState={robotState}
+                            setSelectedSlot={setSelectedSlot}
+                            setHoveredSlot={setHoveredSlot}
+                          >
+                            <StyledText
+                              desktopStyle="captionRegular"
+                              color={COLORS.white}
+                            >
+                              {labwareEntitiesExtended[id].nickName ??
+                                labwareEntities[labwareLoadedOnModuleId].def
+                                  .metadata.displayName}
+                            </StyledText>
+                          </DeckViewOverlay>
+                        )
+                      ) : null}
+                    </>
                   ) : null}
                 </Module>
+                {(isActiveLayerVisible || isStepAssosciatedWithModule) &&
+                selectedRunTimeCommand != null ? (
+                  <ModuleCommandSummary
+                    robotType={robotType}
+                    moduleModel={moduleDef.model}
+                    commandType={selectedRunTimeCommand.commandType}
+                    position={slotPosition}
+                    showModuleIcon={false}
+                    slot={slot}
+                    orientation={inferModuleOrientationFromXCoordinate(
+                      slotPosition[0]
+                    )}
+                  />
+                ) : null}
               </>
             }
           </Fragment>
@@ -229,8 +304,9 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas =
-            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
+          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
+            stagingAreaCutoutIds
+          )
 
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
@@ -265,11 +341,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
                     ? COLORS.grey60
                     : COLORS.transparent
                 }
-                fixtureBaseColor={
-                  selectedSlot === addressableArea.id
-                    ? COLORS.purple30
-                    : COLORS.transparent
-                }
+                fixtureBaseColor={COLORS.transparent}
                 stroke={
                   hoveredSlot === addressableArea.id ? COLORS.purple50 : 'none'
                 }
@@ -286,22 +358,18 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(
-          slot,
-          deckDef
-        )?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
+          ?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(
             `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
           )
           return null
         }
-        // const { isActiveLayerVisible } = getActiveLayer(
-        //   Object.values(pipettes),
-        //   id,
-        //   selectedRunTimeCommand
-        // )
-        // const isActive = selectedSlot === slot || hoveredSlot === slot
+        const { isActiveLayerVisible } = getActiveLayer(
+          id,
+          selectedRunTimeCommand
+        )
         return (
           <Fragment key={id}>
             <LabwareOnDeck
@@ -314,6 +382,33 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               setSelectedSlot={setSelectedSlot}
               setHoveredSlot={setHoveredSlot}
             />
+            {hoveredSlot === slot ? (
+              <DeckViewOverlay
+                key={`${slot}_hoveredSlot_labware`}
+                slotId={slot}
+                slotPosition={slotPosition}
+                slotFillColor={COLORS.purple50}
+                opacity={0.9}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
+                  {labwareEntitiesExtended[id].nickName ??
+                    labwareEntities[id].def.metadata.displayName}
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
+            {isActiveLayerVisible && selectedRunTimeCommand != null ? (
+              <LabwareCommandSummary
+                commandType={selectedRunTimeCommand.commandType}
+                position={slotPosition}
+                labwareDef={labwareEntities[id].def}
+                showModuleIcon={false}
+              />
+            ) : null}
           </Fragment>
         )
       })}
@@ -350,13 +445,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           )
           return null
         }
-        // const { isActiveLayerVisible } = getActiveLayer(
-        //   Object.values(pipettes),
-        //   id,
-        //   selectedRunTimeCommand
-        // )
-        // const isActive =
-        //   selectedSlot === slotForOnTheDeck || hoveredSlot === slotForOnTheDeck
+        const { isActiveLayerVisible } = getActiveLayer(
+          id,
+          selectedRunTimeCommand
+        )
 
         return (
           <Fragment key={id}>
@@ -370,9 +462,47 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
               setSelectedSlot={setSelectedSlot}
               setHoveredSlot={setHoveredSlot}
             />
+            {hoveredSlot === slotForOnTheDeck ? (
+              <DeckViewOverlay
+                key={`${slotForOnTheDeck}_hoveredSlot_labware`}
+                slotId={slotForOnTheDeck}
+                slotPosition={slotPosition}
+                slotFillColor={COLORS.purple50}
+                opacity={0.9}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                <StyledText desktopStyle="captionRegular" color={COLORS.white}>
+                  {labwareEntitiesExtended[id].nickName ??
+                    labwareEntities[id].def.metadata.displayName}
+                </StyledText>
+              </DeckViewOverlay>
+            ) : null}
+            {isActiveLayerVisible && selectedRunTimeCommand != null ? (
+              <LabwareCommandSummary
+                commandType={selectedRunTimeCommand.commandType}
+                position={slotPosition}
+                labwareDef={labwareEntities[id].def}
+                showModuleIcon={false}
+              />
+            ) : null}
           </Fragment>
         )
       })}
+
+      {/* when commandSummary happens on a fixture */}
+      {isPipetteOverTrash &&
+      selectedRunTimeCommand != null &&
+      trashAddressableArea != null ? (
+        <FixtureCommandSummary
+          commandType={selectedRunTimeCommand.commandType}
+          slotPosition={getPositionFromSlotId(trashAddressableArea.id, deckDef)}
+          slotBoundingBox={trashAddressableArea.boundingBox}
+        />
+      ) : null}
     </>
   )
 }
