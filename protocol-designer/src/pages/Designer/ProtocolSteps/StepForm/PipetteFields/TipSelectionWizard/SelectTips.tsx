@@ -40,6 +40,8 @@ import type {
 import type { TipState } from '@opentrons/step-generation'
 import type { TipSelectionBaseProps } from './types'
 
+const NINETY_SIX_ALL_TARGET_WELL = 'A1'
+
 export function SelectTips(
   props: TipSelectionBaseProps & {
     pipetteSpecs: PipetteV2Specs
@@ -160,7 +162,7 @@ export function SelectTips(
       const column = wellName.slice(1, wellName.length)
       transformedWellName = `A${column}`
     } else if (channels === 96 && nozzles === ALL) {
-      transformedWellName = 'A1'
+      transformedWellName = NINETY_SIX_ALL_TARGET_WELL
     }
     setHoveredWell(transformedWellName)
   }

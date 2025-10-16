@@ -1,5 +1,12 @@
 import type { MouseEvent } from 'react'
-import type { INACCESSIBLE, NEW, NO, SELECTED, USED } from './Tips/constants'
+import type {
+  INACCESSIBLE,
+  NEW,
+  NO,
+  SELECTED,
+  SELECTED_USED,
+  USED,
+} from './Tips/constants'
 
 export interface WellMouseEvent {
   wellName: string
@@ -24,3 +31,4 @@ export type TipType =
   | typeof SELECTED
   | typeof NO
   | typeof INACCESSIBLE
+  | typeof SELECTED_USED
