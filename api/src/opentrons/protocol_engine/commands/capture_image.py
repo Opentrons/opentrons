@@ -5,22 +5,11 @@ from typing import Optional, TYPE_CHECKING, Tuple, Any
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from opentrons.system.camera import (
-    ZOOM_MIN,
-    ZOOM_MAX,
-    CONTRAST_MIN,
-    CONTRAST_MAX,
-    SATURATION_MIN,
-    SATURATION_MAX,
-    BRIGHTNESS_MIN,
-    BRIGHTNESS_MAX,
-)
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     StorageLimitReachedError,
     CameraDisabledError,
-    CameraSettingsInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
@@ -89,50 +78,22 @@ class CaptureImageResult(BaseModel):
 
 
 def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
-    def _error_response(
-        category: str, provided_value: float, range_min: float, range_max: float
-    ) -> None:
-        raise CameraSettingsInvalidError(
-            message=f"Provided {category} of {provided_value} is invalid, must be valued through {range_min} and {range_max}"
-        )
-
-    image_parameters = ImageParameters()
-    if params.zoom is not None and (params.zoom < ZOOM_MIN or params.zoom > ZOOM_MAX):
-        _error_response("zoom", params.zoom, ZOOM_MIN, ZOOM_MAX)
-    image_parameters.zoom = params.zoom
-
-    if params.brightness is not None:
-        scaled_brightness: int = int(((params.brightness * 256) // 100) - 128) * -1
-        if scaled_brightness < BRIGHTNESS_MIN or scaled_brightness > BRIGHTNESS_MAX:
-            _error_response("brightness", params.brightness, 0, 100)
-        image_parameters.brightness = scaled_brightness
-    else:
-        image_parameters.brightness = None
-
-    if params.contrast is not None:
-        scaled_contrast = (params.contrast / 100) * 2.0
-        if scaled_contrast is not None and (
-            scaled_contrast < CONTRAST_MIN or scaled_contrast > CONTRAST_MAX
-        ):
-            _error_response("contrast", params.contrast, 0, 100)
-        image_parameters.contrast = scaled_contrast
-    else:
-        image_parameters.contrast = None
-
-    if params.saturation is not None:
-        scaled_saturation = (params.saturation / 100) * 2.0
-        if scaled_saturation is not None and (
-            scaled_saturation < SATURATION_MIN or scaled_saturation > SATURATION_MAX
-        ):
-            _error_response("saturation", params.saturation, 0, 100)
-        image_parameters.saturation = scaled_saturation
-    else:
-        image_parameters.saturation = None
-
-    # todo(chb, 2025-10-13): Validate the resolution and that the pan coordinates exist within the image limits
-    image_parameters.resolution = params.resolution
-    image_parameters.pan = params.pan
-    return image_parameters
+    return ImageParameters(
+        resolution=params.resolution,
+        zoom=params.zoom,
+        pan=params.pan,
+        contrast=(
+            (params.contrast / 100) * 2.0 if params.contrast is not None else None
+        ),
+        brightness=(
+            int(((params.brightness * 256) // 100) - 128) * -1
+            if params.brightness is not None
+            else None
+        ),
+        saturation=(
+            (params.saturation / 100) * 2.0 if params.saturation is not None else None
+        ),
+    )
 
 
 class CaptureImageImpl(

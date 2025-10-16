@@ -264,41 +264,46 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         potential_invalid_param = None
     if potential_invalid_param is not None:
         return CameraError(
-            message=f"{potential_invalid_param} parameter is outside the boundaries allowed for FFMPEG image capture.",
-            code=None,
+            message=f"{potential_invalid_param} parameter is outside the boundaries allowed for image capture.",
+            code="IMAGE_SETTINGS",
+        )
+    try:
+        # Always stop the live stream service to ensure the Camera is always free when attempting an image capture
+        await stop_live_stream()
+
+        zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
+        contrast = (
+            parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
+        )
+        brightness = (
+            parameters.brightness
+            if parameters.brightness is not None
+            else BRIGHTNESS_DEFAULT
+        )
+        saturation = (
+            parameters.saturation
+            if parameters.saturation is not None
+            else SATURATION_DEFAULT
+        )
+        resolution = (
+            parameters.resolution if parameters.resolution is not None else (1920, 1080)
         )
 
-    # Always stop the live stream service to ensure the Camera is always free when attempting an image capture
-    await stop_live_stream()
-
-    zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
-    contrast = (
-        parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
-    )
-    brightness = (
-        parameters.brightness
-        if parameters.brightness is not None
-        else BRIGHTNESS_DEFAULT
-    )
-    saturation = (
-        parameters.saturation
-        if parameters.saturation is not None
-        else SATURATION_DEFAULT
-    )
-    resolution = (
-        parameters.resolution if parameters.resolution is not None else (1920, 1080)
-    )
-
-    result = await ffmpeg.ffmpeg_capture_image_bytes(
-        resolution=resolution,
-        camera=camera,
-        zoom=zoom,
-        pan=parameters.pan if parameters.pan is not None else (0, 0),
-        contrast=contrast,
-        brightness=brightness,
-        saturation=saturation,
-    )
-
-    # Restart the live stream service
-    await restart_live_stream()
+        result = await ffmpeg.ffmpeg_capture_image_bytes(
+            resolution=resolution,
+            camera=camera,
+            zoom=zoom,
+            pan=parameters.pan if parameters.pan is not None else (0, 0),
+            contrast=contrast,
+            brightness=brightness,
+            saturation=saturation,
+        )
+    except Exception:
+        result = CameraError(
+            message="Exception occured during execution of system image capture.",
+            code=None,
+        )
+    finally:
+        # Restart the live stream service
+        await restart_live_stream()
     return result

@@ -1,7 +1,7 @@
 """Camera interaction resource provider."""
 from typing import Optional, Callable, Tuple, Awaitable
 from pydantic import BaseModel, Field
-from ..errors import CameraCaptureError
+from ..errors import CameraCaptureError, CameraSettingsInvalidError
 import logging
 
 log = logging.getLogger(__name__)
@@ -95,10 +95,12 @@ class CameraProvider:
             if not isinstance(capture_result, CameraError):
                 return capture_result
             else:
-                if capture_result.code is not None:
+                if capture_result.code == "IMAGE_SETTINGS":
+                    raise CameraSettingsInvalidError(message=capture_result.message)
+                elif capture_result.code is not None:
                     error_str = f"Camera capture has failed to return an image with return code {capture_result.code}: {capture_result.message}"
                 else:
-                    error_str = f"Camera capture has failed to return an image: {capture_result.message}"
+                    error_str = f"Camera capture has failed with exception: {capture_result.message}"
                 raise CameraCaptureError(message=error_str)
         # Return None if the image capture callback is unavailable (simulation)
         return None
