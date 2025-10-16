@@ -10,8 +10,7 @@ export function DeckOverlay(props: { deckDef: DeckDefinition }): JSX.Element {
       y={deckDef.cornerOffsetFromOrigin[1]}
       width={deckDef.dimensions[0]}
       height={deckDef.dimensions[1]}
-      fill={COLORS.black90}
-      opacity="0.3"
+      fill={`${COLORS.grey10}${COLORS.opacity60HexCode}`}
     />
   )
 }

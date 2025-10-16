@@ -9,6 +9,7 @@ import {
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
+  NO,
   SELECTED,
   SELECTED_ERROR,
   SELECTED_USED,
@@ -22,6 +23,7 @@ import {
   SINGLE,
 } from '@opentrons/shared-data'
 import {
+  EMPTY,
   getDefaultPrimaryNozzle,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
@@ -179,6 +181,9 @@ export function SelectTips(
 
   const handleHoverWell = (e: WellMouseEvent): void => {
     const { wellName } = e
+    if (tipState?.[wellName] === EMPTY) {
+      return
+    }
     let transformedWellName = wellName
     if (
       (channels === 8 && nozzles === ALL) ||
@@ -234,6 +239,9 @@ export function SelectTips(
         ? Object.entries(tipState).reduce<Record<string, TipType>>(
             (acc, [wellName, state]) => {
               let status = TIP_STATE_TO_TIP_TYPE[state]
+              if (state === EMPTY) {
+                status = NO
+              }
               if (
                 wellName in tipAccessibileStatusByWellName &&
                 !tipAccessibileStatusByWellName[wellName]
@@ -277,6 +285,7 @@ export function SelectTips(
             : {})}
           fill={COLORS.white}
           borderStroke={COLORS.yellow40}
+          ignoreMissingTips
         />
         {hoveredWell != null ? (
           <PipetteShadow

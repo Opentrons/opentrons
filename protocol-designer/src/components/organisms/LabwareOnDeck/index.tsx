@@ -25,6 +25,7 @@ interface LabwareOnDeckProps {
   selectedTipsByIndex?: Record<string, number>
   fill?: CSSProperties['fill']
   borderStroke?: CSSProperties['stroke']
+  ignoreMissingTips?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -41,6 +42,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     selectedTipsByIndex,
     fill,
     borderStroke,
+    ignoreMissingTips = false,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -61,7 +63,6 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
-
   return (
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
@@ -73,7 +74,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
         )}
         handleClickWell={handleClickWell}
         {...(showHighlightedWells ? { highlightedWells } : {})}
-        missingTips={missingTips}
+        {...(ignoreMissingTips ? {} : { missingTips })}
         highlight={highlight}
         tipStatusByWellName={tipStatusByWellName}
         onMouseEnterWell={onMouseEnterWell}
