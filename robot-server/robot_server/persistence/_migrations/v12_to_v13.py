@@ -2,12 +2,13 @@
 
 Summary of changes from schema 13:
 
-This compatability change adds additional camera related fields to the BooleanSettingKey table.
+- This compatibility change adds additional camera related fields to the BooleanSettingKey table.
+- Adds a run_id column to the data_files table to associate data files with specific runs.
 """
 
 from pathlib import Path
 
-from ._util import copy_contents
+from ._util import copy_contents, add_column
 from .._folder_migrator import Migration
 import sqlalchemy
 from ..database import sql_engine_ctx
@@ -29,6 +30,12 @@ class Migration12to13(Migration):  # noqa: D101
                 != schema_13.boolean_setting_table.name
             )
             _migrate_boolean_settings_table(transaction)
+
+            add_column(
+                engine,
+                schema_13.data_files_table.name,
+                schema_13.data_files_table.c.run_id,
+            )
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:

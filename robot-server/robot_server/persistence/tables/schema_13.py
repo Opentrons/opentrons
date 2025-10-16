@@ -312,6 +312,13 @@ data_files_table = sqlalchemy.Table(
         # null in practice.
         nullable=True,
     ),
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("run.id"),
+        nullable=True,
+        index=True,
+    ),
 )
 
 
