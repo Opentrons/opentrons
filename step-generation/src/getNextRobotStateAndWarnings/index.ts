@@ -60,6 +60,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
 ): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
+    // TODO: add this in case 'aspirateWhileTracking':
     case 'aspirate':
     case 'aspirateInPlace':
       if (command.meta?.isAirGap === true) {
@@ -69,6 +70,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       }
       break
 
+    // TODO: add this in case 'dispenseWhileTracking':
     case 'dispense':
     case 'dispenseInPlace':
       if (command.meta?.isAirGap === true) {
@@ -106,6 +108,26 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
+    //  for concurrent modules
+    //  TODO: wire these up if they change state
+    //  for concurrent module support
+    case 'createTimer':
+    case 'waitForTasks':
+      break
+
+    //  for flex stacker
+    //  TODO: wire these up if they change state
+    //  for flex stacker support
+    case 'flexStacker/closeLatch':
+    case 'flexStacker/empty':
+    case 'flexStacker/fill':
+    case 'flexStacker/openLatch':
+    case 'flexStacker/prepareShuttle':
+    case 'flexStacker/retrieve':
+    case 'flexStacker/setStoredLabware':
+    case 'flexStacker/store':
+      break
+
     // the following commands currently don't effect tracked robot state
     case 'touchTip': // pipetting
     case 'configureForVolume':
@@ -127,7 +149,17 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'prepareToAspirate':
     case 'liquidProbe':
     case 'loadLiquidClass':
+    case 'loadLidStack':
+    case 'loadLid':
+    case 'getTipPresence':
+    case 'identifyModule':
     case 'getNextTip':
+    case 'retractAxis':
+    case 'sealPipetteToTip':
+    case 'tryLiquidProbe':
+    case 'unsealPipetteFromTip':
+    case 'verifyTipPresence':
+    case 'pressureDispense': //  evo tip specific command
       break
 
     case 'moveToAddressableArea':
@@ -331,8 +363,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'absorbanceReader/read':
       break
     default:
-      assert(
-        false,
+      console.error(
         `unknown command: ${command.commandType} passed to getNextRobotStateAndWarning`
       )
   }
