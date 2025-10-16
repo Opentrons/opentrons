@@ -279,7 +279,7 @@ export function ProtocolTimelineScrubber(
         <LegacyStyledText as="label" marginY={SPACING.spacing8}>
           Jump to command
         </LegacyStyledText>
-        <PrimaryButton onClick={handlePlayPause} width="max-content">
+        <PrimaryButton onClick={handlePlayPause}>
           {isPlaying ? 'Pause' : 'Play'}
         </PrimaryButton>
       </Flex>
