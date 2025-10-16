@@ -282,6 +282,8 @@ jobs:
     needs: [python-lint, python-test, js-test, python-deploy, publish-switch, publish-to-npm]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.python-lint.result == 'success' && needs.python-test.result == 'success' && needs.js-test.result == 'success' && needs.python-deploy.result == 'success' && needs.publish-switch.result == 'success' && needs.publish-to-npm.result == 'success'
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -294,6 +296,8 @@ jobs:
     needs: [python-lint, python-test, js-test, python-deploy, publish-switch, publish-to-npm]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'failure' || needs.python-test.result == 'failure' || needs.js-test.result == 'failure' || needs.python-deploy.result == 'failure' || needs.publish-switch.result == 'failure' || needs.publish-to-npm.result == 'failure')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -334,6 +338,8 @@ jobs:
     needs: [python-lint, python-test, js-test, python-deploy, publish-switch, publish-to-npm]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.python-lint.result == 'cancelled' || needs.python-test.result == 'cancelled' || needs.js-test.result == 'cancelled' || needs.python-deploy.result == 'cancelled' || needs.publish-switch.result == 'cancelled' || needs.publish-to-npm.result == 'cancelled')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

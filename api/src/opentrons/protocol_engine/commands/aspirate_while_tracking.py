@@ -13,7 +13,7 @@ from .pipetting_common import (
     aspirate_while_tracking,
 )
 from .movement_common import (
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
     DestinationPositionResult,
     StallOrCollisionError,
     move_to_well,
@@ -45,7 +45,7 @@ class AspirateWhileTrackingParams(
     PipetteIdMixin,
     AspirateVolumeMixin,
     FlowRateMixin,
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
 ):
     """Parameters required to aspirate from a specific well."""
 
@@ -107,14 +107,20 @@ class AspirateWhileTrackingImplementation(
             )
         state_update = StateUpdate()
 
+        end_point = self._state_view.geometry.get_well_position(
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.trackToLocation,
+            operation_volume=-params.volume,
+            pipette_id=params.pipetteId,
+        )
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.wellLocation,
-            operation_volume=-params.volume,
+            well_location=params.trackFromLocation,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
@@ -128,6 +134,7 @@ class AspirateWhileTrackingImplementation(
             well_name=params.wellName,
             volume=params.volume,
             flow_rate=params.flowRate,
+            end_point=end_point,
             location_if_error={
                 "retryLocation": (
                     move_result.public.position.x,
