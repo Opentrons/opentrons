@@ -1185,7 +1185,7 @@ class ProtocolCore(
         """Capture an image using a camera.
         Args:
             resolution: Width by height resolution in pixels for the image to be captured with.
-            zoom: Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.
+            zoom: Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.
             contrast: The contrast to use when processing an image. Scale is 0% to 100%
             brightness: The brightness to use when processing an image. Scale is 0% to 100%.
             saturation: The saturation to use when processing an image. Scale is 0% to 100%.

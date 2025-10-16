@@ -119,13 +119,11 @@ class CaptureImageImpl(
         state_update = update_types.StateUpdate()
 
         # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
-
-        if params.fileName is not None:
-            # Validate that the file we are about to generate does not put us higher than the limit
-            if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
-                raise StorageLimitReachedError(
-                    message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
-                )
+        
+        if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
+            raise StorageLimitReachedError(
+                message=f"Attempt to write image file exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
+            )
 
         # Handle capturing an image with the CameraProvider
         camera_settings = await self._camera_provider.get_camera_settings()

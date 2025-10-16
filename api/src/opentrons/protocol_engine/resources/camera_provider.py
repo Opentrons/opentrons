@@ -39,7 +39,7 @@ class ImageParameters(BaseModel):
     )
     zoom: Optional[float] = Field(
         None,
-        description="Multiplier to use when cropping and scaling a captured Image.",
+        description="Multiplier to use when cropping and scaling a captured image.",
     )
     pan: Optional[Tuple[int, int]] = Field(
         None,
@@ -52,7 +52,7 @@ class ImageParameters(BaseModel):
         None, description="The brightness to use when processing an image."
     )
     saturation: Optional[float] = Field(
-        None, description="The brightness to use when processing an image."
+        None, description="The saturation to use when processing an image."
     )
 
 
