@@ -40,7 +40,6 @@ import type {
   LabwareTemporalProperties,
   LocationLiquidState,
   ModuleEntities,
-  PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
