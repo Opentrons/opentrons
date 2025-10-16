@@ -1,7 +1,9 @@
 import {
   ALL,
+  COLUMN,
   getIsTiprack,
   getPositionFromSlotId,
+  SINGLE,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
@@ -10,6 +12,7 @@ import {
 
 import type {
   DeckDefinition,
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
@@ -138,4 +141,36 @@ export function getIsTiprackSelectable(args: {
     !COLUMN_4_SLOTS.includes(slot) &&
     isPickupCompatibleWithPossibleAdapter
   )
+}
+
+export const getAllWellsInColumn = (
+  wellName: string,
+  labwareDef: LabwareDefinition
+): string[] => {
+  const column = getColumnFromWellName(wellName)
+  return Object.keys(labwareDef.wells).filter(
+    well => getColumnFromWellName(well) === column
+  )
+}
+
+export const getAffectedWells = (args: {
+  wellName: string | null
+  labwareDef: LabwareDefinition
+  channels: number
+  nozzles: NozzleConfigurationStyle
+}): string[] => {
+  const { wellName, labwareDef, channels, nozzles } = args
+  if (wellName == null) {
+    return []
+  }
+  if (channels === 1 || nozzles === SINGLE) {
+    return [wellName]
+  } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+    const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
+    return allWellsInColumn
+  } else if (channels === 96) {
+    const allWells = Object.keys(labwareDef.wells)
+    return allWells
+  }
+  return []
 }
