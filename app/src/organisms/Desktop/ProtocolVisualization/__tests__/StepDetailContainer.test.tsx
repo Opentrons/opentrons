@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -11,6 +11,10 @@ import { StepDetailContainer } from '../StepDetailContainer'
 import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
+import type { ComponentProps } from 'react'
+import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+
 vi.mock('../PipetteContainer')
 vi.mock('../DestinationLabwareContainer')
 vi.mock('../TipDisposalContainer')
@@ -18,14 +22,67 @@ vi.mock('../SourceLabwareContainer')
 vi.mock('../SourceWellViewContainer')
 vi.mock('../TipPickupContainer')
 
-const render = () => {
-  return renderWithProviders(
-    <StepDetailContainer protocolKey="mockProtocolKey" />
-  )
+const render = (props: ComponentProps<typeof StepDetailContainer>) => {
+  return renderWithProviders(<StepDetailContainer {...props} />)
 }
 
 describe('StepDetailContainer', () => {
+  let props: ComponentProps<typeof StepDetailContainer>
+
   beforeEach(() => {
+    props = {
+      protocolKey: 'mockProtocolKey',
+      commands: [
+        {
+          commandType: 'loadPipette',
+          params: {
+            pipetteName: 'p300_single',
+            mount: 'left',
+            pipetteId: 'leftPipetteId',
+          },
+          result: { pipetteId: 'leftPipetteId' },
+        },
+        {
+          commandType: 'loadPipette',
+          params: {
+            pipetteName: 'p300_multi',
+            mount: 'right',
+            pipetteId: 'rightPipetteId',
+          },
+          result: { pipetteId: 'rightPipetteId' },
+        },
+      ] as RunTimeCommand[],
+      selectedSlot: 'mockSelectedSlot',
+      robotState: {
+        labware: {},
+        liquidState: {
+          pipettes: {},
+          labware: {},
+          trashBins: {},
+          wasteChute: {},
+        },
+        modules: {},
+        pipettes: {
+          leftPipetteId: {
+            mount: 'left',
+            nozzles: 'ALL',
+            tipWell: 'A1',
+            tiprackId: 'mockTiprackId',
+          },
+          rightPipetteId: {
+            mount: 'right',
+            nozzles: 'ALL',
+            tipWell: 'A1',
+            tiprackId: 'mockTiprackId',
+          },
+        },
+        tipState: {
+          tipracks: {},
+          pipettes: {},
+        },
+      } as RobotState,
+      invariantContext: { moduleEntities: {} } as InvariantContext,
+    }
     vi.mocked(PipetteContainer).mockReturnValue(
       <div>mock Pipette Container</div>
     )
@@ -51,8 +108,8 @@ describe('StepDetailContainer', () => {
   })
 
   it('renders the pipette container', () => {
-    render()
-    screen.getByText('mock Pipette Container')
+    render(props)
+    expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
     screen.getByText('mock Destination Labware Container')
     screen.getByText('mock Tip Disposal Container')
     screen.getByText('mock Source Labware Container')

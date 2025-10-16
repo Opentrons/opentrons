@@ -291,7 +291,14 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StepDetailContainer protocolKey={protocolKey} />
+        <StepDetailContainer
+          protocolKey={protocolKey}
+          commands={commands}
+          selectedSlot={selectedSlot}
+          robotState={robotState}
+          invariantContext={invariantContext}
+          selectedRunTimeCommand={selectedRunTimeCommand}
+        />
       </div>
     </div>
   )
