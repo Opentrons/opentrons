@@ -20,13 +20,14 @@ import { COLUMN } from '@opentrons/shared-data'
 import {
   getMainPagePortalEl,
   SelectWellsModal,
-} from '../../../../../components/organisms'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
+} from '/protocol-designer/components/organisms'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import {
   getSelectedStepId,
   getWellSelectionLabwareKey,
   actions as stepsActions,
-} from '../../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
+
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'
@@ -137,7 +138,7 @@ export const WellSelectionField = (
           value={
             disabled || primaryWellCount == null
               ? t('step_edit_form.wellSelectionLabel.choose_wells')
-              : primaryWellCount ?? errorToShow
+              : (primaryWellCount ?? errorToShow)
           }
           onClick={handleOpen}
           hasBackgroundError={hasFormError}

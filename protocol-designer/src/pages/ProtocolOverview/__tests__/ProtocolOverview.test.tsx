@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getEnableCameraSupport } from '/protocol-designer/feature-flags/selectors'
+
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
@@ -14,11 +16,13 @@ import {
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import {
   getAdditionalEquipmentEntities,
+  getArgsAndErrorsByStepId,
   getInitialDeckSetup,
   getSavedStepForms,
 } from '../../../step-forms/selectors'
 import { getDismissedHints } from '../../../tutorial/selectors'
 import { ProtocolOverview } from '../index'
+import { InputDeviceInfo } from '../InputDeviceInfo'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
 import { ProtocolMetadata } from '../ProtocolMetadata'
@@ -40,6 +44,7 @@ vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
 vi.mock('../StepsInfo')
 vi.mock('../StartingDeck')
+vi.mock('../InputDeviceInfo')
 
 const mockNavigate = vi.fn()
 
@@ -67,6 +72,7 @@ describe('ProtocolOverview', () => {
     vi.mocked(labwareIngredSelectors.allIngredientGroupFields).mockReturnValue(
       {}
     )
+    vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
@@ -81,6 +87,7 @@ describe('ProtocolOverview', () => {
       description: 'mockDescription',
       created: 123,
     })
+    vi.mocked(getEnableCameraSupport).mockReturnValue(true)
     vi.mocked(MaterialsListModal).mockReturnValue(
       <div>mock MaterialsListModal</div>
     )
@@ -92,6 +99,7 @@ describe('ProtocolOverview', () => {
     vi.mocked(ProtocolMetadata).mockReturnValue(
       <div>mock ProtocolMetadata</div>
     )
+    vi.mocked(InputDeviceInfo).mockReturnValue(<div>mock InputDevices</div>)
     vi.mocked(StartingDeck).mockReturnValue(<div>mock StartingDeck</div>)
   })
 
@@ -110,6 +118,9 @@ describe('ProtocolOverview', () => {
 
     //   liquids
     screen.getByText('mock LiquidDefinitions')
+
+    //   input devices
+    screen.getByText('mock InputDevices')
 
     //  steps
     screen.getByText('mock StepsInfo')

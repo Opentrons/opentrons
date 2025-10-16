@@ -19,6 +19,7 @@ import {
   TouchScreenSleep,
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
+import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
 import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   getLocalRobot,
@@ -64,14 +65,14 @@ export function RobotSettingsDashboard(): JSX.Element {
   const networkConnection = useNetworkConnection(robotName)
   const { activeSsid } = networkConnection
   const list = useWifiList(robotName)
-  const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
-    ?.securityType
+  const connectedWifiAuthType = list.find(
+    wifi => wifi.ssid === activeSsid
+  )?.securityType
 
   // LOCAL STATE MANAGEMENT for wi-fi user input
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
-    'wpa-psk'
-  )
+  const [selectedAuthType, setSelectedAuthType] =
+    useState<WifiSecurityType>('wpa-psk')
   const [password, setPassword] = useState<string>('')
 
   // REQUESTS
@@ -204,6 +205,9 @@ export function RobotSettingsDashboard(): JSX.Element {
 
     case 'LanguageSetting':
       return <LanguageSetting setCurrentOption={setCurrentOption} />
+
+    case 'CameraPreferences':
+      return <CameraPreferences setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:

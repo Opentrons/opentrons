@@ -30,9 +30,8 @@ import { getSystemLanguage } from '/app/redux/shell'
 import type { DropdownOption } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
 
-type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType extends ReadonlyArray<infer ElementType> ? ElementType : never
+type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends ReadonlyArray<infer ElementType> ? ElementType : never
 
 export function SystemLanguagePreferenceModal(): JSX.Element | null {
   const { i18n, t } = useTranslation(['app_settings', 'shared', 'branded'])

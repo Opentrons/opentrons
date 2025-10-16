@@ -1,0 +1,19 @@
+{
+  "click_and_drag": "Click and drag to select tips in {{labwareName}}",
+  "continue": "Continue",
+  "go_back": "Go back",
+  "legend": {
+    "inaccessible_tip": "Inaccessible tip",
+    "new_tip": "New tip",
+    "no_tip": "No tip",
+    "selected_tip": "Selected tip",
+    "used_tip": "Used tip"
+  },
+  "no_tiprack_selected": "Select a tiprack to continue",
+  "pickups_remaining": "{{count}} pickups remaining",
+  "select": "Select",
+  "selected": "Selected",
+  "select_tiprack": "Select a tip rack to pick up tips from",
+  "select_tips": "Select tips",
+  "select_tips_for_tracking": "Select tips for manual tip tracking"
+}

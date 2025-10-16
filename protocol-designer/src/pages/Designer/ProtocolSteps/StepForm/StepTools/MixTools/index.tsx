@@ -1,16 +1,12 @@
 import { useSelector } from 'react-redux'
 
-import {
-  getEnablePartialTipSupport,
-  getEnableReturnTip,
-} from '../../../../../../feature-flags/selectors'
-import {
-  getLabwareEntities,
-  getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+
 import { useAssignLiquidClass } from '../MoveLiquidTools/hooks/useAssignLiquidClass'
 import { useSupportedLiquidClassOptions } from '../MoveLiquidTools/hooks/useSupportedLiquidClassOptions'
 import { LiquidClassesStepTools } from '../MoveLiquidTools/LiquidClassesStepTools'
+import { TipSettings } from '../MoveLiquidTools/TipSettings'
 import { FirstStepMixTools } from './FirstStepMixTools'
 import { SecondStepMixTools } from './SecondStepMixTools'
 
@@ -31,19 +27,7 @@ export function MixTools(
     setShowFormErrors,
   } = props
   const pipettes = useSelector(getPipetteEntities)
-  const enableReturnTip = useSelector(getEnableReturnTip)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
-  const labwares = useSelector(getLabwareEntities)
-
-  const pickUpTipLocationValue = propsForFields.pickUpTip_location?.value
-  const userSelectedPickUpTipLocation =
-    pickUpTipLocationValue != null &&
-    labwares[String(pickUpTipLocationValue)] != null
-
-  const dropTipLocationValue = propsForFields.dropTip_location?.value
-  const userSelectedDropTipLocation =
-    dropTipLocationValue != null &&
-    labwares[String(dropTipLocationValue)] != null
 
   const orderedLiquidClassOptions = useAssignLiquidClass(
     formData,
@@ -64,9 +48,6 @@ export function MixTools(
         formData={formData}
         enablePartialTip={enablePartialTip}
         pipettes={pipettes}
-        enableReturnTip={enableReturnTip}
-        userSelectedPickUpTipLocation={userSelectedPickUpTipLocation}
-        userSelectedDropTipLocation={userSelectedDropTipLocation}
       />
     ),
     1: () => (
@@ -87,6 +68,14 @@ export function MixTools(
         formData={formData}
         tab={tab}
         setTab={setTab}
+      />
+    ),
+
+    3: () => (
+      <TipSettings
+        propsForFields={propsForFields}
+        formData={formData}
+        stepType="mix"
       />
     ),
   }

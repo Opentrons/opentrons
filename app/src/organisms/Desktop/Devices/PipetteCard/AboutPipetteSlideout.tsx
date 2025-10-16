@@ -26,13 +26,8 @@ interface AboutPipetteSlideoutProps {
 export const AboutPipetteSlideout = (
   props: AboutPipetteSlideoutProps
 ): JSX.Element | null => {
-  const {
-    pipetteId,
-    pipetteName,
-    isExpanded,
-    firmwareVersion,
-    onCloseClick,
-  } = props
+  const { pipetteId, pipetteName, isExpanded, firmwareVersion, onCloseClick } =
+    props
   const { i18n, t } = useTranslation(['device_details', 'shared'])
 
   return (

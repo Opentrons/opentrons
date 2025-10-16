@@ -12,10 +12,14 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.robot.types import RobotType
+from opentrons.system import camera
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
-from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
+from ..hardware_control.modules import (
+    AbstractModule as HardwareModuleAPI,
+    ModuleModel as HardwareModuleModel,
+)
 from ..protocol_engine import (
     ProtocolEngine,
     CommandCreate,
@@ -41,6 +45,7 @@ from ..protocol_engine.types import (
     CommandAnnotation,
     ModuleModel,
 )
+from ..protocol_engine.resources.camera_provider import CameraProvider
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -81,15 +86,16 @@ class RunOrchestrator:
     _protocol_live_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
+    _camera_provider: Optional[CameraProvider] = None
 
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
-        # todo(mm, 2024-07-05): This hardware_api param looks unused?
         hardware_api: HardwareControlAPI,
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
         protocol_live_runner: protocol_runner.LiveRunner,
+        camera_provider: Optional[CameraProvider] = None,
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
@@ -104,6 +110,7 @@ class RunOrchestrator:
             setup_runner: LiveRunner for setup commands.
             protocol_live_runner: LiveRunner for protocol commands.
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
+            camera_provider: Provides callbacks to Camera interface.
             run_id: run id if any, associated to the runner/engine.
         """
         self._run_id = run_id
@@ -112,9 +119,12 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
         self._protocol_live_runner = protocol_live_runner
+        self._camera_provider = camera_provider
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
+        # used by SimulatingRunOrchestrator to clean up the simulating hardware controller
+        self._hardware_api = hardware_api
 
     @property
     def run_id(self) -> str:
@@ -128,6 +138,7 @@ class RunOrchestrator:
         cls,
         hardware_api: HardwareControlAPI,
         protocol_engine: ProtocolEngine,
+        camera_provider: Optional[CameraProvider] = None,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
         ] = None,
@@ -165,6 +176,7 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
             protocol_live_runner=protocol_live_runner,
+            camera_provider=camera_provider,
         )
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
@@ -182,6 +194,8 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
+        if self._camera_provider:
+            await camera.update_live_stream_status(True, self._camera_provider)
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -209,6 +223,9 @@ class RunOrchestrator:
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
+        # Shut down the live stream, if there is one
+        if self._camera_provider:
+            await camera.update_live_stream_status(False, self._camera_provider)
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
@@ -379,6 +396,30 @@ class RunOrchestrator:
     def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
+
+    async def asynchronous_module_error(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an asynchronous module error reported by hardware.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.async_module_error(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
+
+    async def module_disconnected(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an unexpected module disconnection.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.module_disconnected(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
 
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]

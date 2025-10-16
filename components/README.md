@@ -8,6 +8,7 @@ React components for Opentrons' applications. Visit the [Opentrons Components Li
 
 ```javascript
 import { PrimaryButton } from '@opentrons/components'
+
 export default function CowButton(props) {
   return <PrimaryButton onClick={() => console.log('🐄')} />
 }
@@ -17,12 +18,12 @@ export default function CowButton(props) {
 
 Usage requirements for dependent projects:
 
-- Node v22.11.0+ and yarn
+- Node v22.12.0+ and yarn
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
-  - `react`: `17.0.1`,
-  - `react-router-dom`: `^4.2.2`,
+  - `react`: `18.2.0`,
+  - `react-router-dom`: `6.24.1`,
   - `classnames`: `^2.2.5`,
-  - `lodash`: `^4.17.4`
+  - `lodash`: `4.17.21`
 
 ## contributing
 
@@ -43,7 +44,6 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
   - Make sure DOM attributes are mapped correctly
   - Make sure handlers fire correctly
 - Render tests
-
   - Snapshot tests using [jest's snapshot functionality][jest-snapshots]
   - To regenerate snapshots after an intentional rendering change, run:
 

@@ -1,5 +1,6 @@
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from '../labwareInternals'
+import { GenericLid } from './GenericLid'
 import { Opentrons96DeepWellAdapter } from './Opentrons96DeepWellAdapter'
 import { Opentrons96FlatBottomAdapter } from './Opentrons96FlatBottomAdapter'
 import { OpentronsAluminumFlatBottomPlate } from './OpentronsAluminumFlatBottomPlate'
@@ -11,7 +12,7 @@ import { OpentronsUniversalFlatAdapterTypeB } from './OpentronsUniversalFlatAdap
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
-const LABWARE_ADAPTER_LOADNAME_PATHS = {
+const CUSTOM_SVG_LOADNAME_PATHS = {
   opentrons_96_deep_well_adapter: Opentrons96DeepWellAdapter,
   opentrons_96_flat_bottom_adapter: Opentrons96FlatBottomAdapter,
   opentrons_aluminum_flat_bottom_plate: OpentronsAluminumFlatBottomPlate,
@@ -22,16 +23,20 @@ const LABWARE_ADAPTER_LOADNAME_PATHS = {
   opentrons_flex_deck_riser: OpentronsAutoclavableDeckRiser,
 }
 
-export type LabwareAdapterLoadName = keyof typeof LABWARE_ADAPTER_LOADNAME_PATHS
-export const labwareAdapterLoadNames = Object.keys(
-  LABWARE_ADAPTER_LOADNAME_PATHS
-)
+export type LabwareAdapterLoadName = keyof typeof CUSTOM_SVG_LOADNAME_PATHS
+export const customSVGLoadNames = Object.keys(CUSTOM_SVG_LOADNAME_PATHS)
 
 export interface LabwareAdapterProps {
   labwareLoadName: LabwareAdapterLoadName
+  lidDimensions: {
+    xDimension: number
+    yDimension: number
+    zDimension: number
+  } | null
   definition?: LabwareDefinition
   highlight?: boolean
   highlightShadow?: boolean
+  isLid?: boolean
 }
 
 export const LabwareAdapter = (
@@ -42,6 +47,8 @@ export const LabwareAdapter = (
     definition,
     highlight = false,
     highlightShadow,
+    isLid = false,
+    lidDimensions,
   } = props
   const highlightOutline =
     highlight && definition != null ? (
@@ -60,7 +67,15 @@ export const LabwareAdapter = (
         fill={COLORS.transparent}
       />
     ) : null
-  const SVGElement = LABWARE_ADAPTER_LOADNAME_PATHS[labwareLoadName]
+
+  //  TODO(ja, 27.8.25): find a way to simplify this logic more?
+  //  but the PCR auto-sealing lid will always be special-cased here
+  const isGenericLid =
+    isLid && labwareLoadName !== 'opentrons_tough_pcr_auto_sealing_lid'
+
+  const SVGElement = isGenericLid
+    ? GenericLid
+    : CUSTOM_SVG_LOADNAME_PATHS[labwareLoadName]
 
   return (
     <g>
@@ -69,7 +84,7 @@ export const LabwareAdapter = (
        * does not layer over the inside of the SVG labware adapter
        */}
       {highlightShadowOutline}
-      <SVGElement />
+      <SVGElement lidDimensions={lidDimensions} />
       {highlightOutline}
     </g>
   )

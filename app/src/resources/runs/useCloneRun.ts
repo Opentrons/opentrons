@@ -58,12 +58,10 @@ export function useCloneRun(
         'runTimeParameters' in runRecord.data
           ? runRecord.data.runTimeParameters
           : []
-      const runTimeParameterValues = getRunTimeParameterValuesForRun(
-        runTimeParameters
-      )
-      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-        runTimeParameters
-      )
+      const runTimeParameterValues =
+        getRunTimeParameterValuesForRun(runTimeParameters)
+      const runTimeParameterFiles =
+        getRunTimeParameterFilesForRun(runTimeParameters)
       if (triggerAnalysis && protocolKey != null) {
         createProtocolAnalysis({
           protocolKey,

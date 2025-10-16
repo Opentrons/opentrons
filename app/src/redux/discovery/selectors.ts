@@ -84,69 +84,73 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
-export const getDiscoveredRobots: (
-  state: State
-) => DiscoveredRobot[] = createSelector(
-  state => state.discovery.robotsByName,
-  robotsMap => {
-    return Object.keys(robotsMap).map((robotName: string) => {
-      const robot = robotsMap[robotName]
-      const { addresses, ...robotState } = robot
-      const { health, serverHealth } = robotState
-      const addr = head(addresses)
-      const advertisedModel = addr?.advertisedModel ?? null
-      const ip = addr?.ip ? ipToHostname(addr.ip) : null
-      const port = addr?.port ?? null
-      const healthStatus = addr?.healthStatus ?? null
-      const serverHealthStatus = addr?.serverHealthStatus ?? null
-      const baseRobot = {
-        ...robotState,
-        displayName: makeDisplayName(robotName),
-        local: ip !== null ? isLocal(ip) : null,
-        seen: addr?.seen === true,
-        robotModel: makeRobotModel(
-          health?.robot_model ?? null,
-          serverHealth?.robotModel ?? null,
-          advertisedModel ?? null
-        ),
-      }
+export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
+  createSelector(
+    state => state.discovery.robotsByName,
+    robotsMap => {
+      return Object.keys(robotsMap).map((robotName: string) => {
+        const robot = robotsMap[robotName]
+        const { addresses, ...robotState } = robot
+        const { health, serverHealth } = robotState
+        const addr = head(addresses)
+        const advertisedModel = addr?.advertisedModel ?? null
+        const ip = addr?.ip ? ipToHostname(addr.ip) : null
+        const port = addr?.port ?? null
+        const healthStatus = addr?.healthStatus ?? null
+        const serverHealthStatus = addr?.serverHealthStatus ?? null
+        const baseRobot = {
+          ...robotState,
+          displayName: makeDisplayName(robotName),
+          local: ip !== null ? isLocal(ip) : null,
+          seen: addr?.seen === true,
+          robotModel: makeRobotModel(
+            health?.robot_model ?? null,
+            serverHealth?.robotModel ?? null,
+            advertisedModel ?? null
+          ),
+        }
 
-      if (ip !== null && port !== null && healthStatus && serverHealthStatus) {
-        if (health && healthStatus === HEALTH_STATUS_OK) {
-          return {
-            ...baseRobot,
-            ip,
-            port,
-            health,
-            serverHealthStatus,
-            healthStatus: HEALTH_STATUS_OK,
-            status: CONNECTABLE,
+        if (
+          ip !== null &&
+          port !== null &&
+          healthStatus &&
+          serverHealthStatus
+        ) {
+          if (health && healthStatus === HEALTH_STATUS_OK) {
+            return {
+              ...baseRobot,
+              ip,
+              port,
+              health,
+              serverHealthStatus,
+              healthStatus: HEALTH_STATUS_OK,
+              status: CONNECTABLE,
+            }
+          }
+
+          if (healthStatus !== HEALTH_STATUS_UNREACHABLE || addr?.seen) {
+            return {
+              ...baseRobot,
+              ip,
+              port,
+              healthStatus,
+              serverHealthStatus,
+              status: REACHABLE,
+            }
           }
         }
 
-        if (healthStatus !== HEALTH_STATUS_UNREACHABLE || addr?.seen) {
-          return {
-            ...baseRobot,
-            ip,
-            port,
-            healthStatus,
-            serverHealthStatus,
-            status: REACHABLE,
-          }
+        return {
+          ...baseRobot,
+          ip,
+          port,
+          healthStatus,
+          serverHealthStatus,
+          status: UNREACHABLE,
         }
-      }
-
-      return {
-        ...baseRobot,
-        ip,
-        port,
-        healthStatus,
-        serverHealthStatus,
-        status: UNREACHABLE,
-      }
-    })
-  }
-)
+      })
+    }
+  )
 
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getDiscoveredRobots,

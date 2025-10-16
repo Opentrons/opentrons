@@ -41,7 +41,7 @@ Use an Opentrons-verified liquid class in your transfers to automatically apply 
 Liquid Class Properties
 ========================
 
-When you select a liquid class to use in transfers on the the Flex, properties like submerge speed, flow rate, touch tip, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
+When you select a liquid class to use in transfers on the the Flex, properties like submerge speed, flow rate, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
 
 Each Opentrons-verified liquid class is defined by a set of properties: 
 
@@ -64,7 +64,7 @@ Each Opentrons-verified liquid class is defined by a set of properties:
         **Delay after submerging**
       - The pipette delays a specified amount of time:
 
-        - before submerging into or retracting from liquid.
+        - after submerging into or retracting from liquid.
         - before or after an aspirate or dispense.
         - after a push out.
     * - .. image:: ../img/lc_icons/mix.png
@@ -221,20 +221,25 @@ You can create your own liquid class to customize transfer behavior for any liqu
 
 To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use :py:meth:`~.ProtocolContext.get_liquid_class` to specify the liquid class you'll make changes to::
 
-    custom_water = protocol.get_liquid_class(name="water")
+    custom_water = protocol.get_liquid_class(name="water", version=1)
     custom_water_properties=custom_water.get_for(pipette, tiprack)
 
-.. versionadded:: 2.24
 
-Next, edit indivual liquid class properties based on your Flex pipette and tip combination. 
+Here, you can also use the optional ``version`` parameter to specify which version of the liquid class definition you'd like to customize. If unspecified, the API loads the latest version.
+
+.. versionadded:: 2.24
+.. versionchanged:: 2.26
+  The ``version`` parameter lets you apply a previous liquid class definition version. 
+
+Next, edit individual liquid class properties based on your Flex pipette and tip combination. 
 
 .. code-block:: python
     
   # edit aspirate submerge speed to 80 μL/sec
     custom_water_properties.aspirate.submerge.speed = 80
   # edit aspirate flow rate by volume for 10 μL and 20 μL volumes
-    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(10.0, 40.0)
-    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30.0)]
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume(volume=10.0, value=40.0)
+    custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume(volume=20.0, value=30.0)
   # edit to delay for 1 sec before retracting after an aspirate
     custom_water_properties.aspirate.retract.delay.enabled = True
     custom_water_properties.aspirate.retract.delay.duration = 1.0

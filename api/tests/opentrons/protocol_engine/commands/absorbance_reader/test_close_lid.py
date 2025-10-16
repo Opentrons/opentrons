@@ -24,10 +24,6 @@ from opentrons.protocol_engine.commands.absorbance_reader import (
 from opentrons.protocol_engine.commands.absorbance_reader.close_lid import (
     CloseLidImpl,
 )
-from opentrons.protocol_engine.types import (
-    LabwareMovementOffsetData,
-    LabwareOffsetVector,
-)
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
@@ -112,17 +108,6 @@ async def test_absorbance_reader_close_lid_implementation(
     decoy.when(state_view.labware.get_absorbance_reader_lid_definition()).then_return(
         absorbance_def
     )
-    decoy.when(
-        state_view.labware.get_child_gripper_offsets(
-            labware_definition=absorbance_def,
-            slot_name=None,
-        )
-    ).then_return(
-        LabwareMovementOffsetData(
-            pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-            dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        )
-    )
 
     result = await subject.execute(params=params)
 
@@ -161,61 +146,4 @@ async def test_close_lid_raises_no_module(
     decoy.when(state_view.config.use_virtual_modules).then_return(False)
     decoy.when(equipment.get_module_hardware_api(verified_module_id)).then_return(None)
     with pytest.raises(CannotPerformModuleAction):
-        await subject.execute(params=params)
-
-
-async def test_close_lid_raises_no_gripper_offset(
-    decoy: Decoy,
-    state_view: StateView,
-    equipment: EquipmentHandler,
-    subject: CloseLidImpl,
-    absorbance_def: LabwareDefinition2,
-) -> None:
-    """Should raise an error that gripper offset not found."""
-    params = CloseLidParams(
-        moduleId="unverified-module-id",
-    )
-
-    mabsorbance_module_substate = decoy.mock(cls=AbsorbanceReaderSubState)
-    absorbance_module_hw = decoy.mock(cls=AbsorbanceReader)
-    verified_module_id = AbsorbanceReaderId("module-id")
-
-    decoy.when(
-        state_view.modules.get_absorbance_reader_substate("unverified-module-id")
-    ).then_return(mabsorbance_module_substate)
-
-    decoy.when(mabsorbance_module_substate.module_id).then_return(verified_module_id)
-
-    decoy.when(equipment.get_module_hardware_api(verified_module_id)).then_return(
-        absorbance_module_hw
-    )
-
-    decoy.when(await absorbance_module_hw.get_current_lid_status()).then_return(
-        AbsorbanceReaderLidStatus.OFF
-    )
-    decoy.when(state_view.modules.get_requested_model(params.moduleId)).then_return(
-        ModuleModel.ABSORBANCE_READER_V1
-    )
-
-    decoy.when(state_view.labware.get_absorbance_reader_lid_definition()).then_return()
-
-    decoy.when(state_view.modules.get_location(params.moduleId)).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
-    )
-    decoy.when(
-        state_view.modules.ensure_and_convert_module_fixture_location(
-            DeckSlotName.SLOT_D3, ModuleModel.ABSORBANCE_READER_V1
-        )
-    ).then_return("absorbanceReaderV1D3")
-
-    decoy.when(state_view.labware.get_absorbance_reader_lid_definition()).then_return(
-        absorbance_def
-    )
-    decoy.when(
-        state_view.labware.get_child_gripper_offsets(
-            labware_definition=absorbance_def,
-            slot_name=None,
-        )
-    ).then_return(None)
-    with pytest.raises(ValueError):
         await subject.execute(params=params)

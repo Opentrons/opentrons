@@ -65,8 +65,8 @@ export function fieldsToLabware(
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
     const format = 'irregular'
-    let quirks: string[] = []
-
+    let quirks: string[] =
+      fields.hasLpcQuirk === 'true' ? ['noLabwarePositionCheck'] : []
     const heightOrDiameter =
       fields.wellShape === 'circular'
         ? fields.wellDiameter
@@ -107,19 +107,21 @@ export function fieldsToLabware(
 
     const stackingOffsetWithLabware: Record<string, LabwareOffset> = {}
     Object.entries(compatibleAdapters).forEach(([loadName, z]) => {
+      const zValue = parseFloat(String(z))
       const adapterHeight =
         adapterDefinitions != null
-          ? Object.values(adapterDefinitions).find(
+          ? (Object.values(adapterDefinitions).find(
               definition => definition.parameters.loadName === loadName
-            )?.dimensions.zDimension ?? 0
+            )?.dimensions.zDimension ?? 0)
           : 0
-      return (stackingOffsetWithLabware[loadName] = {
+
+      stackingOffsetWithLabware[loadName] = {
         x: 0,
         y: 0,
-        //  ensure that z is a number!
-        z: fields.labwareZDimension + adapterHeight - parseFloat(String(z)),
-      })
+        z: fields.labwareZDimension + adapterHeight - zValue,
+      }
     })
+
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
       const moduleDefinition = getModuleDef(moduleModel as ModuleModel)
@@ -203,7 +205,14 @@ export function fieldsToLabware(
 
     // overwrite loadName from createRegularLabware with ours
     def.parameters.loadName = fields.loadName
-
+    // Calculate stack offset for labware on itself
+    if (fields.stackedLabwareZDimension) {
+      stackingOffsetWithLabware[def.parameters.loadName] = {
+        x: 0,
+        y: 0,
+        z: fields.stackedLabwareZDimension - 2 * fields.labwareZDimension,
+      }
+    }
     return def
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')

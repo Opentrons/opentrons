@@ -3,16 +3,16 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import formDataForSingleStep from '../../../../../../../__fixtures__/formDataForSingleStep.json'
-import propsForFieldsForSingleStep from '../../../../../../../__fixtures__/propsForFieldsForSingleStep.json'
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../../assets/localization'
-import { getEnableReturnTip } from '../../../../../../../feature-flags/selectors'
+import formDataForSingleStep from '/protocol-designer/__fixtures__/formDataForSingleStep.json'
+import propsForFieldsForSingleStep from '/protocol-designer/__fixtures__/propsForFieldsForSingleStep.json'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import {
   ChangeTipField,
   DropTipField,
@@ -30,9 +30,9 @@ import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../../PipetteFields')
-vi.mock('../../../../../../../feature-flags/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -86,7 +86,6 @@ describe('FirstStepMoveLiquidTools', () => {
     vi.mocked(TipWellSelectionField).mockReturnValue(
       <div>mock TipWellSelectionField</div>
     )
-    vi.mocked(getEnableReturnTip).mockReturnValue(false)
   })
 
   it('renders fields', () => {
@@ -97,13 +96,5 @@ describe('FirstStepMoveLiquidTools', () => {
     screen.getAllByText('mock WellSelectionField')
     screen.getByText('mock VolumeField')
     screen.getByText('mock PathField')
-    screen.getByText('mock ChangeTipField')
-    screen.getByText('mock DropTipField')
-  })
-
-  it('renders fields when feature flag is enabled', () => {
-    vi.mocked(getEnableReturnTip).mockReturnValue(true)
-    render(props)
-    screen.getByText('mock PickUpTipField')
   })
 })

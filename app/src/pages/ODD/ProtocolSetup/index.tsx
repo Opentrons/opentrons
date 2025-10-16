@@ -57,6 +57,7 @@ import {
   ProtocolSetupTitleSkeleton,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
+import { ProtocolSetupCamera } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -70,9 +71,10 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getIsHeaterShakerAttached } from '/app/redux/config'
+import { getIsHeaterShakerAttached, useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
+  CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   OFFSETS_CONFLICT,
@@ -135,6 +137,7 @@ interface PrepareToRunProps {
   runRecord: Run | null
   labwareConfirmed: boolean
   offsetsConfirmed: boolean
+  cameraSettingsConfirmed: boolean
   isLPCInitializing: boolean
 }
 
@@ -150,6 +153,7 @@ function PrepareToRun({
   isLPCInitializing,
   confirmStepsComplete,
   offsetsConfirmed,
+  cameraSettingsConfirmed,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -159,6 +163,7 @@ function PrepareToRun({
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
+  const isCameraEnabled = useFeatureFlag('camera')
 
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
@@ -172,21 +177,18 @@ function PrepareToRun({
     ''
 
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [
-    isPollingForCompletedAnalysis,
-    setIsPollingForCompletedAnalysis,
-  ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
+    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
-  const {
-    data: mostRecentAnalysis = null,
-  } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    {
-      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-      refetchInterval: ANALYSIS_POLL_MS,
-    }
-  )
+  const { data: mostRecentAnalysis = null } =
+    useProtocolAnalysisAsDocumentQuery(
+      protocolId,
+      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+      {
+        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+        refetchInterval: ANALYSIS_POLL_MS,
+      }
+    )
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -211,9 +213,8 @@ function PrepareToRun({
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
 
-  const { requiredProtocolHardware } = useRequiredProtocolHardwareFromAnalysis(
-    mostRecentAnalysis
-  )
+  const { requiredProtocolHardware } =
+    useRequiredProtocolHardwareFromAnalysis(mostRecentAnalysis)
 
   const requiredFixtures = requiredProtocolHardware.filter(
     (hardware): hardware is ProtocolFixture => {
@@ -252,9 +253,8 @@ function PrepareToRun({
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
 
-  const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<boolean>(
-    false
-  )
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -288,10 +288,8 @@ function PrepareToRun({
 
   const locationConflictSlots = requiredDeckConfigCompatibility.map(
     fixtureCompatibility => {
-      const {
-        compatibleCutoutFixtureIds,
-        cutoutFixtureId,
-      } = fixtureCompatibility
+      const { compatibleCutoutFixtureIds, cutoutFixtureId } =
+        fixtureCompatibility
       const isCurrentFixtureCompatible =
         cutoutFixtureId != null &&
         compatibleCutoutFixtureIds.includes(cutoutFixtureId)
@@ -364,7 +362,10 @@ function PrepareToRun({
     incompleteInstrumentCount === 0 &&
     areModulesReady &&
     areFixturesReady &&
-    !isAnyNecessaryDefaultOffsetMissing
+    !isAnyNecessaryDefaultOffsetMissing &&
+    // TODO(jh, 10-01-25): Eventually, only block the run if the camera is used in the protocol
+    //  AND the camera is not in an enabled state (unconfirmed enabled is ok).
+    cameraSettingsConfirmed
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -398,6 +399,8 @@ function PrepareToRun({
           })
         }
       } else {
+        // TODO(jh, 10-01-25): Add camera snackbar if the camera is disabled
+        //  but required for this protocol run.
         makeSnackbar(
           i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
         )
@@ -677,6 +680,17 @@ function PrepareToRun({
               status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
             />
+            {isCameraEnabled && (
+              <ProtocolSetupStep
+                onClickSetupStep={() => {
+                  setSetupScreen('camera')
+                }}
+                title={t('camera_setup_step_title')}
+                // TODO(jh, 10-01-25): Handle disabled state, too.
+                detail={t('protocol_setup:enabled')}
+                status={cameraSettingsConfirmed ? 'ready' : 'general'}
+              />
+            )}
           </>
         ) : (
           <ProtocolSetupStepSkeleton />
@@ -711,10 +725,8 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
-  const [
-    showAnalysisFailedModal,
-    setShowAnalysisFailedModal,
-  ] = useState<boolean>(true)
+  const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
+    useState<boolean>(true)
   const robotType = useRobotType(robotName)
   const attachedModules =
     useAttachedModules({
@@ -725,10 +737,8 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
   })
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
-  const [
-    isPollingForCompletedAnalysis,
-    setIsPollingForCompletedAnalysis,
-  ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
+    useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
   const isMaintenanceRunActive =
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
@@ -739,16 +749,21 @@ export function ProtocolSetup(): JSX.Element {
     navigate('/protocols')
   }
 
-  const {
-    data: mostRecentAnalysis = null,
-  } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    {
-      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
-      refetchInterval: ANALYSIS_POLL_MS,
-    }
-  )
+  const isCameraEnabled = useFeatureFlag('camera')
+  const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
+  const confirmCameraSettings = (): void => {
+    setCameraSettingsConfirmed(!cameraSettingsConfirmed)
+  }
+
+  const { data: mostRecentAnalysis = null } =
+    useProtocolAnalysisAsDocumentQuery(
+      protocolId,
+      last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+      {
+        enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+        refetchInterval: ANALYSIS_POLL_MS,
+      }
+    )
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -828,6 +843,7 @@ export function ProtocolSetup(): JSX.Element {
   const missingSteps = [
     !labwareConfirmed ? LABWARE_SETUP_STEP_KEY : null,
     !offsetsConfirmed ? LPC_STEP_KEY : null,
+    !cameraSettingsConfirmed && isCameraEnabled ? CAMERA_SETUP_STEP_KEY : null,
   ].filter(s => s != null) as StepKey[]
   const {
     confirm: confirmMissingSteps,
@@ -858,6 +874,7 @@ export function ProtocolSetup(): JSX.Element {
         labwareConfirmed={labwareConfirmed}
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
         offsetsConfirmed={offsetsConfirmed}
+        cameraSettingsConfirmed={cameraSettingsConfirmed}
       />
     ),
     instruments: (
@@ -885,6 +902,13 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
+      />
+    ),
+    camera: (
+      <ProtocolSetupCamera
+        setSetupScreen={setSetupScreen}
+        isConfirmed={cameraSettingsConfirmed}
+        confirmCameraPreferences={confirmCameraSettings}
       />
     ),
     'view only parameters': (
@@ -940,6 +964,7 @@ const buildSetupScreenStyle = (
       case 'prepare to run':
         return `0 ${SPACING.spacing32} ${SPACING.spacing40}`
       case 'offsets':
+      case 'camera':
         return ''
       default:
         return `${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`

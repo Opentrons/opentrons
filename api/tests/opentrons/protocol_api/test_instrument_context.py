@@ -366,6 +366,8 @@ def test_aspirate(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -399,6 +401,8 @@ def test_aspirate_well_location(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -432,6 +436,8 @@ def test_aspirate_meniscus_well_location(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -464,6 +470,8 @@ def test_aspirate_from_coordinates(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -508,6 +516,8 @@ def test_aspirate_flow_rate(
             rate=1.5,  # requested flow_rate is 1.5 times default of 400
             flow_rate=600,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1075,6 +1085,8 @@ def test_dispense_with_location(
             flow_rate=5.67,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1109,6 +1121,8 @@ def test_dispense_with_well_location(
             flow_rate=3.0,
             push_out=7,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1144,6 +1158,8 @@ def test_dispense_with_well(
             flow_rate=5.67,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1204,6 +1220,8 @@ def test_dispense_flow_rate(
             in_place=True,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1468,6 +1486,8 @@ def test_dispense_0_volume_means_dispense_everything(
             flow_rate=5.67,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1495,6 +1515,8 @@ def test_dispense_0_volume_means_dispense_nothing(
             flow_rate=5.67,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1530,6 +1552,8 @@ def test_aspirate_0_volume_means_aspirate_everything(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1565,6 +1589,8 @@ def test_aspirate_0_volume_means_aspirate_nothing(
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1596,6 +1622,8 @@ def test_dispense_with_trash_last_location(
             flow_rate=6.7,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1744,6 +1772,8 @@ def test_mix_no_lpd(
             5.67,
             matchers.Anything(),  # first one is not in_place, the other 9 are in_place
             None,
+            None,
+            None,
         ),
         times=10,
     )
@@ -1760,6 +1790,8 @@ def test_mix_no_lpd(
                 True,
                 None,
                 None,
+                None,
+                None,
             ),
             times=10,
         )
@@ -1774,6 +1806,8 @@ def test_mix_no_lpd(
                 True,
                 0.0,
                 None,
+                None,
+                None,
             ),
             times=9,
         )
@@ -1785,6 +1819,8 @@ def test_mix_no_lpd(
                 1.23,
                 5.67,
                 True,
+                None,
+                None,
                 None,
                 None,
             ),
@@ -1839,6 +1875,8 @@ def test_mix_with_lpd(
             5.67,
             matchers.Anything(),  # first one is not in_place, the other 9 are in_place
             None,
+            None,
+            None,
         ),
         times=10,
     )
@@ -1852,6 +1890,8 @@ def test_mix_with_lpd(
             True,
             0.0,
             None,
+            None,
+            None,
         ),
         times=9,
     )
@@ -1863,6 +1903,8 @@ def test_mix_with_lpd(
             1.23,
             5.67,
             True,
+            None,
+            None,
             None,
             None,
         ),
@@ -1907,6 +1949,8 @@ def test_mix_with_flow_rates(
             flow_rate=300.0,
             in_place=True,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_instrument_core.dispense(
             location=input_location,
@@ -1917,6 +1961,8 @@ def test_mix_with_flow_rates(
             in_place=True,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
     )
 
@@ -1950,6 +1996,8 @@ def test_mix_with_flow_rates(
             flow_rate=300.0,
             in_place=True,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_instrument_core.dispense(
             location=input_location,
@@ -1960,6 +2008,8 @@ def test_mix_with_flow_rates(
             in_place=True,
             push_out=None,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
     )
 
@@ -1998,6 +2048,8 @@ def test_mix_with_delay_and_final_push_out(
             flow_rate=4.56,
             in_place=True,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_protocol_core.delay(3, msg=None),  # aspirate delay
         mock_instrument_core.dispense(
@@ -2009,6 +2061,8 @@ def test_mix_with_delay_and_final_push_out(
             in_place=True,
             push_out=0.0,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay
         mock_instrument_core.aspirate(
@@ -2019,6 +2073,8 @@ def test_mix_with_delay_and_final_push_out(
             flow_rate=4.56,
             in_place=True,
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_protocol_core.delay(3, msg=None),  # aspirate delay
         mock_instrument_core.dispense(
@@ -2030,6 +2086,8 @@ def test_mix_with_delay_and_final_push_out(
             in_place=True,
             push_out=2,  # final push out
             meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay
     )
@@ -2075,6 +2133,8 @@ def test_aspirate_with_lpd(
             1.23,
             5.67,
             False,
+            None,
+            None,
             None,
         ),
         times=1,

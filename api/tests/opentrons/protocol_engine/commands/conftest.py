@@ -14,10 +14,12 @@ from opentrons.protocol_engine.execution import (
     StatusBarHandler,
     TipHandler,
     GantryMover,
+    TaskHandler,
 )
 from opentrons.protocol_engine.resources import FileProvider
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.resources import ModelUtils, ConcurrencyProvider
+from opentrons.protocol_engine.state.state import StateView, StateStore
+from opentrons.protocol_engine.actions import ActionDispatcher
 
 
 @pytest.fixture
@@ -90,3 +92,58 @@ def gantry_mover(decoy: Decoy) -> GantryMover:
 def file_provider(decoy: Decoy) -> FileProvider:
     """Get a mocked out StateView."""
     return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture
+def task_handler(decoy: Decoy) -> TaskHandler:
+    """Get a mocked out TaskHandler."""
+    return decoy.mock(cls=TaskHandler)
+
+
+@pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mocked out ActionDispatcher.
+
+    Only use this if you are using a real task handler.
+    """
+    return decoy.mock(cls=ActionDispatcher)
+
+
+@pytest.fixture
+def concurrency_provider(decoy: Decoy) -> ConcurrencyProvider:
+    """Get a mocked out ConcurrencyProvider.
+
+    Only use this if you are using a real task handler.
+    """
+    return decoy.mock(cls=ConcurrencyProvider)
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mocked out StateStore.
+
+    Only use this if you are using a real task handler.
+    """
+    return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def real_concurrency_provider() -> ConcurrencyProvider:
+    """Get a real concurrency provider."""
+    return ConcurrencyProvider()
+
+
+@pytest.fixture
+def real_task_handler(
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    real_concurrency_provider: ConcurrencyProvider,
+) -> TaskHandler:
+    """Get a real task handler with mocked dependencies."""
+    return TaskHandler(
+        state_store=state_store,
+        action_dispatcher=action_dispatcher,
+        model_utils=model_utils,
+        concurrency_provider=real_concurrency_provider,
+    )

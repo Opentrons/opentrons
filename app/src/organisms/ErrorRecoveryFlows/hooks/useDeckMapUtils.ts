@@ -129,11 +129,16 @@ export function useDeckMapUtils({
   return {
     deckConfig,
     modulesOnDeck: updatedModules.map(
-      ({ moduleModel, moduleLocation, innerProps, nestedLabwareDef }) => ({
+      ({
         moduleModel,
         moduleLocation,
         innerProps,
-        nestedLabwareDef,
+        nestedLabwareDefsBottomToTop,
+      }) => ({
+        moduleModel,
+        moduleLocation,
+        innerProps,
+        nestedLabwareDefsBottomToTop,
       })
     ),
     labwareOnDeck: runCurrentLabware.map(
@@ -167,7 +172,7 @@ interface RunCurrentModulesOnDeck {
     | {
         lidMotorState?: undefined
       }
-  nestedLabwareDef: LabwareDefinition | null
+  nestedLabwareDefsBottomToTop: LabwareDefinition[]
 }
 
 // Builds the necessary module object expected by BaseDeck.
@@ -191,7 +196,8 @@ export function getRunCurrentModulesOnDeck({
           ? { lidMotorState: 'open' }
           : {},
 
-      nestedLabwareDef,
+      nestedLabwareDefsBottomToTop:
+        nestedLabwareDef != null ? [nestedLabwareDef] : [],
       highlight: getIsLabwareMatch(
         nestedLabwareSlotName,
         runRecord,
@@ -437,8 +443,8 @@ export function getSlotNameAndLwLocFrom(
   const baseSlot =
     onModuleModel != null &&
     getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
-      ? labwareLocationObject?.slotName.charAt(0) ?? null
-      : labwareLocationObject?.slotName ?? null
+      ? (labwareLocationObject?.slotName.charAt(0) ?? null)
+      : (labwareLocationObject?.slotName ?? null)
   if (
     location == null ||
     location === 'offDeck' ||

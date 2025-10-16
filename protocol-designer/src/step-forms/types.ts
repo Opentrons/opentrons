@@ -2,6 +2,7 @@ import type { Mount } from '@opentrons/components'
 import type {
   ABSORBANCE_READER_TYPE,
   CutoutId,
+  FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -68,6 +69,10 @@ export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
 
+export interface FlexStackerModuleState {
+  type: typeof FLEX_STACKER_MODULE_TYPE
+  // TODO: extend this state
+}
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {
   mode: InitializationMode
@@ -89,6 +94,7 @@ export interface ModuleTemporalProperties {
     | HeaterShakerModuleState
     | MagneticBlockState
     | AbsorbanceReaderState
+    | FlexStackerModuleState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
@@ -103,7 +109,8 @@ export type NormalizedLabwareById = Record<
     displayCategory: string
   }
 >
-export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]
+export type NormalizedLabware =
+  NormalizedLabwareById[keyof NormalizedLabwareById]
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {

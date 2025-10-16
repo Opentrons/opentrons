@@ -12,24 +12,23 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { selectors as analyticsSelectors } from '../../analytics'
-import { AnnouncementModal } from '../../components/organisms'
+import { selectors as analyticsSelectors } from '/protocol-designer/analytics'
+import { AnnouncementModal } from '/protocol-designer/components/organisms'
 import {
   AppInfo,
   FeatureFlag,
   Privacy,
   UserSettings,
-} from '../../components/organisms/Settings'
-import { getFeatureFlagData } from '../../feature-flags/selectors'
-import { selectors as tutorialSelectors } from '../../tutorial'
+} from '/protocol-designer/components/organisms/Settings'
+import { getFeatureFlagData } from '/protocol-designer/feature-flags/selectors'
+import { selectors as tutorialSelectors } from '/protocol-designer/tutorial'
 
 const SETTINGS_MAX_WIDTH = '56rem'
 
 export function Settings(): JSX.Element {
   const { t } = useTranslation('shared')
-  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
-    false
-  )
+  const [showAnnouncementModal, setShowAnnouncementModal] =
+    useState<boolean>(false)
   const flags = useSelector(getFeatureFlagData)
   const canClearHintDismissals = useSelector(
     tutorialSelectors.getCanClearHintDismissals

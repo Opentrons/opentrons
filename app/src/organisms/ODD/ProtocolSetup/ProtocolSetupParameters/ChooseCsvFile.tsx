@@ -76,10 +76,8 @@ export function ChooseCsvFile({
   })
 
   const initialFileObject: CsvFileParameterFileData = parameter.file ?? {}
-  const [
-    csvFileSelected,
-    setCsvFileSelected,
-  ] = useState<CsvFileParameterFileData>(initialFileObject)
+  const [csvFileSelected, setCsvFileSelected] =
+    useState<CsvFileParameterFileData>(initialFileObject)
 
   const handleBackButton = (): void => {
     if (!isEqual(csvFileSelected, initialFileObject)) {

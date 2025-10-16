@@ -34,8 +34,8 @@ describe('ManualReplaceLwAndRetry', () => {
     props = {
       recoveryMap: {
         route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
-        step:
-          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
+        step: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS
+          .GRIPPER_HOLDING_LABWARE,
       },
       doorStatusUtils: {
         isDoorOpen: false,

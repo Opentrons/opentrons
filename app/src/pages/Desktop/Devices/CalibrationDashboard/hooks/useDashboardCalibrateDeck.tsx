@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
+import { ModalShell, WizardHeader } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateDeck } from '/app/organisms/Desktop/CalibrateDeck'
 import { LoadingState } from '/app/organisms/Desktop/CalibrationPanels'
 import * as RobotApi from '/app/redux/robot-api'
@@ -45,7 +44,7 @@ export function useDashboardCalibrateDeck(
       if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
         createRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
@@ -54,7 +53,7 @@ export function useDashboardCalibrateDeck(
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -64,7 +63,7 @@ export function useDashboardCalibrateDeck(
       ) {
         trackedRequestId.current =
           'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       }
     }

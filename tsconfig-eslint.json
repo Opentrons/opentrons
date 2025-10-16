@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "/app/*": ["./app/src/*"],
-      "/ai-client/*": ["./opentrons-ai-client/src/*"]
+      "/ai-client/*": ["./opentrons-ai-client/src/*"],
+      "/protocol-designer/*": ["./protocol-designer/src/*"]
     },
     "emitDeclarationOnly": false,
     "noEmit": true

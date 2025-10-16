@@ -19,9 +19,9 @@ enum MixContent {
   ChooseOption = 'Choose option',
   Reservoir = 'Axygen 1 Well Reservoir 90 mL',
   WellPlate = 'Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt',
-  PartOne = 'Part 1 / 3',
-  PartTwo = 'Part 2 / 3',
-  PartThree = 'Part 3 / 3',
+  PartOne = 'Part 1 / 4',
+  PartTwo = 'Part 2 / 4',
+  PartThree = 'Part 3 / 4',
   ApplyLiquidClass = 'Apply liquid class settings for this mix',
   WellSelectTitle = 'Select wells using a Flex 1-Channel 1000 µL',
   ClickAndDragWellSelect = 'Click and drag to select wells',
@@ -63,7 +63,7 @@ enum MixContent {
   SideView = 'Side view',
   BlowoutLocation = 'Blowout location',
   BlowoutPos = 'Blowout position from top',
-  DestinationWell = 'Destination Well',
+  DestinationWell = 'Destination well',
   BlowoutFlowRate = 'Blowout position from top',
   EditBlowoutPos = 'Edit blowout position',
   BlowoutPosDescrip = 'Change where in the well the robot performs the blowout.',
@@ -473,11 +473,6 @@ export const MixVerifications = {
       cy.contains(MixContent.MixRepetitions)
         .should('exist')
         .should('be.visible')
-      cy.contains(MixContent.TipManagement).should('exist').should('be.visible')
-      cy.contains(MixContent.TipDropLocation)
-        .should('exist')
-        .should('be.visible')
-      cy.contains(MixContent.WasteChute).should('exist').should('be.visible')
       cy.get(MixLocators.Continue).should('exist').should('be.visible')
     },
   }),
@@ -507,7 +502,7 @@ export const MixVerifications = {
       cy.get(MixLocators.OneWellReservoirImg)
         .should('exist')
         .should('be.visible')
-      cy.get(MixLocators.Save).should('exist').should('be.visible')
+      cy.get(MixLocators.Continue).should('exist').should('be.visible')
       cy.get(MixLocators.Back).should('exist').should('be.visible')
     },
   }),
@@ -530,7 +525,7 @@ export const MixVerifications = {
         .should('be.visible')
       cy.contains(MixContent.Delay).should('exist').should('be.visible')
       cy.get(MixLocators.Back).should('exist').should('be.visible')
-      cy.get(MixLocators.Save).should('exist').should('be.visible')
+      cy.get(MixLocators.Continue).should('exist').should('be.visible')
     },
   }),
 
@@ -562,7 +557,7 @@ export const MixVerifications = {
       cy.contains(MixContent.TopToBottom).should('exist').should('be.visible')
       cy.contains(MixContent.LeftToRight).should('exist').should('be.visible')
       cy.get(MixLocators.CancelAspSettings).should('exist').should('be.visible')
-      cy.get(MixLocators.Save).should('exist').should('be.visible')
+      cy.get(MixLocators.Continue).should('exist').should('be.visible')
     },
   }),
 

@@ -1,0 +1,29 @@
+/* StepMeter CSS Modules */
+
+.step_meter_container {
+  position: relative;
+  height: var(--spacing-4);
+  background-color: var(--grey-30);
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .step_meter_container {
+    height: var(--spacing-12);
+  }
+}
+
+.step_meter_bar {
+  /* ODD animation optimizations */
+  position: absolute;
+  top: 0;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: var(--blue-50);
+  perspective: 1000px;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.step_meter_bar_animated {
+  transition: width 0.5s ease-in-out;
+}

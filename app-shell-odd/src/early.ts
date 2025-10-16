@@ -9,10 +9,8 @@ let path: string
 
 export const setUserDataPath = (): string => {
   if (path == null) {
-    console.log(
-      `node env is ${process.env.NODE_ENV}, path is ${app.getPath('userData')}`
-    )
-    if (process.env.NODE_ENV === 'production') {
+    console.log(`node env is ${_NODE_ENV_}, path is ${app.getPath('userData')}`)
+    if (_NODE_ENV_ === 'production') {
       console.log(`setting app path to ${ODD_DATA_DIR}`)
       app.setPath('userData', ODD_DATA_DIR)
     }

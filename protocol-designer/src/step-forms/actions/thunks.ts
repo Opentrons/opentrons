@@ -33,8 +33,9 @@ export const createContainerAboveModule: (
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
 
-  const moduleId = Object.values(modules).find(module => module.slot === slot)
-    ?.id
+  const moduleId = Object.values(modules).find(
+    module => module.slot === slot
+  )?.id
   dispatch(
     createContainer({
       slot: moduleId,
@@ -52,37 +53,35 @@ interface ModuleAndChangeFormArgs {
 }
 export const createModuleEntityAndChangeForm: (
   args: ModuleAndChangeFormArgs
-) => ThunkAction<CreateModuleAction | ChangeSavedStepFormAction> = args => (
-  dispatch,
-  getState
-) => {
-  const { slot, model, type, moduleSteps, pauseSteps } = args
-  const moduleId = `${uuid()}:${type}`
+) => ThunkAction<CreateModuleAction | ChangeSavedStepFormAction> =
+  args => (dispatch, getState) => {
+    const { slot, model, type, moduleSteps, pauseSteps } = args
+    const moduleId = `${uuid()}:${type}`
 
-  dispatch({
-    type: 'CREATE_MODULE',
-    payload: { slot, model, type, id: moduleId },
-  })
+    dispatch({
+      type: 'CREATE_MODULE',
+      payload: { slot, model, type, id: moduleId },
+    })
 
-  //  if steps are created with the module that has been regenerated, migrate them to use the correct moduleId
-  moduleSteps.forEach(step => {
-    dispatch(
-      changeSavedStepForm({
-        stepId: step.id,
-        update: {
-          moduleId,
-        },
-      })
-    )
-  })
-  pauseSteps.forEach(step => {
-    dispatch(
-      changeSavedStepForm({
-        stepId: step.id,
-        update: {
-          moduleId,
-        },
-      })
-    )
-  })
-}
+    //  if steps are created with the module that has been regenerated, migrate them to use the correct moduleId
+    moduleSteps.forEach(step => {
+      dispatch(
+        changeSavedStepForm({
+          stepId: step.id,
+          update: {
+            moduleId,
+          },
+        })
+      )
+    })
+    pauseSteps.forEach(step => {
+      dispatch(
+        changeSavedStepForm({
+          stepId: step.id,
+          update: {
+            moduleId,
+          },
+        })
+      )
+    })
+  }

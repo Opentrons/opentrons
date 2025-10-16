@@ -6,7 +6,6 @@ import sum from 'lodash/sum'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,6 +15,7 @@ import {
   ListItemDescriptor,
   Modal,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -27,16 +27,20 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getRobotType } from '../../../file-data/selectors'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import {
+  HandleEnter,
+  LINE_CLAMP_TEXT_STYLE,
+} from '/protocol-designer/components/atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+
 import { getMainPagePortalEl } from '../Portal'
 
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,
 } from '@opentrons/step-generation'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '37.125rem'
@@ -90,7 +94,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={fixture.location.replace('cutout', '')}
                             />
                           </Flex>
@@ -120,7 +124,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={formatLocation(hw.slot)}
                             />
                           </Flex>
@@ -163,7 +167,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel deckLabel={deckLabelSlot} />
+                            <RobotInfoLabel deckLabel={deckLabelSlot} />
                           </Flex>
                         }
                         content={

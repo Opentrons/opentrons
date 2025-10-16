@@ -16,6 +16,7 @@ npm install @opentrons/api-client
 
 ```typescript
 import { getHealth, Health, HostConfig, Response } from '@opentrons/api-client'
+
 const host: HostConfig = { hostname: 'OT2CEP9999999A99.local' }
 getHealth(host)
   .then((response: Response<Health>) => console.log(response.data))

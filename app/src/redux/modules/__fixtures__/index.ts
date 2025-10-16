@@ -7,19 +7,20 @@ import type * as Types from '../types'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
-export const mockApiTemperatureModuleLegacy: ApiTypes.ApiTemperatureModuleLegacy = {
-  name: 'tempdeck',
-  serialNumber: 'abc123',
-  moduleModel: 'temp_deck_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    currentTemperature: 25,
-    targetTemperature: null,
-    status: 'idle',
-  },
-  usbPort: '1',
-}
+export const mockApiTemperatureModuleLegacy: ApiTypes.ApiTemperatureModuleLegacy =
+  {
+    name: 'tempdeck',
+    serialNumber: 'abc123',
+    moduleModel: 'temp_deck_v4.0',
+    firmwareVersion: 'v2.0.0',
+    hasAvailableUpdate: true,
+    data: {
+      currentTemperature: 25,
+      targetTemperature: null,
+      status: 'idle',
+    },
+    usbPort: '1',
+  }
 
 export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
   name: 'tempdeck',

@@ -9,6 +9,7 @@ import {
   AnimationVideo,
   ModalShell,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -16,7 +17,6 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import slotOneRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '/app/assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import {
   CalibrationError,
   useCalibrationError,
@@ -45,7 +45,6 @@ import type {
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
-export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, ComponentType<CalibrationPanelProps>>
@@ -92,9 +91,9 @@ export function CalibrateTipLength({
   }, [instrument])
 
   const tipRack: CalibrationLabware | null =
-    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => l.isTiprack) ?? null) : null
   const calBlock: CalibrationLabware | null =
-    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => !l.isTiprack) ?? null) : null
 
   const errorInfo = useCalibrationError(requestIds, session?.id)
 

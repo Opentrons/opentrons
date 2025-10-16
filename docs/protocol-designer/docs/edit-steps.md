@@ -2,8 +2,6 @@
 title: "Protocol Designer: Editing Steps"
 ---
 
-# Editing Steps
-
 Each step in your protocol appears in the protocol timeline in the order you've added them. After adding steps the robot will perform in your protocol, you can make edits to finalize your protocol. 
 
 Hover over each step in the protocol timeline to view a description of the step and changes to the robot deck, like labware moves or liquid transfers. 
@@ -15,7 +13,7 @@ To view more details or edit a step in your protocol timeline, start by clicking
   <figcaption>Hover over a step, shown in blue, to view details below the deck map.</figcaption>
 </figure>
 
-To edit, double click the step in the protocol timeline. This opens the same step form used when adding a step. At the top right of the form, click **Rename** to give steps a custom name and description. This can make it easier for you to tell the difference between multiple steps of the same type.
+To edit, double click the step in the protocol timeline. This opens the same step form used when adding a step. At the top right of the form, click **Rename** to give steps a custom name and description. This can make it easier for you to tell the difference between multiple steps of the same type. When your protocol is exported as a .py file, step names and details are included. 
 
 Use the three-dot menu at the right side of each step in the protocol timeline to access more step options. Here, you can edit the step or view more details, if available.
 

@@ -45,7 +45,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     parameters.add_int(
         display_name="model type",
         variable_name="model_type",
-        default=200,
+        default=1000,
         choices=[
             {"display_name": "200", "value": 200},
             {"display_name": "1000", "value": 1000},

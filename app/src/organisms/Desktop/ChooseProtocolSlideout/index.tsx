@@ -100,20 +100,16 @@ export function ChooseProtocolSlideoutComponent(
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
-  const [
-    showRestoreValuesTooltip,
-    setShowRestoreValuesTooltip,
-  ] = useState<boolean>(false)
+  const [showRestoreValuesTooltip, setShowRestoreValuesTooltip] =
+    useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
   const robotType = useRobotType(name)
   const isFlex = robotType === FLEX_ROBOT_TYPE
 
-  const [
-    selectedProtocol,
-    setSelectedProtocol,
-  ] = useState<StoredProtocolData | null>(null)
+  const [selectedProtocol, setSelectedProtocol] =
+    useState<StoredProtocolData | null>(null)
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
     RunTimeParameter[]
   >([])

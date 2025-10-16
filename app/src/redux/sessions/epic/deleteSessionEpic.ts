@@ -13,7 +13,9 @@ import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { DeleteSessionAction, SessionResponse } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<DeleteSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  DeleteSessionAction
+> = action => ({
   method: DELETE,
   path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}`,
 })

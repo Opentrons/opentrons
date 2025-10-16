@@ -11,7 +11,7 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
@@ -43,8 +43,7 @@ describe('utils', () => {
           expected: true,
         },
         {
-          msg:
-            '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiDispense',
             volume: '150',
@@ -110,8 +109,7 @@ describe('utils', () => {
           expected: false,
         },
         {
-          msg:
-            '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiAspirate',
             volume: '150',

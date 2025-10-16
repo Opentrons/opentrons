@@ -37,6 +37,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedAdapterDefURI,
     selectedFixture,
     selectedModuleModel,
+    selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getAllLabwareDefs()
@@ -51,14 +52,25 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       )
     }
   )
+
+  const matchingSelectedLidOnDeck = Object.values(labware).find(
+    ({ stack, labwareDefURI }) => {
+      const matchingSlot = getSlotInLocationStack(stack)
+      return (
+        labwareDefURI === selectedLidLabware &&
+        matchingSlot === selectedSlot.slot
+      )
+    }
+  )
   const selectedAdapterDef =
     selectedAdapterDefURI != null
-      ? defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
+      ? (defs[selectedAdapterDefURI] ??
+        customLabwareDefs[selectedAdapterDefURI])
       : null
   const selectedTopLabwareDef =
     selectedTopLabware.labwareDefURI != null
-      ? defs[selectedTopLabware.labwareDefURI] ??
-        customLabwareDefs[selectedTopLabware.labwareDefURI]
+      ? (defs[selectedTopLabware.labwareDefURI] ??
+        customLabwareDefs[selectedTopLabware.labwareDefURI])
       : null
 
   const orientation =
@@ -88,6 +100,10 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     }
     labwareInfos.push(selectedAdapterLabel)
   }
+  const lengthOfStack =
+    (selectedLidLabware ? 1 : 0) +
+    (selectedAdapterDefURI ? 1 : 0) +
+    (selectedTopLabware?.labwareDefURI ? 1 : 0)
 
   return (
     <>
@@ -119,13 +135,12 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             targetSlotId={null}
             childrenPositioningMode="offsetToSlot"
           >
-            <>
-              <SelectedModuleLabwareRender
-                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-                adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
-              />
-            </>
+            <SelectedModuleLabwareRender
+              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+              adapterDef={selectedAdapterDef}
+              moduleModel={selectedModuleModel}
+              lidOnDeck={matchingSelectedLidOnDeck}
+            />
           </Module>
           {selectedModuleModel != null ? (
             <ModuleLabel
@@ -136,13 +151,15 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               isSelected={true}
               labwareInfos={labwareInfos}
               slot={selectedSlot.slot}
+              showModuleIcon={
+                selectedTopLabware.amount > 1 || lengthOfStack > 1
+              }
             />
           ) : null}
         </>
       ) : null}
       <SelectedLabwareRender
-        showModuleIcon={selectedTopLabware.amount > 1}
-        labwareOnDeck={matchingSelectedTopLabwareOnDeck}
+        showModuleIcon={selectedTopLabware.amount > 1 || lengthOfStack > 1}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel ?? null}

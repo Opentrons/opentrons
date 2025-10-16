@@ -3,12 +3,19 @@ from typing_extensions import Final
 import enum
 
 
-# TODO (tz, 5-18-23): think about a better name for it that would also work when we include staging area slots in the type.
+# Implemented with an enum to support type narrowing via `== OFF_DECK`.
 class OffDeckType(enum.Enum):
+    """The type of the :py:obj:`OFF_DECK` constant.
+
+    Do not use directly, except in type annotations and ``isinstance`` calls.
+    """
+
     OFF_DECK = "off-deck"
+    WASTE_CHUTE = "waste-chute"
 
 
 OFF_DECK: Final = OffDeckType.OFF_DECK
+WASTE_CHUTE: Final = OffDeckType.WASTE_CHUTE
 
 # Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
 # the constant definition, Sphinx has trouble picking it up.

@@ -94,11 +94,13 @@ export function CalibrationHealthCheck({
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   const healthCheckIsPossible =
-    !([
-      Calibration.DECK_CAL_STATUS_SINGULARITY,
-      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-      Calibration.DECK_CAL_STATUS_IDENTITY,
-    ] as Array<typeof deckCalibrationStatus>).includes(deckCalibrationStatus) &&
+    !(
+      [
+        Calibration.DECK_CAL_STATUS_SINGULARITY,
+        Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+        Calibration.DECK_CAL_STATUS_IDENTITY,
+      ] as Array<typeof deckCalibrationStatus>
+    ).includes(deckCalibrationStatus) &&
     pipetteCalPresent &&
     pipettePresent
 

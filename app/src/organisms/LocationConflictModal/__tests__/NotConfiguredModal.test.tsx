@@ -35,9 +35,9 @@ describe('NotConfiguredModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
   })
   it('renders the correct text and button works as expected', () => {
     render(props)

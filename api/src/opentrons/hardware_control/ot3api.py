@@ -74,6 +74,8 @@ from .types import (
     DoorStateNotification,
     ErrorMessageNotification,
     HardwareEvent,
+    AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
     HardwareEventHandler,
     HardwareAction,
     HepaFanState,
@@ -367,6 +369,24 @@ class OT3API(
 
         return futures
 
+    def _send_module_notification(self, event: HardwareEvent) -> None:
+        if not isinstance(
+            event,
+            (
+                AsynchronousModuleErrorNotification,
+                ModuleDisconnectedNotification,
+            ),
+        ):
+            return
+        mod_log.info(
+            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+        )
+        for cb in self._callbacks:
+            try:
+                cb(event)
+            except Exception:
+                mod_log.exception("Errored during module asynchronous callback")
+
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
@@ -422,7 +442,9 @@ class OT3API(
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.build_estop_detector()
@@ -484,7 +506,9 @@ class OT3API(
         )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
-            api_instance, board_revision=backend.board_revision
+            api_instance,
+            board_revision=backend.board_revision,
+            event_callback=api_instance._send_module_notification,
         )
         backend.module_controls = module_controls
         await backend.watch(api_instance.loop)
@@ -627,9 +651,10 @@ class OT3API(
             self.is_simulator
         ), "Cannot build simulating module from non-simulating hardware control API"
 
-        return await self._backend.module_controls.build_module(
-            port="",
-            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.LEFT),
+        return await self._backend.module_controls.register_simulated_module(
+            simulated_usb_port=USBPort(
+                name="", port_number=1, port_group=PortGroup.LEFT
+            ),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
@@ -1462,6 +1487,7 @@ class OT3API(
         expected_grip_width: float,
         grip_width_uncertainty_wider: float,
         grip_width_uncertainty_narrower: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """Ensure that a gripper pickup succeeded.
 
@@ -1482,6 +1508,7 @@ class OT3API(
             gripper.max_allowed_grip_error,
             gripper.min_jaw_width,
             gripper.max_jaw_width,
+            disable_geometry_grip_check,
         )
 
     def gripper_jaw_can_home(self) -> bool:
@@ -3055,7 +3082,7 @@ class OT3API(
     async def aspirate_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
         flow_rate: float = 1.0,
     ) -> None:
@@ -3073,12 +3100,21 @@ class OT3API(
         )
         if not aspirate_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            self.critical_point_for,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             aspirate_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
         )
+
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -3102,7 +3138,7 @@ class OT3API(
     async def dispense_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,
@@ -3122,11 +3158,19 @@ class OT3API(
         )
         if not dispense_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            self.critical_point_for,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             dispense_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
         )
 
         try:

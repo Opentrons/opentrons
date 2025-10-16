@@ -15,10 +15,8 @@ export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
 ) => {
   const { moduleId, profile, blockMaxVolumeUl } = args
   const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
-  const {
-    repeatingProfileSteps,
-    numRepetitions,
-  } = findThermocyclerProfileRepetitions(profile)
+  const { repeatingProfileSteps, numRepetitions } =
+    findThermocyclerProfileRepetitions(profile)
 
   const steps = repeatingProfileSteps
     ?.map(

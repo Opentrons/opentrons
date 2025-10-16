@@ -216,26 +216,29 @@ export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   }
 }
 
-export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
-    message: 'The Heater-Shaker is shaking',
+export const heaterShakerNorthSouthEastWestShaking =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+      message: 'The Heater-Shaker is shaking',
+    }
   }
-}
 
-export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
-    message: 'The Heater-Shaker is shaking',
+export const heaterShakerEastWestOfMultiChannelPipette =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+      message: 'The Heater-Shaker is shaking',
+    }
   }
-}
 
-export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
-    message: '8-Channel pipette cannot access labware',
+export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
+      message: '8-Channel pipette cannot access labware',
+    }
   }
-}
 
 export const labwareOffDeck = (): CommandCreatorError => {
   return {
@@ -298,8 +301,8 @@ export const noTipSelected = (): CommandCreatorError => {
 
 export const labwareDiscarded = (): CommandCreatorError => {
   return {
-    type: 'LABWARE_DISCARDED_IN_WASTE_CHUTE',
-    message: 'The labware was discarded in waste chute in a previous step.',
+    type: 'LABWARE_DISCARDED_IN_TRASH',
+    message: 'The labware was discarded in trash in a previous step.',
   }
 }
 
@@ -335,5 +338,42 @@ export const multiDispenseValuesNotFound = (): CommandCreatorError => {
   return {
     type: 'MULTI_DISPENSE_VALUES_NOT_FOUND',
     message: 'Multi dispense values not found for liquid class',
+  }
+}
+
+export const closingThermocyclerWithInvalidLid = (args: {
+  lidDisplayName: string
+}): CommandCreatorError => {
+  return {
+    type: 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID',
+    message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
+  }
+}
+
+export const returnTipUnavailable = (): CommandCreatorError => {
+  return {
+    type: 'RETURN_TIP_UNAVAILABLE',
+    message: 'Current tip does not have a known location to return to',
+  }
+}
+
+export const tipRackLidNotAllowedOnDeck = (): CommandCreatorError => {
+  return {
+    type: 'TIPRACK_LID_NOT_ALLOWED_ON_DECK',
+    message: 'The tip rack lid is not supported directly on the deck',
+  }
+}
+
+export const nextTiprackHasLid = (): CommandCreatorError => {
+  return {
+    type: 'NEXT_TIPRACK_HAS_LID',
+    message: 'A pipette cannot pick up tips from a tip rack with a lid',
+  }
+}
+
+export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
+  return {
+    type: 'STACK_TOO_HIGH',
+    message: `The stack on slot ${args.slot} is too high`,
   }
 }

@@ -11,7 +11,7 @@ import {
   OT2_ROBOT_TYPE,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
-  WATER_LIQUID_CLASS_NAME_V2,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -349,7 +349,7 @@ const getFlowRateFields = (
   return {
     [`${liquidHandlingAction}_flowRate`]:
       hardwareMaximum != null
-        ? min([interpolatedFlowRate, hardwareMaximum]) ?? null
+        ? (min([interpolatedFlowRate, hardwareMaximum]) ?? null)
         : interpolatedFlowRate,
   }
 }
@@ -474,7 +474,8 @@ const getSubmergeRetractFields = (args: {
     'startPosition' in submergeRetractLookup
       ? submergeRetractLookup.startPosition
       : submergeRetractLookup.endPosition
-  const fullPrefix = `${liquidHandlingAction}_${tipMovement}` as SubmergeRetractAspirateDispensePrefix
+  const fullPrefix =
+    `${liquidHandlingAction}_${tipMovement}` as SubmergeRetractAspirateDispensePrefix
   const offsetFields = getOffsetFields(offset, fullPrefix)
   const positionReferenceFields = getPositionReferenceFields(
     positionReference,
@@ -546,9 +547,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tiprack
     ) ?? null
-  const referenceLiquidClass = getAllLiquidClassDefs()[
-    WATER_LIQUID_CLASS_NAME_V2
-  ]
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -649,26 +648,23 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     return {}
   }
   const { aspirate, singleDispense, multiDispense } = liquidClassValuesForTip
-  const {
-    multiWellHandling,
-    referenceVolumes: byVolumeLookup,
-  } = getTransferPlanAndReferenceVolumes({
-    pipetteSpecs,
-    tiprackDefinition: null,
-    conditioningByVolume: (multiDispense?.conditioningByVolume ?? []) as Array<
-      [number, number]
-    >,
-    disposalByVolume: (multiDispense?.disposalByVolume ?? []) as Array<
-      [number, number]
-    >,
-    volume,
-    path: rawForm.path as PathOption,
-    numAspirateWells: rawForm.aspirate_wells.length,
-    numDispenseWells: rawForm.dispense_wells.length,
-    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
-      [number, number]
-    >,
-  })
+  const { multiWellHandling, referenceVolumes: byVolumeLookup } =
+    getTransferPlanAndReferenceVolumes({
+      pipetteSpecs,
+      tiprackDefinition: null,
+      conditioningByVolume: (multiDispense?.conditioningByVolume ??
+        []) as Array<[number, number]>,
+      disposalByVolume: (multiDispense?.disposalByVolume ?? []) as Array<
+        [number, number]
+      >,
+      volume,
+      path: rawForm.path as PathOption,
+      numAspirateWells: rawForm.aspirate_wells.length,
+      numDispenseWells: rawForm.dispense_wells.length,
+      aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+        [number, number]
+      >,
+    })
   const { isSupported: isMultiDispenseSupported } = multiWellHandling
   const dispense =
     multiDispense != null &&
@@ -855,9 +851,7 @@ const getNoLiquidClassValuesMix = (args: {
   }
   const { spec: pipetteSpecs } = pipetteEntity
   const volume = Number(rawVolume)
-  const referenceLiquidClass = getAllLiquidClassDefs()[
-    WATER_LIQUID_CLASS_NAME_V2
-  ]
+  const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
   )
@@ -1039,22 +1033,20 @@ const getLiquidClassValuesMoveLiquid = (args: {
     Object.values(labwareEntities).find(
       ({ labwareDefURI }) => labwareDefURI === tipRack
     )?.def ?? null
-  const {
-    referenceVolumes: byVolumeLookup,
-    multiWellHandling,
-  } = getTransferPlanAndReferenceVolumes({
-    pipetteSpecs,
-    tiprackDefinition,
-    conditioningByVolume,
-    disposalByVolume,
-    volume,
-    path: rawForm.path as PathOption,
-    numAspirateWells: rawForm.aspirate_wells.length,
-    numDispenseWells: rawForm.dispense_wells.length,
-    aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
-      [number, number]
-    >,
-  })
+  const { referenceVolumes: byVolumeLookup, multiWellHandling } =
+    getTransferPlanAndReferenceVolumes({
+      pipetteSpecs,
+      tiprackDefinition,
+      conditioningByVolume,
+      disposalByVolume,
+      volume,
+      path: rawForm.path as PathOption,
+      numAspirateWells: rawForm.aspirate_wells.length,
+      numDispenseWells: rawForm.dispense_wells.length,
+      aspirateAirGapByVolume: aspirate.retract.airGapByVolume as Array<
+        [number, number]
+      >,
+    })
   const { isSupported: isMultiDispenseSupported } = multiWellHandling
   // top-level aspirate fields
   const aspiratePositionReferenceFields = getPositionReferenceFields(

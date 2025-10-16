@@ -115,6 +115,10 @@ class LabwareRole(str, Enum):
     system = "system"
 
 
+class Quirks(Enum):
+    disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
+
+
 class Metadata(BaseModel):
     displayName: str
     displayCategory: DisplayCategory
@@ -604,6 +608,7 @@ class LabwareDefinition3(BaseModel):
     wells: dict[str, WellDefinition3]
     groups: list[Group]
     stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    legacyStackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
     stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)

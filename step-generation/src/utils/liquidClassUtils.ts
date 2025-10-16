@@ -1,8 +1,5 @@
-import last from 'lodash/last'
-
 import { getAllLiquidClassDefs } from '@opentrons/shared-data'
 
-import { sortLabwareBySlot } from '../robotStateSelectors'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -15,8 +12,6 @@ import type {
   DistributeArgs,
   InnerMixArgs,
   LabwareEntities,
-  PipetteEntity,
-  RobotState,
   TransferArgs,
 } from '../types'
 
@@ -209,11 +204,11 @@ export const getCustomLiquidClassProperties = (
                 : false,
             repetitions:
               'mixInDestination' in args
-                ? args.mixInDestination?.times ?? undefined
+                ? (args.mixInDestination?.times ?? undefined)
                 : undefined,
             volume:
               'mixInDestination' in args
-                ? args.mixInDestination?.volume ?? undefined
+                ? (args.mixInDestination?.volume ?? undefined)
                 : undefined,
           },
         },
@@ -243,10 +238,8 @@ export const getCustomLiquidClassProperties = (
     },
   }
 
-  const stringifiedCustomLiquidClassProperties: Record<
-    string,
-    any
-  > = JSON.parse(JSON.stringify(customLiquidClassProperties))
+  const stringifiedCustomLiquidClassProperties: Record<string, any> =
+    JSON.parse(JSON.stringify(customLiquidClassProperties))
   return formatPyDict(stringifiedCustomLiquidClassProperties)
 }
 
@@ -274,33 +267,12 @@ const getBlowoutPythonLocation = (
 }
 
 export const getPythonAssignTipRacksString = (args: {
-  pipetteEntity: PipetteEntity
   labwareEntities: LabwareEntities
-  labwareState: RobotState['labware']
-  tiprackURI: string
+  tiprackIds: string[]
 }): string => {
-  const { pipetteEntity, labwareEntities, labwareState, tiprackURI } = args
-  const { pythonName: pythonPipetteName } = pipetteEntity
-  if (pipetteEntity.tiprackDefURI.length > 1) {
-    const assignedTipRackPythonNames = sortLabwareBySlot(labwareState).reduce(
-      (acc: string[], labwareId) => {
-        const labwareEntity = labwareEntities[labwareId]
-        if (labwareEntity == null) {
-          return acc
-        }
-
-        const isOffDeck = last(labwareState[labwareId].stack) === 'offDeck'
-        if (labwareEntity.labwareDefURI === tiprackURI && !isOffDeck) {
-          acc.push(labwareEntity.pythonName)
-        }
-        return acc
-      },
-      []
-    )
-
-    return `${pythonPipetteName}.tip_racks = [${assignedTipRackPythonNames.join(
-      ', '
-    )}]\n`
-  }
-  return ''
+  const { labwareEntities, tiprackIds } = args
+  const tiprackPythonNames = tiprackIds.map(
+    id => labwareEntities[id].pythonName
+  )
+  return `tip_racks=[${tiprackPythonNames.join(', ')}]`
 }

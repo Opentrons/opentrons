@@ -3,11 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
-import {
-  END_TERMINAL_ITEM_ID,
-  PRESAVED_STEP_ID,
-  START_TERMINAL_ITEM_ID,
-} from '../../../steplist/types'
 import * as utils from '../../modules/utils'
 import {
   MULTI_STEP_SELECTION_TYPE,
@@ -23,7 +18,6 @@ import {
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
   getMultiSelectLastSelected,
-  getSelectedStepTitleInfo,
 } from '../selectors'
 
 import type { MoveLabwareArgs } from '@opentrons/step-generation'
@@ -213,57 +207,6 @@ describe('getHoveredStepLabware', () => {
       )
 
       expect(result).toEqual([])
-    })
-  })
-})
-
-describe('getSelectedStepTitleInfo', () => {
-  it('should return title info of the presaved form when the presaved terminal item is selected', () => {
-    const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = getSelectedStepTitleInfo.resultFunc(
-      unsavedForm,
-      {},
-      null,
-      PRESAVED_STEP_ID
-    )
-    expect(result).toEqual({
-      stepName: unsavedForm.stepName,
-      stepType: unsavedForm.stepType,
-    })
-  })
-
-  it('should return null when the start or end terminal item is selected', () => {
-    const terminals = [START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID]
-    terminals.forEach(terminalId => {
-      const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-      const result = getSelectedStepTitleInfo.resultFunc(
-        unsavedForm,
-        {},
-        null,
-        PRESAVED_STEP_ID
-      )
-      expect(result).toEqual({
-        stepName: unsavedForm.stepName,
-        stepType: unsavedForm.stepType,
-      })
-    })
-  })
-
-  it('should return title info of the saved step when a saved step is selected', () => {
-    const savedForm = { stepName: 'The Step', stepType: 'transfer' }
-    const stepId = 'selectedAndSavedStepId'
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = getSelectedStepTitleInfo.resultFunc(
-      null,
-      { [stepId]: savedForm },
-      stepId,
-      null
-    )
-    expect(result).toEqual({
-      stepName: savedForm.stepName,
-      stepType: savedForm.stepType,
     })
   })
 })
@@ -766,6 +709,17 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        tip_tracking: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        // tip selection wizard fields
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -1143,6 +1097,16 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        tip_tracking: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -1233,6 +1197,16 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_position_reference: {
           isIndeterminate: false,
           value: undefined,
+        },
+        tip_tracking: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
         },
       })
     })
@@ -1341,6 +1315,16 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_position_reference: {
           isIndeterminate: false,
           value: undefined,
+        },
+        tip_tracking: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
         },
       })
     })

@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface CheckboxExpandStepFormFieldProps {
   title: string

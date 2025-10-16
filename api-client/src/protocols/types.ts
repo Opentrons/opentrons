@@ -23,7 +23,7 @@ export interface Protocol {
       {
         id: string
         href: string
-      }
+      },
     ]
   }
   data: ProtocolResource

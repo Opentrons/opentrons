@@ -9,11 +9,11 @@ import {
   ModalShell,
   SPACING,
   TYPOGRAPHY,
+  WizardHeader,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getCalibrationForPipette } from '/app/redux/calibration'
 import {
   getRequestById,
@@ -87,10 +87,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
       ? getCalibrationForPipette(state, robotName, attachedPipette.id, mount)
       : null
   )
-  const [
-    wrongWantedPipette,
-    setWrongWantedPipette,
-  ] = useState<PipetteNameSpecs | null>(wantedPipette)
+  const [wrongWantedPipette, setWrongWantedPipette] =
+    useState<PipetteNameSpecs | null>(wantedPipette)
   const [confirmPipetteLevel, setConfirmPipetteLevel] = useState<boolean>(false)
 
   const movementStatus = useSelector((state: State) => {

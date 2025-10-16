@@ -1,9 +1,10 @@
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData, StepFieldName } from '../../../../form-types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 
 export interface FocusHandlers {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]
+  // NOTE: focus & blur take a field name as an arg, unlike onFieldBlur/onFieldFocus in FieldProps
   focus: (arg: StepFieldName) => void
   blur: (arg: StepFieldName) => void
 }

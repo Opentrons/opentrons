@@ -93,11 +93,12 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
   commands: RunTimeCommand[],
   labware: ProtocolAnalysisOutput['labware']
 ): string[] => {
-  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands.filter(
-    (command): command is PickUpTipRunTimeCommand =>
-      command.commandType === 'pickUpTip' &&
-      command.params.pipetteId === pipetteId
-  )
+  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] =
+    commands.filter(
+      (command): command is PickUpTipRunTimeCommand =>
+        command.commandType === 'pickUpTip' &&
+        command.params.pipetteId === pipetteId
+    )
 
   const tipRackIdsVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
     (visitedIds, command) => {
@@ -263,8 +264,9 @@ export function getLabwareDef(
   labwareId: string,
   protocolData: CompletedProtocolAnalysis
 ): LabwareDefinition | undefined {
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
+  const labwareDefUri = protocolData.labware.find(
+    l => l.id === labwareId
+  )?.definitionUri
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )

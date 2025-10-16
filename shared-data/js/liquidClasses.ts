@@ -1,22 +1,63 @@
-import ethanol80V2Uncasted from '../liquid-class/definitions/1/ethanol_80/2.json'
-import glycerol50V2Uncasted from '../liquid-class/definitions/1/glycerol_50/2.json'
-import waterV2Uncasted from '../liquid-class/definitions/1/water/2.json'
-
 import type { LiquidClass } from '.'
 
-const ethanol80V2 = ethanol80V2Uncasted as LiquidClass
-const glycerol50V2 = glycerol50V2Uncasted as LiquidClass
-const waterV2 = waterV2Uncasted as LiquidClass
+// NOTE: when we have more liquid names, we will need to add them in here.
+// I can't figure out a way to do it autonomously while still having
+// type protection. IMO its easier to just extend this type than not
+// have type protection.
+export type LiquidClassType = 'water' | 'ethanol_80' | 'glycerol_50' | 'none'
 
-export const WATER_LIQUID_CLASS_NAME_V2 = 'waterV2'
+interface WithVersion<LiquidClass> {
+  def: LiquidClass
+  version: number
+}
+
+const liquidClassModules: Record<string, LiquidClass> = import.meta.glob(
+  '../liquid-class/definitions/1/*/*.json',
+  {
+    eager: true,
+  }
+) as Record<string, LiquidClass>
+
+// helper to parse info from the path
+// example path: "../liquid-class/definitions/1/water/2.json"
+const parsePath = (
+  path: string
+): { name: LiquidClassType; version: number; path: string } | null => {
+  const match = path.match(/definitions\/\d+\/([^/]+)\/(\d+)\.json$/)
+  if (!match) {
+    return null
+  }
+  const [, name, versionStr] = match
+  return { name: name as LiquidClassType, version: Number(versionStr), path }
+}
+
+// TODO: make none liquid class definition file
+export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => {
+  // dictionary of latest versions only
+  const latestLiquidClasssDefinitions: Record<
+    string,
+    WithVersion<LiquidClass>
+  > = {}
+
+  Object.entries(liquidClassModules).forEach(([path, def]) => {
+    const info = parsePath(path)
+    if (!info) return
+    const { name, version } = info
+    const existing = latestLiquidClasssDefinitions[name]
+    if (!existing || version > existing.version) {
+      latestLiquidClasssDefinitions[name] = { def, version }
+    }
+  })
+  return Object.fromEntries(
+    Object.entries(latestLiquidClasssDefinitions).map(([name, { def }]) => [
+      name,
+      def,
+    ])
+  )
+}
+
+// Add more liquid class name consts here
+export const WATER_LIQUID_CLASS_NAME = 'water'
+export const ETHANOL_LIQUID_CLASS_NAME = 'ethanol_80'
+export const GLYCEROL_LIQUID_CLASS_NAME = 'glycerol_50'
 export const NONE_LIQUID_CLASS_NAME = 'none'
-export const GLYCEROL_LIQUID_CLASS_NAME_V2 = 'glycerol50V2'
-export const ETHANOL_LIQUID_CLASS_NAME_V2 = 'ethanol80V2'
-
-const defs = { waterV2, glycerol50V2, ethanol80V2 }
-
-//  returns all liquid class defs but their latest version only
-//  NOTE: we should refactor this util though to get the latest versions of all the definitions types
-//  that exist. right now, its hard-coded in which means we need to manually
-//  update it every time, which is not great.
-export const getAllLiquidClassDefs = (): Record<string, LiquidClass> => defs

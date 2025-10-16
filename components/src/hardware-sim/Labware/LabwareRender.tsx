@@ -3,7 +3,7 @@ import {
   getSchema2Dimensions,
 } from '@opentrons/shared-data'
 
-import { LabwareAdapter, labwareAdapterLoadNames } from './LabwareAdapter'
+import { customSVGLoadNames, LabwareAdapter } from './LabwareAdapter'
 import {
   FilledWells,
   StaticLabware,
@@ -17,6 +17,7 @@ import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type {
   HighlightedWellLabels,
+  TipType,
   WellFill,
   WellGroup,
   WellMouseEvent,
@@ -109,18 +110,47 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   showBorder?: boolean
   strokeColor?: string
+  tipStatusByWellName?: Record<string, TipType>
+  handleClickWell?: (wellName: string) => void
+  selectedTipsByIndex?: Record<string, number>
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef, definition, positioningMode } = props
+  const {
+    gRef,
+    definition,
+    positioningMode,
+    onLabwareClick,
+    highlight,
+    highlightShadow,
+    showBorder,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+    wellStroke,
+    wellFill,
+    strokeColor,
+    wellLabelOption,
+    wellLabelColor,
+    highlightedWellLabels,
+    selectedWells,
+    missingTips,
+    tipStatusByWellName,
+    handleClickWell,
+    selectedTipsByIndex,
+    disabledWells,
+    highlightedWells,
+  } = props
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
   const labwareLoadName = definition.parameters.loadName
-  const isAdapter = labwareAdapterLoadNames.includes(labwareLoadName)
+  const isNeedingCustomSVG = customSVGLoadNames.includes(labwareLoadName)
+  const isLid = definition.allowedRoles?.includes('lid')
 
-  if (isAdapter) {
+  if (isNeedingCustomSVG || isLid) {
     const { shouldRotateAdapterOrientation } = props
     const { xDimension, yDimension } = getSchema2Dimensions(definition)
+    const lidDimensions =
+      'dimensions' in definition ? definition.dimensions : null
 
     return (
       <g
@@ -139,13 +169,15 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
               : undefined
           }
           ref={gRef}
-          onClick={props.onLabwareClick}
+          onClick={onLabwareClick}
         >
           <LabwareAdapter
             labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
             definition={definition}
-            highlight={props.highlight}
-            highlightShadow={props.highlightShadow}
+            highlight={highlight}
+            highlightShadow={highlightShadow}
+            isLid={isLid}
+            lidDimensions={lidDimensions}
           />
         </g>
       </g>
@@ -161,66 +193,66 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       ref={gRef}
     >
       <StaticLabware
-        showBorder={props.showBorder}
-        definition={props.definition}
-        onMouseEnterWell={props.onMouseEnterWell}
-        onMouseLeaveWell={props.onMouseLeaveWell}
-        onLabwareClick={props.onLabwareClick}
-        highlight={props.highlight}
-        highlightShadow={props.highlightShadow}
-        wellStroke={props.wellStroke}
+        showBorder={showBorder}
+        definition={definition}
+        onMouseEnterWell={onMouseEnterWell}
+        onMouseLeaveWell={onMouseLeaveWell}
+        onLabwareClick={onLabwareClick}
+        highlight={highlight}
+        highlightShadow={highlightShadow}
+        wellStroke={wellStroke}
+        tipStatusByWellName={tipStatusByWellName}
+        handleClickWell={handleClickWell}
+        selectedTipsByIndex={selectedTipsByIndex}
       />
-      {props.wellStroke != null ? (
-        <StrokedWells
-          definition={props.definition}
-          strokeByWell={props.wellStroke}
-        />
+      {wellStroke != null ? (
+        <StrokedWells definition={definition} strokeByWell={wellStroke} />
       ) : null}
-      {props.wellFill != null ? (
+      {wellFill != null ? (
         <FilledWells
-          definition={props.definition}
-          fillByWell={props.wellFill}
-          strokeColor={props.strokeColor}
+          definition={definition}
+          fillByWell={wellFill}
+          strokeColor={strokeColor}
         />
       ) : null}
-      {props.disabledWells != null
-        ? props.disabledWells.map((well, index) => (
+      {disabledWells != null
+        ? disabledWells.map((well, index) => (
             <StyledWells
               key={index}
               wellContents="disabledWell"
-              definition={props.definition}
+              definition={definition}
               wells={well}
             />
           ))
         : null}
-      {props.highlightedWells != null ? (
+      {highlightedWells != null ? (
         <StyledWells
           wellContents="highlightedWell"
-          definition={props.definition}
-          wells={props.highlightedWells}
+          definition={definition}
+          wells={highlightedWells}
         />
       ) : null}
-      {props.selectedWells != null ? (
+      {selectedWells != null ? (
         <StyledWells
           wellContents="selectedWell"
-          definition={props.definition}
-          wells={props.selectedWells}
+          definition={definition}
+          wells={selectedWells}
         />
       ) : null}
-      {props.missingTips != null ? (
+      {missingTips != null ? (
         <StyledWells
           wellContents="tipMissing"
-          definition={props.definition}
-          wells={props.missingTips}
+          definition={definition}
+          wells={missingTips}
         />
       ) : null}
-      {props.wellLabelOption != null &&
-      props.definition.metadata.displayCategory !== 'adapter' ? (
+      {wellLabelOption != null &&
+      definition.metadata.displayCategory !== 'adapter' ? (
         <WellLabels
-          definition={props.definition}
-          wellLabelOption={props.wellLabelOption}
-          wellLabelColor={props.wellLabelColor}
-          highlightedWellLabels={props.highlightedWellLabels}
+          definition={definition}
+          wellLabelOption={wellLabelOption}
+          wellLabelColor={wellLabelColor}
+          highlightedWellLabels={highlightedWellLabels}
         />
       ) : null}
     </g>

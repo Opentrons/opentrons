@@ -169,6 +169,9 @@
         },
         "title": "Condition"
       },
+      "dropTip": {
+        "option": { "return": "Tip rack" }
+      },
       "delay": {
         "label": "delay"
       },
@@ -358,6 +361,25 @@
       },
       "tip_position": {
         "label": "tip position"
+      },
+      "tip_tracking": {
+        "label": "Tip tracking",
+        "manual": {
+          "description": {
+            "no_tips": "No tips selected"
+          },
+          "title": "Select tips for manual tip tracking"
+        },
+        "options": {
+          "automatic": {
+            "description": "Automatically select tips for the transfer.",
+            "title": "Automatic tip tracking (recommended)"
+          },
+          "manual": {
+            "description": "Manually select tips for the transfer. This will enable reuse of tips.",
+            "title": "Manual tip tracking"
+          }
+        }
       },
       "touchTip": {
         "label": "touch tip"

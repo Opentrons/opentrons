@@ -15,9 +15,13 @@
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."
   },
+  "OT_PD_ENABLE_TIP_PICKUP_LOCATION": {
+    "title": "Enable tip pickup location",
+    "description": "You can choose which tip to pick up."
+  },
   "OT_PD_ENABLE_RETURN_TIP": {
     "title": "Enable return tip",
-    "description": "You can choose which tip to pick up and where to drop tip."
+    "description": "You can choose where to drop tip."
   },
   "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
     "title": "Timeline editing guidance",
@@ -41,10 +45,26 @@
   },
   "OT_PD_ENABLE_STACKING": {
     "title": "Enable more labware capabilities",
-    "description": "Ability to stack labware, add lids, etc"
+    "description": "Ability to stack labwares and add the Flex Stacker"
+  },
+  "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
+    "title": "Enable concurrent module actions",
+    "description": "Features and design changes for running steps while waiting for modules to do stuff."
   },
   "OT_PD_ENABLE_JSON_EXPORT": {
     "title": "Enable exporting JSON",
     "description": "Enables the ability to export JSON for internal usages only"
+  },
+  "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
+    "title": "Enable by-volume builder",
+    "description": "Enables the ability to build by-volume curves"
+  },
+  "OT_PD_ENABLE_TIP_SELCTION": {
+    "title": "Enable tip selection",
+    "description": "Enables the ability to select tips manually"
+  },
+  "OT_PD_ENABLE_CAMERA_SUPPORT": {
+    "title": "Enable camera support",
+    "description": "Enables developmental camera support"
   }
 }

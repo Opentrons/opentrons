@@ -27,7 +27,7 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
     global: 'globalThis',
   },
 })

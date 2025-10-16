@@ -39,9 +39,8 @@ export function TwoColLwInfoAndDeck(
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
-  const {
-    displayNameCurrentLoc: slot,
-  } = failedLabwareUtils.relevantPickUpTipLwLocs
+  const { displayNameCurrentLoc: slot } =
+    failedLabwareUtils.relevantPickUpTipLwLocs
 
   const buildTitle = (): string => {
     switch (selectedRecoveryOption) {
@@ -123,18 +122,17 @@ export function TwoColLwInfoAndDeck(
         const isValidDeck =
           currentLoc != null && newLoc != null && movedLabwareDef != null
 
-        const modulesOnDeck = moduleRenderInfo
-          ?.filter(module => module.targetSlotId != null)
-          .map(module => {
-            return {
-              moduleModel: module.moduleDef.model,
-              moduleLocation: { slotName: module.targetSlotId ?? '' },
-              nestedLabwareDef:
-                module.nestedLabwareId !== failedLwId
-                  ? module.nestedLabwareDef
-                  : null,
-            }
-          })
+        const modulesOnDeck = moduleRenderInfo?.map(module => {
+          return {
+            moduleModel: module.moduleDef.model,
+            moduleLocation: { slotName: module.targetSlotId },
+            nestedLabwareDefsBottomToTop:
+              module.nestedLabwareId !== failedLwId &&
+              module.nestedLabwareDef != null
+                ? [module.nestedLabwareDef]
+                : [],
+          }
+        })
         const labwareOnDeckFiltered = labwareOnDeck?.filter(
           lw => lw.labwareId !== failedLwId
         )

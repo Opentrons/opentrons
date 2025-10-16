@@ -20,9 +20,10 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getTiprackOptions } from '../../../pages/Onboarding/utils'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getTiprackOptions } from '/protocol-designer/pages/Onboarding/utils'
+
 import { IncompatibleTipsModal } from '../IncompatibleTipsModal'
 import { getMainPagePortalEl } from '../Portal'
 import { SelectPipetteGen } from './SelectPipetteGen'
@@ -36,7 +37,7 @@ import type {
   Gen,
   PipetteType,
   WizardTileProps,
-} from '../../../pages/Onboarding/types'
+} from '/protocol-designer/pages/Onboarding/types'
 
 interface SelectedPipetteModalProps extends WizardTileProps {
   mount: PipetteMount

@@ -15,17 +15,12 @@ interface MoveToAddressableAreaAtomicParams
   extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {
   fixtureId: string
 }
-export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaAtomicParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const moveToAddressableArea: CommandCreator<
+  MoveToAddressableAreaAtomicParams
+> = (args, invariantContext, prevRobotState) => {
   const { pipetteId, fixtureId, offset } = args
-  const {
-    pipetteEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { pipetteEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteChannels = pipetteEntity.spec.channels
   const pipettePythonName = pipetteEntity.pythonName
@@ -33,9 +28,8 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaAtomicPa
     trashBinEntities[fixtureId] ?? wasteChuteEntities[fixtureId]
   const fixturePythonName = fixtureEntity.pythonName
 
-  let addressableAreaName: AddressableAreaName = getWasteChuteAddressableAreaNamePip(
-    pipetteChannels
-  )
+  let addressableAreaName: AddressableAreaName =
+    getWasteChuteAddressableAreaNamePip(pipetteChannels)
   if (trashBinEntities[fixtureId] != null) {
     addressableAreaName = getTrashBinAddressableAreaName(
       fixtureEntity.location as CutoutId

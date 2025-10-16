@@ -1,8 +1,6 @@
 ---
-title: "Protocol Designer: Transfer"
+title: "Protocol Designer: Transfer steps"
 ---
-
-# Transfer Steps
 
 Your protocol timeline includes steps the robot will peform in your protocol. To start, the timeline includes the starting and ending deck states. Click **Add Step** in the lower left to add transfer, move, mix, pause, or module-specific steps to your protocol. 
 
@@ -22,6 +20,8 @@ Click **Choose wells**, and then click and drag to select source and destination
 | Single path | N to N | <ul><li>Aspirates enough liquid for a single transfer and repeats</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Per source well</li><li>Never</li></ul> |
 | Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
 | Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
+
+Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
 
 ## Tip management
 
@@ -45,7 +45,10 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
 </figure>
 
-Choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol. 
+Choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack.
+
+!!! Note
+    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol.  
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
@@ -73,11 +76,12 @@ Additional advanced pipetting settings are available in the Aspirate and Dispens
 
 | **Advanced Setting** | **Pipette Movement** | **Description** |
 | :------------------- | :------------------- | :-------------- |
-| Pre-wet tip | <ul><li>Aspirate</li></ul> | <ul><li>Aspirate and dispense once in the source well before aspirating the transfer volume</li></ul> |
-| Mix | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Mix the contents of the well either before aspirating or after dispensing</li><li>Customize volume and number of repetitions</li></ul> |
-| Delay | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Hold the pipette tip at a position for a defined amount of time after aspirating or dispensing</li><li>Customize duration and position from bottom of well</li></ul> |
+| Pre-wet tip | <ul><li>Aspirate</li></ul> | <ul><li>Aspirate and dispense once in the source well before aspirating the transfer volume</li><li>Takes place at your chosen aspirate position</li></ul> |
+| Mix | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Mix the contents of the well either before aspirating or after dispensing</li><li>Customize volume and number of repetitions</li><li>Can take place at your chosen aspirate or submerge position</li></ul> |
+| Delay | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Hold the pipette tip at the submerge, aspirate or dispense, or retract position for a defined amount of time after aspirating or dispensing</li><li>Customize duration and position from bottom of well</li></ul> |
 | Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li></ul> |
 | Touch tip | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Touch the tip to the four sides of the well to remove droplets after aspirating or dispensing</li><li>Customize touch tip position from the top of the well</li></ul> |
-| Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li></ul> |
+| Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li><li>Occurs at your retract location, as long as it's safe to do so (more than 2 mm above the top of the well)</li></ul> |
+
 
 Some advanced settings, like mix and blowout, are not available with consolidate and distribute pipette paths to prevent sample contamination. Settings like touch tip are not available with some types of labware. Protocol Designer only allows you to select compatible settings in your transfer step. 

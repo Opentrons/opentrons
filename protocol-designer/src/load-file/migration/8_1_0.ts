@@ -107,7 +107,7 @@ export const migrateFile = (
           : null
       const tipLength =
         matchingTiprackURI != null
-          ? labwareDefinitions[matchingTiprackURI].parameters.tipLength ?? 0
+          ? (labwareDefinitions[matchingTiprackURI].parameters.tipLength ?? 0)
           : 0
       const pipetteName = loadPipetteCommands.find(
         pipette => pipette.params.pipetteId === item.pipette

@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
+import { ModalShell, WizardHeader } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibrateTipLength } from '/app/organisms/Desktop/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '/app/organisms/Desktop/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '/app/organisms/Desktop/CalibrationPanels'
@@ -55,7 +54,7 @@ export function useDashboardCalibrateTipLength(
       ) {
         createRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
@@ -64,7 +63,7 @@ export function useDashboardCalibrateTipLength(
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -74,51 +73,54 @@ export function useDashboardCalibrateTipLength(
       ) {
         trackedRequestId.current =
           'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       }
     }
   )
 
-  const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
-    (state: State) => {
+  const tipLengthCalibrationSession: TipLengthCalibrationSession | null =
+    useSelector((state: State) => {
       return getTipLengthCalibrationSession(state, robotName)
-    }
-  )
+    })
 
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = useState<boolean | null>(
     null
   )
 
-  const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker = props => {
-    const { params, hasBlockModalResponse, invalidateHandler } = props
-    invalidateHandlerRef.current = invalidateHandler
-    sessionParams.current = params
-    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
-      setShowCalBlockModal(true)
-    } else {
-      setShowCalBlockModal(false)
-      const { mount, tipRackDefinition = null } = sessionParams.current
-      const hasCalibrationBlock = Boolean(
-        configHasCalibrationBlock ?? hasBlockModalResponse
-      )
-      dispatchRequests(
-        Sessions.ensureSession(robotName, sessionType, {
-          mount,
-          tipRackDefinition,
-          hasCalibrationBlock,
-        })
-      )
-      dispatch(
-        tipLengthCalibrationStarted(
-          mount,
-          hasCalibrationBlock,
-          'default Opentrons tip rack for pipette on mount'
+  const handleStartDashboardTipLengthCalSession: DashboardCalTipLengthInvoker =
+    props => {
+      const { params, hasBlockModalResponse, invalidateHandler } = props
+      invalidateHandlerRef.current = invalidateHandler
+      sessionParams.current = params
+      if (
+        hasBlockModalResponse === null &&
+        configHasCalibrationBlock === null
+      ) {
+        setShowCalBlockModal(true)
+      } else {
+        setShowCalBlockModal(false)
+        const { mount, tipRackDefinition = null } = sessionParams.current
+        const hasCalibrationBlock = Boolean(
+          configHasCalibrationBlock ?? hasBlockModalResponse
         )
-      )
+        dispatchRequests(
+          Sessions.ensureSession(robotName, sessionType, {
+            mount,
+            tipRackDefinition,
+            hasCalibrationBlock,
+          })
+        )
+        dispatch(
+          tipLengthCalibrationStarted(
+            mount,
+            hasCalibrationBlock,
+            'default Opentrons tip rack for pipette on mount'
+          )
+        )
+      }
     }
-  }
 
   const startingSession =
     useSelector<State, RequestState | null>(state =>

@@ -10,20 +10,16 @@ on:
       - 'components/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
-      - '.github/actions/webstack/deploy-to-sandbox/**'
       - '.github/workflows/utils.js'
+      - 'scripts/static-deploy/**'
   push:
-    paths:
-      - 'labware-library/**'
-      - 'shared-data/labware/**'
-      - 'components/**'
-      - 'package.json'
-      - '.github/workflows/ll-test-build-deploy.yaml'
     branches:
-      - '**'
+      - 'edge'
+      - 'chore_release*'
     tags:
+      - 'staging-labware-library*'
       - 'labware-library*'
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -34,86 +30,62 @@ defaults:
     shell: bash
 
 env:
-  CI: true
+  CI: 'true'
+  # This is the artifact directory as a relative path
+  # to the working-directory of our tools: scripts/static-deploy
+  # our script deploy_ci_config.py expects this ENV variable is set
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
   js-unit-test:
     name: 'labware library unit tests'
-    timeout-minutes: 20
+    timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - name: 'install libudev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'run labware library unit tests'
         run: make -C labware-library test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage/lcov.info
           flags: labware-library
 
   e2e-test:
     name: 'labware library e2e tests'
-    needs: ['js-unit-test']
-    timeout-minutes: 30
+    timeout-minutes: 20
     runs-on: 'ubuntu-24.04'
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install libudev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'test-e2e'
         env:
           OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
@@ -121,42 +93,15 @@ jobs:
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
-    needs: ['js-unit-test']
-    timeout-minutes: 30
+    needs: ['js-unit-test', 'e2e-test']
+    timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
+    if: always() && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped')
     steps:
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install libudev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'build LL'
         env:
           OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
@@ -168,46 +113,110 @@ jobs:
         with:
           name: 'll-artifact'
           path: labware-library/dist
+
   deploy-ll:
     name: 'deploy LL artifact to S3'
     runs-on: 'ubuntu-24.04'
-    needs: ['js-unit-test', 'e2e-test', 'build-ll']
-    if: github.event_name != 'pull_request'
+    needs: ['determine-deploy-config', 'build-ll']
+    timeout-minutes: 5
+    if: always() && needs.build-ll.result == 'success' && needs.determine-deploy-config.result == 'success'
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
+          fetch-depth: 0
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
         with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'download LL build'
-        uses: 'actions/download-artifact@v4'
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: |
+          make setup
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-2
+          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
         with:
           name: ll-artifact
-          path: ./dist
-      - name: 'deploy builds to s3'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
+          path: ./dist # in the default workspace
+          # RELATIVE_ARTIFACT_DIR is set to ../../dist
+          # because that is the relative path from scripts/static-deploy
+          # to the this location
+      - name: Deploy to S3
+        working-directory: scripts/static-deploy
+        run: make deploy \
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
+
+  # Notification jobs for tagged builds
+  notify-success:
+    name: 'Notify Build Success'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, build-ll, deploy-ll]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && needs.build-ll.result == 'success' && needs.deploy-ll.result == 'success'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send success alert'
+        uses: ./.github/actions/simple-build-alert
         with:
-          domain: 'labware.opentrons.com'
-          distPath: './dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          status: 'success'
+          workflow_name: 'Labware Library test, build, and deploy'
+
+  notify-failure:
+    name: 'Notify Build Failure'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, build-ll, deploy-ll]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'failure' || needs.build-ll.result == 'failure' || needs.deploy-ll.result == 'failure')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Determine failed jobs'
+        id: failed-jobs
+        shell: bash
+        run: |
+          failed_jobs=()
+          if [[ "${{ needs.js-unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("js-unit-test")
+          fi
+          if [[ "${{ needs.build-ll.result }}" == "failure" ]]; then
+            failed_jobs+=("build-ll")
+          fi
+          if [[ "${{ needs.deploy-ll.result }}" == "failure" ]]; then
+            failed_jobs+=("deploy-ll")
+          fi
+          
+          IFS=','
+          echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
+
+      - name: 'Send failure alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'failure'
+          workflow_name: 'Labware Library test, build, and deploy'
+          failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+
+  notify-cancelled:
+    name: 'Notify Build Cancelled'
+    runs-on: 'ubuntu-latest'
+    needs: [js-unit-test, build-ll, deploy-ll]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'cancelled' || needs.build-ll.result == 'cancelled' || needs.deploy-ll.result == 'cancelled')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send cancelled alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'cancelled'
+          workflow_name: 'Labware Library test, build, and deploy'

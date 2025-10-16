@@ -1,0 +1,57 @@
+.scrubber_container {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  gap: var(--spacing-12);
+}
+
+.track_container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 28px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.track_background,
+.track_progress {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.track_background {
+  width: 100%;
+  background-color: var(--grey-20);
+}
+
+.track_progress {
+  width: 0;
+  background-color: var(--blue-50);
+}
+
+.track_thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--blue-50);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.8);
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* track thumb is needed to be visible when hovering over the track or when dragging */
+.track_container:hover .track_thumb,
+.track_container.dragging .track_thumb {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}

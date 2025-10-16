@@ -1,17 +1,10 @@
-import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import { getPDMetadata } from '../../file-types'
 import { PRESAVED_STEP_ID, START_TERMINAL_ITEM_ID } from '../../steplist/types'
 
 import type { Reducer } from 'redux'
 import type { StepIdType } from '../../form-types'
-import type { LoadFileAction } from '../../load-file'
-import type {
-  DeleteMultipleStepsAction,
-  DeleteStepAction,
-} from '../../steplist/actions'
 import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
 import type {
@@ -25,41 +18,6 @@ import type {
   SelectTerminalItemAction,
 } from './actions/types'
 
-export type CollapsedStepsState = Record<StepIdType, boolean>
-// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-const collapsedSteps: Reducer<CollapsedStepsState, any> = handleActions(
-  {
-    SAVE_STEP_FORM: (
-      state: CollapsedStepsState,
-      action: SaveStepFormAction
-    ) => {
-      const id = action.payload.id
-
-      if (!(id in state)) {
-        // if step saved for the first time, initialize collapsed state
-        return { ...state, [id]: false }
-      }
-
-      return state
-    },
-    DELETE_STEP: (state: CollapsedStepsState, action: DeleteStepAction) =>
-      omit(state, action.payload.toString()),
-    DELETE_MULTIPLE_STEPS: (
-      state: CollapsedStepsState,
-      action: DeleteMultipleStepsAction
-    ) => omit(state, action.payload),
-    LOAD_FILE: (
-      state: CollapsedStepsState,
-      action: LoadFileAction // default all steps to collapsed
-    ) =>
-      getPDMetadata(action.payload.file).orderedStepIds.reduce(
-        (acc: CollapsedStepsState, stepId) => ({ ...acc, [stepId]: true }),
-        {}
-      ),
-  },
-  {}
-)
 export const SINGLE_STEP_SELECTION_TYPE: 'SINGLE_STEP_SELECTION_TYPE' =
   'SINGLE_STEP_SELECTION_TYPE'
 export const MULTI_STEP_SELECTION_TYPE: 'MULTI_STEP_SELECTION_TYPE' =
@@ -152,20 +110,18 @@ const hoveredItem: Reducer<HoveredItemState, any> = handleActions(
   },
   null
 )
-const hoveredSubstep: Reducer<
-  SubstepIdentifier,
-  HoverOnSubstepAction
-> = handleActions(
-  {
-    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-    HOVER_ON_SUBSTEP: (
-      state: SubstepIdentifier,
-      action: HoverOnSubstepAction
-    ) => action.payload,
-  },
-  null
-)
+const hoveredSubstep: Reducer<SubstepIdentifier, HoverOnSubstepAction> =
+  handleActions(
+    {
+      // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+      // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
+      HOVER_ON_SUBSTEP: (
+        state: SubstepIdentifier,
+        action: HoverOnSubstepAction
+      ) => action.payload,
+    },
+    null
+  )
 const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
   {
     SET_WELL_SELECTION_LABWARE_KEY: (
@@ -235,7 +191,6 @@ const selectedDropdownItem: Reducer<Selection[], any> = handleActions(
   []
 )
 export interface StepsState {
-  collapsedSteps: CollapsedStepsState
   selectedItem: SelectedItemState
   hoveredItem: HoveredItemState
   hoveredSubstep: SubstepIdentifier
@@ -245,7 +200,6 @@ export interface StepsState {
   selectedDropdownItem: Selection[]
 }
 export const _allReducers = {
-  collapsedSteps,
   selectedItem,
   hoveredItem,
   hoveredSubstep,

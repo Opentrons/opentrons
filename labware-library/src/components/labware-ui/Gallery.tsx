@@ -1,9 +1,8 @@
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
-import { getLabwareViewBox } from '@opentrons/shared-data'
+import { getLabwareViewBox, labwareImages } from '@opentrons/shared-data'
 
-import { labwareImages } from './labware-images'
 import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -31,9 +30,9 @@ export function Gallery(props: GalleryProps): JSX.Element {
     </RobotWorkSpace>
   )
 
-  const staticImages = (
-    labwareImages[params.loadName] || []
-  ).map((src, key) => <img key={key} src={src} />)
+  const staticImages = (labwareImages[params.loadName] || []).map(
+    (src, key) => <img key={key} src={src} />
+  )
 
   const images = [...staticImages, render]
 

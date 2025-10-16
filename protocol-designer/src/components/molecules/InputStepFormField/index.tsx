@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, InputField, SPACING } from '@opentrons/components'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
   title: string
@@ -46,7 +46,7 @@ export function InputStepFormField(
       <InputField
         {...otherProps}
         tooltipText={
-          showTooltip ? t(`${tooltipContent}`) ?? undefined : undefined
+          showTooltip ? (t(`${tooltipContent}`) ?? undefined) : undefined
         }
         type={type}
         title={title}

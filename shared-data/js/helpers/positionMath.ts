@@ -19,7 +19,6 @@ import type {
   LabwareDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  SlotTransforms,
   Vector3D,
 } from '../types'
 
@@ -42,9 +41,7 @@ export function getSchema2Dimensions(
  * Return a bounding box, in coordinates relative to the labware's origin,
  * that encloses the labware when viewed from the top down.
  */
-export function getLabwareViewBox(
-  definition: LabwareDefinition
-): {
+export function getLabwareViewBox(definition: LabwareDefinition): {
   /** The minimum x-coord, i.e. the left of the labware. */
   minX: number
   /** The minimum y-coord, i.e. the front of the labware. */
@@ -229,12 +226,13 @@ function getLabwareStackAsArray(
       return null
     }
     const deckSlotPosition = coordinateTupleToVector3D(deckSlotPositionTuple)
-    const deckSlotPositionToLabwareOrigin = getModuleParentOriginToLabwareOrigin(
-      deckDefinition.otId,
-      slotId,
-      moduleDefinition,
-      bottomLabware
-    )
+    const deckSlotPositionToLabwareOrigin =
+      getModuleParentOriginToLabwareOrigin(
+        deckDefinition.otId,
+        slotId,
+        moduleDefinition,
+        bottomLabware
+      )
 
     result.push({
       debugInfo: {
@@ -357,7 +355,7 @@ export function getDeckSlotOriginToLabwareOrigin(
  * to go slot->module and a second function to go module->labware.
  */
 export function getModuleParentOriginToLabwareOrigin(
-  deckId: string,
+  deckId: string | null,
   slotId: string | null,
   moduleDefinition: ModuleDefinition,
   labwareDefinition: LabwareDefinition
@@ -379,11 +377,8 @@ export function getModuleParentOriginToLabwareOrigin(
       // based on locatingFeatures. As a first-pass approximation, this currently just
       // puts the front-left-bottom of the labware at the front-left of the module's
       // child slot, which is the traditional behavior with labware schema 2.
-      const moduleParentOriginToLabwareFrontLeftBottom = getModuleParentOriginToChildSlotOrigin(
-        deckId,
-        slotId,
-        moduleDefinition
-      )
+      const moduleParentOriginToLabwareFrontLeftBottom =
+        getModuleParentOriginToChildSlotOrigin(deckId, slotId, moduleDefinition)
       const labwareOriginToLabwareFrontLeftBottom = {
         x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
         y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,
@@ -445,15 +440,14 @@ export function getLabwareOriginToLabwareOrigin(
  *  slot -x,-y corner idea.
  */
 export function getModuleParentOriginToChildSlotOrigin(
-  deckId: string,
+  deckId: string | null,
   slotId: string | null,
   moduleDefinition: ModuleDefinition
 ): Vector3D {
-  const transformsForLocation = getSlotTransformsFromModuleDefinition(
-    moduleDefinition,
-    deckId,
-    slotId
-  )
+  const transformsForLocation =
+    deckId != null && slotId != null
+      ? (moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {})
+      : {}
   const labwareOffsetTransform =
     transformsForLocation.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
   const [[x], [y], [z]] = multiplyMatrices(labwareOffsetTransform, [
@@ -533,17 +527,4 @@ export function getSchema2CornerOffsetFromSlot(
       z: 56,
     }
   }
-}
-
-type ModuleTransformsForDeck = NonNullable<SlotTransforms[string]>
-type ModuleTransformsForSlot = NonNullable<ModuleTransformsForDeck[string]>
-function getSlotTransformsFromModuleDefinition(
-  moduleDefinition: ModuleDefinition,
-  targetDeckId: string,
-  targetSlotId: string | null
-): ModuleTransformsForSlot {
-  const transformsForDeck = moduleDefinition.slotTransforms[targetDeckId] ?? {}
-  const transformsForSlot =
-    targetSlotId == null ? {} : transformsForDeck[targetSlotId] ?? {}
-  return transformsForSlot
 }

@@ -66,10 +66,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)
@@ -160,43 +158,49 @@ export const getLabwareIsRecommended = (
 //  purely for labware<>adapter combos
 export const getLabwareCompatibleWithAdapter = (
   defs: LabwareDefByDefURI,
-  enableStackingFF: boolean,
   adapterLoadName?: string
 ): string[] => {
   if (adapterLoadName == null) {
     return []
   }
 
-  if (enableStackingFF) {
-    return Object.entries(defs)
-      .filter(
-        ([, { stackingOffsetWithLabware }]) =>
-          stackingOffsetWithLabware?.[adapterLoadName] != null
-      )
-      .map(([labwareDefUri]) => labwareDefUri)
-  } else {
-    return Object.entries(defs)
-      .filter(
-        ([, { stackingOffsetWithLabware, compatibleParentLabware }]) =>
-          stackingOffsetWithLabware?.[adapterLoadName] != null &&
-          !compatibleParentLabware?.includes(adapterLoadName)
-      )
-      .map(([labwareDefUri]) => labwareDefUri)
-  }
+  return Object.entries(defs)
+    .filter(
+      ([, { stackingOffsetWithLabware }]) =>
+        stackingOffsetWithLabware?.[adapterLoadName] != null
+    )
+    .map(([labwareDefUri]) => labwareDefUri)
 }
 
 const getStackerDefinitionsFromLoadName = (
   defs: LabwareDefByDefURI,
   loadName: string
 ): string[] | null => {
-  const labwareDefURI = Object.entries(defs)
+  const matchingLabwares: Array<{
+    labwareDefUri: string
+    loadName: string
+  }> = Object.entries(defs)
     .filter(([, { compatibleParentLabware }]) =>
       compatibleParentLabware?.includes(loadName)
     )
     .reverse()
-    .map(([labwareDefUri]) => labwareDefUri)
+    .map(([labwareDefUri, def]) => ({
+      labwareDefUri,
+      loadName: def.parameters.loadName,
+    }))
 
-  return labwareDefURI
+  //  TODO: remove this when we allow stacking of the Opentrons Tough plate on itself
+  //  in PD
+  if (loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt') {
+    return matchingLabwares.reduce((acc: string[], labware) => {
+      if (labware.loadName !== loadName) {
+        acc.push(labware.labwareDefUri)
+      }
+      return acc
+    }, [])
+  }
+
+  return matchingLabwares.map(labware => labware.labwareDefUri)
 }
 
 const CATEGORIES_WITH_NO_LID = [
@@ -216,12 +220,13 @@ export const getStackerDefinitions = (
     return []
   }
   const universalLid =
-    category != null && !CATEGORIES_WITH_NO_LID.includes(category)
+    (category != null && !CATEGORIES_WITH_NO_LID.includes(category)) ||
+    loadName === 'opentrons_tough_universal_lid'
       ? universalLidURI
       : null
-  const supportedDef = getStackerDefinitionsFromLoadName(defs, loadName)
+  const supportedDefs = getStackerDefinitionsFromLoadName(defs, loadName)
   return [
-    ...(supportedDef != null ? supportedDef : []),
+    ...(supportedDefs != null ? supportedDefs : []),
     ...(universalLid != null ? [universalLid] : []),
   ]
 }
@@ -414,12 +419,8 @@ export interface SwapBlockedModuleArgs {
 }
 
 export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
-  const {
-    hoveredLabware,
-    draggedLabware,
-    modulesById,
-    customLabwareDefs,
-  } = args
+  const { hoveredLabware, draggedLabware, modulesById, customLabwareDefs } =
+    args
 
   if (!hoveredLabware || !draggedLabware) {
     return false

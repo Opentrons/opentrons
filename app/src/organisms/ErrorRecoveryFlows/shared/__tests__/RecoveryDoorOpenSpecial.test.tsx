@@ -117,7 +117,8 @@ describe('RecoveryDoorOpenSpecial', () => {
   )
 
   it('renders default subtext for an unhandled recovery option', () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption = 'UNHANDLED_OPTION' as any
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      'UNHANDLED_OPTION' as any
     render(props)
     screen.getByText('Close the robot door')
     screen.getByText(
@@ -126,7 +127,8 @@ describe('RecoveryDoorOpenSpecial', () => {
   })
 
   it('calls proceedToRouteAndStep with OPTION_SELECTION for unhandled recovery option when door is closed', () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption = 'UNHANDLED_OPTION' as any
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      'UNHANDLED_OPTION' as any
     props.doorStatusUtils.isDoorOpen = false
     render(props)
     expect(props.routeUpdateActions.proceedToRouteAndStep).toHaveBeenCalledWith(

@@ -5,12 +5,12 @@ import {
   ALIGN_CENTER,
   Btn,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -23,7 +23,7 @@ import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   StepItemSourceDestRow,
   SubstepIdentifier,
-} from '../../../../steplist'
+} from '/protocol-designer/steplist'
 
 interface MultichannelSubstepProps {
   trashName: AdditionalEquipmentName | null
@@ -60,16 +60,16 @@ export function MultichannelSubstep(
   const firstChannelDest = rowGroup[0].dest
   const lastChannelDest = rowGroup[rowGroup.length - 1].dest
   const destWellRange = `${
-    firstChannelDest ? firstChannelDest.well ?? t('shared:trash') : ''
+    firstChannelDest ? (firstChannelDest.well ?? t('shared:trash')) : ''
   }:${lastChannelDest ? lastChannelDest.well : ''}`
 
   let titleCopy = t('protocol_steps:aspirated')
-  let deckLabel = <DeckInfoLabel deckLabel={sourceWellRange} />
+  let deckLabel = <RobotInfoLabel deckLabel={sourceWellRange} />
   if (firstChannelSource != null && firstChannelDest != null) {
     titleCopy = t('protocol_steps:mix')
   } else if (firstChannelSource == null && firstChannelDest != null) {
     titleCopy = t('protocol_steps:dispensed')
-    deckLabel = <DeckInfoLabel deckLabel={destWellRange} />
+    deckLabel = <RobotInfoLabel deckLabel={destWellRange} />
   }
 
   return (

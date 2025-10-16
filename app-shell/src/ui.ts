@@ -48,6 +48,7 @@ export function createUi(): BrowserWindow {
     () => {
       log.debug('Main window ready to show')
       mainWindow.show()
+      mainWindow.webContents.send('window-type', 'desktop-main')
     }
   )
 
@@ -72,8 +73,10 @@ export function registerReloadUi(
     switch (action.type) {
       case RELOAD_UI:
         log.info(`reloading UI: ${action.payload.message}`)
+        browserWindow.webContents.once('did-finish-load', () => {
+          browserWindow.webContents.send('window-type', 'desktop-main')
+        })
         browserWindow.webContents.reload()
-
         break
     }
   }

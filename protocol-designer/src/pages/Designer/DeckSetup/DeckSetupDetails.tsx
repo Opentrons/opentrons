@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
-import { Module } from '@opentrons/components'
+import { DeckLabelSet, Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getModuleDef,
@@ -26,8 +26,8 @@ import {
 } from '../../../step-forms'
 import { START_TERMINAL_ITEM_ID } from '../../../steplist'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
@@ -175,9 +175,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
 
-  const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? getSlotsWithCollisions(deckDef, allModules)
-    : []
+  const multichannelWarningSlotIds: AddressableAreaName[] =
+    showGen1MultichannelCollisionWarnings
+      ? getSlotsWithCollisions(deckDef, allModules)
+      : []
 
   const adjacentLabware =
     preSelectedFixture != null && selectedSlot.cutout != null
@@ -232,7 +233,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           moduleOnDeck.id,
           allLabware
         )
@@ -259,7 +260,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     : 'open',
               }
             : tempInnerProps
-        const labwareOnModule = activeDeckSetup.labware[labwareLoadedOnModuleId]
+        const labwareOnModule =
+          topMostId != null ? activeDeckSetup.labware[topMostId] : null
+        const labwareRightBelowTopMostLabware =
+          rightBelowTopId != null
+            ? activeDeckSetup.labware[rightBelowTopId]
+            : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
@@ -280,6 +286,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
+                  {labwareRightBelowTopMostLabware != null ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      labwareOnDeck={labwareRightBelowTopMostLabware}
+                    />
+                  ) : null}
                   <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareOnModule} />
                   <HighlightLabware
                     labwareOnDeck={labwareOnModule}
@@ -360,8 +373,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {/* on-deck warnings for OT-2 and GEN1 8-channels only */}
       {multichannelWarningSlotIds.map(slotId => {
         const slotPosition = getPositionFromSlotId(slotId, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slotId, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slotId,
+          deckDef
+        )?.boundingBox
         return slotPosition != null && slotBoundingBox != null ? (
           <SlotWarning
             key={slotId}
@@ -378,9 +393,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
 
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
@@ -396,9 +410,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           )
         })
         .map(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
           const moduleOnSlot = Object.values(activeDeckSetup.modules).find(
             module => module.slot === addressableArea.id
           )
@@ -429,14 +442,21 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
-          labware.id === adjacentLabware?.id
+          labware.id === adjacentLabware?.id ||
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }
         const slot = getSlotInLocationStack(labware.stack)
+        const labwareAmount = labware.stack.reduce(
+          (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
+          0
+        )
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
@@ -451,6 +471,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            {labwareAmount > 1 ? (
+              <DeckLabelSet
+                deckLabels={[]}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                width={labware.def.dimensions.xDimension}
+                height={labware.def.dimensions.yDimension}
+                showModuleIcon
+                showBorder={false}
+              />
+            ) : null}
             <HighlightLabware
               labwareOnDeck={labware}
               position={slotPosition}
@@ -518,8 +549,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return null
         }
         const slotForOnTheDeck = getSlotInLocationStack(labware.stack)
-        const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
-          ?.slot
+        const slotForOnMod = allModules.find(
+          mod => mod.id === slotForOnTheDeck
+        )?.slot
         let slotPosition = null
         if (slotForOnMod != null) {
           slotPosition = getPositionFromSlotId(slotForOnMod, deckDef)

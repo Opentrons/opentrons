@@ -20,7 +20,8 @@ import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
   setLocalStorageItem,
-} from '../../../persist'
+} from '/protocol-designer/persist'
+
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
 import { useAnnouncements } from './announcements'
 
@@ -36,9 +37,8 @@ export const AnnouncementModal = (
   const { i18n, t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
 
-  const { announcementKey, message, heading, image } = announcements[
-    announcements.length - 1
-  ]
+  const { announcementKey, message, heading, image } =
+    announcements[announcements.length - 1]
 
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey

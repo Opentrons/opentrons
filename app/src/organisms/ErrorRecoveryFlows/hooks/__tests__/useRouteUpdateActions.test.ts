@@ -140,8 +140,8 @@ describe('useRouteUpdateActions', () => {
       doorStatusUtils: { isDoorOpen: true, isProhibitedDoorOpen: false },
       recoveryMap: {
         route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
-        step:
-          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_RELEASE_LABWARE,
+        step: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS
+          .GRIPPER_RELEASE_LABWARE,
       },
     }
 

@@ -2,7 +2,7 @@ import clsx from 'clsx'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { DeckInfoLabel } from '../../molecules'
+import { RobotInfoLabel } from '../../molecules'
 import styles from './deck.module.css'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
@@ -59,16 +59,16 @@ export const SlotLabels = ({
       >
         <div className={styles.deck_labels_column}>
           <div className={styles.deck_label_column_container}>
-            <DeckInfoLabel deckLabel="A" height="max-content" width="100%" />
+            <RobotInfoLabel deckLabel="A" height="max-content" width="100%" />
           </div>
           <div className={styles.deck_label_column_container}>
-            <DeckInfoLabel deckLabel="B" height="max-content" width="100%" />
+            <RobotInfoLabel deckLabel="B" height="max-content" width="100%" />
           </div>
           <div className={styles.deck_label_column_container}>
-            <DeckInfoLabel deckLabel="C" height="max-content" width="100%" />
+            <RobotInfoLabel deckLabel="C" height="max-content" width="100%" />
           </div>
           <div className={styles.deck_label_column_container}>
-            <DeckInfoLabel deckLabel="D" height="max-content" width="100%" />
+            <RobotInfoLabel deckLabel="D" height="max-content" width="100%" />
           </div>
         </div>
       </RobotCoordsForeignObject>
@@ -87,26 +87,26 @@ export const SlotLabels = ({
             className={styles.deck_label_row_container}
             style={simpleItemWidthStyle}
           >
-            <DeckInfoLabel deckLabel="1" height="100%" />
+            <RobotInfoLabel deckLabel="1" height="100%" />
           </div>
           <div
             className={styles.deck_label_row_container}
             style={smallItemWidthStyle}
           >
-            <DeckInfoLabel deckLabel="2" height="100%" />
+            <RobotInfoLabel deckLabel="2" height="100%" />
           </div>
           <div
             className={styles.deck_label_row_container}
             style={nextTo4thWidthStyle}
           >
-            <DeckInfoLabel deckLabel="3" height="100%" />
+            <RobotInfoLabel deckLabel="3" height="100%" />
           </div>
           {show4thColumn ? (
             <div
               className={styles.deck_label_row_container}
               style={fourthWidthStyle}
             >
-              <DeckInfoLabel deckLabel="4" height="100%" />
+              <RobotInfoLabel deckLabel="4" height="100%" />
             </div>
           ) : null}
         </div>

@@ -182,6 +182,7 @@ async def test_liquid_probe_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -347,6 +348,7 @@ async def test_liquid_not_found_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
     decoy.when(
@@ -754,6 +756,7 @@ async def test_liquid_probe_stall(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

@@ -26,7 +26,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
     )
   })
   it.only('returns staging area fixtures if commands address column 4 areas', () => {
-    const cutoutConfigs = getSimplestDeckConfigForProtocol(({
+    const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [
         {
           ...RUN_TIME_COMMAND_STUB_MIXIN,
@@ -70,7 +70,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
         },
       ],
       labware: [],
-    } as unknown) as CompletedProtocolAnalysis)
+    } as unknown as CompletedProtocolAnalysis)
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 8),
       {
@@ -96,7 +96,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
     ])
   })
   it('returns simplest cutout fixture where many are possible', () => {
-    const cutoutConfigs = getSimplestDeckConfigForProtocol(({
+    const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [
         {
           ...RUN_TIME_COMMAND_STUB_MIXIN,
@@ -109,7 +109,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
         },
       ],
       labware: [],
-    } as unknown) as CompletedProtocolAnalysis)
+    } as unknown as CompletedProtocolAnalysis)
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 11),
       {
@@ -120,7 +120,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
     ])
   })
   it('returns compatible cutout fixture where multiple addressable requirements present', () => {
-    const cutoutConfigs = getSimplestDeckConfigForProtocol(({
+    const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [
         {
           ...RUN_TIME_COMMAND_STUB_MIXIN,
@@ -142,7 +142,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
         },
       ],
       labware: [],
-    } as unknown) as CompletedProtocolAnalysis)
+    } as unknown as CompletedProtocolAnalysis)
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 11),
       {
@@ -153,7 +153,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
     ])
   })
   it('returns deck with trash in A3 when legacy trash labware is present', () => {
-    const cutoutConfigs = getSimplestDeckConfigForProtocol(({
+    const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [],
       labware: [
         {
@@ -164,7 +164,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
           location: { slotName: 'A3' },
         },
       ],
-    } as unknown) as CompletedProtocolAnalysis)
+    } as unknown as CompletedProtocolAnalysis)
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 8),
       {

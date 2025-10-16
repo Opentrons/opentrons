@@ -214,7 +214,7 @@ const SHAKE_TIME_REQUIRED: FormError = {
   location: 'field',
 }
 const SHAKER_TIME_FORMAT: FormError = {
-  title: TIME_TITLE,
+  title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['heaterShakerTimer'],
   location: 'field',
 }
@@ -688,15 +688,15 @@ export const pauseForTimeOrUntilTold = (
 
   if ('pauseAction' in fields && fields.pauseAction === PAUSE_UNTIL_TIME) {
     const { hours, minutes, seconds } = getTimeFromForm(
-      'pauseTime' in fields ? fields.pauseTime ?? null : null
+      'pauseTime' in fields ? (fields.pauseTime ?? null) : null
     )
     // user selected pause for amount of time
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0
       ? TIME_PARAM_REQUIRED
       : isTimeFormat(fields.pauseTime)
-      ? null
-      : PAUSE_TIME_FORMAT
+        ? null
+        : PAUSE_TIME_FORMAT
   } else if (
     'pauseAction' in fields &&
     fields.pauseAction === PAUSE_UNTIL_TEMP
@@ -736,7 +736,7 @@ export const wellRatioMoveLiquid = (
   const { aspirate_wells, dispense_wells, dispense_labware } = fields
   const dispenseLabware =
     dispense_labware != null && 'name' in dispense_labware
-      ? dispense_labware.name ?? null
+      ? (dispense_labware.name ?? null)
       : null
   const isDispensingIntoTrash =
     dispenseLabware != null
@@ -934,18 +934,10 @@ export const shakeTimeRequired = (
   let error = null
   if (heaterShakerSetTimer && !heaterShakerTimer) {
     error = SHAKE_TIME_REQUIRED
-  } else if (
-    heaterShakerSetTimer &&
-    !isTimeFormatMinutesSeconds(heaterShakerTimer)
-  ) {
+  } else if (heaterShakerSetTimer && !isTimeFormat(heaterShakerTimer)) {
     error = SHAKER_TIME_FORMAT
   }
   return error
-}
-
-const isTimeFormatMinutesSeconds = (value: string | null): boolean => {
-  const timeRegex = /^(?:[0-9]?\d):(?:[0-5]\d|[0-9])$/g
-  return value != null && timeRegex.test(value)
 }
 
 export const temperatureRequired = (
@@ -1572,19 +1564,21 @@ type ComposeErrors = <T extends HydratedFormData>(
   labwareEntities?: LabwareEntities
 ) => FormError[]
 
-export const composeErrors: ComposeErrors = <T extends HydratedFormData>(
-  ...errorCheckers: Array<
-    (
-      fields: T,
-      moduleEntities?: ModuleEntities,
-      labwareEntities?: LabwareEntities
-    ) => FormError | null
-  >
-) => (
-  formData: T,
-  moduleEntities?: ModuleEntities,
-  labwareEntities?: LabwareEntities
-) =>
-  errorCheckers
-    .map(checker => checker(formData, moduleEntities, labwareEntities))
-    .filter((error): error is FormError => error !== null)
+export const composeErrors: ComposeErrors =
+  <T extends HydratedFormData>(
+    ...errorCheckers: Array<
+      (
+        fields: T,
+        moduleEntities?: ModuleEntities,
+        labwareEntities?: LabwareEntities
+      ) => FormError | null
+    >
+  ) =>
+  (
+    formData: T,
+    moduleEntities?: ModuleEntities,
+    labwareEntities?: LabwareEntities
+  ) =>
+    errorCheckers
+      .map(checker => checker(formData, moduleEntities, labwareEntities))
+      .filter((error): error is FormError => error !== null)

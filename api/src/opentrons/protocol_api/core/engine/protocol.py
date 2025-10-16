@@ -1,7 +1,7 @@
 """ProtocolEngine-based Protocol API core implementation."""
 
 from __future__ import annotations
-from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING, Sequence
 
 from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
@@ -49,6 +49,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
     LoadableLabwareLocation,
+    WASTE_CHUTE_LOCATION,
     NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -64,6 +65,7 @@ from ...disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
+from .tasks import EngineTaskCore
 from .instrument import InstrumentCore
 from .robot import RobotCore
 from .module_core import (
@@ -95,6 +97,7 @@ class ProtocolCore(
         InstrumentCore,
         LabwareCore,
         Union[ModuleCore, NonConnectedModuleCore],
+        EngineTaskCore,
     ]
 ):
     """Protocol API core using a ProtocolEngine.
@@ -912,6 +915,21 @@ class ProtocolCore(
             cmd.WaitForDurationParams(seconds=seconds, message=msg)
         )
 
+    def wait_for_tasks(self, task_cores: Sequence[EngineTaskCore]) -> None:
+        """Wait for specified tasks to complete."""
+        task_ids = task_ids = [task._id for task in task_cores if task._id is not None]
+        self._engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+
+    def create_timer(self, seconds: float) -> EngineTaskCore:
+        """Create a timer task that runs in the background."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.CreateTimerParams(time=seconds)
+        )
+        timer_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.task_id
+        )
+        return timer_task
+
     def home(self) -> None:
         """Move all axes to their home positions."""
         self._engine_client.execute_command(cmd.HomeParams(axes=None))
@@ -1151,7 +1169,8 @@ class ProtocolCore(
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):
             return self._labware_cores_by_id[labware_location.labwareId]
-
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
 
     def _convert_labware_location(
@@ -1188,6 +1207,8 @@ class ProtocolCore(
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:
             return OFF_DECK_LOCATION
+        elif location is OffDeckType.WASTE_CHUTE:
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):

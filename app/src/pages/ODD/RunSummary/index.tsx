@@ -229,14 +229,11 @@ export function RunSummary(): JSX.Element {
     ) : null
   }
 
-  const {
-    determineTipStatus,
-    setTipStatusResolved,
-    aPipetteWithTip,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-  })
+  const { determineTipStatus, setTipStatusResolved, aPipetteWithTip } =
+    useTipAttachmentStatus({
+      runId,
+      runRecord: runRecord ?? null,
+    })
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({

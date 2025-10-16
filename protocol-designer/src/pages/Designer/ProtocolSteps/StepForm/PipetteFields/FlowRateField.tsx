@@ -8,19 +8,20 @@ import {
   getFlexNameConversion,
   linearInterpolate,
   OT2_ROBOT_TYPE,
-  WATER_LIQUID_CLASS_NAME_V2,
+  WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
-import { InputStepFormField } from '../../../../../components/molecules'
-import { getRobotType } from '../../../../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { getMatchingTipLiquidSpecs } from '../../../../../utils'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
+
 import { getMaxUiFlowRate } from './utils'
 
 import type { PathOption } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../form-types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 import type { FieldProps } from '../types'
 
 interface FlowRateFieldProps extends FieldProps {
@@ -53,7 +54,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef =
     allLiquidClassDefs[formData?.liquidClass ?? ''] ??
-    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME_V2]
+    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME]
   const convertedPipetteName =
     pipette != null ? getFlexNameConversion(pipette.spec) : null
   const liquidClassValuesForPipette = liquidClassDef.byPipette.find(
@@ -64,7 +65,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   )
 
   const matchingTipLiquidSpecs =
-    pipette != null
+    pipette != null && tiprack != null
       ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprack as string)
       : null
   const tiprackDef =
@@ -86,10 +87,10 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
         formData.path === 'multiDispense' &&
         liquidClassValuesForTip != null &&
         'multiDispense' in liquidClassValuesForTip
-          ? (liquidClassValuesForTip.multiDispense?.retract
-              .airGapByVolume as Array<[number, number]>) ?? []
-          : (liquidClassValuesForTip?.singleDispense.retract
-              .airGapByVolume as Array<[number, number]>) ?? []
+          ? ((liquidClassValuesForTip.multiDispense?.retract
+              .airGapByVolume as Array<[number, number]>) ?? [])
+          : ((liquidClassValuesForTip?.singleDispense.retract
+              .airGapByVolume as Array<[number, number]>) ?? [])
     }
   }
 
@@ -114,12 +115,12 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           // multi-dispense is valid on OT-2, even though liquid class values are null
           conditioningByVolume: isOT2
             ? []
-            : (liquidClassValuesForTip?.multiDispense
-                ?.conditioningByVolume as Array<[number, number]>) ?? null,
+            : ((liquidClassValuesForTip?.multiDispense
+                ?.conditioningByVolume as Array<[number, number]>) ?? null),
           disposalByVolume: isOT2
             ? []
-            : (liquidClassValuesForTip?.multiDispense
-                ?.disposalByVolume as Array<[number, number]>) ?? null,
+            : ((liquidClassValuesForTip?.multiDispense
+                ?.disposalByVolume as Array<[number, number]>) ?? null),
           aspirateAirGapByVolume: airGapByVolume,
         }).referenceVolumes
       : null
@@ -192,7 +193,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           t('step_edit_form.field.flow_rate.error_out_of_bounds'),
           'capitalize'
         )
-      : passThruProps.errorToShow ?? null
+      : (passThruProps.errorToShow ?? null)
 
   useEffect(() => {
     if (isPristine && passThruProps.value == null) {

@@ -10,6 +10,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   InputField,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -28,17 +29,22 @@ import {
 } from '@opentrons/shared-data'
 import { swatchColors } from '@opentrons/step-generation'
 
-import { getRobotType } from '../../../file-data/selectors'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { TextAreaField } from '../../molecules'
+import {
+  HandleEnter,
+  LINE_CLAMP_TEXT_STYLE,
+  LINK_BUTTON_STYLE,
+} from '/protocol-designer/components/atoms'
+import { TextAreaField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Ingredient } from '@opentrons/step-generation'
-import type { BaseState } from '../../../types'
+import type { BaseState } from '/protocol-designer/types'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),
@@ -59,6 +65,9 @@ export function DefineLiquidsModal(
   const selectedLiquid = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
   )
+  const allLabwareWellContents = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
   const nextGroupId = useSelector(labwareIngredSelectors.getNextLiquidGroupId)
   const selectedLiquidGroupState = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
@@ -76,6 +85,14 @@ export function DefineLiquidsModal(
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
+  const volumePerWell = Object.values(allLabwareWellContents).flatMap(
+    labwareWithIngred =>
+      Object.values(labwareWithIngred).map(ingred =>
+        liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
+      )
+  )
+  const liquidHasAssignedWell = volumePerWell.some(volume => volume > 0)
+
   const deleteLiquidGroup = (): void => {
     if (liquidGroupId != null) {
       dispatch(labwareIngredActions.deleteLiquidGroup(liquidGroupId))
@@ -109,18 +126,12 @@ export function DefineLiquidsModal(
     liquidGroupId: liquidGroupId ?? nextGroupId,
   }
 
-  const {
-    handleSubmit,
-    formState,
-    control,
-    watch,
-    setValue,
-    register,
-  } = useForm<Ingredient>({
-    defaultValues: initialValues,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    resolver: yupResolver(liquidEditFormSchema),
-  })
+  const { handleSubmit, formState, control, watch, setValue, register } =
+    useForm<Ingredient>({
+      defaultValues: initialValues,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      resolver: yupResolver(liquidEditFormSchema),
+    })
   const name = watch('displayName')
   const color = watch('displayColor')
   const liquidClass = watch('liquidClass')
@@ -131,7 +142,9 @@ export function DefineLiquidsModal(
       displayName: values.displayName,
       displayColor: values.displayColor,
       liquidClass:
-        values.liquidClass !== '' ? values.liquidClass ?? undefined : undefined,
+        values.liquidClass !== ''
+          ? (values.liquidClass ?? undefined)
+          : undefined,
       description: values.description !== '' ? values.description : null,
       liquidGroupId: values.liquidGroupId,
     })
@@ -213,6 +226,7 @@ export function DefineLiquidsModal(
                     name="displayName"
                     render={({ field }) => (
                       <InputField
+                        autoFocus
                         name="displayName"
                         error={
                           touchedFields.displayName != null
@@ -273,14 +287,25 @@ export function DefineLiquidsModal(
                 gridGap={SPACING.spacing8}
               >
                 {selectedIngredFields != null ? (
-                  <Btn
-                    onClick={deleteLiquidGroup}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('delete_liquid')}
-                    </StyledText>
-                  </Btn>
+                  <Flex>
+                    <Btn
+                      css={LINK_BUTTON_STYLE}
+                      padding={SPACING.spacing4}
+                      onClick={deleteLiquidGroup}
+                      width="7.1875rem"
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    >
+                      <StyledText desktopStyle="bodyDefaultRegular">
+                        {t('delete_liquid')}
+                      </StyledText>
+                    </Btn>
+                    {liquidHasAssignedWell ? (
+                      <InlineNotification
+                        type="alert"
+                        message={t('liquid_in_use')}
+                      />
+                    ) : null}
+                  </Flex>
                 ) : (
                   <SecondaryButton onClick={cancelForm}>
                     {t('shared:close')}

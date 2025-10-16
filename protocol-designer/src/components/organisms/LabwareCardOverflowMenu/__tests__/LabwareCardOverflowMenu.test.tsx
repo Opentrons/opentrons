@@ -3,25 +3,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { deleteContainer } from '../../../../labware-ingred/actions'
-import { getIsLabwareOnSlotInUse } from '../../../../pages/Designer/DeckSetup/utils'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import { ConfirmDeleteEntityInUseModal } from '../../ConfirmDeleteEntityInUseModal'
-import { EditNickNameModal } from '../../EditNickNameModal'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { ConfirmDeleteEntityInUseModal } from '/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal'
+import { EditNickNameModal } from '/protocol-designer/components/organisms/EditNickNameModal'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+
 import { LabwareCardOverflowMenu } from '../index'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../EditNickNameModal')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../pages/Designer/DeckSetup/utils')
-vi.mock('../../ConfirmDeleteEntityInUseModal')
+vi.mock('/protocol-designer/components/organisms/EditNickNameModal')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/pages/Designer/DeckSetup/utils')
+vi.mock('/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal')
 const render = (props: ComponentProps<typeof LabwareCardOverflowMenu>) => {
   return renderWithProviders(<LabwareCardOverflowMenu {...props} />, {
     i18nInstance: i18n,

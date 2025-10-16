@@ -12,11 +12,11 @@ import {
 } from '@opentrons/components'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { getIsWellContentsEmpty } from '../../../../components/organisms'
-import { SlotDetailModal } from '../../../../components/organisms/SlotDetailModal'
-import { END_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
+import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
+import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getIsAdapterFromDef } from '/protocol-designer/utils'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -45,24 +45,20 @@ export function ActiveLabwareControls(
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
   const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
-  const hasNoContents = getIsWellContentsEmpty(
-    allWellContentsForActiveItem,
-    fullStack[0]
+  const filteredStack = fullStack.filter(
+    item =>
+      activeDeckSetup.labware[item] != null &&
+      !getIsAdapterFromDef(activeDeckSetup.labware[item].def)
   )
 
   if (
     (terminalItemId != null && terminalItemId !== END_TERMINAL_ITEM_ID) ||
-    hasNoContents ||
     slotPosition == null
   ) {
     return null
   }
   const hoverOpacity = hover != null && hover === itemId ? 1 : 0
-
   return (
     <>
       {showSlotDetailModal ? (
@@ -70,9 +66,10 @@ export function ActiveLabwareControls(
           closeModal={() => {
             setShowSlotDetailModal(false)
           }}
-          itemId={itemId}
+          stackOfLabware={filteredStack}
         />
       ) : null}
+
       <RobotCoordsForeignDiv
         dataTestId={itemId}
         x={slotPosition[0]}

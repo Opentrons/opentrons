@@ -37,9 +37,9 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 describe('ConnectViaUSB', () => {
   beforeEach(() => {
-    vi.mocked(useConnectionsQuery).mockReturnValue(({
+    vi.mocked(useConnectionsQuery).mockReturnValue({
       data: { connections: [] },
-    } as unknown) as UseQueryResult<ActiveConnections>)
+    } as unknown as UseQueryResult<ActiveConnections>)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -62,9 +62,9 @@ describe('ConnectViaUSB', () => {
   })
 
   it('should render successful connection text and button', () => {
-    vi.mocked(useConnectionsQuery).mockReturnValue(({
+    vi.mocked(useConnectionsQuery).mockReturnValue({
       data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
-    } as unknown) as UseQueryResult<ActiveConnections>)
+    } as unknown as UseQueryResult<ActiveConnections>)
     const [{ getByText }] = render()
     getByText('USB')
     getByText('Successfully connected!')
@@ -75,9 +75,9 @@ describe('ConnectViaUSB', () => {
   })
 
   it('should route to the rename robot page when tapping continue button', () => {
-    vi.mocked(useConnectionsQuery).mockReturnValue(({
+    vi.mocked(useConnectionsQuery).mockReturnValue({
       data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
-    } as unknown) as UseQueryResult<ActiveConnections>)
+    } as unknown as UseQueryResult<ActiveConnections>)
     const [{ getByText }] = render()
     const button = getByText('Continue')
     fireEvent.click(button)

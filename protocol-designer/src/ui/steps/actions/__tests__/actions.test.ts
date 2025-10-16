@@ -4,9 +4,10 @@ import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
-import * as utils from '../../../../utils'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import * as utils from '/protocol-designer/utils'
+
 import { getMultiSelectLastSelected } from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
@@ -18,9 +19,9 @@ import {
 
 import type { RobotState, Timeline } from '@opentrons/step-generation/src/types'
 
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 
 const mockStore = legacy_configureStore([thunk] as any)
 

@@ -49,7 +49,8 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as LabwareDefinition
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const {
     closestBeneathModuleModel,
     closestBeneathModuleId,
@@ -61,7 +62,8 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
       return {
         moduleModel: mod.model,
         moduleLocation: mod.location,
-        nestedLabwareDef: closestBeneathModuleId === mod.id ? labwareDef : null,
+        nestedLabwareDefsBottomToTop:
+          closestBeneathModuleId === mod.id ? [labwareDef] : [],
         innerProps:
           closestBeneathModuleModel != null &&
           getModuleType(closestBeneathModuleModel) === THERMOCYCLER_MODULE_TYPE

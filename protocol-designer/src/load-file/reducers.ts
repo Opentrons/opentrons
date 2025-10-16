@@ -80,6 +80,5 @@ export interface RootState {
   fileUploadMessage: FileUploadMessageState
   unsavedChanges: boolean
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

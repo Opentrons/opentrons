@@ -59,9 +59,10 @@ export const getPrimaryPipetteId = (
       : rightPipetteId
   }
 
-  const leftPipetteGenerationCompare = leftPipetteSpecs.displayCategory.localeCompare(
-    rightPipetteSpecs.displayCategory
-  )
+  const leftPipetteGenerationCompare =
+    leftPipetteSpecs.displayCategory.localeCompare(
+      rightPipetteSpecs.displayCategory
+    )
   // prefer new pipette models
   if (leftPipetteGenerationCompare !== 0) {
     return leftPipetteGenerationCompare > 0 ? leftPipetteId : rightPipetteId

@@ -1,3 +1,5 @@
+import { shared_zh_resources } from '@opentrons/components'
+
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
@@ -17,7 +19,6 @@ import labware_landing from './labware_landing.json'
 import labware_position_check from './labware_position_check.json'
 import module_wizard_flows from './module_wizard_flows.json'
 import pipette_wizard_flows from './pipette_wizard_flows.json'
-import protocol_command_text from './protocol_command_text.json'
 import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
@@ -49,7 +50,6 @@ export const zh = {
   labware_position_check,
   module_wizard_flows,
   pipette_wizard_flows,
-  protocol_command_text,
   protocol_details,
   protocol_info,
   protocol_list,
@@ -60,4 +60,5 @@ export const zh = {
   run_details,
   shared,
   top_navigation,
+  ...shared_zh_resources,
 }

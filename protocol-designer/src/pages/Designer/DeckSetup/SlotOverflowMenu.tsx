@@ -83,13 +83,10 @@ export function SlotOverflowMenu(
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const [showDeleteLabwareModal, setShowDeleteLabwareModal] = useState<boolean>(
-    false
-  )
-  const [
-    showDeleteEntityInUseModal,
-    setShowDeleteEntityInUseModal,
-  ] = useState<boolean>(false)
+  const [showDeleteLabwareModal, setShowDeleteLabwareModal] =
+    useState<boolean>(false)
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
+    useState<boolean>(false)
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {

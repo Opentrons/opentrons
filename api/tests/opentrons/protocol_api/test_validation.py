@@ -405,15 +405,15 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                     "hold_time_seconds": 45.6,
                 }
             ],
-            [{"temperature": 42.0, "hold_time_seconds": 783.6}],
+            [{"temperature": 42.0, "hold_time_seconds": 783.6, "ramp_rate": None}],
         ),
         (
-            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
-            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
+            [{"temperature": 42.0, "hold_time_seconds": 45.6, "ramp_rate": 1.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 45.6, "ramp_rate": 1.0}],
         ),
         (
             [{"temperature": 42.0, "hold_time_minutes": 12.3}],
-            [{"temperature": 42.0, "hold_time_seconds": 738.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 738.0, "ramp_rate": None}],
         ),
         (
             [
@@ -421,8 +421,8 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                 {"temperature": 52.0, "hold_time_minutes": 12.3},
             ],
             [
-                {"temperature": 42.0, "hold_time_seconds": 12.3},
-                {"temperature": 52.0, "hold_time_seconds": 738.0},
+                {"temperature": 42.0, "hold_time_seconds": 12.3, "ramp_rate": None},
+                {"temperature": 52.0, "hold_time_seconds": 738.0, "ramp_rate": None},
             ],
         ),
         ([], []),
@@ -913,3 +913,9 @@ def test_ensure_valid_trash_location_for_transfer_v2_raises(decoy: Decoy) -> Non
         subject.ensure_valid_trash_location_for_transfer_v2(
             Location(point=Point(x=1, y=1, z=1), labware=None)
         )
+
+
+def test_is_96_channel() -> None:
+    """Iterate through the pipette names and make sure that validation identifies 96 channels."""
+    for name in PipetteNameType:
+        assert subject.is_pipette_96_channel(name) == ("96" in name.value)

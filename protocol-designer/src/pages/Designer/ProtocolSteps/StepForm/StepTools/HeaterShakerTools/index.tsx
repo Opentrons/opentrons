@@ -2,21 +2,26 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../components/molecules'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/components/molecules'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import { usePriorModuleState } from '../../hooks/usePriorModuleState'
+import { PriorHeaterShakerState } from './PriorHeaterShakerState'
 
 import type { StepFormProps } from '../../types'
 
@@ -24,6 +29,13 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)
+  const priorState = usePriorModuleState(
+    propsForFields.moduleId.value as string | null,
+    HEATERSHAKER_MODULE_TYPE
+  )
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
   const dispatch = useDispatch()
 
   return (
@@ -45,7 +57,29 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
         width="100%"
         tooltipContent={null}
       />
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+
+      <Divider marginY={0} />
+
+      {enableConcurrentModuleActions && priorState !== null && (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            paddingX={SPACING.spacing16}
+          >
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              color={COLORS.black90}
+            >
+              {t('protocol_steps:prior_state')}
+            </StyledText>
+            <PriorHeaterShakerState priorState={priorState} />
+          </Flex>
+
+          <Divider marginY={0} />
+        </>
+      )}
+
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
@@ -96,7 +130,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           toggleValue={propsForFields.latchOpen.value}
           tooltipContent={
             propsForFields.latchOpen.disabled
-              ? propsForFields.latchOpen.tooltipContent ?? null
+              ? (propsForFields.latchOpen.tooltipContent ?? null)
               : null
           }
         />
@@ -109,7 +143,7 @@ export function HeaterShakerTools(props: StepFormProps): JSX.Element {
           )}
           fieldTitle={t('form:step_edit_form.field.heaterShaker.duration')}
           isSelected={formData.heaterShakerSetTimer === true}
-          units={t('application:units.time')}
+          units={t('application:units.time_hms')}
           toggleElement="checkbox"
         />
       </Flex>

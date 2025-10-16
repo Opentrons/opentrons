@@ -18,6 +18,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   Modal,
+  OVERFLOW_SCROLL,
   PrimaryButton,
   SecondaryButton,
   SPACING,
@@ -37,41 +38,43 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../../components/atoms'
-import { getEnableStacking } from '../../../feature-flags/selectors'
-import { getRobotType } from '../../../file-data/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { createCustomLabwareDef } from '../../../labware-defs/actions'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
-} from '../../../pages/Designer/DeckSetup/constants'
-import { getLabwareIsRecommended } from '../../../pages/Designer/DeckSetup/utils'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getPipetteEntities } from '../../../step-forms/selectors'
-import { getHas96Channel } from '../../../utils'
+} from '/protocol-designer/pages/Designer/DeckSetup/constants'
+import { getLabwareIsRecommended } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithModule,
-} from '../../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
 
 import type { ChangeEvent } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
-import type { ModuleOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type { CategoryExpand } from '/protocol-designer/pages/Designer/DeckSetup/DeckSetupToolbox'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 const UNIVERSAL_LID_LOADNAME = 'opentrons_tough_universal_lid'
+const STACK_LIMIT = 1
 
 interface SelectLabwareModalProps {
   slot: DeckSlotId
@@ -94,7 +97,6 @@ export function SelectLabwareModal(
   const [error, setError] = useState<string | null>(null)
 
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const enableStacking = useSelector(getEnableStacking)
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
   const pipetteEntities = useSelector(getPipetteEntities)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
@@ -105,11 +107,8 @@ export function SelectLabwareModal(
   )
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedTopLabware,
-    selectedModuleModel,
-    selectedAdapterDefURI,
-  } = zoomedInSlotInfo
+  const { selectedTopLabware, selectedModuleModel, selectedAdapterDefURI } =
+    zoomedInSlotInfo
 
   const hasNoLabware =
     selectedTopLabware == null && selectedAdapterDefURI == null
@@ -119,10 +118,8 @@ export function SelectLabwareModal(
   const allCategoriesExpanded = useMemo(() => createCategoryState(true), [])
   const allCategoriesCollapsed = useMemo(() => createCategoryState(false), [])
 
-  const [
-    areCategoriesExpanded,
-    setAreCategoriesExpanded,
-  ] = useState<CategoryExpand>(allCategoriesCollapsed)
+  const [areCategoriesExpanded, setAreCategoriesExpanded] =
+    useState<CategoryExpand>(allCategoriesCollapsed)
 
   const [searchTerm, setSearchTerm] = useState<string>('')
 
@@ -203,7 +200,7 @@ export function SelectLabwareModal(
         (slot === 'offDeck' && isAdapter) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
-        (!enableStacking && parameters.loadName === 'opentrons_flex_deck_riser')
+        parameters.loadName === TIPRACK_LID_LOADNAME
       )
     },
     [filterRecommended, filterHeight, getIsLabwareCompatible, moduleType, slot]
@@ -215,13 +212,12 @@ export function SelectLabwareModal(
       { [category: string]: LabwareDefinition2[] }
     >(
       defs,
-      (acc, def: typeof defs[keyof typeof defs]) => {
+      (acc, def: (typeof defs)[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
         //  filter out non-permitted tipracks
         if (
-          (category === 'tipRack' &&
-            !permittedTipracks.includes(getLabwareDefURI(def))) ||
-          (category === 'lid' && !enableStacking)
+          category === 'tipRack' &&
+          !permittedTipracks.includes(getLabwareDefURI(def))
         ) {
           return acc
         }
@@ -282,6 +278,25 @@ export function SelectLabwareModal(
     setAreCategoriesExpanded(updatedExpandState)
   }
 
+  const validateQuantity = (): boolean => {
+    const { selectedTopLabware } = zoomedInSlotInfo
+    if (selectedTopLabware.labwareDefURI == null) {
+      return true
+    }
+    const selectedLabwareDef =
+      defs[selectedTopLabware.labwareDefURI] ??
+      customLabwareDefs[selectedTopLabware.labwareDefURI]
+
+    const amount = selectedTopLabware.amount ?? 0
+    const stackLimit = selectedLabwareDef.stackLimit ?? STACK_LIMIT // the range is 1-5
+
+    if (amount < 1 || amount > stackLimit) {
+      return false
+    }
+
+    return true
+  }
+
   const handleAddLabwareClick = (): void => {
     if (slotFull) {
       setError(t('no_space') as string)
@@ -289,10 +304,16 @@ export function SelectLabwareModal(
     }
     if (hasNoLabware) {
       setError(t('select_before_proceeding') as string)
-    } else {
-      onConfirm()
-      handleResetLabwareTools()
+      return
     }
+
+    if (!validateQuantity()) {
+      setError(t('quantity_out_of_limit') as string)
+      return
+    }
+
+    onConfirm()
+    handleResetLabwareTools()
   }
 
   return createPortal(
@@ -393,8 +414,8 @@ export function SelectLabwareModal(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          overflowY="scroll"
-          maxHeight="15.5rem"
+          overflowY={OVERFLOW_SCROLL}
+          maxHeight="29.5rem"
           paddingTop={SPACING.spacing8}
         >
           <SelectCustomLabware

@@ -135,10 +135,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const {
-    data: modulesData,
-    isLoading: isModulesQueryLoading,
-  } = useModulesQuery()
+  const { data: modulesData, isLoading: isModulesQueryLoading } =
+    useModulesQuery()
   const attachedModules = modulesData?.data ?? []
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
@@ -168,15 +166,11 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
-  const {
-    data: pipettesData,
-    isLoading: isPipetteQueryLoading,
-  } = usePipettesQuery()
+  const { data: pipettesData, isLoading: isPipetteQueryLoading } =
+    usePipettesQuery()
 
-  const {
-    data: attachedInstruments,
-    isLoading: isInstrumentsQueryLoading,
-  } = useInstrumentsQuery({ enabled: isFlex })
+  const { data: attachedInstruments, isLoading: isInstrumentsQueryLoading } =
+    useInstrumentsQuery({ enabled: isFlex })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok

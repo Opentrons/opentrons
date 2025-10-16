@@ -363,6 +363,7 @@ describe('commandCreatorsTimeline', () => {
         {
           robotState: { count: 5 + 4 },
           commands: [{ command: 'add', params: { value: 4 } }],
+          stepInfo: {},
           warnings: [
             {
               message: 'adding 4 with warning example',
@@ -395,6 +396,7 @@ describe('commandCreatorsTimeline', () => {
       {
         robotState: { count: 8 },
         commands: [{ command: 'add', params: { value: 3 } }],
+        stepInfo: {},
         warnings: [
           {
             message: 'adding 3 with warning example',
@@ -406,12 +408,14 @@ describe('commandCreatorsTimeline', () => {
       {
         robotState: { count: 16 },
         commands: [{ command: 'multiply', params: { value: 2 } }],
+        stepInfo: {},
         warnings: [],
       },
       // add 1 w/ warning
       {
         robotState: { count: 17 },
         commands: [{ command: 'add', params: { value: 1 } }],
+        stepInfo: {},
         warnings: [
           {
             message: 'adding 1 with warning example',
@@ -422,6 +426,7 @@ describe('commandCreatorsTimeline', () => {
       // Python hello world
       {
         robotState: { count: 17 },
+        stepInfo: {},
         commands: [],
         warnings: [],
         python: 'print("Hello world")',

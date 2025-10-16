@@ -16,12 +16,13 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+
 import { getMainPagePortalEl } from '../Portal'
 import { WellOrderVisualization } from './WellOrderVisualization'
 
-import type { WellOrderOption } from '../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../resources/types'
+import type { WellOrderOption } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -114,26 +115,26 @@ export function WellOrderModal(props: WellOrderModalProps): JSX.Element | null {
     closeModal()
   }
 
-  const makeOnChange = (ordinality: 'first' | 'second') => (
-    value: string
-  ): void => {
-    let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
+  const makeOnChange =
+    (ordinality: 'first' | 'second') =>
+    (value: string): void => {
+      let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
 
-    if (ordinality === 'first') {
-      if (
-        VERTICAL_VALUES.includes(value as WellOrderOption) &&
-        VERTICAL_VALUES.includes(wellOrder.secondValue)
-      ) {
-        nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
-      } else if (
-        HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
-        HORIZONTAL_VALUES.includes(wellOrder.secondValue)
-      ) {
-        nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
+      if (ordinality === 'first') {
+        if (
+          VERTICAL_VALUES.includes(value as WellOrderOption) &&
+          VERTICAL_VALUES.includes(wellOrder.secondValue)
+        ) {
+          nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
+        } else if (
+          HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
+          HORIZONTAL_VALUES.includes(wellOrder.secondValue)
+        ) {
+          nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
+        }
       }
+      setWellOrder(nextState)
     }
-    setWellOrder(nextState)
-  }
 
   const isSecondOptionDisabled = (value: WellOrderOption): boolean => {
     if (VERTICAL_VALUES.includes(wellOrder.firstValue)) {

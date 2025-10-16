@@ -19,7 +19,8 @@ import type { WellSetHelpers } from '../wellSets'
 const fixture12Trough = fixture_12_trough as LabwareDefinition
 const fixture96Plate = fixture_96_plate as LabwareDefinition
 const fixture384Plate = fixture_384_plate as LabwareDefinition
-const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition
+const fixtureOverlappyWellplate =
+  fixture_overlappy_wellplate as LabwareDefinition
 const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [

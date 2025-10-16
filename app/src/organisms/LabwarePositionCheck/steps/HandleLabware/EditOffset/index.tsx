@@ -84,7 +84,8 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
   ) as SelectedLwOverview
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const pipette = useSelector(selectActivePipette(props.runId)) as LoadedPipette
 
   const handleAddConfirmedWorkingVector = (): void => {

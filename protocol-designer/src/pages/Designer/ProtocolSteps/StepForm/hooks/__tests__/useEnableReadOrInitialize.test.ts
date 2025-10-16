@@ -7,13 +7,14 @@ import { ABSORBANCE_READER_TYPE } from '@opentrons/shared-data'
 import {
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_READ,
-} from '../../../../../../constants'
-import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
+} from '/protocol-designer/constants'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+
 import { useAbsorbanceReaderCommandType } from '../useAbsorbanceReaderCommandType'
 
 import type { Initialization, TimelineFrame } from '@opentrons/step-generation'
 
-vi.mock('../../../../../../top-selectors/labware-locations')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('react-redux', () => ({
   useSelector: vi.fn(),
 }))

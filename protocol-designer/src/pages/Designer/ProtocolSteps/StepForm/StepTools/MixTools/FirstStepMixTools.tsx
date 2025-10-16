@@ -1,29 +1,20 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  DIRECTION_COLUMN,
-  Divider,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 
-import { InputStepFormField } from '../../../../../../components/molecules'
+import { InputStepFormField } from '/protocol-designer/components/molecules'
+
 import {
-  ChangeTipField,
-  DropTipField,
   LabwareField,
   PartialTipField,
-  PickUpTipField,
   PipetteField,
   TiprackField,
-  TipWellSelectionField,
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface FirstStepMixToolsProps {
@@ -31,9 +22,6 @@ interface FirstStepMixToolsProps {
   formData: FormData
   enablePartialTip: boolean
   pipettes: PipetteEntities
-  enableReturnTip: boolean
-  userSelectedPickUpTipLocation: boolean
-  userSelectedDropTipLocation: boolean
 }
 
 export function FirstStepMixTools({
@@ -41,9 +29,6 @@ export function FirstStepMixTools({
   formData,
   enablePartialTip,
   pipettes,
-  enableReturnTip,
-  userSelectedPickUpTipLocation,
-  userSelectedDropTipLocation,
 }: FirstStepMixToolsProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const is96Channel =
@@ -94,66 +79,6 @@ export function FirstStepMixTools({
         title={t('protocol_steps:mix_repetitions')}
         showTooltip={false}
       />
-      <Divider marginY="0" />
-      <Flex
-        paddingX={SPACING.spacing16}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-      >
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('protocol_steps:tip_management')}
-        </StyledText>
-        <ChangeTipField
-          {...propsForFields.changeTip}
-          aspirateWells={formData.aspirate_wells}
-          dispenseWells={formData.dispense_wells}
-          path={formData.path}
-          stepType={formData.stepType}
-          isDisposalLocation={false}
-          tooltipContent={null}
-          padding="0"
-        />
-        <DropTipField
-          {...propsForFields.dropTip_location}
-          tooltipContent={null}
-          padding="0"
-        />
-      </Flex>
-      {enableReturnTip ? (
-        <>
-          <PickUpTipField {...propsForFields.pickUpTip_location} />
-          {userSelectedPickUpTipLocation ? (
-            <>
-              <Divider marginY="0" />
-              <TipWellSelectionField
-                {...propsForFields.pickUpTip_wellNames}
-                nozzles={
-                  typeof propsForFields.nozzles.value === 'string'
-                    ? propsForFields.nozzles.value
-                    : null
-                }
-                labwareId={propsForFields.pickUpTip_location.value}
-                pipetteId={propsForFields.pipette.value}
-              />
-            </>
-          ) : null}
-        </>
-      ) : null}
-      {userSelectedDropTipLocation && enableReturnTip ? (
-        <>
-          <Divider marginY="0" />
-          <TipWellSelectionField
-            {...propsForFields.dropTip_wellNames}
-            nozzles={
-              typeof propsForFields.nozzles.value === 'string'
-                ? propsForFields.nozzles.value
-                : null
-            }
-            labwareId={propsForFields.dropTip_location.value}
-            pipetteId={propsForFields.pipette.value}
-          />
-        </>
-      ) : null}
     </Flex>
   )
 }

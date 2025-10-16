@@ -19,16 +19,16 @@ import {
 } from '@opentrons/components'
 import { swatchColors } from '@opentrons/step-generation'
 
-import { getMainPagePortalEl } from '..'
-import { selectors } from '../../../labware-ingred/selectors'
+import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   formatPercentage,
   formatVolume,
-} from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'
-import type { WellIngredientNames } from '../../../steplist/types'
+import type { WellIngredientNames } from '/protocol-designer/steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4
@@ -69,28 +69,25 @@ export const WellTooltip = ({
   children,
   ingredNames,
 }: WellTooltipProps): JSX.Element => {
-  const [tooltipState, setTooltipState] = useState<TooltipState>(
-    initialTooltipState
-  )
+  const [tooltipState, setTooltipState] =
+    useState<TooltipState>(initialTooltipState)
 
-  const makeHandleMouseEnterWell = (
-    wellName: string,
-    wellIngreds: LocationLiquidState
-  ) => (e: MouseEvent) => {
-    const target = e.target as Element
-    if (target) {
-      const { left, top, height, width } = target.getBoundingClientRect()
-      if (Object.keys(wellIngreds).length > 0 && left && top) {
-        setTooltipState({
-          tooltipX: left + width / 2,
-          tooltipY: top + height / 2,
-          tooltipWellName: wellName,
-          tooltipWellIngreds: wellIngreds,
-          tooltipOffset: height / 2,
-        })
+  const makeHandleMouseEnterWell =
+    (wellName: string, wellIngreds: LocationLiquidState) => (e: MouseEvent) => {
+      const target = e.target as Element
+      if (target) {
+        const { left, top, height, width } = target.getBoundingClientRect()
+        if (Object.keys(wellIngreds).length > 0 && left && top) {
+          setTooltipState({
+            tooltipX: left + width / 2,
+            tooltipY: top + height / 2,
+            tooltipWellName: wellName,
+            tooltipWellIngreds: wellIngreds,
+            tooltipOffset: height / 2,
+          })
+        }
       }
     }
-  }
 
   const handleMouseLeaveWell = (): void => {
     setTooltipState(initialTooltipState)
@@ -219,7 +216,9 @@ const PopperContent = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   color: ${COLORS.white};
   background-color: ${COLORS.black90};
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13), 0 3px 6px rgba(0, 0, 0, 0.23);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.13),
+    0 3px 6px rgba(0, 0, 0, 0.23);
   padding: ${SPACING.spacing8};
   cursor: ${CURSOR_POINTER};
   z-index: 10000;

@@ -2,9 +2,13 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StepMeter,
+} from '@opentrons/components'
 
-import { StepMeter } from '/app/atoms/StepMeter'
 import { DisplayWifiList } from '/app/organisms/ODD/NetworkSettings'
 import { getLocalRobot } from '/app/redux/discovery'
 import * as Networking from '/app/redux/networking'
@@ -29,13 +33,11 @@ export type WifiScreenOption =
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = useState<string>('')
-  const [selectedAuthType, setSelectedAuthType] = useState<WifiSecurityType>(
-    'wpa-psk'
-  )
+  const [selectedAuthType, setSelectedAuthType] =
+    useState<WifiSecurityType>('wpa-psk')
 
-  const [currentOption, setCurrentOption] = useState<WifiScreenOption>(
-    'WifiList'
-  )
+  const [currentOption, setCurrentOption] =
+    useState<WifiScreenOption>('WifiList')
   const [password, setPassword] = useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'

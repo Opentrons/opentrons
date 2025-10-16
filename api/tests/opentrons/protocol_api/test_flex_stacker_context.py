@@ -1,8 +1,11 @@
 """Tests for Protocol API Flex Stacker contexts."""
 
+from unittest.mock import sentinel
+
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support.types import APIVersion
@@ -14,7 +17,7 @@ from opentrons.protocol_api.core.common import (
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
-from . import versions_at_or_above
+from . import versions_at_or_above, versions_between
 
 
 @pytest.fixture
@@ -105,55 +108,161 @@ def test_empty(
 
 
 @pytest.mark.parametrize(
-    "api_version", versions_at_or_above(from_version=APIVersion(2, 25))
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 26))
 )
 def test_set_stored_labware(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
     """It should route arguments appropriately."""
     subject.set_stored_labware(
-        "load_name", "namespace", 1, "adapter", "lid", 2, stacking_offset_z=1.0
+        load_name=sentinel.main_load_name,
+        namespace=sentinel.main_namespace,
+        version=sentinel.main_version,
+        adapter=sentinel.adapter_load_name,
+        lid=sentinel.lid_load_name,
+        count=sentinel.count,
+        stacking_offset_z=sentinel.stacking_offset_z,
     )
     decoy.verify(
         mock_core.set_stored_labware(
-            main_load_name="load_name",
-            main_namespace="namespace",
-            main_version=1,
-            lid_load_name="lid",
+            main_load_name=sentinel.main_load_name,
+            main_namespace=sentinel.main_namespace,
+            main_version=sentinel.main_version,
+            lid_load_name=sentinel.lid_load_name,
             lid_namespace=None,
             lid_version=None,
-            adapter_load_name="adapter",
+            adapter_load_name=sentinel.adapter_load_name,
             adapter_namespace=None,
             adapter_version=None,
-            count=2,
-            stacking_offset_z=1.0,
+            count=sentinel.count,
+            stacking_offset_z=sentinel.stacking_offset_z,
         )
     )
 
     subject.set_stored_labware(
-        "load_name",
-        "namespace",
-        1,
-        "adapter",
-        "lid",
-        2,
-        stacking_offset_z=1.0,
-        adapter_namespace="adapter_namespace",
-        adapter_version=3,
+        load_name=sentinel.main_load_name,
+        namespace=sentinel.main_namespace,
+        version=sentinel.main_version,
+        adapter=sentinel.adapter_load_name,
+        lid=sentinel.lid_load_name,
+        count=sentinel.count,
+        stacking_offset_z=sentinel.stacking_offset_z,
+        adapter_namespace=sentinel.adapter_namespace,
+        adapter_version=sentinel.adapter_version,
+        lid_namespace=sentinel.lid_namespace,
+        lid_version=sentinel.lid_version,
     )
     decoy.verify(
         mock_core.set_stored_labware(
-            main_load_name="load_name",
-            main_namespace="namespace",
-            main_version=1,
-            lid_load_name="lid",
-            lid_namespace=None,
-            lid_version=None,
-            adapter_load_name="adapter",
-            adapter_namespace="adapter_namespace",
-            adapter_version=3,
-            count=2,
+            main_load_name=sentinel.main_load_name,
+            main_namespace=sentinel.main_namespace,
+            main_version=sentinel.main_version,
+            lid_load_name=sentinel.lid_load_name,
+            lid_namespace=sentinel.lid_namespace,
+            lid_version=sentinel.lid_version,
+            adapter_load_name=sentinel.adapter_load_name,
+            adapter_namespace=sentinel.adapter_namespace,
+            adapter_version=sentinel.adapter_version,
+            count=sentinel.count,
+            stacking_offset_z=sentinel.stacking_offset_z,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_inclusive_bound=APIVersion(2, 25), high_exclusive_bound=APIVersion(2, 26)
+    ),
+)
+def test_set_stored_labware_namespace_version_params_minimum_version(
+    subject: FlexStackerContext,
+) -> None:
+    """{adapter,lid}_{namespace,version} params were unavailable before version 2.26."""
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
             stacking_offset_z=1.0,
+            adapter_namespace="foo",
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            adapter_version=123,
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            lid_namespace="foo",
+        )
+    with pytest.raises(APIVersionError):
+        subject.set_stored_labware(
+            "load_name",
+            "namespace",
+            1,
+            "adapter",
+            "lid",
+            2,
+            stacking_offset_z=1.0,
+            lid_version=123,
+        )
+
+
+@pytest.mark.parametrize(
+    "api_version",
+    versions_between(
+        low_inclusive_bound=APIVersion(2, 25), high_exclusive_bound=APIVersion(2, 26)
+    ),
+)
+def test_set_stored_labware_namespace_version_params_legacy_behavior(
+    decoy: Decoy,
+    mock_core: FlexStackerCore,
+    subject: FlexStackerContext,
+) -> None:
+    """Test legacy (version <2.26) behavior when the {adapter,lid}_{namespace,version} params were omitted.
+
+    The adapter and lid namespace and version were taken from the main labware's namespace and version.
+    """
+    subject.set_stored_labware(
+        load_name=sentinel.main_load_name,
+        namespace=sentinel.main_namespace,
+        version=sentinel.main_version,
+        adapter=sentinel.adapter_load_name,
+        lid=sentinel.lid_load_name,
+        count=sentinel.count,
+        stacking_offset_z=sentinel.stacking_offset_z,
+    )
+
+    decoy.verify(
+        mock_core.set_stored_labware(
+            main_load_name=sentinel.main_load_name,
+            main_namespace=sentinel.main_namespace,
+            main_version=sentinel.main_version,
+            lid_load_name=sentinel.lid_load_name,
+            lid_namespace=sentinel.main_namespace,
+            lid_version=sentinel.main_version,
+            adapter_load_name=sentinel.adapter_load_name,
+            adapter_namespace=sentinel.main_namespace,
+            adapter_version=sentinel.main_version,
+            count=sentinel.count,
+            stacking_offset_z=sentinel.stacking_offset_z,
         )
     )
 

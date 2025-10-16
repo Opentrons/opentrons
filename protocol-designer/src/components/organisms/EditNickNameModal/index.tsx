@@ -19,13 +19,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { renameLabware } from '../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../step-forms/selectors'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { HandleEnter, LINK_BUTTON_STYLE } from '../../atoms'
+import {
+  HandleEnter,
+  LINK_BUTTON_STYLE,
+} from '/protocol-designer/components/atoms'
+import { renameLabware } from '/protocol-designer/labware-ingred/actions'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
+
 import { getMainPagePortalEl } from '../Portal'
 
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const MAX_NICK_NAME_LENGTH = 115
 interface EditNickNameModalProps {

@@ -35,9 +35,8 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<
-    typeof inferModuleOrientationFromXCoordinate
-  >()
+  const actualSharedData =
+    await importOriginal<typeof inferModuleOrientationFromXCoordinate>()
   return {
     ...actualSharedData,
     inferModuleOrientationFromXCoordinate: vi.fn(),
@@ -78,6 +77,7 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
+  slotTransforms: {},
 }
 
 const mockTCModule = {
@@ -94,6 +94,7 @@ const mockTCModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
+  slotTransforms: {},
 }
 
 describe('SetupModulesMap', () => {
@@ -104,11 +105,11 @@ describe('SetupModulesMap', () => {
     }
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(MOCK_RUN_ID)
-      .thenReturn(({
+      .thenReturn({
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
-      } as unknown) as CompletedProtocolAnalysis)
+      } as unknown as CompletedProtocolAnalysis)
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
   })
 

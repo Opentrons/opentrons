@@ -267,9 +267,9 @@ describe('ModuleCard', () => {
       .thenReturn({ isRunRunning: false } as any)
     when(useIsFlex).calledWith(props.robotName).thenReturn(true)
     when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectedRobot,
       name: props.robotName,
@@ -439,7 +439,7 @@ describe('ModuleCard', () => {
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -447,7 +447,7 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'fs123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
       module: {
@@ -461,7 +461,7 @@ describe('ModuleCard', () => {
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders information when a firmware update is available if it has already been calibrated', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -469,7 +469,7 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'jkl123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
       module: mockHotThermo,
@@ -480,7 +480,7 @@ describe('ModuleCard', () => {
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders information for update available and it fails rendering the fail modal', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -488,7 +488,7 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'jkl123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     vi.mocked(getRequestById).mockReturnValue({
       status: FAILURE,
       response: {

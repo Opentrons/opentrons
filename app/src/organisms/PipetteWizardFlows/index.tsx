@@ -9,6 +9,7 @@ import {
   COLORS,
   ModalShell,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   ApiHostProvider,
@@ -19,7 +20,6 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import {
@@ -153,25 +153,21 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
-  const {
-    chainRunCommands,
-    isCommandMutationLoading,
-  } = useChainMaintenanceCommands()
+  const { chainRunCommands, isCommandMutationLoading } =
+    useChainMaintenanceCommands()
 
-  const {
-    createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
-  } = useCreateTargetedMaintenanceRunMutation(
-    {
-      onSuccess: response => {
-        setCreatedMaintenanceRunId(response.data.id)
+  const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
+    useCreateTargetedMaintenanceRunMutation(
+      {
+        onSuccess: response => {
+          setCreatedMaintenanceRunId(response.data.id)
+        },
+        onError: error => {
+          setShowErrorMessage(error.message)
+        },
       },
-      onError: error => {
-        setShowErrorMessage(error.message)
-      },
-    },
-    host
-  )
+      host
+    )
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
@@ -218,17 +214,15 @@ export const PipetteWizardFlows = (
     }
   }
 
-  const {
-    deleteMaintenanceRun,
-    isLoading: isDeleteLoading,
-  } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      closeFlow()
-    },
-    onError: () => {
-      closeFlow()
-    },
-  })
+  const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
+    useDeleteMaintenanceRunMutation({
+      onSuccess: () => {
+        closeFlow()
+      },
+      onError: () => {
+        closeFlow()
+      },
+    })
 
   const handleCleanUpAndClose = (): void => {
     if (maintenanceRunData?.data.id == null) handleClose()
