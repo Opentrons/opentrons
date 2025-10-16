@@ -319,6 +319,11 @@ data_files_table = sqlalchemy.Table(
         nullable=True,
         index=True,
     ),
+    sqlalchemy.Index(
+        "ix_data_files_run_id_created_at",
+        "run_id",
+        "created_at",
+    ),
 )
 
 
