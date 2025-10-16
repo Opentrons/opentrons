@@ -1,3 +1,11 @@
+import {
+  INACCESSIBLE,
+  NEW,
+  NO,
+  SELECTED,
+  SELECTED_USED,
+  USED,
+} from './constants'
 import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
 import { NoTip } from './NoTip'
@@ -13,15 +21,17 @@ export function TipStatus(props: {
 }): JSX.Element {
   const { type, size, text } = props
   switch (type) {
-    case 'new':
+    case NEW:
       return <NewTip size={size} />
-    case 'used':
+    case USED:
       return <UsedTip size={size} />
-    case 'selected':
-      return <SelectedTip size={size} text={text} />
-    case 'no':
+    case SELECTED:
+      return <SelectedTip size={size} textInsideTip={text} />
+    case NO:
       return <NoTip size={size} />
-    case 'inaccessible':
+    case INACCESSIBLE:
       return <InaccessibleTip size={size} />
+    case SELECTED_USED:
+      return <SelectedTip size={size} textInsideTip={text} isUsed />
   }
 }

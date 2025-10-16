@@ -4,11 +4,13 @@ import styles from './tips.module.css'
 
 export function SelectedTip(props: {
   size?: string
-  text?: string
+  textInsideTip?: string
+  isUsed?: boolean
 }): JSX.Element {
-  const { size, text } = props
+  const { size, textInsideTip, isUsed = false } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
+  const fill = isUsed ? COLORS.yellow50 : COLORS.blue50
   return (
     <svg
       width={width}
@@ -17,8 +19,8 @@ export function SelectedTip(props: {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="10" cy="10" r="10" fill={COLORS.blue50} />
-      {text != null ? (
+      <circle cx="10" cy="10" r="10" fill={fill} />
+      {textInsideTip != null ? (
         <text
           x="10"
           y="11"
@@ -29,7 +31,7 @@ export function SelectedTip(props: {
           // needed to refactor `transform-origin` to CSS modules for passing lint checks
           className={styles.selected_tip_text}
         >
-          {text}
+          {textInsideTip}
         </text>
       ) : null}
     </svg>
