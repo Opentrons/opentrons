@@ -6,7 +6,7 @@ title: "Opentrons OT-2: Product Elements"
 <!-- looks good enough; tried side by side -->
 ### OT-2 features
 
-![OT-2 isometric image front oblique](images/ot2-features.png)
+![OT-2 isometric image front oblique](images/isometric-features.png)
 
 ### Deck features
 
@@ -44,8 +44,8 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 </figure>
 
 <figure markdown>
-![Ethernet to USB adapter](images/ethernet-usb-dongle.png "Ethernet to USB adapter")
-<figcaption>(1) Ethernet-to-USB Adapter</figcaption>
+![Ethernet to USB adapter](images/ethernet-usb-dongle.png "Ethernet-USB adapter")
+<figcaption>(1) Ethernet-USB Adapter</figcaption>
 </figure>
 
 <figure markdown>
@@ -75,12 +75,12 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 
 <figure markdown>
 ![M3 hex nut](images/m3-hex-nut.png "M3 hex nut")
-<figcaption>(2) M3 Hex Nut</figcaption>
+<figcaption>(2) M3 Hex Nuts</figcaption>
 </figure>
 
 <figure markdown>
 ![M4 square nut](images/m4-square-nut.png "M4 square nut")
-<figcaption>(2) M4 Square Nut</figcaption>
+<figcaption>(2) M4 Square Nuts</figcaption>
 </figure>
 
 <figure markdown>
