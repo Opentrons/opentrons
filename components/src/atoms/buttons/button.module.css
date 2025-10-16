@@ -1,6 +1,8 @@
 /* Base button styles with CSS Modules */
 
 .button {
+  width: 100%;
+
   /* Common styling */
   padding: var(--spacing-8) var(--spacing-16);
   border: none;

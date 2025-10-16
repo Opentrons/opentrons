@@ -133,7 +133,7 @@ export function Toolbox(props: ToolboxProps): JSX.Element {
           >
             {onConfirmClick != null && confirmButtonText != null ? (
               <PrimaryButton
-                width="100%"
+                // width="100%"
                 data-testid="Toolbox_confirmButton"
                 onClick={onConfirmClick}
               >
