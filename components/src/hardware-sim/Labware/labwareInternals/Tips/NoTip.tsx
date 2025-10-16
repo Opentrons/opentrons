@@ -32,7 +32,7 @@ export function NoTip(props: { size?: string }): JSX.Element {
           d="M10 1C14.9706 1 19 5.02944 19 10C19 14.9706 14.9706 19 10 19C5.02944 19 1 14.9706 1 10C1 5.02944 5.02944 1 10 1Z"
           fill="#CBCCCC"
           stroke="#737578"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <line
           x1="24.7071"
@@ -40,7 +40,7 @@ export function NoTip(props: { size?: string }): JSX.Element {
           x2="-3.29289"
           y2="23.7071"
           stroke="#737578"
-          stroke-width="2"
+          strokeWidth="2"
         />
       </g>
     </svg>
