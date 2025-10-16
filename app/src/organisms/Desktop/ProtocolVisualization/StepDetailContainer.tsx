@@ -54,16 +54,19 @@ export function StepDetailContainer({
     Object.entries(robotState.pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === 'right'
     )?.[0] ?? null
+
   const isLeftPipetteActive =
     selectedRunTimeCommand?.params != null &&
     'pipetteId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.pipetteId === leftPipetteId
+    selectedRunTimeCommand.params.pipetteId === leftPipetteId &&
+    leftPipetteId != null &&
+    robotState.pipettes[leftPipetteId].entityId != null
   const isRightPipetteActive =
     selectedRunTimeCommand?.params != null &&
     'pipetteId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.pipetteId === rightPipetteId
-
-  console.log('selectedRunTimeCommand', selectedRunTimeCommand)
+    selectedRunTimeCommand.params.pipetteId === rightPipetteId &&
+    rightPipetteId != null &&
+    robotState.pipettes[rightPipetteId].entityId != null
 
   return (
     <div className={styles.container}>
