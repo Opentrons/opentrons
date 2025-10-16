@@ -12,14 +12,13 @@ from robot_server.service.json_api import MultiBodyMeta, SimpleEmptyBody
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
 from robot_server.data_files.models import (
     DataFile,
-    DataFileSource,
     FileIdNotFoundError,
     FileInUseError,
 )
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from robot_server.data_files.router import (
     upload_data_file,
     get_data_file_info_by_id,
