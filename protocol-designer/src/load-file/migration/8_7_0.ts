@@ -17,7 +17,6 @@ export const migrateFile = (
 
   const savedStepsWithUpdatedFields = Object.values(savedStepForms).reduce(
     (acc, form) => {
-      //  introduction of allowing hours to heater-shaker timer field
       const { stepType, id } = form
       if (stepType === 'moveLiquid' || stepType === 'mix') {
         return {
