@@ -83,9 +83,12 @@ export function StepDetailContainer({
     commands[currentCommandIndex]?.commandType === 'dispense' ||
     commands[currentCommandIndex]?.commandType === 'dispenseInPlace'
 
-  const slotId = getSlotIdFromCommand(commands[currentCommandIndex], robotState)
-
-  console.log('slotId', slotId)
+  const slotId = getSlotIdFromCommand(
+    commands[currentCommandIndex],
+    robotState,
+    commands,
+    currentCommandIndex
+  )
 
   return (
     <div className={styles.container}>
@@ -98,7 +101,7 @@ export function StepDetailContainer({
       ) : null}
       {rightMountPipetteName != null ? (
         <PipetteContainer
-          mount={'right_mount'}
+          mount="right_mount"
           pipetteName={rightMountPipetteName}
           selected={isRightPipetteActive}
         />
