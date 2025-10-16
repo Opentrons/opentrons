@@ -12,42 +12,23 @@ import styles from './runcamera.module.css'
 export function ProtocolRunCamera(): JSX.Element {
   const { t } = useTranslation('run_details')
   const { isCameraEnabled } = useCameraUsageSettings()
-  if (isCameraEnabled) {
-    return (
-      <div className={styles.content_container}>
-        <div className={styles.header_container}>
-          <div className={styles.camera_status}>
-            <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('camera')}
-            </StyledText>
-            <Chip
-              text={t('enabled')}
-              type="success"
-              iconName="connection-status"
-            />
-          </div>
-          <LaunchLivestreamBtn />
+  return (
+    <div className={styles.content_container}>
+      <div className={styles.header_container}>
+        <div className={styles.camera_status}>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('camera')}
+          </StyledText>
+          <Chip
+            text={isCameraEnabled ? t('enabled') : t('Disabled')}
+            type={isCameraEnabled ? 'success' : 'neutral'}
+            iconName="connection-status"
+          />
         </div>
-        <Divider width="100%" />
-        <ImageGalleryContainer />
+        {isCameraEnabled ? <LaunchLivestreamBtn /> : null}
       </div>
-    )
-  } else {
-    return (
-      <div className={styles.content_container}>
-        <div className={styles.header_container}>
-          <div className={styles.camera_status}>
-            <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('camera')}
-            </StyledText>
-            <Chip
-              text={t('Disabled')}
-              type="neutral"
-              iconName="connection-status"
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
+      {isCameraEnabled ? <Divider width="100%" /> : null}
+      {isCameraEnabled ? <ImageGalleryContainer /> : null}
+    </div>
+  )
 }

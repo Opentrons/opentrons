@@ -28,11 +28,9 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
 
   useEffect(() => {
     if (cameraData) {
-      setIsCameraEnabled(cameraData?.cameraEnabled ?? true)
-      setIsLiveVideoEnabled(cameraData?.liveStreamEnabled ?? true)
-      setIsRecoveryCaptureEnabled(
-        cameraData?.errorRecoveryCameraEnabled ?? true
-      )
+      setIsCameraEnabled(cameraData?.cameraEnabled)
+      setIsLiveVideoEnabled(cameraData?.liveStreamEnabled)
+      setIsRecoveryCaptureEnabled(cameraData?.errorRecoveryCameraEnabled)
     }
   }, [cameraData])
 
@@ -47,7 +45,7 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
       },
       {
         onError: () => {
-          setIsCameraEnabled(newValue)
+          setIsCameraEnabled(!newValue)
         },
       }
     )
@@ -60,7 +58,7 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
       {
         cameraEnabled: isCameraEnabled,
         errorRecoveryCameraEnabled: isRecoveryCaptureEnabled,
-        liveStreamEnabled: !newValue,
+        liveStreamEnabled: newValue,
       },
       {
         onError: () => {
@@ -76,9 +74,9 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
 
     void updateCamera(
       {
-        cameraEnabled: cameraData?.cameraEnabled ?? true,
+        cameraEnabled: isCameraEnabled,
         errorRecoveryCameraEnabled: newValue,
-        liveStreamEnabled: cameraData?.liveStreamEnabled ?? true,
+        liveStreamEnabled: isLiveVideoEnabled,
       },
       {
         onError: () => {
