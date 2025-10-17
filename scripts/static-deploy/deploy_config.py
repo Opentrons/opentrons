@@ -49,6 +49,7 @@ class EnvironmentConfig:
     protocol_designer: ApplicationConfig
     docs: ApplicationConfig
     mkdocs: ApplicationConfig
+    components: ApplicationConfig
 
 
 @dataclass(frozen=True)
@@ -133,6 +134,12 @@ def get_deploy_config() -> DeployConfig:
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.docs.opentrons.com/",
         ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.components.opentrons.com/",
+        ),
     )
 
     # Staging configuration
@@ -161,6 +168,12 @@ def get_deploy_config() -> DeployConfig:
             cloudfront_id="E2DBE0K9VT8YB9",
             url="https://staging.docs.opentrons.com/",
         ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            cloudfront_id=None,
+            url="http://sandbox.components.opentrons.com/",
+        ),
     )
 
     # Production configuration
@@ -188,6 +201,12 @@ def get_deploy_config() -> DeployConfig:
             s3_bucket="opentrons.production.docs",
             cloudfront_id="E2PSPUXND1RQWG",
             url="https://docs.opentrons.com/",
+        ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            cloudfront_id=None,
+            url="http://sandbox.components.opentrons.com/",
         ),
     )
 
