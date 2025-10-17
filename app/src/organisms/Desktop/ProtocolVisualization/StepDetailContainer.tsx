@@ -1,37 +1,50 @@
 import { parseInitialPipetteNamesByMount } from '@opentrons/shared-data'
+import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
+import { LabwareSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/LabwareSlotDetails'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { ModuleSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/ModuleSlotDetails'
+import { getActiveSlotForLabwareDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/utils'
 
-import { DestinationLabwareContainer } from './DestinationLabwareContainer'
-import { DestinationWellViewContainer } from './DestinationWellViewContainer'
 import { PipetteContainer } from './PipetteContainer'
-import { SourceLabwareContainer } from './SourceLabwareContainer'
-import { SourceWellViewContainer } from './SourceWellViewContainer'
 import styles from './stepdetailcontainer.module.css'
 import { TipDisposalContainer } from './TipDisposalContainer'
 import { TipPickupContainer } from './TipPickupContainer'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 interface StepDetailContainerProps {
   protocolKey: string
   commands: RunTimeCommand[]
-  selectedSlot: string | null
   robotState: RobotState
   invariantContext: InvariantContext
-  selectedRunTimeCommand?: RunTimeCommand
+  liquids: Liquid[]
+  currentCommand: RunTimeCommand
 }
 
 export function StepDetailContainer({
   protocolKey,
   commands,
-  selectedSlot,
   robotState,
   invariantContext,
-  selectedRunTimeCommand,
+  currentCommand,
+  liquids,
 }: StepDetailContainerProps): JSX.Element {
+  const { labwareEntities, pipetteEntities } = invariantContext
+  const { labware, modules, pipettes } = robotState
+  console.log('for tiprack use getActiveSlotForTiprackDetails')
+  const activeSlot = getActiveSlotForLabwareDetails(
+    Object.values(pipettes),
+    robotState,
+    invariantContext,
+    currentCommand
+  )
+  const stackOfLabwareOnSlot =
+    activeSlot != null ? getFullStackFromLabwares(labware, activeSlot) : []
+  const topMostLabwareOnSlot =
+    stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
+
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
       ? parseInitialPipetteNamesByMount(commands)
@@ -42,31 +55,29 @@ export function StepDetailContainer({
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
 
   const { moduleEntities } = invariantContext
-  const moduleOnSlot = Object.entries(robotState.modules ?? {}).find(
-    ([_, module]) => module.slot === selectedSlot
+  const moduleOnSlot = Object.entries(modules ?? {}).find(
+    ([_, module]) => module.slot === activeSlot
   )
 
   const leftPipetteId =
-    Object.entries(robotState.pipettes ?? {}).find(
+    Object.entries(pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === 'left'
     )?.[0] ?? null
   const rightPipetteId =
-    Object.entries(robotState.pipettes ?? {}).find(
+    Object.entries(pipettes ?? {}).find(
       ([_, pipette]) => pipette.mount === 'right'
     )?.[0] ?? null
 
   const isLeftPipetteActive =
-    selectedRunTimeCommand?.params != null &&
-    'pipetteId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.pipetteId === leftPipetteId &&
+    'pipetteId' in currentCommand.params &&
+    currentCommand.params.pipetteId === leftPipetteId &&
     leftPipetteId != null &&
-    robotState.pipettes[leftPipetteId].entityId != null
+    pipettes[leftPipetteId].entityId != null
   const isRightPipetteActive =
-    selectedRunTimeCommand?.params != null &&
-    'pipetteId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.pipetteId === rightPipetteId &&
+    'pipetteId' in currentCommand.params &&
+    currentCommand.params.pipetteId === rightPipetteId &&
     rightPipetteId != null &&
-    robotState.pipettes[rightPipetteId].entityId != null
+    pipettes[rightPipetteId].entityId != null
 
   return (
     <div className={styles.container}>
@@ -85,10 +96,21 @@ export function StepDetailContainer({
         />
       ) : null}
       <TipPickupContainer protocolKey={protocolKey} />
-      <SourceWellViewContainer protocolKey={protocolKey} />
+      {topMostLabwareOnSlot != null ? (
+        <LabwareSlotDetails
+          topLabwareOnSlotId={topMostLabwareOnSlot}
+          labwareEntities={labwareEntities}
+          commands={commands}
+          currentCommand={currentCommand}
+          liquids={liquids}
+          robotState={robotState}
+          pipetteEntities={pipetteEntities}
+        />
+      ) : null}
+      {/* <SourceWellViewContainer protocolKey={protocolKey} />
       <SourceLabwareContainer protocolKey={protocolKey} />
       <DestinationWellViewContainer protocolKey={protocolKey} />
-      <DestinationLabwareContainer protocolKey={protocolKey} />
+      <DestinationLabwareContainer protocolKey={protocolKey} /> */}
       <TipDisposalContainer protocolKey={protocolKey} />
       {moduleOnSlot != null ? (
         <ModuleSlotDetails

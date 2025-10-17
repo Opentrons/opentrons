@@ -49,7 +49,6 @@ export function VisualizerContainer(
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
   )
-
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
   const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -146,6 +145,7 @@ export function VisualizerContainer(
       }
     }
   }, [isThermocyclerAttached, selectedSlot])
+  console.log('selectedCommandId', selectedCommandId, selectedRunTimeCommand)
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,
@@ -291,14 +291,16 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StepDetailContainer
-          protocolKey={protocolKey}
-          commands={commands}
-          selectedSlot={selectedSlot}
-          robotState={robotState}
-          invariantContext={invariantContext}
-          selectedRunTimeCommand={selectedRunTimeCommand}
-        />
+        {selectedRunTimeCommand != null ? (
+          <StepDetailContainer
+            protocolKey={protocolKey}
+            commands={commands}
+            robotState={robotState}
+            invariantContext={invariantContext}
+            currentCommand={selectedRunTimeCommand}
+            liquids={liquids}
+          />
+        ) : null}
       </div>
     </div>
   )

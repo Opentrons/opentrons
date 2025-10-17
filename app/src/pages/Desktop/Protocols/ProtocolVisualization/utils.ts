@@ -37,6 +37,7 @@ import type {
 import type {
   ContentsByWell,
   DeckSlot,
+  InvariantContext,
   LabwareTemporalProperties,
   LocationLiquidState,
   ModuleEntities,
@@ -266,6 +267,59 @@ export const getActiveLayer = (
   return {
     isActiveLayerVisible: isStepAssosciatedWithLabware,
   }
+}
+
+export const getActiveSlotForLabwareDetails = (
+  pipettes: PipetteTemporalProperties[],
+  robotState: RobotState,
+  invariantContext: InvariantContext,
+  currentCommand: RunTimeCommand
+): DeckSlot | null => {
+  const { labware } = robotState
+  const { trashBinEntities, wasteChuteEntities } = invariantContext
+  const entityUnderPipette = pipettes.find(
+    pipette => pipette.entityId != null
+  )?.entityId
+  let slot = null
+
+  if (entityUnderPipette != null) {
+    if (labware[entityUnderPipette] != null) {
+      slot = getSlotInLocationStack(labware[entityUnderPipette].stack)
+    } else if (trashBinEntities[entityUnderPipette] != null) {
+      slot = trashBinEntities[entityUnderPipette].location.split('cutout')[1]
+    } else if (wasteChuteEntities[entityUnderPipette] != null) {
+      slot = wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
+    }
+  } else if ('labwareId' in currentCommand.params) {
+    slot = currentCommand.params.labwareId
+  }
+
+  return slot
+}
+
+export const getActiveSlotForTiprackDetails = (
+  pipettes: PipetteTemporalProperties[],
+  robotState: RobotState,
+  invariantContext: InvariantContext
+): DeckSlot | null => {
+  const { labware } = robotState
+  const { trashBinEntities, wasteChuteEntities } = invariantContext
+  const entityUnderPipette = pipettes.find(
+    pipette => pipette.tiprackId != null
+  )?.tiprackId
+  let slot = null
+
+  if (entityUnderPipette != null) {
+    if (labware[entityUnderPipette] != null) {
+      slot = getSlotInLocationStack(labware[entityUnderPipette].stack)
+    } else if (trashBinEntities[entityUnderPipette] != null) {
+      slot = trashBinEntities[entityUnderPipette].location.split('cutout')[1]
+    } else if (wasteChuteEntities[entityUnderPipette] != null) {
+      slot = wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
+    }
+  }
+
+  return slot
 }
 
 export const getTopmostLabwareOnModuleFromStack = (
