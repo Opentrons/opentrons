@@ -304,9 +304,8 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
 
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
@@ -358,8 +357,10 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         }
         const slot = getSlotInLocationStack(lw.stack)
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(
             `no slot ${slot} for labware ${Object.keys(labware)[0]}!`
