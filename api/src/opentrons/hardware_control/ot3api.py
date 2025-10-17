@@ -3096,6 +3096,7 @@ class OT3API(
         :param z_distance: The distance the z axis will move during apsiration.
         :param volume: The volume of liquid to be aspirated.
         :param flow_rate: The flow rate to aspirate with.
+        :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
@@ -3159,6 +3160,7 @@ class OT3API(
         :param z_distance: The distance the z axis will move during dispensing.
         :param volume: The volume of liquid to be dispensed.
         :param flow_rate: The flow rate to dispense with.
+        :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
