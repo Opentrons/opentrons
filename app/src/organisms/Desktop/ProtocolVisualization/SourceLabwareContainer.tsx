@@ -24,7 +24,6 @@ import type {
   ContentsByWell,
   InvariantContext,
   RobotState,
-  WellContents,
 } from '@opentrons/step-generation'
 
 interface SourceLabwareContainerProps {
@@ -96,17 +95,6 @@ export function SourceLabwareContainer({
     allWellContentsForActiveItem != null
       ? allWellContentsForActiveItem[labwareId]
       : null
-
-  if (wellContents != null && typeof wellContents === 'object') {
-    Object.entries(wellContents as Record<string, WellContents>).forEach(
-      ([wellName, content]) => {
-        console.log(`Well ${wellName}:`, {
-          groupIds: content.groupIds,
-          ingreds: content.ingreds,
-        })
-      }
-    )
-  }
 
   const wellFill = getWellFillFromWellContents(
     wellContents as ContentsByWell,
