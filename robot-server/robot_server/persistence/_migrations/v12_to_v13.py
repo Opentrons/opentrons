@@ -43,6 +43,24 @@ class Migration12to13(Migration):  # noqa: D101
                 schema_13.data_files_table.c.mime_type,
             )
 
+            add_column(
+                engine,
+                schema_13.data_files_table.name,
+                schema_13.data_files_table.c.command_id,
+            )
+
+            add_column(
+                engine,
+                schema_13.data_files_table.name,
+                schema_13.data_files_table.c.prev_command_id,
+            )
+
+            add_column(
+                engine,
+                schema_13.data_files_table.name,
+                schema_13.data_files_table.c.failed_command_id,
+            )
+
             with engine.begin() as transaction:
                 _populate_mime_type_for_existing_files(transaction)
 

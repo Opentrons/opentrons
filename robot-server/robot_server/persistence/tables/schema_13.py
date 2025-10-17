@@ -324,6 +324,21 @@ data_files_table = sqlalchemy.Table(
         nullable=True,
         index=True,
     ),
+    sqlalchemy.Column(
+        "command_id",
+        sqlalchemy.String,
+        nullable=True,
+    ),
+    sqlalchemy.Column(
+        "prev_command_id",
+        sqlalchemy.String,
+        nullable=True,
+    ),
+    sqlalchemy.Column(
+        "failed_command_id",
+        sqlalchemy.String,
+        nullable=True,
+    ),
     sqlalchemy.Index(
         "ix_data_files_run_id_mime_type_created_at",
         "run_id",
