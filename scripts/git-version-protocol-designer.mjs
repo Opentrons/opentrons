@@ -293,7 +293,7 @@ export async function generateBuildInfoHtml(outputPath) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Build Information - ${project}</title>
+    <title>Build Information - ${buildInfo.project}</title>
     <style>
         * {
             margin: 0;
