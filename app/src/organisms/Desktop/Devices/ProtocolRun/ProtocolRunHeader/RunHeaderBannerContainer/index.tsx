@@ -55,7 +55,6 @@ export function RunHeaderBannerContainer(
   const doorStatus = useIsDoorOpen(robotName)
 
   const {
-    showRunCanceledBanner,
     showDoorOpenBeforeRunBanner,
     showDoorOpenDuringRunBanner,
     showStackerDoorOpenBeforeRunBanner,
@@ -97,11 +96,6 @@ export function RunHeaderBannerContainer(
         <ProtocolAnalysisErrorBanner
           errors={analysisErrorModalUtils.modalProps.errors}
         />
-      ) : null}
-      {showRunCanceledBanner ? (
-        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('run_canceled')}
-        </Banner>
       ) : null}
       {doorBannerText ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
