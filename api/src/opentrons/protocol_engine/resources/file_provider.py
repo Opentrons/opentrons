@@ -184,6 +184,9 @@ class FileProvider:
             file_hash="",
             created_at=datetime.now(),
             source=DataFileSource.GENERATED,
-            run_id=None,
             mime_type=mime_type,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )

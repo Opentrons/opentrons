@@ -403,8 +403,11 @@ async def test_insert_and_get_csv_rtp(
             file_hash="file-hash",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
 
@@ -634,8 +637,11 @@ async def test_remove_run(
             file_hash="file-hash",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
     subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)

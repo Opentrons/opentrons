@@ -46,8 +46,11 @@ class DataFilesStore:
             "source": DataFileSourceSQLEnum(file_info.source.value),
             "created_at": file_info.created_at,
             "file_hash": file_info.file_hash,
-            "run_id": file_info.run_id,
             "mime_type": file_info.mime_type,
+            "run_id": file_info.run_id,
+            "command_id": file_info.command_id,
+            "prev_command_id": file_info.prev_command_id,
+            "failed_command_id": file_info.failed_command_id,
         }
         statement = sqlalchemy.insert(data_files_table).values(file_info_dict)
         with self._sql_engine.begin() as transaction:
@@ -172,4 +175,7 @@ def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
         file_hash=row.file_hash,
         run_id=row.run_id,
         mime_type=row.mime_type,
+        command_id=row.command_id,
+        prev_command_id=row.prev_command_id,
+        failed_command_id=row.failed_command_id,
     )

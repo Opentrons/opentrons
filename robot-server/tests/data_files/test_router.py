@@ -106,8 +106,11 @@ async def test_upload_new_data_file(
                 file_hash="abc123",
                 created_at=datetime(year=2024, month=6, day=18),
                 source=DataFileSource.UPLOADED,
-                run_id=None,
                 mime_type=MimeType.TEXT_CSV,
+                run_id=None,
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
             )
         ),
     )
@@ -139,8 +142,11 @@ async def test_upload_existing_data_file(
             file_hash="abc123",
             created_at=datetime(year=2023, month=6, day=18),
             source=DataFileSource.UPLOADED,
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
 
@@ -211,8 +217,11 @@ async def test_upload_new_data_file_path(
                 file_hash="abc123",
                 created_at=datetime(year=2024, month=6, day=18),
                 source=DataFileSource.UPLOADED,
-                run_id=None,
                 mime_type=MimeType.TEXT_CSV,
+                run_id=None,
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
             )
         ),
     )
@@ -290,8 +299,11 @@ async def test_get_data_file_info(
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
             source=DataFileSource.UPLOADED,
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
 
@@ -341,8 +353,11 @@ async def test_get_data_file(
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
             source=DataFileSource.UPLOADED,
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
 
@@ -385,8 +400,11 @@ async def test_get_all_data_file_info(
                 file_hash="123",
                 created_at=datetime(year=2024, month=7, day=15),
                 source=DataFileSource.UPLOADED,
-                run_id=None,
                 mime_type=MimeType.TEXT_CSV,
+                run_id=None,
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
             ),
             DataFileInfo(
                 id="hfhcjdeowjfie",
@@ -394,8 +412,11 @@ async def test_get_all_data_file_info(
                 file_hash="124",
                 created_at=datetime(year=2024, month=7, day=22),
                 source=DataFileSource.UPLOADED,
-                run_id=None,
                 mime_type=MimeType.TEXT_CSV,
+                run_id=None,
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
             ),
         ]
     )

@@ -94,6 +94,10 @@ class FileProviderExecutor:
                 source=DataFileSource.GENERATED,
                 run_id=self._run_metadata.run_id,
                 mime_type=file_data.mime_type,
+                # TOME TODO: Update after merging CB's PR!
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
             )
             await self._data_files_store.insert(file_info)
             return file_info

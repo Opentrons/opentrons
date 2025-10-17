@@ -113,8 +113,11 @@ async def test_insert_data_file_info_and_fetch_by_hash(
         file_hash="abc123",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     assert subject.get_file_info_by_hash("abc123") is None
     await subject.insert(data_file_info)
@@ -131,8 +134,11 @@ async def test_insert_file_info_with_existing_id(
         file_hash="abc123",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     data_file_info2 = DataFileInfo(
         id="file-id",
@@ -140,8 +146,11 @@ async def test_insert_file_info_with_existing_id(
         file_hash="abc1234",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     await subject.insert(data_file_info1)
     with pytest.raises(Exception):
@@ -160,6 +169,9 @@ async def test_insert_data_file_info_and_get_by_id(
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
         run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     await subject.insert(data_file_info)
     assert subject.get("file-id") == data_file_info
@@ -194,8 +206,11 @@ async def test_get_usage_info(
         file_hash="abc",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     data_file_2 = DataFileInfo(
         id="file-id-2",
@@ -203,8 +218,11 @@ async def test_get_usage_info(
         file_hash="xyz",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     await subject.insert(data_file_1)
     await subject.insert(data_file_2)
@@ -236,8 +254,11 @@ async def test_remove(
         file_hash="abc123",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     await subject.insert(data_file_info)
     subject.remove(file_id="file-id")
@@ -268,8 +289,11 @@ async def test_remove_raises_in_file_in_use(
         file_hash="abc123",
         source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
 
     protocol_resource = _get_sample_protocol_resource("protocol-id")

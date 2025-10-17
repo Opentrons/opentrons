@@ -258,8 +258,11 @@ async def test_create_protocol_run(
             file_hash="987",
             created_at=datetime(month=1, day=2, year=2024),
             source=DataFileSource.UPLOADED,
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
     decoy.when(

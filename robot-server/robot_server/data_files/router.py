@@ -160,8 +160,11 @@ async def upload_data_file(
         file_hash=file_hash,
         created_at=created_at,
         source=DataFileSource.UPLOADED,
-        run_id=None,
         mime_type=MimeType.TEXT_CSV,
+        run_id=None,
+        command_id=None,
+        prev_command_id=None,
+        failed_command_id=None,
     )
     await data_files_store.insert(file_info)
     return await PydanticResponse.create(

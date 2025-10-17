@@ -598,8 +598,11 @@ async def test_get_referenced_data_files(
             file_hash="abc123",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
     await data_files_store.insert(
@@ -609,8 +612,11 @@ async def test_get_referenced_data_files(
             file_hash="abc123",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
     await data_files_store.insert(
@@ -620,8 +626,11 @@ async def test_get_referenced_data_files(
             file_hash="abc123",
             source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            run_id=None,
             mime_type=MimeType.TEXT_CSV,
+            run_id=None,
+            command_id=None,
+            prev_command_id=None,
+            failed_command_id=None,
         )
     )
 
