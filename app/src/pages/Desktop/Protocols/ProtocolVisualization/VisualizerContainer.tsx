@@ -89,7 +89,7 @@ export function VisualizerContainer(
     invariantContextFromRunCommands
   )
 
-  // Get robot state before current command (for displaying source liquids before aspirate)
+  // for displaying source liquids before aspirate
   const previousCommandsSlice = commands.slice(0, selectedCommandIndex)
   const previousFrame =
     previousCommandsSlice.length > 0
