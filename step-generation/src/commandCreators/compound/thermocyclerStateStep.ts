@@ -15,11 +15,9 @@ import type {
   ThermocyclerStateStepArgs,
 } from '../../types'
 
-export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const thermocyclerStateStep: CommandCreator<
+  ThermocyclerStateStepArgs
+> = (args, invariantContext, prevRobotState) => {
   const thermocyclerState = thermocyclerStateGetter(
     prevRobotState,
     args.moduleId

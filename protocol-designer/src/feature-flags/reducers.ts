@@ -85,6 +85,5 @@ export const _allReducers = {
 export interface RootState {
   flags: Flags
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

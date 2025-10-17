@@ -15,13 +15,8 @@ interface CheckPipetteButtonProps {
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
-  const {
-    proceedButtonText,
-    proceed,
-    setFetching,
-    isFetching,
-    isOnDevice,
-  } = props
+  const { proceedButtonText, proceed, setFetching, isFetching, isOnDevice } =
+    props
   const { refetch } = useInstrumentsQuery({
     enabled: false,
     onSettled: () => {

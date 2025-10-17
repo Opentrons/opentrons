@@ -187,12 +187,12 @@ const mockLeftPipetteData = {
   mount: 'left',
   serialNumber: 'def456',
 }
-const mockEmptyAnalysis = ({
+const mockEmptyAnalysis = {
   modules: [],
   labware: [],
   pipettes: [],
   commands: [],
-} as unknown) as SharedData.CompletedProtocolAnalysis
+} as unknown as SharedData.CompletedProtocolAnalysis
 
 const mockPlay = vi.fn()
 const mockOffset = {
@@ -328,9 +328,9 @@ describe('ProtocolSetup', () => {
     } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
       .calledWith()
-      .thenReturn(({
+      .thenReturn({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
-      } as unknown) as any)
+      } as unknown as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
     when(vi.mocked(useTrackProtocolRunEvent))
@@ -342,15 +342,15 @@ describe('ProtocolSetup', () => {
     })
     vi.mocked(useLPCFlows).mockReturnValue({ launchLPC: mockLaunchLPC } as any)
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
-    vi.mocked(
-      selectTotalCountLocationSpecificOffsets
-    ).mockImplementation(() => () => 3)
-    vi.mocked(
-      selectCountMissingLSOffsetsWithoutDefault
-    ).mockImplementation(() => () => 1)
-    vi.mocked(
-      selectIsAnyNecessaryDefaultOffsetMissing
-    ).mockImplementation(() => () => false)
+    vi.mocked(selectTotalCountLocationSpecificOffsets).mockImplementation(
+      () => () => 3
+    )
+    vi.mocked(selectCountMissingLSOffsetsWithoutDefault).mockImplementation(
+      () => () => 1
+    )
+    vi.mocked(selectIsAnyNecessaryDefaultOffsetMissing).mockImplementation(
+      () => () => false
+    )
     vi.mocked(selectOffsetSource).mockImplementation(() => () => 'fromDatabase')
     vi.mocked(useApplyOffsets).mockReturnValue({
       isApplyingOffsets: false,

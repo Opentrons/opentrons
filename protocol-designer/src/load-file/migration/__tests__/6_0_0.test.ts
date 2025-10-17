@@ -7,8 +7,9 @@ import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
 
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 
-const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV5<any>
-const oldMultipleLiquidsProtocol = (_oldMultipleLiquidsProtocol as unknown) as ProtocolFileV5<any>
+const oldDoItAllProtocol = _oldDoItAllProtocol as unknown as ProtocolFileV5<any>
+const oldMultipleLiquidsProtocol =
+  _oldMultipleLiquidsProtocol as unknown as ProtocolFileV5<any>
 
 vi.mock('../utils/getLoadLiquidCommands')
 

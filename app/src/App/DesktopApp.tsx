@@ -46,10 +46,8 @@ import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
-  const [
-    isEmergencyStopModalDismissed,
-    setIsEmergencyStopModalDismissed,
-  ] = useState<boolean>(false)
+  const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
+    useState<boolean>(false)
 
   // note for react-scan
   const enableReactScan = useFeatureFlag('reactScan')
@@ -89,8 +87,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: ProtocolVisualization,
       name: 'Visualization',
-      path:
-        '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
+      path: '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: Labware,

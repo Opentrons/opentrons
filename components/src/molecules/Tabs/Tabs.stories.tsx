@@ -52,9 +52,8 @@ export const Tabs: Story = {
     ],
   },
   render: function TabsStory() {
-    const [args, setArgs] = useArgs<
-      React.ComponentProps<typeof TabsComponent>
-    >()
+    const [args, setArgs] =
+      useArgs<React.ComponentProps<typeof TabsComponent>>()
 
     const modifiedTabs = args.tabs.map((tab, index) => {
       const modifiedTabs = {

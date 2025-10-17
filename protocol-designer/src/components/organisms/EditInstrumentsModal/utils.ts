@@ -91,13 +91,13 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
   const { allLabware, allowAllTipracks, selectedPipetteName } = props
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
-          .defaultTipracks ?? []
+      ? (getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? [])
       : []
   const selectedPipetteDisplayCategory =
     selectedPipetteName != null
-      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)
-          ?.displayCategory ?? []
+      ? (getPipetteSpecsV2(selectedPipetteName as PipetteName)
+          ?.displayCategory ?? [])
       : []
 
   const isFlexPipette =

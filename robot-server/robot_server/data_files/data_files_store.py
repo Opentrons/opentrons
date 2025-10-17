@@ -1,8 +1,6 @@
 """Store and retrieve information about uploaded data files from the database."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Set
 
@@ -16,19 +14,9 @@ from robot_server.persistence.tables import (
     run_csv_rtp_table,
 )
 from robot_server.persistence.tables import DataFileSourceSQLEnum
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
 
-from .models import DataFileSource, FileIdNotFoundError, FileInUseError
-
-
-@dataclass(frozen=True)
-class DataFileInfo:
-    """Metadata info of a saved data file."""
-
-    id: str
-    name: str
-    file_hash: str
-    created_at: datetime
-    source: DataFileSource
+from .models import FileIdNotFoundError, FileInUseError
 
 
 class DataFilesStore:
@@ -158,7 +146,6 @@ class DataFilesStore:
                 transaction.execute(select_ids_used_in_runs).scalars().all()
             )
             if len(files_used_in_analyses) + len(files_used_in_runs) > 0:
-
                 raise FileInUseError(
                     data_file_id=file_id,
                     ids_used_in_runs=files_used_in_runs,

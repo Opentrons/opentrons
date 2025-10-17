@@ -36,6 +36,5 @@ export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
   )
 }
 
-export const StrokedWells: MemoExoticComponent<
-  typeof StrokedWellsComponent
-> = memo(StrokedWellsComponent)
+export const StrokedWells: MemoExoticComponent<typeof StrokedWellsComponent> =
+  memo(StrokedWellsComponent)

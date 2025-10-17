@@ -99,11 +99,18 @@ class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
 
 
+def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
+    """Return if this pipette type is a 96 channel."""
+    if pipette is not None:
+        return pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]
+    return False
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:
     """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
-    if pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]:
+    if is_pipette_96_channel(pipette):
         # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
         # to use the mount value.
         if mount is not None:

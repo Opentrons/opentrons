@@ -4,7 +4,7 @@ import type { BrowserWindow } from 'electron'
 import type mqtt from 'mqtt'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
-type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]
+type FailedConnStatus = (typeof FAILURE_STATUSES)[keyof typeof FAILURE_STATUSES]
 
 interface HostData {
   client: mqtt.MqttClient | null
@@ -164,9 +164,8 @@ class ConnectionStore {
     return new Promise((resolve, reject) => {
       const robotName = this.getRobotNameByIP(ip)
       if (robotName != null && robotName in this.hostsByRobotName) {
-        const { pendingUnsubs, subscriptions } = this.hostsByRobotName[
-          robotName
-        ]
+        const { pendingUnsubs, subscriptions } =
+          this.hostsByRobotName[robotName]
         if (subscriptions.has(topic)) {
           if (status === 'pending') {
             pendingUnsubs.add(topic)
@@ -200,7 +199,7 @@ class ConnectionStore {
 
   public isConnectedToBroker(robotName: string): boolean {
     return robotName != null
-      ? this.hostsByRobotName[robotName]?.client?.connected ?? false
+      ? (this.hostsByRobotName[robotName]?.client?.connected ?? false)
       : false
   }
 

@@ -130,12 +130,8 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
     invariantContext
   ) => {
     const { author, description, created, source } = fileMetadata
-    const {
-      pipetteEntities,
-      labwareEntities,
-      liquidEntities,
-      moduleEntities,
-    } = invariantContext
+    const { pipetteEntities, labwareEntities, liquidEntities, moduleEntities } =
+      invariantContext
 
     const loadCommands = getLoadCommands(
       initialRobotState,
@@ -186,8 +182,9 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
         _internalAppBuildDate,
         pipetteTiprackAssignments: mapValues(
           pipetteEntities,
-          (p: typeof pipetteEntities[keyof typeof pipetteEntities]): string[] =>
-            p.tiprackDefURI
+          (
+            p: (typeof pipetteEntities)[keyof typeof pipetteEntities]
+          ): string[] => p.tiprackDefURI
         ),
         dismissedWarnings,
         ingredients,
@@ -339,21 +336,17 @@ export const createFile: Selector<PDPythonFile> = createSelector(
     labwareNicknamesById,
     invariantContext
   ) => {
-    const {
-      pipetteEntities,
-      moduleEntities,
-      labwareEntities,
-      liquidEntities,
-    } = invariantContext
+    const { pipetteEntities, moduleEntities, labwareEntities, liquidEntities } =
+      invariantContext
 
     const savedOrderedStepIds = orderedStepIds.filter(
       stepId => savedStepForms[stepId]
     )
 
     const ingredients: Ingredients = Object.fromEntries(
-      Object.entries(
-        liquidEntities
-      ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
+      Object.entries(liquidEntities).map(
+        ([liquidId, { pythonName, ...rest }]) => [liquidId, rest]
+      )
     )
 
     const allUniqueLiquidClassesFromForms = Array.from(
@@ -384,7 +377,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
             (
-              p: typeof pipetteEntities[keyof typeof pipetteEntities]
+              p: (typeof pipetteEntities)[keyof typeof pipetteEntities]
             ): string[] => p.tiprackDefURI
           ),
           dismissedWarnings,

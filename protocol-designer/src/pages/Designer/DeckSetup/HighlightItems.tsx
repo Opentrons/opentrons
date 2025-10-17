@@ -83,9 +83,9 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     location?: string | undefined
   } | null =
     hoveredItem?.id != null
-      ? Object.values(additionalEquipmentOnDeck).find(
+      ? (Object.values(additionalEquipmentOnDeck).find(
           ae => ae.location === hoveredItem.id
-        ) ?? null
+        ) ?? null)
       : null
 
   const selectedItemTrash = selectedDropdownItems.find(

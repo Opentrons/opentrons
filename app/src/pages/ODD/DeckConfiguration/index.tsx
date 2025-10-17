@@ -30,21 +30,15 @@ export function DeckConfigurationEditor(): JSX.Element {
     'shared',
   ])
   const navigate = useNavigate()
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const isOnDevice = true
-  const {
-    addFixtureToCutout,
-    removeFixtureFromCutout,
-    addFixtureModal,
-  } = useDeckConfigurationEditingTools(isOnDevice)
+  const { addFixtureToCutout, removeFixtureFromCutout, addFixtureModal } =
+    useDeckConfigurationEditingTools(isOnDevice)
 
-  const [showDiscardChangeModal, setShowDiscardChangeModal] = useState<boolean>(
-    false
-  )
+  const [showDiscardChangeModal, setShowDiscardChangeModal] =
+    useState<boolean>(false)
 
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 

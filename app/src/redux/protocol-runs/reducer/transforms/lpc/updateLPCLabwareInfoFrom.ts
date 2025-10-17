@@ -49,8 +49,8 @@ export function updateLPCLabwareInfoFrom(
 
       // Matching location-specific offset case.
       if (relevantLSIdx > -1) {
-        const newLocationSpecificOffsetDetails = locationSpecificOffsetDetails.map(
-          (detail, idx) => {
+        const newLocationSpecificOffsetDetails =
+          locationSpecificOffsetDetails.map((detail, idx) => {
             if (idx === relevantLSIdx) {
               return {
                 ...detail,
@@ -60,8 +60,7 @@ export function updateLPCLabwareInfoFrom(
               }
             }
             return detail
-          }
-        )
+          })
 
         return {
           ...acc,

@@ -455,15 +455,19 @@
           "title": "Pipetteid",
           "type": "string"
         },
+        "trackFromLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to start the operation"
+        },
+        "trackToLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to end the operation"
+        },
         "volume": {
           "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
           "minimum": 0.0,
           "title": "Volume",
           "type": "number"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to perform the operation"
         },
         "wellName": {
           "description": "Name of well to use in labware.",
@@ -1991,15 +1995,19 @@
           "title": "Pushout",
           "type": "number"
         },
+        "trackFromLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to start the operation"
+        },
+        "trackToLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to end the operation"
+        },
         "volume": {
           "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
           "minimum": 0.0,
           "title": "Volume",
           "type": "number"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to perform the operation"
         },
         "wellName": {
           "description": "Name of well to use in labware.",

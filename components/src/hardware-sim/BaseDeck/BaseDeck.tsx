@@ -527,10 +527,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 : moduleLocation.slotName,
               deckDef
             )
-            let {
-              x: nestedLabwareOffsetX,
-              y: nestedLabwareOffsetY,
-            } = moduleDef.labwareOffset
+            let { x: nestedLabwareOffsetX, y: nestedLabwareOffsetY } =
+              moduleDef.labwareOffset
             if (moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE) {
               nestedLabwareOffsetX += STACKER_HOPPER_LABWARE_X_OFFSET
             }

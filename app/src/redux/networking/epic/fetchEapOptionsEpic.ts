@@ -13,7 +13,9 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { EapOption, FetchEapOptionsAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchEapOptionsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchEapOptionsAction
+> = action => ({
   method: GET,
   path: EAP_OPTIONS_PATH,
 })

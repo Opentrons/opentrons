@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { StyledText } from '@opentrons/components'
 import {
@@ -9,6 +10,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareLabel } from '/protocol-designer/pages/Designer/LabwareLabel'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TiprackSelectHover } from './TiprackSelectHover'
@@ -24,10 +26,14 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
     formTiprackUri,
     activeDeckSetup,
     deckDef,
+    pipetteSpecs,
+    nozzles,
   } = props
   const { t } = useTranslation('tip_selection')
   const { labware: allLabware } = activeDeckSetup
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const { labwareEntities } = useSelector(getInvariantContext)
+
   const controls = (
     <>
       {Object.values(allLabware).map(labware => {
@@ -41,16 +47,21 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
         const slot = getSlotInLocationStack(stack)
 
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${slot} for labware ${id}!`)
           return null
         }
-        const isTiprackSelectable = getIsTiprackSelectable(
+        const isTiprackSelectable = getIsTiprackSelectable({
           labware,
-          formTiprackUri
-        )
+          formTiprackUri,
+          pipetteSpecs,
+          nozzles,
+          labwareEntities,
+        })
         return isTiprackSelectable ? (
           <>
             {id === selectedTiprackId ? (

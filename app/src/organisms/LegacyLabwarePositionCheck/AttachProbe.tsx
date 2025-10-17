@@ -77,7 +77,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
   const pipetteChannels =
-    pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+    pipetteName != null ? (getPipetteNameSpecs(pipetteName)?.channels ?? 1) : 1
   let probeVideoSrc = attachProbe1
   let probeLocation = ''
   if (pipetteChannels === 8) {

@@ -113,6 +113,8 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'success' || needs.deploy-server.result == 'success')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -125,6 +127,8 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'failure' || needs.deploy-server.result == 'failure')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -153,6 +157,8 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'cancelled' || needs.deploy-server.result == 'cancelled')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

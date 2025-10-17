@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import {
-  getLabwareDefinitionsFromCommands,
-  StyledText,
-} from '@opentrons/components'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -13,6 +10,7 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -45,7 +43,6 @@ export function VisualizerContainer(
 ): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
-  const [showDeckRenders, setShowDeckRenders] = useState<boolean>(false)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 
@@ -71,14 +68,22 @@ export function VisualizerContainer(
     rightWidthRef.current = rightWidth
   }, [rightWidth])
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   const selectedCommandIndex = commands.findIndex(
+    command => command.id === selectedCommandId
+  )
+  const filteredSelectedCommandIndex = filteredCommands.findIndex(
     command => command.id === selectedCommandId
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
-    commands
-  )
+  const invariantContextFromRunCommands =
+    constructInvariantContextFromRunCommands(commands)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromRunCommands
@@ -121,10 +126,9 @@ export function VisualizerContainer(
     srcFileNames,
     analysis
   )
-  const commandLength = analysis.commands.length
   const percentComplete =
-    selectedCommandIndex != null
-      ? (selectedCommandIndex / commandLength) * 100
+    filteredSelectedCommandIndex != null
+      ? (filteredSelectedCommandIndex / filteredCommands.length) * 100
       : 0
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
@@ -258,15 +262,13 @@ export function VisualizerContainer(
         <Controls
           protocolName={protocolDisplayName}
           numErrors={analysis.errors.length}
-          numCommandLength={commands.length}
-          currentCommandIndex={selectedCommandIndex}
+          numCommandLength={filteredCommands.length}
+          currentCommandIndex={filteredSelectedCommandIndex}
           setSelectedCommand={setSelectedCommand}
           handlePlayPause={handlePlayPause}
           isPlaying={isPlaying}
-          commands={commands}
+          commands={filteredCommands}
           groupedCommands={groupedCommands}
-          setShowDeckRenders={setShowDeckRenders}
-          showDeckRenders={showDeckRenders}
         />
 
         <DeckView
@@ -278,10 +280,8 @@ export function VisualizerContainer(
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
           selectedRunTimeCommand={selectedRunTimeCommand}
-          showDeckRenders={showDeckRenders}
         />
       </div>
-
       {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
         {/* Right column resizer */}
@@ -291,7 +291,14 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StyledText>Labware Info</StyledText>
+        <StepDetailContainer
+          protocolKey={protocolKey}
+          commands={commands}
+          selectedSlot={selectedSlot}
+          robotState={robotState}
+          invariantContext={invariantContext}
+          selectedRunTimeCommand={selectedRunTimeCommand}
+        />
       </div>
     </div>
   )

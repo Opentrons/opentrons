@@ -2,7 +2,7 @@ import type { DT_ROUTES } from './constants'
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { DropTipErrorComponents } from './hooks'
 
-export type DropTipFlowsRoute = typeof DT_ROUTES[keyof typeof DT_ROUTES]
+export type DropTipFlowsRoute = (typeof DT_ROUTES)[keyof typeof DT_ROUTES]
 export type DropTipFlowsStep = DropTipFlowsRoute[number]
 export interface ErrorDetails {
   message: string

@@ -43,12 +43,20 @@ interface BaseDeckTipSelectionProps {
   hoveredId?: string | null
   showSlotLabels?: boolean
   viewBox?: string | null
+  // labware ID to hide since it will be injected via controls
+  labwareIdToHide?: string | null
 }
 
 export function BaseDeckTipSelection(
   props: BaseDeckTipSelectionProps
 ): JSX.Element {
-  const { controls, hoveredId, showSlotLabels = true, viewBox } = props
+  const {
+    controls,
+    hoveredId,
+    showSlotLabels = true,
+    viewBox,
+    labwareIdToHide,
+  } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const robotType = useSelector(getRobotType)
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -222,15 +230,18 @@ export function BaseDeckTipSelection(
             if (
               getSlotInLocationStack(labware.stack) === 'offDeck' ||
               labware.stack.includes('fixedTrash') ||
-              allModules.some(m => labware.stack.includes(m.id))
+              allModules.some(m => labware.stack.includes(m.id)) ||
+              labwareIdToHide === labware.id
             ) {
               return null
             }
             const slot = getSlotInLocationStack(labware.stack)
 
             const slotPosition = getPositionFromSlotId(slot, deckDef)
-            const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-              ?.boundingBox
+            const slotBoundingBox = getAddressableAreaFromSlotId(
+              slot,
+              deckDef
+            )?.boundingBox
             if (slotPosition == null || slotBoundingBox == null) {
               console.warn(`no slot ${slot} for labware ${labware.id}!`)
               return null

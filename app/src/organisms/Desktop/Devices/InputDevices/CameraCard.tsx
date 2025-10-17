@@ -18,6 +18,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
+import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
@@ -34,12 +35,8 @@ export function CameraCard({
   robotName,
 }: CameraCardProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const {
-    handleOverflowClick,
-    showOverflowMenu,
-    setShowOverflowMenu,
-  } = useMenuHandleClickOutside()
-  const [isStubbedEnabled, setStubbedEnabled] = useState(true)
+  const { handleOverflowClick, showOverflowMenu, setShowOverflowMenu } =
+    useMenuHandleClickOutside()
   const [showControls, setShowControls] = useState(false)
   const navigate = useNavigate()
 
@@ -63,9 +60,7 @@ export function CameraCard({
     },
   })
 
-  const toggleCameraEnabled = (): void => {
-    setStubbedEnabled(!isStubbedEnabled)
-  }
+  const { isCameraEnabled, toggleCameraEnabled } = useCameraUsageSettings()
 
   const toggleControls = (): void => {
     setShowControls(!showControls)
@@ -93,7 +88,7 @@ export function CameraCard({
               {t('camera')}
             </StyledText>
           </div>
-          {isStubbedEnabled ? (
+          {isCameraEnabled ? (
             <Chip type="success" hasIcon={false} text={t('enabled')} />
           ) : (
             <Chip type="neutral" hasIcon={false} text={t('disabled')} />
@@ -108,21 +103,19 @@ export function CameraCard({
         />
       </div>
       {showOverflowMenu && (
-        <>
-          <div
-            ref={cardOverflowWrapperRef}
-            onClick={() => {
-              setShowOverflowMenu(false)
-            }}
-          >
-            <CameraCardOverflowMenu
-              cameraEnabled={isStubbedEnabled}
-              toggleCameraEnabled={toggleCameraEnabled}
-              toggleControls={toggleControls}
-              navigateToUsageSettings={navigateToUsageSettings}
-            />
-          </div>
-        </>
+        <div
+          ref={cardOverflowWrapperRef}
+          onClick={() => {
+            setShowOverflowMenu(false)
+          }}
+        >
+          <CameraCardOverflowMenu
+            cameraEnabled={isCameraEnabled}
+            toggleCameraEnabled={toggleCameraEnabled}
+            toggleControls={toggleControls}
+            navigateToUsageSettings={navigateToUsageSettings}
+          />
+        </div>
       )}
       {showControls &&
         createPortal(

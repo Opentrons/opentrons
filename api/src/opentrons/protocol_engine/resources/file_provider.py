@@ -6,8 +6,9 @@ import csv
 from typing import List, Optional, Callable, Awaitable, Dict
 from dataclasses import dataclass
 from pydantic import BaseModel
-from ..errors import StorageLimitReachedError
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
 
+from ..errors import StorageLimitReachedError
 
 MAXIMUM_FILE_LIMIT = 400
 
@@ -27,14 +28,17 @@ class ReadCmdFileNameMetadata:
     wavelength: int
 
 
-@dataclass(frozen=True)
-class ImageJpegFileNameMetadata:
-    """Data from an image capture by a camera used to build the finalized file name and detail the metadata in the file."""
+class ImageCaptureCmdFileNameMetadata(BaseModel):
+    """Data from a camera capture command used to build the finalized file name."""
 
-    base_filename: str
+    step_number: int
+    command_timestamp: datetime
+    base_filename: Optional[str]
 
 
-CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageJpegFileNameMetadata | None
+CommandFileNameMetadata = (
+    ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata | None
+)
 
 
 class FileData:
@@ -149,7 +153,9 @@ class FileProvider:
 
     def __init__(
         self,
-        data_files_write_file_cb: Optional[Callable[[FileData], Awaitable[str]]] = None,
+        data_files_write_file_cb: Optional[
+            Callable[[FileData], Awaitable[DataFileInfo]]
+        ] = None,
         data_files_filecount: Optional[Callable[[], Awaitable[int]]] = None,
     ) -> None:
         """Initialize the interface callbacks of the File Provider for data file handling within the Protocol Engine.
@@ -166,8 +172,8 @@ class FileProvider:
         data: bytes,
         mime_type: MimeType,
         command_metadata: CommandFileNameMetadata = None,
-    ) -> str:
-        """Writes arbitrary data to a file in the Data Files directory. Returns the File ID of the file created."""
+    ) -> DataFileInfo:
+        """Writes arbitrary data to a file in the Data Files directory. Returns the `DataFileInfo` of the file created."""
         if self._data_files_filecount is not None:
             file_count = await self._data_files_filecount()
             if file_count >= MAXIMUM_FILE_LIMIT:
@@ -181,5 +187,11 @@ class FileProvider:
                     command_metadata=command_metadata,
                 )
                 return await self._data_files_write_file_cb(file_data)
-        # If we are in an analysis or simulation state, return an empty file ID
-        return ""
+        # If we are in an analysis or simulation state, return an empty `DataFileInfo`
+        return DataFileInfo(
+            id="",
+            name="",
+            file_hash="",
+            created_at=datetime.now(),
+            source=DataFileSource.GENERATED,
+        )

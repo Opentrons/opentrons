@@ -47,45 +47,47 @@ export interface DeleteMultipleStepsAction {
   type: 'DELETE_MULTIPLE_STEPS'
   payload: StepIdType[]
 }
-export const deleteMultipleSteps = (
-  stepIds: StepIdType[]
-): ThunkAction<
-  | DeleteMultipleStepsAction
-  | ClearSelectedItemAction
-  | SelectMultipleStepsAction
-> => (dispatch, getState) => {
-  const orderedStepIds = getOrderedStepIds(getState())
-  const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
-    type: 'DELETE_MULTIPLE_STEPS',
-    payload: stepIds,
-  }
-  dispatch(deleteMultipleStepsAction)
-
-  if (stepIds.length === orderedStepIds.length) {
-    // if we are deleting all the steps we need to clear out the selected item
-    const clearSelectedItemAction: ClearSelectedItemAction = {
-      type: 'CLEAR_SELECTED_ITEM',
+export const deleteMultipleSteps =
+  (
+    stepIds: StepIdType[]
+  ): ThunkAction<
+    | DeleteMultipleStepsAction
+    | ClearSelectedItemAction
+    | SelectMultipleStepsAction
+  > =>
+  (dispatch, getState) => {
+    const orderedStepIds = getOrderedStepIds(getState())
+    const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
+      type: 'DELETE_MULTIPLE_STEPS',
+      payload: stepIds,
     }
-    dispatch(clearSelectedItemAction)
-  } else {
-    const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
+    dispatch(deleteMultipleStepsAction)
 
-    if (nextStepId) {
-      const selectMultipleStepsAction: SelectMultipleStepsAction = {
-        type: 'SELECT_MULTIPLE_STEPS',
-        payload: {
-          stepIds: [nextStepId],
-          lastSelected: nextStepId,
-        },
+    if (stepIds.length === orderedStepIds.length) {
+      // if we are deleting all the steps we need to clear out the selected item
+      const clearSelectedItemAction: ClearSelectedItemAction = {
+        type: 'CLEAR_SELECTED_ITEM',
       }
-      dispatch(selectMultipleStepsAction)
+      dispatch(clearSelectedItemAction)
     } else {
-      console.warn(
-        'something went wrong, could not find the next non terminal item'
-      )
+      const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
+
+      if (nextStepId) {
+        const selectMultipleStepsAction: SelectMultipleStepsAction = {
+          type: 'SELECT_MULTIPLE_STEPS',
+          payload: {
+            stepIds: [nextStepId],
+            lastSelected: nextStepId,
+          },
+        }
+        dispatch(selectMultipleStepsAction)
+      } else {
+        console.warn(
+          'something went wrong, could not find the next non terminal item'
+        )
+      }
     }
   }
-}
 export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null

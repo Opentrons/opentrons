@@ -7,7 +7,7 @@ import { i18n } from '/app/i18n'
 
 import { SetupRunCameraUsage } from '../SetupRunCameraSettings'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import type { SetupCameraProps } from '../SetupRunCameraSettings'
 
 const render = (props: SetupCameraProps) => {
@@ -17,7 +17,7 @@ const render = (props: SetupCameraProps) => {
 }
 
 describe('SetupRunCameraUsage', () => {
-  let mockSettings: UseStubCameraUsageSettingsResult
+  let mockSettings: UseCameraUsageSettingsResult
   let mockProps: SetupCameraProps
 
   beforeEach(() => {

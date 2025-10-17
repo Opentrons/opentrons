@@ -71,106 +71,108 @@ export const substepTimelineSingleChannel = (
   const nextFrame = commandCreator(invariantContext, initialRobotState)
 
   if ('commands' in nextFrame) {
-    const timeline: SubstepTimelineAcc = nextFrame.commands.reduce<SubstepTimelineAcc>(
-      (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
-        const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
-          command,
-          invariantContext,
-          acc.prevRobotState
-        ).robotState
+    const timeline: SubstepTimelineAcc =
+      nextFrame.commands.reduce<SubstepTimelineAcc>(
+        (acc: SubstepTimelineAcc, command: CreateCommand, index: number) => {
+          const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
+            command,
+            invariantContext,
+            acc.prevRobotState
+          ).robotState
 
-        const { labwareEntities, wasteChuteEntities } = invariantContext
-        const { pipettes, liquidState } = acc.prevRobotState
+          const { labwareEntities, wasteChuteEntities } = invariantContext
+          const { pipettes, liquidState } = acc.prevRobotState
 
-        if (
-          command.commandType === 'dispenseInPlace' ||
-          command.commandType === 'aspirateInPlace'
-        ) {
           if (
-            'meta' in command &&
-            command.meta != null &&
-            'isAirGap' in command.meta
+            command.commandType === 'dispenseInPlace' ||
+            command.commandType === 'aspirateInPlace'
           ) {
-            return {
-              ...acc,
-              timeline: acc.timeline,
-              prevRobotState: nextRobotState,
+            if (
+              'meta' in command &&
+              command.meta != null &&
+              'isAirGap' in command.meta
+            ) {
+              return {
+                ...acc,
+                timeline: acc.timeline,
+                prevRobotState: nextRobotState,
+              }
             }
-          }
-          const { volume, pipetteId } = command.params
-          const pipetteEntity = pipettes[pipetteId]
-          const entityId = pipetteEntity.entityId ?? ''
-          const wellName = pipetteEntity.wellName ?? ''
-          const isMoveToWell = labwareEntities[entityId] != null
+            const { volume, pipetteId } = command.params
+            const pipetteEntity = pipettes[pipetteId]
+            const entityId = pipetteEntity.entityId ?? ''
+            const wellName = pipetteEntity.wellName ?? ''
+            const isMoveToWell = labwareEntities[entityId] != null
 
-          if (isMoveToWell) {
-            const { id: labwareId } = invariantContext.labwareEntities[entityId]
+            if (isMoveToWell) {
+              const { id: labwareId } =
+                invariantContext.labwareEntities[entityId]
 
-            const wellInfo = {
-              labwareId,
-              wells: [wellName],
-              preIngreds:
-                acc.prevRobotState.liquidState.labware[labwareId][wellName],
-              postIngreds:
-                nextRobotState.liquidState.labware[labwareId][wellName],
-            }
+              const wellInfo = {
+                labwareId,
+                wells: [wellName],
+                preIngreds:
+                  acc.prevRobotState.liquidState.labware[labwareId][wellName],
+                postIngreds:
+                  nextRobotState.liquidState.labware[labwareId][wellName],
+              }
 
-            return {
-              ...acc,
-              prevRobotState: nextRobotState,
-              timeline: [
-                ...acc.timeline,
-                _createNextTimelineFrame({
-                  volume,
-                  index,
-                  nextFrame,
-                  command,
-                  wellInfo,
-                }),
-              ],
+              return {
+                ...acc,
+                prevRobotState: nextRobotState,
+                timeline: [
+                  ...acc.timeline,
+                  _createNextTimelineFrame({
+                    volume,
+                    index,
+                    nextFrame,
+                    command,
+                    wellInfo,
+                  }),
+                ],
+              }
+            } else {
+              const isWasteChute = wasteChuteEntities[entityId] != null
+              const wellInfo = {
+                additionalEquipmentId: entityId,
+                wells: [],
+                preIngreds: isWasteChute
+                  ? liquidState.wasteChute[entityId]
+                  : liquidState.trashBins[entityId],
+                postIngreds: isWasteChute
+                  ? nextRobotState.liquidState.wasteChute[entityId]
+                  : nextRobotState.liquidState.trashBins[entityId],
+              }
+
+              return {
+                ...acc,
+                prevRobotState: nextRobotState,
+                timeline: [
+                  ...acc.timeline,
+                  _createNextTimelineFrame({
+                    volume,
+                    index,
+                    nextFrame,
+                    command,
+                    wellInfo,
+                  }),
+                ],
+              }
             }
           } else {
-            const isWasteChute = wasteChuteEntities[entityId] != null
-            const wellInfo = {
-              additionalEquipmentId: entityId,
-              wells: [],
-              preIngreds: isWasteChute
-                ? liquidState.wasteChute[entityId]
-                : liquidState.trashBins[entityId],
-              postIngreds: isWasteChute
-                ? nextRobotState.liquidState.wasteChute[entityId]
-                : nextRobotState.liquidState.trashBins[entityId],
-            }
-
             return {
-              ...acc,
+              timeline: acc.timeline,
+              errors: null,
               prevRobotState: nextRobotState,
-              timeline: [
-                ...acc.timeline,
-                _createNextTimelineFrame({
-                  volume,
-                  index,
-                  nextFrame,
-                  command,
-                  wellInfo,
-                }),
-              ],
             }
           }
-        } else {
-          return {
-            timeline: acc.timeline,
-            errors: null,
-            prevRobotState: nextRobotState,
-          }
+        },
+        {
+          timeline: [],
+          errors: null,
+          prevRobotState: initialRobotState,
         }
-      },
-      {
-        timeline: [],
-        errors: null,
-        prevRobotState: initialRobotState,
-      }
-    )
+      )
     return timeline.timeline
   } else {
     return []
@@ -193,11 +195,8 @@ export const substepTimelineMultiChannel = (
           acc.prevRobotState
         ).robotState
 
-        const {
-          labwareEntities,
-          pipetteEntities,
-          wasteChuteEntities,
-        } = invariantContext
+        const { labwareEntities, pipetteEntities, wasteChuteEntities } =
+          invariantContext
         const { pipettes, liquidState } = acc.prevRobotState
 
         if (
@@ -233,10 +232,8 @@ export const substepTimelineMultiChannel = (
             numChannels = 1
           }
           if (isMoveToWell) {
-            const {
-              def: labwareDef,
-              id: labwareId,
-            } = invariantContext.labwareEntities[entityId]
+            const { def: labwareDef, id: labwareId } =
+              invariantContext.labwareEntities[entityId]
             const wellsForTips =
               numChannels &&
               labwareDef &&

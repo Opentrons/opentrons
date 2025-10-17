@@ -17,10 +17,8 @@ export function LabwareOffsetsDeckInfoLabels({
   detail,
   slotCopy,
 }: LabwareOffsetsDeckInfoLabelsProps): JSX.Element {
-  const {
-    closestBeneathModuleModel,
-    lwModOnlyStackupDetails,
-  } = detail.locationDetails
+  const { closestBeneathModuleModel, lwModOnlyStackupDetails } =
+    detail.locationDetails
 
   const isLabwareInLwStackup = (): boolean => {
     const lwOnlyStackup = lwModOnlyStackupDetails.filter(

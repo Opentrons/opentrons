@@ -182,11 +182,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
-  const {
-    data: currentSubsystemsUpdatesData,
-  } = useCurrentAllSubsystemUpdatesQuery({
-    refetchInterval: POLL_INTERVAL_MS,
-  })
+  const { data: currentSubsystemsUpdatesData } =
+    useCurrentAllSubsystemUpdatesQuery({
+      refetchInterval: POLL_INTERVAL_MS,
+    })
   const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
     update =>
       update.updateStatus === 'queued' || update.updateStatus === 'updating'

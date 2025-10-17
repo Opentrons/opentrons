@@ -19,7 +19,8 @@ vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const FILE_ID = 'file123'
-const FILE_CONTENT_RESPONSE = 'content,of,my,csv\nfile,' as DownloadedCsvFileResponse
+const FILE_CONTENT_RESPONSE =
+  'content,of,my,csv\nfile,' as DownloadedCsvFileResponse
 
 describe('useCsvFileRawQuery hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

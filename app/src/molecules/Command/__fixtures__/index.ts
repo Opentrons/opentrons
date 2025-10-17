@@ -5,9 +5,12 @@ import robotSideAnalysis from './mockRobotSideAnalysis.json'
 import type { CommandTextData } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-export const mockRobotSideAnalysis: CompletedProtocolAnalysis = robotSideAnalysis as CompletedProtocolAnalysis
-export const mockDoItAllAnalysis: CompletedProtocolAnalysis = doItAllAnalysis as CompletedProtocolAnalysis
-export const mockQIASeqAnalysis: CompletedProtocolAnalysis = (qiaseqAnalysis as unknown) as CompletedProtocolAnalysis
+export const mockRobotSideAnalysis: CompletedProtocolAnalysis =
+  robotSideAnalysis as CompletedProtocolAnalysis
+export const mockDoItAllAnalysis: CompletedProtocolAnalysis =
+  doItAllAnalysis as CompletedProtocolAnalysis
+export const mockQIASeqAnalysis: CompletedProtocolAnalysis =
+  qiaseqAnalysis as unknown as CompletedProtocolAnalysis
 export const mockCommandTextData: CommandTextData = {
   commands: mockRobotSideAnalysis.commands,
   pipettes: mockRobotSideAnalysis.pipettes,

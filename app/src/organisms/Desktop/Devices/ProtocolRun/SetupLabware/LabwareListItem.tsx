@@ -98,10 +98,8 @@ export function LabwareListItem(
     labwareLiquidRenderInfo.some(labware => labware.quantity > 1)
 
   const { i18n, t } = useTranslation('protocol_setup')
-  const [
-    secureLabwareModalType,
-    setSecureLabwareModalType,
-  ] = useState<ModuleType | null>(null)
+  const [secureLabwareModalType, setSecureLabwareModalType] =
+    useState<ModuleType | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isLatchLoading, setIsLatchLoading] = useState<boolean>(false)
   const [isLatchClosed, setIsLatchClosed] = useState<boolean>(false)

@@ -42,9 +42,8 @@ describe('cleanUpUnreachableRobots', () => {
           connectionStore.setConnected(robot.robotName, vi.fn() as any)
         )
     })
-    const unreachableRobots = await cleanUpUnreachableRobots(
-      MOCK_HEALTHY_ROBOTS
-    )
+    const unreachableRobots =
+      await cleanUpUnreachableRobots(MOCK_HEALTHY_ROBOTS)
     expect(unreachableRobots).toEqual(['opentrons-dev3'])
   })
 })

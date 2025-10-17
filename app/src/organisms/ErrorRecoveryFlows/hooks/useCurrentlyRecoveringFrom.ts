@@ -45,32 +45,28 @@ export function useCurrentlyRecoveringFrom(
     }
   }, [isRunInRecoveryMode, host, runId])
 
-  const {
-    data: allCommandsQueryData,
-    isFetching: isAllCommandsFetching,
-  } = useNotifyAllCommandsQuery(
-    runId,
-    { pageLength: 0 }, // pageLength 0 because we only care about the links.
-    {
-      enabled: isRunInRecoveryMode,
-      refetchInterval: ALL_COMMANDS_POLL_MS,
-    }
-  )
+  const { data: allCommandsQueryData, isFetching: isAllCommandsFetching } =
+    useNotifyAllCommandsQuery(
+      runId,
+      { pageLength: 0 }, // pageLength 0 because we only care about the links.
+      {
+        enabled: isRunInRecoveryMode,
+        refetchInterval: ALL_COMMANDS_POLL_MS,
+      }
+    )
   const currentlyRecoveringFromLink =
     allCommandsQueryData?.links.currentlyRecoveringFrom
 
   // TODO(mm, 2024-05-21): When the server supports fetching the
   // currentlyRecoveringFrom command in one step, do that instead of this chained query.
-  const {
-    data: commandQueryData,
-    isFetching: isCommandFetching,
-  } = useCommandQuery(
-    currentlyRecoveringFromLink?.meta.runId ?? null,
-    currentlyRecoveringFromLink?.meta.commandId ?? null,
-    {
-      enabled: currentlyRecoveringFromLink != null && isRunInRecoveryMode,
-    }
-  )
+  const { data: commandQueryData, isFetching: isCommandFetching } =
+    useCommandQuery(
+      currentlyRecoveringFromLink?.meta.runId ?? null,
+      currentlyRecoveringFromLink?.meta.commandId ?? null,
+      {
+        enabled: currentlyRecoveringFromLink != null && isRunInRecoveryMode,
+      }
+    )
 
   // Only mark as ready to show when waterfall fetches are complete
   useEffect(() => {

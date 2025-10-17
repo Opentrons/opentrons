@@ -117,9 +117,8 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     isRunLogLoading,
   } = props
 
-  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
-    robotName
-  )
+  const isRobotOnWrongVersionOfSoftware =
+    useIsRobotOnWrongVersionOfSoftware(robotName)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {

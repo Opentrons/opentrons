@@ -42,9 +42,8 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
     currentVersion: CURRENT_SYSTEM_VERSION,
   })
   const usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
-  let currentBestUsbUpdate:
-    | (ReadyUpdate & { providerName: string })
-    | null = null
+  let currentBestUsbUpdate: (ReadyUpdate & { providerName: string }) | null =
+    null
 
   const updateBestUsbUpdate = (): void => {
     currentBestUsbUpdate = null

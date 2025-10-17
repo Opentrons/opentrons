@@ -18,9 +18,9 @@ from opentrons.protocol_reader import (
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
-from robot_server.data_files.models import DataFile, DataFileSource
+from robot_server.data_files.models import DataFile
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     CompletedAnalysis,

@@ -29,9 +29,8 @@ export function SetupDeckCalibration({
 }: SetupDeckCalibrationProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
-  const { deckCalibrationData, isDeckCalibrated } = useDeckCalibrationData(
-    robotName
-  )
+  const { deckCalibrationData, isDeckCalibrated } =
+    useDeckCalibrationData(robotName)
 
   const calibrateNowButton = (
     <Link to={`/devices/${robotName}/robot-settings/calibration/dashboard`}>

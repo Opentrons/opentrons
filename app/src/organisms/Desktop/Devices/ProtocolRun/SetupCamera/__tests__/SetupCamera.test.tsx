@@ -9,7 +9,7 @@ import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/
 
 import { SetupCamera } from '..'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import type { SetupCameraProps } from '..'
 
 vi.mock(
@@ -26,7 +26,7 @@ const render = (props: SetupCameraProps) => {
 }
 
 describe('SetupCamera', () => {
-  let mockSettings: UseStubCameraUsageSettingsResult
+  let mockSettings: UseCameraUsageSettingsResult
   let mockProps: SetupCameraProps
 
   beforeEach(() => {

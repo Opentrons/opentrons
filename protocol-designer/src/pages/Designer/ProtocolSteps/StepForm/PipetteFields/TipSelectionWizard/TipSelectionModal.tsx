@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Banner,
   Modal,
   PrimaryButton,
   SecondaryButton,
@@ -24,6 +25,8 @@ interface TipSelectionModalProps {
   totalSteps: number
   showBackButton?: boolean
   continueText?: string
+  showPickupsRequiredBanner: boolean
+  numPickupsRemaining: number
 }
 
 export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
@@ -36,6 +39,8 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     continueText,
     currentStepIndex,
     totalSteps,
+    showPickupsRequiredBanner,
+    numPickupsRemaining,
   } = props
   const { t } = useTranslation('tip_selection')
 
@@ -52,6 +57,13 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
 
   const footerElement = (
     <div className={styles.modal_footer}>
+      {showPickupsRequiredBanner ? (
+        <Banner type="error">
+          <StyledText desktopStyle="bodyDefaultRegular">
+            Not enough tips selected ({numPickupsRemaining} pickups remaining)
+          </StyledText>
+        </Banner>
+      ) : null}
       {showBackButton ? (
         <SecondaryButton onClick={onBack}>{t('go_back')}</SecondaryButton>
       ) : null}

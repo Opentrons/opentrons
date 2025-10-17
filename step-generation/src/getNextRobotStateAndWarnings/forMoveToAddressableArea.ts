@@ -15,9 +15,8 @@ export function forMoveToAddressableArea(
 ): void {
   const { pipetteId, addressableAreaName } = params
   const { wasteChuteEntities, trashBinEntities } = invariantContext
-  const addressableAreaInWasteChute = WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
-    addressableAreaName
-  )
+  const addressableAreaInWasteChute =
+    WASTE_CHUTE_ADDRESSABLE_AREAS.includes(addressableAreaName)
   const trashBinId = Object.values(trashBinEntities).find(
     trash =>
       trash.location ===

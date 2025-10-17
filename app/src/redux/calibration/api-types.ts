@@ -22,13 +22,13 @@ export type AffineMatrix = [
   [number, number, number, number],
   [number, number, number, number],
   [number, number, number, number],
-  [number, number, number, number]
+  [number, number, number, number],
 ]
 
 export type AttitudeMatrix = [
   [number, number, number],
   [number, number, number],
-  [number, number, number]
+  [number, number, number],
 ]
 
 export type CalibrationSource =

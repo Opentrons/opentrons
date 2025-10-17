@@ -164,13 +164,10 @@ export function ModuleTableItem({
     calibrationStatus
   )
 
-  const [showHomeStackerWarning, setShowHomeStackerWarning] = useState<boolean>(
-    false
-  )
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showHomeStackerWarning, setShowHomeStackerWarning] =
+    useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const homeStackerWarningModal = (): JSX.Element => {
     return (

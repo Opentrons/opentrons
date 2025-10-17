@@ -23,13 +23,13 @@ export function useLastRunCommand(
       ...options,
       refetchInterval:
         runStatus != null && runIsLive(runStatus)
-          ? options.refetchInterval ?? LIVE_RUN_COMMANDS_POLL_MS
+          ? (options.refetchInterval ?? LIVE_RUN_COMMANDS_POLL_MS)
           : Infinity,
     }
   )
 
   return commandsData?.data?.[0]?.intent !== 'setup'
-    ? commandsData?.data?.[0] ?? null
+    ? (commandsData?.data?.[0] ?? null)
     : null
 }
 

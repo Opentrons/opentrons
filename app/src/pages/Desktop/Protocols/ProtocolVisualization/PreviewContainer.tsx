@@ -32,7 +32,6 @@ interface ContainerProps {
 export function PreviewContainer(props: ContainerProps): JSX.Element {
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
-  const [showDeckRenders, setShowDeckRenders] = useState<boolean>(false)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
 
@@ -45,9 +44,8 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
-    commands
-  )
+  const invariantContextFromRunCommands =
+    constructInvariantContextFromRunCommands(commands)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromRunCommands
@@ -123,8 +121,6 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
         isPlaying={isPlaying}
         commands={commands}
         groupedCommands={groupedCommands}
-        setShowDeckRenders={setShowDeckRenders}
-        showDeckRenders={showDeckRenders}
       />
       <div className={styles.preview_container}>
         <DeckView
@@ -136,7 +132,6 @@ export function PreviewContainer(props: ContainerProps): JSX.Element {
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
           selectedRunTimeCommand={selectedRunTimeCommand}
-          showDeckRenders={showDeckRenders}
         />
         {selectedSlot != null && selectedRunTimeCommand != null ? (
           <SlotDetails
