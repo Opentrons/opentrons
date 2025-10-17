@@ -1,5 +1,7 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, it } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { makeContext } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -9,10 +11,7 @@ import { DestinationLabwareContainer } from '../DestinationLabwareContainer'
 import type { ComponentProps } from 'react'
 import type { LabwareRender } from '@opentrons/components'
 import type { Liquid } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  TimelineFrame,
-} from '@opentrons/step-generation'
+import type { TimelineFrame } from '@opentrons/step-generation'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof LabwareRender>()
@@ -22,9 +21,17 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const mockRobotState = {} as TimelineFrame
+const mockRobotState = {
+  liquidState: {
+    labware: {
+      labware: {
+        A1: { liquidId: { volume: 100 }, liquidId2: { volume: 10 } },
+      },
+    },
+  } as any,
+} as TimelineFrame
 const mockLiquids = [] as Liquid[]
-const mockInvariantContext = {} as InvariantContext
+const mockInvariantContext = makeContext()
 
 const render = (props: ComponentProps<typeof DestinationLabwareContainer>) => {
   return renderWithProviders(<DestinationLabwareContainer {...props} />, {
@@ -38,20 +45,17 @@ describe('DestinationLabwareContainer', () => {
     props = {
       slotId: 'mockSlotId',
       displayName: 'mockDisplayName',
-      labwareId: 'mockLabwareId',
+      labwareId: 'tiprack3Id',
       robotState: mockRobotState,
       liquids: mockLiquids,
       invariantContext: mockInvariantContext,
     }
   })
-  it('render text', () => {
+  it('render text and mock labware render', () => {
     render(props)
     screen.getByText('Destination labware')
+    screen.getByText('mockSlotId')
     screen.getByText('mockDisplayName')
-  })
-
-  it('renders mock labware render', () => {
-    render(props)
     screen.getByText('mock LabwareRender')
   })
 })
