@@ -115,7 +115,7 @@ def test_get_deploy_config_with_env_vars():
     assert sandbox_components.s3_bucket == "opentrons.sandbox.components"
     assert sandbox_components.url == "http://sandbox.components.opentrons.com/"
     assert sandbox_components.cloudfront_id is None
-    
+
     # Components only available in sandbox, so staging and production point to sandbox
     assert staging_components.s3_bucket == "opentrons.sandbox.components"
     assert production_components.s3_bucket == "opentrons.sandbox.components"
