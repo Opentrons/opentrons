@@ -17,13 +17,13 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { NavTab } from '/app/molecules/NavTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
+import { RoundTab } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
 import {
@@ -111,11 +111,11 @@ export function RobotSettings(): JSX.Element | null {
         minHeight="calc(100vh - 3.5rem)"
         width="100%"
       >
-        <Box paddingX={SPACING.spacing16}>
+        <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
           <Box
             color={COLORS.black90}
             css={TYPOGRAPHY.h1Default}
-            padding={`${SPACING.spacing24} 0`}
+            padding={`${SPACING.spacing10} 0`}
           >
             {t('robot_settings')}
           </Box>
@@ -131,31 +131,34 @@ export function RobotSettings(): JSX.Element | null {
               </LegacyStyledText>
             </Banner>
           )}
-          <Flex gridGap={SPACING.spacing16}>
-            <NavTab
+          <Flex gridGap={SPACING.spacing4}>
+            <RoundTab
               to={`/devices/${robotName}/robot-settings/calibration`}
               tabName={t('calibration')}
               disabled={isCalibrationDisabled}
             />
-            <NavTab
+            <RoundTab
               to={`/devices/${robotName}/robot-settings/networking`}
               tabName={t('networking')}
               disabled={isNetworkingDisabled}
             />
             {isCameraEnabled ? (
-              <NavTab
+              <RoundTab
                 to={`/devices/${robotName}/robot-settings/camera`}
                 tabName={t('camera')}
+                disabled={false}
               />
             ) : null}
-            <NavTab
+            <RoundTab
               to={`/devices/${robotName}/robot-settings/advanced`}
               tabName={t('advanced')}
+              disabled={false}
             />
             {devToolsOn ? (
-              <NavTab
+              <RoundTab
                 to={`/devices/${robotName}/robot-settings/feature-flags`}
                 tabName={t('feature_flags')}
+                disabled={false}
               />
             ) : null}
           </Flex>
