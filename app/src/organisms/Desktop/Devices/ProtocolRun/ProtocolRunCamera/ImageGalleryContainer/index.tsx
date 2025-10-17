@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
-
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import { ListTable, StyledText } from '@opentrons/components'
 
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
@@ -12,16 +10,11 @@ import type { UseStubImagesInfoResult } from './hooks/useStubImagesInfo'
 
 export function ImageGalleryContainer(): JSX.Element {
   const imagesInfo = useStubImagesInfo()
-  const { t } = useTranslation('run_details')
-  const { isCameraEnabled } = useCameraUsageSettings()
+
   return (
     <div className={styles.gallery_container}>
       <GalleryHeader imagesCount={imagesInfo.length} />
-      {isCameraEnabled ? (
-        <GalleryContent imagesInfo={imagesInfo} />
-      ) : (
-        <InfoScreen content={t('no_images_available')} />
-      )}
+      <GalleryContent imagesInfo={imagesInfo} />
     </div>
   )
 }

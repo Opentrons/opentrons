@@ -4,12 +4,12 @@ import { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
+  AlertPrimaryButton,
+  BORDERS,
   Box,
-  COLORS,
   DISPLAY_GRID,
   Flex,
   JUSTIFY_FLEX_END,
-  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -87,14 +87,14 @@ export function RunHeaderSectionUpper(
         ) : null}
         <Flex gridGap={SPACING.spacing8}>
           {isCancellableStatus(runStatus) && (
-            <PrimaryButton
-              borderRadius="200px"
+            <AlertPrimaryButton
+              borderRadius={BORDERS.borderRadiusFull}
               onClick={handleCancelRunClick}
               id="RunHeader_cancelRunButton"
-              style={{ backgroundColor: COLORS.red50 }}
+              white-space="nowrap"
             >
               <StyledText as="pSemiBold">{t('cancel_run')}</StyledText>
-            </PrimaryButton>
+            </AlertPrimaryButton>
           )}
           <ActionButton {...props}></ActionButton>
         </Flex>

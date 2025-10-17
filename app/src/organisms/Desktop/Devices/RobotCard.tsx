@@ -17,7 +17,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   WRAP,
 } from '@opentrons/components'
 import {
@@ -151,13 +151,9 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <LegacyStyledText
-        as="h6"
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey60}
-      >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
@@ -179,19 +175,14 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { data } = useCamera()
   return data?.cameraEnabled ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <LegacyStyledText
-        as="h6"
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey60}
-      >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('input_devices')}
-      </LegacyStyledText>
+      </StyledText>
       <Icon
         key={`${String('camera')}_${robotName}`}
         name="photo-camera"
         color={COLORS.grey50}
         size={SPACING.spacing16}
-        marginX={SPACING.spacing4}
       ></Icon>
     </Flex>
   ) : null

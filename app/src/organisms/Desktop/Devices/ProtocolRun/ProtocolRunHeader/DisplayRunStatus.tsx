@@ -24,7 +24,7 @@ const getRunStatusChip = (
     case 'awaiting-recovery':
       return ['error', true, false]
     case 'running':
-      return ['success', true, true, 'small-circle']
+      return ['success', true, true, 'circle']
     case 'succeeded':
       return ['success', true, false]
     default:
@@ -50,6 +50,7 @@ export function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
         hasIcon={icon}
         pulseIcon={pulse}
         iconName={iconName}
+        chipSize={'small'}
       />
     </Flex>
   )
