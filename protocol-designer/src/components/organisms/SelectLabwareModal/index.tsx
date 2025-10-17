@@ -19,8 +19,6 @@ import {
   JUSTIFY_END,
   Modal,
   OVERFLOW_AUTO,
-  OVERFLOW_HIDDEN,
-  OVERFLOW_SCROLL,
   PrimaryButton,
   SecondaryButton,
   SPACING,
