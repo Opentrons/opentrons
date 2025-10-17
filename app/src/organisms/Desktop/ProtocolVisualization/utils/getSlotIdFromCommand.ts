@@ -32,14 +32,12 @@ export const getSlotIdFromCommand = (
     }
   }
 
-  // For aspirateInPlace/dispenseInPlace, look for labwareId in previous moveToWell commands
   if (
     (command.commandType === 'aspirateInPlace' ||
       command.commandType === 'dispenseInPlace') &&
     commands != null &&
     currentCommandIndex != null
   ) {
-    // Search backwards for the most recent moveToWell command with labwareId
     for (let i = currentCommandIndex - 1; i >= 0; i--) {
       const prevCommand = commands[i]
       if (
