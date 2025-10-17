@@ -15,6 +15,7 @@ on:
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
       - 'scripts/static-deploy/**'
+      - 'scripts/git-version-protocol-designer.mjs'
   push:
     branches:
       - 'edge'
