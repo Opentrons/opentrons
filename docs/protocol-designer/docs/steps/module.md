@@ -80,7 +80,7 @@ In the Heater-Shaker step form, set the heater or shaker functions to **On** and
 
 Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. 
 
-If your Heater-Shaker Step doesn't include a set time, Protocol Designer will ask if you'd like to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
+If your Heater-Shaker step doesn't include a set time, Protocol Designer will ask if you'd like to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
 
 <figure class="screenshot" markdown>
   ![Heater-Shaker pause](../images/heater_shaker_pause.png)
