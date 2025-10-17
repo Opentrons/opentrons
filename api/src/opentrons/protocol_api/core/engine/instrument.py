@@ -1509,6 +1509,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Execute a distribution using liquid class properties.
 
@@ -1591,7 +1592,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 trash_location=trash_location,
                 return_tip=return_tip,
                 keep_last_tip=keep_last_tip,
+                selected_tips=selected_tips,
             )
+
+        prioritized_tips_to_pick_up = (
+            None if selected_tips is None else copy(selected_tips)
+        )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1621,7 +1627,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip != TransferTipPolicyV2.NEVER:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks,
+                starting_tip,
+                tiprack_uri_for_transfer_props,
+                prioritized_tips_to_pick_up,
             )
 
         tip_contents = [
@@ -1689,7 +1698,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    prioritized_tips_to_pick_up,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1795,6 +1807,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Execute consolidate using liquid class properties.
 
@@ -1845,6 +1858,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 'Blowout location "source" incompatible with consolidate liquid.'
                 ' Please choose "destination" or "trash".'
             )
+        prioritized_tips_to_pick_up = (
+            None if selected_tips is None else copy(selected_tips)
+        )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1873,7 +1889,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip in [TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS]:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks,
+                starting_tip,
+                tiprack_uri_for_transfer_props,
+                prioritized_tips_to_pick_up,
             )
 
         aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
@@ -1906,7 +1925,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    prioritized_tips_to_pick_up,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -2005,6 +2027,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
+        next_tip: Optional[NextTipInfo]
         if selected_tips is not None:
             # TODO also figure out what to do if we run out here
             tip_core = selected_tips.pop(0)

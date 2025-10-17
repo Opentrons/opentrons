@@ -2056,7 +2056,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in selected_tips],
+                selected_tips=[tip._core for tip in selected_tips]
+                if selected_tips is not None
+                else None,
             )
 
         return self
@@ -2078,6 +2080,7 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
+        selected_tips: Optional[List[labware.Well]] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -2148,6 +2151,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+            selected_tips=selected_tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2210,6 +2214,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                selected_tips=[tip._core for tip in selected_tips]
+                if selected_tips is not None
+                else None,
             )
 
         return self
@@ -2231,6 +2238,7 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
+        selected_tips: Optional[List[labware.Well]] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2302,6 +2310,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+            selected_tips=selected_tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2363,6 +2372,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                selected_tips=[tip._core for tip in selected_tips]
+                if selected_tips is not None
+                else None,
             )
 
         return self

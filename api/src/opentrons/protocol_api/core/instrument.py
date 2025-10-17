@@ -400,6 +400,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[WellCoreType]],
     ) -> None:
         """
         Distribute a liquid from single source to multiple destinations
@@ -420,6 +421,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[WellCoreType]],
     ) -> None:
         """
         Consolidate liquid from multiple sources to a single destination
