@@ -25,29 +25,25 @@ export const versionFromTag = tag => {
 }
 
 export async function getTagsPointingAtHead() {
-    const allTags = []
+    try {
+        const tags = (
+            await monorepoGit().raw([
+                'tag',
+                '--points-at',
+                'HEAD',
+                '--list',
+                ...TAG_PREFIXES.map(prefix => `${prefix}*`),
+            ])
+        ).trim()
 
-    for (const prefix of TAG_PREFIXES) {
-        try {
-            const tags = (
-                await monorepoGit().raw([
-                    'tag',
-                    '--points-at',
-                    'HEAD',
-                    '--list',
-                    `${prefix}*`,
-                ])
-            ).trim()
-
-            if (tags) {
-                allTags.push(...tags.split('\n').filter(t => t.length > 0))
-            }
-        } catch (error) {
-            continue
+        if (tags) {
+            return tags.split('\n').filter(t => t.length > 0)
         }
+    } catch (error) {
+        // No tags found or git error
     }
 
-    return allTags
+    return []
 }
 
 export async function getCurrentBranchName() {
@@ -110,52 +106,51 @@ export async function getLatestTag() {
     const gitClient = monorepoGit()
     const candidates = []
 
-    // Get all tags reachable from HEAD for each prefix
-    for (const prefix of TAG_PREFIXES) {
-        try {
-            const tagsOutput = (
-                await gitClient.raw([
-                    'tag',
-                    '--merged',
-                    'HEAD',
-                    '--list',
-                    `${prefix}*`,
-                ])
-            ).trim()
+    // Get all tags reachable from HEAD (all prefixes in one call)
+    try {
+        const tagsOutput = (
+            await gitClient.raw([
+                'tag',
+                '--merged',
+                'HEAD',
+                '--list',
+                ...TAG_PREFIXES.map(prefix => `${prefix}*`),
+            ])
+        ).trim()
 
-            if (tagsOutput.length === 0) {
+        if (tagsOutput.length === 0) {
+            throw new Error(`No matching tags found for ${PROJECT}.`)
+        }
+
+        const tags = tagsOutput.split('\n').filter(t => t.length > 0)
+
+        // Parse version from each tag and add to candidates
+        for (const tag of tags) {
+            try {
+                const version = versionFromTag(tag)
+                const parsedVersion = semver.parse(version)
+
+                if (parsedVersion != null) {
+                    // Determine which prefix this tag uses
+                    const prefix = TAG_PREFIXES.find(p => tag.startsWith(p))
+                    
+                    candidates.push({
+                        tag,
+                        version: parsedVersion,
+                        prefix,
+                    })
+                }
+            } catch (error) {
+                // Skip tags that don't have valid semver
                 continue
             }
-
-            const tags = tagsOutput.split('\n').filter(t => t.length > 0)
-
-            // Parse version from each tag and add to candidates
-            for (const tag of tags) {
-                try {
-                    const version = versionFromTag(tag)
-                    const parsedVersion = semver.parse(version)
-
-                    if (parsedVersion != null) {
-                        candidates.push({
-                            tag,
-                            version: parsedVersion,
-                            prefix,
-                        })
-                    }
-                } catch (error) {
-                    // Skip tags that don't have valid semver
-                    continue
-                }
-            }
-        } catch (error) {
-            continue
         }
+    } catch (error) {
+        throw new Error(`No matching tags found for ${PROJECT}.`)
     }
 
     if (candidates.length === 0) {
-        throw new Error(
-            `No matching tags found for ${PROJECT}.`
-        )
+        throw new Error(`No matching tags found for ${PROJECT}.`)
     }
 
     // Sort by semantic version (highest first), then by prefix priority
