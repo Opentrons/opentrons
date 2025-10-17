@@ -1,9 +1,8 @@
 'use strict'
 
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import git from 'simple-git'
-import semver from 'semver'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
@@ -12,13 +11,10 @@ export function monorepoGit() {
 }
 
 export const detailsFromTag = tag => {
-    if (tag.includes('@')) {
-        const parts = tag.split('@')
-        // Handle staging- prefix by removing it from the project name
-        const project = parts[0].replace(/^staging-/, '')
-        return [project, parts[1]]
-    }
-    return ['robot-stack', tag.substring(1)]
+    const parts = tag.split('@')
+    // Handle staging- prefix by removing it from the project name
+    const project = parts[0].replace(/^staging-/, '')
+    return [project, parts[1]]
 }
 
 export function tagFromDetails(project, version) {
@@ -27,17 +23,11 @@ export function tagFromDetails(project, version) {
 }
 
 export function prefixForProject(project) {
-    if (project === 'robot-stack') {
-        return 'v'
-    } else {
-        return `${project}@`
-    }
+    return `${project}@`
 }
 
 export function prefixesForProject(project) {
-    if (project === 'robot-stack') {
-        return ['v']
-    } else if (project === 'protocol-designer') {
+    if (project === 'protocol-designer') {
         // Order matters: protocol-designer@ tags take precedence over staging-protocol-designer@ tags
         return [`${project}@`, `staging-${project}@`]
     } else {
@@ -128,134 +118,68 @@ export function getTimestamp() {
     return `${year}${month}${day}-${hours}${minutes}${seconds}`
 }
 
-export function getBuildIdentifier() {
-    const timestamp = getTimestamp()
-    const runId = process.env.GITHUB_RUN_ID
-
-    if (runId) {
-        return `${timestamp}-RUN_ID-${runId}`
-    }
-
-    return timestamp
-}
-
 export async function latestTagForProject(project) {
-    const isCI = process.env.CI === 'true'
-    if (isCI) {
-        console.log(`[git-version2] Running in CI environment`)
-        console.log(`[git-version2] GITHUB_REF: ${process.env.GITHUB_REF}`)
-        console.log(`[git-version2] GITHUB_REF_NAME: ${process.env.GITHUB_REF_NAME}`)
-        console.log(`[git-version2] GITHUB_REF_TYPE: ${process.env.GITHUB_REF_TYPE}`)
-        console.log(`[git-version2] GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF}`)
-    }
+    const gitClient = monorepoGit()
+    const prefixes = prefixesForProject(project)
+    const candidates = []
 
-    const tagsAtHead = await getTagsPointingAtHead(project)
+    for (const prefix of prefixes) {
+        try {
+            const tag = (
+                await gitClient
+                    .raw([
+                        'describe',
+                        '--tags',
+                        '--abbrev=0',
+                        `--match=${prefix}*`,
+                    ])
+            ).trim()
 
-    if (tagsAtHead.length > 0) {
-        const prefixes = prefixesForProject(project)
-        const tagsByPrefix = {}
+            if (tag.length === 0) {
+                continue
+            }
 
-        for (const prefix of prefixes) {
-            const prefixWithoutAt = prefix.replace(/@$/, '')
-            const matchingTags = tagsAtHead.filter(tag => {
-                return tag.startsWith(prefixWithoutAt + '@') || tag.startsWith(prefixWithoutAt) && !tag.includes('@')
+            const distanceOutput = (
+                await gitClient.raw([
+                    'rev-list',
+                    `${tag}..HEAD`,
+                    '--count',
+                ])
+            ).trim()
+
+            const distance = Number.parseInt(distanceOutput, 10)
+
+            candidates.push({
+                tag,
+                distance: Number.isNaN(distance) ? Number.POSITIVE_INFINITY : distance,
+                prefix,
             })
-            if (matchingTags.length > 0) {
-                tagsByPrefix[prefix] = matchingTags
-            }
+        } catch (error) {
+            continue
         }
-
-        // Iterate prefixes in priority order
-        for (const prefix of prefixes) {
-            const matchingTags = tagsByPrefix[prefix]
-            if (matchingTags && matchingTags.length > 0) {
-                if (matchingTags.length === 1) {
-                    return matchingTags[0]
-                }
-
-                const taggedVersions = matchingTags.map(tag => {
-                    const [, version] = detailsFromTag(tag)
-                    return {
-                        tag,
-                        version,
-                        parsed: semver.valid(version) ? version : semver.coerce(version)
-                    }
-                })
-
-                const validVersions = taggedVersions.filter(tv => tv.parsed !== null)
-                if (validVersions.length > 0) {
-                    validVersions.sort((a, b) => semver.rcompare(a.parsed, b.parsed))
-                    return validVersions[0].tag
-                }
-
-                return taggedVersions[0].tag
-            }
-        }
-
-        return tagsAtHead[0]
     }
 
-    const branchName = await getCurrentBranchName()
-    if (isCI) {
-        console.log(`[git-version2] Branch name from getCurrentBranchName: ${branchName}`)
+    if (candidates.length === 0) {
+        throw new Error(
+            `No matching tags found for project ${project}.`
+        )
     }
 
-    if (branchName) {
-        const buildId = getBuildIdentifier()
-        const versionString = `${branchName}-${buildId}`
-        const fullVersion = `${prefixForProject(project)}${versionString}`
-
-        if (isCI) {
-            console.log(`[git-version2] Build identifier: ${buildId}`)
-            console.log(`[git-version2] Final version string: ${fullVersion}`)
+    candidates.sort((a, b) => {
+        if (a.distance !== b.distance) {
+            return a.distance - b.distance
         }
 
-        return fullVersion
-    }
+        return prefixes.indexOf(a.prefix) - prefixes.indexOf(b.prefix)
+    })
 
-    try {
-        const prefix = prefixForProject(project)
-        const described = (
-            await monorepoGit().raw([
-                'describe',
-                '--tags',
-                '--abbrev=10',
-                `--match=${prefix}*`,
-            ])
-        ).trim()
-
-        if (described) {
-            console.warn(`Using git describe fallback for ${project}: ${described}`)
-            return described
-        }
-    } catch (error) {
-        // Ignore - will throw below
-    }
-
-    throw new Error(
-        `No tags found at HEAD for project ${project} and no branch name available. ` +
-        `Env vars: GITHUB_REF_NAME=${process.env.GITHUB_REF_NAME}, ` +
-        `GITHUB_HEAD_REF=${process.env.GITHUB_HEAD_REF}, ` +
-        `CI_COMMIT_REF_NAME=${process.env.CI_COMMIT_REF_NAME}`
-    )
+    return candidates[0].tag
 }
 
 export async function versionForProject(project) {
     return latestTagForProject(project)
         .then(tag => {
             const [, version] = detailsFromTag(tag)
-            
-            // For branch builds (contains timestamp or RUN_ID), return full tag
-            if (version.includes('-RUN_ID-') || /\d{8}-\d{6}/.test(version)) {
-                return tag
-            }
-            
-            // For staging tags, return full tag
-            if (tag.startsWith('staging-')) {
-                return tag
-            }
-            
-            // For production tags, return just the version
             return version
         })
         .catch(error => {
