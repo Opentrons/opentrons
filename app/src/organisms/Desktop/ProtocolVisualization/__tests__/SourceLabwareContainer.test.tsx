@@ -8,6 +8,11 @@ import { SourceLabwareContainer } from '../SourceLabwareContainer'
 
 import type { ComponentProps } from 'react'
 import type { LabwareRender } from '@opentrons/components'
+import type { Liquid } from '@opentrons/shared-data'
+import type {
+  InvariantContext,
+  TimelineFrame,
+} from '@opentrons/step-generation'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof LabwareRender>()
@@ -16,6 +21,10 @@ vi.mock('@opentrons/components', async importOriginal => {
     LabwareRender: () => <div>mock LabwareRender</div>,
   }
 })
+
+const mockRobotState = {} as TimelineFrame
+const mockLiquids = [] as Liquid[]
+const mockInvariantContext = {} as InvariantContext
 
 const render = (props: ComponentProps<typeof SourceLabwareContainer>) => {
   return renderWithProviders(<SourceLabwareContainer {...props} />, {
