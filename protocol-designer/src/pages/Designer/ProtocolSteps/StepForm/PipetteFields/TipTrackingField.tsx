@@ -14,6 +14,7 @@ import { AUTOMATIC, MANUAL } from '@opentrons/step-generation'
 import { TipSelectionWizard } from './TipSelectionWizard'
 import styles from './tiptrackingfield.module.css'
 
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { TipTrackingOption } from '@opentrons/step-generation'
 import type { FieldPropsByName } from '../types'
 
@@ -98,6 +99,8 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
         <TipSelectionWizard
           setShowTipSelectionModal={setShowTipSelectionModal}
           formTiprackUri={propsForFields.tipRack.value as string}
+          pipetteId={propsForFields.pipette.value as string}
+          nozzles={propsForFields.nozzles.value as NozzleConfigurationStyle}
         />
       )}
     </Flex>

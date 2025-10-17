@@ -104,7 +104,7 @@ class DispenseWhileTrackingImplementation(
         end_point = self._state_view.geometry.get_well_position(
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.trackFromLocation,
+            well_location=params.trackToLocation,
             operation_volume=params.volume,
             pipette_id=params.pipetteId,
         )

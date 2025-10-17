@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { StyledText } from '@opentrons/components'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 import { CameraControls } from './CameraControls'
 import { CameraEnableSetting } from './CameraEnableSetting'
@@ -30,7 +30,7 @@ export function CameraSettings({
     isLiveVideoEnabled,
     isRecoveryCaptureEnabled,
     toggleRecoveryCaptureEnabled,
-  } = useStubCameraUsageSettings()
+  } = useCameraUsageSettings()
 
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {

@@ -30,7 +30,7 @@ import {
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
-import { useStubCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
@@ -212,7 +212,7 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
-  const cameraSettings = useStubCameraUsageSettings()
+  const cameraSettings = useCameraUsageSettings()
 
   if (robot == null) {
     return null

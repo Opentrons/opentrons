@@ -713,6 +713,13 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        // tip selection wizard fields
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -1094,6 +1101,12 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -1188,6 +1201,12 @@ describe('_getSavedMultiSelectFieldValues', () => {
         tip_tracking: {
           isIndeterminate: false,
           value: undefined,
+        },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
         },
       })
     })
@@ -1300,6 +1319,12 @@ describe('_getSavedMultiSelectFieldValues', () => {
         tip_tracking: {
           isIndeterminate: false,
           value: undefined,
+        },
+        tiprack_selected: {
+          isIndeterminate: false,
+        },
+        tips_selected: {
+          isIndeterminate: false,
         },
       })
     })
