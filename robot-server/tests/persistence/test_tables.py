@@ -139,8 +139,20 @@ EXPECTED_STATEMENTS_LATEST = [
         file_hash VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,
         source VARCHAR(9),
-        PRIMARY KEY (id)
+        mime_type VARCHAR NOT NULL,
+        run_id VARCHAR,
+        command_id VARCHAR,
+        prev_command_id VARCHAR,
+        failed_command_id VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
     )
+    """,
+    """
+    CREATE INDEX ix_data_files_run_id ON data_files (run_id)
+    """,
+    """
+    CREATE INDEX ix_data_files_run_id_mime_type_created_at ON data_files (run_id, mime_type, created_at)
     """,
     """
     CREATE TABLE run_csv_rtp_table (

@@ -8,7 +8,7 @@ Summary of changes from schema 13:
 
 from pathlib import Path
 
-from ._util import copy_contents, add_column
+from ._util import copy_contents
 from .._folder_migrator import Migration
 import sqlalchemy
 from ..database import sql_engine_ctx
@@ -23,46 +23,15 @@ class Migration12to13(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 12 to 13."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(dest_dir / DB_FILE) as engine:
-            with engine.begin() as transaction:
-                assert (
-                    schema_11.boolean_setting_table.name
-                    != schema_13.boolean_setting_table.name
-                )
-                _migrate_boolean_settings_table(transaction)
-
-            add_column(
-                engine,
-                schema_13.data_files_table.name,
-                schema_13.data_files_table.c.run_id,
+        with sql_engine_ctx(
+            dest_dir / DB_FILE
+        ) as engine, engine.begin() as transaction:
+            assert (
+                schema_11.boolean_setting_table.name
+                != schema_13.boolean_setting_table.name
             )
-
-            add_column(
-                engine,
-                schema_13.data_files_table.name,
-                schema_13.data_files_table.c.mime_type,
-            )
-
-            add_column(
-                engine,
-                schema_13.data_files_table.name,
-                schema_13.data_files_table.c.command_id,
-            )
-
-            add_column(
-                engine,
-                schema_13.data_files_table.name,
-                schema_13.data_files_table.c.prev_command_id,
-            )
-
-            add_column(
-                engine,
-                schema_13.data_files_table.name,
-                schema_13.data_files_table.c.failed_command_id,
-            )
-
-            with engine.begin() as transaction:
-                _populate_mime_type_for_existing_files(transaction)
+            _migrate_boolean_settings_table(transaction)
+            _migrate_data_files_table(transaction)
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
@@ -97,25 +66,35 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
     schema_11.boolean_setting_table.drop(connection)
 
 
-def _populate_mime_type_for_existing_files(
-    connection: sqlalchemy.engine.Connection,
-) -> None:
-    """Populate mime_type for existing data files based on file extension.
+def _migrate_data_files_table(connection: sqlalchemy.engine.Connection) -> None:
+    """Migrate data_files table to add new columns with proper constraints."""
+    # Read all existing data from old table
+    old_data_files = connection.execute(
+        sqlalchemy.select(schema_11.data_files_table)
+    ).fetchall()
 
-    Files ending in .jpeg get IMAGE_JPEG mime type, all others get TEXT_CSV.
-    """
-    connection.execute(
-        sqlalchemy.text(
-            "UPDATE data_files "
-            "SET mime_type = :mime_type "
-            "WHERE mime_type IS NULL AND name LIKE '%.jpeg'"
-        ),
-        {"mime_type": MimeType.IMAGE_JPEG.value},
-    )
+    schema_11.data_files_table.drop(connection)
+    schema_13.data_files_table.create(connection)
 
-    connection.execute(
-        sqlalchemy.text(
-            "UPDATE data_files " "SET mime_type = :mime_type " "WHERE mime_type IS NULL"
-        ),
-        {"mime_type": MimeType.TEXT_CSV.value},
-    )
+    for old_row in old_data_files:
+        # Determine mime_type based on file extension
+        mime_type = (
+            MimeType.IMAGE_JPEG.value
+            if old_row.name.endswith(".jpeg")
+            else MimeType.TEXT_CSV.value
+        )
+
+        connection.execute(
+            sqlalchemy.insert(schema_13.data_files_table).values(
+                id=old_row.id,
+                name=old_row.name,
+                file_hash=old_row.file_hash,
+                created_at=old_row.created_at,
+                source=old_row.source,
+                mime_type=mime_type,
+                run_id=None,
+                command_id=None,
+                prev_command_id=None,
+                failed_command_id=None,
+            )
+        )
