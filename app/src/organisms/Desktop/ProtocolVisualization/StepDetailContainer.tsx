@@ -4,7 +4,10 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 import { LabwareSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/LabwareSlotDetails'
 // eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
 import { ModuleSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/ModuleSlotDetails'
-import { getActiveSlotForLabwareDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/utils'
+import {
+  getActiveSlotForLabwareDetails,
+  getActiveSlotForTiprackDetails,
+} from '/app/pages/Desktop/Protocols/ProtocolVisualization/utils'
 
 import { PipetteContainer } from './PipetteContainer'
 import styles from './stepdetailcontainer.module.css'
@@ -33,17 +36,28 @@ export function StepDetailContainer({
 }: StepDetailContainerProps): JSX.Element {
   const { labwareEntities, pipetteEntities } = invariantContext
   const { labware, modules, pipettes } = robotState
-  console.log('for tiprack use getActiveSlotForTiprackDetails')
-  const activeSlot = getActiveSlotForLabwareDetails(
+  const tiprackActiveSlot = getActiveSlotForTiprackDetails(
+    Object.values(pipettes),
+    robotState,
+    invariantContext
+  )
+  const tiprackStack =
+    tiprackActiveSlot != null
+      ? getFullStackFromLabwares(labware, tiprackActiveSlot)
+      : []
+  const labwareActiveSlot = getActiveSlotForLabwareDetails(
     Object.values(pipettes),
     robotState,
     invariantContext,
     currentCommand
   )
   const stackOfLabwareOnSlot =
-    activeSlot != null ? getFullStackFromLabwares(labware, activeSlot) : []
+    labwareActiveSlot != null
+      ? getFullStackFromLabwares(labware, labwareActiveSlot)
+      : []
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
+  const tiprackOnSlot = tiprackStack.length > 1 ? tiprackStack[0] : null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -56,7 +70,7 @@ export function StepDetailContainer({
 
   const { moduleEntities } = invariantContext
   const moduleOnSlot = Object.entries(modules ?? {}).find(
-    ([_, module]) => module.slot === activeSlot
+    ([_, module]) => module.slot === labwareActiveSlot
   )
 
   const leftPipetteId =
@@ -95,7 +109,13 @@ export function StepDetailContainer({
           selected={isRightPipetteActive}
         />
       ) : null}
-      <TipPickupContainer protocolKey={protocolKey} />
+      {tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null ? (
+        <TipPickupContainer
+          protocolKey={protocolKey}
+          tiprackEntity={labwareEntities[tiprackOnSlot]}
+          robotState={robotState}
+        />
+      ) : null}
       {topMostLabwareOnSlot != null ? (
         <LabwareSlotDetails
           topLabwareOnSlotId={topMostLabwareOnSlot}
@@ -107,10 +127,6 @@ export function StepDetailContainer({
           pipetteEntities={pipetteEntities}
         />
       ) : null}
-      {/* <SourceWellViewContainer protocolKey={protocolKey} />
-      <SourceLabwareContainer protocolKey={protocolKey} />
-      <DestinationWellViewContainer protocolKey={protocolKey} />
-      <DestinationLabwareContainer protocolKey={protocolKey} /> */}
       <TipDisposalContainer protocolKey={protocolKey} />
       {moduleOnSlot != null ? (
         <ModuleSlotDetails

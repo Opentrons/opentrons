@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 
-import { COLORS, StyledText } from '@opentrons/components'
+import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 import { getMmFromBottom } from '@opentrons/shared-data'
 
 import styles from './preview.module.css'
@@ -42,6 +43,7 @@ export function ActiveWellSlotDetails(
     labwareLocationLiquidState,
     tipMaxVolume,
   } = props
+  const { t } = useTranslation('protocol_visualization')
 
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
@@ -82,50 +84,53 @@ export function ActiveWellSlotDetails(
       : 0
   return (
     <>
-      <div className={styles.slot_details_active_step}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {`Well ${activeWellName}`}
-        </StyledText>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <Tag text={t('well_view')} type="default" shrinkToContent />
+          <RobotInfoLabel
+            deckLabel={t('well_name', { wellName: activeWellName })}
+          />
+        </div>
       </div>
       <div>
-        <div className={styles.well_details_speed_container}>
-          {'speed' in params ? (
-            <div className={styles.well_details_speed}>
-              <StyledText desktopStyle="bodyDefaultRegular">Speed</StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">{`${params.speed} mm/s`}</StyledText>
+        <div className={styles.main_content}>
+          <div className={styles.well_detail_svg_positioning}>
+            <div className={styles.well_detail_svg_container}>
+              <TipSvg
+                volume={tipCurrentVolume}
+                maxVolume={tipMaxVolume}
+                roundedXPositionPixels={roundedXPositionPixels}
+                bottomPx={bottomPx}
+                color={tipColor}
+              />
+              <WellSvg
+                volume={totalVolumeInWell}
+                maxVolume={labwareWellMaxVolume}
+                color={wellColor}
+              />
+              {labwareDepth !== null && (
+                <div className={styles.well_details_caption_side}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {round(labwareDepth, 0)}
+                    mm
+                  </StyledText>
+                </div>
+              )}
+              {xLabwareWellWidth !== null && (
+                <div className={styles.well_details_caption_bottom}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {xLabwareWellWidth}
+                    mm
+                  </StyledText>
+                </div>
+              )}
             </div>
-          ) : null}
-        </div>
-        <div className={styles.well_detail_svg_positioning}>
-          <div className={styles.well_detail_svg_container}>
-            <TipSvg
-              volume={tipCurrentVolume}
-              maxVolume={tipMaxVolume}
-              roundedXPositionPixels={roundedXPositionPixels}
-              bottomPx={bottomPx}
-              color={tipColor}
-            />
-            <WellSvg
-              volume={totalVolumeInWell}
-              maxVolume={labwareWellMaxVolume}
-              color={wellColor}
-            />
-            {labwareDepth !== null && (
-              <div className={styles.well_details_caption_side}>
-                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {round(labwareDepth, 0)}
-                  mm
-                </StyledText>
-              </div>
-            )}
-            {xLabwareWellWidth !== null && (
-              <div className={styles.well_details_caption_bottom}>
-                <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                  {xLabwareWellWidth}
-                  mm
-                </StyledText>
-              </div>
-            )}
           </div>
         </div>
       </div>

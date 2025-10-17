@@ -394,3 +394,29 @@
   background-color: var(--white);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
+
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
+}

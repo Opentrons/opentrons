@@ -1,23 +1,22 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   COLORS,
-  Divider,
   LabwareRender,
-  LiquidIcon,
+  RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
   Tag,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
-import { wellFillFromWellContents } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  wellFillFromWellContents,
+} from '@opentrons/step-generation'
 
 import { ActiveWellSlotDetails } from './ActiveWellSlotDetails'
 import styles from './preview.module.css'
-import {
-  getAllWellContentsAtFrame,
-  getChannels,
-  getLiquidDetailInfo,
-  getMissingTips,
-} from './utils'
+import { getAllWellContentsAtFrame, getChannels } from './utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -48,6 +47,8 @@ export function LabwareSlotDetails(
     robotState,
     pipetteEntities,
   } = props
+  const { t } = useTranslation('protocol_visualization')
+  const { labware } = robotState
   const labwareLoadCommand = Object.values(commands).find(
     command =>
       'labwareId' in command.result &&
@@ -56,6 +57,7 @@ export function LabwareSlotDetails(
   const pipetteTemporalProperties = Object.entries(robotState.pipettes).find(
     ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
   )
+  const slot = getSlotInLocationStack(labware[topLabwareOnSlotId].stack)
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname =
@@ -91,8 +93,6 @@ export function LabwareSlotDetails(
         }
       : null
   const { wells } = labwareDef
-  const missingTips = getMissingTips(robotState.tipState, topLabwareOnSlotId)
-  const liquidInfo = getLiquidDetailInfo(wellContents, liquids)
 
   const pipetteLocationLiquidState =
     pipetteTemporalProperties != null
@@ -121,74 +121,47 @@ export function LabwareSlotDetails(
 
   return (
     <>
-      <div>
-        <div className={styles.slot_details_active_step}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">
+      {activeWellName != null ? (
+        <ActiveWellSlotDetails
+          wells={wells}
+          params={params}
+          activeWellName={activeWellName}
+          wellColor={wellFill[activeWellName]}
+          labwareLocationLiquidState={labwareLocationLiquidState}
+          pipetteLocationLiquidState={pipetteLocationLiquidState}
+          liquids={liquids}
+          tipMaxVolume={tipMaxVolume}
+        />
+      ) : null}
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <Tag text={t('labware')} type="default" shrinkToContent />
+          <RobotInfoLabel deckLabel={slot} />
+        </div>
+        <div className={styles.subheader}>
+          <StyledText desktopStyle="captionSemiBold">
             {labwareNickname != null ? labwareNickname : labwareDisplayName}
           </StyledText>
-          {labwareNickname !== labwareDisplayName ? (
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {labwareDisplayName}
-            </StyledText>
-          ) : null}
         </div>
-        <div className={styles.labware_details_all_liquids_container}>
-          <div className={styles.labware_details_all_liquids}>
-            {liquidInfo.map((liquid, index) => {
-              return (
-                <div
-                  key={`${liquid.displayName}_liquid_${index}`}
-                  className={styles.labware_details_liquid_info_container}
-                >
-                  <div className={styles.labware_details_liquid_info}>
-                    <LiquidIcon color={liquid.color} />
-                    <StyledText desktopStyle="captionRegular">
-                      {liquid.displayName}
-                    </StyledText>
-                  </div>
-                  <Tag text={`${liquid.totalVolume} µL`} type="default" />
-                </div>
-              )
-            })}
-          </div>
-          <div className={styles.labware_details_labware_display}>
-            <RobotWorkSpace
-              key={topLabwareOnSlotId}
-              width="14rem"
-              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
-            >
-              {() => (
-                <g>
-                  <LabwareRender
-                    definition={labwareDef}
-                    positioningMode="passThrough"
-                    wellFill={wellFill}
-                    missingTips={missingTips}
-                    highlightedWells={wellGroup}
-                  />
-                </g>
-              )}
-            </RobotWorkSpace>
-          </div>
+        <div className={styles.main_content}>
+          <RobotWorkSpace
+            key={topLabwareOnSlotId}
+            width="14rem"
+            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
+          >
+            {() => (
+              <g>
+                <LabwareRender
+                  definition={labwareDef}
+                  positioningMode="passThrough"
+                  wellFill={wellFill}
+                  highlightedWells={wellGroup}
+                />
+              </g>
+            )}
+          </RobotWorkSpace>
         </div>
       </div>
-      <Divider />
-      {activeWellName != null ? (
-        channels === 1 ? (
-          <ActiveWellSlotDetails
-            wells={wells}
-            params={params}
-            activeWellName={activeWellName}
-            wellColor={wellFill[activeWellName]}
-            labwareLocationLiquidState={labwareLocationLiquidState}
-            pipetteLocationLiquidState={pipetteLocationLiquidState}
-            liquids={liquids}
-            tipMaxVolume={tipMaxVolume}
-          />
-        ) : (
-          <div>TODO: support multi-channel</div>
-        )
-      ) : null}
     </>
   )
 }

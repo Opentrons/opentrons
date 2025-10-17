@@ -297,7 +297,8 @@ export const getActiveSlotForLabwareDetails = (
   currentCommand: RunTimeCommand
 ): DeckSlot | null => {
   const { labware } = robotState
-  const { trashBinEntities, wasteChuteEntities } = invariantContext
+  const { trashBinEntities, wasteChuteEntities, labwareEntities } =
+    invariantContext
   const entityUnderPipette = pipettes.find(
     pipette => pipette.entityId != null
   )?.entityId
@@ -311,7 +312,11 @@ export const getActiveSlotForLabwareDetails = (
       wasteChuteEntities
     )
   } else if ('labwareId' in currentCommand.params) {
-    slot = currentCommand.params.labwareId
+    const isTiprack =
+      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
+    if (!isTiprack) {
+      slot = currentCommand.params.labwareId
+    }
   }
 
   return slot
