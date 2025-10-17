@@ -89,6 +89,16 @@ export function VisualizerContainer(
     invariantContextFromRunCommands
   )
 
+  // Get robot state before current command (for displaying source liquids before aspirate)
+  const previousCommandsSlice = commands.slice(0, selectedCommandIndex)
+  const previousFrame =
+    previousCommandsSlice.length > 0
+      ? getResultingTimelineFrameFromRunCommands(
+          previousCommandsSlice,
+          invariantContextFromRunCommands
+        ).frame
+      : frame
+
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }
@@ -113,6 +123,7 @@ export function VisualizerContainer(
   }, [isPlaying, commands])
 
   const { robotState } = frame
+  const previousRobotState = previousFrame.robotState
   const selectedRunTimeCommand = commands.find(
     command => command.id === selectedCommandId
   )
@@ -296,9 +307,11 @@ export function VisualizerContainer(
           commands={commands}
           selectedSlot={selectedSlot}
           robotState={robotState}
+          previousRobotState={previousRobotState}
           invariantContext={invariantContext}
           selectedRunTimeCommand={selectedRunTimeCommand}
           currentCommandIndex={selectedCommandIndex}
+          liquids={liquids}
         />
       </div>
     </div>

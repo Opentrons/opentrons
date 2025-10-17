@@ -13,7 +13,7 @@ import { TipDisposalContainer } from './TipDisposalContainer'
 import { TipPickupContainer } from './TipPickupContainer'
 import { getSlotIdFromCommand } from './utils/getSlotIdFromCommand'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 interface StepDetailContainerProps {
@@ -21,9 +21,11 @@ interface StepDetailContainerProps {
   commands: RunTimeCommand[]
   selectedSlot: string | null
   robotState: RobotState
+  previousRobotState: RobotState
   invariantContext: InvariantContext
   selectedRunTimeCommand?: RunTimeCommand
   currentCommandIndex: number
+  liquids: Liquid[]
 }
 
 export function StepDetailContainer({
@@ -31,9 +33,11 @@ export function StepDetailContainer({
   commands,
   selectedSlot,
   robotState,
+  previousRobotState,
   invariantContext,
   selectedRunTimeCommand,
   currentCommandIndex,
+  liquids,
 }: StepDetailContainerProps): JSX.Element {
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     commands.length > 0
@@ -71,10 +75,6 @@ export function StepDetailContainer({
     rightPipetteId != null &&
     robotState.pipettes[rightPipetteId].entityId != null
 
-  console.log('robotState', robotState)
-  console.log('commands', commands)
-  console.log('invariantContext', invariantContext)
-
   const isSourceActive =
     commands[currentCommandIndex]?.commandType === 'aspirate' ||
     commands[currentCommandIndex]?.commandType === 'aspirateInPlace'
@@ -83,11 +83,12 @@ export function StepDetailContainer({
     commands[currentCommandIndex]?.commandType === 'dispense' ||
     commands[currentCommandIndex]?.commandType === 'dispenseInPlace'
 
-  const slotId = getSlotIdFromCommand(
+  const { slotId, displayName, labwareId } = getSlotIdFromCommand(
     commands[currentCommandIndex],
     robotState,
     commands,
-    currentCommandIndex
+    currentCommandIndex,
+    invariantContext
   )
 
   return (
@@ -113,15 +114,26 @@ export function StepDetailContainer({
         <SourceWellViewContainer protocolKey={protocolKey} />
       ) : null}
       {isSourceActive ? (
-        <SourceLabwareContainer protocolKey={protocolKey} slotId={slotId} />
+        <SourceLabwareContainer
+          slotId={slotId}
+          displayName={displayName}
+          labwareId={labwareId}
+          robotState={previousRobotState}
+          liquids={liquids}
+          invariantContext={invariantContext}
+        />
       ) : null}
       {isDestinationActive ? (
         <DestinationWellViewContainer protocolKey={protocolKey} />
       ) : null}
       {isDestinationActive ? (
         <DestinationLabwareContainer
-          protocolKey={protocolKey}
           slotId={slotId}
+          displayName={displayName}
+          labwareId={labwareId}
+          robotState={robotState}
+          liquids={liquids}
+          invariantContext={invariantContext}
         />
       ) : null}
       <TipDisposalContainer protocolKey={protocolKey} />

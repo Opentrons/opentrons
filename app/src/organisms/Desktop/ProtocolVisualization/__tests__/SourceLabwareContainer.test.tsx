@@ -7,6 +7,15 @@ import { i18n } from '/app/i18n'
 import { SourceLabwareContainer } from '../SourceLabwareContainer'
 
 import type { ComponentProps } from 'react'
+import type { LabwareRender } from '@opentrons/components'
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof LabwareRender>()
+  return {
+    ...actual,
+    LabwareRender: () => <div>mock LabwareRender</div>,
+  }
+})
 
 const render = (props: ComponentProps<typeof SourceLabwareContainer>) => {
   return renderWithProviders(<SourceLabwareContainer {...props} />, {
@@ -18,7 +27,12 @@ describe('SourceLabwareContainer', () => {
   let props: ComponentProps<typeof SourceLabwareContainer>
   beforeEach(() => {
     props = {
-      protocolKey: 'mockProtocolKey',
+      slotId: 'mockSlotId',
+      displayName: 'mockDisplayName',
+      labwareId: 'mockLabwareId',
+      robotState: mockRobotState,
+      liquids: mockLiquids,
+      invariantContext: mockInvariantContext,
     }
   })
   it('render text', () => {

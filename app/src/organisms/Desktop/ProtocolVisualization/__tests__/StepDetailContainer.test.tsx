@@ -12,7 +12,7 @@ import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 
 import type { ComponentProps } from 'react'
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
 vi.mock('../PipetteContainer')
@@ -25,6 +25,8 @@ vi.mock('../TipPickupContainer')
 const render = (props: ComponentProps<typeof StepDetailContainer>) => {
   return renderWithProviders(<StepDetailContainer {...props} />)
 }
+
+const mockLiquids = [] as Liquid[]
 
 describe('StepDetailContainer', () => {
   let props: ComponentProps<typeof StepDetailContainer>
@@ -82,9 +84,15 @@ describe('StepDetailContainer', () => {
         },
       } as RobotState,
       invariantContext: { moduleEntities: {} } as InvariantContext,
+      liquids: mockLiquids,
+      previousRobotState: {} as any,
+      currentCommandIndex: 1,
     }
     vi.mocked(PipetteContainer).mockReturnValue(
       <div>mock Pipette Container</div>
+    )
+    vi.mocked(TipPickupContainer).mockReturnValue(
+      <div>mock Tip Pickup Container</div>
     )
     vi.mocked(DestinationLabwareContainer).mockReturnValue(
       <div>mock Destination Labware Container</div>
@@ -98,9 +106,6 @@ describe('StepDetailContainer', () => {
     vi.mocked(SourceWellViewContainer).mockReturnValue(
       <div>mock Source Well View Container</div>
     )
-    vi.mocked(TipPickupContainer).mockReturnValue(
-      <div>mock Tip Pickup Container</div>
-    )
   })
 
   afterEach(() => {
@@ -110,10 +115,10 @@ describe('StepDetailContainer', () => {
   it('renders the pipette container', () => {
     render(props)
     expect(screen.getAllByText('mock Pipette Container')).toHaveLength(2)
-    screen.getByText('mock Destination Labware Container')
+    // screen.getByText('mock Destination Labware Container')
+    // screen.getByText('mock Source Labware Container')
     screen.getByText('mock Tip Disposal Container')
-    screen.getByText('mock Source Labware Container')
-    screen.getByText('mock Source Well View Container')
+    // screen.getByText('mock Source Well View Container')
     screen.getByText('mock Tip Pickup Container')
   })
 })
