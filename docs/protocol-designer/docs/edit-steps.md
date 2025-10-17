@@ -26,7 +26,15 @@ In this transfer step, step details include each single-path aspirate and dispen
 
 ## Batch edit steps
 
-To edit multiple transfer steps of the same type, use the shift or command key and click to select. Selecting multiple transfer steps allows you to batch edit aspirate and dispense flow rate, well order, tip position, and other advanced settings.
+You can click to edit multiple transfer steps of the same type: 
+
+| **Keyboard Shortcut** | **Step Selection** |
+| --------------------- | ------------------ |
+|     Double Click      | Select an individual step |
+|       <ul><li>^ + Click</li><li>Shift + Click</li></ul>  | Select a range of steps   |
+|  Command + Click | Select multiple steps | 
+
+Selecting multiple transfer steps allows you to batch edit aspirate and dispense flow rate, well order, tip position, and other advanced settings.
 
 ## Change step order
 
