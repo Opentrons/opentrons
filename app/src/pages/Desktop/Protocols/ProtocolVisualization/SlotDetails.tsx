@@ -131,6 +131,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             liquids={liquids}
             robotState={robotState}
             pipetteEntities={pipetteEntities}
+            moduleEntities={moduleEntities}
           />
         ) : null}
         {isTrashOnSlot ? (

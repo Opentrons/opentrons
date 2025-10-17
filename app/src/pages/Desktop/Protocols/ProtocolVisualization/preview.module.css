@@ -420,3 +420,16 @@
   justify-content: space-between;
   gap: auto;
 }
+
+.info_label_container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.labware_render_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}

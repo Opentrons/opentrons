@@ -125,6 +125,7 @@ export function StepDetailContainer({
           liquids={liquids}
           robotState={robotState}
           pipetteEntities={pipetteEntities}
+          moduleEntities={moduleEntities}
         />
       ) : null}
       <TipDisposalContainer protocolKey={protocolKey} />

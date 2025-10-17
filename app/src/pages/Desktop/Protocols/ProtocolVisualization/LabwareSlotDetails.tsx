@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   LabwareRender,
+  MODULE_ICON_NAME_BY_TYPE,
   RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
@@ -16,12 +17,13 @@ import {
 
 import { ActiveWellSlotDetails } from './ActiveWellSlotDetails'
 import styles from './preview.module.css'
-import { getAllWellContentsAtFrame, getChannels } from './utils'
+import { getAllWellContentsAtFrame } from './utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
+  ModuleEntities,
   PipetteEntities,
   RobotState,
 } from '@opentrons/step-generation'
@@ -34,6 +36,7 @@ interface LabwareSlotDetailsProps {
   currentCommand: RunTimeCommand
   robotState: RobotState
   pipetteEntities: PipetteEntities
+  moduleEntities: ModuleEntities
 }
 export function LabwareSlotDetails(
   props: LabwareSlotDetailsProps
@@ -46,6 +49,7 @@ export function LabwareSlotDetails(
     currentCommand,
     robotState,
     pipetteEntities,
+    moduleEntities,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const { labware } = robotState
@@ -109,14 +113,6 @@ export function LabwareSlotDetails(
           .maxVolume
       : 0
 
-  const channels =
-    pipetteTemporalProperties != null
-      ? getChannels(
-          pipetteEntities[pipetteTemporalProperties[0]].spec.channels,
-          pipetteTemporalProperties[1].nozzles
-        )
-      : 1
-
   const labwareViewBox = getLabwareViewBox(labwareDef)
 
   return (
@@ -136,7 +132,27 @@ export function LabwareSlotDetails(
       <div className={styles.container}>
         <div className={styles.header}>
           <Tag text={t('labware')} type="default" shrinkToContent />
-          <RobotInfoLabel deckLabel={slot} />
+          <div className={styles.info_label_container}>
+            {labware[topLabwareOnSlotId]?.stack
+              .filter(item => item !== topLabwareOnSlotId)
+              .reverse()
+              .map(item => {
+                if (moduleEntities[item] != null) {
+                  return (
+                    <RobotInfoLabel
+                      key={item}
+                      iconName={
+                        MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
+                      }
+                    />
+                  )
+                } else if (labware[item] != null) {
+                  return <RobotInfoLabel key={item} iconName="stacked" />
+                } else {
+                  return <RobotInfoLabel key={item} deckLabel={slot} />
+                }
+              })}
+          </div>
         </div>
         <div className={styles.subheader}>
           <StyledText desktopStyle="captionSemiBold">
@@ -144,22 +160,24 @@ export function LabwareSlotDetails(
           </StyledText>
         </div>
         <div className={styles.main_content}>
-          <RobotWorkSpace
-            key={topLabwareOnSlotId}
-            width="14rem"
-            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
-          >
-            {() => (
-              <g>
-                <LabwareRender
-                  definition={labwareDef}
-                  positioningMode="passThrough"
-                  wellFill={wellFill}
-                  highlightedWells={wellGroup}
-                />
-              </g>
-            )}
-          </RobotWorkSpace>
+          <div className={styles.labware_render_container}>
+            <RobotWorkSpace
+              key={topLabwareOnSlotId}
+              width="14rem"
+              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
+            >
+              {() => (
+                <g>
+                  <LabwareRender
+                    definition={labwareDef}
+                    positioningMode="passThrough"
+                    wellFill={wellFill}
+                    highlightedWells={wellGroup}
+                  />
+                </g>
+              )}
+            </RobotWorkSpace>
+          </div>
         </div>
       </div>
     </>
