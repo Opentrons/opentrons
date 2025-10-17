@@ -24,10 +24,19 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 
 import { FLOWS, SECTIONS } from './constants'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  DeckConfiguration,
+  MotorAxes,
+} from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import type { PipetteWizardFlow, PipetteWizardStep } from './types'
+import type {
+  PipetteWizardFlow,
+  PipetteWizardStep,
+  PipetteWizardStepProps,
+} from './types'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery
@@ -38,6 +47,59 @@ export function getIsGantryEmpty(
 interface PipetteAnimationProps {
   pipetteWizardStep: PipetteWizardStep
   channel?: number
+}
+
+export function startCalibrationOnClick(
+  props: PipetteWizardStepProps,
+  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
+  pipetteId: string
+): () => void {
+  const { chainRunCommands, proceed, setShowErrorMessage, mount } = props
+  return () => {
+    const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
+    const verifyCommands: CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: {
+          pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
+      },
+    ]
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home',
+        params: { axes },
+      },
+      {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: mount },
+      },
+      {
+        commandType: 'calibration/calibratePipette',
+        params: { mount },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: { mount },
+      },
+    ]
+
+    chainRunCommands?.(verifyCommands, false)
+      .then(() => {
+        chainRunCommands?.(homeCommands, false)
+          .then(() => {
+            proceed()
+          })
+          .catch(error => {
+            setShowErrorMessage(error.message as string)
+          })
+      })
+      .catch(() => {
+        setShowUnableToDetect?.(true)
+      })
+  }
 }
 
 export function isWasteChuteOnDeck(

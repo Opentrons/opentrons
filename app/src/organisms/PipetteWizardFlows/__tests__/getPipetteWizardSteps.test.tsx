@@ -399,14 +399,14 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
       },
       {
         section: SECTIONS.DETACH_PROBE,
@@ -454,12 +454,12 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.ATTACH_PROBE,
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },

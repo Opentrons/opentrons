@@ -10,7 +10,7 @@
   "attach_pip": "attach pipette",
   "attach_pipette": "attach {{mount}} pipette",
   "attach_probe": "attach calibration probe",
-  "attach_wastechute": "Attach waste chute",
+  "attach_wastechute": "Re-attach waste chute",
   "backmost": "backmost",
   "before_you_begin": "Before you begin",
   "begin_calibration": "Begin calibration",
@@ -89,7 +89,8 @@
   "unscrew_carriage": "unscrew z-axis carriage",
   "waste_chute_error": "Remove waste chute before calibrating.",
   "waste_chute_warning": "A collision will occur with the pipette if the waste chute remains on deck.",
-  "waste_chute_attach_warning": "Attach waste chute to match current deck configuration.",
+  "waste_chute_warning_probe": "If the waste chute is installed, remove it from the Deck Plate Adapter before proceeding.",
+  "waste_chute_attach_warning": "Re-attach waste chute to match current deck configuration.",
   "wrong_pip": "wrong instrument installed",
   "z_axis_still_attached": "z-axis screw still secure"
 }

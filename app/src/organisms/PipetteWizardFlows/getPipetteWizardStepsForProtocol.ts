@@ -180,6 +180,11 @@ const detachTwoSingleMountsAndAttachNinetySix = (
     flowType: FLOWS.ATTACH,
   },
   { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
   ...(wasteChute
     ? [
         {
@@ -189,11 +194,6 @@ const detachTwoSingleMountsAndAttachNinetySix = (
         },
       ]
     : []),
-  {
-    section: SECTIONS.ATTACH_PROBE,
-    mount: LEFT,
-    flowType: FLOWS.ATTACH,
-  },
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
@@ -255,6 +255,11 @@ const detachSingleMountOnLeftAndAttachNinetySix = (
     flowType: FLOWS.ATTACH,
   },
   { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
   ...(wasteChute
     ? [
         {
@@ -264,11 +269,6 @@ const detachSingleMountOnLeftAndAttachNinetySix = (
         },
       ]
     : []),
-  {
-    section: SECTIONS.ATTACH_PROBE,
-    mount: LEFT,
-    flowType: FLOWS.ATTACH,
-  },
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
@@ -330,6 +330,11 @@ const detachSingleMountOnRightAndAttachNinetySix = (
     flowType: FLOWS.ATTACH,
   },
   { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
   ...(wasteChute
     ? [
         {
@@ -339,11 +344,6 @@ const detachSingleMountOnRightAndAttachNinetySix = (
         },
       ]
     : []),
-  {
-    section: SECTIONS.ATTACH_PROBE,
-    mount: LEFT,
-    flowType: FLOWS.ATTACH,
-  },
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
@@ -394,6 +394,11 @@ const fromEmptyGantryAttachNinetySix = (
     flowType: FLOWS.ATTACH,
   },
   { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+  {
+    section: SECTIONS.ATTACH_PROBE,
+    mount: LEFT,
+    flowType: FLOWS.ATTACH,
+  },
   ...(wasteChute
     ? [
         {
@@ -403,11 +408,6 @@ const fromEmptyGantryAttachNinetySix = (
         },
       ]
     : []),
-  {
-    section: SECTIONS.ATTACH_PROBE,
-    mount: LEFT,
-    flowType: FLOWS.ATTACH,
-  },
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,

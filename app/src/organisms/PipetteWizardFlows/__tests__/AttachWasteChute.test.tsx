@@ -39,13 +39,12 @@ describe('AttachWasteChute', () => {
   })
   it('returns the correct information, buttons work as expected for attach flow', async () => {
     render(props)
-    screen.getByText('Attach waste chute')
-    screen.getByText('Attach waste chute to match current deck configuration.')
+    screen.getByText('Re-attach waste chute')
+    screen.getByText(
+      'Re-attach waste chute to match current deck configuration.'
+    )
     const proceedBtn = screen.getByRole('button', { name: /continue/i })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
-    const backBtn = screen.getByRole('button', { name: /go back/i })
-    fireEvent.click(backBtn)
-    expect(props.goBack).toHaveBeenCalled()
   })
 })

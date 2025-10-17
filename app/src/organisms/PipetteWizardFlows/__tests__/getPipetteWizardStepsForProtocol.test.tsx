@@ -361,14 +361,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
       },
       {
         section: SECTIONS.DETACH_PROBE,
@@ -506,14 +506,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
       },
       {
         section: SECTIONS.DETACH_PROBE,
@@ -617,7 +617,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       )
     ).toStrictEqual(mockFlowSteps)
   })
-  it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel', () => {
+  it('returns the correct array of info when the attached pipette on both mounts need to be switched out for 96-channel and a waste chute is present', () => {
     const mockDeckConfig = {
       data: [
         {
@@ -676,14 +676,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
       },
       {
         section: SECTIONS.DETACH_PROBE,

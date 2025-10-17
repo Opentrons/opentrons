@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
@@ -43,11 +43,45 @@ describe('RemoveWasteChute', () => {
     screen.getByText(
       'A collision will occur with the pipette if the waste chute remains on deck.'
     )
-    const proceedBtn = screen.getByRole('button', { name: /continue/i })
+    const proceedBtn = screen.getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
-    const backBtn = screen.getByRole('button', { name: /go back/i })
-    fireEvent.click(backBtn)
-    expect(props.goBack).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: {
+              pipetteId: 'abc',
+              expectedState: 'present',
+              followSingularSensor: 'primary',
+            },
+          },
+        ],
+        false
+      )
+    })
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
+            commandType: 'home',
+            params: { skipIfMountPositionOk: 'left' },
+          },
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left' },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: 'left' },
+          },
+        ],
+        false
+      )
+    })
   })
 })
