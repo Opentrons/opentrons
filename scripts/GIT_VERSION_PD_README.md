@@ -1,60 +1,65 @@
-# Git Version 2 - Enhanced Tag Resolution
+# Git Version Protocol Designer - Semantic Version Resolution
 
 ## Summary
 
-`git-version2.mjs` provides enhanced tag resolution and build information generation for Protocol Designer with the following features:
+`scripts/git-version-protocol-designer.mjs` provides semantic version-based tag resolution and build information generation for Protocol Designer.
 
 ### Key Features
 
-1. **Tags must be at HEAD**: Only returns tags that are pointing at the current commit (`git tag --points-at HEAD`)
-2. **Branch name fallback**: If no tag exists at HEAD, uses branch name + timestamp + GitHub Run ID for unique versioning
-3. **Prefix priority**: When multiple tags exist on the same commit, prefers `protocol-designer@` over `staging-protocol-designer@`
-4. **Semver selection**: When multiple tags with the same prefix exist, selects the highest semantic version
-5. **Build info HTML**: Automatically generates a detailed build information page at `dist/info/index.html` this is accessible at `/info/` on deployed sites.
+1. **Semantic version resolution**: Finds the highest semantic version among all tags reachable from `HEAD` for both production (`protocol-designer@`) and staging (`staging-protocol-designer@`) prefixes.
+2. **Prerelease support**: Properly handles prerelease versions like `-alpha.0`, `-beta.1`, etc., following semver precedence rules.
+3. **Prefix priority**: When production and staging tags have identical versions, production tags win.
+4. **Simple version output**: Always returns the portion to the right of `@`.
+5. **Build info HTML**: Generates an info page at `dist/info/index.html` that records branch, timestamp, run metadata, and other diagnostics.
 
-### Tag Priority
+### Tag Priority and Semver Rules
 
-For protocol-designer project:
+For the `protocol-designer` project:
 
-1. **Prefix priority** (evaluated first):
+- **Version comparison**: Tags are compared using semantic versioning (semver) rules
 
-   - `protocol-designer@*` (highest priority)
-   - `staging-protocol-designer@*` (fallback)
+  - Stable releases take precedence over prerelease versions of the same version (e.g., `8.6.0` > `8.6.0-beta.1`)
+  - Higher version numbers always win (e.g., `8.7.0-alpha.1` > `8.6.0`)
+  - Prerelease ordering: `alpha` < `beta` < `rc` < stable
+  - Prerelease numbers are compared numerically (e.g., `alpha.2` > `alpha.1`)
 
-2. **Semver selection** (within same prefix):
-   - If multiple tags with same prefix: selects highest semantic version
-   - Example: `staging-protocol-designer@1.1.2` wins over `staging-protocol-designer@1.1.1`
-   - Example: `protocol-designer@8.6.1` wins over `protocol-designer@8.6.0`
+- **Prefix priority** (tie-breaker when versions are identical):
+  1. `protocol-designer@*` (production)
+  2. `staging-protocol-designer@*` (staging)
+
+When production and staging tags have the exact same version, the production prefix wins.
 
 ### Version Resolution Logic
 
-1. **Check for tags at HEAD** using `git tag --points-at HEAD`
+1. **Collect all reachable tags**
 
-   - If multiple tags exist, prefer non-staging tags based on prefix priority
-   - **Version string formatting**:
-     - **Production tags** (without "staging-" prefix): Return only the version part after `@`
-       - `protocol-designer@8.6.0` → `8.6.0`
-     - **Staging tags** (with "staging-" prefix): Return the full tag
-       - `staging-protocol-designer@8.6.0-alpha.4` → `staging-protocol-designer@8.6.0-alpha.4`
+   - Execute `git tag --merged HEAD --list <prefix>*` for each prefix.
+   - This returns all tags reachable from the current `HEAD` that match the prefix.
+   - Ignore prefixes with no reachable tags in the current history.
 
-2. **Fallback to branch name** if no tags at HEAD
+2. **Parse and validate versions**
 
-   - Constructs a synthetic version using: `branch-name` + `timestamp` + `GitHub Run ID` (in CI)
-   - Format: `protocol-designer@{branch}-{YYYYMMDD-HHMMSS}-RUN_ID-{run_id}`
+   - Extract the version string from each tag (the part after `@`).
+   - Parse each version using semver to validate it's a valid semantic version.
+   - Skip any tags that don't have valid semver.
+
+3. **Determine the highest version**
+
+   - Sort all valid tags by semantic version using `semver.rcompare()` (highest first).
+   - If multiple tags have the same version, use prefix priority as a tie-breaker.
+   - Select the first tag from the sorted list (highest version with highest priority prefix).
+
+4. **Format the version**
+
+   - Return the substring after `@`.
    - Examples:
-     - Local build: `protocol-designer@edge-20251014-143022`
-     - CI build: `protocol-designer@edge-20251014-143022-RUN_ID-12345678`
-     - PR build: `protocol-designer@version-script-for-pd-20251014-150530-RUN_ID-87654321`
+     - `protocol-designer@8.6.0` → `8.6.0`
+     - `staging-protocol-designer@8.7.0-alpha.1` → `8.7.0-alpha.1`
+     - `protocol-designer@8.6.0-beta.2` → `8.6.0-beta.2`
 
-   **Why timestamp + run ID instead of SHA?**
+5. **No tags available**
 
-   - In CI PR builds, the SHA is the ephemeral merge commit, not the actual branch commit
-   - Timestamp provides chronological ordering
-   - Run ID enables direct linking to the GitHub Actions workflow run
-
-3. **Git describe fallback**: Uses `git describe --tags` if branch name unavailable
-
-4. **Error fallback**: Returns `0.0.0-dev` if nothing works
+   - If no matching tags are found, log an error and return `0.0.0-dev`.
 
 ## Build Info HTML Generation
 
@@ -63,7 +68,7 @@ The script automatically generates a comprehensive build information page at `di
 ### What's Included
 
 - **Build Details**: Version, timestamp, build date, Node version, platform
-- **Git Information**: Branch, commit SHA, author, message, tags at HEAD
+- **Git Information**: Branch, commit SHA, author, message, tags at `HEAD`
 - **GitHub Actions Info** (CI builds only):
   - Quick links to workflow run, PR, compare view, branch/tag
   - Run details (ID, number, attempt, job name)
@@ -71,64 +76,52 @@ The script automatically generates a comprehensive build information page at `di
   - Actor/triggering user
   - Reference information
   - Repository details
+- **Environment Details**: Timestamp and GitHub run IDs remain on the info page even though they no longer appear in the version string.
 
 ### Accessing Build Info
 
-- Local deployment: `http://localhost:5178/info/` - only available on `make serve`
+- Local deployment: `http://localhost:5178/info/` — available during `make serve`
 - Production: `https://designer.opentrons.com/info/` (or your deployed URL)
 
 ## Testing Results
 
-### Test Case 1: Commit with staging tag only
+- **Case 1: Highest semantic version selection**
 
-- Commit: `staging-protocol-designer@8.6.0-alpha.4`
-- Result: ✅ Returns full tag `staging-protocol-designer@8.6.0-alpha.4`
+  - Available tags: `protocol-designer@8.5.0`, `protocol-designer@8.6.0`, `protocol-designer@8.7.0`
+  - Result: ✅ Returns `8.7.0` (highest version)
 
-### Test Case 2: Commit with 2 tags having different prefixes
+- **Case 2: Staging tag with higher version beats production tag**
 
-- Commit: Has both `protocol-designer@8.6.0-alpha.1` and `staging-protocol-designer@8.6.0-alpha.2`
-- Result: ✅ Prefers `protocol-designer@8.6.0-alpha.1` (returns clean version `8.6.0-alpha.1`)
+  - Available tags: `protocol-designer@8.6.0`, `staging-protocol-designer@8.7.0-alpha.1`
+  - Result: ✅ Returns `8.7.0-alpha.1` (higher semver)
 
-### Test Case 2b: Commit with production tag
+- **Case 3: Production prefix priority with identical versions**
 
-- Commit: `protocol-designer@8.6.0`
-- Result: ✅ Returns clean version `8.6.0`
+  - Available tags: `protocol-designer@8.6.0-alpha.1`, `staging-protocol-designer@8.6.0-alpha.1`
+  - Result: ✅ Returns `8.6.0-alpha.1` from production prefix
 
-### Test Case 3: Branch build with no tag (local)
+- **Case 4: Stable release preferred over prerelease of same version**
 
-- Branch: `edge`
-- Time: `2025-10-14 14:30:22 UTC`
-- Result: ✅ Returns `protocol-designer@edge-20251014-143022`
+  - Available tags: `protocol-designer@8.6.0-beta.5`, `protocol-designer@8.6.0`
+  - Result: ✅ Returns `8.6.0` (stable > prerelease)
 
-### Test Case 4: Branch build with no tag (CI)
+- **Case 5: Prerelease ordering**
 
-- Branch: `version-script-for-pd`
-- Time: `2025-10-14 15:05:30 UTC`
-- Run ID: `12345678`
-- Result: ✅ Returns `protocol-designer@version-script-for-pd-20251014-150530-RUN_ID-12345678`
+  - Available tags: `protocol-designer@8.6.0-alpha.1`, `protocol-designer@8.6.0-beta.1`
+  - Result: ✅ Returns `8.6.0-beta.1` (beta > alpha)
 
-### Test Case 5: Multiple staging tags (semver selection)
-
-- Tags at HEAD: `staging-protocol-designer@1.1.1`, `staging-protocol-designer@1.1.2`, `staging-protocol-designer@8.6.0-alpha.2`
-- Result: ✅ Returns `staging-protocol-designer@8.6.0-alpha.2` (highest semver: 8.6.0 > 1.1.2 > 1.1.1)
-
-### Test Case 6: Prefix priority with semver
-
-- Tags at HEAD: `protocol-designer@8.6.0-alpha.1`, `staging-protocol-designer@8.6.0-alpha.2`
-- Result: ✅ Returns `8.6.0-alpha.1` (prefix priority wins over higher staging version, clean version format for production tag)
+- **Case 6: No matching tags**
+  - History: No `protocol-designer@` or `staging-protocol-designer@` tags
+  - Result: ✅ Falls back to `0.0.0-dev`
 
 ## Implementation Notes
 
-### Why Timestamp + Run ID Instead of SHA?
+- **Semantic versioning**: Uses the `semver` package to properly compare versions according to semver rules.
+- **All reachable tags**: Considers all tags reachable from `HEAD`, not just the nearest one, ensuring the highest version is always selected.
+- **Prerelease handling**: Correctly handles prerelease identifiers (`alpha`, `beta`, `rc`) with proper ordering and numeric comparison.
+- **Prefix priority**: Production tags outrank staging tags when versions are identical, maintaining backward compatibility.
+- **Build info HTML**: Continues to surface branch, timestamp, run ID, and other metadata for debugging.
 
-In GitHub Actions PR builds, the code is checked out in detached HEAD state at a merge commit. This merge commit's SHA is ephemeral and not meaningful for identifying the actual branch code. Instead:
+## Integration
 
-- **Timestamp**: Provides chronological ordering of builds
-- **Run ID**: Enables direct linking to the GitHub Actions workflow run for debugging
-- **Branch name**: Identifies which branch was built
-
-### Integration
-
-The script is integrated into Protocol Designer's build process via a Vite plugin in `vite.config.mts`:
-
-This ensures the build info page is automatically generated after every build.
+The script is integrated into Protocol Designer's build process via a Vite plugin in `vite.config.mts`, ensuring the build info page is generated after every build.
