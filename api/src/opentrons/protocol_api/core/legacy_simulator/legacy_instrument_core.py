@@ -540,6 +540,7 @@ class LegacyInstrumentCoreSimulator(
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[LegacyWellCore]],
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from itertools import dropwhile
-from copy import deepcopy
+from copy import copy, deepcopy
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -1335,6 +1335,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Execute transfer using liquid class properties.
 
@@ -1358,13 +1359,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the transfer.
         """
-        if not tip_racks:
+        if not tip_racks and not selected_tips:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tipracks or tips found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         transfer_props = self._get_transfer_properties_for_tip_rack(
             liquid_class, tiprack_uri_for_transfer_props
+        )
+        prioritized_tips_to_pick_up = (
+            None if selected_tips is None else copy(selected_tips)
         )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
@@ -1402,7 +1406,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip == TransferTipPolicyV2.ONCE:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks,
+                starting_tip,
+                tiprack_uri_for_transfer_props,
+                prioritized_tips_to_pick_up,
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
@@ -1442,7 +1449,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 if prev_src is not None and prev_dest is not None:
                     self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    prioritized_tips_to_pick_up,
                 )
                 post_disp_tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1992,22 +2002,37 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
         tiprack_uri_for_transfer_props: str,
+        selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
-        next_tip = self.get_next_tip(
-            tip_racks=[core for loc, core in tip_racks],
-            starting_well=starting_tip,
-        )
-        if next_tip is None:
-            raise RuntimeError(
-                f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
-                f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
+        if selected_tips is not None:
+            # TODO this can just be made into a NextTipInfo object and use the existing method
+            # TODO also figure out what to do if we run out here
+            tip_well = selected_tips.pop(0)
+            tiprack_labware_core = self._protocol_core._labware_cores_by_id[
+                tip_well.labware_id
+            ]
+            tiprack = [
+                loc for loc, lw_core in tip_racks if lw_core == tiprack_labware_core
+            ]
+            tiprack_uri = tiprack_labware_core.get_uri()
+            tiprack_loc = Location(tip_well.get_top(0), tiprack[0].labware)
+        else:
+            next_tip = self.get_next_tip(
+                tip_racks=[core for loc, core in tip_racks],
+                starting_well=starting_tip,
             )
-        (
-            tiprack_loc,
-            tiprack_uri,
-            tip_well,
-        ) = self._get_location_and_well_core_from_next_tip_info(next_tip, tip_racks)
+            if next_tip is None:
+                raise RuntimeError(
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
+                )
+            (
+                tiprack_loc,
+                tiprack_uri,
+                tip_well,
+            ) = self._get_location_and_well_core_from_next_tip_info(next_tip, tip_racks)
+
         if tiprack_uri != tiprack_uri_for_transfer_props:
             raise RuntimeError(
                 f"Tiprack {tiprack_uri} does not match the tiprack designated "

@@ -36,6 +36,7 @@ def verify_and_normalize_transfer_args(
     group_wells_for_multi_channel: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
+    selected_tips: Optional[List[Well]],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     if not isinstance(dest, (TrashBin, WasteChute)):
@@ -58,7 +59,9 @@ def verify_and_normalize_transfer_args(
         )
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
-    if valid_new_tip == TransferTipPolicyV2.NEVER:
+    if selected_tips is not None:
+        valid_tip_racks = [tip.parent for tip in selected_tips]
+    elif valid_new_tip == TransferTipPolicyV2.NEVER:
         if last_tip_well is None:
             raise RuntimeError(
                 "Pipette has no tip attached to perform transfer."
