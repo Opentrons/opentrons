@@ -16,7 +16,6 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 import { CommandSteps } from './CommandSteps'
 import { Controls } from './Controls'
 import { DeckView } from './DeckView'
-import { SlotDetails } from './SlotDetails'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
@@ -221,6 +220,7 @@ export function VisualizerContainer(
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
       <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
+        {/* TODO: slotDetails info should be moved to the spotlight window!
         {selectedSlot != null && selectedRunTimeCommand != null ? (
           <SlotDetails
             slotId={selectedSlot}
@@ -236,18 +236,18 @@ export function VisualizerContainer(
             invariantContext={invariantContext}
             liquids={liquids}
           />
-        ) : (
-          <CommandSteps
-            analysis={analysis}
-            currentCommandIndex={selectedCommandIndex}
-            groupedCommands={groupedCommands}
-            setSelectedCommand={setSelectedCommand}
-            percentComplete={percentComplete}
-            handlePause={() => {
-              setIsPlaying(false)
-            }}
-          />
-        )}
+        ) : ( */}
+        <CommandSteps
+          analysis={analysis}
+          currentCommandIndex={selectedCommandIndex}
+          groupedCommands={groupedCommands}
+          setSelectedCommand={setSelectedCommand}
+          percentComplete={percentComplete}
+          handlePause={() => {
+            setIsPlaying(false)
+          }}
+        />
+        {/* )} */}
         {/* Left column resizer */}
         <div
           className={`${styles.resizer} ${styles.resizer_right}`}

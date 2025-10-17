@@ -143,7 +143,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     <div className={styles.deck_view_padding}>
       <div className={styles.deck_view_container}>
         <Flex justifyContent="space-between" with="100%">
-          <StyledText desktopStyle="bodyLargeSemiBold">Deck View</StyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('deck_view')}
+          </StyledText>
           <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
             {t('step', { number: selectedCommandIndex })}
           </StyledText>
