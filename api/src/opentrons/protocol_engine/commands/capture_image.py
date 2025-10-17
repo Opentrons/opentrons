@@ -7,6 +7,7 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons_shared_data.data_files import MimeType
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     StorageLimitReachedError,
@@ -16,7 +17,6 @@ from ..errors.error_occurrence import ErrorOccurrence
 
 from ..resources.file_provider import (
     MAXIMUM_FILE_LIMIT,
-    MimeType,
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
