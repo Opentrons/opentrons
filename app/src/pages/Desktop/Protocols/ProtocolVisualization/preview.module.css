@@ -345,18 +345,6 @@
   bottom: 4rem;
 }
 
-.well_details_caption_liquid {
-  position: absolute;
-  left: 0.8rem;
-  bottom: 4rem;
-}
-
-.well_header_container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
-}
-
 .well_detail_svg_container {
   position: relative;
   overflow: hidden;
