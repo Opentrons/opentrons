@@ -27,7 +27,7 @@ To start, Protocol Designer places your chosen tip racks on the deck. You can dr
 
 Hover over any deck slot to view slot details. Then, click individual slots to add, remove, or change labware. 
 
-For the example below, add labware by clicking empty deck slot D2 and choosing **Add labware**. 
+For the example below, add labware by clicking empty deck slot D2.  
 
 <figure class="screenshot" markdown>
   ![Add labware](images/add_labware3.png)
