@@ -24,7 +24,7 @@ classifiers = [
 ]
 dependencies = [
     "typing-extensions>=4.0.0,<5",
-    "aiohttp==3.9.3",
+    "aiohttp==3.12.14",
 ]
 dynamic = ['version']
 
