@@ -445,6 +445,7 @@ class AspirateDispenseCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
     volume: float
     rate: float
+    end_location: Optional[Location]
 
 
 class AspirateCommand(TypedDict):

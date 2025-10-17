@@ -3,6 +3,7 @@ from datetime import datetime
 from io import StringIO
 import csv
 from typing import List, Optional, Callable, Awaitable, Dict
+from dataclasses import dataclass
 from pydantic import BaseModel
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 
@@ -11,7 +12,8 @@ from ..errors import StorageLimitReachedError
 MAXIMUM_FILE_LIMIT = 400
 
 
-class ReadCmdFileNameMetadata(BaseModel):
+@dataclass(frozen=True)
+class ReadCmdFileNameMetadata:
     """Data from a plate reader `read` command used to build the finalized file name."""
 
     base_filename: str

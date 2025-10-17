@@ -1,8 +1,5 @@
-import { useState } from 'react'
+import { Chip, COLORS, NewIconButton } from '@opentrons/components'
 
-import { Chip, COLORS, NewIconButton, OverflowBtn } from '@opentrons/components'
-
-import { ControlsOverflowMenu } from './ControlsOverflowMenu'
 import styles from './preview.module.css'
 
 // import {
@@ -24,8 +21,6 @@ interface ControlsProps {
   isPlaying: boolean
   commands: RunTimeCommand[]
   groupedCommands: GroupedCommands | null
-  setShowDeckRenders: Dispatch<SetStateAction<boolean>>
-  showDeckRenders: boolean
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -38,10 +33,7 @@ export function Controls(props: ControlsProps): JSX.Element {
     isPlaying,
     commands,
     // groupedCommands,
-    showDeckRenders,
-    setShowDeckRenders,
   } = props
-  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
 
   // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
   // const currentCommandId = commands[currentCommandIndex].id
@@ -69,21 +61,8 @@ export function Controls(props: ControlsProps): JSX.Element {
   //   }
   // }
 
-  const handleOverflowMenuClick = (showRenders: boolean): void => {
-    setShowDeckRenders(showRenders)
-    setShowOverflowMenu(false)
-  }
-
   return (
     <>
-      {showOverflowMenu ? (
-        <ControlsOverflowMenu
-          handleDeckView={showRenders => {
-            handleOverflowMenuClick(showRenders)
-          }}
-          showsRenders={showDeckRenders}
-        />
-      ) : null}
       <div className={styles.container}>
         <div className={styles.controls_container}>
           <div className={styles.all_controls_info}>
@@ -107,13 +86,6 @@ export function Controls(props: ControlsProps): JSX.Element {
                 onClick={handlePlayPause}
               />
             </div>
-          </div>
-          <div className={styles.controls_overflow_btn}>
-            <OverflowBtn
-              onClick={() => {
-                setShowOverflowMenu(prev => !prev)
-              }}
-            />
           </div>
         </div>
         <input

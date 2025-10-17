@@ -130,10 +130,9 @@
   display: flex;
   height: 100%;
   flex-direction: column;
-
-  /* padding-right: var(--spacing-16); */
-
-  /* padding-bottom: var(--spacing-16); */
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
 }
 
 .slot_container {
@@ -243,6 +242,10 @@
   display: flex;
   width: 100%;
   flex-direction: column;
+  padding: var(--spacing-16);
+
+  /* border-radius: var(--border-radius-8); */
+  background-color: var(--white);
   gap: var(--spacing-4);
 }
 

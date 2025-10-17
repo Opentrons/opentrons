@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.notes import make_error_recovery_debug_note
 
 from ..state.state import StateStore
-from ..resources import ModelUtils, FileProvider
+from ..resources import ModelUtils, FileProvider, CameraProvider
 from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
@@ -75,6 +75,7 @@ class CommandExecutor:
         self,
         hardware_api: HardwareControlAPI,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         state_store: StateStore,
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
@@ -93,6 +94,7 @@ class CommandExecutor:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._hardware_api = hardware_api
         self._file_provider = file_provider
+        self._camera_provider = camera_provider
         self._state_store = state_store
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
@@ -123,6 +125,7 @@ class CommandExecutor:
             state_view=self._state_store,
             hardware_api=self._hardware_api,
             file_provider=self._file_provider,
+            camera_provider=self._camera_provider,
             equipment=self._equipment,
             movement=self._movement,
             gantry_mover=self._gantry_mover,

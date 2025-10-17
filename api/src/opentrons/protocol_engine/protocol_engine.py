@@ -22,7 +22,7 @@ from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllow
 from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization, labware_offset_standardization
-from .resources import ModelUtils, ModuleDataProvider, FileProvider
+from .resources import ModelUtils, ModuleDataProvider, FileProvider, CameraProvider
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -96,6 +96,7 @@ class ProtocolEngine:
         door_watcher: DoorWatcher,
         module_data_provider: ModuleDataProvider,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -107,6 +108,7 @@ class ProtocolEngine:
         """
         self._hardware_api = hardware_api
         self._file_provider = file_provider
+        self._camera_provider = camera_provider
         self._state_store = state_store
         self._model_utils = model_utils
         self._action_dispatcher = action_dispatcher
@@ -709,6 +711,7 @@ class ProtocolEngine:
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
             file_provider=self._file_provider,
+            camera_provider=self._camera_provider,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
             command_generator=command_generator,
