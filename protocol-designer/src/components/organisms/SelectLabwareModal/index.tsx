@@ -18,6 +18,8 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   Modal,
+  OVERFLOW_AUTO,
+  OVERFLOW_HIDDEN,
   OVERFLOW_SCROLL,
   PrimaryButton,
   SecondaryButton,
@@ -327,34 +329,42 @@ export function SelectLabwareModal(
       title={t('add_labware')}
       type="info"
       width="37.125rem"
+      maxHeight="39.5rem"
+      childrenPadding={SPACING.spacing24}
       onClose={() => {
         onClose()
         handleResetLabwareTools()
       }}
       footer={
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
-          gridGap="36px"
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           {!slotFull ? (
-            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
-              <StyledLabel css={LINK_BUTTON_STYLE}>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('upload_custom_labware')}
-                </StyledText>
-                <input
-                  data-testid="customLabwareInput"
-                  type="file"
-                  onChange={e => {
-                    dispatch(createCustomLabwareDef(e))
-                    handleCategoryClick(CUSTOM_CATEGORY, true)
-                  }}
-                />
-              </StyledLabel>
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+            >
+              <Flex padding={SPACING.spacing4}>
+                <StyledLabel css={LINK_BUTTON_STYLE}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('upload_custom_labware')}
+                  </StyledText>
+                  <input
+                    data-testid="customLabwareInput"
+                    type="file"
+                    onChange={e => {
+                      dispatch(createCustomLabwareDef(e))
+                      handleCategoryClick(CUSTOM_CATEGORY, true)
+                    }}
+                  />
+                </StyledLabel>
+              </Flex>
             </Flex>
           ) : null}
-          <Flex justifyContent={JUSTIFY_END} gridGap={SPACING.spacing8}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            justifyContent={JUSTIFY_END}
+            alignItems={ALIGN_CENTER}
+            padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
+          >
             {error != null && (
               <InlineNotification type="error" heading={error} hug />
             )}
@@ -377,14 +387,14 @@ export function SelectLabwareModal(
       }
     >
       <Flex
-        paddingTop={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
+        height="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <InputField
             value={searchTerm}
-            onChange={e => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setSearchTerm(e.target.value)
             }}
             placeholder={t('search_labware')}
@@ -419,8 +429,8 @@ export function SelectLabwareModal(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          overflowY={OVERFLOW_SCROLL}
-          maxHeight="29.5rem"
+          flex="1"
+          overflowY={OVERFLOW_AUTO}
           paddingTop={SPACING.spacing8}
         >
           <SelectCustomLabware

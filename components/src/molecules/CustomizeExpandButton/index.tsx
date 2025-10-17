@@ -101,7 +101,7 @@ export function CustomizeExpandButtonComponent(
                 <CheckboxField
                   onChange={e => {
                     e.stopPropagation()
-                    e.preventDefault()
+                    // e.preventDefault()
                     stackingProps.onCheckboxChange?.()
                   }}
                   value={stackingProps.checked}
