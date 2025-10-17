@@ -35,6 +35,7 @@ def test_create_step() -> None:
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
 
+
 def test_add_group_delay() -> None:
     origin = {
         Axis.X: 0,
@@ -59,7 +60,9 @@ def test_add_group_delay() -> None:
     )
     assert len(move_group) == 3
 
-    new_move_group = ot3utils.add_delay_to_move_group(move_group, present_nodes, ([NodeId.gantry_x], 3.0))
+    new_move_group = ot3utils.add_delay_to_move_group(
+        move_group, present_nodes, ([NodeId.gantry_x], 3.0)
+    )
     # new group should be one step longer
     assert len(new_move_group) == 4
     # all nodes have the same duration of all steps
@@ -72,7 +75,6 @@ def test_add_group_delay() -> None:
     assert new_move_group[3][NodeId.gantry_x].duration_sec == 1.0
     assert new_move_group[3][NodeId.gantry_y].duration_sec == 3.0
     assert new_move_group[3][NodeId.head_l].duration_sec == 3.0
-
 
 
 def test_filter_zero_duration_step() -> None:
