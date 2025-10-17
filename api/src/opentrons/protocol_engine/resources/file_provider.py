@@ -13,24 +13,34 @@ MAXIMUM_FILE_LIMIT = 400
 
 
 @dataclass(frozen=True)
+class FileNameCmdMetadata:
+    """Command metadata associated with a specific data file."""
+
+    command_id: Optional[str] = None
+    prev_command_id: Optional[str] = None
+    failed_command_id: Optional[str] = None
+
+
+@dataclass(frozen=True)
 class ReadCmdFileNameMetadata:
     """Data from a plate reader `read` command used to build the finalized file name."""
 
     base_filename: str
     wavelength: int
+    command_id_info = None
 
 
-class ImageCaptureCmdFileNameMetadata(BaseModel):
+@dataclass(frozen=True)
+class ImageCaptureCmdFileNameMetadata:
     """Data from a camera capture command used to build the finalized file name."""
 
     step_number: int
     command_timestamp: datetime
+    command_id_info: FileNameCmdMetadata
     base_filename: Optional[str]
 
 
-CommandFileNameMetadata = (
-    ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata | None
-)
+CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata
 
 
 class FileData:
@@ -44,7 +54,7 @@ class FileData:
     def build(
         data: bytes,
         mime_type: MimeType,
-        command_metadata: CommandFileNameMetadata = None,
+        command_metadata: CommandFileNameMetadata,
     ) -> "FileData":
         """Build a generic file data class."""
         file_data = FileData()
@@ -163,7 +173,7 @@ class FileProvider:
         self,
         data: bytes,
         mime_type: MimeType,
-        command_metadata: CommandFileNameMetadata = None,
+        command_metadata: CommandFileNameMetadata,
     ) -> DataFileInfo:
         """Writes arbitrary data to a file in the Data Files directory. Returns the `DataFileInfo` of the file created."""
         if self._data_files_filecount is not None:

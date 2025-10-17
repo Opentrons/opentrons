@@ -79,6 +79,10 @@ class FileProviderExecutor:
                 filename=final_filename, file_id=file_id, file_data=file_data
             )
             md5sum = self._get_md5sum(file_data)
+            cmd_id_info = file_data.command_metadata.command_id_info
+            command_id = cmd_id_info.command_id if cmd_id_info else None
+            prev_command_id = cmd_id_info.prev_command_id if cmd_id_info else None
+            failed_command_id = cmd_id_info.failed_command_id if cmd_id_info else None
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -94,10 +98,9 @@ class FileProviderExecutor:
                 source=DataFileSource.GENERATED,
                 run_id=self._run_metadata.run_id,
                 mime_type=file_data.mime_type,
-                # TOME TODO: Update after merging CB's PR!
-                command_id=None,
-                prev_command_id=None,
-                failed_command_id=None,
+                command_id=command_id,
+                prev_command_id=prev_command_id,
+                failed_command_id=failed_command_id,
             )
             await self._data_files_store.insert(file_info)
             return file_info
