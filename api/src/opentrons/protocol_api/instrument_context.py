@@ -200,6 +200,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
         flow_rate: Optional[float] = None,
         end_location: Optional[types.Location] = None,
+        movement_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -243,7 +244,12 @@ class InstrumentContext(publisher.CommandPublisher):
             while aspirating liquid. When this argument is used the location and
             end_location must both be :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-
+        :param movement_delay: Delay the x/y/z movement during a dynamic aspirate.
+            This option is only valid when using end_location. When this argument
+            is used, the x/y/z movement will wait movement_delay seconds after the pipette
+            starts to aspirate before moving. This may help when dispensing very viscous liquids
+            that need to build up some pressure before liquid starts to flow.
+        :type movement_delay: float
         :returns: This instance.
 
         .. note::
@@ -395,6 +401,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 meniscus_tracking=meniscus_tracking,
                 end_location=end_move_to_location,
                 end_meniscus_tracking=end_meniscus_tracking,
+                movement_delay=movement_delay,
             )
 
         return self
@@ -410,6 +417,7 @@ class InstrumentContext(publisher.CommandPublisher):
         push_out: Optional[float] = None,
         flow_rate: Optional[float] = None,
         end_location: Optional[types.Location] = None,
+        movement_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Dispense liquid from a pipette tip.
@@ -483,7 +491,12 @@ class InstrumentContext(publisher.CommandPublisher):
             while dispensing liquid held in the pipette. When this argument is used
             the location and end_location must both be a :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-
+        :param movement_delay: Delay the x/y/z movement during a dynamic dispense.
+            This option is only valid when using end_location. When this argument
+            is used, the x/y/z movement will wait movement_delay seconds after the pipette
+            starts to dispense before moving. This may help when dispensing very viscous liquids
+            that need to build up some pressure before liquid starts to flow.
+        :type movement_delay: float
         :returns: This instance.
 
         .. note::
@@ -572,6 +585,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     meniscus_tracking=None,
                     end_location=None,
                     end_meniscus_tracking=None,
+                    movement_delay=movement_delay,
                 )
             return self
 
