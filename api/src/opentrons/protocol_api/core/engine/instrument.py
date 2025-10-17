@@ -2006,17 +2006,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> None:
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
         if selected_tips is not None:
-            # TODO this can just be made into a NextTipInfo object and use the existing method
             # TODO also figure out what to do if we run out here
-            tip_well = selected_tips.pop(0)
-            tiprack_labware_core = self._protocol_core._labware_cores_by_id[
-                tip_well.labware_id
-            ]
-            tiprack = [
-                loc for loc, lw_core in tip_racks if lw_core == tiprack_labware_core
-            ]
-            tiprack_uri = tiprack_labware_core.get_uri()
-            tiprack_loc = Location(tip_well.get_top(0), tiprack[0].labware)
+            tip_core = selected_tips.pop(0)
+            next_tip = NextTipInfo(
+                labwareId=tip_core.labware_id, tipStartingWell=tip_core.get_name()
+            )
         else:
             next_tip = self.get_next_tip(
                 tip_racks=[core for loc, core in tip_racks],
@@ -2027,11 +2021,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
                     f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
                 )
-            (
-                tiprack_loc,
-                tiprack_uri,
-                tip_well,
-            ) = self._get_location_and_well_core_from_next_tip_info(next_tip, tip_racks)
+        (
+            tiprack_loc,
+            tiprack_uri,
+            tip_well,
+        ) = self._get_location_and_well_core_from_next_tip_info(next_tip, tip_racks)
 
         if tiprack_uri != tiprack_uri_for_transfer_props:
             raise RuntimeError(
