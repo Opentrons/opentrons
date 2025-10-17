@@ -23,7 +23,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "aiohttp==3.9.3",
+    "aiohttp==3.13.1",
 ]
 dynamic = ['version']
 
