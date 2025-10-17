@@ -6,6 +6,14 @@ There are hundreds of OT-2 protocols in the Protocol Library, and you may have c
 
 ## OT-2 Python protocols
 
+### Using OpentronsAI 
+
+OpentronsAI is the easiest way to convert your Python protocol to run on Flex. 
+
+Upload your exising Python file to OpentronsAI. From the dropdown menu, choose **Adapt Python protocol from OT-2 to Flex**. Be sure to include details of the changes you'd like below. You can request that OpentronsAI include Flex-exclusive modules and features, like the Flex Stacker Module or X, in your updated protocol. 
+
+### Using the Python Protocol API
+
 Using the Python Protocol API, you only have to change a few aspects of an OT-2 protocol for it to run on Flex.
 
 ### Metadata and requirements

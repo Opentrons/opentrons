@@ -42,6 +42,7 @@ nav:
       - Protocol Library: protocols/library.md
       - Custom Protocol Service: protocols/development-service.md
       - Protocol Designer: protocols/designer.md
+      - Opentrons AI: protocols/opentrons-ai.md
       - Python Protocol API: protocols/python-api.md
       - Converting OT-2 Protocols: protocols/ot-2.md
   - Touchscreen: 
