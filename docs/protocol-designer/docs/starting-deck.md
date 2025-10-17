@@ -43,7 +43,7 @@ In the menu, search for or select a labware type and view available options from
 - **Adapters** like the Flex Deck Riser
 - Labware **lids** 
 
-You can stack up to five lids to use later in your protocol in an open deck slot or on a Flex Deck Riser. 
+You can stack up to five lids to use later in your protocol in an open deck slot or on a Flex Deck Riser. Tip rack lids can't be stacked or placed on the deck or a Deck Riser. 
 
 Click at the bottom of the labware list to upload a JSON file and use custom labware in your protocol. 
 
