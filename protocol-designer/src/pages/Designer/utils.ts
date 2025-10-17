@@ -395,7 +395,9 @@ export const getUnoccupiedStackOptions = (args: {
       //  on itself. We don't allow that pattern with any other well plate. So i'm hardcoding
       //  it in to filter it out for now. but in the future when we support labware stacking
       //  we need to make this logic more robust
-      const isCompatible = labwareCompatibleParentLabware?.includes(loadName) && loadName !== TOUGH_PLATE_LOADNAME
+      const isCompatible =
+        labwareCompatibleParentLabware?.includes(loadName) &&
+        loadName !== TOUGH_PLATE_LOADNAME
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )
