@@ -1,7 +1,6 @@
 import {
   ETHANOL_LIQUID_CLASS_NAME,
   GLYCEROL_LIQUID_CLASS_NAME,
-  NONE_LIQUID_CLASS_NAME,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
@@ -30,9 +29,7 @@ const getMigratedLiquidClassNames = (liquidClass: string): string => {
     return GLYCEROL_LIQUID_CLASS_NAME
   } else if (liquidClass === ETHANOL_LIQUID_CLASS_NAME_V1) {
     return ETHANOL_LIQUID_CLASS_NAME
-  } else {
-    return NONE_LIQUID_CLASS_NAME
-  }
+  } else return liquidClass
 }
 
 export const migrateFile = (
