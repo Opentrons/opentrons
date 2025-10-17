@@ -78,7 +78,7 @@ export const migrateFile = (
           [id]: {
             ...form,
             //  migrate from old liquidClass name
-            liquidClass: getMigratedLiquidClassNames(liquidClass),
+            liquidClass: getMigratedLiquidClassNames(liquidClass as string),
             aspirate_mmFromBottom:
               aspirate_mmFromBottom != null
                 ? aspirate_mmFromBottom
@@ -98,7 +98,7 @@ export const migrateFile = (
           [id]: {
             ...form,
             //  migrate from old liquidClass name
-            liquidClass: getMigratedLiquidClassNames(liquidClass),
+            liquidClass: getMigratedLiquidClassNames(liquidClass as string),
           },
         }
       }
