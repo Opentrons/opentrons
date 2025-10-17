@@ -60,6 +60,8 @@ async def ffmpeg_capture_image_bytes(
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
+    stdout: bytes
+    stderr: bytes
     stdout, stderr = await subprocess.communicate()
     if subprocess.returncode == 0:
         log.info("Successfully captured an image with camera.")

@@ -1,6 +1,7 @@
 """Command models to capture an image with a camera."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Tuple, Any
+from datetime import datetime
 
 from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
@@ -16,7 +17,7 @@ from ..errors.error_occurrence import ErrorOccurrence
 from ..resources.file_provider import (
     MAXIMUM_FILE_LIMIT,
     MimeType,
-    ImageJpegFileNameMetadata,
+    ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
 from ..resources import CameraProvider
@@ -119,7 +120,7 @@ class CaptureImageImpl(
         state_update = update_types.StateUpdate()
 
         # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
-        
+
         if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
             raise StorageLimitReachedError(
                 message=f"Attempt to write image file exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
@@ -138,22 +139,16 @@ class CaptureImageImpl(
         # Conditionally save file if camera data was returned - in simulation we don't return anything.
         file_id: str | None = None
         if camera_data:
-            # Begin interfacing with the file provider
-            if params.fileName is not None:
-                filename = params.fileName
-            else:
-                # TODO: determine file name generation behavior and replace this
-                file_count = self._state_view.files.get_filecount() + 1
-                filename = "TEMPORARY" + str(file_count)
-
-            file_id = await self._file_provider.write_file(
+            file_info = await self._file_provider.write_file(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
-                command_metadata=ImageJpegFileNameMetadata(
-                    base_filename=filename,
+                command_metadata=ImageCaptureCmdFileNameMetadata(
+                    step_number=len(self._state_view.commands.get_all()) + 1,
+                    command_timestamp=datetime.now(),
+                    base_filename=params.fileName,
                 ),
             )
-
+            file_id = file_info.id
             state_update.files_added = update_types.FilesAddedUpdate(file_ids=[file_id])
 
         return SuccessData(
