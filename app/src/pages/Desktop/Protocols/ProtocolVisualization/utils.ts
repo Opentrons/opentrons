@@ -44,6 +44,8 @@ import type {
   PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -269,6 +271,25 @@ export const getActiveLayer = (
   }
 }
 
+const getSlotFromPipetteLocation = (
+  entityUnderPipette: string,
+  labware: RobotState['labware'],
+  trashBinEntities: TrashBinEntities,
+  wasteChuteEntities: WasteChuteEntities
+): string | null => {
+  if (labware[entityUnderPipette] != null) {
+    return getSlotInLocationStack(labware[entityUnderPipette].stack)
+  } else if (trashBinEntities[entityUnderPipette] != null) {
+    return trashBinEntities[entityUnderPipette].location.split('cutout')[1]
+  } else if (wasteChuteEntities[entityUnderPipette] != null) {
+    return wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
+  } else
+    console.warn(
+      `expected to find slot assosciated with piette location ${entityUnderPipette} but could not`
+    )
+  return null
+}
+
 export const getActiveSlotForLabwareDetails = (
   pipettes: PipetteTemporalProperties[],
   robotState: RobotState,
@@ -283,13 +304,12 @@ export const getActiveSlotForLabwareDetails = (
   let slot = null
 
   if (entityUnderPipette != null) {
-    if (labware[entityUnderPipette] != null) {
-      slot = getSlotInLocationStack(labware[entityUnderPipette].stack)
-    } else if (trashBinEntities[entityUnderPipette] != null) {
-      slot = trashBinEntities[entityUnderPipette].location.split('cutout')[1]
-    } else if (wasteChuteEntities[entityUnderPipette] != null) {
-      slot = wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
-    }
+    slot = getSlotFromPipetteLocation(
+      entityUnderPipette,
+      labware,
+      trashBinEntities,
+      wasteChuteEntities
+    )
   } else if ('labwareId' in currentCommand.params) {
     slot = currentCommand.params.labwareId
   }
@@ -304,19 +324,18 @@ export const getActiveSlotForTiprackDetails = (
 ): DeckSlot | null => {
   const { labware } = robotState
   const { trashBinEntities, wasteChuteEntities } = invariantContext
-  const entityUnderPipette = pipettes.find(
+  const tiprackUnderPipette = pipettes.find(
     pipette => pipette.tiprackId != null
   )?.tiprackId
   let slot = null
 
-  if (entityUnderPipette != null) {
-    if (labware[entityUnderPipette] != null) {
-      slot = getSlotInLocationStack(labware[entityUnderPipette].stack)
-    } else if (trashBinEntities[entityUnderPipette] != null) {
-      slot = trashBinEntities[entityUnderPipette].location.split('cutout')[1]
-    } else if (wasteChuteEntities[entityUnderPipette] != null) {
-      slot = wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
-    }
+  if (tiprackUnderPipette != null) {
+    slot = getSlotFromPipetteLocation(
+      tiprackUnderPipette,
+      labware,
+      trashBinEntities,
+      wasteChuteEntities
+    )
   }
 
   return slot
