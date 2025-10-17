@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -15,8 +16,8 @@ import type { PipetteWizardStepProps } from './types'
 export const RemoveWasteChute = (
   props: PipetteWizardStepProps
 ): JSX.Element | null => {
-  const { attachedPipettes, mount } = props
-  const { isRobotMoving, errorMessage } = props
+  const { attachedPipettes, mount, isOnDevice, isRobotMoving, errorMessage } =
+    props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [, setShowUnableToDetect] = useState<boolean>(false)
   const pipetteId = attachedPipettes[mount]?.serialNumber
@@ -34,20 +35,30 @@ export const RemoveWasteChute = (
   return errorMessage != null ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
       header={t('shared:error_encountered')}
       isSuccess={false}
       subHeader={errorMessage}
     />
   ) : (
     <SimpleWizardBody
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
       header={t('waste_chute_error')}
       subHeader={t('waste_chute_warning')}
       iconColor={COLORS.yellow50}
       isSuccess={false}
     >
-      <PrimaryButton onClick={startCalibration}>
-        {t('begin_calibration')}
-      </PrimaryButton>
+      {isOnDevice ? (
+        <SmallButton
+          buttonType="primary"
+          onClick={startCalibration}
+          buttonText={t('begin_calibration')}
+        />
+      ) : (
+        <PrimaryButton onClick={startCalibration}>
+          {t('begin_calibration')}
+        </PrimaryButton>
+      )}
     </SimpleWizardBody>
   )
 }

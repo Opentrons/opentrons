@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 
+import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -12,7 +13,7 @@ import type { PipetteWizardStepProps } from './types'
 export const AttachWasteChute = (
   props: PipetteWizardStepProps
 ): JSX.Element => {
-  const { isRobotMoving, errorMessage, proceed } = props
+  const { isRobotMoving, errorMessage, proceed, isOnDevice } = props
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -33,14 +34,23 @@ export const AttachWasteChute = (
     />
   ) : (
     <SimpleWizardBody
+      justifyContentForOddButton={JUSTIFY_FLEX_END}
       header={t('attach_wastechute')}
       subHeader={t('waste_chute_attach_warning')}
       iconColor={COLORS.yellow50}
       isSuccess={false}
     >
-      <PrimaryButton onClick={handleOnClick}>
-        {i18n.format(t('shared:continue'), 'capitalize')}
-      </PrimaryButton>
+      {isOnDevice ? (
+        <SmallButton
+          buttonType="primary"
+          onClick={handleOnClick}
+          buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+        />
+      ) : (
+        <PrimaryButton onClick={handleOnClick}>
+          {i18n.format(t('shared:continue'), 'capitalize')}
+        </PrimaryButton>
+      )}
     </SimpleWizardBody>
   )
 }

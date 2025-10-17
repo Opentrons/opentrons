@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 import { css } from 'styled-components'
 
 import {
@@ -196,7 +197,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       }
       proceedButtonText={
         is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? t('shared:continue')
+          ? capitalize('shared:continue')
           : t('begin_calibration')
       }
       proceed={
