@@ -83,13 +83,14 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background: linear-gradient(
-    to right,
-    var(--blue-50) 0%,
-    var(--blue-50) var(--progress, 0%),
-    #ccc var(--progress, 0%),
-    #ccc 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
 }
 
 /* Hide thumb initially */
@@ -179,8 +180,8 @@
 }
 
 .deck_view_padding {
-  padding: 0 var(--spacing-12);
   height: 100%;
+  padding: 0 var(--spacing-12);
 }
 
 .align_deck_modules {

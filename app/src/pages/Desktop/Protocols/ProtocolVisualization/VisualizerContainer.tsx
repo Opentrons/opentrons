@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -118,7 +117,6 @@ export function VisualizerContainer(
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
   )
-  const allRunDefs = getLabwareDefinitionsFromCommands(commands)
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
