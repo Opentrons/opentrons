@@ -3,43 +3,31 @@
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import git from 'simple-git'
+import semver from 'semver'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
+const PROJECT = 'protocol-designer'
+
+// Tag prefixes in priority order (production > staging)
+const TAG_PREFIXES = [
+    `${PROJECT}@`,
+    `staging-${PROJECT}@`
+]
 
 export function monorepoGit() {
     return git({ baseDir: REPO_BASE })
 }
 
-export const detailsFromTag = tag => {
+export const versionFromTag = tag => {
+    // Extract version from tag format: protocol-designer@8.6.0 or staging-protocol-designer@8.6.0
     const parts = tag.split('@')
-    // Handle staging- prefix by removing it from the project name
-    const project = parts[0].replace(/^staging-/, '')
-    return [project, parts[1]]
+    return parts[1]
 }
 
-export function tagFromDetails(project, version) {
-    const prefix = prefixForProject(project)
-    return `${prefix}${version}`
-}
-
-export function prefixForProject(project) {
-    return `${project}@`
-}
-
-export function prefixesForProject(project) {
-    if (project === 'protocol-designer') {
-        // Order matters: protocol-designer@ tags take precedence over staging-protocol-designer@ tags
-        return [`${project}@`, `staging-${project}@`]
-    } else {
-        return [`${project}@`]
-    }
-}
-
-export async function getTagsPointingAtHead(project) {
-    const prefixes = prefixesForProject(project)
+export async function getTagsPointingAtHead() {
     const allTags = []
 
-    for (const prefix of prefixes) {
+    for (const prefix of TAG_PREFIXES) {
         try {
             const tags = (
                 await monorepoGit().raw([
@@ -118,42 +106,47 @@ export function getTimestamp() {
     return `${year}${month}${day}-${hours}${minutes}${seconds}`
 }
 
-export async function latestTagForProject(project) {
+export async function getLatestTag() {
     const gitClient = monorepoGit()
-    const prefixes = prefixesForProject(project)
     const candidates = []
 
-    for (const prefix of prefixes) {
+    // Get all tags reachable from HEAD for each prefix
+    for (const prefix of TAG_PREFIXES) {
         try {
-            const tag = (
-                await gitClient
-                    .raw([
-                        'describe',
-                        '--tags',
-                        '--abbrev=0',
-                        `--match=${prefix}*`,
-                    ])
-            ).trim()
-
-            if (tag.length === 0) {
-                continue
-            }
-
-            const distanceOutput = (
+            const tagsOutput = (
                 await gitClient.raw([
-                    'rev-list',
-                    `${tag}..HEAD`,
-                    '--count',
+                    'tag',
+                    '--merged',
+                    'HEAD',
+                    '--list',
+                    `${prefix}*`,
                 ])
             ).trim()
 
-            const distance = Number.parseInt(distanceOutput, 10)
+            if (tagsOutput.length === 0) {
+                continue
+            }
 
-            candidates.push({
-                tag,
-                distance: Number.isNaN(distance) ? Number.POSITIVE_INFINITY : distance,
-                prefix,
-            })
+            const tags = tagsOutput.split('\n').filter(t => t.length > 0)
+
+            // Parse version from each tag and add to candidates
+            for (const tag of tags) {
+                try {
+                    const version = versionFromTag(tag)
+                    const parsedVersion = semver.parse(version)
+
+                    if (parsedVersion != null) {
+                        candidates.push({
+                            tag,
+                            version: parsedVersion,
+                            prefix,
+                        })
+                    }
+                } catch (error) {
+                    // Skip tags that don't have valid semver
+                    continue
+                }
+            }
         } catch (error) {
             continue
         }
@@ -161,44 +154,46 @@ export async function latestTagForProject(project) {
 
     if (candidates.length === 0) {
         throw new Error(
-            `No matching tags found for project ${project}.`
+            `No matching tags found for ${PROJECT}.`
         )
     }
 
+    // Sort by semantic version (highest first), then by prefix priority
     candidates.sort((a, b) => {
-        if (a.distance !== b.distance) {
-            return a.distance - b.distance
+        // Compare semantic versions
+        const versionCompare = semver.rcompare(a.version, b.version)
+        
+        if (versionCompare !== 0) {
+            return versionCompare
         }
 
-        return prefixes.indexOf(a.prefix) - prefixes.indexOf(b.prefix)
+        // If versions are equal, use prefix priority (production > staging)
+        return TAG_PREFIXES.indexOf(a.prefix) - TAG_PREFIXES.indexOf(b.prefix)
     })
 
     return candidates[0].tag
 }
 
-export async function versionForProject(project) {
-    return latestTagForProject(project)
-        .then(tag => {
-            const [, version] = detailsFromTag(tag)
-            return version
-        })
+export async function getVersion() {
+    return getLatestTag()
+        .then(tag => versionFromTag(tag))
         .catch(error => {
             console.error(
-                `Could not find a version for project ${project} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
+                `Could not find a version for ${PROJECT} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
             )
             return '0.0.0-dev'
         })
 }
 
-export async function generateBuildInfoHtml(project, outputPath) {
-    const version = await versionForProject(project)
+export async function generateBuildInfoHtml(outputPath) {
+    const version = await getVersion()
     const timestamp = getTimestamp()
     const isCI = process.env.CI === 'true'
 
     let gitInfo = {}
     try {
         const branch = await getCurrentBranchName()
-        const tags = await getTagsPointingAtHead(project)
+        const tags = await getTagsPointingAtHead()
         const commitSha = (await monorepoGit().raw(['rev-parse', 'HEAD'])).trim()
         const shortSha = commitSha.substring(0, 7)
         const commitMessage = (await monorepoGit().raw(['log', '-1', '--pretty=%B'])).trim()
@@ -287,7 +282,7 @@ export async function generateBuildInfoHtml(project, outputPath) {
 
     // Build information
     const buildInfo = {
-        project,
+        project: PROJECT,
         version,
         timestamp,
         buildDate: new Date().toISOString(),
