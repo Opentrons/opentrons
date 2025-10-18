@@ -22,7 +22,6 @@ import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import { ProbeNotAttached } from './ProbeNotAttached'
@@ -32,10 +31,13 @@ import {
   startCalibrationOnClick,
 } from './utils'
 
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
+  deckConfig: UseQueryResult<DeckConfiguration>
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -60,6 +62,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     errorMessage,
     isOnDevice,
     flowType,
+    deckConfig,
   } = props
 
   const handleOnClick = (): void => {
@@ -69,7 +72,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
   const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
-  const deckConfig = useNotifyDeckConfigurationQuery()
   const pipetteId = attachedPipettes[mount]?.serialNumber
   if (pipetteId == null) return null
   const displayName = attachedPipettes[mount]?.displayName

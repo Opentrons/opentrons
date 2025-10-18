@@ -43,7 +43,7 @@ describe('AttachWasteChute', () => {
     screen.getByText(
       'Re-attach waste chute to match current deck configuration.'
     )
-    const proceedBtn = screen.getByRole('button', { name: /continue/i })
+    const proceedBtn = screen.getByRole('button', { name: /confirm/i })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })

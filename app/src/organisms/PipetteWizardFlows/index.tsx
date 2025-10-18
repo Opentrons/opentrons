@@ -341,6 +341,7 @@ export const PipetteWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
+        deckConfig={deckConfig}
         requiredPipette={requiredPipette}
       />
     )
@@ -353,6 +354,7 @@ export const PipetteWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isExiting={isExiting}
+        deckConfig={deckConfig}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {

@@ -48,7 +48,7 @@ export const AttachWasteChute = (
         />
       ) : (
         <PrimaryButton onClick={handleOnClick}>
-          {i18n.format(t('shared:continue'), 'capitalize')}
+          {t('shared:confirm')}
         </PrimaryButton>
       )}
     </SimpleWizardBody>

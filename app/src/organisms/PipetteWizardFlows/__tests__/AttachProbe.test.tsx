@@ -10,13 +10,14 @@ import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '/app/redux/pipettes/__fixtures__'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { AttachProbe } from '../AttachProbe'
 import { FLOWS } from '../constants'
 
 import type { ComponentProps } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 const render = (props: ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
@@ -26,6 +27,16 @@ const render = (props: ComponentProps<typeof AttachProbe>) => {
 vi.mock('/app/resources/deck_configuration')
 
 describe('AttachProbe', () => {
+  const mockDeckConfig = {
+    data: [
+      {
+        cutoutId: 'cutoutD3',
+      } as any,
+    ],
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as UseQueryResult<DeckConfiguration>
   let props: ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
@@ -45,14 +56,8 @@ describe('AttachProbe', () => {
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
+      deckConfig: mockDeckConfig,
     }
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
-      data: [
-        {
-          cutoutId: 'cutoutD3',
-        } as any,
-      ],
-    } as any)
   })
   it('returns the correct information, buttons work as expected', async () => {
     render(props)

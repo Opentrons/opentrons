@@ -23,7 +23,6 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import {
   BODY_STYLE,
@@ -37,13 +36,14 @@ import {
 import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
 
 import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { UseMutateFunction, UseQueryResult } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type {
   CreateCommand,
+  DeckConfiguration,
   LoadedPipette,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -58,6 +58,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   >
   isCreateLoading: boolean
   createdMaintenanceRunId: string | null
+  deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
 }
 export const BeforeBeginning = (
@@ -79,6 +80,7 @@ export const BeforeBeginning = (
     requiredPipette,
     maintenanceRunId,
     createdMaintenanceRunId,
+    deckConfig,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   useEffect(() => {
@@ -92,8 +94,6 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useNotifyDeckConfigurationQuery()
-
   const pipetteDisplayName = usePipetteNameSpecs(
     requiredPipette?.pipetteName as PipetteName
   )?.displayName
