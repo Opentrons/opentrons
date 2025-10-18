@@ -55,7 +55,7 @@ class FileProviderExecutor:
     ) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
         async with self._lock:
-            file_id = await get_unique_id()
+            file_id = await self._build_file_id(file_data)
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
@@ -108,6 +108,24 @@ class FileProviderExecutor:
 
             return base_name + str(metadata.wavelength) + "nm.csv"
         elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            return file_id
+        else:
+            return f"{file_id}.dat"
+
+    def _format_filepath(
+        self, filename: str, file_id: str, file_data: FileData
+    ) -> Path:
+        """Given a finalized filename, return the full filepath for the filename."""
+        if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
+            return self._data_files_directory / file_id / filename
+        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            return self._images_directory / file_data.run_metadata.run_id / filename
+        else:
+            return self._data_files_directory / filename
+
+    async def _build_file_id(self, file_data: FileData) -> str:
+        """Return a file id for the provided file data."""
+        if isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
             cmd_metadata = file_data.command_metadata
             base_name = (
                 f"{cmd_metadata.base_filename}_" if cmd_metadata.base_filename else ""
@@ -127,20 +145,8 @@ class FileProviderExecutor:
                 + str(cmd_metadata.command_timestamp)
                 + ".jpeg"
             )
-
         else:
-            return f"{file_id}.dat"
-
-    def _format_filepath(
-        self, filename: str, file_id: str, file_data: FileData
-    ) -> Path:
-        """Given a finalized filename, return the full filepath for the filename."""
-        if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
-            return self._data_files_directory / file_id / filename
-        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
-            return self._images_directory / file_data.run_metadata.run_id / filename
-        else:
-            return self._data_files_directory / filename
+            return await get_unique_id()
 
     def _get_md5sum(self, file_data: FileData) -> str:
         """Returns the md5 checksum of the provided file data."""
