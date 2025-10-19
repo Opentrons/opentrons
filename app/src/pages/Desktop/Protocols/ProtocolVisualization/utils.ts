@@ -17,7 +17,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   _wellContentsForLabware,
-  AIR,
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
   getVolumesPerLiquid,
@@ -37,15 +36,11 @@ import type {
 import type {
   ContentsByWell,
   DeckSlot,
-  InvariantContext,
   LabwareTemporalProperties,
-  LocationLiquidState,
   ModuleEntities,
   PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
-  TrashBinEntities,
-  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -271,81 +266,6 @@ export const getActiveLayer = (
   }
 }
 
-const getSlotFromPipetteLocation = (
-  entityUnderPipette: string,
-  labware: RobotState['labware'],
-  trashBinEntities: TrashBinEntities,
-  wasteChuteEntities: WasteChuteEntities
-): string | null => {
-  if (labware[entityUnderPipette] != null) {
-    return getSlotInLocationStack(labware[entityUnderPipette].stack)
-  } else if (trashBinEntities[entityUnderPipette] != null) {
-    return trashBinEntities[entityUnderPipette].location.split('cutout')[1]
-  } else if (wasteChuteEntities[entityUnderPipette] != null) {
-    return wasteChuteEntities[entityUnderPipette].location.split('cutout')[1]
-  } else
-    console.warn(
-      `expected to find slot assosciated with piette location ${entityUnderPipette} but could not`
-    )
-  return null
-}
-
-export const getActiveSlotForLabwareDetails = (
-  pipettes: PipetteTemporalProperties[],
-  robotState: RobotState,
-  invariantContext: InvariantContext,
-  currentCommand: RunTimeCommand
-): DeckSlot | null => {
-  const { labware } = robotState
-  const { trashBinEntities, wasteChuteEntities, labwareEntities } =
-    invariantContext
-  const entityUnderPipette = pipettes.find(
-    pipette => pipette.entityId != null
-  )?.entityId
-  let slot = null
-
-  if (entityUnderPipette != null) {
-    slot = getSlotFromPipetteLocation(
-      entityUnderPipette,
-      labware,
-      trashBinEntities,
-      wasteChuteEntities
-    )
-  } else if ('labwareId' in currentCommand.params) {
-    const isTiprack =
-      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
-    if (!isTiprack) {
-      slot = currentCommand.params.labwareId
-    }
-  }
-
-  return slot
-}
-
-export const getActiveSlotForTiprackDetails = (
-  pipettes: PipetteTemporalProperties[],
-  robotState: RobotState,
-  invariantContext: InvariantContext
-): DeckSlot | null => {
-  const { labware } = robotState
-  const { trashBinEntities, wasteChuteEntities } = invariantContext
-  const tiprackUnderPipette = pipettes.find(
-    pipette => pipette.tiprackId != null
-  )?.tiprackId
-  let slot = null
-
-  if (tiprackUnderPipette != null) {
-    slot = getSlotFromPipetteLocation(
-      tiprackUnderPipette,
-      labware,
-      trashBinEntities,
-      wasteChuteEntities
-    )
-  }
-
-  return slot
-}
-
 export const getTopmostLabwareOnModuleFromStack = (
   moduleId: string,
   labware: LabwareTemporalProperties[]
@@ -368,36 +288,6 @@ export const getChannels = (
     numChannels = 12
   }
   return numChannels
-}
-
-interface TipSvgInfo {
-  tipColor: string
-  tipCurrentVolume: number
-}
-
-export const getTipSvgInfo = (
-  pipetteLocationLiquidState: LocationLiquidState,
-  liquids: Liquid[]
-): TipSvgInfo => {
-  const ingredIds = Object.keys(pipetteLocationLiquidState)
-  const colorsInTip = liquids
-    .filter(liquid => ingredIds.includes(liquid.id))
-    ?.map(liquid => liquid.displayColor)
-  const tipColor =
-    colorsInTip.length > 1 ? COLORS.grey40 : (colorsInTip[0] ?? COLORS.grey40)
-  const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
-    (sum, { volume }) => sum + volume,
-    0
-  )
-  return { tipColor, tipCurrentVolume }
-}
-
-export const getWellVolume = (
-  labwareLocationLiquidState: LocationLiquidState
-): number => {
-  return Object.entries(labwareLocationLiquidState)
-    .filter(([id, _]) => id !== AIR) // filter out air gap volume
-    .reduce((sum, [_, volume]) => sum + volume.volume, 0)
 }
 
 export function getNextGroupFirstCommandId(

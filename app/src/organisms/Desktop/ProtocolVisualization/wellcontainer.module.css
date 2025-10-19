@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: auto;
+}
+
+.well_details_caption_bottom {
+  position: absolute;
+  right: 3.6rem;
+  bottom: 0.5rem;
+}
+
+.well_details_caption_side {
+  position: absolute;
+  right: 0.8rem;
+  top: 4.6rem;
+}
+
+.well_details_volume {
+  position: absolute;
+  left: 0.2rem;
+  top: 4.6rem;
+}
+
+.tip_details_volume {
+  position: absolute;
+  right: 2rem;
+  top: 0.3rem;
+}
+
+.well_detail_svg_container {
+  position: relative;
+  overflow: hidden;
+  width: 13.5rem;
+  height: 9.875rem;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+}
+
+.well_detail_svg_positioning {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+}

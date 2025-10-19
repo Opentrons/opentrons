@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { LabwareSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/LabwareSlotDetails'
 
+import { LabwareSlotContainer } from '../LabwareSlotContainer'
 import { PipetteContainer } from '../PipetteContainer'
 import { StepDetailContainer } from '../StepDetailContainer'
 import { TipDisposalContainer } from '../TipDisposalContainer'
@@ -16,7 +16,7 @@ import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 vi.mock('../PipetteContainer')
 vi.mock('../TipDisposalContainer')
 vi.mock('../TipPickupContainer')
-vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization/LabwareSlotDetails')
+vi.mock('../LabwareSlotContainer')
 
 const render = (props: ComponentProps<typeof StepDetailContainer>) => {
   return renderWithProviders(<StepDetailContainer {...props} />)
@@ -95,8 +95,8 @@ describe('StepDetailContainer', () => {
     vi.mocked(PipetteContainer).mockReturnValue(
       <div>mock Pipette Container</div>
     )
-    vi.mocked(LabwareSlotDetails).mockReturnValue(
-      <div>mock LabwareSlotDetails </div>
+    vi.mocked(LabwareSlotContainer).mockReturnValue(
+      <div>mock LabwareSlotContainer </div>
     )
     vi.mocked(TipDisposalContainer).mockReturnValue(
       <div>mock Tip Disposal Container</div>

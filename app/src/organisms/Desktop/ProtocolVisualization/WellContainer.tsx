@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 
 import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 import { getMmFromBottom } from '@opentrons/shared-data'
 
-import styles from './preview.module.css'
 import { TipSvg } from './TipSvg'
 import { getTipSvgInfo, getWellVolume } from './utils'
+import styles from './wellcontainer.module.css'
 import { WellSvg } from './WellSvg'
 
 import type {
@@ -20,7 +21,7 @@ const WELL_HEIGHT_PIXELS = 54
 const WELL_WIDTH_PIXELS = 20
 const PIXEL_DECIMALS = 2
 
-interface ActiveWellSlotDetailsProps {
+interface WellContainerProps {
   params: RunTimeCommand['params']
   activeWellName: string
   wellColor: string
@@ -30,9 +31,7 @@ interface ActiveWellSlotDetailsProps {
   liquids: Liquid[]
   tipMaxVolume: number
 }
-export function ActiveWellSlotDetails(
-  props: ActiveWellSlotDetailsProps
-): JSX.Element {
+export function WellContainer(props: WellContainerProps): JSX.Element {
   const {
     params,
     activeWellName,
@@ -44,6 +43,8 @@ export function ActiveWellSlotDetails(
     tipMaxVolume,
   } = props
   const { t } = useTranslation('protocol_visualization')
+  const [isWellHovered, setIsWellHovered] = useState<boolean>(false)
+  const [isTipHovered, setIsTipHovered] = useState<boolean>(false)
 
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
@@ -91,45 +92,70 @@ export function ActiveWellSlotDetails(
             deckLabel={t('well_name', { wellName: activeWellName })}
           />
         </div>
-      </div>
-      <div>
-        <div className={styles.main_content}>
-          <div className={styles.well_detail_svg_positioning}>
-            <div className={styles.well_detail_svg_container}>
-              <TipSvg
-                volume={tipCurrentVolume}
-                maxVolume={tipMaxVolume}
-                roundedXPositionPixels={roundedXPositionPixels}
-                bottomPx={bottomPx}
-                color={tipColor}
-              />
-              <WellSvg
-                volume={totalVolumeInWell}
-                maxVolume={labwareWellMaxVolume}
-                color={wellColor}
-              />
-              {labwareDepth !== null && (
-                <div className={styles.well_details_caption_side}>
-                  <StyledText
-                    desktopStyle="captionRegular"
-                    color={COLORS.grey60}
-                  >
-                    {round(labwareDepth, 0)}
-                    mm
-                  </StyledText>
+
+        <div>
+          <div className={styles.main_content}>
+            <div className={styles.well_detail_svg_positioning}>
+              <div className={styles.well_detail_svg_container}>
+                <TipSvg
+                  volume={tipCurrentVolume}
+                  maxVolume={tipMaxVolume}
+                  roundedXPositionPixels={roundedXPositionPixels}
+                  bottomPx={bottomPx}
+                  color={tipColor}
+                  setIsHovered={setIsTipHovered}
+                  isHovered={isTipHovered}
+                />
+                {isTipHovered ? (
+                  <div className={styles.tip_details_volume}>
+                    <Tag
+                      text={t('well_volume', {
+                        volume: tipCurrentVolume.toString(),
+                      })}
+                      type="flex"
+                    />
+                  </div>
+                ) : null}
+                {isWellHovered ? (
+                  <div className={styles.well_details_volume}>
+                    <Tag
+                      text={t('well_volume', {
+                        volume: totalVolumeInWell.toString(),
+                      })}
+                      type="flex"
+                    />
+                  </div>
+                ) : null}
+                <div style={{ paddingTop: '1rem' }}>
+                  <WellSvg
+                    volume={totalVolumeInWell}
+                    maxVolume={labwareWellMaxVolume}
+                    color={wellColor}
+                    setIsHovered={setIsWellHovered}
+                    isHovered={isWellHovered}
+                  />
                 </div>
-              )}
-              {xLabwareWellWidth !== null && (
-                <div className={styles.well_details_caption_bottom}>
-                  <StyledText
-                    desktopStyle="captionRegular"
-                    color={COLORS.grey60}
-                  >
-                    {xLabwareWellWidth}
-                    mm
-                  </StyledText>
-                </div>
-              )}
+                {labwareDepth !== null && (
+                  <div className={styles.well_details_caption_side}>
+                    <StyledText
+                      desktopStyle="captionRegular"
+                      color={COLORS.grey60}
+                    >
+                      {t('well_dimension', { number: round(labwareDepth, 0) })}
+                    </StyledText>
+                  </div>
+                )}
+                {xLabwareWellWidth !== null && (
+                  <div className={styles.well_details_caption_bottom}>
+                    <StyledText
+                      desktopStyle="captionRegular"
+                      color={COLORS.grey60}
+                    >
+                      {t('well_dimension', { number: xLabwareWellWidth })}
+                    </StyledText>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

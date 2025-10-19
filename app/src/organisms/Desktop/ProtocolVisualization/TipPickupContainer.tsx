@@ -10,17 +10,17 @@ import {
   RobotWorkSpace,
   StyledText,
   Tag,
-  TipType,
   USED,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { getMissingTips } from '/app/pages/Desktop/Protocols/ProtocolVisualization/utils'
 import { stepDetailViewerOpenAction } from '/app/redux/shell'
 
 import styles from './tippickupcontainer.module.css'
+import { getMissingTips } from './utils'
 
+import type { TipType } from '@opentrons/components'
 import type {
   LabwareEntity,
   RobotState,

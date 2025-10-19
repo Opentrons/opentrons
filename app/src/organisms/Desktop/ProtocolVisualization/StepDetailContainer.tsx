@@ -1,18 +1,15 @@
 import { parseInitialPipetteNamesByMount } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/LabwareSlotDetails'
-// eslint-disable-next-line opentrons/no-imports-up-the-tree-of-life
-import { ModuleSlotDetails } from '/app/pages/Desktop/Protocols/ProtocolVisualization/ModuleSlotDetails'
-import {
-  getActiveSlotForLabwareDetails,
-  getActiveSlotForTiprackDetails,
-} from '/app/pages/Desktop/Protocols/ProtocolVisualization/utils'
-
+import { LabwareSlotContainer } from './LabwareSlotContainer'
 import { PipetteContainer } from './PipetteContainer'
 import styles from './stepdetailcontainer.module.css'
 import { TipDisposalContainer } from './TipDisposalContainer'
 import { TipPickupContainer } from './TipPickupContainer'
+import {
+  getActiveSlotForLabwareDetails,
+  getActiveSlotForTiprackDetails,
+} from './utils'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
@@ -34,8 +31,8 @@ export function StepDetailContainer({
   currentCommand,
   liquids,
 }: StepDetailContainerProps): JSX.Element {
-  const { labwareEntities, pipetteEntities } = invariantContext
-  const { labware, modules, pipettes } = robotState
+  const { labwareEntities, pipetteEntities, moduleEntities } = invariantContext
+  const { labware, pipettes } = robotState
   const tiprackActiveSlot = getActiveSlotForTiprackDetails(
     Object.values(pipettes),
     robotState,
@@ -67,11 +64,6 @@ export function StepDetailContainer({
     leftMountPipetteName != null &&
     rightMountPipetteName == null &&
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
-
-  const { moduleEntities } = invariantContext
-  const moduleOnSlot = Object.entries(modules ?? {}).find(
-    ([_, module]) => module.slot === labwareActiveSlot
-  )
 
   const leftPipetteId =
     Object.entries(pipettes ?? {}).find(
@@ -117,7 +109,7 @@ export function StepDetailContainer({
         />
       ) : null}
       {topMostLabwareOnSlot != null ? (
-        <LabwareSlotDetails
+        <LabwareSlotContainer
           topLabwareOnSlotId={topMostLabwareOnSlot}
           labwareEntities={labwareEntities}
           commands={commands}
@@ -128,14 +120,7 @@ export function StepDetailContainer({
           moduleEntities={moduleEntities}
         />
       ) : null}
-      <TipDisposalContainer protocolKey={protocolKey} />
-      {moduleOnSlot != null ? (
-        <ModuleSlotDetails
-          moduleId={moduleOnSlot[0]}
-          moduleEntities={moduleEntities}
-          moduleRobotState={{ [moduleOnSlot[0]]: moduleOnSlot[1] }}
-        />
-      ) : null}
+      <TipDisposalContainer robotState={robotState} />
     </div>
   )
 }

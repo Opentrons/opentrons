@@ -15,9 +15,10 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import { ActiveWellSlotDetails } from './ActiveWellSlotDetails'
-import styles from './preview.module.css'
+import styles from './labwareslotcontainer.module.css'
 import { getAllWellContentsAtFrame } from './utils'
+import { WellContainer } from './WellContainer'
+import { WellTooltip } from './WellTooltip'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -28,7 +29,7 @@ import type {
   RobotState,
 } from '@opentrons/step-generation'
 
-interface LabwareSlotDetailsProps {
+interface LabwareSlotContainerProps {
   topLabwareOnSlotId: string
   labwareEntities: LabwareEntities
   commands: RunTimeCommand[]
@@ -38,8 +39,8 @@ interface LabwareSlotDetailsProps {
   pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
-export function LabwareSlotDetails(
-  props: LabwareSlotDetailsProps
+export function LabwareSlotContainer(
+  props: LabwareSlotContainerProps
 ): JSX.Element {
   const {
     commands,
@@ -114,11 +115,18 @@ export function LabwareSlotDetails(
       : 0
 
   const labwareViewBox = getLabwareViewBox(labwareDef)
+  const ingredNames = liquids.reduce(
+    (acc: Record<string, string>, { id, displayName }) => {
+      acc[id] = displayName
+      return acc
+    },
+    {}
+  )
 
   return (
     <>
       {activeWellName != null ? (
-        <ActiveWellSlotDetails
+        <WellContainer
           wells={wells}
           params={params}
           activeWellName={activeWellName}
@@ -160,24 +168,40 @@ export function LabwareSlotDetails(
           </StyledText>
         </div>
         <div className={styles.main_content}>
-          <div className={styles.labware_render_container}>
-            <RobotWorkSpace
-              key={topLabwareOnSlotId}
-              width="14rem"
-              viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
-            >
-              {() => (
-                <g>
-                  <LabwareRender
-                    definition={labwareDef}
-                    positioningMode="passThrough"
-                    wellFill={wellFill}
-                    highlightedWells={wellGroup}
-                  />
-                </g>
-              )}
-            </RobotWorkSpace>
-          </div>
+          <WellTooltip ingredNames={ingredNames}>
+            {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
+              <div className={styles.labware_render_container}>
+                <RobotWorkSpace
+                  key={topLabwareOnSlotId}
+                  width="14rem"
+                  viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
+                >
+                  {() => (
+                    <g>
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                        wellFill={wellFill}
+                        highlightedWells={wellGroup}
+                        onMouseLeaveWell={mouseEventArgs => {
+                          handleMouseLeaveWell(mouseEventArgs)
+                          handleMouseLeaveWell(mouseEventArgs.event)
+                        }}
+                        onMouseEnterWell={({ wellName, event }) => {
+                          if (wellContents !== null) {
+                            makeHandleMouseEnterWell(
+                              wellName,
+                              wellContents[wellName]?.ingreds
+                            )(event)
+                          }
+                        }}
+                      />
+                    </g>
+                  )}
+                </RobotWorkSpace>
+              </div>
+            )}
+          </WellTooltip>
         </div>
       </div>
     </>

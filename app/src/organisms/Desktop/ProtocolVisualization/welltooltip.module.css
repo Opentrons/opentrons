@@ -1,0 +1,36 @@
+.popperContent {
+  position: absolute;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  color: white;
+  background-color: rgba(0, 0, 0, 0.9);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.13),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+  padding: var(--spacing-8);
+  cursor: pointer;
+  z-index: 10000;
+  border-radius: var(--border-radius-8);
+  pointer-events: none;
+}
+
+.tooltipTable {
+  margin: 0.5em;
+  max-width: 20rem;
+}
+
+.tooltipRow {
+  min-width: 11.25rem;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background-color: #bcbcbc;
+  margin: 1em 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+}

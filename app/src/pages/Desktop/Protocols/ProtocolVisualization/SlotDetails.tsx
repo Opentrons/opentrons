@@ -9,7 +9,7 @@ import {
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareSlotDetails } from './LabwareSlotDetails'
+import { LabwareSlotContainer } from '../../../../organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
 import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
@@ -123,7 +123,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           />
         ) : null}
         {topMostLabwareOnSlot != null ? (
-          <LabwareSlotDetails
+          <LabwareSlotContainer
             topLabwareOnSlotId={topMostLabwareOnSlot}
             labwareEntities={labwareEntities}
             commands={commands}
