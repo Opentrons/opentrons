@@ -2,11 +2,13 @@ import asyncio
 import os
 from pathlib import Path
 import logging
+from functools import lru_cache
 from enum import Enum
 from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons.config import IS_ROBOT
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     ImageParameters,
@@ -132,6 +134,7 @@ async def update_live_stream_status(
         # Enable the stream
         status = "ON"
     # Overwrite the contents
+    contents["BOOT_ID"] = get_boot_id()
     contents["STATUS"] = status
     write_stream_configuration_file_data(contents)
     await restart_live_stream()
@@ -307,3 +310,11 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         # Restart the live stream service
         await restart_live_stream()
     return result
+
+
+@lru_cache(maxsize=1)
+def get_boot_id() -> str:
+    if IS_ROBOT:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    else:
+        return "SIMULATED_BOOT_ID"
