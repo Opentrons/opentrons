@@ -98,8 +98,8 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
           analysis: action.payload.analysis,
           liquids: action.payload.liquids,
         })
+        return null
       }
-      break
     case STEP_DETAIL_VIEWER_UPDATE:
       updateStepDetailViewerData(action.payload.protocolKey, {
         slot: action.payload.slot,
