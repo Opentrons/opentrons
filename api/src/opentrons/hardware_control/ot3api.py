@@ -3253,6 +3253,5 @@ class OT3API(
         s_data = await self._backend.read_capacitive_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def touch_probe(
-        self, axis: Axis, speed: float, distance: float) -> float:
-        return await self._backend.touch_probe(axis,speed,distance)
+    async def touch_probe(self, axis: Axis, speed: float, distance: float) -> float:
+        return await self._backend.touch_probe(axis, speed, distance)

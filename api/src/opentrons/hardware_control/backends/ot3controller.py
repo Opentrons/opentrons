@@ -1495,32 +1495,21 @@ class OT3Controller(FlexBackend):
         else:
             yield
 
-    async def touch_probe(
-        self,
-        axis: Axis,
-        speed: float,
-        distance: float
-    ) -> float:
+    async def touch_probe(self, axis: Axis, speed: float, distance: float) -> float:
 
-    positions = await touch_probe(
-        messenger=self._messenger,
-        mover=axis_to_node(axis),
-        distance=distance,
-        speed=speed
-    )
+        status = await touch_probe(
+            messenger=self._messenger,
+            mover=axis_to_node(axis),
+            distance=distance,
+            speed=speed,
+        )
 
-    for node, point in positions.items():
-        self._position.update({node: point.motor_position})
-        self._encoder_position.update({node: point.encoder_position})
+        self._position[axis_to_node(axis)] = status.motor_position
 
-    if (
-        axis_to_node(axis) not in positions
-        or positions[axis_to_node(axis)].move_ack
-        == MoveCompleteAck.complete_without_condition
-    ):
-        raise Exception("Booo")
+        if status.move_ack != MoveCompleteAck.stopped_by_condition:
+            raise Exception("Booo")
 
-    return self._position[axis_to_node(Axis.by_mount(mount))]
+        return self._position[axis_to_node(axis)]
 
     async def liquid_probe(
         self,

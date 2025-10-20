@@ -520,7 +520,7 @@ async def capacitive_pass(
 
 async def touch_probe(
     messenger: CanMessenger,
-    mover: Union[NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r],
+    mover: NodeId,
     distance: float,
     speed: float,
 ) -> MotorPositionStatus:
