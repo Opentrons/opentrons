@@ -117,7 +117,6 @@ async def test_insert_data_file_info_and_fetch_by_hash(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     assert subject.get_file_info_by_hash("abc123") is None
     await subject.insert(data_file_info)
@@ -138,7 +137,6 @@ async def test_insert_file_info_with_existing_id(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     data_file_info2 = DataFileInfo(
         id="file-id",
@@ -150,7 +148,6 @@ async def test_insert_file_info_with_existing_id(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     await subject.insert(data_file_info1)
     with pytest.raises(Exception):
@@ -171,7 +168,6 @@ async def test_insert_data_file_info_and_get_by_id(
         mime_type=MimeType.TEXT_CSV,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     await subject.insert(data_file_info)
     assert subject.get("file-id") == data_file_info
@@ -210,7 +206,6 @@ async def test_get_usage_info(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     data_file_2 = DataFileInfo(
         id="file-id-2",
@@ -222,7 +217,6 @@ async def test_get_usage_info(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     await subject.insert(data_file_1)
     await subject.insert(data_file_2)
@@ -258,7 +252,6 @@ async def test_remove(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
     await subject.insert(data_file_info)
     subject.remove(file_id="file-id")
@@ -293,7 +286,6 @@ async def test_remove_raises_in_file_in_use(
         run_id=None,
         command_id=None,
         prev_command_id=None,
-        failed_command_id=None,
     )
 
     protocol_resource = _get_sample_protocol_resource("protocol-id")

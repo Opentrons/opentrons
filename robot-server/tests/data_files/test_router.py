@@ -110,7 +110,6 @@ async def test_upload_new_data_file(
                 run_id=None,
                 command_id=None,
                 prev_command_id=None,
-                failed_command_id=None,
             )
         ),
     )
@@ -146,7 +145,6 @@ async def test_upload_existing_data_file(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
 
@@ -221,7 +219,6 @@ async def test_upload_new_data_file_path(
                 run_id=None,
                 command_id=None,
                 prev_command_id=None,
-                failed_command_id=None,
             )
         ),
     )
@@ -303,7 +300,6 @@ async def test_get_data_file_info(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
 
@@ -357,7 +353,6 @@ async def test_get_data_file(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
 
@@ -404,7 +399,6 @@ async def test_get_all_data_file_info(
                 run_id=None,
                 command_id=None,
                 prev_command_id=None,
-                failed_command_id=None,
             ),
             DataFileInfo(
                 id="hfhcjdeowjfie",
@@ -416,7 +410,6 @@ async def test_get_all_data_file_info(
                 run_id=None,
                 command_id=None,
                 prev_command_id=None,
-                failed_command_id=None,
             ),
         ]
     )

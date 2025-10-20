@@ -50,7 +50,6 @@ class DataFilesStore:
             "run_id": file_info.run_id,
             "command_id": file_info.command_id,
             "prev_command_id": file_info.prev_command_id,
-            "failed_command_id": file_info.failed_command_id,
         }
         statement = sqlalchemy.insert(data_files_table).values(file_info_dict)
         with self._sql_engine.begin() as transaction:
@@ -177,5 +176,4 @@ def _convert_row_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
         mime_type=row.mime_type,
         command_id=row.command_id,
         prev_command_id=row.prev_command_id,
-        failed_command_id=row.failed_command_id,
     )

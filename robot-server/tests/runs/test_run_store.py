@@ -407,7 +407,6 @@ async def test_insert_and_get_csv_rtp(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
 
@@ -641,7 +640,6 @@ async def test_remove_run(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)

@@ -337,7 +337,6 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     await subject.make_room_and_add(
@@ -477,7 +476,6 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     # Set up the database with existing analyses

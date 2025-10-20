@@ -143,7 +143,6 @@ EXPECTED_STATEMENTS_LATEST = [
         run_id VARCHAR,
         command_id VARCHAR,
         prev_command_id VARCHAR,
-        failed_command_id VARCHAR,
         PRIMARY KEY (id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )

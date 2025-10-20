@@ -262,7 +262,6 @@ async def test_create_protocol_run(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     decoy.when(

@@ -33,4 +33,3 @@ class DataFileInfo:
     run_id: Optional[str]
     command_id: Optional[str]
     prev_command_id: Optional[str]
-    failed_command_id: Optional[str]

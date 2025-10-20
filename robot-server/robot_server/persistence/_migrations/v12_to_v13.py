@@ -95,6 +95,5 @@ def _migrate_data_files_table(connection: sqlalchemy.engine.Connection) -> None:
                 run_id=None,
                 command_id=None,
                 prev_command_id=None,
-                failed_command_id=None,
             )
         )

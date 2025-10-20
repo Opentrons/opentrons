@@ -82,7 +82,6 @@ class FileProviderExecutor:
             cmd_id_info = file_data.command_metadata.command_id_info
             command_id = cmd_id_info.command_id if cmd_id_info else None
             prev_command_id = cmd_id_info.prev_command_id if cmd_id_info else None
-            failed_command_id = cmd_id_info.failed_command_id if cmd_id_info else None
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -100,7 +99,6 @@ class FileProviderExecutor:
                 mime_type=file_data.mime_type,
                 command_id=command_id,
                 prev_command_id=prev_command_id,
-                failed_command_id=failed_command_id,
             )
             await self._data_files_store.insert(file_info)
             return file_info

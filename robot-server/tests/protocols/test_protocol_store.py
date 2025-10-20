@@ -602,7 +602,6 @@ async def test_get_referenced_data_files(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     await data_files_store.insert(
@@ -616,7 +615,6 @@ async def test_get_referenced_data_files(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
     await data_files_store.insert(
@@ -630,7 +628,6 @@ async def test_get_referenced_data_files(
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
     )
 

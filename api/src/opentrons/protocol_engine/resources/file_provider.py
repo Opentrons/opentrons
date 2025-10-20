@@ -18,7 +18,6 @@ class FileNameCmdMetadata:
 
     command_id: Optional[str] = None
     prev_command_id: Optional[str] = None
-    failed_command_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -200,5 +199,4 @@ class FileProvider:
             run_id=None,
             command_id=None,
             prev_command_id=None,
-            failed_command_id=None,
         )
