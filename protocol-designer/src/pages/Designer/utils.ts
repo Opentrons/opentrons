@@ -361,8 +361,6 @@ export const useLabwareDropdownOptions = (
   return _sortLabwareDropdownOptions(labwareOptions)
 }
 
-const TOUGH_PLATE_LOADNAME = 'opentrons_96_wellplate_200ul_pcr_full_skirt'
-
 //  used for LabwareLocationField dropdown
 export const getUnoccupiedStackOptions = (args: {
   robotState: RobotState
