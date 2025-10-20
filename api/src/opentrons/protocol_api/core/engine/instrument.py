@@ -2029,8 +2029,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
         next_tip: Optional[NextTipInfo]
         if selected_tips is not None:
-            # TODO also figure out what to do if we run out here
-            tip_core = selected_tips.pop(0)
+            try:
+                tip_core = selected_tips.pop(0)
+            except IndexError:
+                raise RuntimeError("No more selected tips available for liquid class.")
             next_tip = NextTipInfo(
                 labwareId=tip_core.labware_id, tipStartingWell=tip_core.get_name()
             )
