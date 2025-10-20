@@ -164,7 +164,6 @@ export interface TCStartSetTargetBlockTemperatureRunTimeCommand
   result?: any
 }
 
-
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
