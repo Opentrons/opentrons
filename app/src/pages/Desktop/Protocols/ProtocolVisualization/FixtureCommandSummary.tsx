@@ -23,6 +23,8 @@ interface FixtureCommandSummaryProps {
   slotPosition: CoordinateTuple | null
 }
 
+const Y_OFFSET = 28 // allow for the deck label set to be even with the slot
+
 export function FixtureCommandSummary(
   props: FixtureCommandSummaryProps
 ): JSX.Element | null {
@@ -66,7 +68,7 @@ export function FixtureCommandSummary(
           },
         ]}
         x={slotPosition[0]}
-        y={slotPosition[1] - 28}
+        y={slotPosition[1] - Y_OFFSET}
         width={slotBoundingBox.xDimension}
         height={slotBoundingBox.yDimension}
       />
