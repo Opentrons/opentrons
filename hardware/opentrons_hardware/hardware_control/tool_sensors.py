@@ -517,12 +517,12 @@ async def capacitive_pass(
 
     return list(_drain())
 
+
 async def touch_probe(
     messenger: CanMessenger,
-    tool: InstrumentProbeTarget,
-    mover: NodeId,
+    mover: Union[NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r],
     distance: float,
-    mount_speed: float
+    speed: float,
 ) -> MotorPositionStatus:
     """Move the specified tool down until the probe triggers.
 
@@ -532,28 +532,13 @@ async def touch_probe(
     The direction is sgn(distance)*sgn(speed), so you can set the direction
     either by negating speed or negating distance.
     """
-
-    tool_present = tool in [NodeId.gripper] 
-    probe_distance = {mover: distance}
-    probe_speed = {mover: mount_speed}
     movers = [mover]
-    if tool_present:
-        probe_distance[tool] = 0.0
-        probe_speed[tool] = 0.0
-        movers.append(tool)
-
     sensor_group = _build_pass_step(
         movers=movers,
-        distance={mover: probe_distance},
-        speed={mover: probe_speed},
-        stop_condition=MoveStopCondition.sync_line,
-    )
-
-    sensor_group = _fix_pass_step_for_buffer(
-        sensor_group,
-        movers=movers,
-        distance=probe_distance,
-        speed=probe_speed,
+        distance={mover: distance},
+        speed={mover: speed},
+        sensor_type=SensorType.UNUSED,
+        sensor_id=SensorId.UNUSED,
         stop_condition=MoveStopCondition.sync_line,
     )
 

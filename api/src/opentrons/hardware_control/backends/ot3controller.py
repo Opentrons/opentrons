@@ -171,6 +171,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     liquid_probe,
     check_overpressure,
     grab_pressure,
+    touch_probe,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -1493,6 +1494,33 @@ class OT3Controller(FlexBackend):
                         )
         else:
             yield
+
+    async def touch_probe(
+        self,
+        axis: Axis,
+        speed: float,
+        distance: float
+    ) -> float:
+
+    positions = await touch_probe(
+        messenger=self._messenger,
+        mover=axis_to_node(axis),
+        distance=distance,
+        speed=speed
+    )
+
+    for node, point in positions.items():
+        self._position.update({node: point.motor_position})
+        self._encoder_position.update({node: point.encoder_position})
+
+    if (
+        axis_to_node(axis) not in positions
+        or positions[axis_to_node(axis)].move_ack
+        == MoveCompleteAck.complete_without_condition
+    ):
+        raise Exception("Booo")
+
+    return self._position[axis_to_node(Axis.by_mount(mount))]
 
     async def liquid_probe(
         self,
