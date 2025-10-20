@@ -1,33 +1,33 @@
-.popperContent {
+.popper_content {
   position: absolute;
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-regular);
-  color: white;
+  z-index: 10000;
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-8);
   background-color: rgba(0, 0, 0, 0.9);
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.13),
     0 3px 6px rgba(0, 0, 0, 0.23);
-  padding: var(--spacing-8);
+  color: white;
   cursor: pointer;
-  z-index: 10000;
-  border-radius: var(--border-radius-8);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
   pointer-events: none;
 }
 
-.tooltipTable {
-  margin: 0.5em;
+.tooltip_table {
   max-width: 20rem;
+  margin: 0.5em;
 }
 
-.tooltipRow {
+.tooltip_row {
   min-width: 11.25rem;
 }
 
 .divider {
-  height: 1px;
   width: 100%;
-  background-color: #bcbcbc;
+  height: 1px;
   margin: 1em 0;
+  background-color: #bcbcbc;
 }
 
 .footer {

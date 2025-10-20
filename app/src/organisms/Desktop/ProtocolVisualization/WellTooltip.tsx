@@ -101,7 +101,7 @@ export const WellTooltip = ({
       {tooltipWellName != null && tooltipX != null && tooltipY != null
         ? createPortal(
             <div
-              className={styles.popperContent}
+              className={styles.popper_content}
               style={{
                 top:
                   tooltipY +
@@ -111,10 +111,10 @@ export const WellTooltip = ({
                 transform: 'translate(-50%, 0)',
               }}
             >
-              <table className={styles.tooltipTable}>
+              <table className={styles.tooltip_table}>
                 <tbody>
                   {map(tooltipWellIngreds || {}, (ingred, groupId) => (
-                    <tr key={groupId} className={styles.tooltipRow}>
+                    <tr key={groupId} className={styles.tooltip_row}>
                       <td>
                         <LiquidIcon
                           color={

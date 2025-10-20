@@ -32,20 +32,20 @@
 
 .well_details_caption_side {
   position: absolute;
-  right: 0.8rem;
   top: 4.6rem;
+  right: 0.8rem;
 }
 
 .well_details_volume {
   position: absolute;
-  left: 0.2rem;
   top: 4.6rem;
+  left: 0.2rem;
 }
 
 .tip_details_volume {
   position: absolute;
-  right: 2rem;
   top: 0.3rem;
+  right: 2rem;
 }
 
 .well_detail_svg_container {
