@@ -325,14 +325,30 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> EngineTaskCore:
+    ) -> None:
         """Set the target temperature for the well block, in °C."""
-        result = self._engine_client.execute_command_without_recovery(
+        self._engine_client.execute_command(
             cmd.thermocycler.SetTargetBlockTemperatureParams(
                 moduleId=self.module_id,
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
                 holdTimeSeconds=hold_time_seconds,
+                ramp_rate=ramp_rate,
+            )
+        )
+
+    def start_set_target_block_temperature(
+        self,
+        celsius: float,
+        ramp_rate: Optional[float],
+        block_max_volume: Optional[float] = None,
+    ) -> EngineTaskCore:
+        """Start setting the target temperature for the well block, in °C."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.StartSetTargetBlockTemperatureParams(
+                moduleId=self.module_id,
+                celsius=celsius,
+                blockMaxVolumeUl=block_max_volume,
                 ramp_rate=ramp_rate,
             )
         )
@@ -347,10 +363,18 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             cmd.thermocycler.WaitForBlockTemperatureParams(moduleId=self.module_id)
         )
 
-    def set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
+    def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
-        result = self._engine_client.execute_command_without_recovery(
+        self._engine_client.execute_command(
             cmd.thermocycler.SetTargetLidTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
+        )
+
+    def start_set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
+        """Start setting the target temperature for the heated lid, in °C."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.StartSetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )

@@ -277,33 +277,72 @@ def test_close_lid(
     assert isinstance(result, ThermocyclerLidStatus) is False
 
 
-def test_set_block_temperature(
+def test_start_set_block_temperature(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
     mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
-    api_version: APIVersion,
+    api_version: APIVersion
 ) -> None:
     """It should set the block temperature via the core."""
     subject._api_version = api_version
     mock_task = decoy.mock(cls=Task)
     decoy.when(
-        mock_validation.ensure_hold_time_seconds(seconds=1.2, minutes=3.4)
-    ).then_return(5.6)
-    decoy.when(
-        mock_core.set_target_block_temperature(
+        mock_core.start_set_target_block_temperature(
             celsius=42.0,
-            hold_time_seconds=5.6,
-            block_max_volume=7.8,
             ramp_rate=5.6,
+            block_max_volume=7.8,
         )
     ).then_return(mock_task._core)
-    result = subject.set_block_temperature(
+    result = subject.start_set_block_temperature(
+        temperature=42.0,
+        block_max_volume=7.8,
+        ramp_rate=5.6,
+    )
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_START_SET_BLOCK_TEMP",
+                    "payload": matchers.DictMatching({"temperature": 42.0}),
+                }
+            ),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "after",
+                    "payload": matchers.DictMatching({"temperature": 42.0}),
+                }
+            ),
+        ),
+    )
+    assert isinstance(result, Task)
+    assert result._core is mock_task._core
+    assert result._api_version == api_version
+
+
+def test_set_block_temperature(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: LegacyBroker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should set the block temperature via the core."""
+    decoy.when(
+        mock_validation.ensure_hold_time_seconds(seconds=1.2, minutes=3.4)
+    ).then_return(205.2)
+
+    subject.set_block_temperature(
         temperature=42.0,
         hold_time_seconds=1.2,
         hold_time_minutes=3.4,
-        block_max_volume=7.8,
         ramp_rate=5.6,
+        block_max_volume=7.8,
     )
 
     decoy.verify(
@@ -319,6 +358,13 @@ def test_set_block_temperature(
                 }
             ),
         ),
+        mock_core.set_target_block_temperature(
+            celsius=42.0,
+            hold_time_seconds=205.2,
+            block_max_volume=7.8,
+            ramp_rate=5.6,
+        ),
+        mock_core.wait_for_block_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching(
@@ -331,12 +377,6 @@ def test_set_block_temperature(
             ),
         ),
     )
-    if api_version >= APIVersion(2, 27):
-        assert isinstance(result, Task)
-        assert result._core is mock_task._core
-        assert result._api_version == api_version
-    else:
-        assert result is None
 
 
 def test_set_block_temperature_with_liquid_tracking(
@@ -406,13 +446,9 @@ def test_set_lid_temperature(
     mock_core: ThermocyclerCore,
     mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
-    api_version: APIVersion,
 ) -> None:
     """It should close the lid via the core."""
-    subject._api_version = api_version
-    mock_task = decoy.mock(cls=Task)
-    decoy.when(mock_core.set_target_lid_temperature(42.0)).then_return(mock_task._core)
-    result = subject.set_lid_temperature(42.0)
+    subject.set_lid_temperature(42.0)
     decoy.verify(
         mock_broker.publish(
             "command",
@@ -423,17 +459,44 @@ def test_set_lid_temperature(
                 }
             ),
         ),
+        mock_core.set_target_lid_temperature(celsius=42.0),
+        mock_core.wait_for_lid_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching({"$": "after"}),
         ),
     )
-    if api_version >= APIVersion(2, 27):
-        assert isinstance(result, Task)
-        assert result._core is mock_task._core
-        assert result._api_version == api_version
-    else:
-        assert result is None
+
+
+def test_start_set_lid_temperature(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_broker: LegacyBroker,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should close the lid via the core."""
+    mock_task = decoy.mock(cls=Task)
+    decoy.when(mock_core.start_set_target_lid_temperature(42.0)).then_return(
+        mock_task._core
+    )
+    result = subject.start_set_lid_temperature(42.0)
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.THERMOCYCLER_START_SET_LID_TEMP",
+                }
+            ),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
+    assert isinstance(result, Task)
+    assert result._core is mock_task._core
 
 
 def test_start_execute_profile(

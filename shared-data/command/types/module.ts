@@ -13,7 +13,9 @@ export type ModuleRunTimeCommand =
   | TemperatureModuleDeactivateRunTimeCommand
   | TemperatureModuleAwaitTemperatureRunTimeCommand
   | TCSetTargetBlockTemperatureRunTimeCommand
+  | TCStartSetTargetBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureRunTimeCommand
+  | TCStartSetTargetLidTemperatureRunTimeCommand
   | TCWaitForBlockTemperatureRunTimeCommand
   | TCWaitForLidTemperatureRunTimeCommand
   | TCOpenLidRunTimeCommand
@@ -50,7 +52,9 @@ export type ModuleCreateCommand =
   | TemperatureModuleDeactivateCreateCommand
   | TemperatureModuleAwaitTemperatureCreateCommand
   | TCSetTargetBlockTemperatureCreateCommand
+  | TCStartSetTargetBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureCreateCommand
+  | TCStartSetTargetLidTemperatureCreateCommand
   | TCWaitForBlockTemperatureCreateCommand
   | TCWaitForLidTemperatureCreateCommand
   | TCOpenLidCreateCommand
@@ -148,6 +152,19 @@ export interface TCSetTargetBlockTemperatureRunTimeCommand
     TCSetTargetBlockTemperatureCreateCommand {
   result?: any
 }
+
+export interface TCStartSetTargetBlockTemperatureCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startSetTargetBlockTemperature'
+  params: ThermocyclerStartSetTargetBlockTemperatureParams
+}
+export interface TCStartSetTargetBlockTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartSetTargetBlockTemperatureCreateCommand {
+  result?: any
+}
+
+
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
@@ -158,6 +175,18 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
     TCSetTargetLidTemperatureCreateCommand {
   result?: any
 }
+
+export interface TCStartSetTargetLidTemperatureCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startSetTargetLidTemperature'
+  params: TemperatureParams
+}
+export interface TCStartSetTargetLidTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartSetTargetLidTemperatureCreateCommand {
+  result?: any
+}
+
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
@@ -413,6 +442,12 @@ export interface ThermocyclerSetTargetBlockTemperatureParams {
   celsius: number
   volume?: number
   holdTimeSeconds?: number
+}
+
+export interface ThermocyclerStartSetTargetBlockTemperatureParams {
+  moduleId: string
+  celsius: number
+  volume?: number
 }
 
 export interface TCProfileCycle {
