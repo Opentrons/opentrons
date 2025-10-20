@@ -517,7 +517,7 @@ const PIPETTE_REQUIRED: FormError = {
 }
 const TIPRACK_REQUIRED: FormError = {
   title: 'Tiprack required',
-  dependentFields: ['tiprack'],
+  dependentFields: ['tipRack'],
   location: 'field',
   page: 0,
   showOnReopen: true,
