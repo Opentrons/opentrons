@@ -143,10 +143,10 @@ export function AssignLiquidsModal(
             width={CONTAINER_WIDTH}
           >
             <Flex
-              width="100%"
               height="100%"
               alignItems={ALIGN_CENTER}
               gap={SPACING.spacing10}
+              marginLeft="auto"
             >
               <DeckInfoLabel
                 size="large"
