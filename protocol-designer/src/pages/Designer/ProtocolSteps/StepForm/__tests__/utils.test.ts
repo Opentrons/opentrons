@@ -22,7 +22,7 @@ import {
   getFormErrorsMappedToField,
 } from '../utils'
 
-import type { PipetteChannels } from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
 import type { FormErrorLocationType } from '/protocol-designer/steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
@@ -34,8 +34,7 @@ const BASE_VISIBLE_FORM_ERROR = {
 const MOCK_INVARIANT_CONTEXT = makeContext()
 
 vi.mock('@opentrons/step-generation', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/step-generation')>()
+  const actual = await importOriginal<typeof SharedData>()
   return {
     ...actual,
     getPipetteWithTipMaxVol: vi.fn(),
@@ -246,7 +245,7 @@ describe('getMaxUiFlowRate', () => {
   it('should use the last entry in flowRateFunction if targetVolume is larger than all defined points', () => {
     const largeVolumeArgs = {
       targetVolume: 150,
-      channels: 1 as PipetteChannels,
+      channels: 1,
       robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
