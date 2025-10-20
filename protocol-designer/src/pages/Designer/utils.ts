@@ -401,13 +401,10 @@ export const getUnoccupiedStackOptions = (args: {
       const { displayName } = labwareOnDeckDef.metadata
       const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
 
-      //  NOTE: the tough plate is the only plate in the repo whose def allows for stacking
-      //  on itself. We don't allow that pattern with any other well plate. So i'm hardcoding
-      //  it in to filter it out for now. but in the future when we support labware stacking
-      //  we need to make this logic more robust
-      const isCompatible =
-        labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
-        def.parameters.loadName !== TOUGH_PLATE_LOADNAME
+      const isCompatible = labwareCompatibleParentLabware?.includes(
+        labwareOnDeckLoadName
+      )
+
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )
