@@ -36,7 +36,11 @@ async function run() {
         )
         .join('\n')
 
-    core.setOutput('analysis-results', JSON.stringify(memoryAnalysis))
+    // Use modern GitHub Actions output method
+    const fs = require('fs')
+    if (process.env.GITHUB_OUTPUT) {
+      fs.appendFileSync(process.env.GITHUB_OUTPUT, `analysis-results=${JSON.stringify(memoryAnalysis)}\n`)
+    }
 
     await core.summary
       .addHeading('ODD Memory Usage Results')
