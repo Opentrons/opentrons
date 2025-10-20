@@ -585,7 +585,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     meniscus_tracking=None,
                     end_location=None,
                     end_meniscus_tracking=None,
-                    movement_delay=movement_delay,
+                    movement_delay=None,
                 )
             return self
 
@@ -676,6 +676,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 meniscus_tracking=meniscus_tracking,
                 end_location=end_move_to_location,
                 end_meniscus_tracking=end_meniscus_tracking,
+                movement_delay=movement_delay,
             )
 
         return self

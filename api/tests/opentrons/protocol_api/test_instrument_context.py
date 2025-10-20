@@ -368,6 +368,7 @@ def test_aspirate(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -403,6 +404,7 @@ def test_aspirate_well_location(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -438,6 +440,7 @@ def test_aspirate_meniscus_well_location(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -472,6 +475,7 @@ def test_aspirate_from_coordinates(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -518,6 +522,7 @@ def test_aspirate_flow_rate(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1087,6 +1092,7 @@ def test_dispense_with_location(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1123,6 +1129,7 @@ def test_dispense_with_well_location(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1160,6 +1167,7 @@ def test_dispense_with_well(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1222,6 +1230,7 @@ def test_dispense_flow_rate(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1488,6 +1497,7 @@ def test_dispense_0_volume_means_dispense_everything(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1517,6 +1527,7 @@ def test_dispense_0_volume_means_dispense_nothing(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1554,6 +1565,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1591,6 +1603,7 @@ def test_aspirate_0_volume_means_aspirate_nothing(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1624,6 +1637,7 @@ def test_dispense_with_trash_last_location(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1774,6 +1788,7 @@ def test_mix_no_lpd(
             None,
             None,
             None,
+            movement_delay=None,
         ),
         times=10,
     )
@@ -1792,37 +1807,40 @@ def test_mix_no_lpd(
                 None,
                 None,
                 None,
+                movement_delay=None,
             ),
             times=10,
         )
     else:
         decoy.verify(
             mock_instrument_core.dispense(
-                bottom_location,
-                mock_well._core,
-                10.0,
-                1.23,
-                5.67,
-                True,
-                0.0,
-                None,
-                None,
-                None,
+                location=bottom_location,
+                well_core=mock_well._core,
+                volume=10.0,
+                rate=1.23,
+                flow_rate=5.67,
+                in_place=True,
+                push_out=0.0,
+                meniscus_tracking=None,
+                end_location=None,
+                end_meniscus_tracking=None,
+                movement_delay=None,
             ),
             times=9,
         )
         decoy.verify(
             mock_instrument_core.dispense(
-                bottom_location,
-                mock_well._core,
-                10.0,
-                1.23,
-                5.67,
-                True,
-                None,
-                None,
-                None,
-                None,
+                location=bottom_location,
+                well_core=mock_well._core,
+                volume=10.0,
+                rate=1.23,
+                flow_rate=5.67,
+                in_place=True,
+                push_out=None,
+                meniscus_tracking=None,
+                end_location=None,
+                end_meniscus_tracking=None,
+                movement_delay=None,
             ),
             times=1,
         )
@@ -1877,36 +1895,39 @@ def test_mix_with_lpd(
             None,
             None,
             None,
+            movement_delay=None,
         ),
         times=10,
     )
     decoy.verify(
         mock_instrument_core.dispense(
-            bottom_location,
-            mock_well._core,
-            10.0,
-            1.23,
-            5.67,
-            True,
-            0.0,
-            None,
-            None,
-            None,
+            location=bottom_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.23,
+            flow_rate=5.67,
+            in_place=True,
+            push_out=0.0,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=9,
     )
     decoy.verify(
         mock_instrument_core.dispense(
-            bottom_location,
-            mock_well._core,
-            10.0,
-            1.23,
-            5.67,
-            True,
-            None,
-            None,
-            None,
-            None,
+            location=bottom_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.23,
+            flow_rate=5.67,
+            in_place=True,
+            push_out=None,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         times=1,
     )
@@ -1951,6 +1972,7 @@ def test_mix_with_flow_rates(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_instrument_core.dispense(
             location=input_location,
@@ -1963,6 +1985,7 @@ def test_mix_with_flow_rates(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
     )
 
@@ -1998,6 +2021,7 @@ def test_mix_with_flow_rates(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_instrument_core.dispense(
             location=input_location,
@@ -2010,6 +2034,7 @@ def test_mix_with_flow_rates(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
     )
 
@@ -2050,6 +2075,7 @@ def test_mix_with_delay_and_final_push_out(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_protocol_core.delay(3, msg=None),  # aspirate delay
         mock_instrument_core.dispense(
@@ -2063,6 +2089,7 @@ def test_mix_with_delay_and_final_push_out(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay
         mock_instrument_core.aspirate(
@@ -2075,6 +2102,7 @@ def test_mix_with_delay_and_final_push_out(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_protocol_core.delay(3, msg=None),  # aspirate delay
         mock_instrument_core.dispense(
@@ -2088,6 +2116,7 @@ def test_mix_with_delay_and_final_push_out(
             meniscus_tracking=None,
             end_location=None,
             end_meniscus_tracking=None,
+            movement_delay=None,
         ),
         mock_protocol_core.delay(4, msg=None),  # dispense delay
     )
@@ -2136,6 +2165,7 @@ def test_aspirate_with_lpd(
             None,
             None,
             None,
+            movement_delay=None,
         ),
         times=1,
     )
