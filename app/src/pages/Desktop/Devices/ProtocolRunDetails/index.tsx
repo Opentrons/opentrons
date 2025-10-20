@@ -104,7 +104,7 @@ interface RoundTabProps {
   tabName: string
 }
 
-function RoundTab({
+export function RoundTab({
   disabled,
   tabDisabledReason,
   to,

@@ -133,6 +133,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
+        borderRadius="200px"
         {...targetProps}
       >
         {buttonIconName != null ? (
