@@ -11,6 +11,7 @@ class GCODE(str, Enum):
     GET_DEVICE_INFO = "M115"
     SET_SERIAL_NUMBER = "M996"
     ENTER_BOOTLOADER = "dfu"
+    SET_LED = "M200"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""

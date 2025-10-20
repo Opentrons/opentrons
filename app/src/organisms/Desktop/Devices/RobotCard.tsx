@@ -10,16 +10,18 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   WRAP,
 } from '@opentrons/components'
 import {
+  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -116,7 +118,15 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <AttachedInstruments robotName={robotName} />
-              <AttachedModules robotName={robotName} />
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
+                flexWrap={WRAP}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
+                <AttachedModules robotName={robotName} />
+                <AttachedDevices robotName={robotName} />
+              </Flex>
             </Flex>
           ) : null}
         </Flex>
@@ -141,13 +151,9 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <LegacyStyledText
-        as="h6"
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey60}
-      >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
@@ -159,6 +165,25 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
           />
         ))}
       </Flex>
+    </Flex>
+  ) : null
+}
+
+function AttachedDevices(props: { robotName: string }): JSX.Element | null {
+  const { robotName } = props
+  const { t } = useTranslation('devices_landing')
+  const { data } = useCamera()
+  return data?.cameraEnabled ? (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {t('input_devices')}
+      </StyledText>
+      <Icon
+        key={`${String('camera')}_${robotName}`}
+        name="photo-camera"
+        color={COLORS.grey50}
+        size={SPACING.spacing16}
+      ></Icon>
     </Flex>
   ) : null
 }
