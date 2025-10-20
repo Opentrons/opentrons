@@ -4,6 +4,7 @@ import type {
   NEW,
   NO,
   SELECTED,
+  SELECTED_ERROR,
   SELECTED_USED,
   USED,
 } from './Tips/constants'
@@ -32,3 +33,4 @@ export type TipType =
   | typeof NO
   | typeof INACCESSIBLE
   | typeof SELECTED_USED
+  | typeof SELECTED_ERROR

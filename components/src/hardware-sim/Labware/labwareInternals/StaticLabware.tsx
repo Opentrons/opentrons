@@ -32,6 +32,7 @@ export interface StaticLabwareProps {
   wellStroke?: WellStroke
   /** optional show of labware border, defaulted to true */
   showBorder?: boolean
+  borderStroke?: CSSProperties['stroke']
   tipStatusByWellName?: Record<string, TipType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
@@ -76,6 +77,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     tipStatusByWellName,
     handleClickWell,
     selectedTipsByIndex,
+    borderStroke,
   } = props
   const { isTiprack } = definition.parameters
   return (
@@ -88,6 +90,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
             highlightShadow={highlightShadow}
             fill={fill}
             showRadius={showRadius}
+            stroke={borderStroke}
           />
         </LabwareDetailGroup>
       )}

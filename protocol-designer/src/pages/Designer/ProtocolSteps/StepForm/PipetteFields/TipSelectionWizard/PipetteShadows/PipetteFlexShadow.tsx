@@ -1,3 +1,5 @@
+import { COLORS } from '@opentrons/components'
+
 import { getHoveredOffsetFromWell } from '../utils'
 import { EightChannelFlexShadow } from './EightChannelFlexShadow'
 import { NinetySixFlexShadow } from './NinetySixFlexShadow'
@@ -7,14 +9,14 @@ import type { CoordinateTuple, PipetteV2Specs } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 // TODO: adjust once partial tip selection is enabled
-const PRIMARY_NOZZLE = 'A1'
-
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
   slotPosition: CoordinateTuple
   hoveredWell: string
   selectedTiprackId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
+  isAccessible: boolean
+  primaryNozzle: string
 }): JSX.Element {
   const {
     pipetteSpec,
@@ -22,6 +24,8 @@ export function PipetteShadow(props: {
     hoveredWell,
     selectedTiprackId,
     labwareState,
+    isAccessible,
+    primaryNozzle,
   } = props
   const [slotX, slotY] = slotPosition
 
@@ -30,7 +34,7 @@ export function PipetteShadow(props: {
     labwareState,
     wellName: hoveredWell,
     pipetteSpec,
-    primaryNozzle: PRIMARY_NOZZLE,
+    primaryNozzle,
   })
 
   const { channels, pipetteBoundingBoxOffsets } = pipetteSpec
@@ -42,6 +46,10 @@ export function PipetteShadow(props: {
     y: slotY + yOffset,
     width,
     height,
+    stroke: isAccessible ? COLORS.blue50 : COLORS.red50,
+    fill: isAccessible
+      ? `${COLORS.black90}${COLORS.opacity20HexCode}`
+      : `${COLORS.red50}${COLORS.opacity20HexCode}`,
   }
   if (channels === 1) {
     return <SingleChannelFlexShadow {...shadowProps} />

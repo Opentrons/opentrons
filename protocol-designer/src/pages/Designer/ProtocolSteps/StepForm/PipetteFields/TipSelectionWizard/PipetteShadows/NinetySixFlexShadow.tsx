@@ -1,32 +1,24 @@
-import { COLORS } from '@opentrons/components'
-
 import styles from '../tipselectionwizard.module.css'
 
-export function NinetySixFlexShadow(props: {
-  x: number
-  y: number
-  width: number
-  height: number
-}): JSX.Element {
-  const { x, y, width, height } = props
+import type { PipetteShadowProps } from '../types'
+
+export function NinetySixFlexShadow(props: PipetteShadowProps): JSX.Element {
+  const { x, y, width, height, fill, stroke } = props
   return (
     <svg
-      width={width}
-      height={height}
+      viewBox="0 0 499 341"
+      xmlns="http://www.w3.org/2000/svg"
       x={x}
       y={y}
-      viewBox="0 0 499 341"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      fill={fill}
       className={styles.shadow_overlay}
+      transform={`rotate(180, ${x + width / 2}, ${y + height / 2})`}
+      stroke={stroke}
+      strokeWidth="2.7881"
     >
-      <path
-        d="M2.09863 338.737H497.549V48.9296C497.549 23.4361 476.883 2.76959 451.389 2.76959H48.2586C22.7651 2.76959 2.09863 23.4361 2.09863 48.9296V338.737Z"
-        fill="#16212D"
-        fillOpacity="0.2"
-        stroke={COLORS.blue50}
-        strokeWidth="2.5"
-      />
+      <path d="M2.09766 1.76855H497.548V292.577C497.548 318.07 476.882 338.737 451.388 338.737H48.2576C22.7642 338.737 2.09766 318.07 2.09766 292.577V1.76855Z" />
     </svg>
   )
 }
