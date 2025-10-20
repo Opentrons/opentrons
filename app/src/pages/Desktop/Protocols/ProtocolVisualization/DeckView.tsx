@@ -24,6 +24,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
 import styles from './preview.module.css'
 import { getActiveLayer, getBackgroundColor } from './utils'
@@ -42,7 +43,6 @@ import type {
   LabwareEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 
 export interface LabwareEntityExtended extends LabwareEntity {
   nickName: string | null

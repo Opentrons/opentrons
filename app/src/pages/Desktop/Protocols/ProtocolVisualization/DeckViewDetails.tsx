@@ -16,6 +16,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
@@ -44,7 +45,6 @@ import type {
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type { LabwareEntityExtended } from './DeckView'
-import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 
 interface DeckViewDetailsProps {
   labwareEntitiesExtended: Record<string, LabwareEntityExtended>
@@ -90,11 +90,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
       pipette.entityId != null && trashBinEntities[pipette.entityId] != null
   )?.entityId
   const isPipetteOverTrash =
-  pipetteCurrentTrashId != null &&
+    pipetteCurrentTrashId != null &&
     selectedRunTimeCommand != null &&
     POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
   const trashSlotWherePipetteIsOver =
-  pipetteCurrentTrashId != null ? trashBinEntities[pipetteCurrentTrashId].location : null
+    pipetteCurrentTrashId != null
+      ? trashBinEntities[pipetteCurrentTrashId].location
+      : null
   const trashAddressableArea =
     trashSlotWherePipetteIsOver != null
       ? getAddressableAreaFromSlotId(

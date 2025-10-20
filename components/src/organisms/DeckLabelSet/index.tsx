@@ -22,7 +22,7 @@ interface DeckLabelSetProps {
   showModuleIcon?: boolean
   showBorder?: boolean
 }
-      //  +15/30 to leave room for the deck info label to be fully visible in the viewbox
+//  +15/30 to leave room for the deck info label to be fully visible in the viewbox
 const WIDTH_ADJUSTED = 15
 const HEIGHT_ADJUSTED = 30
 
