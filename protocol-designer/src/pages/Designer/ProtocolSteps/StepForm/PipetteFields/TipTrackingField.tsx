@@ -18,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
-  getPipetteWithTipMaxVol,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -32,6 +31,7 @@ import {
 
 import { TipSelectionWizard } from './TipSelectionWizard'
 import styles from './tiptrackingfield.module.css'
+import { getNumPickups } from './utils'
 
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { PathOption, TipTrackingOption } from '@opentrons/step-generation'
@@ -110,44 +110,11 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
         })
       : null
 
-  let numPickups: number
-  if (formData.stepType === 'moveLiquid') {
-    let numWellsToConsider: number
-    const isMultiWellHandlingSupported =
-      transferPlanAndReferenceVolumes?.multiWellHandling?.isSupported
-    const numWellsToFitInTip =
-      transferPlanAndReferenceVolumes?.multiWellHandling?.numWellsToFitInTip
-    if (
-      isMultiWellHandlingSupported &&
-      numWellsToFitInTip != null &&
-      numWellsToFitInTip > 0 &&
-      formData.path !== 'single'
-    ) {
-      numWellsToConsider =
-        formData.path === 'multiDispense'
-          ? formData.dispense_wells.length
-          : formData.aspirate_wells.length
-      numPickups = Math.ceil(numWellsToConsider / numWellsToFitInTip)
-    } else {
-      const effectiveTransferVol =
-        getPipetteWithTipMaxVol(
-          formData.pipette as string,
-          invariantContext,
-          formData.tipRack as string
-        ) - (formData.aspirate_airGap_volume as number)
-      const chunksPerSubTransfer = Math.ceil(
-        (formData.volume as number) / effectiveTransferVol
-      )
-      numWellsToConsider = Math.max(
-        (formData.dispense_wells as string[]).length,
-        (formData.aspirate_wells as string[]).length
-      )
-      numPickups = chunksPerSubTransfer * numWellsToConsider
-    }
-  } else {
-    // if form type is 'mix', we will use single path and assume volume can be accommdated in tip
-    numPickups = formData.wells.length
-  }
+  const numPickups = getNumPickups({
+    formData,
+    multiWellHandling: transferPlanAndReferenceVolumes?.multiWellHandling,
+    invariantContext,
+  })
 
   const tipTrackingOptions: Array<{
     title: string
