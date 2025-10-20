@@ -282,7 +282,7 @@ def test_start_set_block_temperature(
     mock_core: ThermocyclerCore,
     mock_broker: LegacyBroker,
     subject: ThermocyclerContext,
-    api_version: APIVersion
+    api_version: APIVersion,
 ) -> None:
     """It should set the block temperature via the core."""
     subject._api_version = api_version
