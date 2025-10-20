@@ -42,20 +42,11 @@ import type {
   LabwareEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 
 export interface LabwareEntityExtended extends LabwareEntity {
   nickName: string | null
 }
-export const POTENTIAL_TRASH_COMMAND_TYPES = [
-  'moveToAddressableArea',
-  'moveToAddressableAreaForDropTip',
-  'dropTip',
-  'dropTipInPlace',
-  'airGapInPlace',
-  'blowOutInPlace',
-  'blowOut',
-  'airGap',
-]
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',

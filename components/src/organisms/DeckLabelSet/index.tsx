@@ -1,16 +1,16 @@
-import { forwardRef } from 'react'
+import { value forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { RobotCoordsForeignDiv } from '../../hardware-sim'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { RobotInfoLabel } from '../../molecules'
-import { DeckLabel } from '../../molecules/DeckLabel'
-import { Box } from '../../primitives'
-import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
-import { SPACING } from '../../ui-style-constants'
+import { value RobotCoordsForeignDiv } from '../../hardware-sim'
+import { value BORDERS, value COLORS } from '../../helix-design-system'
+import { value RobotInfoLabel } from '../../molecules'
+import { value DeckLabel } from '../../molecules/DeckLabel'
+import { value Box } from '../../primitives'
+import { value POSITION_ABSOLUTE, value POSITION_RELATIVE } from '../../styles'
+import { value SPACING } from '../../ui-style-constants'
 
-import type { ForwardedRef } from 'react'
-import type { DeckLabelProps } from '../../molecules/DeckLabel'
+import type { value ForwardedRef } from 'react'
+import type { value DeckLabelProps } from '../../molecules/DeckLabel'
 
 interface DeckLabelSetProps {
   deckLabels: DeckLabelProps[]
@@ -22,10 +22,13 @@ interface DeckLabelSetProps {
   showModuleIcon?: boolean
   showBorder?: boolean
 }
+//  +15/30 to leave room for the deck info label to be fully visible in the viewbox
+const WIDTH_ADJUSTED = 15
+const HEIGHT_ADJUSTED = 30
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
-  ref: ForwardedRef<HTMLDivElement>
+  ref: ForwardedRef
 ): JSX.Element => {
   const {
     deckLabels,
@@ -42,9 +45,8 @@ const DeckLabelSetComponent = (
     <RobotCoordsForeignDiv
       x={x}
       y={y}
-      //  +15/30 to leave room for the deck info label
-      width={width + 15}
-      height={height + 30}
+      width={width + WIDTH_ADJUSTED}
+      height={height + HEIGHT_ADJUSTED}
       innerDivProps={{
         transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
       }}
@@ -92,7 +94,7 @@ interface StyledBoxProps {
   showBorder: boolean
 }
 
-const StyledBox = styled(Box)<StyledBoxProps>`
+const StyledBox = styled(Box)`
   border-radius: ${BORDERS.borderRadius4};
   border: ${({ isZoomed, showBorder }) => {
     if (!showBorder) {
@@ -128,7 +130,7 @@ interface IconWrapperProps {
   leftPosition: number
 }
 
-const IconWrapper = styled(Box)<IconWrapperProps>`
+const IconWrapper = styled(Box)`
   position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
   left: ${props => `${props.leftPosition}px`};

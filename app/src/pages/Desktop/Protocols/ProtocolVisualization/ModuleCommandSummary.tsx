@@ -27,6 +27,7 @@ interface ModuleCommandSummaryProps {
   orientation: 'left' | 'right'
   slot: DeckSlotId | null
 }
+// NOTE: a lot of this is similar to ModuleLabel in PD so we should try to combine them
 export const ModuleCommandSummary = (
   props: ModuleCommandSummaryProps
 ): JSX.Element => {
@@ -63,7 +64,7 @@ export const ModuleCommandSummary = (
   const tempAdjustmentY = def?.moduleType === TEMPERATURE_MODULE_TYPE ? -1 : 0
   const heaterShakerAdjustmentX =
     def?.moduleType === HEATERSHAKER_MODULE_TYPE && orientation === 'right' // shift depending on side of deck
-      ? 7 // TODO(ND: 12/18/2024): investigate further why the module definition does not contain sufficient info to find this offset
+      ? 7 // investigate further why the module definition does not contain sufficient info to find this offset
       : 0
 
   return (

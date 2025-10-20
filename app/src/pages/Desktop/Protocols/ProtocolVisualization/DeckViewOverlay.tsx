@@ -37,6 +37,9 @@ interface SlotOverlayProps {
   opacity?: number
 }
 
+const TC_X_OFFSET = 20
+const TC_Y_OFFSET = 68
+
 export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const {
     slotId,
@@ -88,8 +91,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
       key={`${robotType.toLowerCase()}_slotOverlay`}
       width={width}
       height="6%"
-      x={x + (hasTCOnSlot ? 20 : 0)}
-      y={y - (hasTCOnSlot ? 68 : 0)}
+      x={x + (hasTCOnSlot ? TC_X_OFFSET : 0)}
+      y={y - (hasTCOnSlot ? TC_Y_OFFSET : 0)}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{
         opacity: opacity,
