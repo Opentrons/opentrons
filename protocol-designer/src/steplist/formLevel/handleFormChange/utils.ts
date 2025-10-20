@@ -457,6 +457,7 @@ const getSubmergeRetractFields = (args: {
   additionalEquipmentEntities?: AdditionalEquipmentEntities
   isDisposalVolumeEnabled?: boolean
   isConditioningVolumeEnabled?: boolean
+  blowoutMaxUiFlowRate?: number | null
 }): Record<string, any> => {
   const {
     submergeRetractLookup,
@@ -466,6 +467,7 @@ const getSubmergeRetractFields = (args: {
     additionalEquipmentEntities,
     isDisposalVolumeEnabled = false,
     isConditioningVolumeEnabled = false,
+    blowoutMaxUiFlowRate = null,
   } = args
 
   // all common submerge and retract fields
@@ -506,6 +508,9 @@ const getSubmergeRetractFields = (args: {
           blowout: submergeRetractLookup.blowout,
           additionalEquipmentEntities,
           disable: isDisposalVolumeEnabled,
+          ...(blowoutMaxUiFlowRate != null
+            ? { hardwareMaximumFlowRate: blowoutMaxUiFlowRate }
+            : {}),
         })
       : {}
 
@@ -1105,6 +1110,16 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : null
 
+  const blowoutMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'blowout',
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+        })
+      : null
+
   const aspirateFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.aspirate,
     aspirateFlowRateByVolume,
@@ -1199,6 +1214,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
     tipMovement: 'retract',
     additionalEquipmentEntities,
     isDisposalVolumeEnabled,
+    blowoutMaxUiFlowRate,
   })
 
   const aspirateFields = {
