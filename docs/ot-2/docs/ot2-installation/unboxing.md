@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Unboxing and Assembly"
 ---
 
-Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides instructions that walk you through the steps required to get the OT-2 unboxed, set up, and ready for use.
+Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides instructions that walk you through the steps required to get the OT-2 unboxed, assembled, and ready for use.
 
 ## Effort and time required
 
@@ -11,6 +11,8 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 ## Assembly instructions
 
 <div class="instruction-list" markdown>
+
+<!-- Remove padding/whitespace around images or good enough? -->
 
 1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present. <!-- too much border or padding around these images -->
     ![image shows padding removal](../images/remove-padding.png)
