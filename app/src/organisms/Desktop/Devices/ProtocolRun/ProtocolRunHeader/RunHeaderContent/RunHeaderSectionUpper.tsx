@@ -93,7 +93,12 @@ export function RunHeaderSectionUpper(
               id="RunHeader_cancelRunButton"
               white-space="nowrap"
             >
-              <StyledText as="pSemiBold">{t('cancel_run')}</StyledText>
+              <StyledText
+                oddStyle="bodyTextSemiBold"
+                desktopStyle="bodyDefaultSemiBold"
+              >
+                {t('cancel_run')}
+              </StyledText>
             </AlertPrimaryButton>
           )}
           <ActionButton {...props}></ActionButton>

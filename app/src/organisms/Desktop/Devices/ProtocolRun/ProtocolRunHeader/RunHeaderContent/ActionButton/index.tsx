@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
@@ -133,7 +134,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
-        borderRadius="200px"
+        borderRadius={BORDERS.borderRadiusFull}
         {...targetProps}
       >
         {buttonIconName != null ? (

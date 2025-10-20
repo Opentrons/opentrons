@@ -92,6 +92,7 @@
   "pause_protocol": "Pause protocol",
   "pause_run": "Pause run",
   "paused_for": "Paused For",
+  "paused_on_error": "Paused on error",
   "pickup_tip": "Picking up tip from {{well_name}} of {{labware}} in {{labware_location}}",
   "plus_more": "+{{count}} more",
   "preview_of_protocol_steps": "This is a preview of your protocol's steps",
