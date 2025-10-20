@@ -2571,6 +2571,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -2632,6 +2633,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -2681,6 +2683,7 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -2733,6 +2736,7 @@ def test_transfer_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -2956,6 +2960,7 @@ def test_distribute_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3020,6 +3025,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3088,6 +3094,7 @@ def test_distribute_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3305,6 +3312,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3370,6 +3378,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3420,6 +3429,7 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
 
@@ -3473,5 +3483,6 @@ def test_consolidate_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
+            selected_tips=None,
         )
     )
