@@ -8,7 +8,6 @@ import warnings
 import pytest
 from decoy import Decoy
 from robot_server.data_files.data_files_store import (
-    DataFileInfo,
     DataFilesStore,
 )
 from sqlalchemy.engine import Engine
@@ -17,7 +16,7 @@ from unittest import mock
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.errors.codes import ErrorCodes
 
-from robot_server.data_files.models import DataFileSource
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     CSVParameterRunResource,

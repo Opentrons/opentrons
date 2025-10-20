@@ -45,9 +45,9 @@ describe('useCommandTypeSummaries', () => {
       })
 
       // Make sure it returns something non-empty and not the fallback string
-      expect(result.current).toBeDefined()
-      expect(result.current).not.toBe('')
-      expect(result.current).not.toBe('Unknown')
+      expect(result.current, cmd).toBeDefined()
+      expect(result.current, cmd).not.toBe('')
+      expect(result.current, cmd).not.toBe('Unknown')
     }
   })
 })

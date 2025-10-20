@@ -103,7 +103,6 @@ export function StepDetailContainer({
       ) : null}
       {tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null ? (
         <TipPickupContainer
-          protocolKey={protocolKey}
           tiprackEntity={labwareEntities[tiprackOnSlot]}
           robotState={robotState}
         />

@@ -166,6 +166,7 @@
   "select_volume": "Select a volume",
   "select_wells": "Select wells using a {{displayName}}",
   "shake": "Shake",
+  "shake_speed": "Shake speed",
   "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",

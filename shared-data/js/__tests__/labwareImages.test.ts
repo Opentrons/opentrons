@@ -17,6 +17,7 @@ const ignoredLoadNames = new Set([
   'corning_96_wellplate_330ul',
   'costar_96_wellplate_2.2ml',
   'thermoscientific_abgene_96_wellplate_1.2ml',
+  'greiner_384_wellplate_240ul',
 ])
 
 const loadNames = Array.from(

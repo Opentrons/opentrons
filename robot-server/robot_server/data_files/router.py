@@ -21,11 +21,11 @@ from .dependencies import (
     get_data_files_store,
     get_data_file_auto_deleter,
 )
-from .data_files_store import DataFilesStore, DataFileInfo
+from .data_files_store import DataFilesStore
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
 from .file_auto_deleter import DataFileAutoDeleter
 from .models import (
     DataFile,
-    DataFileSource,
     FileIdNotFoundError,
     FileIdNotFound,
     FileInUseError,

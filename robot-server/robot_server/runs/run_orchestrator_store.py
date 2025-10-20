@@ -280,6 +280,7 @@ class RunOrchestratorStore:
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             notify_publishers=notify_publishers,
         )
 

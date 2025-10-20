@@ -10,11 +10,10 @@ from sqlalchemy.engine import Engine as SQLEngine
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from robot_server.deletion_planner import FileUsageInfo
 from robot_server.data_files.models import (
-    DataFileSource,
     FileIdNotFoundError,
     FileInUseError,
 )

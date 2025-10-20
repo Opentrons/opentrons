@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 import { CLEAN, EMPTY } from '@opentrons/step-generation'
@@ -22,7 +22,6 @@ describe('TipPickupContainer', () => {
   let props: ComponentProps<typeof TipPickupContainer>
   beforeEach(() => {
     props = {
-      protocolKey: 'mockProtocolKey',
       tiprackEntity: {
         id: 'mockId',
         pythonName: 'mockName',

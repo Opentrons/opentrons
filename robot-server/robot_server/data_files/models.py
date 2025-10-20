@@ -1,21 +1,14 @@
 """Data files models."""
 from datetime import datetime
 from typing import Literal, Set
-from enum import Enum
 
 from pydantic import Field
 
 from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.data_files import DataFileSource
 
 from robot_server.errors.error_responses import ErrorDetails
 from robot_server.service.json_api import ResourceModel
-
-
-class DataFileSource(Enum):
-    """The source this data file is from."""
-
-    UPLOADED = "uploaded"
-    GENERATED = "generated"
 
 
 class DataFile(ResourceModel):

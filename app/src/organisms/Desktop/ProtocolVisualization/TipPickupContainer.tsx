@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   COLORS,
@@ -15,8 +14,6 @@ import {
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { stepDetailViewerOpenAction } from '/app/redux/shell'
-
 import styles from './tippickupcontainer.module.css'
 import { getMissingTips } from './utils'
 
@@ -28,7 +25,6 @@ import type {
 } from '@opentrons/step-generation'
 
 interface TipPickupContainerProps {
-  protocolKey: string // the interface  will be updated soon
   tiprackEntity: LabwareEntity
   robotState: RobotState
 }
@@ -36,8 +32,7 @@ interface TipPickupContainerProps {
 export function TipPickupContainer(
   props: TipPickupContainerProps
 ): JSX.Element {
-  const { protocolKey, tiprackEntity, robotState } = props
-  const dispatch = useDispatch()
+  const { tiprackEntity, robotState } = props
   const { t } = useTranslation('protocol_visualization')
   const { id, def } = tiprackEntity
   const { tipState, labware } = robotState
@@ -60,10 +55,7 @@ export function TipPickupContainer(
     state => state !== NO
   ).length
   return (
-    <div
-      className={styles.container}
-      onClick={() => dispatch(stepDetailViewerOpenAction(protocolKey))}
-    >
+    <div className={styles.container}>
       <div className={styles.header}>
         <Tag text={t('tipPickup')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={slot} />

@@ -7,13 +7,13 @@ import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
 import styles from './preferences.module.css'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface UsagePreferencesSettingsProps {
-  toggleLiveVideoEnabled: UseStubCameraUsageSettingsResult['toggleLiveVideoEnabled']
-  toggleRecoveryCaptureEnabled: UseStubCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
-  isLiveVideoEnabled: UseStubCameraUsageSettingsResult['isLiveVideoEnabled']
-  isRecoveryCaptureEnabled: UseStubCameraUsageSettingsResult['isRecoveryCaptureEnabled']
+  toggleLiveVideoEnabled: UseCameraUsageSettingsResult['toggleLiveVideoEnabled']
+  toggleRecoveryCaptureEnabled: UseCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
+  isLiveVideoEnabled: UseCameraUsageSettingsResult['isLiveVideoEnabled']
+  isRecoveryCaptureEnabled: UseCameraUsageSettingsResult['isRecoveryCaptureEnabled']
 }
 
 export function UsagePreferencesSettings({
