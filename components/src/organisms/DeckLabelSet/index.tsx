@@ -1,16 +1,16 @@
-import { value forwardRef } from 'react'
+import { forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { value RobotCoordsForeignDiv } from '../../hardware-sim'
-import { value BORDERS, value COLORS } from '../../helix-design-system'
-import { value RobotInfoLabel } from '../../molecules'
-import { value DeckLabel } from '../../molecules/DeckLabel'
-import { value Box } from '../../primitives'
-import { value POSITION_ABSOLUTE, value POSITION_RELATIVE } from '../../styles'
-import { value SPACING } from '../../ui-style-constants'
+import { RobotCoordsForeignDiv } from '../../hardware-sim'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { RobotInfoLabel } from '../../molecules'
+import { DeckLabel } from '../../molecules/DeckLabel'
+import { Box } from '../../primitives'
+import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 
-import type { value ForwardedRef } from 'react'
-import type { value DeckLabelProps } from '../../molecules/DeckLabel'
+import type { ForwardedRef } from 'react'
+import type { DeckLabelProps } from '../../molecules/DeckLabel'
 
 interface DeckLabelSetProps {
   deckLabels: DeckLabelProps[]
@@ -22,13 +22,13 @@ interface DeckLabelSetProps {
   showModuleIcon?: boolean
   showBorder?: boolean
 }
-//  +15/30 to leave room for the deck info label to be fully visible in the viewbox
+      //  +15/30 to leave room for the deck info label to be fully visible in the viewbox
 const WIDTH_ADJUSTED = 15
 const HEIGHT_ADJUSTED = 30
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
-  ref: ForwardedRef
+  ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
   const {
     deckLabels,
@@ -94,7 +94,7 @@ interface StyledBoxProps {
   showBorder: boolean
 }
 
-const StyledBox = styled(Box)`
+const StyledBox = styled(Box)<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
   border: ${({ isZoomed, showBorder }) => {
     if (!showBorder) {
@@ -130,7 +130,7 @@ interface IconWrapperProps {
   leftPosition: number
 }
 
-const IconWrapper = styled(Box)`
+const IconWrapper = styled(Box)<IconWrapperProps>`
   position: ${POSITION_ABSOLUTE};
   top: -${SPACING.spacing8};
   left: ${props => `${props.leftPosition}px`};
