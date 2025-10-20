@@ -25,10 +25,9 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
 
-from robot_server.data_files.models import DataFileSource
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
     RequestModel,

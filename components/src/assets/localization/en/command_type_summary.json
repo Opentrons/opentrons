@@ -13,6 +13,7 @@
   "calibration/calibrateModule": "Calibrate",
   "calibration/calibratePipette": "Calibrate",
   "calibration/moveToMaintenancePosition": "Calibrate",
+  "captureImage": "Take a photo",
   "comment": "Comment",
   "configureForVolume": "Configure",
   "configureNozzleLayout": "Configure",

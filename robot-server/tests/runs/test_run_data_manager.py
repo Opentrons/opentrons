@@ -358,6 +358,7 @@ async def test_create(
         mock_file_provider_wrapper.set_run_metadata(
             RunFileNameMetadata.model_construct(
                 robot_name=config.name(),
+                run_id=run_id,
                 run_created_at=created_at,
                 protocol_name="test_protocol",
             )

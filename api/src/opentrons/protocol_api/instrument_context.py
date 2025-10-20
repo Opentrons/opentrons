@@ -199,6 +199,7 @@ class InstrumentContext(publisher.CommandPublisher):
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
         flow_rate: Optional[float] = None,
+        end_location: Optional[types.Location] = None,
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
@@ -238,6 +239,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
                           ``rate`` must not be set.
         :type flow_rate: float
+        :param end_location: Tells the robot to move between location and end_location
+            while aspirating liquid. When this argument is used the location and
+            end_location must both be :py:class:`.Location`.
+        :type end_location: :py:class:`.Location`
+
         :returns: This instance.
 
         .. note::
@@ -291,6 +297,60 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
+        if (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # we're using the old dynamic pipetting
+            if end_location is not None:
+                raise ValueError(
+                    "Dynamic target is depreciated and you cannot use a dynamic target and and end location."
+                )
+            # re-work the dynamic location as a start and end location
+            new_start_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.START,
+            )
+            target = validation.validate_location(
+                location=new_start_location, last_location=last_location
+            )
+            # Target already checked for this above, this is just for lint
+            assert not isinstance(target, validation.DisposalTarget)
+            move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
+                target=target
+            )
+            end_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.END,
+            )
+        end_move_to_location: Optional[types.Location] = None
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
+        if end_location is not None:
+            end_target: Optional[validation.ValidTarget] = None
+            if location is None:
+                raise ValueError("Location must be supplied if using an End Location.")
+            end_target = validation.validate_location(
+                location=end_location, last_location=None
+            )
+            if isinstance(end_target, validation.DisposalTarget):
+                raise ValueError(
+                    "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
+                )
+            (
+                end_move_to_location,
+                end_well,
+                end_meniscus_tracking,
+            ) = self._handle_aspirate_target(target=end_target)
+        elif (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # Preserve the old behavior
+            meniscus_tracking = types.MeniscusTrackingTarget.START
+            end_move_to_location = move_to_location
+            end_meniscus_tracking = types.MeniscusTrackingTarget.END
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -322,6 +382,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 flow_rate=flow_rate,
                 rate=rate,
+                end_location=end_move_to_location,
             ),
         ):
             self._core.aspirate(
@@ -332,6 +393,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 flow_rate=flow_rate,
                 in_place=target.in_place,
                 meniscus_tracking=meniscus_tracking,
+                end_location=end_move_to_location,
+                end_meniscus_tracking=end_meniscus_tracking,
             )
 
         return self
@@ -346,6 +409,7 @@ class InstrumentContext(publisher.CommandPublisher):
         rate: float = 1.0,
         push_out: Optional[float] = None,
         flow_rate: Optional[float] = None,
+        end_location: Optional[types.Location] = None,
     ) -> InstrumentContext:
         """
         Dispense liquid from a pipette tip.
@@ -414,6 +478,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
                           ``rate`` must not be set.
         :type flow_rate: float
+
+        :param end_location: Tells the robot to move between location and end_location
+            while dispensing liquid held in the pipette. When this argument is used
+            the location and end_location must both be a :py:class:`.Location`.
+        :type end_location: :py:class:`.Location`
 
         :returns: This instance.
 
@@ -501,12 +570,68 @@ class InstrumentContext(publisher.CommandPublisher):
                     in_place=target.in_place,
                     push_out=push_out,
                     meniscus_tracking=None,
+                    end_location=None,
+                    end_meniscus_tracking=None,
                 )
             return self
 
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
+        if (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # we're using the old dynamic pipetting
+            if end_location is not None:
+                raise ValueError(
+                    "Dynamic target is depreciated and you cannot use a dynamic target and and end location."
+                )
+            # re-work the dynamic location as a start and end location
+            new_start_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.START,
+            )
+            target = validation.validate_location(
+                location=new_start_location, last_location=last_location
+            )
+            # Target already checked for this above, this is just for lint
+            assert not isinstance(target, validation.DisposalTarget)
+            move_to_location, well, meniscus_tracking = self._handle_dispense_target(
+                target=target
+            )
+            end_location = types.Location(
+                point=move_to_location.point,
+                labware=move_to_location.labware,
+                _meniscus_tracking=types.MeniscusTrackingTarget.END,
+            )
+        end_move_to_location: Optional[types.Location] = None
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
+        if end_location is not None:
+            end_target: Optional[validation.ValidTarget] = None
+            if location is None:
+                raise ValueError("Location must be supplied if using an End Location.")
+            end_target = validation.validate_location(
+                location=end_location, last_location=None
+            )
+            if isinstance(end_target, validation.DisposalTarget):
+                raise ValueError(
+                    "Trash Bin and Waste Chute are not acceptable location parameters for dynamic pipetting commands."
+                )
+            (
+                end_move_to_location,
+                end_well,
+                end_meniscus_tracking,
+            ) = self._handle_dispense_target(target=end_target)
+        elif (
+            meniscus_tracking is not None
+            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
+        ):
+            # Preserve the old behavior
+            meniscus_tracking = types.MeniscusTrackingTarget.START
+            end_move_to_location = move_to_location
+            end_meniscus_tracking = types.MeniscusTrackingTarget.END
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -523,6 +648,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=move_to_location,
                 rate=rate,
                 flow_rate=flow_rate,
+                end_location=end_move_to_location,
             ),
         ):
             self._core.dispense(
@@ -534,6 +660,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 in_place=target.in_place,
                 push_out=push_out,
                 meniscus_tracking=meniscus_tracking,
+                end_location=end_move_to_location,
+                end_meniscus_tracking=end_meniscus_tracking,
             )
 
         return self

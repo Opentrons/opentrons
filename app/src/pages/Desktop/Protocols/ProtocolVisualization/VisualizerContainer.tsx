@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -10,6 +11,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
+import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
@@ -39,6 +41,7 @@ interface VisualizerContainerProps {
 export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
+  const dispatch = useDispatch()
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
@@ -57,7 +60,6 @@ export function VisualizerContainer(
   const startWidthRef = useRef<number>(0)
   const leftWidthRef = useRef<number>(leftWidth)
   const rightWidthRef = useRef<number>(rightWidth)
-
   useEffect(() => {
     leftWidthRef.current = leftWidth
   }, [leftWidth])
@@ -218,23 +220,6 @@ export function VisualizerContainer(
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
       <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
-        {/* TODO: slotDetails info should be moved to the spotlight window!
-        {selectedSlot != null && selectedRunTimeCommand != null ? (
-          <SlotDetails
-            slotId={selectedSlot}
-            command={selectedRunTimeCommand}
-            robotState={robotState}
-            onClose={() => {
-              setSelectedSlot(null)
-            }}
-            percentComplete={percentComplete}
-            analysis={analysis}
-            robotType={robotType ?? FLEX_ROBOT_TYPE}
-            allRunDefs={allRunDefs}
-            invariantContext={invariantContext}
-            liquids={liquids}
-          />
-        ) : ( */}
         <CommandSteps
           analysis={analysis}
           currentCommandIndex={selectedCommandIndex}
@@ -245,7 +230,6 @@ export function VisualizerContainer(
             setIsPlaying(false)
           }}
         />
-        {/* )} */}
         {/* Left column resizer */}
         <div
           className={`${styles.resizer} ${styles.resizer_right}`}
@@ -267,6 +251,15 @@ export function VisualizerContainer(
           isPlaying={isPlaying}
           commands={filteredCommands}
           groupedCommands={groupedCommands}
+          spotlightWindowData={{
+            protocolKey,
+            slot: selectedSlot,
+            command: selectedRunTimeCommand,
+            robotState,
+            invariantContext,
+            analysis,
+            liquids,
+          }}
         />
 
         <DeckView
@@ -276,7 +269,22 @@ export function VisualizerContainer(
           robotState={robotState}
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           selectedSlot={selectedSlot}
-          setSelectedSlot={setSelectedSlot}
+          setSelectedSlot={slot => {
+            setSelectedSlot(slot)
+            if (selectedRunTimeCommand != null && selectedSlot != null) {
+              dispatch(
+                stepDetailViewerOpenAction({
+                  protocolKey,
+                  slot: selectedSlot,
+                  command: selectedRunTimeCommand,
+                  robotState,
+                  invariantContext,
+                  analysis,
+                  liquids,
+                })
+              )
+            }
+          }}
           selectedRunTimeCommand={selectedRunTimeCommand}
         />
       </div>

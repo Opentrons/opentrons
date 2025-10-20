@@ -297,6 +297,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -304,6 +305,13 @@ export const useLabwareDropdownOptions = (
         labwareId
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
+      const topId = fullStackFromLabwares[0]
+      const isLabwareLidCombo =
+        (fullStackFromLabwares[1] === labwareId &&
+          labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('adapter')) ??
+        false
       const isLabwareInTrash =
         deckSlot === 'gripperWasteChute' ||
         MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
@@ -325,12 +333,14 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        !isTopOfStack
+        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'labware' && !isTopOfStack)
           ? acc
           : [
               ...acc,
@@ -350,6 +360,8 @@ export const useLabwareDropdownOptions = (
   )
   return _sortLabwareDropdownOptions(labwareOptions)
 }
+
+const TOUGH_PLATE_LOADNAME = 'opentrons_96_wellplate_200ul_pcr_full_skirt'
 
 //  used for LabwareLocationField dropdown
 export const getUnoccupiedStackOptions = (args: {
@@ -389,7 +401,13 @@ export const getUnoccupiedStackOptions = (args: {
       const { displayName } = labwareOnDeckDef.metadata
       const { loadName } = labwareOnDeckDef.parameters
 
-      const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
+      //  NOTE: the tough plate is the only plate in the repo whose def allows for stacking
+      //  on itself. We don't allow that pattern with any other well plate. So i'm hardcoding
+      //  it in to filter it out for now. but in the future when we support labware stacking
+      //  we need to make this logic more robust
+      const isCompatible =
+        labwareCompatibleParentLabware?.includes(loadName) &&
+        loadName !== TOUGH_PLATE_LOADNAME
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )

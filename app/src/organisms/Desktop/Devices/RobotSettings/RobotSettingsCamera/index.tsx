@@ -2,7 +2,7 @@ import { Divider } from '@opentrons/components'
 
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
-import { useStubCameraUsageSettings } from './hooks/useStubCameraUsageSettings'
+import { useCameraUsageSettings } from './hooks/useCameraUsageSettings'
 import { RobotSettingsCameraControls } from './RobotSettingsCameraControls'
 import { RobotSettingsCameraUsage } from './RobotSettingsCameraUsage'
 
@@ -16,7 +16,7 @@ export function RobotSettingsCamera(): JSX.Element {
     isLiveVideoEnabled,
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
-  } = useStubCameraUsageSettings()
+  } = useCameraUsageSettings()
 
   return (
     <div className={styles.container}>

@@ -113,8 +113,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
         nozzle_map=result1.nozzle_map,
-        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
-        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        back_left_corner_offset=Point(-38, 0.0, -259.15),
+        front_right_corner_offset=Point(11.5, -64.0, -259.15),
         pipette_lld_settings={
             "t20": {"minHeight": 1.5, "minVolume": 0.0},
             "t50": {"minHeight": 1.0, "minVolume": 0.0},
@@ -151,8 +151,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
         nozzle_map=result2.nozzle_map,
-        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
-        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        back_left_corner_offset=Point(-38, 0.0, -259.15),
+        front_right_corner_offset=Point(11.5, -64.0, -259.15),
         pipette_lld_settings={
             "t20": {"minHeight": 1.5, "minVolume": 0.0},
             "t50": {"minHeight": 1.0, "minVolume": 0.0},
