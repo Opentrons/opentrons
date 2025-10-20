@@ -3,11 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { DIRTY } from '@opentrons/step-generation'
 
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
-import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import {
+  getDeckSetupForActiveItem,
+  getRobotStateAtActiveItem,
+} from '/protocol-designer/top-selectors/labware-locations'
 
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
@@ -18,27 +22,43 @@ import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { TipSelectionBaseProps } from './types'
 
 const NUM_TOTAL_STEPS = 2
-const STUBBED_NUM_PICKUPS = 10
 
 interface TipSelectionWizardProps {
   formTiprackUri: string
   setShowTipSelectionModal: Dispatch<SetStateAction<boolean>>
   pipetteId: string
   nozzles: NozzleConfigurationStyle
+  numPickups: number
+  tiprackSelected: string | null
+  updateTiprackSelected: Dispatch<SetStateAction<string | null>>
+  tipsSelected: string[][]
+  updateTipsSelected: Dispatch<SetStateAction<string[][]>>
 }
 
 export function TipSelectionWizard(
   props: TipSelectionWizardProps
 ): JSX.Element {
-  const { setShowTipSelectionModal, formTiprackUri, pipetteId, nozzles } = props
+  const {
+    setShowTipSelectionModal,
+    formTiprackUri,
+    pipetteId,
+    nozzles,
+    numPickups,
+    tiprackSelected,
+    updateTiprackSelected,
+    tipsSelected,
+    updateTipsSelected,
+  } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
-    null
+    tiprackSelected
   )
   const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] =
     useState(false)
-  const [selectedTips, setSelectedTips] = useState<string[][]>([])
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
+  const [selectedTips, setSelectedTips] = useState<string[][]>(tipsSelected)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { pipetteEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
@@ -46,14 +66,22 @@ export function TipSelectionWizard(
   const { makeSnackbar } = useKitchen()
   const deckDef = getDeckDefFromRobotType(robotType)
 
+  const isAnySelectedWellUsed =
+    tipState != null && selectedTips.flat().some(tip => tipState[tip] === DIRTY)
+  const handleSave = (): void => {
+    updateTiprackSelected(selectedTiprackId)
+    updateTipsSelected(selectedTips)
+    setShowTipSelectionModal(false)
+  }
+
   const handleContinue = (): void => {
     if (selectedTiprackId == null) {
       makeSnackbar(t('no_tiprack_selected') as string)
     } else if (currentStepIndex === NUM_TOTAL_STEPS - 1) {
-      if (selectedTips.length !== STUBBED_NUM_PICKUPS) {
+      if (selectedTips.length !== numPickups) {
         setShowPickupsRequiredBanner(true)
       } else {
-        setShowTipSelectionModal(false)
+        handleSave()
       }
     } else {
       setCurrentStepIndex(prevStepIndex => prevStepIndex + 1)
@@ -76,6 +104,7 @@ export function TipSelectionWizard(
     deckDef,
     pipetteSpecs,
     nozzles,
+    pipetteId,
   }
 
   let currentComponent: JSX.Element
@@ -90,7 +119,7 @@ export function TipSelectionWizard(
           selectedTips={selectedTips}
           setSelectedTips={setSelectedTips}
           setShowPickupsRequiredBanner={setShowPickupsRequiredBanner}
-          numTotalPickups={STUBBED_NUM_PICKUPS}
+          numTotalPickups={numPickups}
           nozzles={nozzles}
         />
       )
@@ -116,7 +145,8 @@ export function TipSelectionWizard(
       currentStepIndex={currentStepIndex}
       totalSteps={NUM_TOTAL_STEPS}
       showPickupsRequiredBanner={showPickupsRequiredBanner}
-      numPickupsRemaining={STUBBED_NUM_PICKUPS - selectedTips.length}
+      numPickupsRemaining={numPickups - selectedTips.length}
+      showReusingTipsBanner={isAnySelectedWellUsed}
     >
       {currentComponent}
     </TipSelectionModal>

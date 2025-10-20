@@ -1,26 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 
-import { stepDetailViewerOpenAction } from '/app/redux/shell'
-
 import styles from './tippickupcontainer.module.css'
 
-interface TipPickupContainerProps {
-  protocolKey: string // the interface  will be updated soon
-}
-
-export function TipPickupContainer({
-  protocolKey,
-}: TipPickupContainerProps): JSX.Element {
-  const dispatch = useDispatch()
+export function TipPickupContainer(): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   return (
-    <div
-      className={styles.container}
-      onClick={() => dispatch(stepDetailViewerOpenAction(protocolKey))}
-    >
+    <div className={styles.container}>
       <div className={styles.header}>
         <Tag text={t('tipPickup')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel="slot" />

@@ -1,6 +1,12 @@
 import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
+import type {
+  Liquid,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -195,6 +201,28 @@ export interface StepDetailViewerOpenAction {
   type: 'shell:STEP_DETAIL_VIEWER_OPEN'
   payload: {
     protocolKey: string
+    slot: string
+    command: RunTimeCommand
+    robotState: RobotState
+    invariantContext: InvariantContext
+    analysis: ProtocolAnalysisOutput
+    liquids: Liquid[]
+  }
+  meta: {
+    shell: true
+  }
+}
+
+export interface StepDetailViewerUpdateAction {
+  type: 'shell:STEP_DETAIL_VIEWER_UPDATE'
+  payload: {
+    protocolKey: string
+    slot: string
+    command: RunTimeCommand
+    robotState: RobotState
+    invariantContext: InvariantContext
+    analysis: ProtocolAnalysisOutput
+    liquids: Liquid[]
   }
   meta: {
     shell: true
