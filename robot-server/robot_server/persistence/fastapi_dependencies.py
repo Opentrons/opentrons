@@ -311,7 +311,7 @@ async def initialize_images_directory(
         raise
 
 
-async def _get_images_directory(
+async def get_images_directory(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the path to the server's images directory."""
@@ -323,7 +323,7 @@ async def _get_images_directory(
 
 
 async def get_images_resetter(
-    directory_to_reset: Annotated[Path, Depends(_get_images_directory)],
+    directory_to_reset: Annotated[Path, Depends(get_images_directory)],
 ) -> ImagesResetter:
     """Get an `ImagesResetter` to reset the robot-server's stored data."""
     return ImagesResetter(directory_to_reset)

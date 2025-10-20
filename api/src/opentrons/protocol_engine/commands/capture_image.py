@@ -1,0 +1,180 @@
+"""Command models to capture an image with a camera."""
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING, Tuple, Any
+from datetime import datetime
+
+from typing_extensions import Literal, Type
+from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
+
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors import (
+    StorageLimitReachedError,
+    CameraDisabledError,
+)
+from ..errors.error_occurrence import ErrorOccurrence
+
+from ..resources.file_provider import (
+    MAXIMUM_FILE_LIMIT,
+    MimeType,
+    ImageCaptureCmdFileNameMetadata,
+)
+from ..resources import FileProvider
+from ..resources import CameraProvider
+from ..resources.camera_provider import ImageParameters
+from ..state import update_types
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.state.state import StateView
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
+
+
+CaptureImageCommandType = Literal["captureImage"]
+
+
+class CaptureImageParams(BaseModel):
+    """Input parameters for an image capture."""
+
+    fileName: str | SkipJsonSchema[None] = Field(
+        None,
+        description="Optional file name to use when storing the results of an Image Capture.",
+        json_schema_extra=_remove_default,
+    )
+    resolution: Optional[Tuple[int, int]] = Field(
+        None,
+        description="Width by height resolution in pixels for the image to be captured with.",
+    )
+    zoom: Optional[float] = Field(
+        None,
+        description="Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.",
+    )
+    pan: Optional[Tuple[int, int]] = Field(
+        None,
+        description="X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.",
+    )
+    contrast: Optional[float] = Field(
+        None,
+        description="The contrast to use when processing an image. Scale is 0% to 100%.",
+    )
+    brightness: Optional[float] = Field(
+        None,
+        description="The brightness to use when processing an image. Scale is 0% to 100%.",
+    )
+    saturation: Optional[float] = Field(
+        None,
+        description="The saturation to use when processing an image. Scale is 0% to 100%.",
+    )
+
+
+class CaptureImageResult(BaseModel):
+    """Result data from running an image capture."""
+
+    fileId: Optional[str] = Field(
+        ...,
+        description="File ID for image files output as a result of an image capture action.",
+    )
+
+
+def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
+    return ImageParameters(
+        resolution=params.resolution,
+        zoom=params.zoom,
+        pan=params.pan,
+        contrast=(
+            (params.contrast / 100) * 2.0 if params.contrast is not None else None
+        ),
+        brightness=(
+            int(((params.brightness * 256) // 100) - 128) * -1
+            if params.brightness is not None
+            else None
+        ),
+        saturation=(
+            (params.saturation / 100) * 2.0 if params.saturation is not None else None
+        ),
+    )
+
+
+class CaptureImageImpl(
+    AbstractCommandImpl[CaptureImageParams, SuccessData[CaptureImageResult]]
+):
+    """Execution implementation of an image capture."""
+
+    def __init__(
+        self,
+        state_view: StateView,
+        file_provider: FileProvider,
+        camera_provider: CameraProvider,
+        **unused_dependencies: object,
+    ) -> None:
+        self._state_view = state_view
+        self._file_provider = file_provider
+        self._camera_provider = camera_provider
+
+    async def execute(
+        self, params: CaptureImageParams
+    ) -> SuccessData[CaptureImageResult]:
+        """Initiate an image capture with a camera."""
+        state_update = update_types.StateUpdate()
+
+        # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
+
+        if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
+            raise StorageLimitReachedError(
+                message=f"Attempt to write image file exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
+            )
+
+        # Handle capturing an image with the CameraProvider
+        camera_settings = await self._camera_provider.get_camera_settings()
+        if camera_settings.camera_enabled is False:
+            raise CameraDisabledError(
+                "Cannot capture image because Camera is disabled."
+            )
+
+        parameters = _converted_image_params(params=params)
+        camera_data = await self._camera_provider.capture_image(parameters)
+
+        # Conditionally save file if camera data was returned - in simulation we don't return anything.
+        file_id: str | None = None
+        if camera_data:
+            file_info = await self._file_provider.write_file(
+                data=camera_data,
+                mime_type=MimeType.IMAGE_JPEG,
+                command_metadata=ImageCaptureCmdFileNameMetadata(
+                    step_number=len(self._state_view.commands.get_all()) + 1,
+                    command_timestamp=datetime.now(),
+                    base_filename=params.fileName,
+                ),
+            )
+            file_id = file_info.id
+            state_update.files_added = update_types.FilesAddedUpdate(file_ids=[file_id])
+
+        return SuccessData(
+            public=CaptureImageResult(
+                fileId=file_id,
+            ),
+            state_update=state_update,
+        )
+
+
+class CaptureImage(
+    BaseCommand[CaptureImageParams, CaptureImageResult, ErrorOccurrence]
+):
+    """A command to execute an Absorbance Reader measurement."""
+
+    commandType: CaptureImageCommandType = "captureImage"
+    params: CaptureImageParams
+    result: Optional[CaptureImageResult] = None
+
+    _ImplementationCls: Type[CaptureImageImpl] = CaptureImageImpl
+
+
+class CaptureImageCreate(BaseCommandCreate[CaptureImageParams]):
+    """A request to execute an Absorbance Reader measurement."""
+
+    commandType: CaptureImageCommandType = "captureImage"
+    params: CaptureImageParams
+
+    _CommandCls: Type[CaptureImage] = CaptureImage
