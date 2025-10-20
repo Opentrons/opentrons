@@ -23,7 +23,7 @@ FLEX_EMBEDDED_CAMERA = "/dev/video2"
 OT2_CAMERA = "/dev/video0"
 
 # Stream Globals
-STREAM_CONF_FILE = "opentrons-live-stream.conf"
+STREAM_CONF_FILE = "opentrons-live-stream.env"
 STREAM_CONF_FILE_KEYS = [
     "BOOT_ID",
     "STATUS",
