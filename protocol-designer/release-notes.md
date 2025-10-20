@@ -35,7 +35,7 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 ### Known Issues
 
-- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.  
+- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.
 
 ## Opentrons Protocol Designer Changes in 8.5.6
 
@@ -72,6 +72,7 @@ This hotfix release addresses several bugs.
 
 - Crashes and protocol loss no longer occur when:
 - Crashes and protocol loss no longer occur when:
+
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
