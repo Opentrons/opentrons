@@ -361,8 +361,6 @@ export const useLabwareDropdownOptions = (
   return _sortLabwareDropdownOptions(labwareOptions)
 }
 
-const TOUGH_PLATE_LOADNAME = 'opentrons_96_wellplate_200ul_pcr_full_skirt'
-
 //  used for LabwareLocationField dropdown
 export const getUnoccupiedStackOptions = (args: {
   robotState: RobotState
@@ -399,15 +397,12 @@ export const getUnoccupiedStackOptions = (args: {
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
       const { displayName } = labwareOnDeckDef.metadata
-      const { loadName } = labwareOnDeckDef.parameters
+      const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
 
-      //  NOTE: the tough plate is the only plate in the repo whose def allows for stacking
-      //  on itself. We don't allow that pattern with any other well plate. So i'm hardcoding
-      //  it in to filter it out for now. but in the future when we support labware stacking
-      //  we need to make this logic more robust
-      const isCompatible =
-        labwareCompatibleParentLabware?.includes(loadName) &&
-        loadName !== TOUGH_PLATE_LOADNAME
+      const isCompatible = labwareCompatibleParentLabware?.includes(
+        labwareOnDeckLoadName
+      )
+
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )
