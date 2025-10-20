@@ -49,6 +49,7 @@ import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
+import { LabwareStackToolboxContainer } from './LabwareToolbox'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -174,6 +175,7 @@ export function AssignLiquidsModal(
                   />
                 </Flex>
               ) : null}
+              <LabwareStackToolboxContainer selectedLabwareIds={selectedLabwareArray} showBadFormState={showBadFormState} setShowBadFormState={setShowBadFormState} setDefineLiquidModal={setDefineLiquidModal} />
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
