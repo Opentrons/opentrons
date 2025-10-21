@@ -33,33 +33,56 @@ class CIConfig:
     relative_artifact_dir: str
 
 
+def _determine_application_from_tag(ref_name: str) -> str | None:
+    """Determine application from tag name patterns."""
+    ref_name_lower = ref_name.lower()
+    
+    tag_patterns = {
+        "labware_library": ["staging-labware-library", "labware-library"],
+        "mkdocs": ["staging-mkdocs", "mkdocs"],
+        "docs": ["staging-docs", "docs"],
+        "protocol_designer": ["staging-protocol-designer", "protocol-designer"],
+    }
+    
+    for app_name, prefixes in tag_patterns.items():
+        if any(ref_name_lower.startswith(prefix) for prefix in prefixes):
+            return app_name
+    
+    return None
+
+
+def _determine_application_from_workflow() -> str | None:
+    """Determine application from workflow name."""
+    workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
+    
+    workflow_patterns = {
+        "mkdocs": "Docs build and deploy",
+        "protocol_designer": "PD test, build, and deploy",
+        "labware_library": "Labware Library test, build, and deploy",
+        "components": "Components test, build, and deploy",
+        "docs": "API docs build",
+    }
+    
+    for app_name, pattern in workflow_patterns.items():
+        if pattern in workflow_name:
+            return app_name
+    
+    return None
+
+
 def _determine_application(ref_type: str, ref_name: str) -> str:
     """Determine application from ref type and name."""
+    # Try tag-based detection first
     if ref_type == "tag":
-        # Tag-based application detection - normalize to lowercase for comparison
-        ref_name_lower = ref_name.lower()
-        if any(ref_name_lower.startswith(prefix) for prefix in ["staging-labware-library", "labware-library"]):
-            return "labware_library"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-mkdocs", "mkdocs"]):
-            return "mkdocs"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-docs", "docs"]):
-            return "docs"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-protocol-designer", "protocol-designer"]):
-            return "protocol_designer"
-
-    # If not a tag, or a tag we are not expecting, determine application from workflow name.
-    workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
-    if "Docs build and deploy" in workflow_name:
-        return "mkdocs"
-    elif "PD test, build, and deploy" in workflow_name:
-        return "protocol_designer"
-    elif "Labware Library test, build, and deploy" in workflow_name:
-        return "labware_library"
-    elif "Components test, build, and deploy" in workflow_name:
-        return "components"
-    elif "API docs build" in workflow_name:
-        return "docs"
-
+        app_from_tag = _determine_application_from_tag(ref_name)
+        if app_from_tag:
+            return app_from_tag
+    
+    # Fall back to workflow-based detection
+    app_from_workflow = _determine_application_from_workflow()
+    if app_from_workflow:
+        return app_from_workflow
+    
     # No application could be determined - exit with error
     raise ValueError(
         f"Could not determine application from ref_type='{ref_type}', ref_name='{ref_name}', "
