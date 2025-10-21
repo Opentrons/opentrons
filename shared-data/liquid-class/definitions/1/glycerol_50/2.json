@@ -6098,8 +6098,8 @@
             },
             "flowRateByVolume": [
               [5.0, 10.0],
-              [50.0, 47.12385],
-              [200.0, 47.12385]
+              [50.0, 50.0],
+              [200.0, 200.0]
             ],
             "correctionByVolume": [
               [0.0, 0.0],
@@ -6155,7 +6155,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 47.12385
+                  "flowRate": 50.0
                 }
               },
               "touchTip": {
@@ -6236,7 +6236,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 47.12385
+                  "flowRate": 50.0
                 }
               },
               "touchTip": {
@@ -6262,7 +6262,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 47.12385]],
+            "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.3],
@@ -6345,8 +6345,8 @@
             },
             "flowRateByVolume": [
               [5.0, 10.0],
-              [50.0, 47.12385],
-              [200.0, 47.12385]
+              [50.0, 50.0],
+              [200.0, 200.0]
             ],
             "correctionByVolume": [
               [0.0, 0.0],
@@ -6402,7 +6402,7 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 47.12385
+                  "flowRate": 50.0
                 }
               },
               "touchTip": {
@@ -6483,7 +6483,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 47.12385
+                  "flowRate": 50.0
                 }
               },
               "touchTip": {
@@ -6509,7 +6509,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[0.0, 47.12385]],
+            "flowRateByVolume": [[0.0, 50.0]],
             "correctionByVolume": [
               [0.0, 0.0],
               [5.0, -0.3],
