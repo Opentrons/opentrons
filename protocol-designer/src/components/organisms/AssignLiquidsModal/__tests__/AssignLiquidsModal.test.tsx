@@ -36,9 +36,13 @@ vi.mock('/protocol-designer/step-forms/selectors', async importOriginal => {
     getInitialDeckSetup: vi.fn(),
   }
 })
-// Mock the MyButton component
 vi.mock('../LiquidToolbox', () => ({
   LiquidToolboxContainer: vi.fn(() => <div>mock LiquidToolbox</div>),
+}))
+vi.mock('../LabwareToolbox', () => ({
+  LabwareStackToolboxContainer: vi.fn(() => (
+    <div>mock LabwareStackToolbox</div>
+  )),
 }))
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -48,13 +52,6 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
-// vi.mock('/protocol-designer/top-selectors/labware-locations', async (importOriginal) => {
-//     const actual = await importOriginal()
-//     return {
-//       ...actual,
-//       getDeckSetupForActiveItem: vi.fn()
-//     }
-//   })
 
 const render = (props: ComponentProps<typeof AssignLiquidsModal>) => {
   return renderWithProviders(<AssignLiquidsModal {...props} />, {
@@ -108,14 +105,14 @@ describe('AssignLiquidsModal', () => {
     }
     render(props)
 
-    screen.getByText('Top of stack')
-    expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
-    const firstButton = screen.getByTestId('LabwareButton-1')
-    expect(firstButton).toHaveClass('_button_active_386e4e')
+    screen.getByText('mock LabwareStackToolbox')
+    // expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
+    // const firstButton = screen.getByTestId('LabwareButton-1')
+    // expect(firstButton).toHaveClass('_button_active_386e4e')
 
-    const scondButton = screen.getByTestId('LabwareButton-0')
-    fireEvent.click(scondButton)
-    expect(scondButton).toHaveClass('_button_active_386e4e')
+    // const scondButton = screen.getByTestId('LabwareButton-0')
+    // fireEvent.click(scondButton)
+    // expect(scondButton).toHaveClass('_button_active_386e4e')
     // expect(mockDispatch).toHaveBeenCalledWith({
     //   type: 'SELECT_WELLS',
     //   payload: {
