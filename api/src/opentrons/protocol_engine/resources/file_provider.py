@@ -5,7 +5,11 @@ import csv
 from typing import List, Optional, Callable, Awaitable, Dict
 from dataclasses import dataclass
 from pydantic import BaseModel
-from opentrons_shared_data.data_files import DataFileInfo, MimeType
+from opentrons_shared_data.data_files import (
+    DataFileInfo,
+    MimeType,
+    RunFileNameMetadata,
+)
 
 from ..errors import StorageLimitReachedError
 
@@ -45,18 +49,21 @@ class FileData:
 
     data: bytes
     mime_type: MimeType
+    run_metadata: RunFileNameMetadata
     command_metadata: CommandFileNameMetadata
 
     @staticmethod
     def build(
         data: bytes,
         mime_type: MimeType,
+        run_metadata: RunFileNameMetadata,
         command_metadata: CommandFileNameMetadata,
     ) -> "FileData":
         """Build a generic file data class."""
         file_data = FileData()
         file_data.data = data
         file_data.mime_type = mime_type
+        file_data.run_metadata = run_metadata
         file_data.command_metadata = command_metadata
         return file_data
 
@@ -165,6 +172,7 @@ class FileProvider:
         """
         self._data_files_write_file_cb = data_files_write_file_cb
         self._data_files_filecount = data_files_filecount
+        self._run_metadata: RunFileNameMetadata | None = None
 
     async def write_file(
         self,
@@ -180,10 +188,12 @@ class FileProvider:
                     f"Not enough space to store file. Maximum file limit of {MAXIMUM_FILE_LIMIT} reached."
                 )
             if self._data_files_write_file_cb is not None:
+                assert self._run_metadata is not None
                 file_data = FileData.build(
                     data=data,
                     mime_type=mime_type,
                     command_metadata=command_metadata,
+                    run_metadata=self._run_metadata,
                 )
                 return await self._data_files_write_file_cb(file_data)
         # If we are in an analysis or simulation state, return an empty `DataFileInfo`
@@ -197,3 +207,11 @@ class FileProvider:
             path="",
             mime_type=mime_type,
         )
+
+    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
+        """Sets metadata specific to the run."""
+        self._run_metadata = metadata
+
+    def clear_run_metadata(self) -> None:
+        """Clears metadata specific to the run."""
+        self._run_metadata = None
