@@ -26,11 +26,14 @@ from robot_server.data_files.router import (
     get_all_data_files,
     delete_file_by_id,
     get_run_image_metadata,
+    delete_run_images,
 )
 from robot_server.data_files.data_files_store import DataFileWithCommandsInfoSlice
 from opentrons_shared_data.data_files import DataFileInfoWithCommands, CmdDataFileInfo
 from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunNotFoundError
 
 
 @pytest.fixture
@@ -55,6 +58,12 @@ def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
 def file_auto_deleter(decoy: Decoy) -> DataFileAutoDeleter:
     """Get a mocked out DataFileAutoDeleter."""
     return decoy.mock(cls=DataFileAutoDeleter)
+
+
+@pytest.fixture
+def run_data_manager(decoy: Decoy) -> RunDataManager:
+    """Get a mocked out RunDataManager."""
+    return decoy.mock(cls=RunDataManager)
 
 
 async def test_upload_new_data_file(
@@ -577,3 +586,44 @@ async def test_get_run_image_metadata_with_pagination(
     assert len(result.content.data) == 1
     assert result.content.data[0].id == "file-id-3"
     assert result.content.meta == MultiBodyMeta(totalLength=5, cursor=2)
+
+
+async def test_delete_run_images(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+) -> None:
+    """It should delete all images for a run."""
+    decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
+    decoy.when(run_data_manager.current_run_id).then_return(None)
+
+    result = await delete_run_images(
+        runId="run-id",
+        data_files_store=data_files_store,
+        run_data_manager=run_data_manager,
+    )
+
+    decoy.verify(data_files_store.remove_all_by_run_id("run-id"))
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
+
+
+async def test_delete_run_images_run_not_found(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+) -> None:
+    """It should raise an error if the run doesn't exist."""
+    decoy.when(run_data_manager.get("run-id")).then_raise(
+        RunNotFoundError(run_id="run-id")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await delete_run_images(
+            runId="run-id",
+            data_files_store=data_files_store,
+            run_data_manager=run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"

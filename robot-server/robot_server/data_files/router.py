@@ -6,6 +6,10 @@ from typing import Annotated, Optional, Literal, Union, Final
 
 from fastapi import UploadFile, File, Form, Depends, Response, status, Query
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.router.base_router import RunNotFound
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunNotFoundError
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.service.json_api import (
@@ -401,5 +405,47 @@ async def get_run_image_metadata(
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.model_construct(data=data, meta=meta),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.delete,
+    path="/dataFiles/{runId}/images",
+    summary="Delete all camera images for a run",
+    description=dedent(
+        """
+        Delete all camera image files associated with a run from both the database
+        and filesystem storage.
+
+        This operation cannot be undone.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def delete_run_images(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Delete all camera images for a run.
+
+    Arguments:
+        runId: The run ID whose images should be deleted.
+        data_files_store: Store for data files database access.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        run_data_manager.get(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    data_files_store.remove_all_by_run_id(runId)
+
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
     )
