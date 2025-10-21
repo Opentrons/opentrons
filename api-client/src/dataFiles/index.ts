@@ -1,4 +1,4 @@
-export { getCsvFile } from './getCsvFile'
+export { getDataFile } from './getDataFile'
 export { getDataFileRaw } from './getDataFileRaw'
 export { uploadCsvFile } from './uploadCsvFile'
 
