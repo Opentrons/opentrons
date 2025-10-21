@@ -8,6 +8,7 @@ from .types import (
     MimeType,
     IODataFileInfo,
     DataFileSource,
+    DataFileInfoWithCommands,
     RunFileNameMetadata,
 )
 
@@ -21,4 +22,5 @@ __all__ = [
     "MimeType",
     "DataFileSource",
     "RunFileNameMetadata",
+    "DataFileInfoWithCommands",
 ]

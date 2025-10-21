@@ -38,7 +38,8 @@ router = APIRouter()
 JPG = "image/jpg"
 
 # todo(chb, 2025-09-19): This temporary for an initial implementation while we determine if some units will ship without cameras
-DEFAULT_CAMERA = "/dev/ot_system_camera"
+DEFAULT_CAMERA_ID = "ot_system_camera"
+DEFAULT_CAMERA_PATH = f"/dev/{DEFAULT_CAMERA_ID}"
 
 
 @router.post(
@@ -393,11 +394,11 @@ def _live_stream_settings_to_configuration_file(
 
 
 def _validate_camera_present() -> None:
-    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA):
+    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA_PATH):
         # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements
         # incase the camera isn't present, however eventually we can change this to support dynamically set third party cameras
         raise LegacyErrorResponse(
-            message=f"No video device found with device path: {DEFAULT_CAMERA}",
+            message=f"No video device found with device path: {DEFAULT_CAMERA_PATH}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
