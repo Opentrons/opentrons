@@ -32,6 +32,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
     <Overlay
       width="100%"
       height="100%"
+      position="absolute"
       backgroundColor={COLORS.transparentBlack90}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}

@@ -42,12 +42,12 @@ import {
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { SelectableLabware } from '../Labware/SelectableLabware'
+import { OverlayModal } from '../OverlayModal'
 import { LabwareStackToolboxContainer } from './LabwareToolbox'
 import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import { OverlayModal } from '../OverlayModal'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -164,8 +164,12 @@ export function AssignLiquidsModal(
                 })}
               </StyledText>
             </Flex>
-            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
-            <LiquidLayoutOverlayModalContainer />
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gap={SPACING.spacing24}
+              position={POSITION_RELATIVE}
+            >
+              <LiquidLayoutOverlayModalContainer />
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
@@ -248,10 +252,25 @@ interface AssignLiquidsModalContainerProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 
-export function LiquidLayoutOverlayModalContainer(
-): JSX.Element | null {
-  return <OverlayModal header='Selected labware have different liquid layouts' subText='Clear liquids in labware to edit them together' />
-
+export function LiquidLayoutOverlayModalContainer(): JSX.Element | null {
+  return (
+    <OverlayModal
+      header="Selected labware have different liquid layouts"
+      subText="Clear liquids in labware to edit them together"
+      primaryButtonProps={{
+        text: 'Clear liquids',
+        onClick: () => {
+          console.log('clear liquids')
+        },
+      }}
+      secondaryButtonProps={{
+        text: 'Cancel',
+        onClick: () => {
+          console.log('cancel')
+        },
+      }}
+    />
+  )
 }
 
 export function AssignLiquidsModalContainer(
