@@ -14,6 +14,7 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
+  USED,
 } from '@opentrons/components'
 import {
   ALL,
