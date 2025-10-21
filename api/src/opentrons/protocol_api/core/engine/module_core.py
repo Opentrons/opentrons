@@ -345,7 +345,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     ) -> EngineTaskCore:
         """Start setting the target temperature for the well block, in °C."""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.thermocycler.StartSetTargetBlockTemperatureParams(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
                 moduleId=self.module_id,
                 celsius=celsius,
                 blockMaxVolumeUl=block_max_volume,
@@ -374,7 +374,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
     def start_set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
         """Start setting the target temperature for the heated lid, in °C."""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.thermocycler.StartSetTargetLidTemperatureParams(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )

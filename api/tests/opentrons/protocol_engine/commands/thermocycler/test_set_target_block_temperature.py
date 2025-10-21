@@ -1,5 +1,5 @@
 """Test Thermocycler set block temperature command implementation."""
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.hardware_control.modules import Thermocycler
 
@@ -8,28 +8,41 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
 )
-from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.actions import ActionDispatcher, Action, StartTaskAction
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (
     SetTargetBlockTemperatureImpl,
+    SetTargetBlockTemperatureResult,
 )
+from opentrons.protocol_engine.types.tasks import Task
 
 
 async def test_set_target_block_temperature(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
+    real_task_handler: TaskHandler,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
 ) -> None:
     """It should be able to set the specified module's target temperature."""
-    subject = SetTargetBlockTemperatureImpl(state_view=state_view, equipment=equipment)
+    subject = SetTargetBlockTemperatureImpl(
+        state_view=state_view, equipment=equipment, task_handler=real_task_handler
+    )
 
     data = tc_commands.SetTargetBlockTemperatureParams(
         moduleId="input-thermocycler-id",
         celsius=12.3,
         blockMaxVolumeUl=50.2,
         holdTimeSeconds=123456,
+        taskId="taskId",
     )
-    tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=45.6)
+    tc_commands.SetTargetBlockTemperatureResult(
+        targetBlockTemperature=45.6, taskId="taskId"
+    )
 
     tc_module_substate = decoy.mock(cls=ThermocyclerModuleSubState)
     tc_hardware = decoy.mock(cls=Thermocycler)
@@ -40,6 +53,7 @@ async def test_set_target_block_temperature(
     decoy.when(tc_module_substate.module_id).then_return(
         ThermocyclerModuleId("thermocycler-id")
     )
+    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
 
     # Stub temperature validation from TC module view
     decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
@@ -56,14 +70,32 @@ async def test_set_target_block_temperature(
         equipment.get_module_hardware_api(ThermocyclerModuleId("thermocycler-id"))
     ).then_return(tc_hardware)
 
-    await subject.execute(data)
+    task: Task | None = None
+
+    def _capture_task(action: Action) -> None:
+        nonlocal task
+        assert isinstance(action, StartTaskAction)
+        task = action.task
+
+    decoy.when(
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))
+    ).then_do(_capture_task)
+
+    result = await subject.execute(data)
+    assert task is not None
+    await task.asyncioTask
 
     decoy.verify(
         await tc_hardware.set_target_block_temperature(
             celsius=45.6,
-            volume=77.6,
             hold_time_seconds=654321,
+            volume=77.6,
             ramp_rate=None,
         ),
-        times=1,
+    )
+    decoy.verify(await tc_hardware.wait_for_block_target())
+    assert result == SuccessData(
+        public=SetTargetBlockTemperatureResult(
+            targetBlockTemperature=45.6, taskId="taskId"
+        )
     )

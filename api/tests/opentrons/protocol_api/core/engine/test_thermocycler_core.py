@@ -173,7 +173,7 @@ def test_start_set_target_block_temperature(
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
-            cmd.thermocycler.StartSetTargetBlockTemperatureParams(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
                 moduleId="1234",
                 celsius=42.0,
                 blockMaxVolumeUl=3.4,
@@ -181,7 +181,7 @@ def test_start_set_target_block_temperature(
             )
         )
     ).then_return(
-        cmd.thermocycler.StartSetTargetBlockTemperatureResult(
+        cmd.thermocycler.SetTargetBlockTemperatureResult(
             targetBlockTemperature=42.0, taskId="taskId"
         )
     )
@@ -236,12 +236,12 @@ def test_start_set_target_lid_temperature(
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
-            cmd.thermocycler.StartSetTargetLidTemperatureParams(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
                 moduleId="1234", celsius=42.0
             )
         ),
     ).then_return(
-        cmd.thermocycler.StartSetTargetLidTemperatureResult(
+        cmd.thermocycler.SetTargetLidTemperatureResult(
             targetLidTemperature=42.0, taskId="taskId"
         )
     )

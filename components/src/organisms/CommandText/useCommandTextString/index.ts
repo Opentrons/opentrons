@@ -134,9 +134,7 @@ export function useCommandTextString(
     case 'temperatureModule/setTargetTemperature':
     case 'temperatureModule/waitForTemperature':
     case 'thermocycler/setTargetBlockTemperature':
-    case 'thermocycler/startSetTargetBlockTemperature':
     case 'thermocycler/setTargetLidTemperature':
-    case 'thermocycler/startSetTargetLidTemperature':
     case 'heaterShaker/setTargetTemperature':
       return {
         kind: 'generic',

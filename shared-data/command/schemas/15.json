@@ -5369,6 +5369,11 @@
           "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
           "title": "Ramp Rate",
           "type": "number"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5403,7 +5408,7 @@
       "type": "object"
     },
     "SetTargetLidTemperatureParams": {
-      "description": "Input parameters to set a Thermocycler's target lid temperature.",
+      "description": "Input parameters to  to set a Thermocycler's target lid temperature.",
       "properties": {
         "celsius": {
           "description": "Target temperature in \u00b0C.",
@@ -5413,6 +5418,11 @@
         "moduleId": {
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
+          "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
           "type": "string"
         }
       },
@@ -5764,116 +5774,6 @@
       },
       "required": ["moduleId", "profileElements"],
       "title": "StartRunExtendedProfileParams",
-      "type": "object"
-    },
-    "StartSetTargetBlockTemperatureCreate": {
-      "description": "A request to create a Thermocycler's set block temperature command.",
-      "properties": {
-        "commandType": {
-          "const": "thermocycler/startSetTargetBlockTemperature",
-          "default": "thermocycler/startSetTargetBlockTemperature",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/StartSetTargetBlockTemperatureParams"
-        }
-      },
-      "required": ["params"],
-      "title": "StartSetTargetBlockTemperatureCreate",
-      "type": "object"
-    },
-    "StartSetTargetBlockTemperatureParams": {
-      "description": "Input parameters to set a Thermocycler's target block temperature.",
-      "properties": {
-        "blockMaxVolumeUl": {
-          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
-          "title": "Blockmaxvolumeul",
-          "type": "number"
-        },
-        "celsius": {
-          "description": "Target temperature in \u00b0C.",
-          "title": "Celsius",
-          "type": "number"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Thermocycler Module.",
-          "title": "Moduleid",
-          "type": "string"
-        },
-        "ramp_rate": {
-          "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
-          "title": "Ramp Rate",
-          "type": "number"
-        },
-        "taskId": {
-          "description": "Id for the background task that manages the temperature.",
-          "title": "Taskid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId", "celsius"],
-      "title": "StartSetTargetBlockTemperatureParams",
-      "type": "object"
-    },
-    "StartSetTargetLidTemperatureCreate": {
-      "description": "A request to create a Thermocycler's set lid temperature command.",
-      "properties": {
-        "commandType": {
-          "const": "thermocycler/startSetTargetLidTemperature",
-          "default": "thermocycler/startSetTargetLidTemperature",
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/StartSetTargetLidTemperatureParams"
-        }
-      },
-      "required": ["params"],
-      "title": "StartSetTargetLidTemperatureCreate",
-      "type": "object"
-    },
-    "StartSetTargetLidTemperatureParams": {
-      "description": "Input parameters to start to set a Thermocycler's target lid temperature.",
-      "properties": {
-        "celsius": {
-          "description": "Target temperature in \u00b0C.",
-          "title": "Celsius",
-          "type": "number"
-        },
-        "moduleId": {
-          "description": "Unique ID of the Thermocycler Module.",
-          "title": "Moduleid",
-          "type": "string"
-        },
-        "taskId": {
-          "description": "Id for the background task that manages the temperature.",
-          "title": "Taskid",
-          "type": "string"
-        }
-      },
-      "required": ["moduleId", "celsius"],
-      "title": "StartSetTargetLidTemperatureParams",
       "type": "object"
     },
     "StatusBarAnimation": {
@@ -7427,8 +7327,6 @@
       "thermocycler/setTargetBlockTemperature": "#/$defs/SetTargetBlockTemperatureCreate",
       "thermocycler/setTargetLidTemperature": "#/$defs/SetTargetLidTemperatureCreate",
       "thermocycler/startRunExtendedProfile": "#/$defs/StartRunExtendedProfileCreate",
-      "thermocycler/startSetTargetBlockTemperature": "#/$defs/StartSetTargetBlockTemperatureCreate",
-      "thermocycler/startSetTargetLidTemperature": "#/$defs/StartSetTargetLidTemperatureCreate",
       "thermocycler/waitForBlockTemperature": "#/$defs/WaitForBlockTemperatureCreate",
       "thermocycler/waitForLidTemperature": "#/$defs/WaitForLidTemperatureCreate",
       "touchTip": "#/$defs/TouchTipCreate",
@@ -7651,16 +7549,10 @@
       "$ref": "#/$defs/SetTargetBlockTemperatureCreate"
     },
     {
-      "$ref": "#/$defs/StartSetTargetBlockTemperatureCreate"
-    },
-    {
       "$ref": "#/$defs/WaitForBlockTemperatureCreate"
     },
     {
       "$ref": "#/$defs/SetTargetLidTemperatureCreate"
-    },
-    {
-      "$ref": "#/$defs/StartSetTargetLidTemperatureCreate"
     },
     {
       "$ref": "#/$defs/WaitForLidTemperatureCreate"

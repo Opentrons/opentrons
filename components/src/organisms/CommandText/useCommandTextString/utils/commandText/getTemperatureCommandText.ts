@@ -3,8 +3,6 @@ import type {
   RunTimeCommand,
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
-  TCStartSetTargetBlockTemperatureCreateCommand,
-  TCStartSetTargetLidTemperatureCreateCommand,
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data'
@@ -15,8 +13,6 @@ export type TemperatureCreateCommand =
   | TemperatureModuleAwaitTemperatureCreateCommand
   | TCSetTargetBlockTemperatureCreateCommand
   | TCSetTargetLidTemperatureCreateCommand
-  | TCStartSetTargetLidTemperatureCreateCommand
-  | TCStartSetTargetBlockTemperatureCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
 
 const T_KEYS_BY_COMMAND_TYPE: {
@@ -26,10 +22,6 @@ const T_KEYS_BY_COMMAND_TYPE: {
   'temperatureModule/waitForTemperature': 'waiting_to_reach_temp_module',
   'thermocycler/setTargetBlockTemperature': 'setting_thermocycler_block_temp',
   'thermocycler/setTargetLidTemperature': 'setting_thermocycler_lid_temp',
-  'thermocycler/startSetTargetBlockTemperature':
-    'setting_thermocycler_block_temp_in_background',
-  'thermocycler/startSetTargetLidTemperature':
-    'setting_thermocycler_lid_temp_in_background',
   'heaterShaker/setTargetTemperature': 'setting_hs_temp',
 }
 
