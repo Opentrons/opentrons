@@ -40,3 +40,25 @@ async def test_make_room_for_new_file(
     decoy.verify(mock_data_files_store.remove_stored("id-to-be-deleted-2"))
     assert "id-to-be-deleted-1" in caplog.text
     assert "id-to-be-deleted-2" in caplog.text
+
+
+def test_make_room_for_new_generated_files(
+    decoy: Decoy,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """It should delete generated files for the specified run IDs."""
+    mock_data_files_store = decoy.mock(cls=DataFilesStore)
+    mock_deletion_planner = decoy.mock(cls=DataFileDeletionPlanner)
+
+    subject = DataFileAutoDeleter(
+        data_files_store=mock_data_files_store,
+        deletion_planner=mock_deletion_planner,
+    )
+
+    with caplog.at_level(logging.INFO):
+        subject.make_room_for_new_generated_files({"run-1", "run-2"})
+
+    decoy.verify(mock_data_files_store.remove_all_by_run_id("run-1"))
+    decoy.verify(mock_data_files_store.remove_all_by_run_id("run-2"))
+    assert "run-1" in caplog.text
+    assert "run-2" in caplog.text

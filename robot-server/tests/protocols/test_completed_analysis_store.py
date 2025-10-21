@@ -79,7 +79,13 @@ def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
     """
     data_files_dir = tmp_path / "data_files"
     data_files_dir.mkdir()
-    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    return DataFilesStore(
+        sql_engine=sql_engine,
+        data_files_directory=data_files_dir,
+        images_directory=images_dir,
+    )
 
 
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
