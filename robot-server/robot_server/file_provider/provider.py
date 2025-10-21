@@ -13,7 +13,11 @@ from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import (
+    OutputDataFileInfo,
+    DataFileInfo,
+    CmdDataFileInfo,
+)
 from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
@@ -71,12 +75,16 @@ class FileProviderExecutor:
     ) -> DataFileInfo:
         """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
         async with self._lock:
+            assert self._run_metadata is not None
+
             file_id = await get_unique_id()
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
             )
             md5sum = self._get_md5sum(file_data)
+            command_id = file_data.command_metadata.command_id
+            prev_command_id = file_data.command_metadata.prev_command_id
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -88,17 +96,27 @@ class FileProviderExecutor:
                 id=file_id,
                 name=final_filename,
                 file_hash=md5sum,
+                path=str(final_filepath),
                 created_at=created_at,
-                source=DataFileSource.GENERATED,
+                mime_type=file_data.mime_type,
+                stored=True,
+                generated=True,
             )
+            output_file_info = OutputDataFileInfo(
+                file_id=file_id,
+                run_id=self._run_metadata.run_id,
+                command_info=CmdDataFileInfo(
+                    command_id=command_id, prev_command_id=prev_command_id
+                ),
+            )
+
             await self._data_files_store.insert(file_info)
+            await self._data_files_store.insert_output_file(output_file_info)
             return file_info
 
     async def filecount_cb(self) -> int:
         """Return the current count of generated files stored within the data files directory."""
-        data_file_usage_info = self._data_files_store.get_usage_info(
-            DataFileSource.GENERATED
-        )
+        data_file_usage_info = self._data_files_store.get_usage_info(generated=True)
         return len(data_file_usage_info)
 
     def _format_filename(self, file_data: FileData, file_id: str) -> str:

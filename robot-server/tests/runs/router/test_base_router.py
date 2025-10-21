@@ -27,7 +27,7 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
     RequestModel,
@@ -257,7 +257,10 @@ async def test_create_protocol_run(
             name="abc.xyz",
             file_hash="987",
             created_at=datetime(month=1, day=2, year=2024),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path="/dev/null/123/abc.xyz",
         )
     )
     decoy.when(

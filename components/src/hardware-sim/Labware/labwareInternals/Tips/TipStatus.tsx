@@ -3,6 +3,7 @@ import {
   NEW,
   NO,
   SELECTED,
+  SELECTED_ERROR,
   SELECTED_USED,
   USED,
 } from './constants'
@@ -33,5 +34,7 @@ export function TipStatus(props: {
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
       return <SelectedTip size={size} textInsideTip={text} isUsed />
+    case SELECTED_ERROR:
+      return <SelectedTip size={size} textInsideTip={text} isError />
   }
 }

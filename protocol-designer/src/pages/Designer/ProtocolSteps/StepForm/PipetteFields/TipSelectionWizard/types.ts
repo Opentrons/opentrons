@@ -14,4 +14,14 @@ export interface TipSelectionBaseProps {
   deckDef: DeckDefinition
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
+  pipetteId: string
+}
+
+export interface PipetteShadowProps {
+  x: number
+  y: number
+  width: number
+  height: number
+  fill: string
+  stroke: string
 }
