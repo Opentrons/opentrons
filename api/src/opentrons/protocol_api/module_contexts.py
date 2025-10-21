@@ -697,7 +697,7 @@ class ThermocyclerContext(ModuleContext):
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
         )
-        if block_max_volume is None:
+        if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
         self._core.set_target_block_temperature(
             celsius=temperature,
