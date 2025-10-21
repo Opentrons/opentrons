@@ -399,9 +399,13 @@ export const getUnoccupiedStackOptions = (args: {
       const { displayName } = labwareOnDeckDef.metadata
       const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
 
-      const isCompatible = labwareCompatibleParentLabware?.includes(
-        labwareOnDeckLoadName
-      )
+      const isCompatible =
+        labwareCompatibleParentLabware?.includes(
+          labwareOnDeckLoadName
+          //  allow universal lid to go on itself, special-case since it doesn't have a compatibleParentLabware array
+        ) ||
+        (def.parameters.loadName === 'opentrons_tough_universal_lid' &&
+          labwareOnDeckLoadName === 'opentrons_tough_universal_lid')
 
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
