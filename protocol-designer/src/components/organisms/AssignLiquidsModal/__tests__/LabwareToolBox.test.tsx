@@ -117,6 +117,14 @@ describe('LabwareStackToolboxContainer', () => {
     expect(allLabwareButton).toHaveClass('_button_active_386e4e')
   })
 
+  it('select shows an overlay when liquids dont match', () => {
+    render(props)
+    const labwareButton = screen.getByRole('button', { name: 'Labware2' })
+    expect(labwareButton).toBeInTheDocument()
+    fireEvent.click(labwareButton)
+    expect(labwareButton).toHaveClass('_button_active_386e4e')
+  })
+
   // test that when selecting labware with different liquids shows modal
   // test that different labware does not render the left side of the modal
 })

@@ -47,6 +47,7 @@ import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
+import { OverlayModal } from '../OverlayModal'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -164,6 +165,7 @@ export function AssignLiquidsModal(
               </StyledText>
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
+            <LiquidLayoutOverlayModalContainer />
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
@@ -244,6 +246,12 @@ export function AssignLiquidsModal(
 interface AssignLiquidsModalContainerProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+}
+
+export function LiquidLayoutOverlayModalContainer(
+): JSX.Element | null {
+  return <OverlayModal header='Selected labware have different liquid layouts' subText='Clear liquids in labware to edit them together' />
+
 }
 
 export function AssignLiquidsModalContainer(
