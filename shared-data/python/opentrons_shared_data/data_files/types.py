@@ -3,7 +3,17 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
+
+
+@dataclass(frozen=True)
+class RunFileNameMetadata:
+    """Data from the run used that may be used to build a finalized file name."""
+
+    robot_name: str
+    run_id: str
+    run_created_at: datetime
+    protocol_name: Optional[str]
 
 
 class MimeType(str, Enum):
