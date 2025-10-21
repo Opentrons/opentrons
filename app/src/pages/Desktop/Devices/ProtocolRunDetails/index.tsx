@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import styled, { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -14,16 +13,12 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
   OVERFLOW_SCROLL,
-  POSITION_RELATIVE,
   SPACING,
-  Tooltip,
-  TYPOGRAPHY,
-  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
 import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
@@ -49,83 +44,7 @@ import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
 
-const baseRoundTabStyling = css`
-  ${TYPOGRAPHY.pSemiBold}
-  color: ${COLORS.black90};
-  background-color: ${COLORS.purple30};
-  border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
-  border-radius: ${BORDERS.borderRadius8};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  position: ${POSITION_RELATIVE};
-
-  &:hover {
-    background-color: ${COLORS.purple35};
-  }
-
-  &:focus-visible {
-    outline: 2px ${BORDERS.styleSolid} ${COLORS.yellow50};
-  }
-`
-
-const disabledRoundTabStyling = css`
-  ${baseRoundTabStyling}
-  color: ${COLORS.grey40};
-  background-color: ${COLORS.grey30};
-
-  &:hover {
-    background-color: ${COLORS.grey30};
-  }
-`
-
-const RoundNavLink = styled(NavLink)`
-  ${baseRoundTabStyling}
-  color: ${COLORS.black90};
-
-  &:hover {
-    background-color: ${COLORS.purple35};
-  }
-
-  &.active {
-    background-color: ${COLORS.purple50};
-    color: ${COLORS.white};
-
-    &:hover {
-      background-color: ${COLORS.purple55};
-    }
-  }
-`
-
 const JUMP_OFFSET_FROM_TOP_PX = 20
-
-interface RoundTabProps {
-  disabled: boolean
-  tabDisabledReason?: string
-  to: string
-  tabName: string
-}
-
-export function RoundTab({
-  disabled,
-  tabDisabledReason,
-  to,
-  tabName,
-}: RoundTabProps): JSX.Element {
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  return disabled ? (
-    <>
-      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
-        {tabName}
-      </LegacyStyledText>
-      {tabDisabledReason != null ? (
-        <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
-      ) : null}
-    </>
-  ) : (
-    <RoundNavLink to={to} replace>
-      {tabName}
-    </RoundNavLink>
-  )
-}
 
 export function ProtocolRunDetails(): JSX.Element | null {
   const { robotName, runId, protocolRunDetailsTab } = useParams<

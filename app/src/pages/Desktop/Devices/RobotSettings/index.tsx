@@ -17,13 +17,13 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { RoundTab } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
 import { useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
 import {
