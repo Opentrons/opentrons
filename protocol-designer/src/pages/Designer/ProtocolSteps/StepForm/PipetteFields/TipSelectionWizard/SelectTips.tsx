@@ -287,7 +287,7 @@ export function SelectTips(
             hoveredWell={hoveredWell}
             selectedTiprackId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
-            isAccessible={tipAccessibileStatusByWellName[hoveredWell]}
+            isAccessible={areAllHoveredWellsAccessibleAndOccupied}
             primaryNozzle={primaryNozzle}
           />
         ) : null}
