@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import clsx from 'clsx'
 
 import { StyledText } from '@opentrons/components'
+
+import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
 
 import styles from './cameracontrols.module.css'
 
@@ -69,23 +70,11 @@ function ZoomBtn({
   }
 
   return (
-    <button
+    <TouchControlButton
       onClick={onClick}
-      className={clsx(
-        styles.zoom_btn,
-        isActive ? styles.zoom_btn_active : styles.zoom_btn_inactive
-      )}
-    >
-      <span
-        className={
-          isActive ? styles.zoom_btn_txt_active : styles.zoom_btn_txt_inactive
-        }
-      >
-        {t(btnZoomValue)}
-      </span>
-      <StyledText className={styles.zoom_btn_txt} desktopStyle="captionRegular">
-        {buildBtnCopy()}
-      </StyledText>
-    </button>
+      text1={btnZoomValue}
+      text2={buildBtnCopy()}
+      isActive={isActive}
+    />
   )
 }
