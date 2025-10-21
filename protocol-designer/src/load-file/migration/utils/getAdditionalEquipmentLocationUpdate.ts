@@ -18,6 +18,7 @@ import { getUnoccupiedSlotForTrash } from '../../../step-forms'
 import type {
   AddressableAreaName,
   CreateCommand,
+  LabwareLocation,
   LoadLabwareCreateCommand,
   MoveLabwareCreateCommand,
   MoveToAddressableAreaCreateCommand,
@@ -76,8 +77,10 @@ const getStagingAreaSlotNames = (
           command
         ): command is MoveLabwareCreateCommand | LoadLabwareCreateCommand =>
           command.commandType === commandType &&
-          //  @ts-expect-error: ts doesn't trust that locationkey is actually found in the command params
-          locationIsOnAddressableArea(command.params[locationKey]) &&
+          locationIsOnAddressableArea(
+            //  @ts-expect-error: ts doesn't trust that locationkey is actually found in the command params
+            command.params[locationKey] as any as LabwareLocation
+          ) &&
           COLUMN_4_SLOTS.includes(
             //  @ts-expect-error
             command.params[locationKey]
