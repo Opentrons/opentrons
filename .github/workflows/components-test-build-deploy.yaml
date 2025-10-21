@@ -19,6 +19,7 @@ on:
       - 'edge'
       - 'release'
       - 'chore_release*'
+      - 'add-components-static-deploy'
     tags:
       - 'components*'
   workflow_dispatch:
