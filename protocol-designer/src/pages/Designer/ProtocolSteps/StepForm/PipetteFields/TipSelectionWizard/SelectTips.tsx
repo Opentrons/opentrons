@@ -245,11 +245,11 @@ export function SelectTips(
               if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
                 status = rawState === USED ? SELECTED_USED : SELECTED
               } else if (allWellsAffectedByHover.includes(wellName)) {
-                status = areAllHoveredWellsAccessibleAndOccupied
-                  ? rawState === USED
-                    ? SELECTED_USED
-                    : SELECTED
-                  : SELECTED_ERROR
+                if (areAllHoveredWellsAccessibleAndOccupied) {
+                  status = rawState === USED ? SELECTED_USED : SELECTED
+                } else {
+                  status = SELECTED_ERROR
+                }
               }
               return { ...acc, [wellName]: status }
             },
