@@ -107,7 +107,7 @@ async def take_picture(filename: Path) -> None:
 
 def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
-    filepath = get_opentrons_path("live_stream_configuration_file")
+    filepath = get_opentrons_path("live_stream_environment_file")
     if IS_ROBOT and not os.path.exists(filepath):
         # If the dynamic configuration file doesn't exist make it using our defaults file
         with open(DEFAULT_CONF_FILE, "r") as default_config:

@@ -308,7 +308,7 @@ CONFIG_ELEMENTS = (
         "The dir where performance metrics are stored",
     ),
     ConfigElement(
-        "live_stream_configuration_file",
+        "live_stream_environment_file",
         "Live Stream Configuration",
         Path("opentrons-live-stream.env"),
         ConfigElementType.FILE,
