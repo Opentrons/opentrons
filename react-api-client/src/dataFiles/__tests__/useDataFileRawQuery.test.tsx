@@ -2,14 +2,14 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getCsvFileRaw } from '@opentrons/api-client'
+import { getDataFileRaw } from '@opentrons/api-client'
 
-import { useCsvFileRawQuery } from '..'
+import { useDataFileRawQuery } from '..'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
 import type {
-  DownloadedCsvFileResponse,
+  DownloadedDataFileResponse,
   HostConfig,
   Response,
 } from '@opentrons/api-client'
@@ -19,10 +19,9 @@ vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const FILE_ID = 'file123'
-const FILE_CONTENT_RESPONSE =
-  'content,of,my,csv\nfile,' as DownloadedCsvFileResponse
+const FILE_CONTENT_RESPONSE = 'content,of,my,csv\nfile,' as DownloadedDataFileResponse
 
-describe('useCsvFileRawQuery hook', () => {
+describe('useDataFileRawQuery hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
@@ -39,7 +38,7 @@ describe('useCsvFileRawQuery hook', () => {
   it('should return no data if no host', () => {
     vi.mocked(useHost).mockReturnValue(null)
 
-    const { result } = renderHook(() => useCsvFileRawQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileRawQuery(FILE_ID), {
       wrapper,
     })
 
@@ -48,9 +47,9 @@ describe('useCsvFileRawQuery hook', () => {
 
   it('should return no data if the get file request fails', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCsvFileRaw).mockRejectedValue('oh no')
+    vi.mocked(getDataFileRaw).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCsvFileRawQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileRawQuery(FILE_ID), {
       wrapper,
     })
     expect(result.current.data).toBeUndefined()
@@ -58,11 +57,11 @@ describe('useCsvFileRawQuery hook', () => {
 
   it('should return file data if successful request', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCsvFileRaw).mockResolvedValue({
+    vi.mocked(getDataFileRaw).mockResolvedValue({
       data: FILE_CONTENT_RESPONSE,
-    } as Response<DownloadedCsvFileResponse>)
+    } as Response<DownloadedDataFileResponse>)
 
-    const { result } = renderHook(() => useCsvFileRawQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileRawQuery(FILE_ID), {
       wrapper,
     })
 

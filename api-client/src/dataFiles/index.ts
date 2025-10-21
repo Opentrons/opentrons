@@ -1,5 +1,5 @@
 export { getCsvFile } from './getCsvFile'
-export { getCsvFileRaw } from './getCsvFileRaw'
+export { getDataFileRaw } from './getDataFileRaw'
 export { uploadCsvFile } from './uploadCsvFile'
 
 export * from './types'

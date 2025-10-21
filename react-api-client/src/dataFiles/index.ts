@@ -1,3 +1,3 @@
 export { useCsvFileQuery } from './useCsvFileQuery'
-export { useCsvFileRawQuery } from './useCsvFileRawQuery'
+export { useDataFileRawQuery } from './useDataFileRawQuery'
 export { useUploadCsvFileMutation } from './useUploadCsvFileMutation'

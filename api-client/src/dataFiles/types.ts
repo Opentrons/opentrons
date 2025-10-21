@@ -23,4 +23,4 @@ export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
 }
 
-export type DownloadedCsvFileResponse = string
+export type DownloadedDataFileResponse = string
