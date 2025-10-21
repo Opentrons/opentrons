@@ -27,14 +27,25 @@ To start, Protocol Designer places your chosen tip racks on the deck. You can dr
 
 Hover over any deck slot to view slot details. Then, click individual slots to add, remove, or change labware. 
 
-For the example below, add labware by clicking deck slot D2 and choosing **Add labware**. 
+For the example below, add labware by clicking empty deck slot D2.  
 
 <figure class="screenshot" markdown>
   ![Add labware](images/add_labware3.png)
   <figcaption>Add a well plate to the deck.</figcaption>
 </figure>
 
-In the menu, search for or select a labware type, like well plates, and view available options from the [Labware Library](https://labware.opentrons.com "Labware Library"). Protocol Designer also includes compatible lid options for well plates and reservoirs. At the bottom of the labware list, you can upload a JSON file to use custom labware in your protocol. 
+In the menu, search for or select a labware type and view available options from the [Labware Library](https://labware.opentrons.com "Labware Library"): 
+
+- Additional **tip racks** 
+- **Tube racks** 
+- **Well plates**, **reservoirs**, and their compatible lid options 
+- **Aluminum blocks** to hold tubes or well plates on a Temperature module 
+- **Adapters** like the Flex Deck Riser
+- Labware **lids** 
+
+You can stack up to five lids to use later in your protocol in an open deck slot or on a Flex Deck Riser. Tip rack lids can't be stacked or placed on the deck or a Deck Riser. 
+
+Click at the bottom of the labware list to upload a JSON file and use custom labware in your protocol. 
 
 Click **Edit liquid** in the labware menu on the right to add liquids you've already defined in your protocol. In the labware graphic, click and drag to select wells across rows and columns. From the dropdown menu, select your liquid and enter the starting volume for each well in microliters (µL). Click **Save** for each liquid added to your labware before clicking **Done**.  
 
@@ -51,9 +62,9 @@ To add labware to a module, click any open module and choose **Edit labware**.
   <figcaption>Add compatible labware to the Temperature Module. </figcaption>
 </figure>
 
-Protocol Designer only shows recommended labware in the list of available options. You can choose to view all labware, including labware that may be incompatible with the module. Add compatible adapters for modules on the deck from the "adapter" labware category. Use the toggle switch at the upper right of the protocol starting deck if you need to add any off-deck labware. 
+Protocol Designer only shows recommended labware in the list of available options. You can choose to view all labware, including labware that may be incompatible with the module. Add compatible adapters for modules on the deck from the "adapter" labware category. 
 
-You can place compatible labware on or off-deck and move to a module later in your protocol. You'll need to use a move step to add any labware to the Absorbance Plate Reader Module. 
+Use the toggle switch at the upper right of the protocol starting deck if you need to add any off-deck labware. You can place compatible labware on or off-deck and move to a module later in your protocol. You'll need to use a move step to add any labware to the Absorbance Plate Reader Module. 
 
 After adding labware, drag and drop to move to another slot. Click the deck slot for additional editing options: 
 

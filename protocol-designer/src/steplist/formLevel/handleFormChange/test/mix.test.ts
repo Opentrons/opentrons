@@ -7,6 +7,7 @@ import {
   fixture_tiprack_300_ul,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
 
@@ -101,6 +102,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: null,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette single -> multi', () => {
@@ -114,6 +118,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: ALL,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette multi -> single', () => {
@@ -128,6 +135,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: null,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('select single-well labware', () => {
