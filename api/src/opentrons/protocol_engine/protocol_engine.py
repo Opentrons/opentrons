@@ -481,7 +481,7 @@ class ProtocolEngine:
         )
         self._state_store.commands.raise_fatal_command_error()
 
-    async def finish(
+    async def finish(  # noqa: C901
         self,
         error: Optional[Exception] = None,
         drop_tips_after_run: bool = True,
