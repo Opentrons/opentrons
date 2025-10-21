@@ -55,7 +55,7 @@ def run(protocol):
 
 If you're running a protocol via the Opentrons App or the touchscreen, you don't need to call the `run()` function, because the robot software does it for you.
 
-However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called *cells*), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation chapter](../advanced-operation.md).
+However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called *cells*), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation chapter](../advanced-operation/index.md).
 
 ## Python-exclusive features
 
@@ -93,4 +93,4 @@ Some module commands that take a long time to complete (such as heating from amb
 
 Not only does the Python API support some features not included in Protocol Designer, but every Python protocol *is a Python script*, which means that it can perform any computation that relies on the Python standard libraries or the suite of libraries included in the Flex system software.
 
-You can even install additional Python packages on Flex. [Connect to your Flex via SSH][command-line-operation-over-ssh] and install the package with `pip`. To avoid analysis errors in the Opentrons App, install the packages on your computer as well. In the Opentrons App settings, go to **Advanced** and click **Add override path** in the Override Path to Python section. Choose the copy of `python` on your system that has access to the packages.
+You can even install additional Python packages on Flex. [Connect to your Flex via SSH](../advanced-operation/command-line.md) and install the package with `pip`. To avoid analysis errors in the Opentrons App, install the packages on your computer as well. In the Opentrons App settings, go to **Advanced** and click **Add override path** in the Override Path to Python section. Choose the copy of `python` on your system that has access to the packages.
