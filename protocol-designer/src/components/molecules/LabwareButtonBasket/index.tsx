@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Flex, StyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { LabwareButton } from '../../atoms'
 import styles from './labwarebuttonbasket.module.css'

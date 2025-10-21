@@ -10,7 +10,6 @@ import {
   StyledText,
   Toolbox,
 } from '@opentrons/components'
-import { LabwareEntities } from '@opentrons/step-generation'
 
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import {
@@ -23,6 +22,7 @@ import { deselectAllWells } from '/protocol-designer/well-selection/actions'
 import { LabwareButtonBasket } from '../../molecules'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { LabwareEntities } from '@opentrons/step-generation'
 
 export interface LiquidInfo {
   name: string
@@ -30,7 +30,6 @@ export interface LiquidInfo {
   liquidIndex: string
   liquidClassDisplayName: string | null
 }
-
 
 interface LabwareStackToolboxData {
   labwareEntities: LabwareEntities
@@ -56,7 +55,7 @@ export function LabwareStackToolbox({
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const { labwareEntities, labware, labwareId, allWellContents } = data
+  const { labware, labwareId, allWellContents } = data
 
   const handleCancelForm = (): void => {
     dispatch(deselectAllWells())
@@ -83,8 +82,8 @@ export function LabwareStackToolbox({
     setSelectedLabware([labwareId ?? ''])
   }, [labwareId])
 
-  const handleAssignToLabware = (newItem: string) => {
-    if (labwareId && allWellContents[newItem] == allWellContents[labwareId]) {
+  const handleAssignToLabware = (newItem: string): void => {
+    if (labwareId && allWellContents[newItem] === allWellContents[labwareId]) {
       alert('You cannot assign to the same labware')
     }
     setSelectedLabware(prevItems => [...prevItems, newItem])

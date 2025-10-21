@@ -1,18 +1,16 @@
-import { useSelector } from 'react-redux'
 import { NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
+import { fixture96Plate } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
 import { AssignLiquidsModal } from '..'
-import { LiquidToolboxContainer } from '../LiquidToolbox'
 
-import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 const mockDispatch = vi.fn()
@@ -66,13 +64,8 @@ const render = (props: ComponentProps<typeof AssignLiquidsModal>) => {
 
 describe('AssignLiquidsModal', () => {
   let props: ComponentProps<typeof AssignLiquidsModal>
-  let mockShowLiquidOverflowMenu: Mock
-  let mockSetDefineLiquidModal: Mock
 
   beforeEach(() => {
-    mockShowLiquidOverflowMenu = vi.fn()
-    mockSetDefineLiquidModal = vi.fn()
-
     props = {
       showLiquidOverflowMenu: vi.fn(),
       setDefineLiquidModal: vi.fn(),
@@ -109,8 +102,8 @@ describe('AssignLiquidsModal', () => {
   })
 
   it('loads the modal with selectable labware', () => {
-    props.data.labware['mockLabwareId'].stack = ['mockLabwareId', 'labware2']
-    props.data.labware['labware2'] = {
+    props.data.labware.mockLabwareId.stack = ['mockLabwareId', 'labware2']
+    props.data.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
     render(props)

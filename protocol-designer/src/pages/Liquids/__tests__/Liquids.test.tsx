@@ -37,7 +37,6 @@ const render = () => {
 
 describe('Liquids', () => {
   beforeEach(() => {
-    const props = {}
     vi.mocked(labwareIngredSelectors.getSelectedLabwareId).mockReturnValue(
       'mockId'
     )

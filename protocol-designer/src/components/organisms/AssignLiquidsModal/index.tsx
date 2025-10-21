@@ -29,9 +29,7 @@ import {
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
-import {
-  LiquidButton,
-} from '/protocol-designer/components/molecules'
+import { LiquidButton } from '/protocol-designer/components/molecules'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -96,14 +94,7 @@ export function AssignLiquidsModal(
     setSelectedLabware([labwareId ?? ''])
   }, [labwareId])
 
-  const handleAssignToLabware = (newItem: string) => {
-    if (labwareId && allWellContents[newItem] == allWellContents[labwareId]) {
-      alert('You cannot assign to the same labware')
-    }
-    setSelectedLabware(prevItems => [...prevItems, newItem])
-  }
-
-  if (labwareId == null) {
+  if (labwareId === null) {
     console.assert(
       false,
       'No labware is selected, and no labwareId was given to AssignLiquidsModal'
