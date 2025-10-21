@@ -25,7 +25,10 @@ from robot_server.data_files.router import (
     get_data_file,
     get_all_data_files,
     delete_file_by_id,
+    get_run_image_metadata,
 )
+from robot_server.data_files.data_files_store import DataFileWithCommandsInfoSlice
+from opentrons_shared_data.data_files import DataFileInfoWithCommands, CmdDataFileInfo
 from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
 
@@ -470,3 +473,107 @@ async def test_delete_file_in_use(
         await delete_file_by_id(dataFileId="file-id", data_files_store=data_files_store)
 
     assert exc_info.value.status_code == 409
+
+
+async def test_get_run_image_metadata(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+) -> None:
+    """It should return metadata for multiple images."""
+    file_info_1 = DataFileInfoWithCommands(
+        id="file-id-1",
+        name="image1.jpeg",
+        file_hash="hash1",
+        created_at=datetime(year=2024, month=6, day=20),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/file-id-1/image1.jpeg",
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-1",
+            prev_command_id="prev-1",
+        ),
+    )
+
+    file_info_2 = DataFileInfoWithCommands(
+        id="file-id-2",
+        name="image2.jpeg",
+        file_hash="hash2",
+        created_at=datetime(year=2024, month=6, day=21),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/file-id-2/image2.jpeg",
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-2",
+            prev_command_id="prev-2",
+        ),
+    )
+
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            limit=99,
+            offset=0,
+        )
+    ).then_return(
+        DataFileWithCommandsInfoSlice(
+            file_info=[file_info_1, file_info_2], total_length=2
+        )
+    )
+
+    result = await get_run_image_metadata(
+        runId="run-id",
+        data_files_store=data_files_store,
+        pageLength=99,
+        cursor=0,
+    )
+
+    assert result.status_code == 200
+    assert len(result.content.data) == 2
+    assert result.content.data[0].id == "file-id-1"
+    assert result.content.data[1].id == "file-id-2"
+    assert result.content.meta == MultiBodyMeta(totalLength=2, cursor=0)
+
+
+async def test_get_run_image_metadata_with_pagination(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+) -> None:
+    """It should respect pageLength and cursor parameters."""
+    file_info = DataFileInfoWithCommands(
+        id="file-id-3",
+        name="image3.jpeg",
+        file_hash="hash3",
+        created_at=datetime(year=2024, month=6, day=22),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/file-id-3/image3.jpeg",
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-3",
+            prev_command_id="prev-3",
+        ),
+    )
+
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            limit=10,
+            offset=2,
+        )
+    ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=5))
+
+    result = await get_run_image_metadata(
+        runId="run-id",
+        data_files_store=data_files_store,
+        pageLength=10,
+        cursor=2,
+    )
+
+    assert result.status_code == 200
+    assert len(result.content.data) == 1
+    assert result.content.data[0].id == "file-id-3"
+    assert result.content.meta == MultiBodyMeta(totalLength=5, cursor=2)

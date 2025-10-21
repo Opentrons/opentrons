@@ -1,6 +1,7 @@
 """Store and retrieve information about uploaded data files from the database."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List, Set
 
@@ -21,9 +22,19 @@ from opentrons_shared_data.data_files import (
     OutputDataFileInfo,
     IODataFileInfo,
     CmdDataFileInfo,
+    MimeType,
+    DataFileInfoWithCommands,
 )
 
 from .models import FileIdNotFoundError, FileInUseError
+
+
+@dataclass(frozen=True)
+class DataFileWithCommandsInfoSlice:
+    """A subset of data file info."""
+
+    file_info: List[DataFileInfoWithCommands]
+    total_length: int
 
 
 class DataFilesStore:
@@ -51,6 +62,47 @@ class DataFilesStore:
                 return None
             else:
                 return _convert_row_to_data_file_info(result)
+
+    def get_files_info_by_run_mime_type(
+        self,
+        run_id: str,
+        mime_type: MimeType,
+        limit: int,
+        offset: int,
+    ) -> DataFileWithCommandsInfoSlice:
+        """Get all data files associated with a specific run, ordered oldest to newest."""
+        statement = (
+            sqlalchemy.select(
+                data_files_table,
+                output_data_files_table.c.command_id,
+                output_data_files_table.c.prev_command_id,
+                sqlalchemy.func.count().over().label("total_count"),
+            )
+            .join(
+                output_data_files_table,
+                data_files_table.c.id == output_data_files_table.c.file_id,
+            )
+            .where(output_data_files_table.c.run_id == run_id)
+            .where(data_files_table.c.mime_type == mime_type.value)
+            .order_by(data_files_table.c.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            rows = transaction.execute(statement).all()
+
+        if not rows:
+            return DataFileWithCommandsInfoSlice(file_info=[], total_length=0)
+        else:
+            total_count = rows[0].total_count
+            file_info = [
+                _convert_row_to_data_file_info_with_commands(row) for row in rows
+            ]
+
+            return DataFileWithCommandsInfoSlice(
+                file_info=file_info, total_length=total_count
+            )
 
     async def insert(self, file_info: DataFileInfo) -> None:
         """Insert data file info in the database."""
@@ -386,4 +438,24 @@ def _convert_row_to_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:
         file_hash=row.file_hash,
         mime_type=row.mime_type,
         created_at=row.created_at,
+    )
+
+
+def _convert_row_to_data_file_info_with_commands(
+    row: sqlalchemy.engine.Row,
+) -> DataFileInfoWithCommands:
+    """Convert a database row to DataFileInfoWithCommands."""
+    return DataFileInfoWithCommands(
+        id=row.id,
+        name=row.name,
+        path=row.path,
+        stored=row.stored,
+        generated=row.generated,
+        file_hash=row.file_hash,
+        mime_type=row.mime_type,
+        created_at=row.created_at,
+        command_info=CmdDataFileInfo(
+            command_id=row.command_id,
+            prev_command_id=row.prev_command_id,
+        ),
     )

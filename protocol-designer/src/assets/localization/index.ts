@@ -10,6 +10,8 @@ i18n.use(initReactI18next).init(
     ...baseI18nConfig,
     resources: { en },
     keySeparator: '.',
+    saveMissing: false,
+    debug: false,
   },
   err => {
     if (err) {

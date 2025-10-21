@@ -518,3 +518,91 @@ async def test_remove_file_with_input_and_output_associations(
 
     output_info = subject.get_io_file_info("file-id", "run-id-2")
     assert isinstance(output_info, OutputDataFileInfo)
+
+
+async def test_get_files_info_by_run_mime_type(
+    subject: DataFilesStore,
+) -> None:
+    """It should filter files by run ID and mime type."""
+    _create_run_in_db(subject._sql_engine, "run-id-1")
+    _create_run_in_db(subject._sql_engine, "run-id-2")
+
+    jpeg_run1 = DataFileInfo(
+        id="jpeg-run1",
+        name="image1.jpeg",
+        file_hash="hash1",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/jpeg-run1/image1.jpeg",
+        generated=True,
+        stored=True,
+    )
+
+    csv_run1 = DataFileInfo(
+        id="csv-run1",
+        name="data1.csv",
+        file_hash="hash2",
+        created_at=datetime(year=2024, month=6, day=21, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/csv-run1/data1.csv",
+        generated=True,
+        stored=True,
+    )
+
+    jpeg_run2 = DataFileInfo(
+        id="jpeg-run2",
+        name="image2.jpeg",
+        file_hash="hash3",
+        created_at=datetime(year=2024, month=6, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/jpeg-run2/image2.jpeg",
+        generated=True,
+        stored=True,
+    )
+
+    await subject.insert(jpeg_run1)
+    await subject.insert(csv_run1)
+    await subject.insert(jpeg_run2)
+
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="jpeg-run1",
+            run_id="run-id-1",
+            command_info=CmdDataFileInfo(
+                command_id="command-1",
+                prev_command_id="prev-1",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="csv-run1",
+            run_id="run-id-1",
+            command_info=CmdDataFileInfo(
+                command_id="command-2",
+                prev_command_id="prev-2",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="jpeg-run2",
+            run_id="run-id-2",
+            command_info=CmdDataFileInfo(
+                command_id="command-3",
+                prev_command_id="prev-3",
+            ),
+        )
+    )
+
+    result = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        limit=10,
+        offset=0,
+    )
+
+    assert len(result.file_info) == 1
+    assert result.total_length == 1
+    assert result.file_info[0].id == "jpeg-run1"
+    assert result.file_info[0].command_info.command_id == "command-1"
