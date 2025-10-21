@@ -13,18 +13,12 @@ on:
       - 'app/src/atoms/**'
       - 'app/src/molecules/**'
       - 'protocol-designer/src/components/**'
+      - 'scripts/static-deploy/**'
   push:
-    paths:
-      - Makefile
-      - 'package.json'
-      - '.github/workflows/components-test-build-deploy.yaml'
-      - '**.stories.*'
-      - 'components/**'
-      - 'app/src/atoms/**'
-      - 'app/src/molecules/**'
-      - 'protocol-designer/src/components/**'
     branches:
-      - '**'
+      - 'edge'
+      - 'release'
+      - 'chore_release*'
     tags:
       - 'components*'
   workflow_dispatch:
