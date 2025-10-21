@@ -1,4 +1,8 @@
-import { getLabwareDefURI, getModuleDef } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  getModuleDef,
+  locationIsOnDeck,
+} from '@opentrons/shared-data'
 
 import type {
   ComputeLabwareOriginInput,
@@ -49,10 +53,7 @@ export function resolveLabwareLocation({
   const bottomLabwareLocation =
     labwareTopToBottom[labwareTopToBottom.length - 1].location
 
-  if (
-    bottomLabwareLocation === 'offDeck' ||
-    bottomLabwareLocation === 'systemLocation'
-  ) {
+  if (!locationIsOnDeck(bottomLabwareLocation)) {
     return 'offDeck'
   }
 
