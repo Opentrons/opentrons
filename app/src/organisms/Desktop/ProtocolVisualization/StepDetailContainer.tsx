@@ -84,7 +84,7 @@ export function StepDetailContainer({
           selected={isRightPipetteActive}
         />
       ) : null}
-      <TipPickupContainer protocolKey={protocolKey} />
+      <TipPickupContainer />
       <SourceWellViewContainer protocolKey={protocolKey} />
       <SourceLabwareContainer protocolKey={protocolKey} />
       <DestinationWellViewContainer protocolKey={protocolKey} />

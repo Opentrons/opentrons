@@ -24,6 +24,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
 import styles from './preview.module.css'
 import { getActiveLayer, getBackgroundColor } from './utils'
@@ -46,16 +47,6 @@ import type {
 export interface LabwareEntityExtended extends LabwareEntity {
   nickName: string | null
 }
-const POTENTIAL_TRASH_COMMAND_TYPES = [
-  'moveToAddressableArea',
-  'moveToAddressableAreaForDropTip',
-  'dropTip',
-  'dropTipInPlace',
-  'airGapInPlace',
-  'blowOutInPlace',
-  'blowOut',
-  'airGap',
-]
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -101,7 +92,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
-  const { labware, pipettes } = robotState
+  const { labware } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -143,7 +134,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     <div className={styles.deck_view_padding}>
       <div className={styles.deck_view_container}>
         <Flex justifyContent="space-between" with="100%">
-          <StyledText desktopStyle="bodyLargeSemiBold">Deck View</StyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('deck_view')}
+          </StyledText>
           <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
             {t('step', { number: selectedCommandIndex })}
           </StyledText>
@@ -178,20 +171,14 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                     const { isActiveLayerVisible } =
                       labwareOnSlot != null
                         ? getActiveLayer(
-                            Object.values(pipettes),
                             labwareOnSlot[0],
                             selectedRunTimeCommand
                           )
                         : { isActiveLayerVisible: false }
-                    let fixtureBaseColor = lightFill
+                    let strokeColor = 'none'
 
-                    if (isActiveLayerVisible) {
-                      fixtureBaseColor = COLORS.purple30
-                    } else if (
-                      !isActiveLayerVisible &&
-                      selectedSlot === addressableArea.id
-                    ) {
-                      fixtureBaseColor = COLORS.grey40
+                    if (hoveredSlot === addressableArea.id) {
+                      strokeColor = COLORS.purple50
                     }
 
                     return cutoutId != null ? (
@@ -200,14 +187,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         cutoutId={cutoutId}
                         deckDefinition={deckDef}
                         showExpansion={cutoutId === 'cutoutA1'}
-                        fixtureBaseColor={fixtureBaseColor}
-                        slotClipColor={darkFill}
-                        stroke={
-                          hoveredSlot === addressableArea.id ||
-                          selectedSlot === addressableArea.id
-                            ? COLORS.purple50
-                            : 'none'
+                        fixtureBaseColor={
+                          isActiveLayerVisible ? COLORS.purple30 : lightFill
                         }
+                        slotClipColor={darkFill}
+                        stroke={strokeColor}
                       />
                     ) : null
                   })}

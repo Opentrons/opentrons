@@ -6,11 +6,15 @@ export function SelectedTip(props: {
   size?: string
   textInsideTip?: string
   isUsed?: boolean
+  isError?: boolean
 }): JSX.Element {
-  const { size, textInsideTip, isUsed = false } = props
+  const { size, textInsideTip, isUsed = false, isError = false } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-  const fill = isUsed ? COLORS.yellow50 : COLORS.blue50
+  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : COLORS.blue50
+
+  // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
+  const showStroke = textInsideTip == null
   return (
     <svg
       width={width}
@@ -19,7 +23,14 @@ export function SelectedTip(props: {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="10" cy="10" r="10" fill={fill} />
+      <circle
+        cx="10"
+        cy="10"
+        r={showStroke ? '9' : '10'}
+        fill={fill}
+        stroke={showStroke ? COLORS.black90 : undefined}
+        strokeWidth={showStroke ? '2' : undefined}
+      />
       {textInsideTip != null ? (
         <text
           x="10"

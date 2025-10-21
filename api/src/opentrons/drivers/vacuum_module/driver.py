@@ -87,6 +87,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Check connection to vacuum module."""
         return await self._connection.is_open()
 
+    async def reset_serial_buffers(self) -> None:
+        """Reset the input and output serial buffers."""
+        self._connection._serial.reset_input_buffer()
+        self._connection._serial.reset_output_buffer()
+
     async def get_device_info(self) -> VacuumModuleInfo:
         """Get Device Info."""
         response = await self._connection.send_command(
@@ -100,17 +105,60 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         device_info.rr = reason
         return device_info
 
+    async def enter_programming_mode(self) -> None:
+        """Reboot into programming mode"""
+        command = GCODE.ENTER_BOOTLOADER.build_command()
+        await self._connection.send_dfu_command(command)
+        await self._connection.close()
+
     async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
         if not re.match(r"^VM[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
             raise ValueError(
-                f"Invalid serial number: ({sn}) expected format: VMTA1020250119001"
+                f"Invalid serial number: ({sn}) expected format: VMA1020250119001"
             )
         resp = await self._connection.send_command(
             GCODE.SET_SERIAL_NUMBER.build_command().add_element(sn)
         )
         if not re.match(rf"^{GCODE.SET_SERIAL_NUMBER}$", resp):
             raise ValueError(f"Incorrect Response for set serial number: {resp}")
+
+    async def set_led(
+        self,
+        power: float,
+        color: Optional[LEDColor] = None,
+        external: Optional[bool] = None,
+        pattern: Optional[LEDPattern] = None,
+        duration: Optional[int] = None,
+        reps: Optional[int] = None,
+    ) -> None:
+        """Set LED Status bar color and pattern.
+
+        :param power: Power of the LED (0-1.0), 0 is off, 1 is full power
+        :param color: Color of the LED
+        :param external: True if external LED, False if internal LED
+        :param pattern: Animation pattern of the LED status bar
+        :param duration: Animation duration in milliseconds (25-10000), 10s max
+        :param reps: Number of times to repeat the animation (-1 - 10), -1 is forever.
+        """
+        power = max(0, min(power, 1.0))
+        command = GCODE.SET_LED.build_command().add_float(
+            "P", power, GCODE_ROUNDING_PRECISION
+        )
+        if color is not None:
+            command.add_int("C", color.value)
+        if external is not None:
+            command.add_int("K", int(external))
+        if pattern is not None:
+            command.add_int("A", pattern.value)
+        if duration is not None:
+            duration = max(MIN_DURATION_MS, min(duration, MAX_DURATION_MS))
+            command.add_int("D", duration)
+        if reps is not None:
+            command.add_int("R", max(-1, min(reps, MAX_REPS)))
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_LED}$", resp):
+            raise ValueError(f"Incorrect Response for set led: {resp}")
 
     async def enable_pump(self) -> None:
         """Enables the vacuum pump, does not turn it on."""
@@ -158,26 +206,3 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def vent(self) -> None:
         """Release the vacuum in the module chamber."""
         ...
-
-    async def set_led(
-        self,
-        power: float,
-        color: Optional[LEDColor] = None,
-        external: Optional[bool] = None,
-        pattern: Optional[LEDPattern] = None,
-        duration: Optional[int] = None,  # Default firmware duration is 500ms
-        reps: Optional[int] = None,  # Default firmware reps is 0
-    ) -> None:
-        """Set LED Status bar color and pattern."""
-        ...
-
-    async def enter_programming_mode(self) -> None:
-        """Reboot into programming mode"""
-        command = GCODE.ENTER_BOOTLOADER.build_command()
-        await self._connection.send_dfu_command(command)
-        await self._connection.close()
-
-    async def reset_serial_buffers(self) -> None:
-        """Reset the input and output serial buffers."""
-        self._connection._serial.reset_input_buffer()
-        self._connection._serial.reset_output_buffer()

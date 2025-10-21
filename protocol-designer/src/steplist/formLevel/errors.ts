@@ -4,6 +4,7 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
+import { MANUAL } from '@opentrons/step-generation'
 
 import {
   ABSORBANCE_READER_INITIALIZE,
@@ -517,7 +518,7 @@ const PIPETTE_REQUIRED: FormError = {
 }
 const TIPRACK_REQUIRED: FormError = {
   title: 'Tiprack required',
-  dependentFields: ['tiprack'],
+  dependentFields: ['tipRack'],
   location: 'field',
   page: 0,
   showOnReopen: true,
@@ -618,7 +619,12 @@ const DISPOSAL_VOLUME_REQUIRED: FormError = {
   showOnReopen: true,
   tab: 'dispense',
 }
-
+const TIPS_SELECTED_REQUIRED: FormError = {
+  title: 'Tips selected required',
+  dependentFields: ['tips_selected', 'tip_tracking'],
+  location: 'field',
+  page: 3,
+}
 export type FormErrorChecker = (
   arg: HydratedFormData,
   moduleEntities?: ModuleEntities
@@ -1547,6 +1553,17 @@ export const disposalVolumeRequired = (
     ? DISPOSAL_VOLUME_REQUIRED
     : null
 }
+
+export const tipSelectionRequired = (
+  fields: HydratedMixFormData | HydratedMoveLiquidFormData
+): FormError | null => {
+  const { tips_selected, tip_tracking } = fields
+  return tip_tracking === MANUAL &&
+    (tips_selected == null || tips_selected?.length === 0)
+    ? TIPS_SELECTED_REQUIRED
+    : null
+}
+
 /*******************
  **     Helpers    **
  ********************/
