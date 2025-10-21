@@ -19,7 +19,9 @@ import { getIsTiprackSelectable } from './utils'
 
 import type { TipSelectionBaseProps } from './types'
 
-export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
+export function SelectTiprack(
+  props: TipSelectionBaseProps & { validTiprackIds: string[] }
+): JSX.Element {
   const {
     selectedTiprackId,
     setSelectedTiprackId,
@@ -28,6 +30,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
     deckDef,
     pipetteSpecs,
     nozzles,
+    validTiprackIds,
   } = props
   const { t } = useTranslation('tip_selection')
   const { labware: allLabware } = activeDeckSetup
@@ -61,6 +64,7 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
           pipetteSpecs,
           nozzles,
           labwareEntities,
+          validTiprackIds,
         })
         return isTiprackSelectable ? (
           <>

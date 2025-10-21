@@ -22,11 +22,7 @@ import {
   getPositionFromSlotId,
   SINGLE,
 } from '@opentrons/shared-data'
-import {
-  EMPTY,
-  getDefaultPrimaryNozzle,
-  getSlotInLocationStack,
-} from '@opentrons/step-generation'
+import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -35,7 +31,6 @@ import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TIP_STATE_TO_TIP_TYPE } from './constants'
 import { DeckOverlay } from './DeckOverlay'
-import { useMemoizedTipAccessibileStatusByWellName } from './hooks'
 import { PipetteShadow } from './PipetteShadows/PipetteFlexShadow'
 import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
@@ -63,10 +58,10 @@ export function SelectTips(
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
+    primaryNozzle: string
+    tipAccessibilityStatus: Record<string, Record<string, boolean>>
   }
 ): JSX.Element {
-  const { pipetteSpecs, nozzles, pipetteId } = props
-
   const { t } = useTranslation('tip_selection')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const [hoveredWell, setHoveredWell] = useState<string | null>(null)
@@ -74,6 +69,7 @@ export function SelectTips(
   const currentHoveredWellRef = useRef<string | null>(null)
 
   const {
+    pipetteSpecs,
     selectedTiprackId,
     activeDeckSetup,
     deckDef,
@@ -81,6 +77,9 @@ export function SelectTips(
     setSelectedTips,
     numTotalPickups,
     setShowPickupsRequiredBanner,
+    tipAccessibilityStatus,
+    nozzles,
+    primaryNozzle,
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
   const viewBox =
@@ -98,20 +97,11 @@ export function SelectTips(
 
   const robotState = useSelector(getRobotStateAtActiveItem)
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels: pipetteSpecs.channels,
-  })
 
   const tipAccessibileStatusByWellName =
-    useMemoizedTipAccessibileStatusByWellName({
-      selectedTiprackId: selectedTiprackId ?? '',
-      nozzles,
-      pipetteSpecs,
-      selectedTips,
-      primaryNozzle,
-      pipetteId,
-    })
+    selectedTiprackId != null
+      ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
+      : {}
   const numPickupsRemaining = numTotalPickups - selectedTips.length
 
   const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
