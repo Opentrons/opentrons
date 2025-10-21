@@ -1,8 +1,8 @@
 """Data files models."""
 from datetime import datetime
-from typing import Literal, Set
+from typing import Literal, Set, Optional
 
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.data_files import DataFileSource
@@ -68,3 +68,28 @@ class FileIdNotFound(ErrorDetails):
 
     id: Literal["FileIdNotFound"] = "FileIdNotFound"
     title: str = "Specified file id not found on the robot"
+
+
+class ImageFileMetadata(BaseModel):
+    """Metadata associated with a particular image file captured by a camera during a run."""
+
+    id: str = Field(
+        ...,
+        description="The id of the camera image file."
+        " This id is identical to the filename of the camera image file.",
+    )
+    cameraId: str = Field(
+        ..., description="The ID of the camera used to capture the image file."
+    )
+    commandId: Optional[str] = Field(
+        ...,
+        description="The command ID of the command that generated the image file, if any.",
+    )
+    prevCommandId: Optional[str] = Field(
+        ...,
+        description="The command ID of the command immediately before the command"
+        " that generated the image file, if any.",
+    )
+    createdAt: datetime = Field(
+        ..., description="The time the camera image file was created."
+    )
