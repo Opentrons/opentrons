@@ -83,9 +83,8 @@ class FileProviderExecutor:
                 filename=final_filename, file_id=file_id, file_data=file_data
             )
             md5sum = self._get_md5sum(file_data)
-            cmd_id_info = file_data.command_metadata.command_id_info
-            command_id = cmd_id_info.command_id if cmd_id_info else None
-            prev_command_id = cmd_id_info.prev_command_id if cmd_id_info else None
+            command_id = file_data.command_metadata.command_id
+            prev_command_id = file_data.command_metadata.prev_command_id
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -107,7 +106,7 @@ class FileProviderExecutor:
                 file_id=file_id,
                 run_id=self._run_metadata.run_id,
                 command_info=CmdDataFileInfo(
-                    command_id=command_id or "", prev_command_id=prev_command_id or ""
+                    command_id=command_id, prev_command_id=prev_command_id
                 ),
             )
 

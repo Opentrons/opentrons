@@ -18,7 +18,6 @@ from ..errors.error_occurrence import ErrorOccurrence
 from ..resources.file_provider import (
     MAXIMUM_FILE_LIMIT,
     ImageCaptureCmdFileNameMetadata,
-    FileNameCmdMetadata,
 )
 from ..resources import FileProvider
 from ..resources import CameraProvider
@@ -151,9 +150,8 @@ class CaptureImageImpl(
                     step_number=len(self._state_view.commands.get_all()) + 1,
                     command_timestamp=datetime.now(),
                     base_filename=params.fileName,
-                    command_id_info=FileNameCmdMetadata(
-                        command_id=this_cmd_id, prev_command_id=prev_cmd_id
-                    ),
+                    command_id=this_cmd_id or "",
+                    prev_command_id=prev_cmd_id or "",
                 ),
             )
             file_id = file_info.id

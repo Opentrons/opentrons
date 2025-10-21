@@ -16,26 +16,24 @@ MAXIMUM_FILE_LIMIT = 400
 class FileNameCmdMetadata:
     """Command metadata associated with a specific data file."""
 
-    command_id: Optional[str] = None
-    prev_command_id: Optional[str] = None
+    command_id: str
+    prev_command_id: str
 
 
 @dataclass(frozen=True)
-class ReadCmdFileNameMetadata:
+class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a plate reader `read` command used to build the finalized file name."""
 
     base_filename: str
     wavelength: int
-    command_id_info: FileNameCmdMetadata
 
 
 @dataclass(frozen=True)
-class ImageCaptureCmdFileNameMetadata:
+class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a camera capture command used to build the finalized file name."""
 
     step_number: int
     command_timestamp: datetime
-    command_id_info: FileNameCmdMetadata
     base_filename: Optional[str]
 
 

@@ -17,7 +17,6 @@ from ...resources.file_provider import (
     ReadData,
     MAXIMUM_FILE_LIMIT,
     ReadCmdFileNameMetadata,
-    FileNameCmdMetadata,
 )
 from ...resources import FileProvider
 from ...state import update_types
@@ -192,9 +191,8 @@ class ReadAbsorbanceImpl(
                         command_metadata=ReadCmdFileNameMetadata(
                             base_filename=params.fileName,
                             wavelength=measurement.wavelength,
-                            command_id_info=FileNameCmdMetadata(
-                                command_id=this_cmd_id, prev_command_id=prev_cmd_id
-                            ),
+                            command_id=this_cmd_id or "",
+                            prev_command_id=prev_cmd_id or "",
                         ),
                     )
                     file_ids.append(file_info.id)
