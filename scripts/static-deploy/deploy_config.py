@@ -232,7 +232,7 @@ def get_config(environment: str, application: str) -> ApplicationConfig:
     application = application.lower()
 
     valid_environments = ["sandbox", "staging", "production"]
-    valid_applications = ["labware_library", "protocol_designer", "docs", "mkdocs"]
+    valid_applications = ["labware_library", "protocol_designer", "docs", "mkdocs", "components"]
 
     if environment not in valid_environments:
         raise InvalidEnvironmentError(f"Invalid environment '{environment}'. Valid environments are: {', '.join(valid_environments)}")
