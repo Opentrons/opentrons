@@ -186,7 +186,7 @@ async def upload_data_file(
 @PydanticResponse.wrap_route(
     datafiles_router.get,
     path="/dataFiles/{dataFileId}",
-    summary="Get information about an uploaded data file",
+    summary="Get information about a data file",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
@@ -224,7 +224,7 @@ async def get_data_file_info_by_id(
 
 @datafiles_router.get(
     path="/dataFiles/{dataFileId}/download",
-    summary="Get an uploaded data file",
+    summary="Get a data file",
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorBody[Union[FileIdNotFound, FileNotFound]]
