@@ -43,6 +43,13 @@ class CmdDataFileInfo:
 
 
 @dataclass(frozen=True)
+class DataFileInfoWithCommands(DataFileInfo):
+    """Data file info with associated command information."""
+
+    command_info: CmdDataFileInfo
+
+
+@dataclass(frozen=True)
 class BaseInputOutputDataFileInfo:
     """Base metadata info for data files acting as input or output to a run."""
 
