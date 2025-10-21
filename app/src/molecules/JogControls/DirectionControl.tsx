@@ -28,9 +28,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import { ControlContainer } from './ControlContainer'
-import { TouchControlButton } from './TouchControlButton'
 
 import type { CSSProperties } from 'styled-components'
 import type { MouseEvent } from 'react'

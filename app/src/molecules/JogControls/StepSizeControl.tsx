@@ -19,8 +19,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+
 import { ControlContainer } from './ControlContainer'
-import { TouchControlButton } from './TouchControlButton'
 
 import type { MouseEvent } from 'react'
 import type { StepSize } from './types'
