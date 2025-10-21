@@ -310,7 +310,7 @@ CONFIG_ELEMENTS = (
     ConfigElement(
         "live_stream_configuration_file",
         "Live Stream Configuration",
-        Path("opentrons-live-stream.conf"),
+        Path("opentrons-live-stream.env"),
         ConfigElementType.FILE,
         "The file storing the Opentrons Live Stream Configuration values.",
     ),

@@ -23,7 +23,7 @@ FLEX_EMBEDDED_CAMERA = "/dev/video2"
 OT2_CAMERA = "/dev/video0"
 
 # Stream Globals
-STREAM_CONF_FILE = "opentrons-live-stream.env"
+DEFAULT_CONF_FILE = "/lib/systemd/system/opentrons-live-stream/opentrons-live-stream.env"
 STREAM_CONF_FILE_KEYS = [
     "BOOT_ID",
     "STATUS",
@@ -105,7 +105,14 @@ async def take_picture(filename: Path) -> None:
 
 def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
-    return get_opentrons_path("live_stream_configuration_file")
+    filepath = get_opentrons_path("live_stream_configuration_file")
+    if IS_ROBOT and not os.path.exists(filepath):
+        # If the dynamic configuration file doesn't exist make it using our defaults file
+        with open(DEFAULT_CONF_FILE, 'r') as default_config:
+            content = default_config.read()
+        with open(filepath, 'w') as new_config_file:
+            new_config_file.write(content)
+    return filepath
 
 
 async def update_live_stream_status(
