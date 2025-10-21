@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Config from '../../config'
 import * as Actions from '../actions'
 

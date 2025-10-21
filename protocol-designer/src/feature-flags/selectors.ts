@@ -1,14 +1,21 @@
 import { createSelector } from 'reselect'
+
 import { getFlagsFromQueryParams } from './utils'
-import { BaseState, Selector } from '../types'
-import { Flags } from './types'
-export const getFeatureFlagData = (state: BaseState): Flags => ({
-  ...state.featureFlags.flags,
-  ...getFlagsFromQueryParams(),
-})
-export const getEnabledPrereleaseMode: Selector<
-  boolean | null | undefined
-> = createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
+
+import type { BaseState, Selector } from '../types'
+import type { Flags } from './types'
+
+const getFeatureFlags = (state: BaseState): Flags => state.featureFlags.flags
+
+export const getFeatureFlagData: Selector<Flags> = createSelector(
+  [getFeatureFlags, getFlagsFromQueryParams],
+  (flags, queryParamsFlags) => ({
+    ...flags,
+    ...queryParamsFlags,
+  })
+)
+export const getEnabledPrereleaseMode: Selector<boolean | null | undefined> =
+  createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
 export const getDisableModuleRestrictions: Selector<
   boolean | null | undefined
 > = createSelector(
@@ -19,15 +26,53 @@ export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
-export const getAllow96Channel: Selector<boolean> = createSelector(
+export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ALLOW_96_CHANNEL ?? false
+  flags => flags.OT_PD_ENABLE_COMMENT ?? false
 )
-export const getEnableDeckModification: Selector<boolean> = createSelector(
+export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_FLEX_DECK_MODIFICATION ?? false
+  flags => flags.OT_PD_ENABLE_HOT_KEYS_DISPLAY ?? false
 )
-export const getEnableOffDeckVisAndMultiTip: Selector<boolean> = createSelector(
+export const getEnableReactScan: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP ?? false
+  flags => flags.OT_PD_ENABLE_REACT_SCAN ?? false
+)
+export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 ?? false
+)
+export const getEnableTimelineScrubber: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIMELINE_SCRUBBER ?? false
+)
+export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
+)
+export const getEnableStacking: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_STACKING ?? false
+)
+export const getEnableConcurrentModuleActions: Selector<boolean> =
+  createSelector(
+    getFeatureFlagData,
+    flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
+  )
+export const getEnableJsonExport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false
+)
+export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
+)
+export const getEnableTipSelection: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
+)
+// @ts-expect-error -- Will be utilized in development soon!
+export const getEnableCameraSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CAMERA_SUPPORT
 )

@@ -1,19 +1,21 @@
-import * as React from 'react'
 import {
-  SPACING,
+  ALIGN_CENTER,
   Box,
   COLORS,
-  TYPOGRAPHY,
-  Flex,
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { MiniCard } from './'
-import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
 
-import type { Story, Meta } from '@storybook/react'
+import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
+import { Slideout } from '/app/atoms/Slideout'
+
+import { MiniCard } from './'
+
+import type { Meta, Story } from '@storybook/react'
+import type * as React from 'react'
 
 export default {
   title: 'App/Molecules/MiniCard',
@@ -37,13 +39,13 @@ const Children = (
     <Box backgroundColor={COLORS.white}>
       <img src={OT2_PNG} style={{ width: '3rem' }} />
     </Box>
-    <StyledText
+    <LegacyStyledText
       as="p"
       marginLeft={SPACING.spacing8}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
       MiniCard stories protocol
-    </StyledText>
+    </LegacyStyledText>
   </Flex>
 )
 

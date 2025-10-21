@@ -1,31 +1,38 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { ProgressBar } from '../../../atoms/ProgressBar'
+import { beforeEach, describe, it } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { screen } from '@testing-library/react'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 
-jest.mock('../../../atoms/ProgressBar')
+import type { ComponentProps } from 'react'
 
-const mockProgressBar = ProgressBar as jest.MockedFunction<typeof ProgressBar>
-
-const render = (props: React.ComponentProps<typeof UpdateInProgressModal>) => {
+const render = (props: ComponentProps<typeof UpdateInProgressModal>) => {
   return renderWithProviders(<UpdateInProgressModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('UpdateInProgressModal', () => {
-  let props: React.ComponentProps<typeof UpdateInProgressModal>
+  let props: ComponentProps<typeof UpdateInProgressModal>
   beforeEach(() => {
     props = {
-      percentComplete: 12,
       subsystem: 'pipette_right',
     }
-    mockProgressBar.mockReturnValue('12' as any)
   })
-  it('renders test and progress bar', () => {
-    const { getByText } = render(props)
-    getByText('Updating pipette firmware...')
-    getByText('12')
+  it('renders pipette text', () => {
+    render(props)
+    screen.getByText('Updating pipette firmware...')
+  })
+  it('renders Hepa/UV text', () => {
+    props = {
+      subsystem: 'hepa_uv',
+    }
+    render(props)
+    screen.getByText('Updating HEPA/UV Module firmware...')
   })
 })

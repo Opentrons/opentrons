@@ -1,4 +1,5 @@
 """Store and retrieve information about uploaded protocols."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -7,18 +8,28 @@ from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Optional, Set
+import shutil
 
 from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import (
+
+from robot_server.data_files.models import DataFile
+from opentrons_shared_data.data_files import DataFileSource
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
     analysis_table,
     protocol_table,
     run_table,
-    sqlite_rowid,
+    analysis_primitive_type_rtp_table,
+    analysis_csv_rtp_table,
+    data_files_table,
+    run_csv_rtp_table,
+    ProtocolKindSQLEnum,
 )
+from robot_server.protocols.protocol_models import ProtocolKind
 
 
 _CACHE_ENTRIES = 32
@@ -35,6 +46,7 @@ class ProtocolResource:
     created_at: datetime
     source: ProtocolSource
     protocol_key: Optional[str]
+    protocol_kind: ProtocolKind
 
 
 @dataclass(frozen=True)
@@ -88,7 +100,7 @@ class ProtocolStore:
         self,
         *,
         _sql_engine: sqlalchemy.engine.Engine,
-        _sources_by_id: Dict[str, ProtocolSource],
+        _sources_by_id: dict[str, ProtocolSource | _BadProtocolSource],
     ) -> None:
         """Do not call directly.
 
@@ -107,8 +119,7 @@ class ProtocolStore:
         Params:
             sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
-                This is expected to already have the proper tables set up;
-                see `add_tables_to_db()`.
+                This is expected to already have the proper tables set up.
                 This should have no protocol data currently stored.
                 If there is data, use `rehydrate()` instead.
         """
@@ -131,8 +142,7 @@ class ProtocolStore:
         Params:
             sql_engine: A reference to the database that this ProtocolStore should
                 use as its backing storage.
-                This is expected to already have the proper tables set up;
-                see `add_tables_to_db()`.
+                This is expected to already have the proper tables set up.
             protocols_directory: Where to look for protocol files while rehydrating.
                 This is expected to have one subdirectory per protocol,
                 named after its protocol ID.
@@ -147,7 +157,7 @@ class ProtocolStore:
 
         sources_by_id = await _compute_protocol_sources(
             expected_protocol_ids=expected_ids,
-            protocols_directory=AsyncPath(protocols_directory),
+            protocols_directory=protocols_directory,
             protocol_reader=protocol_reader,
         )
 
@@ -161,15 +171,18 @@ class ProtocolStore:
 
         The resource must have a unique ID.
         """
-        self._sql_insert(
-            resource=_DBProtocolResource(
-                protocol_id=resource.protocol_id,
-                created_at=resource.created_at,
-                protocol_key=resource.protocol_key,
+        try:
+            self._sql_insert(
+                resource=_DBProtocolResource(
+                    protocol_id=resource.protocol_id,
+                    created_at=resource.created_at,
+                    protocol_key=resource.protocol_key,
+                    protocol_kind=_http_protocol_kind_to_sql(resource.protocol_kind),
+                )
             )
-        )
-        self._sources_by_id[resource.protocol_id] = resource.source
-        self._clear_caches()
+            self._sources_by_id[resource.protocol_id] = resource.source
+        finally:
+            self._clear_caches()
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, protocol_id: str) -> ProtocolResource:
@@ -179,25 +192,48 @@ class ProtocolStore:
             ProtocolNotFoundError
         """
         sql_resource = self._sql_get(protocol_id=protocol_id)
-        return ProtocolResource(
-            protocol_id=sql_resource.protocol_id,
-            created_at=sql_resource.created_at,
-            protocol_key=sql_resource.protocol_key,
-            source=self._sources_by_id[sql_resource.protocol_id],
-        )
+        protocol_source = self._sources_by_id[sql_resource.protocol_id]
+        match protocol_source:
+            case ProtocolSource() as protocol_source:
+                return ProtocolResource(
+                    protocol_id=sql_resource.protocol_id,
+                    created_at=sql_resource.created_at,
+                    protocol_key=sql_resource.protocol_key,
+                    protocol_kind=_sql_protocol_kind_to_http(
+                        sql_resource.protocol_kind
+                    ),
+                    source=protocol_source,
+                )
+            case _BadProtocolSource(reason=reason):
+                raise reason
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
-        """Get all protocols currently saved in this store."""
+        """Get all protocols currently saved in this store.
+
+        Results are ordered from first-added to last-added.
+
+        If there was an error processing a protocol, it's excluded from the returned
+        list. This can happen, for example, if a software downgrade left the robot with
+        protocol files that are too new for the software that it's running now.
+        """
         all_sql_resources = self._sql_get_all()
+        all_sql_resources_and_protocol_sources = (
+            (r, self._sources_by_id[r.protocol_id]) for r in all_sql_resources
+        )
         return [
             ProtocolResource(
-                protocol_id=r.protocol_id,
-                created_at=r.created_at,
-                protocol_key=r.protocol_key,
-                source=self._sources_by_id[r.protocol_id],
+                protocol_id=sql_resource.protocol_id,
+                created_at=sql_resource.created_at,
+                protocol_key=sql_resource.protocol_key,
+                protocol_kind=_sql_protocol_kind_to_http(sql_resource.protocol_kind),
+                source=protocol_source,
             )
-            for r in all_sql_resources
+            for (
+                sql_resource,
+                protocol_source,
+            ) in all_sql_resources_and_protocol_sources
+            if not isinstance(protocol_source, _BadProtocolSource)
         ]
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -209,7 +245,7 @@ class ProtocolStore:
         return protocol_ids
 
     def get_id_by_hash(self, hash: str) -> Optional[str]:
-        """Get all protocol hashes keyed by protocol id."""
+        """Get ID of protocol corresponding to the provided hash."""
         for p in self.get_all():
             if p.source.content_hash == hash:
                 return p.protocol_id
@@ -242,17 +278,20 @@ class ProtocolStore:
             ProtocolUsedByRunError: the protocol could not be deleted because
                 there is a run currently referencing the protocol.
         """
-        self._sql_remove(protocol_id=protocol_id)
+        try:
+            self._sql_remove(protocol_id=protocol_id)
 
-        deleted_source = self._sources_by_id.pop(protocol_id)
-        protocol_dir = deleted_source.directory
-
-        for source_file in deleted_source.files:
-            source_file.path.unlink()
-        if protocol_dir:
-            protocol_dir.rmdir()
-
-        self._clear_caches()
+            deleted_source = self._sources_by_id.pop(protocol_id)
+            match deleted_source:
+                case ProtocolSource(directory=directory, files=files):
+                    for source_file in files:
+                        source_file.path.unlink()
+                    if directory:
+                        directory.rmdir()
+                case _BadProtocolSource(directory=directory):
+                    shutil.rmtree(directory, ignore_errors=True)
+        finally:
+            self._clear_caches()
 
     # Note that this is NOT cached like the other getters because we would need
     # to invalidate the cache whenever the runs table changes, which is not something
@@ -292,22 +331,66 @@ class ProtocolStore:
 
         return usage_info
 
+    async def get_referenced_data_files(self, protocol_id: str) -> List[DataFile]:
+        """Return a list of data files referenced in specified protocol's analyses and runs.
+
+        List returned is in the order in which the data files were uploaded to the server.
+        """
+        # Get analyses and runs of protocol_id
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
+            run_table.c.protocol_id == protocol_id
+        )
+        # Get all entries in analysis_csv_table that match the analysis IDs above
+        select_analysis_csv_file_ids = sqlalchemy.select(
+            analysis_csv_rtp_table.c.file_id
+        ).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
+        # Get all entries in run_csv_table that match the run IDs above
+        select_run_csv_file_ids = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
+            run_csv_rtp_table.c.run_id.in_(select_referencing_run_ids)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            data_files_rows = transaction.execute(
+                data_files_table.select()
+                .where(
+                    data_files_table.c.id.in_(select_analysis_csv_file_ids)
+                    | data_files_table.c.id.in_(select_run_csv_file_ids)
+                )
+                .order_by(sqlite_rowid)
+            ).all()
+
+        return [
+            DataFile(
+                id=sql_row.id,
+                name=sql_row.name,
+                createdAt=sql_row.created_at,
+                source=DataFileSource.GENERATED
+                if sql_row.generated
+                else DataFileSource.UPLOADED,
+            )
+            for sql_row in data_files_rows
+        ]
+
     def get_referencing_run_ids(self, protocol_id: str) -> List[str]:
         """Return a list of run ids that reference a particular protocol.
 
         See the `runs` module for information about runs.
 
-        Results are ordered with the oldest-added (NOT created) run first.
+        Results are ordered with the oldest run first.
         """
-        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
-            run_table.c.protocol_id == protocol_id
+        select_referencing_run_ids = (
+            sqlalchemy.select(run_table.c.id)
+            .where(run_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
-            referencing_run_ids = (
-                transaction.execute(select_referencing_run_ids).scalars().all()
-            )
-        return referencing_run_ids
+            return transaction.execute(select_referencing_run_ids).scalars().all()
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
@@ -334,12 +417,27 @@ class ProtocolStore:
     def _sql_get_all_from_engine(
         sql_engine: sqlalchemy.engine.Engine,
     ) -> List[_DBProtocolResource]:
-        statement = sqlalchemy.select(protocol_table)
+        statement = sqlalchemy.select(protocol_table).order_by(sqlite_rowid)
         with sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
     def _sql_remove(self, protocol_id: str) -> None:
+        select_referencing_analysis_ids = sqlalchemy.select(analysis_table.c.id).where(
+            analysis_table.c.protocol_id == protocol_id
+        )
+        delete_analysis_rtps_statement = sqlalchemy.delete(
+            analysis_primitive_type_rtp_table
+        ).where(
+            analysis_primitive_type_rtp_table.c.analysis_id.in_(
+                select_referencing_analysis_ids
+            )
+        )
+        delete_analysis_csv_rtps_statement = sqlalchemy.delete(
+            analysis_csv_rtp_table
+        ).where(
+            analysis_csv_rtp_table.c.analysis_id.in_(select_referencing_analysis_ids)
+        )
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
@@ -348,16 +446,18 @@ class ProtocolStore:
         )
 
         with self._sql_engine.begin() as transaction:
-            # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
-            # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
-            # analyses, they'll be left behind in the AnalysisStore, orphaned,
-            # since they're stored independently of this SQL table.
+            # TODO(mm, 2022-04-28): Deleting analyses, and any RTP tables that reference
+            #  those analyses, from the table is enough to avoid a SQL foreign key conflict.
+            #  But, if this protocol had any *pending* analyses, they'll be left behind
+            #  in the AnalysisStore, orphaned, since they're stored independently of this SQL table.
             #
-            # To fix this, we'll need to either:
+            #  To fix this, we'll need to either:
             #
-            # * Merge the Store classes or otherwise give them access to each other.
-            # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
+            #  * Merge the Store classes or otherwise give them access to each other.
+            #  * Switch from SQLAlchemy Core to ORM and use cascade deletes.
             try:
+                transaction.execute(delete_analysis_rtps_statement)
+                transaction.execute(delete_analysis_csv_rtps_statement)
                 transaction.execute(delete_analyses_statement)
                 result = transaction.execute(delete_protocol_statement)
             except sqlalchemy.exc.IntegrityError as e:
@@ -373,18 +473,11 @@ class ProtocolStore:
         self.has.cache_clear()
 
 
-# TODO(mm, 2022-04-18):
-# Restructure to degrade gracefully in the face of ProtocolReader failures.
-#
-# * ProtocolStore.get_all() should omit protocols for which it failed to compute
-#   a ProtocolSource.
-# * ProtocolStore.get(id) should continue to raise an exception if it failed to compute
-#   that protocol's ProtocolSource.
 async def _compute_protocol_sources(
     expected_protocol_ids: Set[str],
-    protocols_directory: AsyncPath,
+    protocols_directory: Path,
     protocol_reader: ProtocolReader,
-) -> Dict[str, ProtocolSource]:
+) -> dict[str, ProtocolSource | _BadProtocolSource]:
     """Compute `ProtocolSource` objects from protocol source files.
 
     We don't store these `ProtocolSource` objects in the SQL database because
@@ -400,19 +493,19 @@ async def _compute_protocol_sources(
         protocol_reader: An interface to use to compute `ProtocolSource`s.
 
     Returns:
-        A map from protocol ID to computed `ProtocolSource`.
+        A map from protocol ID to computed `ProtocolSource`, or an `Exception` if
+        there was a problem processing that particular protocol.
 
     Raises:
         Exception: This is not expected to raise anything,
             but it might if a software update makes ProtocolReader reject files
             that it formerly accepted.
     """
-    sources_by_id: Dict[str, ProtocolSource] = {}
+    sources_by_id: dict[str, ProtocolSource | _BadProtocolSource] = {}
 
-    directory_members = [m async for m in protocols_directory.iterdir()]
+    directory_members = [m async for m in AsyncPath(protocols_directory).iterdir()]
     directory_member_names = set(m.name for m in directory_members)
     extra_members = directory_member_names - expected_protocol_ids
-    missing_members = expected_protocol_ids - directory_member_names
 
     if extra_members:
         # Extra members may be left over from prior interrupted writes
@@ -423,38 +516,48 @@ async def _compute_protocol_sources(
             f" Ignoring them."
         )
 
-    if missing_members:
-        raise SubdirectoryMissingError(
-            f"Missing subdirectories for protocols: {missing_members}"
-        )
-
     async def compute_source(
-        protocol_id: str, protocol_subdirectory: AsyncPath
+        protocol_subdirectory: Path,
+    ) -> ProtocolSource | _BadProtocolSource:
+        try:
+            # Given that the expected protocol subdirectory exists,
+            # we trust that the files in it are correct.
+            # No extra files, and no files missing.
+            #
+            # This is a safe assumption as long as:
+            #  * Nobody has tampered with file the storage.
+            #  * We don't try to compute the source of any protocol whose insertion
+            #    failed halfway through and left files behind.
+            protocol_files = [
+                Path(f) async for f in AsyncPath(protocol_subdirectory).iterdir()
+            ]
+            protocol_source = await protocol_reader.read_saved(
+                files=protocol_files,
+                directory=Path(protocol_subdirectory),
+                files_are_prevalidated=True,
+                python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            )
+            return protocol_source
+        except Exception as exception:
+            # e.g. if a software downgrade left the robot with some protocol files that
+            # are too new for the software version that it's running now.
+            _log.exception(f"Error reading protocol in {protocol_subdirectory}.")
+            return _BadProtocolSource(directory=protocol_subdirectory, reason=exception)
+
+    async def compute_source_and_store_in_result_dict(
+        protocol_id: str, protocol_subdirectory: Path
     ) -> None:
-        # Given that the expected protocol subdirectory exists,
-        # we trust that the files in it are correct.
-        # No extra files, and no files missing.
-        #
-        # This is a safe assumption as long as:
-        #  * Nobody has tampered with file the storage.
-        #  * We don't try to compute the source of any protocol whose insertion
-        #    failed halfway through and left files behind.
-        protocol_files = [Path(f) async for f in protocol_subdirectory.iterdir()]
-        protocol_source = await protocol_reader.read_saved(
-            files=protocol_files,
-            directory=Path(protocol_subdirectory),
-            files_are_prevalidated=True,
-            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-        )
-        sources_by_id[protocol_id] = protocol_source
+        result = await compute_source(protocol_subdirectory)
+        sources_by_id[protocol_id] = result
 
     async with create_task_group() as task_group:
-        # Use a TaskGroup instead of asyncio.gather() so,
-        # if any task raises an unexpected exception,
-        # it cancels every other task and raises an exception to signal the bug.
         for protocol_id in expected_protocol_ids:
             protocol_subdirectory = protocols_directory / protocol_id
-            task_group.start_soon(compute_source, protocol_id, protocol_subdirectory)
+            task_group.start_soon(
+                compute_source_and_store_in_result_dict,
+                protocol_id,
+                protocol_subdirectory,
+            )
 
     for id in expected_protocol_ids:
         assert id in sources_by_id
@@ -469,6 +572,15 @@ class _DBProtocolResource:
     protocol_id: str
     created_at: datetime
     protocol_key: Optional[str]
+    protocol_kind: ProtocolKindSQLEnum
+
+
+@dataclass(frozen=True)
+class _BadProtocolSource:
+    """Information about files that we failed to process into a ProtocolSource."""
+
+    directory: Path
+    reason: Exception
 
 
 def _convert_sql_row_to_dataclass(
@@ -477,16 +589,21 @@ def _convert_sql_row_to_dataclass(
     protocol_id = sql_row.id
     protocol_key = sql_row.protocol_key
     created_at = sql_row.created_at
+    protocol_kind = sql_row.protocol_kind
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
     assert protocol_key is None or isinstance(
         protocol_key, str
     ), f"Protocol Key {protocol_key} not a string or None"
+    assert isinstance(
+        protocol_kind, ProtocolKindSQLEnum
+    ), f"Protocol Kind {protocol_kind} not the expected enum"
 
     return _DBProtocolResource(
         protocol_id=protocol_id,
         created_at=created_at,
         protocol_key=protocol_key,
+        protocol_kind=protocol_kind,
     )
 
 
@@ -497,4 +614,21 @@ def _convert_dataclass_to_sql_values(
         "id": resource.protocol_id,
         "created_at": resource.created_at,
         "protocol_key": resource.protocol_key,
+        "protocol_kind": resource.protocol_kind,
     }
+
+
+def _http_protocol_kind_to_sql(http_enum: ProtocolKind) -> ProtocolKindSQLEnum:
+    match http_enum:
+        case ProtocolKind.STANDARD:
+            return ProtocolKindSQLEnum.STANDARD
+        case ProtocolKind.QUICK_TRANSFER:
+            return ProtocolKindSQLEnum.QUICK_TRANSFER
+
+
+def _sql_protocol_kind_to_http(sql_enum: ProtocolKindSQLEnum) -> ProtocolKind:
+    match sql_enum:
+        case ProtocolKindSQLEnum.STANDARD:
+            return ProtocolKind.STANDARD
+        case ProtocolKindSQLEnum.QUICK_TRANSFER:
+            return ProtocolKind.QUICK_TRANSFER

@@ -1,7 +1,6 @@
-import * as React from 'react'
-import styles from './styles.css'
-import { NavLink } from './NavLink'
 import { protocolLinkProps } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.module.css'
 
 interface Props {
   active: boolean
@@ -9,14 +8,8 @@ interface Props {
 
 export function ProtocolMenu(props: Props): JSX.Element {
   const { active } = props
-  const {
-    options,
-    designer,
-    library,
-    api,
-    github,
-    bottomLink,
-  } = protocolLinkProps
+  const { options, designer, library, api, github, bottomLink } =
+    protocolLinkProps
   return (
     <>
       <span>Protocols</span>

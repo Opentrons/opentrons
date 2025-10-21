@@ -11,6 +11,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
     CalibratePipetteImplementation,
     CalibratePipetteParams,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 from opentrons.protocol_engine.types import InstrumentOffsetVector
 
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.mark.ot3_only
 @pytest.fixture(autouse=True)
 def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(calibration, inspect.isfunction):
@@ -59,8 +59,10 @@ async def test_calibrate_pipette_implementation(
         times=1,
     )
 
-    assert result == CalibratePipetteResult(
-        pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+    assert result == SuccessData(
+        public=CalibratePipetteResult(
+            pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+        ),
     )
 
 

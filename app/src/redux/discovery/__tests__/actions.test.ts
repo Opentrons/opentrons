@@ -1,5 +1,7 @@
-// discovery actions test
+import { describe, expect, it } from 'vitest'
+
 import * as actions from '../actions'
+
 import type { Action } from '../../types'
 
 describe('discovery actions', () => {

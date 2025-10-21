@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 // common types
 
@@ -8,7 +8,7 @@ interface LabwareFileProps {
 }
 
 interface ValidatedLabwareProps extends LabwareFileProps {
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
 }
 
 export interface UncheckedLabwareFile extends LabwareFileProps {
@@ -94,6 +94,12 @@ export interface AddCustomLabwareAction {
 export interface AddCustomLabwareFileAction {
   type: 'labware:ADD_CUSTOM_LABWARE_FILE'
   payload: { filePath: string }
+  meta: { shell: true }
+}
+
+export interface AddCustomLabwareFromCreatorAction {
+  type: 'labware:ADD_CUSTOM_LABWARE_FILE_BLOB'
+  payload: { file: string }
   meta: { shell: true }
 }
 

@@ -1,9 +1,16 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
-from opentrons_shared_data.robot.dev_types import RobotType
+
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    PrimitiveRunTimeParamValuesType,
+    CSVRunTimeParamFilesType,
+    CommandAnnotation,
+)
+from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -13,6 +20,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LoadedPipette,
     Liquid,
+    LiquidClassRecordWithId,
 )
 
 
@@ -32,10 +40,31 @@ class AnalysisResult(str, Enum):
         OK: No problems were found during protocol analysis.
         NOT_OK: Problems were found during protocol analysis. Inspect
             `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
+
+
+class AnalysisRequest(BaseModel):
+    """Model for analysis request body."""
+
+    runTimeParameterValues: PrimitiveRunTimeParamValuesType = Field(
+        default={},
+        description="Key-value pairs of primitive run-time parameters defined in a protocol.",
+    )
+    runTimeParameterFiles: CSVRunTimeParamFilesType = Field(
+        default={},
+        description="Key-fileId pairs of CSV run-time parameters defined in a protocol.",
+    )
+    forceReAnalyze: bool = Field(
+        False, description="Whether to force start a new analysis."
+    )
 
 
 class AnalysisSummary(BaseModel):
@@ -43,6 +72,16 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
+    runTimeParameters: Optional[List[RunTimeParameter]] = Field(
+        default=None,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
+    )
 
 
 class PendingAnalysis(BaseModel):
@@ -52,6 +91,16 @@ class PendingAnalysis(BaseModel):
     status: Literal[AnalysisStatus.PENDING] = Field(
         AnalysisStatus.PENDING,
         description="Status marking the analysis as pending",
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
     )
 
 
@@ -82,7 +131,7 @@ class CompletedAnalysis(BaseModel):
     # Fields that are currently unique to robot-server, missing from local analysis:
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.COMPLETED] = Field(
-        AnalysisStatus.COMPLETED,
+        ...,
         description="Status marking the analysis as completed",
     )
     result: AnalysisResult = Field(
@@ -92,14 +141,24 @@ class CompletedAnalysis(BaseModel):
 
     # Fields that should match local analysis:
     robotType: Optional[RobotType] = Field(
-        # robotType is deliberately typed as a Literal instead of an Enum.
-        # It's a bad idea at the moment to store enums in robot-server's database.
-        # https://opentrons.atlassian.net/browse/RSS-98
+        # robotType was typed as a Literal instead of an Enum because it was a bad idea
+        # at the time to store enums in robot-server's database
+        # (https://opentrons.atlassian.net/browse/RSS-98).
         default=None,  # default=None to fit objects that were stored before this field existed.
         description=(
             "The type of robot that this protocol can run on."
             " This field was added in v7.1.0. It will be `null` or omitted"
             " in analyses that were originally created on older versions."
+        ),
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
         ),
     )
     commands: List[Command] = Field(
@@ -128,6 +187,10 @@ class CompletedAnalysis(BaseModel):
         default_factory=list,
         description="Liquids used by the protocol",
     )
+    liquidClasses: List[LiquidClassRecordWithId] = Field(
+        default_factory=list,
+        description="Liquid classes used by the protocol",
+    )
     errors: List[ErrorOccurrence] = Field(
         ...,
         description=(
@@ -136,6 +199,20 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
+    commandAnnotations: List[CommandAnnotation] = Field(
+        default_factory=list,
+        description="Optional annotations for commands in this run.",
+    )
+
+
+AnalysisParameterType = Union[float, bool, str, None]
+
+
+class RunTimeParameterAnalysisData(NamedTuple):
+    """Data from analysis of a run-time parameter."""
+
+    value: AnalysisParameterType
+    default: AnalysisParameterType
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

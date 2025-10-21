@@ -1,32 +1,29 @@
 // labware filters
-import * as React from 'react'
 import { Link } from 'react-router-dom'
+
 import { Icon } from '@opentrons/components'
+
 import {
-  LABWARE_GUIDE,
-  WHAT_IS_A_LABWARE_DEFINITION,
-  USING_THE_LABWARE_LIBRARY,
   CREATING_CUSTOM_LABWARE_DEFINITIONS,
   LABWARE_CREATOR,
+  LABWARE_GUIDE,
+  USING_THE_LABWARE_LIBRARY,
+  WHAT_IS_A_LABWARE_DEFINITION,
 } from '../../localization'
-import { getPublicPath } from '../../public-path'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 const LINKS = [
   {
     label: WHAT_IS_A_LABWARE_DEFINITION,
-    href:
-      'https://support.opentrons.com/en/articles/3136501-what-is-a-labware-definition',
+    href: 'https://support.opentrons.com/en/articles/3136501-what-is-a-labware-definition',
   },
   {
     label: USING_THE_LABWARE_LIBRARY,
-    href:
-      'https://support.opentrons.com/en/articles/3136507-using-the-labware-library',
+    href: 'https://support.opentrons.com/en/articles/3136507-using-the-labware-library',
   },
   {
     label: CREATING_CUSTOM_LABWARE_DEFINITIONS,
-    href:
-      'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions',
+    href: 'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions',
   },
 ]
 
@@ -55,10 +52,7 @@ export function LabwareGuide(): JSX.Element {
             </li>
           ))}
           <li>
-            <Link
-              to={`${getPublicPath()}create`}
-              className={styles.labware_guide_link}
-            >
+            <Link to={`/create`} className={styles.labware_guide_link}>
               {LABWARE_CREATOR}
             </Link>
           </li>

@@ -1,17 +1,36 @@
 """Basic pipette data state and store."""
+
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Tuple
+
+import dataclasses
+from logging import getLogger
+from typing import (
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    cast,
+)
+
+from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
+from opentrons_shared_data.pipette.types import (
+    UlPerMmAction,
+    LiquidClasses as VolumeModes,
+)
+
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.nozzle_manager import (
-    NozzleConfigurationType,
     NozzleMap,
 )
-from opentrons.types import MountType, Mount as HwMount
+from opentrons.types import MountType, Mount as HwMount, Point, NozzleConfigurationType
 
+from . import update_types, fluid_stack
 from .. import errors
 from ..types import (
     LoadedPipette,
@@ -22,43 +41,19 @@ from ..types import (
     CurrentAddressableArea,
     CurrentPipetteLocation,
     TipGeometry,
-)
-from ..commands import (
-    Command,
-    LoadPipetteResult,
-    AspirateResult,
-    DispenseResult,
-    DispenseInPlaceResult,
-    MoveLabwareResult,
-    MoveToCoordinatesResult,
-    MoveToWellResult,
-    MoveRelativeResult,
-    MoveToAddressableAreaResult,
-    PickUpTipResult,
-    DropTipResult,
-    DropTipInPlaceResult,
-    HomeResult,
-    RetractAxisResult,
-    BlowOutResult,
-    TouchTipResult,
-    thermocycler,
-    heater_shaker,
-    CommandPrivateResult,
-    PrepareToAspirateResult,
-)
-from ..commands.configuring_common import (
-    PipetteConfigUpdateResultMixin,
-    PipetteNozzleLayoutResultMixin,
+    LabwareWellId,
 )
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
-    UpdateCommandAction,
+    get_state_updates,
 )
-from .abstract_store import HasState, HandlesActions
+from ._abstract_store import HasState, HandlesActions
+
+LOG = getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class HardwarePipette:
     """Hardware pipette data."""
 
@@ -66,7 +61,7 @@ class HardwarePipette:
     config: PipetteDict
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class CurrentDeckPoint:
     """The latest deck point and mount the robot has accessed."""
 
@@ -74,7 +69,25 @@ class CurrentDeckPoint:
     deck_point: Optional[DeckPoint]
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
+class BoundingNozzlesOffsets:
+    """Offsets of the bounding nozzles of the pipette."""
+
+    back_left_offset: Point
+    front_right_offset: Point
+
+
+@dataclasses.dataclass(frozen=True)
+class PipetteBoundingBoxOffsets:
+    """Offsets of the corners of the pipette's bounding box."""
+
+    back_left_corner: Point
+    front_right_corner: Point
+    back_right_corner: Point
+    front_left_corner: Point
+
+
+@dataclasses.dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -90,21 +103,36 @@ class StaticPipetteConfig:
     nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
+    bounding_nozzle_offsets: BoundingNozzlesOffsets
+    default_nozzle_map: NozzleMap  # todo(mm, 2024-10-14): unused, remove?
+    lld_settings: Optional[Dict[str, Dict[str, float]]]
+    plunger_positions: Dict[str, float]
+    shaft_ul_per_mm: float
+    available_sensors: pipette_definition.AvailableSensorDefinition
+    volume_mode: VolumeModes
 
 
-@dataclass
+@dataclasses.dataclass
 class PipetteState:
     """Basic pipette data state and getter methods."""
 
+    # todo(mm, 2024-10-14): It's getting difficult to ensure that all of these
+    # attributes are populated at the appropriate times. Refactor to a
+    # single dict-of-many-things instead of many dicts-of-single-things.
     pipettes_by_id: Dict[str, LoadedPipette]
-    aspirated_volume_by_id: Dict[str, Optional[float]]
+    pipette_contents_by_id: Dict[str, Optional[fluid_stack.FluidStack]]
     current_location: Optional[CurrentPipetteLocation]
     current_deck_point: CurrentDeckPoint
     attached_tip_by_id: Dict[str, Optional[TipGeometry]]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
+    nozzle_configuration_by_id: Dict[str, NozzleMap]
+    liquid_presence_detection_by_id: Dict[str, bool]
+    ready_to_aspirate_by_id: Dict[str, bool]
+    has_clean_tips_by_id: Dict[str, bool]
+    tip_source_by_id: Dict[str, Optional[LabwareWellId]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -116,7 +144,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         """Initialize a PipetteStore and its state."""
         self._state = PipetteState(
             pipettes_by_id={},
-            aspirated_volume_by_id={},
+            pipette_contents_by_id={},
             attached_tip_by_id={},
             current_location=None,
             current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
@@ -124,27 +152,139 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             static_config_by_id={},
             flow_rates_by_id={},
             nozzle_configuration_by_id={},
+            liquid_presence_detection_by_id={},
+            ready_to_aspirate_by_id={},
+            has_clean_tips_by_id={},
+            tip_source_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
-            self._handle_command(action.command, action.private_result)
-        elif isinstance(action, SetPipetteMovementSpeedAction):
+        for state_update in get_state_updates(action):
+            self._set_load_pipette(state_update)
+            self._update_current_location(state_update)
+            self._update_pipette_config(state_update)
+            self._update_pipette_nozzle_map(state_update)
+            self._update_tip_state(state_update)
+            self._update_volumes(state_update)
+            self._update_ready_for_aspirate(state_update)
+
+        if isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
 
-    def _handle_command(  # noqa: C901
-        self, command: Command, private_result: CommandPrivateResult
-    ) -> None:
-        self._update_current_location(command)
-        self._update_deck_point(command)
+    def _set_load_pipette(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.loaded_pipette != update_types.NO_CHANGE:
+            pipette_id = state_update.loaded_pipette.pipette_id
 
-        if isinstance(private_result, PipetteConfigUpdateResultMixin):
-            config = private_result.config
+            self._state.pipettes_by_id[pipette_id] = LoadedPipette(
+                id=pipette_id,
+                pipetteName=state_update.loaded_pipette.pipette_name,
+                mount=state_update.loaded_pipette.mount,
+            )
+            self._state.liquid_presence_detection_by_id[pipette_id] = (
+                state_update.loaded_pipette.liquid_presence_detection or False
+            )
+            self._state.movement_speed_by_id[pipette_id] = None
+            self._state.attached_tip_by_id[pipette_id] = None
+            self._state.ready_to_aspirate_by_id[pipette_id] = False
+            self._state.tip_source_by_id[pipette_id] = None
+
+    def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.pipette_tip_state != update_types.NO_CHANGE:
+            pipette_id = state_update.pipette_tip_state.pipette_id
+            if state_update.pipette_tip_state.tip_geometry:
+                attached_tip = state_update.pipette_tip_state.tip_geometry
+
+                self._state.attached_tip_by_id[pipette_id] = attached_tip
+                self._state.tip_source_by_id[
+                    pipette_id
+                ] = state_update.pipette_tip_state.tip_source
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    try:
+                        tip_configuration = (
+                            static_config.tip_configuration_lookup_table[
+                                attached_tip.volume
+                            ]
+                        )
+                    except KeyError:
+                        # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                        # we used to look up a default tip config via the pipette max volume, but if that isn't
+                        # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                        # the first entry in the table is ok I guess but we really need to generally rethink how
+                        # we identify tip classes - looking things up by volume is not enough.
+                        tip_configuration = list(
+                            static_config.tip_configuration_lookup_table.values()
+                        )[-1]
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
+
+            else:
+                pipette_id = state_update.pipette_tip_state.pipette_id
+                self._state.attached_tip_by_id[pipette_id] = None
+                self._state.has_clean_tips_by_id[pipette_id] = False
+                self._state.tip_source_by_id[pipette_id] = None
+
+                static_config = self._state.static_config_by_id.get(pipette_id)
+                if static_config:
+                    # TODO(seth,9/11/2023): bad way to do defaulting, see above.
+                    tip_configuration = list(
+                        static_config.tip_configuration_lookup_table.values()
+                    )[-1]
+                    self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                        default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                        default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                        default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                    )
+
+    def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
+        location_update = state_update.pipette_location
+
+        if location_update is update_types.NO_CHANGE:
+            pass
+        elif location_update is update_types.CLEAR:
+            self._state.current_location = None
+            self._state.current_deck_point = CurrentDeckPoint(
+                mount=None, deck_point=None
+            )
+        else:
+            new_logical_location = location_update.new_location
+            new_deck_point = location_update.new_deck_point
+            match new_logical_location:
+                case LabwareWellId(labware_id=labware_id, well_name=well_name):
+                    self._state.current_location = CurrentWell(
+                        pipette_id=location_update.pipette_id,
+                        labware_id=labware_id,
+                        well_name=well_name,
+                    )
+                case update_types.AddressableArea(
+                    addressable_area_name=addressable_area_name
+                ):
+                    self._state.current_location = CurrentAddressableArea(
+                        pipette_id=location_update.pipette_id,
+                        addressable_area_name=addressable_area_name,
+                    )
+                case None:
+                    self._state.current_location = None
+                case update_types.NO_CHANGE:
+                    pass
+            if new_deck_point is not update_types.NO_CHANGE:
+                loaded_pipette = self._state.pipettes_by_id[location_update.pipette_id]
+                self._state.current_deck_point = CurrentDeckPoint(
+                    mount=loaded_pipette.mount, deck_point=new_deck_point
+                )
+
+    def _update_pipette_config(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.pipette_config != update_types.NO_CHANGE:
+            config = state_update.pipette_config.config
             self._state.static_config_by_id[
-                private_result.pipette_id
+                state_update.pipette_config.pipette_id
             ] = StaticPipetteConfig(
-                serial_number=private_result.serial_number,
+                serial_number=state_update.pipette_config.serial_number,
                 model=config.model,
                 display_name=config.display_name,
                 min_volume=config.min_volume,
@@ -154,228 +294,103 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
+                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                    back_left_corner=config.back_left_corner_offset,
+                    front_right_corner=config.front_right_corner_offset,
+                    back_right_corner=Point(
+                        config.front_right_corner_offset.x,
+                        config.back_left_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                    front_left_corner=Point(
+                        config.back_left_corner_offset.x,
+                        config.front_right_corner_offset.y,
+                        config.back_left_corner_offset.z,
+                    ),
+                ),
+                bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
+                ),
+                default_nozzle_map=config.nozzle_map,
+                lld_settings=config.pipette_lld_settings,
+                plunger_positions=config.plunger_positions,
+                shaft_ul_per_mm=config.shaft_ul_per_mm,
+                available_sensors=config.available_sensors,
+                volume_mode=config.volume_mode,
             )
-            self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
-        elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
+            self._state.flow_rates_by_id[
+                state_update.pipette_config.pipette_id
+            ] = config.flow_rates
             self._state.nozzle_configuration_by_id[
-                private_result.pipette_id
-            ] = private_result.nozzle_map
+                state_update.pipette_config.pipette_id
+            ] = config.nozzle_map
 
-        if isinstance(command.result, LoadPipetteResult):
-            pipette_id = command.result.pipetteId
+    def _update_pipette_nozzle_map(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        if state_update.pipette_nozzle_map != update_types.NO_CHANGE:
+            self._state.nozzle_configuration_by_id[
+                state_update.pipette_nozzle_map.pipette_id
+            ] = state_update.pipette_nozzle_map.nozzle_map
 
-            self._state.pipettes_by_id[pipette_id] = LoadedPipette(
-                id=pipette_id,
-                pipetteName=command.params.pipetteName,
-                mount=command.params.mount,
-            )
-            self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.movement_speed_by_id[pipette_id] = None
-            self._state.attached_tip_by_id[pipette_id] = None
-            self._state.nozzle_configuration_by_id[pipette_id] = None
+    def _update_ready_for_aspirate(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        if state_update.ready_to_aspirate != update_types.NO_CHANGE:
+            self._state.ready_to_aspirate_by_id[
+                state_update.ready_to_aspirate.pipette_id
+            ] = state_update.ready_to_aspirate.ready_to_aspirate
 
-        elif isinstance(command.result, AspirateResult):
-            pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            next_volume = previous_volume + command.result.volume
+    def _update_volumes(self, state_update: update_types.StateUpdate) -> None:
+        if state_update.pipette_aspirated_fluid == update_types.NO_CHANGE:
+            return
+        # set the tip state to unclean, if an "empty" update has a clean_tip flag
+        # it will set it to true
+        self._state.has_clean_tips_by_id[
+            state_update.pipette_aspirated_fluid.pipette_id
+        ] = False
 
-            self._state.aspirated_volume_by_id[pipette_id] = next_volume
+        if state_update.pipette_aspirated_fluid.type == "aspirated":
+            self._update_aspirated(state_update.pipette_aspirated_fluid)
+        elif state_update.pipette_aspirated_fluid.type == "ejected":
+            self._update_ejected(state_update.pipette_aspirated_fluid)
+        elif state_update.pipette_aspirated_fluid.type == "empty":
+            self._update_empty(state_update.pipette_aspirated_fluid)
+        elif state_update.pipette_aspirated_fluid.type == "unknown":
+            self._update_unknown(state_update.pipette_aspirated_fluid)
+        else:
+            assert_never(state_update.pipette_aspirated_fluid.type)
 
-        elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            next_volume = max(0.0, previous_volume - command.result.volume)
-            self._state.aspirated_volume_by_id[pipette_id] = next_volume
+    def _update_aspirated(
+        self, update: update_types.PipetteAspiratedFluidUpdate
+    ) -> None:
+        if self._state.pipette_contents_by_id[update.pipette_id] is None:
+            self._state.pipette_contents_by_id[
+                update.pipette_id
+            ] = fluid_stack.FluidStack()
 
-        elif isinstance(command.result, PickUpTipResult):
-            pipette_id = command.params.pipetteId
-            attached_tip = TipGeometry(
-                length=command.result.tipLength,
-                volume=command.result.tipVolume,
-                diameter=command.result.tipDiameter,
-            )
+        self._fluid_stack_log_if_empty(update.pipette_id).add_fluid(update.fluid)
 
-            self._state.attached_tip_by_id[pipette_id] = attached_tip
-            self._state.aspirated_volume_by_id[pipette_id] = 0
+    def _update_ejected(self, update: update_types.PipetteEjectedFluidUpdate) -> None:
+        self._fluid_stack_log_if_empty(update.pipette_id).remove_fluid(update.volume)
 
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                try:
-                    tip_configuration = static_config.tip_configuration_lookup_table[
-                        attached_tip.volume
-                    ]
-                except KeyError:
-                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
-                    # we used to look up a default tip config via the pipette max volume, but if that isn't
-                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
-                    # the first entry in the table is ok I guess but we really need to generally rethink how
-                    # we identify tip classes - looking things up by volume is not enough.
-                    tip_configuration = list(
-                        static_config.tip_configuration_lookup_table.values()
-                    )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
+    def _update_empty(self, update: update_types.PipetteEmptyFluidUpdate) -> None:
+        self._state.pipette_contents_by_id[update.pipette_id] = fluid_stack.FluidStack()
+        self._state.has_clean_tips_by_id[update.pipette_id] = update.clean_tip
 
-        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = None
-            self._state.attached_tip_by_id[pipette_id] = None
+    def _update_unknown(self, update: update_types.PipetteUnknownFluidUpdate) -> None:
+        self._state.pipette_contents_by_id[update.pipette_id] = None
 
-            static_config = self._state.static_config_by_id.get(pipette_id)
-            if static_config:
-                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
-                tip_configuration = list(
-                    static_config.tip_configuration_lookup_table.values()
-                )[0]
-                self._state.flow_rates_by_id[pipette_id] = FlowRates(
-                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
-                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
-                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
-                )
-        elif isinstance(command.result, BlowOutResult):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = None
-
-        elif isinstance(command.result, PrepareToAspirateResult):
-            pipette_id = command.params.pipetteId
-            self._state.aspirated_volume_by_id[pipette_id] = 0
-
-    def _update_current_location(self, command: Command) -> None:
-        # These commands leave the pipette in a new location.
-        # Update current_location to reflect that.
-        if isinstance(
-            command.result,
-            (
-                MoveToWellResult,
-                PickUpTipResult,
-                DropTipResult,
-                AspirateResult,
-                DispenseResult,
-                BlowOutResult,
-                TouchTipResult,
-            ),
-        ):
-            self._state.current_location = CurrentWell(
-                pipette_id=command.params.pipetteId,
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
-            )
-
-        elif isinstance(command.result, MoveToAddressableAreaResult):
-            self._state.current_location = CurrentAddressableArea(
-                pipette_id=command.params.pipetteId,
-                addressable_area_name=command.params.addressableAreaName,
-            )
-
-        # These commands leave the pipette in a place that we can't logically associate
-        # with a well. Clear current_location to reflect the fact that it's now unknown.
-        #
-        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
-        elif isinstance(
-            command.result,
-            (
-                HomeResult,
-                RetractAxisResult,
-                MoveToCoordinatesResult,
-                thermocycler.OpenLidResult,
-                thermocycler.CloseLidResult,
-            ),
-        ):
-            self._state.current_location = None
-
-        # Heater-Shaker commands may have left the pipette in a place that we can't
-        # associate with a logical location, depending on their result.
-        elif isinstance(
-            command.result,
-            (
-                heater_shaker.SetAndWaitForShakeSpeedResult,
-                heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if command.result.pipetteRetracted:
-                self._state.current_location = None
-
-        # A moveLabware command may have moved the labware that contains the current
-        # well out from under the pipette. Clear the current location to reflect the
-        # fact that the pipette is no longer over any labware.
-        #
-        # This is necessary for safe motion planning in case the next movement
-        # goes to the same labware (now in a new place).
-        elif isinstance(command.result, MoveLabwareResult):
-            moved_labware_id = command.params.labwareId
-            if command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._state.current_location = None
-            elif (
-                isinstance(self._state.current_location, CurrentWell)
-                and self._state.current_location.labware_id == moved_labware_id
-            ):
-                self._state.current_location = None
-
-    def _update_deck_point(self, command: Command) -> None:
-        if isinstance(
-            command.result,
-            (
-                MoveToWellResult,
-                MoveToCoordinatesResult,
-                MoveRelativeResult,
-                MoveToAddressableAreaResult,
-                PickUpTipResult,
-                DropTipResult,
-                AspirateResult,
-                DispenseResult,
-                BlowOutResult,
-                TouchTipResult,
-            ),
-        ):
-            pipette_id = command.params.pipetteId
-            deck_point = command.result.position
-
-            try:
-                loaded_pipette = self._state.pipettes_by_id[pipette_id]
-            except KeyError:
-                self._clear_deck_point()
-            else:
-                self._state.current_deck_point = CurrentDeckPoint(
-                    mount=loaded_pipette.mount, deck_point=deck_point
-                )
-
-        elif isinstance(
-            command.result,
-            (
-                HomeResult,
-                RetractAxisResult,
-                thermocycler.OpenLidResult,
-                thermocycler.CloseLidResult,
-            ),
-        ):
-            self._clear_deck_point()
-
-        elif isinstance(
-            command.result,
-            (
-                heater_shaker.SetAndWaitForShakeSpeedResult,
-                heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            if command.result.pipetteRetracted:
-                self._clear_deck_point()
-
-        elif isinstance(command.result, MoveLabwareResult):
-            if command.params.strategy == "usingGripper":
-                # All mounts will have been retracted.
-                self._clear_deck_point()
-
-    def _clear_deck_point(self) -> None:
-        """Reset last deck point to default None value for mount and point."""
-        self._state.current_deck_point = CurrentDeckPoint(mount=None, deck_point=None)
+    def _fluid_stack_log_if_empty(self, pipette_id: str) -> fluid_stack.FluidStack:
+        stack = self._state.pipette_contents_by_id[pipette_id]
+        if stack is None:
+            LOG.error("Pipette state tried to alter an unknown-contents pipette")
+            return fluid_stack.FluidStack()
+        return stack
 
 
-class PipetteView(HasState[PipetteState]):
+class PipetteView:
     """Read-only view of computed pipettes state."""
 
     _state: PipetteState
@@ -474,12 +489,27 @@ class PipetteView(HasState[PipetteState]):
             if tip is not None
         ]
 
+    def get_tip_rack_well_picked_up_from(
+        self, pipette_id: str
+    ) -> Optional[LabwareWellId]:
+        """Get the tip rack well a tip has been has picked up from, if there currently is a tip attached."""
+        try:
+            return self._state.tip_source_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} no found; unable to get last tip rack well accessed."
+            ) from e
+
     def get_aspirated_volume(self, pipette_id: str) -> Optional[float]:
         """Get the currently aspirated volume of a pipette by ID.
 
+        This is the volume currently displaced by the plunger relative to its bottom position,
+        regardless of whether that volume likely contains liquid or air. This makes it the right
+        function to call to know how much more volume the plunger may displace.
+
         Returns:
             The volume the pipette has aspirated.
-            None, after blow-out and the plunger is in an unsafe position or drop-tip and there is no tip attached.
+            None, after blow-out and the plunger is in an unsafe position.
 
         Raises:
             PipetteNotLoadedError: pipette ID does not exist.
@@ -488,11 +518,71 @@ class PipetteView(HasState[PipetteState]):
         self.validate_tip_state(pipette_id, True)
 
         try:
-            return self._state.aspirated_volume_by_id[pipette_id]
+            stack = self._state.pipette_contents_by_id[pipette_id]
+            if stack is None:
+                return None
+            return stack.aspirated_volume()
 
         except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
+            ) from e
+
+    def get_has_clean_tip(self, pipette_id: str) -> bool:
+        """Get if the tip of a pipette by ID is clean.
+
+        This is only true directly after a pick up tip, once any kind of aspirate happens
+        it is no longer clean
+
+        Returns:
+            True if the tip is clean
+            False if it is unclean
+
+        Raises:
+            PipetteNotLoadedError: pipette ID does not exist.
+            TipNotAttachedError: if no tip is attached to the pipette.
+        """
+        self.validate_tip_state(pipette_id, True)
+
+        try:
+            return self._state.has_clean_tips_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get current volume."
+            ) from e
+
+    def get_liquid_dispensed_by_ejecting_volume(
+        self, pipette_id: str, volume: float
+    ) -> Optional[float]:
+        """Get the amount of liquid (not air) that will be dispensed if the pipette ejects a specified volume.
+
+        For instance, if the pipette contains, in vertical order,
+        10 ul air
+        80 ul liquid
+        5 ul air
+
+        then dispensing 10ul would result in 5ul of liquid; dispensing 85 ul would result in 80ul liquid; dispensing
+        95ul would result in 80ul liquid.
+
+        Returns:
+            The volume of liquid that would be dispensed by the requested volume.
+            None, after blow-out or when the plunger is in an unsafe position.
+
+        Raises:
+            PipetteNotLoadedError: pipette ID does not exist.
+            TipnotAttachedError: No tip is attached to the pipette.
+        """
+        self.validate_tip_state(pipette_id, True)
+
+        try:
+            stack = self._state.pipette_contents_by_id[pipette_id]
+            if stack is None:
+                return None
+            return stack.liquid_part_of_dispense_volume(volume)
+
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get current liquid volume."
             ) from e
 
     def get_working_volume(self, pipette_id: str) -> float:
@@ -518,6 +608,27 @@ class PipetteView(HasState[PipetteState]):
         current_volume = self.get_aspirated_volume(pipette_id)
 
         return max(0.0, working_volume - current_volume) if current_volume else None
+
+    def get_pipette_lld_settings(
+        self, pipette_id: str
+    ) -> Optional[Dict[str, Dict[str, float]]]:
+        """Get the liquid level settings for all possible tips for a single pipette."""
+        return self.get_config(pipette_id).lld_settings
+
+    def get_current_tip_lld_settings(self, pipette_id: str) -> float:
+        """Get the liquid level settings for pipette and its current tip."""
+        attached_tip = self.get_attached_tip(pipette_id)
+        if attached_tip is None or attached_tip.volume is None:
+            return 0
+        lld_settings = self.get_pipette_lld_settings(pipette_id)
+        tipVolume = "t" + str(int(attached_tip.volume))
+        if (
+            lld_settings is None
+            or lld_settings[tipVolume] is None
+            or lld_settings[tipVolume]["minHeight"] is None
+        ):
+            return 0
+        return float(lld_settings[tipVolume]["minHeight"])
 
     def validate_tip_state(self, pipette_id: str, expected_has_tip: bool) -> None:
         """Validate that a pipette's tip state matches expectations."""
@@ -562,6 +673,10 @@ class PipetteView(HasState[PipetteState]):
     def get_channels(self, pipette_id: str) -> int:
         """Return the max channels of the pipette."""
         return self.get_config(pipette_id).channels
+
+    def get_active_channels(self, pipette_id: str) -> int:
+        """Get the number of channels being used in the given pipette's configuration."""
+        return self.get_nozzle_configuration(pipette_id).tip_count
 
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
@@ -628,12 +743,172 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
         """Get the current set nozzle layout configuration."""
-        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map_for_pipette:
-            return nozzle_map_for_pipette.configuration
-        else:
-            return NozzleConfigurationType.FULL
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map_for_pipette.configuration
 
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
+
+    def get_primary_nozzle(self, pipette_id: str) -> str:
+        """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
+        return nozzle_map.starting_nozzle
+
+    def get_nozzle_configurations(self) -> Dict[str, NozzleMap]:
+        """Get the nozzle maps of all pipettes, keyed by pipette ID."""
+        return self._state.nozzle_configuration_by_id.copy()
+
+    def get_nozzle_configuration(self, pipette_id: str) -> NozzleMap:
+        """Get the nozzle map of the pipette."""
+        return self._state.nozzle_configuration_by_id[pipette_id]
+
+    def _get_critical_point_offset_without_tip(
+        self, pipette_id: str, critical_point: Optional[CriticalPoint]
+    ) -> Point:
+        """Get the offset of the specified critical point from pipette's mount position."""
+        nozzle_map = self._state.nozzle_configuration_by_id[pipette_id]
+        match critical_point:
+            case CriticalPoint.INSTRUMENT_XY_CENTER:
+                return nozzle_map.instrument_xy_center_offset
+            case CriticalPoint.XY_CENTER:
+                return nozzle_map.xy_center_offset
+            case CriticalPoint.Y_CENTER:
+                return nozzle_map.y_center_offset
+            case CriticalPoint.FRONT_NOZZLE:
+                return nozzle_map.front_nozzle_offset
+            case _:
+                return nozzle_map.starting_nozzle_offset
+
+    def get_pipette_bounding_nozzle_offsets(
+        self, pipette_id: str
+    ) -> BoundingNozzlesOffsets:
+        """Get the nozzle offsets of the pipette's bounding nozzles."""
+        return self.get_config(pipette_id).bounding_nozzle_offsets
+
+    def get_pipette_bounding_box(self, pipette_id: str) -> PipetteBoundingBoxOffsets:
+        """Get the bounding box of the pipette."""
+        return self.get_config(pipette_id).pipette_bounding_box_offsets
+
+    # TODO (spp, 2024-09-17): in order to find the position of pipette at destination,
+    #  this method repeats the same steps that waypoints builder does while finding
+    #  waypoints to move to. We should consolidate these steps into a shared entity
+    #  so that the deck conflict checker and movement plan builder always remain in sync.
+    def get_pipette_bounds_at_specified_move_to_position(
+        self,
+        pipette_id: str,
+        destination_position: Point,
+        critical_point: Optional[CriticalPoint],
+    ) -> Tuple[Point, Point, Point, Point]:
+        """Get the pipette's bounding box position when critical point is at the destination position.
+
+        Returns a tuple of the pipette's bounding box position in deck coordinates as-
+            (back_left_bound, front_right_bound, back_right_bound, front_left_bound)
+        Bounding box of the pipette includes the pipette's outer casing as well as nozzles.
+        """
+        tip = self.get_attached_tip(pipette_id)
+
+        # *Offset* of pipette's critical point w.r.t pipette mount
+        critical_point_offset = self._get_critical_point_offset_without_tip(
+            pipette_id, critical_point
+        )
+
+        # Position of the above critical point at destination, in deck coordinates
+        critical_point_position = destination_position + Point(
+            x=0, y=0, z=tip.length if tip else 0
+        )
+
+        # Get the pipette bounding box coordinates
+        pipette_bounds_offsets = self.get_config(
+            pipette_id
+        ).pipette_bounding_box_offsets
+        pip_back_left_bound = (
+            critical_point_position
+            - critical_point_offset
+            + pipette_bounds_offsets.back_left_corner
+        )
+        pip_front_right_bound = (
+            critical_point_position
+            - critical_point_offset
+            + pipette_bounds_offsets.front_right_corner
+        )
+        pip_back_right_bound = Point(
+            pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z
+        )
+        pip_front_left_bound = Point(
+            pip_back_left_bound.x, pip_front_right_bound.y, pip_back_left_bound.z
+        )
+        return (
+            pip_back_left_bound,
+            pip_front_right_bound,
+            pip_back_right_bound,
+            pip_front_left_bound,
+        )
+
+    def get_pipette_supports_pressure(self, pipette_id: str) -> bool:
+        """Return if this pipette supports a pressure sensor."""
+        return (
+            "pressure"
+            in self._state.static_config_by_id[pipette_id].available_sensors.sensors
+        )
+
+    def get_liquid_presence_detection(self, pipette_id: str) -> bool:
+        """Determine if liquid presence detection is enabled for this pipette."""
+        try:
+            return self._state.liquid_presence_detection_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to determine if pipette liquid presence detection enabled."
+            ) from e
+
+    def get_nozzle_configuration_supports_lld(self, pipette_id: str) -> bool:
+        """Determine if the current partial tip configuration supports LLD."""
+        nozzle_map = self.get_nozzle_configuration(pipette_id)
+        if (
+            nozzle_map.physical_nozzle_count == 96
+            and nozzle_map.back_left != nozzle_map.full_instrument_back_left
+            and nozzle_map.front_right != nozzle_map.full_instrument_front_right
+        ):
+            return False
+        return True
+
+    def get_is_low_volume_mode(self, pipette_id: str) -> bool:
+        """Determine if the pipette is currently in low volume mode."""
+        return self.get_config(pipette_id).volume_mode == VolumeModes.lowVolumeDefault
+
+    def lookup_volume_to_mm_conversion(
+        self, pipette_id: str, volume: float, action: str
+    ) -> float:
+        """Get the volumn to mm conversion for a pipette."""
+        try:
+            lookup_volume = self.get_working_volume(pipette_id)
+        except errors.TipNotAttachedError:
+            lookup_volume = self.get_maximum_volume(pipette_id)
+
+        pipette_config = self.get_config(pipette_id)
+        lookup_table_from_config = pipette_config.tip_configuration_lookup_table
+        try:
+            tip_settings = lookup_table_from_config[lookup_volume]
+        except KeyError:
+            tip_settings = list(lookup_table_from_config.values())[0]
+        return calculate_ul_per_mm(
+            volume,
+            cast(UlPerMmAction, action),
+            tip_settings,
+            shaft_ul_per_mm=pipette_config.shaft_ul_per_mm,
+        )
+
+    def lookup_plunger_position_name(
+        self, pipette_id: str, position_name: str
+    ) -> float:
+        """Get the plunger position provided for the given pipette id."""
+        return self.get_config(pipette_id).plunger_positions[position_name]
+
+    def get_ready_to_aspirate(self, pipette_id: str) -> bool:
+        """Get if the provided pipette is ready to aspirate for the given pipette id."""
+        try:
+            return self._state.ready_to_aspirate_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to determine if pipette ready to aspirate."
+            ) from e

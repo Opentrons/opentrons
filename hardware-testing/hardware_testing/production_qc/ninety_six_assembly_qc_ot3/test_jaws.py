@@ -1,5 +1,5 @@
 """Test Jaws."""
-from typing import List, Union, Tuple, Dict
+from typing import List, Union, Tuple, Dict, Literal
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -74,7 +74,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     """Check the LEDs work and jaws are aligned."""
     # HOME
     print("homing...")
-    await api.home([ax])
+    await helpers_ot3.home_tip_motors(api, False)  # Home with no backoff
     # Check LEDs can turn on when homed
     if not api.is_simulator:
         led_check = ui.get_user_answer("are both endstop Lights ON?")
@@ -98,7 +98,9 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     return led_check, jaws_aligned
 
 
-async def run(api: OT3API, report: CSVReport, section: str) -> None:
+async def run(
+    api: OT3API, report: CSVReport, section: str, pipette: Literal[200, 1000]
+) -> None:
     """Run."""
     ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)

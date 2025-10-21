@@ -3,13 +3,14 @@ from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
 
-from opentrons.protocol_engine.state import StateView
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
     HeaterShakerModuleId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.close_labware_latch import (
     CloseLabwareLatchImpl,
 )
@@ -43,7 +44,9 @@ async def test_close_labware_latch(
 
     result = await subject.execute(data)
     decoy.verify(await heater_shaker_hardware.close_labware_latch(), times=1)
-    assert result == heater_shaker.CloseLabwareLatchResult()
+    assert result == SuccessData(
+        public=heater_shaker.CloseLabwareLatchResult(),
+    )
 
 
 async def test_close_labware_latch_virtual(
@@ -73,4 +76,6 @@ async def test_close_labware_latch_virtual(
 
     result = await subject.execute(data)
 
-    assert result == heater_shaker.CloseLabwareLatchResult()
+    assert result == SuccessData(
+        public=heater_shaker.CloseLabwareLatchResult(),
+    )

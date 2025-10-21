@@ -1,48 +1,57 @@
-import * as React from 'react'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
-const render = (props: React.ComponentProps<typeof UpdateResultsModal>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof UpdateResultsModal>) => {
   return renderWithProviders(<UpdateResultsModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('UpdateResultsModal', () => {
-  let props: React.ComponentProps<typeof UpdateResultsModal>
+  let props: ComponentProps<typeof UpdateResultsModal>
   beforeEach(() => {
     props = {
       isSuccess: true,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: vi.fn(),
       instrument: {
         ok: true,
+        instrumentType: 'gripper',
         subsystem: 'gripper',
         instrumentModel: 'gripper',
       } as any,
     }
   })
   it('renders correct text for a successful instrument update', () => {
-    const { getByText } = render(props)
-    getByText('Successful update!')
-    getByText(nestedTextMatcher('Your Gripper is ready to use!'))
+    render(props)
+    screen.getByText('Successful update!')
   })
   it('calls close modal when the close button is pressed', () => {
-    const { getByText } = render(props)
-    getByText('Close').click()
-    expect(props.closeModal).toHaveBeenCalled()
+    render(props)
+    fireEvent.click(screen.getByText('Close'))
+    expect(props.onClose).toHaveBeenCalled()
   })
   it('renders correct text for a failed instrument update', () => {
     props = {
       isSuccess: false,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: vi.fn(),
       instrument: {
         ok: false,
       } as any,
     }
-    const { getByText } = render(props)
-    getByText('Update failed')
-    getByText(
+    render(props)
+    screen.getByText('Update failed')
+    screen.getByText(
       'Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
     )
   })

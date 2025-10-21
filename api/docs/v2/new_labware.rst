@@ -10,7 +10,7 @@ Labware are the durable or consumable items that you work with, reuse, or discar
 
 .. note::
 
-    Code snippets use coordinate deck slot locations (e.g. ``'D1'``, ``'D2'``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Code snippets use coordinate deck slot locations (e.g. ``"D1"``, ``"D2"``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 *************
 Labware Types
@@ -32,6 +32,8 @@ After you've created your labware, save it as a ``.json`` file and add it to the
 
 If other people need to use your custom labware definition, they must also add it to their Opentrons App.
 
+.. _loading-labware:
+
 ***************
 Loading Labware
 ***************
@@ -46,7 +48,7 @@ Throughout this section, we'll use the labware listed in the following table.
       - Labware name
       - API load name
     * - Well plate
-      - `Corning 96 Well Plate 360 µL Flat <https://labware.opentrons.com/corning_96_wellplate_360ul_flat/>`_
+      - `Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt <https://labware.opentrons.com/opentrons_96_wellplate_200ul_pcr_full_skirt/>`_
       - ``corning_96_wellplate_360ul_flat``
     * - Flex tip rack
       - `Opentrons Flex 96 Tips 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
@@ -60,14 +62,14 @@ Similar to the code sample in :ref:`overview-section-v2`, here's how you use the
 .. code-block:: python
 
     #Flex
-    tiprack = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+    tiprack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+    plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "D2")
 
 .. code-block:: python
 
     #OT-2
-    tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
+    tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", "1")
+    plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "2")
     
 .. versionadded:: 2.0
 
@@ -80,9 +82,45 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
     The ``load_labware`` method includes an optional ``label`` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example::
         
         tiprack = protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat',
-            location='D1',
-            label='any-name-you-want')
+            load_name="opentrons_flex_96_tiprack_200ul",
+            location="D1",
+            label="any-name-you-want")
+
+
+.. _loading-lids:
+
+Loading Lids
+============
+
+You can load lids on compatible plates or tip racks with the optional ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware`. This example adds an Opentrons Tough Auto-Sealing Lid to a PCR plate::
+
+    plate = protocol.load_labware(
+        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
+        location="D2",
+        lid="opentrons_tough_pcr_auto_sealing_lid"
+    )
+
+And this example loads an Opentrons Flex Tip Rack Lid onto a rack of 200 µL tips::
+
+    tiprack = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_200ul",
+        location="D1",
+        lid="opentrons_flex_tiprack_lid"
+    )
+
+You might need multiple lids during your protocol. Use :py:meth:`.ProtocolContext.load_lid_stack` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, or use :py:meth:`.Labware.load_lid_stack` to stack them on the riser or other compatible adapter.
+
+.. code-block:: python
+
+    lid_stack = protocol.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
+        location="B2",
+        quantity=4
+    )
+
+Tip rack lids can't be stacked or placed on the deck.
+
+.. versionadded:: 2.23
 
 .. _labware-on-adapters:
 
@@ -98,9 +136,9 @@ Loading Separately
 
 The ``load_adapter()`` method is available on ``ProtocolContext`` and module contexts. It behaves similarly to ``load_labware()``, requiring the load name and location for the desired adapter. Load a module, adapter, and labware with separate calls to specify each layer of the physical stack of components individually::
 
-    hs_mod = protocol.load_module('heaterShakerModuleV1', 'D1')
-    hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
-    hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
+    hs_mod = protocol.load_module("heaterShakerModuleV1", "D1")
+    hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
+    hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
     
 .. versionadded:: 2.15
     The ``load_adapter()`` method.
@@ -111,20 +149,24 @@ Loading Together
 Use the ``adapter`` argument of ``load_labware()`` to load an adapter at the same time as labware. For example, to load the same 96-well plate and adapter from the previous section at once::
     
     hs_plate = hs_mod.load_labware(
-        name='nest_96_wellplate_200ul_flat',
-        adapter='opentrons_96_flat_bottom_adapter'
+        name="nest_96_wellplate_200ul_flat",
+        adapter="opentrons_96_flat_bottom_adapter"
     )
 
 .. versionadded:: 2.15
     The ``adapter`` parameter.
 
-The API also has some "combination" labware definitions, which treat the adapter and labware as a unit::
+.. note::
 
-    hs_combo = hs_mod.load_labware(
-        'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat'
-    )
+    The API also has some "combination" labware definitions, which treat the adapter and labware as a unit::
 
-Loading labware this way prevents you from :ref:`moving the labware <moving-labware>` onto or off of the adapter, so it's less flexible than loading the two separately. Avoid using combination definitions unless your protocol specifies an ``apiLevel`` of 2.14 or lower.
+        hs_combo = hs_mod.load_labware(
+            "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+        )
+
+    .. deprecated:: 2.15
+
+    Labware loaded with combination adapters no longer support all API features, such as moving the top labware or pipetting relative to liquid meniscus. These definitions are marked as "Retired" in version 8.5.0 of the Opentrons App and later. Avoid using combination definitions unless your protocol specifies an ``apiLevel`` of 2.14 or lower, in which case they are required.
 
 .. _new-well-access:
 
@@ -137,9 +179,9 @@ Well Ordering
 
 You need to select which wells to transfer liquids to and from over the course of a protocol.
 
-Rows of wells on a labware have labels that are capital letters starting with A. For instance, an 96-well plate has 8 rows, labeled ``'A'`` through ``'H'``.
+Rows of wells on a labware have labels that are capital letters starting with A. For instance, an 96-well plate has 8 rows, labeled ``"A"`` through ``"H"``.
 
-Columns of wells on a labware have labels that are numbers starting with 1. For instance, a 96-well plate has columns ``'1'`` through ``'12'``.
+Columns of wells on a labware have labels that are numbers starting with 1. For instance, a 96-well plate has columns ``"1"`` through ``"12"``.
 
 All well-accessing functions start with the well at the top left corner of the labware. The ending well is in the bottom right. The order of travel from top left to bottom right depends on which function you use.
 
@@ -149,7 +191,7 @@ The code in this section assumes that ``plate`` is a 24-well plate. For example:
 
 .. code-block:: python
 
-    plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='D1')
+    plate = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="D1")
 
 .. _well-accessor-methods:
 
@@ -176,28 +218,30 @@ The API provides many different ways to access wells inside labware. Different m
      - ``[[labware:A1, labware:B1...], [labware:A2, labware:B2...]]``
    * - :py:meth:`.Labware.wells_by_name`
      - Dictionary with well names as keys.
-     - ``{'A1': labware:A1, 'B1': labware:B1}``
+     - ``{"A1": labware:A1, "B1": labware:B1}``
    * - :py:meth:`.Labware.rows_by_name`
      - Dictionary with row names as keys.
-     - ``{'A': [labware:A1, labware:A2...], 'B': [labware:B1, labware:B2...]}``
+     - ``{"A": [labware:A1, labware:A2...], "B": [labware:B1, labware:B2...]}``
    * - :py:meth:`.Labware.columns_by_name`
      - Dictionary with column names as keys.
-     - ``{'1': [labware:A1, labware:B1...], '2': [labware:A2, labware:B2...]}``
+     - ``{"1": [labware:A1, labware:B1...], "2": [labware:A2, labware:B2...]}``
 
 Accessing Individual Wells
 ==========================
 
+.. _well-dictionary-access:
+
 Dictionary Access
 -----------------
 
-The simplest way to refer to a single well is by its name, like A1 or D6. :py:meth:`.Labware.wells_by_name` accomplishes this. This is such a common task that the API also has an equivalent shortcut: dictionary indexing.
+The simplest way to refer to a single well is by its :py:obj:`.well_name`, like A1 or D6. Referencing a particular key in the result of :py:meth:`.Labware.wells_by_name` accomplishes this. This is such a common task that the API also has an equivalent shortcut: dictionary indexing.
 
 .. code-block:: python
 
-    a1 = plate.wells_by_name()['A1']
-    d6 = plate['D6']  # dictionary indexing
+    a1 = plate.wells_by_name()["A1"]
+    d6 = plate["D6"]  # dictionary indexing
     
-If a well does not exist in the labware, such as ``plate['H12']`` on a 24-well plate, the API will raise a ``KeyError``. In contrast, it would be a valid reference on a standard 96-well plate.
+If a well does not exist in the labware, such as ``plate["H12"]`` on a 24-well plate, the API will raise a ``KeyError``. In contrast, it would be a valid reference on a standard 96-well plate.
 
 .. versionadded:: 2.0
 
@@ -227,9 +271,9 @@ Use :py:meth:`.Labware.rows_by_name` to access a specific row of wells or  :py:m
 
 .. code-block:: python
 
-    row_dict = plate.rows_by_name()['A']
+    row_dict = plate.rows_by_name()["A"]
     row_list = plate.rows()[0]  # equivalent to the line above
-    column_dict = plate.columns_by_name()['1']
+    column_dict = plate.columns_by_name()["1"]
     column_list = plate.columns()[0]  # equivalent to the line above
 
     print('Column "1" has', len(column_dict), 'wells')  # Column "1" has 4 wells
@@ -237,33 +281,35 @@ Use :py:meth:`.Labware.rows_by_name` to access a specific row of wells or  :py:m
 
 Since these methods return either lists or dictionaries, you can iterate through them as you would regular Python data structures.
 
-For example, to transfer 50 µL of liquid from the first well of a reservoir to each of the wells of row ``'A'`` on a plate::
+For example, to transfer 50 µL of liquid from the first well of a reservoir to each of the wells of row ``"A"`` on a plate::
 
     for well in plate.rows()[0]:
-        pipette.transfer(reservoir['A1'], well, 50)
+        pipette.transfer(reservoir["A1"], well, 50)
 
 Equivalently, using ``rows_by_name``::
 
-    for well in plate.rows_by_name()['A'].values():
-        pipette.transfer(reservoir['A1'], well, 50)
+    for well in plate.rows_by_name()["A"].values():
+        pipette.transfer(reservoir["A1"], well, 50)
 
 .. versionadded:: 2.0
 
 
 .. _labeling-liquids:
 
-*************************
-Labeling Liquids in Wells
-*************************
+****************************
+Labeling Liquids in Labware
+****************************
 
-Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. You can view the initial liquid setup:
+Optionally, you can specify the liquids that should be in labware at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, group of wells, or an entire labware. You can view the initial liquid setup:
 
 - For Flex protocols, on the touchscreen.
 - For Flex or OT-2 protocols, in the Opentrons App (v6.3.0 or higher).
 
-To use these optional methods, first create a liquid object with :py:meth:`.ProtocolContext.define_liquid` and then label individual wells by calling :py:meth:`.Well.load_liquid`.
+To use these optional methods, first create a liquid object with :py:meth:`.ProtocolContext.define_liquid` and then label individual wells by calling :py:meth:`.Labware.load_liquid`.
 
 Let's examine how these two methods work. The following examples demonstrate how to define colored water samples for a well plate and reservoir.
+
+.. _defining-liquids:
 
 Defining Liquids
 ================
@@ -287,21 +333,43 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
         
 The ``display_color`` parameter accepts a hex color code, which adds a color to that liquid's label when you import your protocol into the Opentrons App. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
 
+.. _loading-liquids:
+
 Labeling Wells and Reservoirs
 =============================
 
-This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
+This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate wells in each labware with a particular liquid: 
 
 .. code-block:: python
 
-        well_plate["A1"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["A2"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["B1"].load_liquid(liquid=blueWater, volume=50)
-        well_plate["B2"].load_liquid(liquid=blueWater, volume=50)
-        reservoir["A1"].load_liquid(liquid=greenWater, volume=200)
-        reservoir["A2"].load_liquid(liquid=blueWater, volume=200)
+        ## load entire well plate with greenWater
+        plate.load_liquid(
+            wells=plate.wells(), # using accessor
+            volume=50,
+            liquid=greenWater
+        )
+
+        ## load entire reservoir with blueWater
+        reservoir.load_liquid(
+            wells=[A1], # using list of well names
+            volume=50,
+            liquid=blueWater
+        )
+
+``load_liquid`` makes it easy to load an entire well plate with a single command. Let's say you only need to load liquid in a few wells, or want to load multiple liquids or volumes in the same labware. 
+
+.. code-block:: python
+
+    plate.load_liquid_by_well({'A1': 200, 'A2': 100, 'A3': 50}, greenWater)
+    plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)
+
+
+You can also use :py:meth:`.Labware.load_empty` to label individual wells or an entire labware as empty at the beginning of your protocol. 
         
 .. versionadded:: 2.14
+    Use ``Well.load_liquid()`` to label liquid in individual wells. 
+.. versionadded:: 2.22
+    Use ``Labware.load_liquid``, ``Labware.load_liquid_by_well``, or ``Labware.load_empty`` to label liquid in individual wells or an entire labware. 
 
 This information is available after you import your protocol to the app or send it to Flex. A summary of liquids appears on the protocol detail page, and well-by-well detail is available on the run setup page (under Initial Liquid Setup in the app, or under Liquids on Flex).
 
@@ -312,6 +380,8 @@ Labeling vs Handling Liquids
 ============================
 
 The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
+
+Although it's optional to define and load liquids in your protocol, you can use a starting liquid volume to specify pipette movements relative to a liquid location, like the :ref:`meniscus <well-meniscus>`, in your protocol. 
 
 
 .. _v2-location-within-wells:
@@ -331,8 +401,8 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
 .. code-block:: python
     :substitutions:
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
-    depth = plate['A1'].depth  # 10.67
+    plate = protocol.load_labware("corning_96_wellplate_360ul_flat", "D1")
+    depth = plate["A1"].depth  # 10.67
 
 Diameter
 ========
@@ -342,8 +412,8 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
 .. code-block:: python
     :substitutions:
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
-    diameter = plate['A1'].diameter	 # 6.86
+    plate = protocol.load_labware("corning_96_wellplate_360ul_flat", "D1")
+    diameter = plate["A1"].diameter	 # 6.86
 
 Length
 ======
@@ -353,8 +423,8 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 .. code-block:: python
     :substitutions:
 
-    plate = protocol.load_labware('nest_12_reservoir_15ml', 'D1')
-    length = plate['A1'].length	 # 8.2
+    plate = protocol.load_labware("nest_12_reservoir_15ml", "D1")
+    length = plate["A1"].length	 # 8.2
 
 
 Width
@@ -366,8 +436,8 @@ Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defi
 .. code-block:: python
     :substitutions:
 
-    plate = protocol.load_labware('nest_12_reservoir_15ml', 'D1')
-    width = plate['A1'].width  # 71.2
+    plate = protocol.load_labware("nest_12_reservoir_15ml", "D1")
+    width = plate["A1"].width  # 71.2
 
 
 .. versionadded:: 2.9

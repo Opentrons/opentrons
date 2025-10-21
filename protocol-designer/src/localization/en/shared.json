@@ -1,9 +1,0 @@
-{
-  "add": "add",
-  "edit": "edit",
-  "exit": "exit",
-  "go_back": "go back",
-  "next": "next",
-  "remove": "remove",
-  "step": "Step {{current}} / {{max}}"
-}

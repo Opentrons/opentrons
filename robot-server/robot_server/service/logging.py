@@ -2,6 +2,7 @@ import logging
 from logging.config import dictConfig
 from typing import Any, Dict
 from opentrons.config import IS_ROBOT, robot_configs
+from opentrons.util.logging_config import log_queue
 
 
 def initialize_logging() -> None:
@@ -36,28 +37,32 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
         "filters": {"records_below_warning": {"()": _LogBelow, "level": logging.WARN}},
         "handlers": {
             "unit_only": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
+                "queue": log_queue,
             },
             "syslog_plus_unit": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "uvicorn",
+                "queue": log_queue,
+                "extra": {"SYSLOG_IDENTIFIER": "uvicorn"},
             },
             "syslog_plus_unit_above_warn": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.WARN,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "uvicorn",
+                "queue": log_queue,
+                "extra": {"SYSLOG_IDENTIFIER": "uvicorn"},
             },
             "unit_only_below_warn": {
-                "class": "systemd.journal.JournalHandler",
+                "class": "opentrons.util.logging_queue_handler.CustomQueueHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "filters": ["records_below_warning"],
-                "SYSLOG_IDENTIFIER": "uvicorn",
+                "queue": log_queue,
+                "extra": {"SYSLOG_IDENTIFIER": "uvicorn"},
             },
         },
         "loggers": {

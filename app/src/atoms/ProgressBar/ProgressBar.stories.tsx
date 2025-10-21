@@ -1,17 +1,17 @@
 import * as React from 'react'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
   SecondaryButton,
+  SPACING,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
 import { ProgressBar } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/ProgressBar',
@@ -26,19 +26,28 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
         setProgress(prevProgress => prevProgress + 5)
       }, 200)
 
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+      }
     }
   })
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      backgroundColor={COLORS.darkGreyDisabled}
+      backgroundColor={COLORS.grey30}
       padding={SPACING.spacing16}
     >
-      <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>
+      <LegacyStyledText>
+        {'Add 5% to the current progress every 0.2 sec'}
+      </LegacyStyledText>
       <ProgressBar percentComplete={progress} />
-      <SecondaryButton onClick={() => setProgress(0)} width="5rem">
+      <SecondaryButton
+        onClick={() => {
+          setProgress(0)
+        }}
+        width="5rem"
+      >
         {'reset'}
       </SecondaryButton>
     </Flex>

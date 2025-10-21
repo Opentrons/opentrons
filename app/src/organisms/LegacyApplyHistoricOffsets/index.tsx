@@ -1,0 +1,198 @@
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
+
+import {
+  ALIGN_CENTER,
+  CheckboxField,
+  DIRECTION_COLUMN,
+  Flex,
+  getLabwareDefinitionsFromCommands,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  Link,
+  ModalHeader,
+  ModalShell,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { getTopPortalEl } from '/app/App/portal'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
+
+import { LegacyLabwareOffsetTable } from './LegacyLabwareOffsetTable'
+
+import type { ChangeEvent } from 'react'
+import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LoadedLabware,
+  LoadedModule,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+
+const HOW_OFFSETS_WORK_SUPPORT_URL =
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
+export interface OffsetCandidate extends LabwareOffset {
+  runCreatedAt: string
+  labwareDisplayName: string
+}
+
+interface LegacyApplyHistoricOffsetsProps {
+  offsetCandidates: OffsetCandidate[]
+  shouldApplyOffsets: boolean
+  setShouldApplyOffsets: (shouldApplyOffsets: boolean) => void
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
+}
+export function LegacyApplyHistoricOffsets(
+  props: LegacyApplyHistoricOffsetsProps
+): JSX.Element {
+  const {
+    offsetCandidates,
+    shouldApplyOffsets,
+    setShouldApplyOffsets,
+    labware,
+    modules,
+    commands,
+  } = props
+  const [showOffsetDataModal, setShowOffsetDataModal] = useState(false)
+  const { t } = useTranslation('labware_position_check')
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
+  )
+  const JupyterSnippet = (
+    <LabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
+    />
+  )
+  const CommandLineSnippet = (
+    <LabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={offsetCandidates.map(o =>
+        pick(o, ['definitionUri', 'vector', 'location'])
+      )}
+      {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
+    />
+  )
+  const noOffsetData = offsetCandidates.length < 1
+  return (
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <CheckboxField
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          setShouldApplyOffsets(e.currentTarget.checked)
+        }}
+        value={shouldApplyOffsets}
+        disabled={noOffsetData}
+        isIndeterminate={noOffsetData}
+        label={
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+            <Icon size={SIZE_1} name="reticle" />
+            <LegacyStyledText as="p">
+              {t(noOffsetData ? 'legacy_no_offset_data' : 'apply_offset_data')}
+            </LegacyStyledText>
+          </Flex>
+        }
+      />
+      <Link
+        onClick={() => {
+          setShowOffsetDataModal(true)
+        }}
+        css={TYPOGRAPHY.linkPSemiBold}
+      >
+        {t(noOffsetData ? 'learn_more' : 'view_data')}
+      </Link>
+      {showOffsetDataModal
+        ? createPortal(
+            <ModalShell
+              maxWidth="40rem"
+              header={
+                <ModalHeader
+                  title={t(
+                    noOffsetData
+                      ? 'what_is_labware_offset_data'
+                      : 'stored_offset_data'
+                  )}
+                  onClose={() => {
+                    setShowOffsetDataModal(false)
+                  }}
+                />
+              }
+            >
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                padding={
+                  noOffsetData
+                    ? `${SPACING.spacing16} ${SPACING.spacing32} ${SPACING.spacing32}`
+                    : SPACING.spacing32
+                }
+              >
+                {noOffsetData ? (
+                  <Trans
+                    t={t}
+                    i18nKey={'robot_has_no_offsets_from_previous_runs'}
+                    components={{
+                      block: (
+                        <LegacyStyledText
+                          as="p"
+                          marginBottom={SPACING.spacing8}
+                        />
+                      ),
+                    }}
+                  />
+                ) : (
+                  <LegacyStyledText as="p">
+                    {t('robot_has_offsets_from_previous_runs')}
+                  </LegacyStyledText>
+                )}
+                <ExternalLink
+                  marginTop={noOffsetData ? '0px' : SPACING.spacing8}
+                  href={HOW_OFFSETS_WORK_SUPPORT_URL}
+                >
+                  {t('see_how_offsets_work')}
+                </ExternalLink>
+                {!noOffsetData ? (
+                  isLabwareOffsetCodeSnippetsOn ? (
+                    <LegacyLabwareOffsetTabs
+                      TableComponent={
+                        <LegacyLabwareOffsetTable
+                          offsetCandidates={offsetCandidates}
+                          labwareDefinitions={getLabwareDefinitionsFromCommands(
+                            commands
+                          )}
+                        />
+                      }
+                      JupyterComponent={JupyterSnippet}
+                      CommandLineComponent={CommandLineSnippet}
+                    />
+                  ) : (
+                    <LegacyLabwareOffsetTable
+                      offsetCandidates={offsetCandidates}
+                      labwareDefinitions={getLabwareDefinitionsFromCommands(
+                        commands
+                      )}
+                    />
+                  )
+                ) : null}
+              </Flex>
+            </ModalShell>,
+            getTopPortalEl()
+          )
+        : null}
+    </Flex>
+  )
+}

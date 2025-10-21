@@ -10,18 +10,26 @@ from .module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
+    AbstractAbsorbanceReaderCore,
+    AbstractFlexStackerCore,
 )
 from .protocol import AbstractProtocol
 from .well import AbstractWellCore
+from .robot import AbstractRobot
+from .tasks import AbstractTaskCore
 
 
 WellCore = AbstractWellCore
 LabwareCore = AbstractLabware[WellCore]
-InstrumentCore = AbstractInstrument[WellCore]
-ModuleCore = AbstractModuleCore
-TemperatureModuleCore = AbstractTemperatureModuleCore
-MagneticModuleCore = AbstractMagneticModuleCore
-ThermocyclerCore = AbstractThermocyclerCore
-HeaterShakerCore = AbstractHeaterShakerCore
-MagneticBlockCore = AbstractMagneticBlockCore
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
+InstrumentCore = AbstractInstrument[WellCore, LabwareCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+TemperatureModuleCore = AbstractTemperatureModuleCore[LabwareCore]
+MagneticModuleCore = AbstractMagneticModuleCore[LabwareCore]
+ThermocyclerCore = AbstractThermocyclerCore[LabwareCore]
+HeaterShakerCore = AbstractHeaterShakerCore[LabwareCore]
+MagneticBlockCore = AbstractMagneticBlockCore[LabwareCore]
+AbsorbanceReaderCore = AbstractAbsorbanceReaderCore[LabwareCore]
+FlexStackerCore = AbstractFlexStackerCore[LabwareCore]
+RobotCore = AbstractRobot
+TaskCore = AbstractTaskCore
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore, TaskCore]

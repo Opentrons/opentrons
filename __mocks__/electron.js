@@ -1,24 +1,25 @@
 // mock electron module
-'use strict'
+// 'use strict'
+import { vi } from 'vitest'
 
 module.exports = {
   app: {
     getPath: () => '__mock-app-path__',
-    once: jest.fn(),
+    once: vi.fn(),
   },
 
   ipcRenderer: {
-    on: jest.fn(),
-    send: jest.fn(),
+    on: vi.fn(),
+    send: vi.fn(),
   },
 
   dialog: {
     // https://electronjs.org/docs/api/dialog#dialogshowopendialogbrowserwindow-options
-    showOpenDialog: jest.fn(),
+    showOpenDialog: vi.fn(),
   },
 
   shell: {
-    trashItem: jest.fn(),
-    openPath: jest.fn(),
+    trashItem: vi.fn(),
+    openPath: vi.fn(),
   },
 }

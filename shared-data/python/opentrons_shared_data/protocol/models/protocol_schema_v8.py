@@ -1,86 +1,37 @@
-from pydantic import BaseModel, Field, Extra
-from typing import Any, List, Optional, Dict, Union
+from enum import Enum
+from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 
+from pydantic import BaseModel, Field, ConfigDict
+
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.command import known_schema_ids
 
 from .shared_models import (
     Liquid,
-    Location,
-    ProfileStep,
-    WellLocation,
-    OffsetVector,
     Metadata,
     DesignerApplication,
     Robot,
 )
 
 
-# TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
-class Params(BaseModel):
-    slotName: Optional[str]
-    axes: Optional[List[str]]
-    pipetteId: Optional[str]
-    mount: Optional[str]
-    moduleId: Optional[str]
-    location: Optional[Union[Location, Literal["offDeck"]]]
-    labwareId: Optional[str]
-    displayName: Optional[str]
-    liquidId: Optional[str]
-    volumeByWell: Optional[Dict[str, Any]]
-    wellName: Optional[str]
-    volume: Optional[float]
-    flowRate: Optional[float]
-    wellLocation: Optional[WellLocation]
-    waitForResume: Optional[Literal[True]]
-    seconds: Optional[float]
-    minimumZHeight: Optional[float]
-    forceDirect: Optional[bool]
-    speed: Optional[float]
-    message: Optional[str]
-    coordinates: Optional[OffsetVector]
-    axis: Optional[str]
-    distance: Optional[float]
-    positionId: Optional[str]
-    temperature: Optional[float]
-    celsius: Optional[float]
-    blockMaxVolumeUl: Optional[float]
-    rpm: Optional[float]
-    height: Optional[float]
-    offset: Optional[OffsetVector]
-    profile: Optional[List[ProfileStep]]
-    radius: Optional[float]
-    newLocation: Optional[Union[Location, Literal["offDeck"]]]
-    strategy: Optional[str]
-    # schema v7 add-ons
-    homeAfter: Optional[bool]
-    alternateDropLocation: Optional[bool]
-    holdTimeSeconds: Optional[float]
-    maintenancePosition: Optional[str]
-    pipetteName: Optional[str]
-    model: Optional[str]
-    loadName: Optional[str]
-    namespace: Optional[str]
-    version: Optional[int]
-    pushOut: Optional[float]
-    pickUpOffset: Optional[OffsetVector]
-    dropOffset: Optional[OffsetVector]
-    # schema v8 add-ons
-    addressableAreaName: Optional[str]
-
-
 class Command(BaseModel):
     commandType: str
-    params: Params
-    key: Optional[str]
+    params: Dict[str, Any]
+    key: Optional[str] = None
 
 
 class CommandAnnotation(BaseModel):
     commandKeys: List[str]
     annotationType: str
+    model_config = ConfigDict(extra="allow")
 
-    class Config:
-        extra = Extra.allow
+
+CommandSchemaId = Enum(  # type: ignore[misc]
+    "CommandSchemaId",
+    ((schema_id, schema_id) for schema_id in known_schema_ids()),
+    type=str,
+)
 
 
 class ProtocolSchemaV8(BaseModel):
@@ -97,12 +48,9 @@ class ProtocolSchemaV8(BaseModel):
     liquids: Dict[str, Liquid]
     labwareDefinitionSchemaId: Literal["opentronsLabwareSchemaV2"]
     labwareDefinitions: Dict[str, LabwareDefinition]
-    commandSchemaId: Literal["opentronsCommandSchemaV8"]
+    commandSchemaId: CommandSchemaId
     commands: List[Command]
     commandAnnotationSchemaId: Literal["opentronsCommandAnnotationSchemaV1"]
     commandAnnotations: List[CommandAnnotation]
-    designerApplication: Optional[DesignerApplication]
-
-    class Config:
-        # added for constructing the class with field name instead of alias
-        allow_population_by_field_name = True
+    designerApplication: Optional[DesignerApplication] = None
+    model_config = ConfigDict(populate_by_name=True)

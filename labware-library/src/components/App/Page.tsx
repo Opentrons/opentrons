@@ -1,7 +1,8 @@
-import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
+
+import type * as React from 'react'
 
 export interface PageProps {
   scrollRef: React.RefObject<HTMLDivElement>

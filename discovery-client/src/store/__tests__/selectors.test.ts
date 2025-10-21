@@ -1,21 +1,20 @@
-import type { Agent } from 'http'
+import { describe, expect, it } from 'vitest'
 
 import {
-  mockLegacyHealthResponse,
-  mockLegacyServerHealthResponse,
-  mockHealthErrorJsonResponse,
-  mockHealthFetchErrorResponse,
-} from '../../__fixtures__/health'
-
-import {
-  HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
 } from '../../constants'
-
+import {
+  mockHealthErrorJsonResponse,
+  mockHealthFetchErrorResponse,
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
+} from '../../fixtures/health'
 import * as Selectors from '../selectors'
 
-import type { State, HostState } from '../types'
+import type { Agent } from 'http'
+import type { HostState, State } from '../types'
 
 const STATE: State = {
   robotsByName: {

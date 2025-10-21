@@ -1,30 +1,36 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
+  ALIGN_FLEX_END,
   Btn,
   COLORS,
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-  SPACING,
+  LegacyStyledText,
   PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
-  ALIGN_FLEX_END,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
+
+import { SmallButton } from '/app/atoms/buttons'
+import { usePipetteNameSpecs } from '/app/local-resources/instruments'
 import {
-  getPipetteNameSpecs,
-  LEFT,
-  RIGHT,
-  LoadedPipette,
-  MotorAxes,
-  NINETY_SIX_CHANNEL,
-} from '@opentrons/shared-data'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type {
+  LoadedPipette,
+  MotorAxes,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
@@ -32,7 +38,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   currentStepIndex: number
   totalStepCount: number
   isFetching: boolean
-  setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  setFetching: Dispatch<SetStateAction<boolean>>
   hasCalData: boolean
   requiredPipette?: LoadedPipette
   nextMount?: string
@@ -56,30 +62,36 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
+    errorMessage,
     setShowErrorMessage,
     nextMount,
   } = props
-  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation([
+    'pipette_wizard_flows',
+    'shared',
+    'branded',
+  ])
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
 
   const isCorrectPipette =
     requiredPipette != null &&
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
+
   const requiredPipDisplayName =
-    requiredPipette != null
-      ? getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName
-      : null
-  const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
+    usePipetteNameSpecs(requiredPipette?.pipetteName as PipetteName)
+      ?.displayName ?? null
+
+  const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
   let header: string = 'unknown results screen'
-  let iconColor: string = COLORS.successEnabled
+  let iconColor: string = COLORS.green50
   let isSuccess: boolean = true
   let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       header = t(hasCalData ? 'pip_recal_success' : 'pip_cal_success', {
-        pipetteName: pipetteName,
+        pipetteName,
       })
       break
     }
@@ -89,7 +101,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         (attachedPipettes[mount] != null && requiredPipette == null) ||
         Boolean(isCorrectPipette)
       ) {
-        header = t('pipette_attached', { pipetteName: pipetteName })
+        header = t('pipette_attached', { pipetteName })
         buttonText = t('cal_pipette')
         // attached wrong pipette
       } else if (
@@ -98,20 +110,20 @@ export const Results = (props: ResultsProps): JSX.Element => {
       ) {
         header = i18n.format(t('wrong_pip'), 'capitalize')
         buttonText = i18n.format(t('detach_and_retry'), 'capitalize')
-        iconColor = COLORS.errorEnabled
+        iconColor = COLORS.red50
         isSuccess = false
       } else {
         // attachment flow fail
         header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
-        iconColor = COLORS.errorEnabled
+        iconColor = COLORS.red50
         isSuccess = false
       }
       break
     }
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
-        header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
-        iconColor = COLORS.errorEnabled
+        header = t('pipette_failed_to_detach', { pipetteName })
+        iconColor = COLORS.red50
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
@@ -167,7 +179,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed()
         })
         .catch(error => {
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     } else if (
       isSuccess &&
@@ -184,13 +196,13 @@ export const Results = (props: ResultsProps): JSX.Element => {
             params: {
               pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
               pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
-              mount: mount,
+              mount,
             },
           },
           {
             commandType: 'home' as const,
             params: {
-              axes: axes,
+              axes,
             },
           },
         ],
@@ -200,13 +212,13 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed()
         })
         .catch(error => {
-          setShowErrorMessage(error.message)
+          setShowErrorMessage(error.message as string)
         })
     } else {
       proceed()
     }
   }
-  let button: JSX.Element = isOnDevice ? (
+  let button: JSX.Element = Boolean(isOnDevice) ? (
     <SmallButton
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
@@ -247,7 +259,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   ) {
     const GO_BACK_BUTTON_STYLE = css`
       ${TYPOGRAPHY.pSemiBold};
-      color: ${COLORS.darkGreyEnabled};
+      color: ${COLORS.grey50};
 
       &:hover {
         opacity: 70%;
@@ -262,14 +274,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
         }
       }
     `
-    subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
+    subHeader =
+      numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
     button = (
       <>
-        {isOnDevice ? (
+        {Boolean(isOnDevice) ? (
           <Btn onClick={goBack} aria-label="back">
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
+            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
               {t('shared:go_back')}
-            </StyledText>
+            </LegacyStyledText>
           </Btn>
         ) : (
           <SecondaryButton
@@ -286,7 +299,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
           </SecondaryButton>
         )}
         <CheckPipetteButton
-          proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
+          proceed={() => {
+            setNumberOfTryAgains(numberOfTryAgains + 1)
+          }}
           proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
           setFetching={setFetching}
           isFetching={isFetching}
@@ -295,8 +310,18 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
-  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-
+  if (isRobotMoving)
+    return <SimpleWizardInProgressBody description={t('stand_back')} />
+  if (errorMessage != null) {
+    return (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
+  }
   return (
     <SimpleWizardBody
       iconColor={iconColor}
@@ -306,7 +331,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       isPending={isFetching}
       width="100%"
       justifyContentForOddButton={
-        isOnDevice && isSuccess ? ALIGN_FLEX_END : undefined
+        Boolean(isOnDevice) && isSuccess ? ALIGN_FLEX_END : undefined
       }
     >
       {button}

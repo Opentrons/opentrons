@@ -2,18 +2,38 @@ import abc
 import asyncio
 import logging
 import re
-from pkg_resources import parse_version
-from typing import ClassVar, Mapping, Optional, cast, TypeVar
-
+from typing import Any, ClassVar, Mapping, Optional, TypeVar
+from packaging.version import InvalidVersion, parse, Version
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, LiveData, ModuleType
+from .types import (
+    BundledFirmware,
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    UploadFunction,
+    LiveData,
+    ModuleType,
+    HopperDoorState,
+)
 
 mod_log = logging.getLogger(__name__)
 
 TaskPayload = TypeVar("TaskPayload")
+
+
+def parse_fw_version(version: str) -> Version:
+    try:
+        device_version = parse(version)
+        # This is a patch for older versions of packaging - they would try and parse old
+        # kidns of versions and return a LegacyVersion object. We can't check for that
+        # explicitly because they removed it in modern versions of packaging.
+        if not isinstance(device_version, Version):
+            raise InvalidVersion()
+    except InvalidVersion:
+        device_version = parse("v0.0.0")
+    return device_version
 
 
 class AbstractModule(abc.ABC):
@@ -27,11 +47,14 @@ class AbstractModule(abc.ABC):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
-        poll_interval_seconds: Optional[float] = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
+        poll_interval_seconds: float | None = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -43,14 +66,19 @@ class AbstractModule(abc.ABC):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
         self._loop = hw_control_loop
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
+        self._disconnected_callback = disconnected_callback
+        self._updating = False
+        self._error_callback = error_callback
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -69,13 +97,27 @@ class AbstractModule(abc.ABC):
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
 
+    @property
+    def updating(self) -> bool:
+        """The device is updating is True."""
+        return self._updating
+
+    def disconnected_callback(self) -> None:
+        """Called from within the module object to signify the object is no longer connected"""
+        if self._disconnected_callback is not None:
+            self._disconnected_callback(self.model(), self.port, self.serial_number)
+
+    def error_callback(self, exc: Exception) -> None:
+        """Called from within the module object when an asynchronous hardware error occurrs."""
+        self._error_callback(exc, self.model(), self.port, self.serial_number)
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
             return None
         file_prefix = self.firmware_prefix()
 
-        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
+        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin|byoup)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
@@ -87,17 +129,18 @@ class AbstractModule(abc.ABC):
     def has_available_update(self) -> bool:
         """Return whether a newer firmware file is available"""
         if self.device_info and self._bundled_fw:
-            device_version = parse_version(self.device_info["version"])
-            available_version = parse_version(self._bundled_fw.version)
-            return cast(bool, available_version > device_version)
+            device_version = parse_fw_version(self.device_info["version"])
+            available_version = parse_fw_version(self._bundled_fw.version)
+            return available_version > device_version
         return False
 
     async def wait_for_is_running(self) -> None:
-        if not self.is_simulated:
+        if not self.is_simulated and self._execution_manager is not None:
             await self._execution_manager.wait_for_is_running()
 
     def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
-        self._execution_manager.register_cancellable_task(task)
+        if self._execution_manager is not None:
+            self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
     async def deactivate(self, must_be_running: bool = True) -> None:
@@ -140,6 +183,16 @@ class AbstractModule(abc.ABC):
     def usb_port(self) -> USBPort:
         """The physical port where the module is connected."""
         return self._usb_port
+
+    @property
+    def serial_number(self) -> Optional[str]:
+        """The usb serial number of this device."""
+        return self.device_info.get("serial")
+
+    @property
+    def hopper_door_state(self) -> Optional[HopperDoorState]:
+        """Return a Flex Stacker Hopper Module Door State"""
+        pass
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
@@ -185,4 +238,16 @@ class AbstractModule(abc.ABC):
         Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
         object destruction.
         """
+        pass
+
+    def event_listener(self, event: Any) -> None:
+        """Listen for events and update the module state."""
+        pass
+
+    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
+        """Identify the module."""
+        pass
+
+    def cleanup_persistent(self) -> None:
+        """Reset any persistent data on the module that should not exist outside of a run."""
         pass

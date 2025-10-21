@@ -1,23 +1,24 @@
-import { createSelector } from 'reselect'
 import isIp from 'is-ip'
 import unionBy from 'lodash/unionBy'
+import { createSelector } from 'reselect'
+
 import {
-  HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
-  RE_HOSTNAME_IPV6_LL,
   RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_IPV6_LL,
   RE_HOSTNAME_LOCALHOST,
   RE_HOSTNAME_LOOPBACK,
 } from '../constants'
 
 import type { DiscoveryClientRobot } from '../types'
 import type {
-  State,
-  RobotState,
-  HostState,
   Address,
   HealthStatus,
+  HostState,
+  RobotState,
+  State,
 } from './types'
 
 export const getRobotStates: (state: State) => RobotState[] = createSelector(
@@ -48,12 +49,8 @@ export const getAddresses: (state: State) => Address[] = createSelector(
   }
 )
 
-export const getRobots: (
-  state: State
-) => DiscoveryClientRobot[] = createSelector(
-  getRobotStates,
-  getHostStates,
-  (robots, hosts) => {
+export const getRobots: (state: State) => DiscoveryClientRobot[] =
+  createSelector(getRobotStates, getHostStates, (robots, hosts) => {
     return robots.map(robot => ({
       ...robot,
       addresses: hosts
@@ -61,8 +58,7 @@ export const getRobots: (
         .sort(compareHostsByConnectability)
         .map(({ robotName, ...host }) => host),
     }))
-  }
-)
+  })
 
 // ascending priority order, where no match is lowest priority
 const HEALTH_PRIORITY = [

@@ -1,26 +1,26 @@
-import * as React from 'react'
-
 import {
-  Box,
-  Flex,
-  InstrumentDiagram,
   ALIGN_FLEX_START,
+  ALIGN_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  InstrumentDiagram,
   JUSTIFY_CENTER,
-  POSITION_ABSOLUTE,
+  OverflowBtn,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useMenuHandleClickOutside,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.png'
 
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../atoms/text'
+import flexGripper from '/app/assets/images/flex_gripper.png'
+
 import { MenuOverlay } from './MenuOverlay'
 
+import type { ReactNode } from 'react'
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
 import type { MenuOverlayItemProps } from './MenuOverlay'
 
@@ -32,7 +32,8 @@ interface InstrumentCardProps extends StyleProps {
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
   isGripperAttached?: boolean
-  banner?: React.ReactNode
+  banner?: ReactNode
+  isEstopNotDisengaged: boolean
 }
 
 /**
@@ -48,6 +49,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     label,
     menuOverlayItems,
     banner,
+    isEstopNotDisengaged,
     ...styleProps
   } = props
 
@@ -61,71 +63,85 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing8}
-      padding={SPACING.spacing16}
-      position={POSITION_RELATIVE}
+      backgroundColor={COLORS.grey10}
+      borderRadius={BORDERS.borderRadius8}
       {...styleProps}
     >
-      {isGripperAttached ? (
-        <Flex justifyContent={JUSTIFY_CENTER} width="3.75rem" height="3.375rem">
-          <img
-            src={flexGripper}
-            alt="Flex Gripper"
-            max-width="100%"
-            max-height="100%"
-          />
-        </Flex>
-      ) : null}
-      {instrumentDiagramProps?.pipetteSpecs != null ? (
-        <InstrumentDiagram
-          pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
-          mount={instrumentDiagramProps.mount}
-          transform="scale(0.3)"
-          size="3.125rem"
-          transformOrigin="20% -10%"
-        />
-      ) : null}
       <Flex
-        alignItems={ALIGN_FLEX_START}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
-        paddingRight={SPACING.spacing24}
         width="100%"
+        paddingY={SPACING.spacing16}
+        paddingLeft={SPACING.spacing16}
+        gridGap={SPACING.spacing8}
       >
-        {banner}
-        <StyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          fontSize={TYPOGRAPHY.fontSizeH6}
+        {isGripperAttached ? (
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            width="3.75rem"
+            height="3.375rem"
+          >
+            <img src={flexGripper} alt="Flex Gripper" />
+          </Flex>
+        ) : null}
+        {instrumentDiagramProps?.pipetteSpecs != null ? (
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            width="3.75rem"
+            height="3.375rem"
+          >
+            <InstrumentDiagram
+              pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
+              mount={instrumentDiagramProps.mount}
+            />
+          </Flex>
+        ) : null}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
+          width="100%"
         >
-          {label}
-        </StyledText>
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
-          {description}
-        </StyledText>
+          {banner}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
+            width="100%"
+          >
+            <StyledText
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              color={COLORS.grey60}
+              desktopStyle="bodyDefaultRegular"
+            >
+              {label}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {description}
+            </StyledText>
+          </Flex>
+        </Flex>
       </Flex>
       {menuOverlayItems != null && (
-        <Box
-          position={POSITION_ABSOLUTE}
-          top={SPACING.spacing4}
-          right={SPACING.spacing4}
-        >
-          <OverflowBtn
-            onClick={handleOverflowClick}
-            aria-label="InstrumentCard_overflowMenu"
-          />
-          {menuOverlay}
-          {showOverflowMenu ? (
-            <MenuOverlay
-              hasDivider={hasDivider}
-              menuOverlayItems={menuOverlayItems}
-              setShowMenuOverlay={setShowOverflowMenu}
+        <>
+          <Box alignSelf={ALIGN_START} padding={SPACING.spacing4}>
+            <OverflowBtn
+              onClick={handleOverflowClick}
+              aria-label="InstrumentCard_overflowMenu"
+              disabled={isEstopNotDisengaged}
             />
+          </Box>
+          {showOverflowMenu ? (
+            <Flex
+              position={POSITION_RELATIVE}
+              top={SPACING.spacing4}
+              right={SPACING.spacing4}
+            >
+              <MenuOverlay
+                hasDivider={hasDivider}
+                menuOverlayItems={menuOverlayItems}
+                setShowMenuOverlay={setShowOverflowMenu}
+              />
+              {menuOverlay}
+            </Flex>
           ) : null}
-        </Box>
+        </>
       )}
     </Flex>
   )

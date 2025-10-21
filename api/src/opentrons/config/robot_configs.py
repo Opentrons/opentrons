@@ -148,7 +148,7 @@ def _load_json(filename: Union[str, Path]) -> Dict[str, Any]:
         log.warning("{0} not found. Loading defaults".format(filename))
         res = {}
     except json.decoder.JSONDecodeError:
-        log.warning("{0} is corrupt. Loading defaults".format(filename))
+        log.warning("{0} is corrupt. Loading defaults".format(filename), exc_info=True)
         res = {}
     return cast(Dict[str, Any], res)
 

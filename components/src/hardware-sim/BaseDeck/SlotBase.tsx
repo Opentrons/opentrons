@@ -1,5 +1,5 @@
-import * as React from 'react'
+import type { SVGProps } from 'react'
 
-export function SlotBase(props: React.SVGProps<SVGPathElement>): JSX.Element {
-  return <path fill="#CCCCCC" {...props} />
+export function SlotBase(props: SVGProps<SVGPathElement>): JSX.Element {
+  return <path {...props} />
 }

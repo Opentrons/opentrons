@@ -1,11 +1,11 @@
-import * as React from 'react'
 import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
 import { Icon } from '../icons'
-import { Modal } from './Modal'
-import styles from './modals.css'
+import { LegacyModal } from './LegacyModal'
+import styles from './modals.module.css'
 
+import type { ReactNode } from 'react'
 import type { ButtonProps } from '../buttons'
 import type { IconName } from '../icons'
 
@@ -13,11 +13,11 @@ export interface AlertModalProps {
   /** optional handler for overlay click */
   onCloseClick?: () => unknown
   /** optional modal heading */
-  heading?: React.ReactNode
+  heading?: ReactNode
   /** optional array of `ButtonProps` for `OutlineButton`s at bottom of modal */
   buttons?: Array<ButtonProps | null | undefined>
   /** modal contents */
-  children: React.ReactNode
+  children: ReactNode
   /** optional classes to apply */
   className?: string
   /** optional classes to apply */
@@ -31,6 +31,7 @@ export interface AlertModalProps {
 }
 
 /**
+ * @deprecated use Modal instead
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
 export function AlertModal(props: AlertModalProps): JSX.Element {
@@ -52,7 +53,7 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
   )
 
   return (
-    <Modal
+    <LegacyModal
       className={className}
       contentsClassName={wrapperStyle}
       onCloseClick={onCloseClick}
@@ -83,6 +84,6 @@ export function AlertModal(props: AlertModalProps): JSX.Element {
           ))}
         </div>
       )}
-    </Modal>
+    </LegacyModal>
   )
 }

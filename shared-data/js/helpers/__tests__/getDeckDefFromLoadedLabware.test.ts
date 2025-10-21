@@ -1,6 +1,8 @@
-import ot2DeckDef from '../../../deck/definitions/4/ot2_standard.json'
-import ot3DeckDef from '../../../deck/definitions/4/ot3_standard.json'
+import { describe, expect, it } from 'vitest'
+
 import { getDeckDefFromRobotType } from '..'
+import ot2DeckDef from '../../../deck/definitions/5/ot2_standard.json'
+import ot3DeckDef from '../../../deck/definitions/5/ot3_standard.json'
 
 describe('getDeckDefFromRobotType', () => {
   it('should return an OT-2 deck when the protocol is for an OT-2', () => {

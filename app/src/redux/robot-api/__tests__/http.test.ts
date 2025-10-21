@@ -1,19 +1,20 @@
-// tests for the robot-api fetch wrapper
-
 import { promisify } from 'util'
+// todo(mm, 2025-09-10): This test file looks like the last remaining use of express.
+// Try to remove the dependency if this test file ever gets rethought.
 import express from 'express'
-import multer from 'multer'
-import portfinder from 'portfinder'
-import fetch from 'node-fetch'
 import FormData from 'form-data'
+import multer from 'multer'
+import fetch from 'node-fetch'
+import portfinder from 'portfinder'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { robotApiUrl, fetchRobotApi } from '../http'
-import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
+import { DELETE, GET, HTTP_API_VERSION, PATCH, POST } from '../constants'
+import { fetchRobotApi, robotApiUrl } from '../http'
 
 import type { Application } from 'express'
 import type { RobotHost } from '../types'
 
-jest.unmock('node-fetch')
+vi.unmock('node-fetch')
 
 describe('robot-api http client', () => {
   let testApp: Application
@@ -22,8 +23,7 @@ describe('robot-api http client', () => {
   let robot: RobotHost
 
   beforeAll(() => {
-    // @ts-expect-error(sa, 2021-6-28): global.fetch and node fetch have different interfaces
-    global.fetch = fetch
+    ;(global as any).fetch = fetch
     testApp = express()
     testApp.use((express as any).json())
 

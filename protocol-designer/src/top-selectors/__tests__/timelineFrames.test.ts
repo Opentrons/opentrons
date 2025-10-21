@@ -1,19 +1,23 @@
+import { describe, expect, it } from 'vitest'
+
 import {
-  timelineFrameBeforeActiveItem,
-  timelineFrameAfterActiveItem,
-} from '../timelineFrames'
-import {
-  START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
 } from '../../steplist/types'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  HoverableItem,
 } from '../../ui/steps/reducers'
-import { CommandsAndRobotState } from '@opentrons/step-generation'
-import { StepIdType } from '../../form-types'
+import {
+  timelineFrameAfterActiveItem,
+  timelineFrameBeforeActiveItem,
+} from '../timelineFrames'
+
+import type { CommandsAndRobotState } from '@opentrons/step-generation'
+import type { StepIdType } from '../../form-types'
+import type { HoverableItem } from '../../ui/steps/reducers'
+
 const initialRobotState: any = 'fake initial robot state'
 const initialFrame: any = {
   robotState: initialRobotState,

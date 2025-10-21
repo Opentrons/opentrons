@@ -1,12 +1,14 @@
+import { describe, expect, it } from 'vitest'
+
 // discovery client reducer
 import {
+  mockHealthErrorJsonResponse,
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
-  mockHealthErrorJsonResponse,
-} from '../../__fixtures__/health'
-
+} from '../../fixtures/health'
 import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'
+
 import type { HealthResponse, ServerHealthResponse } from '../../types'
 import type { Action, RobotsByNameMap } from '../types'
 
@@ -110,10 +112,10 @@ describe('robotsByName reducer', () => {
     const initialState: RobotsByNameMap = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: ({ mockHealth: true } as unknown) as HealthResponse,
-        serverHealth: ({
+        health: { mockHealth: true } as unknown as HealthResponse,
+        serverHealth: {
           mockServerHealth: true,
-        } as unknown) as ServerHealthResponse,
+        } as unknown as ServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)

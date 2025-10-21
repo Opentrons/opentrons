@@ -2,13 +2,14 @@
 import asyncio
 import argparse
 import datetime
+from struct import unpack
 
 from opentrons_hardware.drivers.can_bus import (
     build,
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_bindings import constants
+from opentrons_hardware.firmware_bindings import constants, utils
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
     payloads,
@@ -22,6 +23,8 @@ from opentrons_hardware.sensors.types import (
 
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
+THRESHOLD_NUM_READS = 20
+
 
 async def do_run(
     messenger: CanMessenger,
@@ -33,7 +36,7 @@ async def do_run(
 ) -> None:
     """Configure and start the monitoring."""
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
-        sensor=fields.SensorTypeField(constants.SensorType.capacitive),
+        sensor=fields.SensorTypeField(target_sensor.value),
         sensor_id=fields.SensorIdField(sensor_id),
         threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
         mode=fields.SensorThresholdModeField(constants.SensorThresholdMode.absolute),
@@ -42,10 +45,21 @@ async def do_run(
         payload=threshold_payload
     )
     await messenger.send(target_node, threshold_message)
+    baseline_payload = payloads.BaselineSensorRequestPayload(
+        sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
+        number_of_reads=utils.UInt16Field(THRESHOLD_NUM_READS),
+    )
+    baseline_message = message_definitions.BaselineSensorRequest(
+        payload=baseline_payload
+    )
+
+    await messenger.send(target_node, baseline_message)
+    # set sensor to report
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
         sensor_id=fields.SensorIdField(sensor_id),
-        binding=fields.SensorOutputBindingField(3),
+        binding=fields.SensorOutputBindingField(2),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     reset_payload = payloads.BindSensorOutputRequestPayload(
@@ -68,6 +82,18 @@ async def do_run(
                 )
                 rd = message.payload.sensor_data
                 print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
+            elif isinstance(message, message_definitions.BatchReadFromSensorResponse):
+                ts = (datetime.datetime.now() - start).total_seconds()
+                s = constants.SensorType(message.payload.sensor.value).name
+                data_length = message.payload.data_length.value
+                data_bytes = message.payload.sensor_data.value
+                struct_vals = [
+                    unpack(">l", data_bytes[i * 4 : i * 4 + 4])[0] / 65536
+                    for i in range(data_length)
+                ]
+                for v in struct_vals:
+                    print(f"{ts:.3f}: {s} {v:5.3f}")
+
     finally:
         print("cleaning up")
         await messenger.send(target_node, reset_message)

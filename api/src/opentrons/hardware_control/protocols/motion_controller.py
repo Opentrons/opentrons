@@ -1,12 +1,19 @@
 from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
-from opentrons.types import Mount, Point
+from opentrons.types import Point
 from ..types import Axis, CriticalPoint, MotionChecks
+from .types import MountArgType
 
 
-class MotionController(Protocol):
+class MotionController(Protocol[MountArgType]):
     """Protocol specifying fundamental motion controls."""
+
+    def get_deck_from_machine(
+        self, machine_pos: Dict[Axis, float]
+    ) -> Dict[Axis, float]:
+        """Convert machine coordinates to deck coordinates."""
+        ...
 
     async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion.
@@ -44,13 +51,13 @@ class MotionController(Protocol):
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(
         self,
-        mount: Optional[Mount] = None,
+        mount: Optional[MountArgType] = None,
         allow_home_other: bool = True,
     ) -> None:
         """Home a selected z-axis, or both if not specified."""
         ...
 
-    async def home_plunger(self, mount: Mount) -> None:
+    async def home_plunger(self, mount: MountArgType) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
@@ -69,7 +76,7 @@ class MotionController(Protocol):
 
     async def current_position(
         self,
-        mount: Mount,
+        mount: MountArgType,
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
@@ -97,7 +104,7 @@ class MotionController(Protocol):
 
     async def gantry_position(
         self,
-        mount: Mount,
+        mount: MountArgType,
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
@@ -114,7 +121,7 @@ class MotionController(Protocol):
 
     async def move_to(
         self,
-        mount: Mount,
+        mount: MountArgType,
         abs_position: Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -164,6 +171,7 @@ class MotionController(Protocol):
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -173,7 +181,7 @@ class MotionController(Protocol):
 
     async def move_rel(
         self,
-        mount: Mount,
+        mount: MountArgType,
         delta: Point,
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
@@ -203,7 +211,11 @@ class MotionController(Protocol):
         """Disengage some axes."""
         ...
 
-    async def retract(self, mount: Mount, margin: float = 10) -> None:
+    async def engage_axes(self, which: List[Axis]) -> None:
+        """Engage some axes."""
+        ...
+
+    async def retract(self, mount: MountArgType, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
@@ -224,4 +236,8 @@ class MotionController(Protocol):
 
     async def cancel_execution_and_running_tasks(self) -> None:
         """Cancel all tasks and set execution manager state to Cancelled."""
+        ...
+
+    async def prepare_for_mount_movement(self, mount: MountArgType) -> None:
+        """Retract the other mount if necessary."""
         ...

@@ -1,22 +1,23 @@
-import { labwareDefToFields } from '../labwareDefToFields'
-import { fieldsToLabware } from '../fieldsToLabware'
-import { labwareFormSchema } from '../labwareFormSchema'
+import { describe, expect, it, vi } from 'vitest'
+
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import _fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import {
+  fixture_12_trough,
+  fixture_24_tuberack,
+  fixture_96_plate,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
+
+import { fieldsToLabware } from '../fieldsToLabware'
+import { labwareDefToFields } from '../labwareDefToFields'
+import { labwareFormSchema } from '../labwareFormSchema'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from '../fields'
 
-const fixture96Plate = _fixture96Plate as LabwareDefinition2
-const fixture12Trough = _fixture12Trough as LabwareDefinition2
-const fixtureTiprack = _fixtureTiprack300ul as LabwareDefinition2
-const fixture24TubeRack = _fixture24TubeRack as LabwareDefinition2
-jest.mock('../../definitions')
+vi.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
-  const pipetteName = 'p10_single'
   const fakeDisplayName = 'Fake Display Name'
   const fakeLoadName = 'fake_load_name'
 
@@ -24,25 +25,27 @@ describe('load and immediately save integrity test', () => {
   // (without these fields, Yup schema cast would fail)
   const testCases = [
     {
-      inputDef: fixture96Plate,
-      extraFields: { pipetteName },
+      inputDef: fixture_96_plate as LabwareDefinition2,
+      extraFields: {},
     },
     {
-      inputDef: fixture12Trough,
-      extraFields: { pipetteName },
+      inputDef: fixture_12_trough as LabwareDefinition2,
+      extraFields: {},
     },
     {
-      inputDef: fixtureTiprack,
-      extraFields: { pipetteName },
+      inputDef: fixture_tiprack_300_ul as LabwareDefinition2,
+      extraFields: {},
     },
     {
-      inputDef: fixture24TubeRack,
-      extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
+      inputDef: fixture_24_tuberack as LabwareDefinition2,
+      extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
     it(inputDef.parameters.loadName, () => {
-      const initialRawFieldValues = labwareDefToFields(inputDef)
+      const initialRawFieldValues = labwareDefToFields(inputDef, [
+        fixture_12_trough,
+      ] as LabwareDefinition2[])
       // both name fields should be set to null upon import
       expect(initialRawFieldValues?.displayName).toBe(null)
       expect(initialRawFieldValues?.loadName).toBe(null)
@@ -55,9 +58,8 @@ describe('load and immediately save integrity test', () => {
         ...extraFields,
       }
 
-      const processedFieldValues: ProcessedLabwareFields = labwareFormSchema.cast(
-        rawFieldValues
-      )
+      const processedFieldValues: ProcessedLabwareFields =
+        labwareFormSchema.cast(rawFieldValues)
       const outputDef = fieldsToLabware(processedFieldValues)
 
       // We need to compensate for acceptable differences btw input def & output def.

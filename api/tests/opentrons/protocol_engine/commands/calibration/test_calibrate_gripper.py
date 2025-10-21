@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import ot3_calibration
@@ -26,6 +26,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_gripper import (
     CalibrateGripperParams,
     CalibrateGripperParamsJaw,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.types import Vec3f
 
@@ -36,7 +37,6 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.mark.ot3_only
 @pytest.fixture(autouse=True)
 def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(ot3_calibration, inspect.isfunction):
@@ -69,7 +69,9 @@ async def test_calibrate_gripper(
     ).then_return(Point(1.1, 2.2, 3.3))
 
     result = await subject.execute(params)
-    assert result == CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3))
+    assert result == SuccessData(
+        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3)),
+    )
 
 
 @pytest.mark.ot3_only
@@ -90,6 +92,7 @@ async def test_calibrate_gripper_saves_calibration(
         status=CalibrationStatus(markedBad=False),
         last_modified=datetime(year=3000, month=1, day=1),
     )
+    saved_delta_captor = matchers.Captor()
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
             ot3_hardware_api, probe=GripperProbe.REAR
@@ -97,12 +100,14 @@ async def test_calibrate_gripper_saves_calibration(
     ).then_return(Point(1.1, 2.2, 3.3))
     decoy.when(
         await ot3_hardware_api.save_instrument_offset(
-            mount=OT3Mount.GRIPPER, delta=Point(x=2.75, y=3.85, z=4.95)
+            mount=OT3Mount.GRIPPER, delta=saved_delta_captor
         )
     ).then_return(expected_calibration_data)
     result = await subject.execute(params)
-    assert result.jawOffset == Vec3f(x=1.1, y=2.2, z=3.3)
-    assert result.savedCalibration == expected_calibration_data
+    saved_delta: Point = saved_delta_captor.value
+    assert result.public.jawOffset == Vec3f(x=1.1, y=2.2, z=3.3)
+    assert saved_delta.elementwise_isclose(Point(x=2.75, y=3.85, z=4.95))
+    assert result.public.savedCalibration == expected_calibration_data
 
 
 @pytest.mark.ot3_only

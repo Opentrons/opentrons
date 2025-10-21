@@ -1,13 +1,5 @@
-import type {
-  CheckCalibrationSessionDetails,
-  CalibrationCheckComparisonsPerCalibration,
-  CalibrationCheckComparisonMap,
-  CalibrationCheckComparison,
-  CheckCalibrationSessionParams,
-  CalibrationLabware,
-} from '../types'
+import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   CHECK_STEP_COMPARING_HEIGHT,
   CHECK_STEP_COMPARING_POINT_ONE,
@@ -15,14 +7,24 @@ import {
   CHECK_STEP_COMPARING_POINT_TWO,
   CHECK_STEP_COMPARING_TIP,
 } from '../calibration-check/constants'
+import { calibrationSlotFromSlotName } from '../utils'
+
+import type {
+  CalibrationCheckComparison,
+  CalibrationCheckComparisonMap,
+  CalibrationCheckComparisonsPerCalibration,
+  CalibrationLabware,
+  CheckCalibrationSessionDetails,
+  CheckCalibrationSessionParams,
+} from '../types'
 
 export const mockCalibrationCheckLabware: CalibrationLabware = {
-  slot: '8',
+  slot: calibrationSlotFromSlotName('8'),
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
   version: 1,
   isTiprack: true,
-  definition: tipRackFixture as CalibrationLabware['definition'],
+  definition: fixtureTiprack300ul as CalibrationLabware['definition'],
 }
 
 export const badZComparison: CalibrationCheckComparison = {
@@ -71,19 +73,53 @@ export const goodDeckCalibration: CalibrationCheckComparisonMap = {
   [CHECK_STEP_COMPARING_POINT_THREE]: goodXYComparison,
 } as any
 
-export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparisonsPerCalibration = {
-  tipLength: badTipLengthCalibration,
-  pipetteOffset: badPipetteOffsetCalibration,
-}
-export const mockFirstPipetteHealthCheckPerCalibration: CalibrationCheckComparisonsPerCalibration = {
-  tipLength: goodTipLengthCalibration,
-  pipetteOffset: goodPipetteOffsetCalibration,
-  deck: goodDeckCalibration,
-}
+export const mockSecondPipetteHealthCheckCalibration: CalibrationCheckComparisonsPerCalibration =
+  {
+    tipLength: badTipLengthCalibration,
+    pipetteOffset: badPipetteOffsetCalibration,
+  }
+export const mockFirstPipetteHealthCheckPerCalibration: CalibrationCheckComparisonsPerCalibration =
+  {
+    tipLength: goodTipLengthCalibration,
+    pipetteOffset: goodPipetteOffsetCalibration,
+    deck: goodDeckCalibration,
+  }
 
-export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDetails = {
-  instruments: [
-    {
+export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDetails =
+  {
+    instruments: [
+      {
+        model: 'fake_pipette_model' as any,
+        name: 'fake_pipette_name',
+        tipLength: 42,
+        mount: 'left',
+        rank: 'first',
+        serial: 'fake pipette serial 1',
+        tipRackLoadName: 'fake_tiprack_load_name',
+        tipRackDisplay: 'fake tiprack display name',
+        tipRackUri: 'fake tiprack uri',
+        defaultTipracks: [],
+      },
+      {
+        model: 'fake_pipette_model' as any,
+        name: 'fake_pipette_name',
+        tipLength: 42,
+        mount: 'right',
+        rank: 'second',
+        serial: 'fake pipette serial 2',
+        tipRackLoadName: 'fake_tiprack_load_name_2',
+        tipRackDisplay: 'fake tiprack display name 2',
+        tipRackUri: 'fake tiprack uri 2',
+        defaultTipracks: [],
+      },
+    ],
+    currentStep: 'sessionStarted',
+    comparisonsByPipette: {
+      first: mockFirstPipetteHealthCheckPerCalibration,
+      second: mockSecondPipetteHealthCheckCalibration,
+    },
+    labware: [mockCalibrationCheckLabware],
+    activePipette: {
       model: 'fake_pipette_model' as any,
       name: 'fake_pipette_name',
       tipLength: 42,
@@ -95,41 +131,11 @@ export const mockRobotCalibrationCheckSessionDetails: CheckCalibrationSessionDet
       tipRackUri: 'fake tiprack uri',
       defaultTipracks: [],
     },
-    {
-      model: 'fake_pipette_model' as any,
-      name: 'fake_pipette_name',
-      tipLength: 42,
-      mount: 'right',
-      rank: 'second',
-      serial: 'fake pipette serial 2',
-      tipRackLoadName: 'fake_tiprack_load_name_2',
-      tipRackDisplay: 'fake tiprack display name 2',
-      tipRackUri: 'fake tiprack uri 2',
-      defaultTipracks: [],
-    },
-  ],
-  currentStep: 'sessionStarted',
-  comparisonsByPipette: {
-    first: mockFirstPipetteHealthCheckPerCalibration,
-    second: mockSecondPipetteHealthCheckCalibration,
-  },
-  labware: [mockCalibrationCheckLabware],
-  activePipette: {
-    model: 'fake_pipette_model' as any,
-    name: 'fake_pipette_name',
-    tipLength: 42,
-    mount: 'left',
-    rank: 'first',
-    serial: 'fake pipette serial 1',
-    tipRackLoadName: 'fake_tiprack_load_name',
-    tipRackDisplay: 'fake tiprack display name',
-    tipRackUri: 'fake tiprack uri',
-    defaultTipracks: [],
-  },
-  activeTipRack: mockCalibrationCheckLabware,
-}
+    activeTipRack: mockCalibrationCheckLabware,
+  }
 
-export const mockRobotCalibrationCheckSessionParams: CheckCalibrationSessionParams = {
-  hasCalibrationBlock: true,
-  tipRacks: [],
-}
+export const mockRobotCalibrationCheckSessionParams: CheckCalibrationSessionParams =
+  {
+    hasCalibrationBlock: true,
+    tipRacks: [],
+  }

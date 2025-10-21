@@ -1,57 +1,77 @@
-import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
+import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
+import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
+import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
+import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
+import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
+import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
+import { NameRobot } from '/app/pages/ODD/NameRobot'
+import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
+import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
+import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
+import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
+import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
+import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
+import { RunSummary } from '/app/pages/ODD/RunSummary'
+import { Welcome } from '/app/pages/ODD/Welcome'
+import { getOnDeviceDisplaySettings } from '/app/redux/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { getIsShellReady } from '/app/redux/shell'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
-import { i18n } from '../../i18n'
-import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthernet'
-import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
-import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
-import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
-import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
-import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
-import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
+import { LocalizationProvider } from '../../LocalizationProvider'
+import { useProtocolReceiptToast, useScrollRef } from '../hooks'
+import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
-import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
-import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
-import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
-import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
-import { EmergencyStop } from '../../pages/EmergencyStop'
-import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
-import { getOnDeviceDisplaySettings } from '../../redux/config'
-import { getIsShellReady } from '../../redux/shell'
-import { getLocalRobot } from '../../redux/discovery'
-import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
-import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
-import type { OnDeviceDisplaySettings } from '../../redux/config/types'
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
+import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
-jest.mock('../../pages/OnDeviceDisplay/Welcome')
-jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
-jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
-jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
-jest.mock('../../pages/ProtocolDashboard')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
-jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
-jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../pages/OnDeviceDisplay/RunSummary')
-jest.mock('../../pages/OnDeviceDisplay/NameRobot')
-jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
-jest.mock('../../pages/EmergencyStop')
-jest.mock('../../pages/DeckConfiguration')
-jest.mock('../../redux/config')
-jest.mock('../../redux/shell')
-jest.mock('../../redux/discovery')
-jest.mock('../hooks')
+vi.mock('@opentrons/react-api-client', async () => {
+  const actual = await vi.importActual('@opentrons/react-api-client')
+  return {
+    ...actual,
+    useRobotSettingsQuery: () =>
+      ({
+        data: { settings: [] },
+      }) as unknown as UseQueryResult<RobotSettingsResponse>,
+  }
+})
+vi.mock('../../LocalizationProvider')
+vi.mock('/app/pages/ODD/Welcome')
+vi.mock('/app/pages/ODD/NetworkSetupMenu')
+vi.mock('/app/pages/ODD/ChooseLanguage')
+vi.mock('/app/pages/ODD/ConnectViaEthernet')
+vi.mock('/app/pages/ODD/ConnectViaUSB')
+vi.mock('/app/pages/ODD/ConnectViaWifi')
+vi.mock('/app/pages/ODD/RobotDashboard')
+vi.mock('/app/pages/ODD/RobotSettingsDashboard')
+vi.mock('/app/pages/ODD/ProtocolDashboard')
+vi.mock('/app/pages/ODD/ProtocolSetup')
+vi.mock('/app/pages/ODD/ProtocolDetails')
+vi.mock('/app/pages/ODD/InstrumentsDashboard')
+vi.mock('/app/pages/ODD/RunningProtocol')
+vi.mock('/app/pages/ODD/RunSummary')
+vi.mock('/app/pages/ODD/NameRobot')
+vi.mock('/app/pages/ODD/EmergencyStop')
+vi.mock('/app/pages/ODD/DeckConfiguration')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/shell')
+vi.mock('/app/redux/discovery')
+vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/organisms/ModuleWizardFlows')
+vi.mock('../hooks')
+vi.mock('../ODDTopLevelRedirects')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -59,67 +79,6 @@ const mockSettings = {
   textSize: 1,
   unfinishedUnboxingFlowRoute: '/welcome',
 } as OnDeviceDisplaySettings
-
-const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
-const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
-  typeof NetworkSetupMenu
->
-const mockConnectViaEthernet = ConnectViaEthernet as jest.MockedFunction<
-  typeof ConnectViaWifi
->
-const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
-  typeof ConnectViaUSB
->
-const mockInitialLoadingScreen = InitialLoadingScreen as jest.MockedFunction<
-  typeof InitialLoadingScreen
->
-const mockConnectViaWifi = ConnectViaWifi as jest.MockedFunction<
-  typeof ConnectViaWifi
->
-const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
-  typeof RobotDashboard
->
-const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
-  typeof ProtocolDashboard
->
-const mockProtocolDetails = ProtocolDetails as jest.MockedFunction<
-  typeof ProtocolDetails
->
-const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
-  typeof ProtocolSetup
->
-const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
-  typeof RobotSettingsDashboard
->
-const mockInstrumentsDashboard = InstrumentsDashboard as jest.MockedFunction<
-  typeof InstrumentsDashboard
->
-const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
-  typeof RunningProtocol
->
-const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
-const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
-const mockEmergencyStop = EmergencyStop as jest.MockedFunction<
-  typeof EmergencyStop
->
-const mockDeckConfigurationEditor = DeckConfigurationEditor as jest.MockedFunction<
-  typeof DeckConfigurationEditor
->
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
->
-const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
-  typeof getIsShellReady
->
-const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
-  typeof useCurrentRunRoute
->
-const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunction<
-  typeof useProtocolReceiptToast
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -132,116 +91,117 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
-    mockInstrumentsDashboard.mockReturnValue(
-      <div>Mock InstrumentsDashboard</div>
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
+    vi.mocked(getIsShellReady).mockReturnValue(true)
+    vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useScrollRef).mockReturnValue({
+      isScrolling: false,
+      refCallback: () => null,
+      element: null,
+    })
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
+    // TODO(bh, 2024-03-27): implement testing of branded and anonymous i18n, but for now pass through
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
     )
-    mockWelcome.mockReturnValue(<div>Mock Welcome</div>)
-    mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
-    mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
-    mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
-    mockConnectViaWifi.mockReturnValue(<div>Mock ConnectViaWifi</div>)
-    mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
-    mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
-    mockProtocolSetup.mockReturnValue(<div>Mock ProtocolSetup</div>)
-    mockProtocolDetails.mockReturnValue(<div>Mock ProtocolDetails</div>)
-    mockRobotSettingsDashboard.mockReturnValue(
-      <div>Mock RobotSettingsDashboard</div>
-    )
-    mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
-    mockRunSummary.mockReturnValue(<div>Mock RunSummary</div>)
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
-    mockgetIsShellReady.mockReturnValue(false)
-    mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
-    mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
-    mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
-    mockDeckConfigurationEditor.mockReturnValue(
-      <div>Mock DeckConfiguration</div>
-    )
-    mockUseCurrentRunRoute.mockReturnValue(null)
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
+  it('renders ChooseLanguage component from /choose-language', () => {
+    render('/choose-language')
+    expect(vi.mocked(ChooseLanguage)).toHaveBeenCalled()
+  })
   it('renders Welcome component from /welcome', () => {
-    const [{ getByText }] = render('/welcome')
-    getByText('Mock Welcome')
+    render('/welcome')
+    expect(vi.mocked(Welcome)).toHaveBeenCalled()
   })
-
   it('renders NetworkSetupMenu component from /network-setup', () => {
-    const [{ getByText }] = render('/network-setup')
-    getByText('Mock NetworkSetupMenu')
+    render('/network-setup')
+    expect(vi.mocked(NetworkSetupMenu)).toHaveBeenCalled()
   })
-
   it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
-    const [{ getByText }] = render('/network-setup/ethernet')
-    getByText('Mock ConnectViaEthernet')
+    render('/network-setup/ethernet')
+    expect(vi.mocked(ConnectViaEthernet)).toHaveBeenCalled()
   })
-
   it('renders ConnectViaUSB component from /network-setup/usb', () => {
-    const [{ getByText }] = render('/network-setup/usb')
-    getByText('Mock ConnectViaUSB')
+    render('/network-setup/usb')
+    expect(vi.mocked(ConnectViaUSB)).toHaveBeenCalled()
   })
-
   it('renders ConnectViaWifi component from /network-setup/wifi', () => {
-    const [{ getByText }] = render('/network-setup/wifi')
-    getByText('Mock ConnectViaWifi')
+    render('/network-setup/wifi')
+    expect(vi.mocked(ConnectViaWifi)).toHaveBeenCalled()
   })
-
   it('renders RobotDashboard component from /dashboard', () => {
-    const [{ getByText }] = render('/dashboard')
-    getByText('Mock RobotDashboard')
+    render('/dashboard')
+    expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
   })
   it('renders ProtocolDashboard component from /protocols', () => {
-    const [{ getByText }] = render('/protocols')
-    getByText('Mock ProtocolDashboard')
+    render('/protocols')
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
   })
   it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
-    const [{ getByText }] = render('/protocols/my-protocol-id')
-    getByText('Mock ProtocolDetails')
+    render('/protocols/my-protocol-id')
+    expect(vi.mocked(ProtocolDetails)).toHaveBeenCalled()
   })
-
   it('renders RobotSettingsDashboard component from /robot-settings', () => {
-    const [{ getByText }] = render('/robot-settings')
-    getByText('Mock RobotSettingsDashboard')
+    render('/robot-settings')
+    expect(vi.mocked(RobotSettingsDashboard)).toHaveBeenCalled()
   })
   it('renders InstrumentsDashboard component from /instruments', () => {
-    const [{ getByText }] = render('/instruments')
-    getByText('Mock InstrumentsDashboard')
+    render('/instruments')
+    expect(vi.mocked(InstrumentsDashboard)).toHaveBeenCalled()
   })
   it('when current run route present renders ProtocolSetup component from /runs/:runId/setup', () => {
-    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/setup')
-    const [{ getByText }] = render('/runs/my-run-id/setup')
-    getByText('Mock ProtocolSetup')
+    render('/runs/my-run-id/setup')
+    expect(vi.mocked(ProtocolSetup)).toHaveBeenCalled()
   })
   it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
-    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/run')
-    const [{ getByText }] = render('/runs/my-run-id/run')
-    getByText('Mock RunningProtocol')
+    render('/runs/my-run-id/run')
+    expect(vi.mocked(RunningProtocol)).toHaveBeenCalled()
   })
   it('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
-    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/summary')
-    const [{ getByText }] = render('/runs/my-run-id/summary')
-    getByText('Mock RunSummary')
+    render('/runs/my-run-id/summary')
+    expect(vi.mocked(RunSummary)).toHaveBeenCalled()
   })
-  it('renders the loading screen on mount', () => {
-    const [{ getByText }] = render('/')
-    mockgetIsShellReady.mockReturnValue(true)
-    getByText('Mock Loading')
+  it('renders the localization provider and not the loading screen when app-shell is ready', () => {
+    render('/')
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+  })
+  it('renders the loading screen when app-shell is not ready', () => {
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+    render('/')
+    screen.getByLabelText('loading indicator')
+    expect(vi.mocked(LocalizationProvider)).not.toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
-    mockUseCurrentRunRoute.mockReturnValue('/emergency-stop')
-    const [{ getByText }] = render('/emergency-stop')
-    getByText('Mock EmergencyStop')
+    render('/emergency-stop')
+    expect(vi.mocked(EmergencyStop)).toHaveBeenCalled()
   })
   it('renders DeckConfiguration component from /deck-configuration', () => {
-    mockUseCurrentRunRoute.mockReturnValue('/deck-configuration')
-    const [{ getByText }] = render('/deck-configuration')
-    getByText('Mock DeckConfiguration')
+    render('/deck-configuration')
+    expect(vi.mocked(DeckConfigurationEditor)).toHaveBeenCalled()
+  })
+  it('renders DeckConfiguration component from /deck-configuration', () => {
+    render('/robot-settings/rename-robot')
+    expect(vi.mocked(NameRobot)).toHaveBeenCalled()
   })
   it('renders protocol receipt toasts', () => {
     render('/')
-    expect(mockUseProtocolReceiptToasts).toHaveBeenCalled()
+    expect(vi.mocked(useProtocolReceiptToast)).toHaveBeenCalled()
+  })
+  it('renders TopLevelRedirects when it should conditionally render', () => {
+    vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)
+    render('/')
+    screen.getByText('MOCK_REDIRECTS')
   })
 })

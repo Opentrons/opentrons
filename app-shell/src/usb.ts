@@ -1,28 +1,25 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
+import { ipcMain } from 'electron'
 import FormData from 'form-data'
-import fs from 'fs'
-import path from 'path'
 
 import {
-  usbRequestsStart,
-  usbRequestsStop,
-} from '@opentrons/app/src/redux/shell'
-import {
-  INITIALIZED as SYSTEM_INFO_INITIALIZED,
-  USB_DEVICE_ADDED,
-  USB_DEVICE_REMOVED,
-} from '@opentrons/app/src/redux/system-info/constants'
-import {
-  fetchSerialPortList,
-  SerialPortHttpAgent,
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
+  fetchSerialPortList,
+  SerialPortHttpAgent,
 } from '@opentrons/usb-bridge/node-client'
 
+import { usbRequestsStart, usbRequestsStop } from './config/actions'
+import {
+  SYSTEM_INFO_INITIALIZED,
+  USB_DEVICE_ADDED,
+  USB_DEVICE_REMOVED,
+} from './constants'
 import { createLogger } from './log'
-import { getProtocolSrcFilePaths } from './protocol-storage'
 
+import type { AxiosRequestConfig } from 'axios'
+import type { IpcMainInvokeEvent } from 'electron'
+import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { Action, Dispatch } from './types'
@@ -34,27 +31,50 @@ let usbFetchInterval: NodeJS.Timeout
 export function getSerialPortHttpAgent(): SerialPortHttpAgent | undefined {
   return usbHttpAgent
 }
-
-export function createSerialPortHttpAgent(path: string): void {
-  const serialPortHttpAgent = new SerialPortHttpAgent({
-    maxFreeSockets: 1,
-    maxSockets: 1,
-    maxTotalSockets: 1,
-    keepAlive: true,
-    keepAliveMsecs: 10000,
-    path,
-    logger: usbLog,
-    timeout: 100000,
-  })
-
-  usbHttpAgent = serialPortHttpAgent
+export function createSerialPortHttpAgent(
+  path: string,
+  onComplete: (err: Error | null, agent?: SerialPortHttpAgent) => void
+): void {
+  if (usbHttpAgent != null) {
+    onComplete(
+      new Error('Tried to make a USB http agent when one already existed')
+    )
+  } else {
+    usbHttpAgent = new SerialPortHttpAgent(
+      {
+        maxFreeSockets: 1,
+        maxSockets: 1,
+        maxTotalSockets: 1,
+        keepAlive: true,
+        keepAliveMsecs: Infinity,
+        path,
+        logger: usbLog,
+        timeout: 100000,
+      },
+      (err, agent?) => {
+        if (err != null) {
+          usbHttpAgent = undefined
+        }
+        onComplete(err, agent)
+      }
+    )
+  }
 }
 
-export function destroyUsbHttpAgent(): void {
+export function destroyAndStopUsbHttpRequests(dispatch: Dispatch): void {
   if (usbHttpAgent != null) {
     usbHttpAgent.destroy()
   }
   usbHttpAgent = undefined
+  ipcMain.removeHandler('usb:request')
+  dispatch(usbRequestsStop())
+  // handle any additional invocations of usb:request
+  ipcMain.handle('usb:request', () =>
+    Promise.resolve({
+      status: 400,
+      statusText: 'USB robot disconnected',
+    })
+  )
 }
 
 function isUsbDeviceOt3(device: UsbDevice): boolean {
@@ -64,51 +84,68 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
   )
 }
 
+function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
+  const result = new FormData()
+  ipcSafeFormData.forEach(entry => {
+    entry.type === 'file'
+      ? result.append(entry.name, Buffer.from(entry.value), entry.filename)
+      : result.append(entry.name, entry.value)
+  })
+  return result
+}
+
+const cloneError = (e: any): Record<string, unknown> =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce<
+    Record<string, unknown>
+  >((acc, [k, v]) => {
+    try {
+      acc[k] = structuredClone(v)
+      return acc
+    } catch (e) {
+      return acc
+    }
+  }, {})
+
 async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
 ): Promise<unknown> {
+  // TODO(bh, 2023-05-03): remove mutation
+  let { data } = config
+  let formHeaders = {}
+
+  // check for formDataProxy
+  if (data?.proxiedFormData != null) {
+    // reconstruct FormData
+    const formData = reconstructFormData(
+      data.proxiedFormData as IPCSafeFormData
+    )
+    formHeaders = formData.getHeaders()
+    data = formData
+  }
+
+  const usbHttpAgent = getSerialPortHttpAgent()
   try {
-    // TODO(bh, 2023-05-03): remove mutation
-    let { data } = config
-    let formHeaders = {}
-
-    // check for formDataProxy
-    if (data?.formDataProxy != null) {
-      // reconstruct FormData
-      const formData = new FormData()
-      const { protocolKey } = data.formDataProxy
-
-      const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
-
-      // create readable stream from file
-      srcFilePaths.forEach(srcFilePath => {
-        const readStream = fs.createReadStream(srcFilePath)
-        formData.append('files', readStream, path.basename(srcFilePath))
-      })
-
-      formData.append('key', protocolKey)
-
-      formHeaders = formData.getHeaders()
-      data = formData
-    }
-
-    const usbHttpAgent = getSerialPortHttpAgent()
-
+    usbLog.silly(`${config.method} ${config.url} timeout=${config.timeout}`)
     const response = await axios.request({
       httpAgent: usbHttpAgent,
       ...config,
       data,
       headers: { ...config.headers, ...formHeaders },
     })
+    usbLog.silly(`${config.method} ${config.url} resolved ok`)
     return {
+      error: null,
       data: response.data,
       status: response.status,
       statusText: response.statusText,
     }
-  } catch (e) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)
+  } catch (e: any) {
+    usbLog.info(`${config.method} ${config.url} failed: ${e}`)
+    return {
+      error: cloneError(e),
+    }
   }
 }
 
@@ -119,42 +156,11 @@ function pollSerialPortAndCreateAgent(dispatch: Dispatch): void {
   }
   usbFetchInterval = setInterval(() => {
     // already connected to an Opentrons robot via USB
-    if (getSerialPortHttpAgent() != null) {
-      return
-    }
-    usbLog.debug('fetching serialport list')
-    fetchSerialPortList()
-      .then((list: PortInfo[]) => {
-        const ot3UsbSerialPort = list.find(
-          port =>
-            port.productId?.localeCompare(DEFAULT_PRODUCT_ID, 'en-US', {
-              sensitivity: 'base',
-            }) === 0 &&
-            port.vendorId?.localeCompare(DEFAULT_VENDOR_ID, 'en-US', {
-              sensitivity: 'base',
-            }) === 0
-        )
-
-        if (ot3UsbSerialPort == null) {
-          usbLog.debug('no OT-3 serial port found')
-          return
-        }
-
-        createSerialPortHttpAgent(ot3UsbSerialPort.path)
-        // remove any existing handler
-        ipcMain.removeHandler('usb:request')
-        ipcMain.handle('usb:request', usbListener)
-
-        dispatch(usbRequestsStart())
-      })
-      .catch(e =>
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        usbLog.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
-      )
+    tryCreateAndStartUsbHttpRequests(dispatch)
   }, 10000)
 }
 
-function startUsbHttpRequests(dispatch: Dispatch): void {
+function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
   fetchSerialPortList()
     .then((list: PortInfo[]) => {
       const ot3UsbSerialPort = list.find(
@@ -167,19 +173,24 @@ function startUsbHttpRequests(dispatch: Dispatch): void {
           }) === 0
       )
 
-      // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
+      // retry if no Flex serial port found - usb-detection and serialport packages have race condition
       if (ot3UsbSerialPort == null) {
-        usbLog.debug('no OT-3 serial port found, retrying')
-        setTimeout(() => startUsbHttpRequests(dispatch), 1000)
+        usbLog.debug('No Flex serial port found.')
         return
       }
-
-      createSerialPortHttpAgent(ot3UsbSerialPort.path)
-      // remove any existing handler
-      ipcMain.removeHandler('usb:request')
-      ipcMain.handle('usb:request', usbListener)
-
-      dispatch(usbRequestsStart())
+      if (usbHttpAgent == null) {
+        createSerialPortHttpAgent(ot3UsbSerialPort.path, (err, agent?) => {
+          if (err != null) {
+            const message = err?.message ?? err
+            usbLog.error(`Failed to create serial port: ${message}`)
+          }
+          if (agent != null) {
+            ipcMain.removeHandler('usb:request')
+            ipcMain.handle('usb:request', usbListener)
+            dispatch(usbRequestsStart())
+          }
+        })
+      }
     })
     .catch(e =>
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -192,27 +203,18 @@ export function registerUsb(dispatch: Dispatch): (action: Action) => unknown {
     switch (action.type) {
       case SYSTEM_INFO_INITIALIZED:
         if (action.payload.usbDevices.find(isUsbDeviceOt3) != null) {
-          startUsbHttpRequests(dispatch)
+          tryCreateAndStartUsbHttpRequests(dispatch)
         }
         pollSerialPortAndCreateAgent(dispatch)
         break
       case USB_DEVICE_ADDED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          startUsbHttpRequests(dispatch)
+          tryCreateAndStartUsbHttpRequests(dispatch)
         }
         break
       case USB_DEVICE_REMOVED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          destroyUsbHttpAgent()
-          ipcMain.removeHandler('usb:request')
-          dispatch(usbRequestsStop())
-          // handle any additional invocations of usb:request
-          ipcMain.handle('usb:request', () =>
-            Promise.resolve({
-              status: 400,
-              statusText: 'USB robot disconnected',
-            })
-          )
+          destroyAndStopUsbHttpRequests(dispatch)
         }
         break
     }

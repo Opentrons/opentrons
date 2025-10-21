@@ -31,10 +31,10 @@ const GrayBox = () => <Box color={C_WHITE} backgroundColor={C_DARK_GRAY} />
 
 ```js static
 import {
-  Text,
   FONT_SIZE_HEADER,
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_TITLE,
+  Text,
 } from '@opentrons/components'
 
 const Heading = () => (
@@ -66,7 +66,7 @@ const Heading = () => (
 | `paddingLeft`   | `padding-left`                     |
 
 ```js static
-import { Box, SPACING_AUTO, SPACING_3 } from '@opentrons/components'
+import { Box, SPACING_3, SPACING_AUTO } from '@opentrons/components'
 
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
@@ -88,9 +88,9 @@ Note: If you specify both of a shorthand prop and the explicit prop (e.g. `margi
 
 ```js static
 import {
-  Box,
-  BORDER_SOLID_LIGHT,
   BORDER_RADIUS_DEFAULT,
+  BORDER_SOLID_LIGHT,
+  Box,
 } from '@opentrons/components'
 
 const Heading = () => (
@@ -110,8 +110,8 @@ const Heading = () => (
 
 ```js static
 import {
-  Flex,
   ALIGN_ITEMS_CENTER,
+  Flex,
   JUSTIFY_CONTENT_CENTER,
 } from '@opentrons/components'
 
@@ -140,7 +140,7 @@ const Heading = () => (
 | `overflowY` | `overflow-y`         |
 
 ```js static
-import { Box, SIZE_4, OVERFLOW_HIDDEN } from '@opentrons/components'
+import { Box, OVERFLOW_HIDDEN, SIZE_4 } from '@opentrons/components'
 
 const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 ```
@@ -175,10 +175,8 @@ If you find yourself in a place where...
 
 ```js static
 import styled from 'styled-components'
-import { styleProps, isntStyleProp, C_DARK_GRAY } from '@opentrons/components'
-
+import { C_DARK_GRAY, isntStyleProp, styleProps } from '@opentrons/components'
 import type { PrimitiveComponent } from '@opentrons/components'
-
 export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })`

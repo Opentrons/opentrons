@@ -1,29 +1,24 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
+import isEqual from 'lodash/isEqual'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   getDefaultFormState,
   getInitialStatus,
-  LabwareFields,
   snugLooseOptions,
 } from '../../../fields'
-import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TipFitAlerts } from '../../alerts/TipFitAlerts'
 import { Dropdown } from '../../Dropdown'
+import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../Dropdown')
-jest.mock('../../alerts/FormAlerts')
-jest.mock('../../alerts/TipFitAlerts')
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-const dropdownMock = Dropdown as jest.MockedFunction<typeof Dropdown>
-
-const tipFitAlertsMock = TipFitAlerts as jest.MockedFunction<
-  typeof TipFitAlerts
->
+vi.mock('../../Dropdown')
+vi.mock('../../alerts/FormAlerts')
+vi.mock('../../alerts/TipFitAlerts')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -32,10 +27,10 @@ describe('HandPlacedTipFit', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    dropdownMock.mockImplementation(args => {
+    vi.mocked(Dropdown).mockImplementation(args => {
       if (
         isEqual(args, { name: 'handPlacedTipFit', options: snugLooseOptions })
       ) {
@@ -45,7 +40,7 @@ describe('HandPlacedTipFit', () => {
       }
     })
 
-    FormAlertsMock.mockImplementation(args => {
+    vi.mocked(FormAlerts).mockImplementation(args => {
       if (
         isEqual(args, {
           values: formikConfig.initialValues,
@@ -60,7 +55,7 @@ describe('HandPlacedTipFit', () => {
       }
     })
 
-    tipFitAlertsMock.mockImplementation(args => {
+    vi.mocked(TipFitAlerts).mockImplementation(args => {
       if (
         isEqual(args, {
           values: formikConfig.initialValues,
@@ -75,7 +70,7 @@ describe('HandPlacedTipFit', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should not render when no labware type selected', () => {

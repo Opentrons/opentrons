@@ -8,16 +8,16 @@ The following should be present in the application entry point:
 
 ```js
 import { analyticsMiddleware } from './path/to/analytics'
-
-// add the middleware to the store
+ add the middleware to the store
+c
 const middleware = applyMiddleware(
-  // ...
-  analyticsMiddleware
-  // ...
+   ...
+  analyticsMiddleware  ...
 )
-
-// create store
-const store = createStore(reducer, middleware)
+)
+ create store
+c
+const store = legacy_createStore(reducer, middleware)
 ```
 
 ## sending an event to mixpanel
@@ -76,7 +76,6 @@ export default function makeEvent(
 
 - Redux action: `robot:RUN`
 - Payload:
-
   - ...protocol data (see below)
   - ...robot data (see below)
 

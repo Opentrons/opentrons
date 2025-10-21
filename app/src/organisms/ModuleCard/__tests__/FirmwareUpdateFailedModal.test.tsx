@@ -1,43 +1,45 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
-import { mockTemperatureModule } from '../../../redux/modules/__fixtures__'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const render = (
-  props: React.ComponentProps<typeof FirmwareUpdateFailedModal>
-) => {
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
+
+import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof FirmwareUpdateFailedModal>) => {
   return renderWithProviders(<FirmwareUpdateFailedModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('FirmwareUpdateFailedModal', () => {
-  let props: React.ComponentProps<typeof FirmwareUpdateFailedModal>
+  let props: ComponentProps<typeof FirmwareUpdateFailedModal>
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       module: mockTemperatureModule,
       errorMessage: 'error message',
     }
   })
 
   it('should render the correct header and body', () => {
-    const { getByText } = render(props)
-    getByText('Failed to update module firmware')
-    getByText(
+    render(props)
+    screen.getByText('Failed to update module firmware')
+    screen.getByText(
       'An error occurred while updating your Temperature Module GEN1. Please try again.'
     )
-    getByText('error message')
+    screen.getByText('error message')
   })
   it('should call onCloseClick when the close button is pressed', () => {
-    const { getByRole, getByLabelText } = render(props)
+    render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(props.onCloseClick).toHaveBeenCalled()
-    const closeIcon = getByLabelText('information')
+    const closeIcon = screen.getByLabelText('information')
     fireEvent.click(closeIcon)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

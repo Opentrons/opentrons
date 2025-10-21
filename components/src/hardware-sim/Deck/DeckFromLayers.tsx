@@ -1,33 +1,41 @@
-import * as React from 'react'
-import parseHtml from 'html-react-parser'
-import { stringify } from 'svgson'
-
-import ot2DeckDefV3 from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import type { INode } from 'svgson'
+import { ALL_OT2_DECK_LAYERS } from './constants'
+import {
+  CalibrationMarkings,
+  DoorStops,
+  FixedBase,
+  FixedTrash,
+  MetalFrame,
+  RemovableDeckOutline,
+  RemovalHandle,
+  ScrewHoles,
+  SlotNumbers,
+  SlotRidges,
+} from './OT2Layers'
+
 import type { RobotType } from '@opentrons/shared-data'
+
+export * from './OT2Layers'
 
 export interface DeckFromLayersProps {
   robotType: RobotType
   layerBlocklist: string[]
 }
 
-// recursively filter layer and children nodes by blocklist
-function filterLayerGroupNodes(
-  layers: INode[],
-  layerBlocklist: string[]
-): INode[] {
-  return layers.reduce((acc: INode[], layer) => {
-    if (layerBlocklist.includes(layer.attributes?.id)) return acc
-
-    const filteredLayerChildren = filterLayerGroupNodes(
-      layer.children,
-      layerBlocklist
-    )
-
-    return acc.concat({ ...layer, children: filteredLayerChildren })
-  }, [])
+const OT2_LAYER_MAP: {
+  [layer in (typeof ALL_OT2_DECK_LAYERS)[number]]: () => JSX.Element
+} = {
+  fixedBase: () => <FixedBase />,
+  fixedTrash: () => <FixedTrash />,
+  doorStops: () => <DoorStops />,
+  metalFrame: () => <MetalFrame />,
+  removableDeckOutline: () => <RemovableDeckOutline />,
+  slotRidges: () => <SlotRidges />,
+  slotNumbers: () => <SlotNumbers />,
+  calibrationMarkings: () => <CalibrationMarkings />,
+  removalHandle: () => <RemovalHandle />,
+  screwHoles: () => <ScrewHoles />,
 }
 
 /**
@@ -40,29 +48,14 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
   // early return null if not OT-2
   if (robotType !== OT2_ROBOT_TYPE) return null
 
-  // get layers from OT-2 deck definition v3
-  const layerGroupNodes = filterLayerGroupNodes(
-    ot2DeckDefV3.layers,
-    layerBlocklist
-  )
-
-  const groupNodeWrapper = {
-    name: 'g',
-    type: 'element',
-    value: '',
-    attributes: { id: 'deckLayers' },
-    children: layerGroupNodes,
-  }
-
   return (
-    <>
-      {parseHtml(
-        // TODO(bh, 2023-7-12): use svgson stringify option to apply individual attributes https://github.com/elrumordelaluz/svgson#svgsonstringify
-        // the goal would be to give more styling control over individual deck map elements
-        stringify(groupNodeWrapper, {
-          selfClose: false,
-        })
+    <g id="deckLayers">
+      {ALL_OT2_DECK_LAYERS.filter(layer => !layerBlocklist.includes(layer)).map(
+        layer => {
+          const LayerComponent = OT2_LAYER_MAP[layer]
+          return <LayerComponent key={layer} />
+        }
       )}
-    </>
+    </g>
   )
 }

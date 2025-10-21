@@ -1,7 +1,8 @@
 import * as React from 'react'
+
 import { PipetteSelect as PipetteSelectComponent } from './index'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'App/Molecules/Pipette Select',
@@ -11,11 +12,11 @@ const Template: Story<React.ComponentProps<typeof PipetteSelectComponent>> = ({
   pipetteName,
   ...args
 }) => {
-  const [pipetteNameControlled, setPipetteNameControlled] = React.useState(
-    pipetteName
-  )
-  const handleChange = (pipName: string): unknown =>
+  const [pipetteNameControlled, setPipetteNameControlled] =
+    React.useState(pipetteName)
+  const handleChange = (pipName: string): unknown => {
     setPipetteNameControlled(pipName)
+  }
   return (
     <PipetteSelectComponent
       {...args}

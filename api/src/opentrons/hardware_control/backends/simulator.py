@@ -26,7 +26,7 @@ from ..module_control import AttachedModulesControl
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+    from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -49,7 +49,7 @@ class Simulator:
     async def build(
         cls,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -71,8 +71,9 @@ class Simulator:
                                      This dict should map mounts to either
                                      empty dicts or to dicts containing
                                      'model' and 'id' keys.
-        :param attached_modules: A list of module model names (e.g.
-                                 `'tempdeck'` or `'magdeck'`) representing
+        :param attached_modules: A map of module type names (e.g.
+                                 `'tempdeck'` or `'magdeck'`) to lists of SimulatingModel
+                                 dataclasses representing
                                  modules the simulator should assume are
                                  attached. Like `attached_instruments`, used
                                  to make the simulator match the setup of the
@@ -105,7 +106,7 @@ class Simulator:
     def __init__(
         self,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[modules.SimulatingModule]],
         config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         gpio_chardev: GPIODriverLike,
@@ -332,10 +333,17 @@ class Simulator:
 
     @ensure_yield
     async def watch(self) -> None:
-        new_mods_at_ports = [
-            modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
-            for idx, mod in enumerate(self._stubbed_attached_modules)
-        ]
+        new_mods_at_ports = []
+        for mod_name, list_of_modules in self._stubbed_attached_modules.items():
+            for module_details in list_of_modules:
+                new_mods_at_ports.append(
+                    modules.SimulatingModuleAtPort(
+                        port=f"/dev/ot_module_sim_{mod_name}{str(module_details.serial_number)}",
+                        name=mod_name,
+                        serial_number=module_details.serial_number,
+                        model=module_details.model,
+                    )
+                )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @contextmanager
@@ -406,7 +414,8 @@ class Simulator:
 
     @ensure_yield
     async def clean_up(self) -> None:
-        pass
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
 
     @ensure_yield
     async def configure_mount(

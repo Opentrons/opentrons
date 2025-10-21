@@ -1,37 +1,45 @@
-import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
-import range from 'lodash/range'
-import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
+
+import { COLUMN } from '@opentrons/shared-data'
 import {
   consolidate,
-  distribute,
-  transfer,
-  mix,
   curryCommandCreator,
+  distribute,
+  mix,
+  transfer,
 } from '@opentrons/step-generation'
-import { substepTimeline } from './substepTimeline'
-import * as steplistUtils from './utils'
+
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import {
+  substepTimelineMultiChannel,
+  substepTimelineSingleChannel,
+} from './substepTimeline'
+import * as steplistUtils from './utils'
+
 import type {
-  CurriedCommandCreator,
-  InvariantContext,
-  RobotState,
   ConsolidateArgs,
+  CurriedCommandCreator,
   DistributeArgs,
+  InvariantContext,
   MixArgs,
+  RobotState,
   TransferArgs,
 } from '@opentrons/step-generation'
-import { StepIdType } from '../form-types'
-import {
+import type { StepIdType } from '../form-types'
+import type {
+  LabwareNamesByModuleId,
   NamedIngred,
+  SourceDestSubstepItem,
   StepArgsAndErrors,
   StepItemSourceDestRow,
-  SourceDestSubstepItem,
   SubstepItemData,
   SubstepTimelineFrame,
-  LabwareNamesByModuleId,
+  SubstepWellData,
 } from './types'
+
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
   | ConsolidateArgs
@@ -51,7 +59,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       sourceWells: stepArgs.sourceWells,
@@ -59,6 +66,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixBeforeAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
@@ -67,7 +75,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWells: stepArgs.destWells,
       disposalVolume: stepArgs.disposalVolume,
@@ -75,6 +82,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       // set special values for substeps
       mixBeforeAspirate: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
@@ -84,7 +92,6 @@ function getCommandCreatorForTransferlikeSubsteps(
       // spread `...stepArgs` above, so for now, they have to be redundantly explicit
       blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
       blowoutLocation: stepArgs.blowoutLocation,
-      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       destWell: stepArgs.destWell,
       sourceWells: stepArgs.sourceWells,
@@ -92,6 +99,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixFirstAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
@@ -129,6 +137,8 @@ export const mergeSubstepRowsSingleChannel = (args: {
         preIngreds: nextRow.dest && nextRow.dest.preIngreds,
         postIngreds: nextRow.dest && nextRow.dest.postIngreds,
       },
+      aspirateVolume: currentRow.volume ?? null,
+      dispenseVolume: nextRow.volume ?? null,
       volume: showDispenseVol ? nextRow.volume : currentRow.volume,
     }),
     currentRow => {
@@ -158,84 +168,59 @@ export const mergeSubstepRowsMultiChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
-  return steplistUtils.mergeWhen(
-    substepRows,
-    (
-      currentMultiRow: SubstepTimelineFrame,
-      nextMultiRow: SubstepTimelineFrame
-    ) => {
-      // aspirate then dispense multirows adjacent
-      // (inferring from first channel row in each multirow)
-      return (
-        currentMultiRow &&
-        currentMultiRow.source &&
-        nextMultiRow &&
-        nextMultiRow.dest
-      )
-    }, // Merge each channel row together when predicate true
-    (currentMultiRow, nextMultiRow) => {
-      return range(channels).map(channelIndex => {
-        const sourceChannelWell =
-          currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
-        const destChannelWell =
-          nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
-        const source = currentMultiRow.source &&
-          sourceChannelWell && {
-            well: sourceChannelWell,
-            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
-          }
-        const dest = nextMultiRow.dest &&
-          destChannelWell && {
-            well: destChannelWell,
-            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-          }
-        const activeTips = currentMultiRow.activeTips
+  const mergedRows = substepRows.reduce<StepItemSourceDestRow[][]>(
+    (acc, _, index) => {
+      if (index % channels !== 0) {
+        return acc
+      }
+
+      const chunk = substepRows.slice(index, index + channels)
+
+      const row = range(chunk.length).map(channelIndex => {
+        const step = chunk[channelIndex]
+        const wellNameSource = step?.source?.wells?.[0]
+        const wellNameDest = step?.dest?.wells?.[0]
+
+        const source: SubstepWellData | undefined =
+          wellNameSource != null
+            ? {
+                well: wellNameSource,
+                preIngreds: step.source?.preIngreds ?? {},
+                postIngreds: step.source?.postIngreds ?? {},
+              }
+            : undefined
+
+        const dest: SubstepWellData | undefined =
+          wellNameDest != null
+            ? {
+                well: wellNameDest,
+                preIngreds: step.dest?.preIngreds ?? {},
+                postIngreds: step.dest?.postIngreds ?? {},
+              }
+            : undefined
+
         return {
-          activeTips,
+          activeTips: step.activeTips,
           source,
           dest: isMixStep ? source : dest,
-          // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
-          volume: showDispenseVol
-            ? nextMultiRow.volume
-            : currentMultiRow.volume,
+          volume: showDispenseVol ? step.volume : step.volume,
         }
       })
+      //  this is for a mixing step
+      const hasNoSourceOrDest = row.every(
+        ({ source, dest }) => source === undefined && dest === undefined
+      )
+
+      if (!hasNoSourceOrDest) {
+        acc.push(row)
+      }
+
+      return acc
     },
-    currentMultiRow =>
-      range(channels).map(channelIndex => {
-        const source = currentMultiRow.source && {
-          well: currentMultiRow.source.wells[channelIndex],
-          preIngreds:
-            currentMultiRow.source.preIngreds[
-              currentMultiRow.source.wells[channelIndex]
-            ],
-          postIngreds:
-            currentMultiRow.source.postIngreds[
-              currentMultiRow.source.wells[channelIndex]
-            ],
-        }
-        const dest = currentMultiRow.dest && {
-          well: currentMultiRow.dest.wells[channelIndex],
-          preIngreds:
-            currentMultiRow.dest.preIngreds[
-              currentMultiRow.dest.wells[channelIndex]
-            ],
-          postIngreds:
-            currentMultiRow.dest.postIngreds[
-              currentMultiRow.dest.wells[channelIndex]
-            ],
-        }
-        const activeTips = currentMultiRow.activeTips
-        return {
-          activeTips,
-          source,
-          dest,
-          volume: currentMultiRow.volume,
-        }
-      })
+    []
   )
+
+  return mergedRows
 }
 
 function transferLikeSubsteps(args: {
@@ -248,14 +233,16 @@ function transferLikeSubsteps(args: {
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const tipState = cloneDeep(args.robotState.tipState)
-  tipState.pipettes = mapValues(tipState.pipettes, () => true)
+  tipState.pipettes = mapValues(tipState.pipettes, () => {
+    return { hasTip: true, tiprackURI: '' } // arbitrary tip URI
+  })
   const initialRobotState = { ...args.robotState, tipState }
   const { pipette: pipetteId } = stepArgs
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipetteSpec) {
-    assert(
+    console.assert(
       false,
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
@@ -266,31 +253,35 @@ function transferLikeSubsteps(args: {
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  const substepCommandCreator = getCommandCreatorForTransferlikeSubsteps(
-    stepArgs
-  )
+  const substepCommandCreator =
+    getCommandCreatorForTransferlikeSubsteps(stepArgs)
 
   if (!substepCommandCreator) {
-    assert(false, `transferLikeSubsteps could not make a command creator`)
+    console.assert(
+      false,
+      `transferLikeSubsteps could not make a command creator`
+    )
     return null
   }
 
+  let channels = pipetteSpec.channels
+  if (stepArgs.nozzles === COLUMN && channels === 96) {
+    channels = 8
+  }
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
-    const substepRows: SubstepTimelineFrame[] = substepTimeline(
+    const substepRows = substepTimelineMultiChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      pipetteSpec.channels
+      initialRobotState
     )
-    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
-      {
+    const mergedMultiRows: StepItemSourceDestRow[][] =
+      mergeSubstepRowsMultiChannel({
         substepRows,
         isMixStep: stepArgs.commandCreatorFnName === 'mix',
-        channels: pipetteSpec.channels,
+        channels,
         showDispenseVol,
-      }
-    )
+      })
     return {
       substepType: 'sourceDest',
       multichannel: true,
@@ -300,16 +291,16 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(
+    const substepRows = substepTimelineSingleChannel(
       substepCommandCreator,
       invariantContext,
-      initialRobotState,
-      1
+      initialRobotState
     )
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
       showDispenseVol,
     })
+
     return {
       substepType: 'sourceDest',
       multichannel: false,
@@ -347,20 +338,6 @@ export function generateSubstepItem(
 
   const { stepArgs } = stepArgsAndErrors
 
-  if (stepArgs.commandCreatorFnName === 'delay') {
-    return {
-      substepType: 'pause',
-      pauseStepArgs: stepArgs,
-    }
-  }
-
-  if (stepArgs.commandCreatorFnName === 'moveLabware') {
-    return {
-      substepType: 'moveLabware',
-      moveLabwareArgs: stepArgs,
-    }
-  }
-
   if (
     stepArgs.commandCreatorFnName === 'consolidate' ||
     stepArgs.commandCreatorFnName === 'distribute' ||
@@ -375,51 +352,11 @@ export function generateSubstepItem(
     })
   }
 
-  const labwareNames = stepArgs.module
-    ? labwareNamesByModuleId[stepArgs.module]
-    : null
-
-  if (
-    stepArgs.commandCreatorFnName === 'disengageMagnet' ||
-    stepArgs.commandCreatorFnName === 'engageMagnet'
-  ) {
-    return {
-      substepType: 'magnet',
-      engage: stepArgs.commandCreatorFnName === 'engageMagnet',
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-    }
-  }
-
-  if (
-    stepArgs.commandCreatorFnName === 'setTemperature' ||
-    stepArgs.commandCreatorFnName === 'deactivateTemperature'
-  ) {
-    const temperature =
-      stepArgs.commandCreatorFnName === 'setTemperature'
-        ? stepArgs.targetTemperature
-        : null
-    return {
-      substepType: 'temperature',
-      temperature: temperature,
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-    }
-  }
-
-  if (stepArgs.commandCreatorFnName === 'waitForTemperature') {
-    const moduleId = stepArgs.module
-    const { type } = invariantContext.moduleEntities[moduleId as string]
-    return {
-      substepType: 'waitForTemperature',
-      temperature: stepArgs.temperature,
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-      moduleType: type,
-    }
-  }
-
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
+    const labwareNames = stepArgs.moduleId
+      ? labwareNamesByModuleId[stepArgs.moduleId]
+      : null
+
     const {
       blockTargetTempHold,
       lidOpenHold,
@@ -445,6 +382,10 @@ export function generateSubstepItem(
   }
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_STATE) {
+    const labwareNames = stepArgs.moduleId
+      ? labwareNamesByModuleId[stepArgs.moduleId]
+      : null
+
     return {
       substepType: THERMOCYCLER_STATE,
       labwareNickname: labwareNames?.nickname,
@@ -454,24 +395,5 @@ export function generateSubstepItem(
       message: stepArgs.message,
     }
   }
-
-  if (stepArgs.commandCreatorFnName === 'heaterShaker') {
-    return {
-      substepType: 'heaterShaker',
-      labwareNickname: labwareNames?.nickname,
-      targetSpeed: stepArgs.rpm,
-      targetHeaterShakerTemperature: stepArgs.targetTemperature,
-      latchOpen: stepArgs.latchOpen,
-      heaterShakerTimerMinutes: stepArgs.timerMinutes,
-      heaterShakerTimerSeconds: stepArgs.timerSeconds,
-    }
-  }
-
-  console.warn(
-    "generateSubsteps doesn't support commandCreatorFnName: ",
-    // @ts-expect-error(sa, 2021-6-14): I don't think this case can ever happen, so stepArgs.commandCreatorFnName gets never typed
-    stepArgs.commandCreatorFnName,
-    stepId
-  )
   return null
 }

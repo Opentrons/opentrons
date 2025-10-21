@@ -1,15 +1,17 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from opentrons.calibration_storage import helpers
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
-from opentrons.types import DeckSlotName, Location, Point
-from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
+from opentrons.types import DeckSlotName, Location, Point, NozzleMapInterface
 
+from opentrons_shared_data.labware.types import LabwareParameters2, LabwareDefinition2
+
+from ..._liquid import Liquid
 from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
+from ._labware_geometry import LabwareGeometry
 
 
 # URIs of labware whose definitions accidentally specify an engage height
@@ -34,7 +36,11 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
 
     def __init__(
         self,
-        definition: LabwareDefinition,
+        # We need labware schema 2, specifically, because schema 3 changes how positions
+        # are calculated, and we don't attempt to handle that here in
+        # `opentrons.protocol_api.core.legacy`. We do handle it in
+        # `opentrons.protocol_api.core.engine` and `opentrons.protocol_engine`.
+        definition: LabwareDefinition2,
         parent: Location,
         label: Optional[str] = None,
     ) -> None:
@@ -104,10 +110,10 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     def set_name(self, new_name: str) -> None:
         self._name = new_name
 
-    def get_definition(self) -> LabwareDefinition:
+    def get_definition(self) -> LabwareDefinition2:
         return self._definition
 
-    def get_parameters(self) -> LabwareParameters:
+    def get_parameters(self) -> LabwareParameters2:
         return self._parameters
 
     def get_quirks(self) -> List[str]:
@@ -137,6 +143,11 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     def is_adapter(self) -> bool:
         return False  # Adapters were introduced in v2.15 and not supported in legacy protocols
 
+    def is_lid(self) -> bool:
+        return (
+            False  # Lids were introduced in v2.21 and not supported in legacy protocols
+        )
+
     def is_fixed_trash(self) -> bool:
         """Whether the labware is fixed trash."""
         return "fixedTrash" in self.get_quirks()
@@ -153,8 +164,15 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
                 well.set_has_tip(True)
 
     def get_next_tip(
-        self, num_tips: int, starting_tip: Optional[LegacyWellCore]
+        self,
+        num_tips: int,
+        starting_tip: Optional[LegacyWellCore],
+        nozzle_map: Optional[NozzleMapInterface],
     ) -> Optional[str]:
+        if nozzle_map is not None:
+            raise ValueError(
+                "Nozzle Map cannot be provided to calls for next tip in legacy protocols."
+            )
         next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
         return next_well.get_name() if next_well else None
 
@@ -207,3 +225,11 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
         """Get the deck slot the labware is in, if in a deck slot."""
         slot = self._geometry.parent.labware.first_parent()
         return DeckSlotName.from_primitive(slot) if slot is not None else None
+
+    def load_liquid(self, volumes: Dict[str, float], liquid: Liquid) -> None:
+        """Load liquid into wells of the labware."""
+        assert False, "load_liquid only supported in API version 2.22 & later"
+
+    def load_empty(self, wells: List[str]) -> None:
+        """Mark wells of the labware as empty."""
+        assert False, "load_empty only supported in API version 2.22 & later"

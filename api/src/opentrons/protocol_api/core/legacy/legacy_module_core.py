@@ -1,4 +1,5 @@
 """Legacy Protocol API module implementation logic."""
+
 from __future__ import annotations
 
 import logging
@@ -30,6 +31,7 @@ from ..module import (
 )
 
 from .legacy_labware_core import LegacyLabwareCore
+from .tasks import LegacyTaskCore
 from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
 from ...labware import Labware
 
@@ -48,7 +50,7 @@ class CannotPerformModuleAction(RuntimeError):
     """An error raised when attempting to execute an invalid module action."""
 
 
-class LegacyModuleCore(AbstractModuleCore):
+class LegacyModuleCore(AbstractModuleCore[LegacyLabwareCore]):
     """Legacy ModuleCore implementation for pre-ProtocolEngine protocols."""
 
     def __init__(
@@ -108,14 +110,17 @@ class LegacyModuleCore(AbstractModuleCore):
         return labware
 
 
-class LegacyTemperatureModuleCore(LegacyModuleCore, AbstractTemperatureModuleCore):
+class LegacyTemperatureModuleCore(
+    LegacyModuleCore, AbstractTemperatureModuleCore[LegacyLabwareCore]
+):
     """Legacy core control implementation for an attached Temperature Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the Temperature Module's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
+        return LegacyTaskCore()
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
@@ -142,7 +147,9 @@ class LegacyTemperatureModuleCore(LegacyModuleCore, AbstractTemperatureModuleCor
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
-class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
+class LegacyMagneticModuleCore(
+    LegacyModuleCore, AbstractMagneticModuleCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Magnetic Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
@@ -235,7 +242,9 @@ class LegacyMagneticModuleCore(LegacyModuleCore, AbstractMagneticModuleCore):
         return labware
 
 
-class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
+class LegacyThermocyclerCore(
+    LegacyModuleCore, AbstractThermocyclerCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
@@ -256,23 +265,27 @@ class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> LegacyTaskCore:
         """Set the target temperature for the well block, in °C."""
         self._sync_module_hardware.set_target_block_temperature(
             celsius=celsius,
             hold_time_seconds=hold_time_seconds,
             volume=block_max_volume,
+            ramp_rate=ramp_rate,
         )
+        return LegacyTaskCore()
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
         self._sync_module_hardware.wait_for_block_target()
 
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the target temperature for the heated lid, in °C."""
         self._sync_module_hardware.set_target_lid_temperature(celsius=celsius)
+        return LegacyTaskCore()
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
@@ -288,6 +301,15 @@ class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
         self._sync_module_hardware.cycle_temperatures(
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
+
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> LegacyTaskCore:
+        """Start a Thermocycler Profile."""
+        assert False, "start_execute_profile only supported on engine core"
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
@@ -398,15 +420,18 @@ class LegacyThermocyclerCore(LegacyModuleCore, AbstractThermocyclerCore):
             )
 
 
-class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
+class LegacyHeaterShakerCore(
+    LegacyModuleCore, AbstractHeaterShakerCore[LegacyLabwareCore]
+):
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
     _geometry: HeaterShakerGeometry
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the labware plate's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
+        return LegacyTaskCore()
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
@@ -432,6 +457,10 @@ class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
             raise CannotPerformModuleAction(
                 "Cannot start shaking unless labware latch is closed."
             )
+
+    def set_shake_speed(self, rpm: int) -> LegacyTaskCore:
+        """Set heatershaker speed."""
+        assert False, "set_shake_speed only supported on engine core."
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""

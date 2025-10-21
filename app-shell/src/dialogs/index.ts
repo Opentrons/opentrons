@@ -1,4 +1,5 @@
 import { dialog, shell } from 'electron'
+
 import type {
   BrowserWindow,
   OpenDialogOptions,

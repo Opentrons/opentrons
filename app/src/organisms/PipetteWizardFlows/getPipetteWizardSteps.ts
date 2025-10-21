@@ -1,55 +1,71 @@
+import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
 import { FLOWS, SECTIONS } from './constants'
-import { SINGLE_MOUNT_PIPETTES, LEFT, RIGHT } from '@opentrons/shared-data'
+import { is96Channel, isWasteChuteOnDeck } from './utils'
+
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration, PipetteMount } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type {
-  PipetteWizardStep,
   PipetteWizardFlow,
+  PipetteWizardStep,
   SelectablePipettes,
 } from './types'
-import type { PipetteMount } from '@opentrons/shared-data'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
-  isGantryEmpty: boolean
-): PipetteWizardStep[] => {
+  isGantryEmpty: boolean,
+  attachedInstruments: AttachedPipettesFromInstrumentsQuery,
+  deckConfig?: UseQueryResult<DeckConfiguration>
+): PipetteWizardStep[] | null => {
+  const is96ChannelCalibrateAndWasteChute =
+    (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH) &&
+    (is96Channel(attachedInstruments) || selectedPipette === '96-Channel') &&
+    isWasteChuteOnDeck(deckConfig)
+
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      return [
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount: mount,
-          flowType: flowType,
-        },
-        { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
-        { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
-        {
-          section: SECTIONS.RESULTS,
-          mount: mount,
-          flowType: flowType,
-        },
-      ]
+      if (is96ChannelCalibrateAndWasteChute) {
+        return [
+          { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
+          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+          { section: SECTIONS.REMOVE_WASTE_CHUTE, mount, flowType },
+          { section: SECTIONS.DETACH_PROBE, mount, flowType },
+          { section: SECTIONS.ATTACH_WASTE_CHUTE, mount, flowType },
+          { section: SECTIONS.RESULTS, mount, flowType },
+        ]
+      } else {
+        return [
+          { section: SECTIONS.BEFORE_BEGINNING, mount, flowType },
+          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+          { section: SECTIONS.DETACH_PROBE, mount, flowType },
+          { section: SECTIONS.RESULTS, mount, flowType },
+        ]
+      }
     }
+
     case FLOWS.ATTACH: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         return [
           {
             section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
-          { section: SECTIONS.MOUNT_PIPETTE, mount: mount, flowType: flowType },
+          { section: SECTIONS.MOUNT_PIPETTE, mount, flowType },
           {
             section: SECTIONS.FIRMWARE_UPDATE,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
-          { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
-          { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
+          { section: SECTIONS.RESULTS, mount, flowType },
+          { section: SECTIONS.ATTACH_PROBE, mount, flowType },
+          { section: SECTIONS.DETACH_PROBE, mount, flowType },
           {
             section: SECTIONS.RESULTS,
-            mount: mount,
+            mount,
             flowType: FLOWS.CALIBRATE,
           },
         ]
@@ -64,7 +80,7 @@ export const getPipetteWizardSteps = (
             {
               section: SECTIONS.BEFORE_BEGINNING,
               mount: detachMount,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.DETACH_PIPETTE,
@@ -80,34 +96,52 @@ export const getPipetteWizardSteps = (
             {
               section: SECTIONS.CARRIAGE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.MOUNTING_PLATE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.MOUNT_PIPETTE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.FIRMWARE_UPDATE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             {
               section: SECTIONS.ATTACH_PROBE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
+            ...(is96ChannelCalibrateAndWasteChute
+              ? [
+                  {
+                    section: SECTIONS.REMOVE_WASTE_CHUTE,
+                    mount: LEFT,
+                    flowType: FLOWS.DETACH,
+                  },
+                ]
+              : []),
             {
               section: SECTIONS.DETACH_PROBE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
+            ...(is96ChannelCalibrateAndWasteChute
+              ? [
+                  {
+                    section: SECTIONS.ATTACH_WASTE_CHUTE,
+                    mount: LEFT,
+                    flowType: FLOWS.DETACH,
+                  },
+                ]
+              : []),
             {
               section: SECTIONS.RESULTS,
               mount: LEFT,
@@ -120,39 +154,57 @@ export const getPipetteWizardSteps = (
             {
               section: SECTIONS.BEFORE_BEGINNING,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.CARRIAGE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.MOUNTING_PLATE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.MOUNT_PIPETTE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.FIRMWARE_UPDATE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+            ...(is96ChannelCalibrateAndWasteChute
+              ? [
+                  {
+                    section: SECTIONS.REMOVE_WASTE_CHUTE,
+                    mount: LEFT,
+                    flowType: FLOWS.DETACH,
+                  },
+                ]
+              : []),
             {
               section: SECTIONS.ATTACH_PROBE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
             {
               section: SECTIONS.DETACH_PROBE,
               mount: LEFT,
-              flowType: flowType,
+              flowType,
             },
+            ...(is96ChannelCalibrateAndWasteChute
+              ? [
+                  {
+                    section: SECTIONS.ATTACH_WASTE_CHUTE,
+                    mount: LEFT,
+                    flowType: FLOWS.DETACH,
+                  },
+                ]
+              : []),
             {
               section: SECTIONS.RESULTS,
               mount: LEFT,
@@ -167,43 +219,43 @@ export const getPipetteWizardSteps = (
         return [
           {
             section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
           {
             section: SECTIONS.DETACH_PIPETTE,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+          { section: SECTIONS.RESULTS, mount, flowType },
         ]
         //  96 channel detach
       } else {
         return [
           {
             section: SECTIONS.BEFORE_BEGINNING,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
           {
             section: SECTIONS.DETACH_PIPETTE,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
           {
             section: SECTIONS.MOUNTING_PLATE,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
           {
             section: SECTIONS.CARRIAGE,
-            mount: mount,
-            flowType: flowType,
+            mount,
+            flowType,
           },
-          { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+          { section: SECTIONS.RESULTS, mount, flowType },
         ]
       }
     }
   }
-  return []
+  return null
 }

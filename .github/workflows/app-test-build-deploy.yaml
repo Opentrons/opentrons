@@ -6,15 +6,14 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'app/**/*'
-      - 'app-shell/**/*'
-      - 'app-shell-odd/**/*'
-      - 'components/**/*'
-      - 'shared-data/**/*'
-      - 'webpack-config/**/*'
-      - 'discovery-client/**/*'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'app-shell-odd/**'
+      - 'components/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
       - '*.js'
-      - 'scripts/**/*'
+      - 'scripts/**'
       - '*.json'
       - 'yarn.lock'
       - '.github/workflows/app-test-build-deploy.yaml'
@@ -27,25 +26,24 @@ on:
   pull_request:
     paths:
       - 'Makefile'
-      - 'app/**/*'
-      - 'app-shell/**/*'
-      - 'app-shell-odd/**/*'
-      - 'components/**/*'
-      - 'shared-data/**/*'
-      - 'webpack-config/**/*'
-      - 'discovery-client/**/*'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'app-shell-odd/**'
+      - 'components/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
       - '*.js'
       - '*.json'
       - 'yarn.lock'
-      - 'scripts/**/*'
-  workflow_dispatch:
+      - 'scripts/**'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
   cancel-in-progress: true
 
 env:
-  CI: true
+  CI: 'true'
   _APP_DEPLOY_BUCKET_ROBOTSTACK: builds.opentrons.com
   _APP_DEPLOY_FOLDER_ROBOTSTACK: app
   _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
@@ -54,35 +52,12 @@ env:
 jobs:
   js-unit-test:
     # unit tests for the app's view layer (not the node layer)
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name: 'opentrons app frontend unit tests'
     timeout-minutes: 60
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+      - uses: 'actions/checkout@v4'
+      - uses: ./.github/actions/js/setup
       - name: 'test frontend packages'
         run: |
           make -C app test-cov
@@ -95,53 +70,26 @@ jobs:
   backend-unit-test:
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
-    name: 'opentrons app backend unit tests on ${{matrix.os}}'
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        shell: ['app-shell', 'app-shell-odd', 'discovery-client']
+        exclude:
+          - os: 'windows-2022'
+            shell: 'app-shell-odd'
+    name: 'opentrons ${{matrix.shell}} unit tests on ${{matrix.os}}'
+    timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
+      - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
-      - name: 'install libudev and libsystemd'
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: setup-js
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
+        run: make test-js-internal tests="${{matrix.shell}}/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
@@ -182,36 +130,58 @@ jobs:
             echo "both develop builds for edge"
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ] ; then
-            echo "internal-release builds for app-build-internal suffixes"
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build-internal')) }}" = "true" ] ; then
+
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build')) }}" = "true" ] ; then
-            echo "release develop builds for app-build suffixes"
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "internal-release as-release builds for app-build-internal + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "internal-release develop builds for app-build-internal suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build')) }}" = "true" ] ; then
             echo 'variants=["release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-both')) }}" = "true" ] ; then
-            echo "Both develop builds for app-build-both suffixes"
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "release as-release builds for app-build + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "release develop builds for app-build suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
+          elif [ "${{ format('{0}', contains(github.ref, 'app-build-both')) }}" = "true" ] ; then
+
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
+            if [ "${{ format('{0}', contains(github.ref, 'as-release')) }}" = "true" ] ; then
+               echo "Both as-release builds for app-build-both + as-release suffixes"
+               echo 'type=as-release' >> $GITHUB_OUTPUT
+            else
+               echo "Both develop builds for app-build-both + as-release suffixes"
+               echo 'type=develop' >> $GITHUB_OUTPUT
+            fi
           else
             echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
             echo 'variants=[]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           fi
 
+      - name: set summary
+        run: |
+          echo 'Type: ${{steps.determine-build-type.outputs.type}} Variants: ${{steps.determine-build-type.outputs.variants}}' >> $GITHUB_STEP_SUMMARY
+
   build-app:
     needs: [determine-build-type]
     if: needs.determine-build-type.outputs.variants != '[]'
     strategy:
+      fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         variant: ${{fromJSON(needs.determine-build-type.outputs.variants)}}
         target: ['desktop', 'odd']
         exclude:
           - os: 'windows-2022'
             target: 'odd'
-          - os: 'macos-11'
+          - os: 'macos-latest'
             target: 'odd'
 
     runs-on: ${{ matrix.os }}
@@ -232,47 +202,59 @@ jobs:
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
              echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
+      - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
-      - name: 'install libudev and libsystemd'
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: setup-js
+      - name: 'Configure Windows code signing environment'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: bash
         run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64_V2 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+          echo "${{ secrets.WINDOWS_CSC_B64_V2 }}" | base64 --decode > /d/opentrons_labworks_inc.crt
+          echo "C:\Program Files (x86)\Windows Kits\10\App Certification Kit" >> $GITHUB_PATH
+          echo "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools" >> $GITHUB_PATH
+          echo "C:\Program Files\DigiCert\DigiCert Keylocker Tools" >> $GITHUB_PATH
+
+      - name: 'Setup Windows code signing helpers'
+        if: startsWith(matrix.os, 'windows') && contains(needs.determine-build-type.outputs.type, 'release')
+        shell: cmd
+        env:
+          SM_HOST: ${{ secrets.SM_HOST_V2 }}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
+          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
+        run: |
+          REM Download DigiCert Keylocker Tools installer (quiet curl: -s silent, -S show errors, -f fail on HTTP errors, -L follow redirects)
+          curl -sSfL ^
+            --retry 5 --retry-all-errors ^
+            --connect-timeout 30 --max-time 120 ^
+            -X GET ^
+            -H "x-api-key:%SM_API_KEY%" ^
+            -o Keylockertools-windows-x64.msi ^
+            --write-out "Download complete: %%{filename_effective} (%%{size_download} bytes) in %%{time_total}s @ %%{speed_download} bytes/s\n" ^
+            "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download"
+          msiexec /i Keylockertools-windows-x64.msi /quiet /qn
+          smksp_registrar.exe list
+          smctl.exe keypair ls
+          C:\Windows\System32\certutil.exe -csp "DigiCert Signing Manager KSP" -key -user
+          smksp_cert_sync.exe
+          smctl.exe healthcheck --all
+
+      # Do the frontend dist bundle
+      - name: 'bundle ${{matrix.variant}} frontend'
+        env:
+          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+        run: |
+          make -C app dist
+
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
         if: matrix.target == 'desktop'
@@ -280,24 +262,30 @@ jobs:
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
-          WIN_CSC_LINK: ${{ secrets.OT_APP_CSC_WINDOWS }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_WINDOWS }}
-          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
-          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
-          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
+          WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
+          SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V3}}
+          SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V3}}
+          SM_HOST: ${{ secrets.SM_HOST_V2 }}
+          SM_CLIENT_CERT_FILE: "D:\\Certificate_pkcs12.p12"
+          SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
+          SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
+          WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
+          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
           OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
-          make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'opentrons-${{matrix.variant}}-${{ matrix.os }}'
           path: app-shell/dist/publish
@@ -313,13 +301,13 @@ jobs:
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
-        uses: 'actions/download-artifact@v3'
+        uses: 'actions/download-artifact@v4'
         with:
           path: ./artifacts
       - name: 'separate release and internal-release artifacts'
@@ -414,52 +402,119 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
 
+      - name: 'backup upload folders before checkout'
+        run: |
+          # Move upload folders to temp location to preserve them during checkout
+          mkdir -p ${{ runner.temp }}/upload_backup
+          mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
-        uses: 'actions/checkout@v3'
-        with:
-          path: ./monorepo
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
+        uses: 'actions/checkout@v4'
+      - name: 'restore upload folders after checkout'
         run: |
-          cd ./monorepo
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/monorepo/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
+          # Restore upload folders from temp location
+          mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true
+      - uses: ./.github/actions/js/setup
+      - name: 'print upload folders contents'
         run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          cd monorepo
-          make setup-js
+          echo "Test Outputs"
+          echo "Contents of to_upload_internal-release: $(ls -l ./to_upload_internal-release)"
+          echo "Contents of to_upload_release: $(ls -l ./to_upload_release)"
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
           aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
-          node ./monorepo/scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
+          node ./scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
           aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
 
       - name: 'update release releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
           aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
-          node ./monorepo/scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
+          node ./scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
           aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+
+  # Notification jobs for tagged builds
+  notify-success:
+    name: 'Notify Build Success'
+    runs-on: 'ubuntu-latest'
+    needs:
+      [
+        js-unit-test,
+        backend-unit-test,
+        build-app,
+        deploy-release-app,
+        determine-build-type,
+      ]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send success alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'success'
+          workflow_name: 'App test, build, and deploy'
+
+  notify-failure:
+    name: 'Notify Build Failure'
+    runs-on: 'ubuntu-latest'
+    needs:
+      [
+        js-unit-test,
+        backend-unit-test,
+        build-app,
+        deploy-release-app,
+        determine-build-type,
+      ]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Determine failed jobs'
+        id: failed-jobs
+        shell: bash
+        run: |
+          failed_jobs=()
+          if [[ "${{ needs.js-unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("js-unit-test")
+          fi
+          if [[ "${{ needs.backend-unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("backend-unit-test")
+          fi
+          if [[ "${{ needs.build-app.result }}" == "failure" ]]; then
+            failed_jobs+=("build-app")
+          fi
+          if [[ "${{ needs.deploy-release-app.result }}" == "failure" ]]; then
+            failed_jobs+=("deploy-release-app")
+          fi
+
+          IFS=','
+          echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
+
+      - name: 'Send failure alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'failure'
+          workflow_name: 'App test, build, and deploy'
+          failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+
+  notify-cancelled:
+    name: 'Notify Build Cancelled'
+    runs-on: 'ubuntu-latest'
+    needs:
+      [
+        js-unit-test,
+        backend-unit-test,
+        build-app,
+        deploy-release-app,
+        determine-build-type,
+      ]
+    if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send cancelled alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'cancelled'
+          workflow_name: 'App test, build, and deploy'

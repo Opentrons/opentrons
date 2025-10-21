@@ -1,14 +1,15 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
 import cx from 'classnames'
-import { PrimaryBtn } from '@opentrons/components'
+import { useFormikContext } from 'formik'
+
+import { PrimaryButton } from '@opentrons/components'
+
 import { Dropdown } from '../../components/Dropdown'
+import { labwareTypeAutofills, labwareTypeOptions } from '../../fields'
+import styles from '../../styles.module.css'
 import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
-import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
 import type { LabwareFields } from '../../fields'
 
 interface Props {
@@ -25,19 +26,10 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
     'aluminumBlockType',
     'aluminumBlockChildType',
   ]
-  const {
-    disabled,
-    onClick,
-    showDropDownOptions,
-    labwareTypeChildFields,
-  } = props
-  const {
-    values,
-    errors,
-    touched,
-    setValues,
-    setTouched,
-  } = useFormikContext<LabwareFields>()
+  const { disabled, onClick, showDropDownOptions, labwareTypeChildFields } =
+    props
+  const { values, errors, touched, setValues, setTouched } =
+    useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
     return null
@@ -63,13 +55,13 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
         </>
       )}
 
-      <PrimaryBtn
+      <PrimaryButton
         className={styles.start_creating_btn}
         disabled={disabled}
         onClick={onClick}
       >
-        start creating labware
-      </PrimaryBtn>
+        Start creating labware
+      </PrimaryButton>
     </div>
   )
 

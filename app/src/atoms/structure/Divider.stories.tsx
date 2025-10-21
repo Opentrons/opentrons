@@ -1,56 +1,66 @@
-import * as React from 'react'
 import {
   ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { Divider } from './index'
-import type { Story, Meta } from '@storybook/react'
 
-export default {
+import { Divider as DividerComponent } from './index'
+
+import type { Meta, StoryObj } from '@storybook/react'
+
+const meta: Meta<typeof DividerComponent> = {
   title: 'App/Atoms/Divider',
-  component: Divider,
-} as Meta
+  component: DividerComponent,
+  decorators: [
+    Story => (
+      <>
+        <Box>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing8}
+          >
+            <Box padding={SPACING.spacing16}>
+              <LegacyStyledText
+                as="h3"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
+                {'About Calibration'}
+              </LegacyStyledText>
 
-const Template: Story<React.ComponentProps<typeof Divider>> = args => (
-  <>
-    <Box paddingBottom={SPACING.spacing24}>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box marginRight={SPACING.spacing32}>
-          <Box marginBottom={SPACING.spacing8}>
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {'About Calibration'}
-            </StyledText>
-          </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing8}>
-            {'This section is about calibration.'}
-          </StyledText>
+              <LegacyStyledText as="p">
+                {'This section is about calibration.'}
+              </LegacyStyledText>
+            </Box>
+          </Flex>
         </Box>
-      </Flex>
-    </Box>
-    <Divider {...args} />
-    <Box paddingTop={SPACING.spacing24} paddingBottom={SPACING.spacing24}>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box marginRight={SPACING.spacing32}>
-          <Box marginBottom={SPACING.spacing8}>
-            <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {'Deck Calibration'}
-            </StyledText>
-          </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing8}>
-            {'This section is for deck calibration.'}
-          </StyledText>
+        <Story />
+        <Box>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Box padding={SPACING.spacing16} gridGap={SPACING.spacing8}>
+              <LegacyStyledText
+                as="h3"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
+                {'Deck Calibration'}
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
+                {'This section is for deck calibration.'}
+              </LegacyStyledText>
+            </Box>
+          </Flex>
         </Box>
-      </Flex>
-    </Box>
-  </>
-)
-
-export const Primary = Template.bind({})
-Primary.args = {
-  marginY: SPACING.spacing16,
+      </>
+    ),
+  ],
 }
+export default meta
+type Story = StoryObj<typeof DividerComponent>
+export const Divider: Story = {}

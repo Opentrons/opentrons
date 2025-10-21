@@ -1,9 +1,11 @@
 // labware load name with copy button
-import * as React from 'react'
-import { IconButton, DeprecatedTooltip } from '@opentrons/components'
-import { LabelText, LABEL_TOP } from '../ui'
+import { useEffect, useRef, useState } from 'react'
+
+import { DeprecatedTooltip, IconButton } from '@opentrons/components'
+
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
-import styles from './styles.css'
+import { LABEL_TOP, LabelText } from '../ui'
+import styles from './styles.module.css'
 
 const COPY_ICON = 'ot-copy-text'
 const SUCCESS_TIMEOUT_MS = 1500
@@ -14,14 +16,14 @@ export interface LoadNameProps {
 
 export function LoadName(props: LoadNameProps): JSX.Element {
   const { loadName } = props
-  const [success, setSuccess] = React.useState(false)
-  const inputRef = React.useRef<HTMLInputElement>(null)
-  const successTimeout = React.useRef<NodeJS.Timeout | null>(null)
+  const [success, setSuccess] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const successTimeout = useRef<NodeJS.Timeout | null>(null)
   const cleanupSuccessTimeout = (): void => {
     if (successTimeout.current) clearTimeout(successTimeout.current)
   }
 
-  React.useEffect(() => cleanupSuccessTimeout, [])
+  useEffect(() => cleanupSuccessTimeout, [])
 
   // note: we could choose to always copy the entire loadName string here,
   // regardless of what the user selects, but the benefit of catching missed
@@ -29,10 +31,9 @@ export function LoadName(props: LoadNameProps): JSX.Element {
   const handleCopy = (): void => {
     setSuccess(true)
     cleanupSuccessTimeout()
-    successTimeout.current = setTimeout(
-      () => setSuccess(false),
-      SUCCESS_TIMEOUT_MS
-    )
+    successTimeout.current = setTimeout(() => {
+      setSuccess(false)
+    }, SUCCESS_TIMEOUT_MS)
   }
 
   const handleCopyButtonClick = (): void => {
@@ -51,7 +52,9 @@ export function LoadName(props: LoadNameProps): JSX.Element {
           className={styles.load_name_input}
           type="text"
           value={loadName}
-          onFocus={e => e.currentTarget.select()}
+          onFocus={e => {
+            e.currentTarget.select()
+          }}
           readOnly
         />
       </label>

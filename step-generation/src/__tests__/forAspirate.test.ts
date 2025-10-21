@@ -1,17 +1,23 @@
-import { AIR, createTipLiquidState } from '../utils/misc'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
-  makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
-
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
+import { AIR, createTipLiquidState } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+
+import type { AspDispAirgapParams } from '@opentrons/shared-data'
+import type {
+  CommandCreatorWarning,
+  InvariantContext,
+  RobotState,
+} from '../types'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 
@@ -44,6 +50,28 @@ describe('...single-channel pipette', () => {
   })
   describe('...fresh tip', () => {
     it('aspirate from single-ingredient well', () => {
+      robotState = {
+        ...robotState,
+        liquidState: {
+          labware: {
+            [labwareId]: {
+              A1: {
+                ingred1: {
+                  volume: 200,
+                },
+              },
+              A2: {},
+            },
+          },
+          pipettes: {
+            p300SingleId: {
+              '0': { ingred1: { volume: 0 } },
+            },
+          },
+          wasteChute: {} as any,
+          trashBins: {} as any,
+        },
+      }
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: {
           volume: 200,
@@ -69,6 +97,8 @@ describe('...single-channel pipette', () => {
             A2: {},
           },
         },
+        wasteChute: {} as any,
+        trashBins: {} as any,
       })
     })
 
@@ -373,4 +403,6 @@ describe('8-channel trough', () => {
   )
 
   it.todo('aspirate from 384 plate starting from B row') // TODO
+
+  it.todo('aspirating from a full 96-channel and a reservoir labware')
 })

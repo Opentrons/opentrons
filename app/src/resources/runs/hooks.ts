@@ -1,26 +1,31 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { HostConfig } from '@opentrons/api-client'
+
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
-  useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
+
+// TODO: refactor this so helper code doesn't spawn UI
+/* eslint-disable-next-line opentrons/no-imports-across-applications */
+import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
+import { getIsOnDevice } from '/app/redux/config'
+
 import {
-  chainRunCommandsRecursive,
-  chainMaintenanceCommandsRecursive,
   chainLiveCommandsRecursive,
+  chainRunCommandsRecursive,
+  setCommandIntent,
 } from './utils'
-import { getIsOnDevice } from '../../redux/config'
-import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
+
+import type { ErrorRecoveryPolicy, HostConfig } from '@opentrons/api-client'
 import type {
+  CreateMaintenanceRunType,
+  useCreateMaintenanceCommandMutation,
   UseCreateMaintenanceRunMutationOptions,
   UseCreateMaintenanceRunMutationResult,
-  CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
-import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 export type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
@@ -40,18 +45,29 @@ type CreateRunCommandMutation = Omit<
 > & { createRunCommand: CreateRunCommand }
 
 export function useCreateRunCommandMutation(
-  runId: string
+  runId: string,
+  failedCommandId?: string
 ): CreateRunCommandMutation {
   const createCommandMutation = useCreateCommandMutation()
+
   return {
     ...createCommandMutation,
-    createRunCommand: (variables, ...options) =>
-      createCommandMutation.createCommand({ ...variables, runId }, ...options),
+    createRunCommand: (variables, ...options) => {
+      const { command } = variables
+      const commandWithIntent = setCommandIntent(command, failedCommandId)
+
+      return createCommandMutation.createCommand(
+        { ...variables, runId, command: commandWithIntent, failedCommandId },
+        ...options
+      )
+    },
   }
 }
 
 export function useChainRunCommands(
-  runId: string
+  runId: string,
+  failedCommandId?: string,
+  recoveryPolicy?: ErrorRecoveryPolicy
 ): {
   chainRunCommands: (
     commands: CreateCommand[],
@@ -59,8 +75,12 @@ export function useChainRunCommands(
   ) => ReturnType<typeof chainRunCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const { createRunCommand } = useCreateRunCommandMutation(runId)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { createRunCommand } = useCreateRunCommandMutation(
+    runId,
+    failedCommandId
+  )
   return {
     chainRunCommands: (
       commands: CreateCommand[],
@@ -70,34 +90,8 @@ export function useChainRunCommands(
         commands,
         createRunCommand,
         continuePastCommandFailure,
-        setIsLoading
-      ),
-    isCommandMutationLoading: isLoading,
-  }
-}
-
-export function useChainMaintenanceCommands(): {
-  chainRunCommands: (
-    maintenanceRunId: string,
-    commands: CreateCommand[],
-    continuePastCommandFailure: boolean
-  ) => ReturnType<typeof chainMaintenanceCommandsRecursive>
-  isCommandMutationLoading: boolean
-} {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
-  return {
-    chainRunCommands: (
-      maintenanceRunId,
-      commands: CreateCommand[],
-      continuePastCommandFailure: boolean
-    ) =>
-      chainMaintenanceCommandsRecursive(
-        maintenanceRunId,
-        commands,
-        createMaintenanceCommand,
-        continuePastCommandFailure,
-        setIsLoading
+        setIsLoading,
+        recoveryPolicy
       ),
     isCommandMutationLoading: isLoading,
   }
@@ -105,16 +99,16 @@ export function useChainMaintenanceCommands(): {
 
 export function useChainLiveCommands(): {
   chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
+    commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => ReturnType<typeof chainLiveCommandsRecursive>
   isCommandMutationLoading: boolean
 } {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   return {
     chainLiveCommands: (
-      commands: ModulePrepCommandsType[],
+      commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ) =>
       chainLiveCommandsRecursive(
@@ -127,10 +121,12 @@ export function useChainLiveCommands(): {
   }
 }
 
-type CreateTargetedMaintenanceRunMutation = UseCreateMaintenanceRunMutationResult & {
-  createTargetedMaintenanceRun: CreateMaintenanceRunType
-}
+type CreateTargetedMaintenanceRunMutation =
+  UseCreateMaintenanceRunMutationResult & {
+    createTargetedMaintenanceRun: CreateMaintenanceRunType
+  }
 
+// A wrapper around useCreateMaintenanceRunMutation that ensures the ODD TakeoverModal renders, if applicable.
 export function useCreateTargetedMaintenanceRunMutation(
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null

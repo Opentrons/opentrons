@@ -1,0 +1,21 @@
+{
+  "click_to_select": "Click to select tips in {{labwareName}}",
+  "continue": "Continue",
+  "go_back": "Go back",
+  "legend": {
+    "inaccessible_tip": "Inaccessible tip",
+    "new_tip": "New tip",
+    "no_tip": "No tip",
+    "selected_tip": "Selected tip",
+    "used_tip": "Used tip"
+  },
+  "no_tiprack_selected": "Select a tiprack to continue",
+  "not_enough_tips_selected": "Not enough tips selected ({{count}} pickups remaining)",
+  "pickups_remaining": "{{count}} pickups remaining",
+  "reusing_tips_banner": "Selected tips have been reused. Pipetting accuracy may be reduced.",
+  "select": "Select",
+  "selected": "Selected",
+  "select_tiprack": "Select a tip rack to pick up tips from",
+  "select_tips": "Select tips",
+  "select_tips_for_tracking": "Select tips for manual tip tracking"
+}

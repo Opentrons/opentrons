@@ -1,8 +1,9 @@
 """Core module control interfaces."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, ClassVar
+from typing import List, Dict, Optional, TypeVar, ClassVar, Sequence, Any, Generic
 
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -16,10 +17,13 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     SpeedStatus,
 )
+from .labware import LabwareCoreType, AbstractLabware
+from .tasks import AbstractTaskCore
+from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons.types import DeckSlotName
 
 
-class AbstractModuleCore(ABC):
+class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     """Abstract core module control interface."""
 
     MODULE_TYPE: ClassVar[ModuleType]
@@ -41,10 +45,12 @@ class AbstractModuleCore(ABC):
         """Get the module's display name."""
 
 
-ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore)
+ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
 
 
-class AbstractTemperatureModuleCore(AbstractModuleCore):
+class AbstractTemperatureModuleCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
     """Core control interface for an attached Temperature Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.TEMPERATURE
@@ -54,7 +60,7 @@ class AbstractTemperatureModuleCore(AbstractModuleCore):
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the Temperature Module's target temperature in °C."""
 
     @abstractmethod
@@ -82,7 +88,9 @@ class AbstractTemperatureModuleCore(AbstractModuleCore):
         """Get the module's current temperature status."""
 
 
-class AbstractMagneticModuleCore(AbstractModuleCore):
+class AbstractMagneticModuleCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
     """Core control interface for an attached Magnetic Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.MAGNETIC
@@ -131,7 +139,9 @@ class AbstractMagneticModuleCore(AbstractModuleCore):
         """Get the module's current magnet status."""
 
 
-class AbstractThermocyclerCore(AbstractModuleCore):
+class AbstractThermocyclerCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
     """Core control interface for an attached Thermocycler Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.THERMOCYCLER
@@ -152,9 +162,10 @@ class AbstractThermocyclerCore(AbstractModuleCore):
     def set_target_block_temperature(
         self,
         celsius: float,
+        ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> None:
+    ) -> AbstractTaskCore:
         """Set the target temperature for the well block, in °C.
 
         Note:
@@ -174,7 +185,7 @@ class AbstractThermocyclerCore(AbstractModuleCore):
         """Wait for target block temperature to be reached."""
 
     @abstractmethod
-    def set_target_lid_temperature(self, celsius: float) -> None:
+    def set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the target temperature for the heated lid, in °C."""
 
     @abstractmethod
@@ -196,6 +207,33 @@ class AbstractThermocyclerCore(AbstractModuleCore):
             Unlike the :py:meth:`set_block_temperature`, either or both of
             'hold_time_minutes' and 'hold_time_seconds' must be defined
             and finite for each step.
+        Args:
+            steps: List of unique steps that make up a single cycle.
+                Each list item should be a dictionary that maps to
+                the parameters of the :py:meth:`set_block_temperature`
+                method with keys 'temperature', 'hold_time_seconds',
+                and 'hold_time_minutes'.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
+        """
+
+    @abstractmethod
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> AbstractTaskCore:
+        """Start a Thermocycler Profile.
+
+        Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
+
+        Note:
+            Unlike the :py:meth:`execute_profile`, once the profile has started
+            the protocol will immediately move on to the next command, rather than waiting
+            for it to finish.
         Args:
             steps: List of unique steps that make up a single cycle.
                 Each list item should be a dictionary that maps to
@@ -273,7 +311,9 @@ class AbstractThermocyclerCore(AbstractModuleCore):
         """Get the index of the current step within the current cycle."""
 
 
-class AbstractHeaterShakerCore(AbstractModuleCore):
+class AbstractHeaterShakerCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
     """Core control interface for an attached Heater-Shaker Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.HEATER_SHAKER
@@ -283,7 +323,7 @@ class AbstractHeaterShakerCore(AbstractModuleCore):
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> AbstractTaskCore:
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod
@@ -293,6 +333,10 @@ class AbstractHeaterShakerCore(AbstractModuleCore):
     @abstractmethod
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
+
+    @abstractmethod
+    def set_shake_speed(self, rpm: int) -> AbstractTaskCore:
+        """Set the shaker's target shake speed."""
 
     @abstractmethod
     def open_labware_latch(self) -> None:
@@ -339,7 +383,135 @@ class AbstractHeaterShakerCore(AbstractModuleCore):
         """Get the module's labware latch status."""
 
 
-class AbstractMagneticBlockCore(AbstractModuleCore):
+class AbstractMagneticBlockCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
     """Core control interface for an attached Magnetic Block."""
 
     MODULE_TYPE: ClassVar = ModuleType.MAGNETIC_BLOCK
+
+
+class AbstractAbsorbanceReaderCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
+    """Core control interface for an attached Absorbance Reader Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.ABSORBANCE_READER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def initialize(
+        self,
+        mode: ABSMeasureMode,
+        wavelengths: List[int],
+        reference_wavelength: Optional[int] = None,
+    ) -> None:
+        """Initialize the Absorbance Reader by taking zero reading."""
+
+    @abstractmethod
+    def read(self, filename: Optional[str] = None) -> Dict[int, Dict[str, float]]:
+        """Get an absorbance reading from the Absorbance Reader."""
+
+    @abstractmethod
+    def close_lid(self) -> None:
+        """Close the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def open_lid(self) -> None:
+        """Open the Absorbance Reader's lid."""
+
+    @abstractmethod
+    def is_lid_on(self) -> bool:
+        """Return True if the Absorbance Reader's lid is currently closed."""
+
+
+class AbstractFlexStackerCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
+    """Core control interface for an attached Flex Stacker."""
+
+    MODULE_TYPE: ClassVar = ModuleType.FLEX_STACKER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def retrieve(self) -> AbstractLabware[Any]:
+        """Release a labware from the hopper to the staging slot.
+
+        Returns the retreived primary labware.
+        """
+
+    @abstractmethod
+    def store(self) -> None:
+        """Store a labware in the stacker hopper."""
+
+    @abstractmethod
+    def fill(self, count: int | None, message: str | None) -> None:
+        """Pause the protocol to allow for filling the stacker."""
+
+    @abstractmethod
+    def fill_items(
+        self, labware: Sequence[LabwareCoreType], message: str | None
+    ) -> None:
+        """Pause the protocol to fill with a specific set of labware."""
+
+    @abstractmethod
+    def empty(self, message: str | None) -> None:
+        """Pause the protocol to allow for emptying the stacker."""
+
+    @abstractmethod
+    def set_stored_labware_items(
+        self,
+        labware: Sequence[LabwareCoreType],
+        stacking_offset_z: float | None,
+    ) -> None:
+        """Configure the stacker to contain a set of labware."""
+
+    @abstractmethod
+    def get_max_storable_labware(self) -> int:
+        """Get the total number of configured labware the stacker can store."""
+
+    @abstractmethod
+    def get_current_storable_labware(self) -> int:
+        """Get the amount of space currently available for labware."""
+
+    @abstractmethod
+    def get_max_storable_labware_from_list(
+        self,
+        labware: Sequence[LabwareCoreType],
+        overlap_offset: float | None = None,
+    ) -> Sequence[LabwareCoreType]:
+        """Limit the passed list to how many labware can fit in a stacker."""
+
+    @abstractmethod
+    def get_current_storable_labware_from_list(
+        self,
+        labware: Sequence[LabwareCoreType],
+    ) -> Sequence[LabwareCoreType]:
+        """Limit the passed list to how many labware can fit in the stacker right now."""
+
+    @abstractmethod
+    def get_stored_labware(self) -> Sequence[LabwareCoreType]:
+        """Get the currently-stored labware from the stacker."""
+
+    @abstractmethod
+    def set_stored_labware(
+        self,
+        main_load_name: str,
+        main_namespace: str | None,
+        main_version: int | None,
+        lid_load_name: str | None,
+        lid_namespace: str | None,
+        lid_version: int | None,
+        adapter_load_name: str | None,
+        adapter_namespace: str | None,
+        adapter_version: int | None,
+        count: int | None,
+        stacking_offset_z: float | None = None,
+    ) -> None:
+        """Configure the kind of labware that the stacker stores."""

@@ -1,5 +1,6 @@
 # TODO(mc, 2021-05-10): delete this file; these models have been moved to
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
+# Note: (2024-07-18): this file does not actually seem to be safe to delete
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Any, Dict, Optional, Sequence, Tuple
@@ -7,7 +8,12 @@ from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
 
-from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import (
+    ApiError,
+    ErrorSource,
+    ErrorDetails,
+    ErrorBody,
+)
 from robot_server.service.json_api import ResourceLinks
 
 
@@ -23,7 +29,7 @@ class ErrorDef(ErrorCreateDef, Enum):
     """An enumeration of ErrorCreateDef Error definitions for use by
     RobotServerError"""
 
-    def __init__(self, e) -> None:
+    def __init__(self, e: Any) -> None:
         super().__init__(**(asdict(e)))
 
 
@@ -42,9 +48,9 @@ class RobotServerError(ApiError):
         source: Optional[ErrorSource] = None,
         meta: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[BaseException]] = None,
-        *fmt_args,
-        **fmt_kw_args
-    ):
+        *fmt_args: object,
+        **fmt_kw_args: object
+    ) -> None:
         """
         Constructor.
 
@@ -73,7 +79,7 @@ class RobotServerError(ApiError):
                 *wrapped_details,
             ),
             links=links,
-        ).dict(exclude_none=True)
+        ).model_dump(exclude_none=True)
 
         super().__init__(
             status_code=definition.status_code,

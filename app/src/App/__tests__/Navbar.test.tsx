@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-import { StaticRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
+import { render, screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
 import { Navbar } from '../Navbar'
 
@@ -14,23 +14,23 @@ const ROUTE_PROPS: RouteProps[] = [
 
 describe('Navbar', () => {
   it('should render a NavbarLink for every nav location', () => {
-    const { getByRole } = render(
-      <StaticRouter>
+    render(
+      <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </StaticRouter>
+      </MemoryRouter>
     )
-    getByRole('link', { name: 'foo' })
-    getByRole('link', { name: 'bar' })
-    getByRole('link', { name: 'baz' })
+    screen.getByRole('link', { name: 'foo' })
+    screen.getByRole('link', { name: 'bar' })
+    screen.getByRole('link', { name: 'baz' })
   })
   it('should render logo, settings, and help', () => {
-    const { getByRole, getByTestId } = render(
-      <StaticRouter>
+    render(
+      <MemoryRouter>
         <Navbar routes={ROUTE_PROPS} />
-      </StaticRouter>
+      </MemoryRouter>
     )
-    getByRole('img', { name: 'opentrons logo' })
-    getByTestId('Navbar_settingsLink')
-    getByTestId('Navbar_helpLink')
+    screen.getByRole('img', { name: 'opentrons logo' })
+    screen.getByTestId('Navbar_settingsLink')
+    screen.getByTestId('Navbar_helpLink')
   })
 })

@@ -1,23 +1,19 @@
-// events map tests
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
 
-jest.mock('../selectors')
-jest.mock('../../sessions/selectors')
-jest.mock('../../discovery/selectors')
-jest.mock('../../pipettes/selectors')
-jest.mock('../../calibration/selectors')
-
-const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
-  typeof selectors.getAnalyticsSessionExitDetails
->
-const getSessionInstrumentAnalyticsData = selectors.getSessionInstrumentAnalyticsData as jest.MockedFunction<
-  typeof selectors.getSessionInstrumentAnalyticsData
->
+vi.mock('../selectors')
+vi.mock('../../sessions/selectors')
+vi.mock('../../discovery/selectors')
+vi.mock('../../pipettes/selectors')
+vi.mock('../../calibration/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('events with protocol data', () => {
@@ -55,6 +51,7 @@ describe('analytics events map', () => {
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
+          robotType: OT2_ROBOT_TYPE,
         },
       })
     })
@@ -71,6 +68,7 @@ describe('analytics events map', () => {
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
+          robotType: OT2_ROBOT_TYPE,
         },
       })
     })
@@ -83,16 +81,17 @@ describe('analytics events map', () => {
           robotName: 'my-robot',
           sessionId: 'seshid',
           command: { command: 'calibration.exitSession' },
+          robotType: OT2_ROBOT_TYPE,
         },
       } as any
-      getAnalyticsSessionExitDetails.mockReturnValue({
+      vi.mocked(selectors.getAnalyticsSessionExitDetails).mockReturnValue({
         sessionType: 'my-session-type',
         step: 'session-step',
       })
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'my-session-typeExit',
-        properties: { step: 'session-step' },
+        properties: { step: 'session-step', robotType: OT2_ROBOT_TYPE },
       })
     })
 
@@ -113,7 +112,7 @@ describe('analytics events map', () => {
           },
         },
       } as any
-      getSessionInstrumentAnalyticsData.mockReturnValue({
+      vi.mocked(selectors.getSessionInstrumentAnalyticsData).mockReturnValue({
         sessionType: 'my-session-type',
         pipetteModel: 'my-pipette-model',
       })
@@ -123,7 +122,25 @@ describe('analytics events map', () => {
         properties: {
           pipetteModel: 'my-pipette-model',
           tipRackDisplayName: 'some display name',
+          robotType: OT2_ROBOT_TYPE,
         },
+      })
+    })
+
+    it('analytics:RESOURCE_MONITOR_REPORT -> resourceMonitorReport event', () => {
+      const state = {} as any
+      const action = {
+        type: 'analytics:RESOURCE_MONITOR_REPORT',
+        payload: {
+          systemAvailMemMb: '500',
+          systemUptimeHrs: '111',
+          processesDetails: [],
+        },
+      } as any
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'resourceMonitorReport',
+        properties: { ...action.payload },
       })
     })
   })

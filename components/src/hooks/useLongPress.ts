@@ -1,12 +1,8 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  CSSProperties,
-  MutableRefObject,
-} from 'react'
+import { useEffect, useRef, useState } from 'react'
 import interact from 'interactjs'
+
 import type PointerEvent from 'interactjs'
+import type { CSSProperties, MutableRefObject } from 'react'
 
 const HOLD_DURATION_MS = 1000
 
@@ -40,21 +36,21 @@ export const useLongPress = (): UseLongPressResult => {
 
   const enable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement)
+      interact(interactiveRef.current as unknown as HTMLElement)
         .pointerEvents({
           holdDuration: HOLD_DURATION_MS,
         })
-        .on('hold', (event: PointerEvent) => {
+        .on('hold', (_event: PointerEvent) => {
           setIsLongPressed(isLongPressed => !isLongPressed)
         })
-        .on('tap', (event: PointerEvent) => {
+        .on('tap', (_event: PointerEvent) => {
           setIsTapped(isTapped => !isTapped)
         })
     }
   }
   const disable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement).unset()
+      interact(interactiveRef.current as unknown as HTMLElement).unset()
     }
   }
 
@@ -78,7 +74,11 @@ export const useLongPress = (): UseLongPressResult => {
     isTapped,
     setIsLongPressed,
     setIsTapped,
-    enable: () => setIsEnabled(true),
-    disable: () => setIsEnabled(false),
+    enable: () => {
+      setIsEnabled(true)
+    },
+    disable: () => {
+      setIsEnabled(false)
+    },
   }
 }

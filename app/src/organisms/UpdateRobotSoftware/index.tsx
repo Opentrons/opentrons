@@ -1,20 +1,20 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import type { Dispatch } from '../../redux/types'
 
+import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
+import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftware'
 import {
   getRobotUpdateSession,
   startRobotUpdate,
-} from '../../redux/robot-update'
-
-import type { ViewableRobot } from '../../redux/discovery/types'
-
-import { CompleteUpdateSoftware } from '../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
-import { UpdateSoftware } from '../../organisms/UpdateRobotSoftware/UpdateSoftware'
+} from '/app/redux/robot-update'
 
 import { CheckUpdates } from './CheckUpdates'
-import { NoUpdateFound } from './NoUpdateFound'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
+import { NoUpdateFound } from './NoUpdateFound'
+
+import type { ViewableRobot } from '/app/redux/discovery/types'
+import type { Dispatch } from '/app/redux/types'
+
 export {
   CheckUpdates,
   NoUpdateFound,
@@ -37,13 +37,17 @@ export function UpdateRobotSoftware(
   const dispatch = useDispatch<Dispatch>()
 
   const session = useSelector(getRobotUpdateSession)
-  const { step, stage, progress, error: sessionError } = session ?? {
+  const {
+    step,
+    stage,
+    error: sessionError,
+  } = session ?? {
     step: null,
     error: null,
   }
-  const [isDownloading, setIsDownloading] = React.useState<boolean>(false)
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     // check isDownloading to avoid dispatching again
     if (!isDownloading) {
       setIsDownloading(true)
@@ -76,11 +80,6 @@ export function UpdateRobotSoftware(
         beforeCommittingSuccessfulUpdate && beforeCommittingSuccessfulUpdate()
       }
     }
-    return (
-      <UpdateSoftware
-        updateType={updateType}
-        processProgress={progress != null ? progress : 0}
-      />
-    )
+    return <UpdateSoftware updateType={updateType} />
   }
 }

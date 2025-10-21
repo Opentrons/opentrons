@@ -1,14 +1,16 @@
-import {
-  Timeline,
-  RobotState,
-  InvariantContext,
-} from '@opentrons/step-generation'
 import { generateSubstepItem } from '../steplist/generateSubstepItem'
-import {
+
+import type {
+  InvariantContext,
+  RobotState,
+  Timeline,
+} from '@opentrons/step-generation'
+import type {
   LabwareNamesByModuleId,
   StepArgsAndErrorsById,
   Substeps,
 } from '../steplist/types'
+
 export interface GenerateSubstepsArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   invariantContext: InvariantContext

@@ -1,10 +1,9 @@
 // titled modal page component
-import * as React from 'react'
 import cx from 'classnames'
-import { Overlay } from './Overlay'
-import { Icon } from '../icons'
 
-import styles from './modals.css'
+import { Icon } from '../icons'
+import styles from './modals.module.css'
+import { Overlay } from './Overlay'
 
 export interface SpinnerModalProps {
   /** Additional/Override style */
@@ -15,7 +14,10 @@ export interface SpinnerModalProps {
   alertOverlay?: boolean
 }
 
+// TODO(ja, 8/2/24): this modal and SpinnerModalPage are only used in utils
+// that are no longer in use, investigate deleting them
 /**
+ * @deprecated use Modal instead
  * Spinner Modal with no background and optional message
  */
 export function SpinnerModal(props: SpinnerModalProps): JSX.Element {

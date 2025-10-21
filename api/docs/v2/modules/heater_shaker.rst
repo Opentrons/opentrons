@@ -6,7 +6,7 @@
 Heater-Shaker Module
 ********************
 
-The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
+The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat samples to 95 °C, and can shake samples from 200 to 3000 rpm.
 
 The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
@@ -15,6 +15,10 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
     )
 
 .. versionadded:: 2.13
+  The Heater-Shaker can heat samples from 37 to 95 °C. 
+.. versionchanged:: 2.25
+  The Heater-Shaker accepts target temperatures lower than 37 °C. Set the Heater-Shaker's temperature at least 1.5 °C above ambient temperature. 
+
 
 Deck Slots
 ==========
@@ -92,6 +96,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
      - API Load Name
    * - Opentrons Universal Flat Heater-Shaker Adapter
      - ``opentrons_universal_flat_adapter``
+   * - Opentrons Universal Flat Heater-Shaker Adapter Type B
+     - ``opentrons_universal_flat_adapter_type_b``
    * - Opentrons 96 PCR Heater-Shaker Adapter
      - ``opentrons_96_pcr_adapter``
    * - Opentrons 96 Deep Well Heater-Shaker Adapter
@@ -101,8 +107,8 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 
 For example, these commands load a well plate on top of the flat bottom adapter::
 
-    hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
-    hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
+    hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
+    hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
 
 .. versionadded:: 2.15
     The ``load_adapter()`` method.
@@ -183,8 +189,8 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
     hs_mod.set_target_temperature(75)
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     hs_mod.wait_for_temperature()
     protocol.delay(minutes=1)
@@ -199,8 +205,8 @@ Additionally, if you want to pipette while the module holds a temperature for a 
     hs_mod.set_and_wait_for_temperature(75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))

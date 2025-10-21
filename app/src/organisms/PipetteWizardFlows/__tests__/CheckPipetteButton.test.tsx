@@ -1,53 +1,46 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { CheckPipetteButton } from '../CheckPipetteButton'
-import { waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
+import { CheckPipetteButton } from '../CheckPipetteButton'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
 }
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 describe('CheckPipetteButton', () => {
-  let props: React.ComponentProps<typeof CheckPipetteButton>
-  const refetch = jest.fn(() => Promise.resolve())
+  let props: ComponentProps<typeof CheckPipetteButton>
+  const refetch = vi.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       proceedButtonText: 'continue',
-      setFetching: jest.fn(),
+      setFetching: vi.fn(),
       isOnDevice: false,
       isFetching: false,
     }
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('clicking on the button calls refetch and proceed', async () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'continue' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'continue' }))
     expect(refetch).toHaveBeenCalled()
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
   it('button is disabled when fetching is true', () => {
-    const { getByRole } = render({ ...props, isFetching: true })
-    expect(getByRole('button', { name: 'continue' })).toBeDisabled()
-  })
-  it('renders button for on device display', () => {
-    props = {
-      ...props,
-      isOnDevice: true,
-    }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_primary')
+    render({ ...props, isFetching: true })
+    expect(screen.getByRole('button', { name: 'continue' })).toBeDisabled()
   })
 })

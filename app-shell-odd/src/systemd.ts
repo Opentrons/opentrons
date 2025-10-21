@@ -1,5 +1,6 @@
-import { platform } from 'process'
 import { exec } from 'child_process'
+import { platform } from 'process'
+
 // Provide systemd when possible and a default mocked instance, used only during
 // dev workflows, when not.
 
@@ -54,18 +55,30 @@ const provideExports = (): SystemD => {
     }
   } else {
     return {
-      ready: () => new Promise<string>(resolve => resolve('fake notify done')),
+      ready: () =>
+        new Promise<string>(resolve => {
+          resolve('fake notify done')
+        }),
       sendStatus: text =>
-        new Promise<string>(resolve => resolve(`fake status done for ${text}`)),
+        new Promise<string>(resolve => {
+          resolve(`fake status done for ${text}`)
+        }),
       setRemoteDevToolsEnabled: enabled =>
-        new Promise<string>(resolve => resolve(`dev tools set to ${enabled}`)),
+        new Promise<string>(resolve => {
+          resolve(`dev tools set to ${enabled}`)
+        }),
       getisRobotServerReady: () =>
-        new Promise<boolean>(resolve => resolve(true)),
-      restartApp: () => new Promise<string>(resolve => resolve('')),
+        new Promise<boolean>(resolve => {
+          resolve(true)
+        }),
+      restartApp: () =>
+        new Promise<string>(resolve => {
+          resolve('')
+        }),
       updateBrightness: text =>
-        new Promise<string>(resolve =>
+        new Promise<string>(resolve => {
           resolve(`fake brightness ${text} was set`)
-        ),
+        }),
     }
   }
 }

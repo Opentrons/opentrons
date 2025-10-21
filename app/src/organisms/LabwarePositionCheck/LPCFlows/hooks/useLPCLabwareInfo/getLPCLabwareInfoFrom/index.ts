@@ -1,0 +1,120 @@
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  splitLabwareDefURI,
+} from '@opentrons/shared-data'
+
+import {
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  OFFSETS_SOURCE_INITIALIZING,
+} from '/app/redux/protocol-runs'
+
+import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
+import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
+
+import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
+import type {
+  LabwareLocationInfo,
+  LPCLabwareInfo,
+} from '/app/redux/protocol-runs'
+import type { UseLPCLabwareInfoProps } from '..'
+
+interface GetLPCLabwareInfoParams {
+  currentOffsets: StoredLabwareOffset[] | undefined
+  lwLocInfo: LabwareLocationInfo[]
+  labwareDefs: UseLPCLabwareInfoProps['labwareDefs']
+  protocolData: CompletedProtocolAnalysis | null
+}
+
+// Prepare data for injection into LPC.
+export function getLPCLabwareInfoFrom(
+  params: GetLPCLabwareInfoParams
+): LPCLabwareInfo {
+  const labware = getLabwareInfoRecords(params)
+  // If the run contains no LPC-able labware, mark offsets as applied.
+  const areOffsetsApplied =
+    getTotalCountNonHardCodedLocationSpecificOffsets(labware) === 0
+
+  return {
+    areOffsetsApplied,
+    selectedLabware: null,
+    labware,
+    initialRunRecordOffsets: [],
+    initialDatabaseOffsets: [],
+    conflictTimestampInfo: { timestamp: null, isInitialized: false },
+    sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
+  }
+}
+
+function getLabwareInfoRecords(
+  params: GetLPCLabwareInfoParams
+): LPCLabwareInfo['labware'] {
+  const labwareDetails: LPCLabwareInfo['labware'] = {}
+
+  params.lwLocInfo.forEach(combo => {
+    const uri = combo.definitionUri
+
+    const matchedDef = params.labwareDefs?.find(
+      def => getLabwareDefURI(def) === uri
+    )
+    if (matchedDef?.parameters?.quirks?.includes('noLabwarePositionCheck')) {
+      return
+    }
+
+    const locationSpecificOffsetDetails =
+      getLocationSpecificOffsetDetailsForLabware({
+        ...params,
+        uri,
+      })
+
+    if (!(uri in labwareDetails)) {
+      labwareDetails[uri] = {
+        id: getALabwareIdFromUri({ ...params, uri }),
+        displayName: getDisplayNameFromUri({ ...params, uri }),
+        version: splitLabwareDefURI(uri).version,
+        defaultOffsetDetails: getDefaultOffsetDetailsForLabware({
+          ...params,
+          uri,
+          locationSpecificOffsetDetails,
+        }),
+        locationSpecificOffsetDetails,
+      }
+    }
+  })
+
+  return labwareDetails
+}
+
+export type GetLPCLabwareInfoForURI = GetLPCLabwareInfoParams & {
+  uri: string
+}
+
+function getALabwareIdFromUri({
+  uri,
+  lwLocInfo,
+}: GetLPCLabwareInfoForURI): string {
+  return lwLocInfo.find(combo => combo.definitionUri === uri)?.labwareId ?? ''
+}
+
+function getDisplayNameFromUri({
+  uri,
+  labwareDefs,
+}: GetLPCLabwareInfoForURI): string {
+  const matchedDef = labwareDefs?.find(
+    def => getLabwareDefURI(def) === uri
+  ) as LabwareDefinition
+
+  if (!!!matchedDef) {
+    console.warn(
+      `Could not get labware def for uri ${uri} from list of defs with uri ${
+        labwareDefs?.map(getLabwareDefURI) ?? '<no list provided>'
+      }`
+    )
+  }
+
+  return getLabwareDisplayName(matchedDef)
+}

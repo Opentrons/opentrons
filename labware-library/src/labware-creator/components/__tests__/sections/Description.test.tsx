@@ -1,22 +1,18 @@
-import React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
-import { Description } from '../../sections/Description'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import '@testing-library/jest-dom/vitest'
+
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils/isEveryFieldHidden'
+import { Description } from '../../sections/Description'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils/isEveryFieldHidden')
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils/isEveryFieldHidden')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -25,20 +21,19 @@ describe('Description', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues
       )
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render fields when fields are visible', () => {
@@ -85,12 +80,12 @@ describe('Description', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Description />, formikConfig))
     expect(container.firstChild).toBe(null)

@@ -11,7 +11,7 @@ SRC_PATH = server_utils
 # Project to get the version for
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 
 # Find the version of the wheel from git using a helper script. We
@@ -19,13 +19,8 @@ project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,server-utils,$(project_rs_default),server_utils,$(BUILD_NUMBER))
 
-# Find the version of the sdist from git using a helper script. We
-# use python here so we can use the same version normalization that will be
-# used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,server-utils,$(project_ot3_default),server_utils)
-
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,server-utils,$(project_ot3_default),server_utils)
+version_file = $(call python_get_git_version,server-utils,$(project_rs_default),server_utils)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -49,13 +44,13 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'server_utils/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
+clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
-clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
 
 .PHONY: all
-all: clean sdist wheel
+all: clean wheel
 
 .PHONY: setup
 setup:
@@ -65,24 +60,17 @@ setup:
 .PHONY: clean
 clean:
 	$(clean_all_cmd)
+	$(clean_cache_cmd)
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
-wheel: setup.py $(ot_sources)
+wheel: $(ot_sources)
 	$(clean_wheel_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-.PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
-sdist: setup.py $(ot_sources)
-	$(clean_sdist_cmd)
-	$(python) setup.py sdist
+	$(python) -m build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -98,7 +86,7 @@ test-cov:
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
 	$(python) -m black --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(python) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: format
 format:
@@ -111,9 +99,9 @@ local-shell:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
 
 .PHONY: push-ot3
-push-ot3: sdist
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-system-server","server_utils",,,$(version_file))
-	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils")
+push-ot3: wheel
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-system-server/)
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)

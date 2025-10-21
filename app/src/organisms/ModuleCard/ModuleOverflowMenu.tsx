@@ -1,20 +1,31 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
-
-import { MenuList } from '../../atoms/MenuList'
-import { Tooltip } from '../../atoms/Tooltip'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
-  useIsFlex,
-  useRunStatuses,
-  useIsLegacySessionInProgress,
-} from '../Devices/hooks'
+  Flex,
+  MenuItem,
+  MenuList,
+  NO_WRAP,
+  POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
+import {
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
+import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
+
 import { useModuleOverflowMenu } from './hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -68,6 +79,23 @@ export const ModuleOverflowMenu = (
     isDisabled = true
   }
 
+  let isHeatingOrCooling
+  switch (module.moduleType) {
+    case TEMPERATURE_MODULE_TYPE:
+      isHeatingOrCooling = module.data.status !== 'idle'
+      break
+    case HEATERSHAKER_MODULE_TYPE:
+      isHeatingOrCooling = module.data.temperatureStatus !== 'idle'
+      break
+    case THERMOCYCLER_MODULE_TYPE:
+      isHeatingOrCooling =
+        module.data.lidTemperatureStatus !== 'idle' ||
+        module.data.status !== 'idle'
+      break
+    default:
+      isHeatingOrCooling = false
+  }
+
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
     handleAboutClick,
@@ -78,14 +106,31 @@ export const ModuleOverflowMenu = (
     isIncompatibleWithOT3
   )
 
+  const isCalibrateDisabled = !isPipetteReady || isTooHot || isHeatingOrCooling
+  let calibrateDisabledReason
+  if (!isPipetteReady) {
+    calibrateDisabledReason = t('calibrate_pipette')
+  } else if (isTooHot) {
+    calibrateDisabledReason = t('module_too_hot')
+  } else if (isHeatingOrCooling) {
+    calibrateDisabledReason = t('module_heating_or_cooling')
+  } else {
+    calibrateDisabledReason = null
+  }
+
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {isFlex ? (
+        {isFlex &&
+        module.moduleType !== ABSORBANCE_READER_TYPE &&
+        module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
+        !MODULE_MODELS_OT2_ONLY.some(
+          modModel => modModel === module.moduleModel
+        ) ? (
           <>
             <MenuItem
               onClick={handleCalibrateClick}
-              disabled={!isPipetteReady || isTooHot}
+              disabled={isCalibrateDisabled}
               {...targetProps}
             >
               {i18n.format(
@@ -95,9 +140,9 @@ export const ModuleOverflowMenu = (
                 'capitalize'
               )}
             </MenuItem>
-            {!isPipetteReady || isTooHot ? (
+            {isCalibrateDisabled ? (
               <Tooltip tooltipProps={tooltipProps}>
-                {t(!isPipetteReady ? 'calibrate_pipette' : 'module_too_hot')}
+                {calibrateDisabledReason}
               </Tooltip>
             ) : null}
           </>
@@ -105,16 +150,16 @@ export const ModuleOverflowMenu = (
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {
             return (
-              <React.Fragment key={`${index}_${String(module.moduleType)}`}>
+              <Fragment key={`${index}_${String(module.moduleType)}`}>
                 <MenuItem
                   onClick={() => item.onClick(item.isSecondary)}
-                  disabled={item.disabledReason || isDisabled}
-                  whiteSpace="nowrap"
+                  disabled={item.isSettingDisabled}
+                  whiteSpace={NO_WRAP}
                 >
                   {item.setSetting}
                 </MenuItem>
                 {item.menuButtons}
-              </React.Fragment>
+              </Fragment>
             )
           }
         )}

@@ -1,8 +1,9 @@
 """Map equipment cores to public PAPI objects."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, Union
-from typing import overload
+from typing import overload, Callable
 
 from .common import ModuleCore, LabwareCore
 
@@ -60,3 +61,14 @@ class LoadedCoreMap:
     ) -> Union[Labware, ModuleTypes, None]:
         """Given a core, get the public PAPI object it represents."""
         return self._contexts_by_core[core] if core is not None else None
+
+    def get_or_add(
+        self, core: LabwareCore, context_builder: Callable[[LabwareCore], Labware]
+    ) -> Labware:
+        try:
+            return self.get(core)
+        except KeyError:
+            pass
+        context = context_builder(core)
+        self.add(core, context)
+        return context

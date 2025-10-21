@@ -1,5 +1,8 @@
+import { describe, expect, it, vi } from 'vitest'
+
 import { getMigrationVersionsToRunFromVersion } from '../index'
-jest.mock('../../../labware-defs/utils')
+
+vi.mock('../../../labware-defs/utils')
 describe('runs appropriate migrations for version', () => {
   // purposefully out of order
   const stubbedMigrationByVersion = {

@@ -1,34 +1,36 @@
 // jog controls component
-import * as React from 'react'
+import { useState } from 'react'
 import { css } from 'styled-components'
+
 import {
-  Flex,
-  ALIGN_STRETCH,
   ALIGN_CENTER,
+  ALIGN_STRETCH,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
 
+import {
+  DEFAULT_STEP_SIZES,
+  HORIZONTAL_PLANE,
+  LARGE_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+  VERTICAL_PLANE,
+} from './constants'
 import { DirectionControl, TouchDirectionControl } from './DirectionControl'
 import { StepSizeControl, TouchStepSizeControl } from './StepSizeControl'
-import {
-  HORIZONTAL_PLANE,
-  VERTICAL_PLANE,
-  SMALL_STEP_SIZE_MM,
-  MEDIUM_STEP_SIZE_MM,
-  LARGE_STEP_SIZE_MM,
-  DEFAULT_STEP_SIZES,
-} from './constants'
 
-import type { Jog, Plane, StepSize } from './types'
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
+import type { Jog, Plane, StepSize } from './types'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {
   jog: Jog
   planes?: Plane[]
   stepSizes?: StepSize[]
-  auxiliaryControl?: React.ReactNode | null
+  auxiliaryControl?: ReactNode | null
   directionControlButtonColor?: string
   initialPlane?: Plane
   isOnDevice?: boolean
@@ -53,9 +55,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     isOnDevice = false,
     ...styleProps
   } = props
-  const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
-    stepSizes[0]
-  )
+  const [currentStepSize, setCurrentStepSize] = useState<StepSize>(stepSizes[0])
 
   const controls = isOnDevice ? (
     <>

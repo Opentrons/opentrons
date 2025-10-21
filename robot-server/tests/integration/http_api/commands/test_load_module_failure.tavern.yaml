@@ -6,7 +6,7 @@ marks:
   - parametrize:
       key: model
       vals:
-        - magneticModuleV2
+        - thermocyclerModuleV2
 
 stages:
   - name: Create Empty Run

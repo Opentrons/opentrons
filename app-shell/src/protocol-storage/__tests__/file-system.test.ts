@@ -1,37 +1,30 @@
 // tests for labware directory utilities
 
 import path from 'path'
+import Electron from 'electron'
 import fs from 'fs-extra'
 import tempy from 'tempy'
-import Electron from 'electron'
 import uuid from 'uuid/v4'
-import { when } from 'jest-when'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { analyzeProtocolSource } from '../../protocol-analysis'
 import {
-  readDirectoriesWithinDirectory,
-  readFilesWithinDirectory,
-  parseProtocolDirs,
   addProtocolFile,
-  removeProtocolByKey,
+  parseProtocolDirs,
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
+  readDirectoriesWithinDirectory,
+  readFilesWithinDirectory,
+  removeProtocolByKey,
 } from '../file-system'
-import { getConfig } from '../../config'
-import { analyzeProtocolSource } from '../../protocol-analysis'
 
-jest.mock('uuid/v4')
-jest.mock('electron')
-jest.mock('../../config')
-jest.mock('../../protocol-analysis')
+vi.mock('uuid/v4')
+vi.mock('electron')
+vi.mock('electron-store')
+vi.mock('../../protocol-analysis')
+vi.mock('../../log')
 
-const trashItem = Electron.shell.trashItem as jest.MockedFunction<
-  typeof Electron.shell.trashItem
->
-const mockUuid = uuid as jest.MockedFunction<typeof uuid>
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockRunFileWithPython = analyzeProtocolSource as jest.MockedFunction<
-  typeof analyzeProtocolSource
->
+const trashItem = Electron.shell.trashItem
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -43,14 +36,11 @@ describe('protocol storage directory utilities', () => {
   }
   beforeEach(() => {
     protocolsDir = makeEmptyDir()
-    mockGetConfig.mockReturnValue({
-      python: { pathToPythonOverride: null },
-    } as any)
-    mockRunFileWithPython.mockReturnValue(Promise.resolve())
+    vi.mocked(analyzeProtocolSource).mockReturnValue(Promise.resolve())
   })
 
-  afterAll(() => {
-    jest.resetAllMocks()
+  afterAll((): any => {
+    vi.resetAllMocks()
     return Promise.all(tempDirs.map(d => fs.remove(d)))
   })
 
@@ -119,79 +109,78 @@ describe('protocol storage directory utilities', () => {
   })
 
   describe('parseProtocolDirs', () => {
-    it('reads and parses directories', () => {
+    it('reads and parses directories', async () => {
       const protocolsDir = makeEmptyDir()
-
       const firstProtocolDirName = 'protocol_item_1'
       const secondProtocolDirName = 'protocol_item_2'
-
       const firstDirPath = path.join(protocolsDir, firstProtocolDirName)
       const secondDirPath = path.join(protocolsDir, secondProtocolDirName)
 
-      return Promise.all([
-        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName)),
-        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName, 'src')),
-        fs.createFile(
-          path.join(protocolsDir, firstProtocolDirName, 'src', 'main.py')
-        ),
-        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName, 'analysis')),
-        fs.createFile(
-          path.join(
-            protocolsDir,
-            firstProtocolDirName,
-            'analysis',
-            'fake_timestamp0.json'
-          )
-        ),
-        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName)),
-        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName, 'src')),
-        fs.createFile(
-          path.join(protocolsDir, secondProtocolDirName, 'src', 'main.json')
-        ),
-        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName, 'analysis')),
-        fs.createFile(
-          path.join(
-            protocolsDir,
-            secondProtocolDirName,
-            'analysis',
-            'fake_timestamp1.json'
-          )
-        ),
-      ]).then(() => {
-        return expect(
-          parseProtocolDirs([firstDirPath, secondDirPath])
-        ).resolves.toEqual([
-          {
-            dirPath: firstDirPath,
-            modified: expect.any(Number),
-            srcFilePaths: [path.join(firstDirPath, 'src', 'main.py')],
-            analysisFilePaths: [
-              path.join(firstDirPath, 'analysis', 'fake_timestamp0.json'),
-            ],
-          },
-          {
-            dirPath: secondDirPath,
-            modified: expect.any(Number),
-            srcFilePaths: [path.join(secondDirPath, 'src', 'main.json')],
-            analysisFilePaths: [
-              path.join(secondDirPath, 'analysis', 'fake_timestamp1.json'),
-            ],
-          },
-        ])
-      })
+      await fs.emptyDir(path.join(protocolsDir, firstProtocolDirName))
+      await fs.emptyDir(path.join(protocolsDir, firstProtocolDirName, 'src'))
+      await fs.emptyDir(
+        path.join(protocolsDir, firstProtocolDirName, 'analysis')
+      )
+      await fs.createFile(
+        path.join(protocolsDir, firstProtocolDirName, 'src', 'main.py')
+      )
+      await fs.createFile(
+        path.join(
+          protocolsDir,
+          firstProtocolDirName,
+          'analysis',
+          'fake_timestamp0.json'
+        )
+      )
+
+      await fs.emptyDir(path.join(protocolsDir, secondProtocolDirName))
+      await fs.emptyDir(path.join(protocolsDir, secondProtocolDirName, 'src'))
+      await fs.emptyDir(
+        path.join(protocolsDir, secondProtocolDirName, 'analysis')
+      )
+      await fs.createFile(
+        path.join(protocolsDir, secondProtocolDirName, 'src', 'main.json')
+      )
+      await fs.createFile(
+        path.join(
+          protocolsDir,
+          secondProtocolDirName,
+          'analysis',
+          'fake_timestamp1.json'
+        )
+      )
+
+      const result = await parseProtocolDirs([firstDirPath, secondDirPath])
+
+      expect(result).toEqual([
+        {
+          dirPath: firstDirPath,
+          modified: expect.any(Number),
+          srcFilePaths: [path.join(firstDirPath, 'src', 'main.py')],
+          analysisFilePaths: [
+            path.join(firstDirPath, 'analysis', 'fake_timestamp0.json'),
+          ],
+        },
+        {
+          dirPath: secondDirPath,
+          modified: expect.any(Number),
+          srcFilePaths: [path.join(secondDirPath, 'src', 'main.json')],
+          analysisFilePaths: [
+            path.join(secondDirPath, 'analysis', 'fake_timestamp1.json'),
+          ],
+        },
+      ])
     })
   })
 
   describe('addProtocolFile', () => {
     it('writes a protocol file to a new directory', () => {
       let count = 0
-      when(mockUuid)
-        .calledWith()
-        .mockImplementation(() => {
-          const nextId = `${count}abc123`
-          count = count + 1
-          return nextId
-        })
+      vi.mocked(uuid).mockImplementation(() => {
+        const nextId = `${count}abc123`
+        count = count + 1
+        return nextId
+      })
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')
@@ -223,7 +212,7 @@ describe('protocol storage directory utilities', () => {
       const protocolId = 'def456'
       const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
-      trashItem.mockResolvedValue()
+      vi.mocked(trashItem).mockResolvedValue()
 
       return setup
         .then(() => removeProtocolByKey('def456', protocolsDir))
@@ -239,7 +228,7 @@ describe('protocol storage directory utilities', () => {
       const protocolId = 'def456'
       const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
-      trashItem.mockRejectedValue(Error('something went wrong'))
+      vi.mocked(trashItem).mockRejectedValue(Error('something went wrong'))
 
       return setup
         .then(() => removeProtocolByKey('def456', protocolsDir))

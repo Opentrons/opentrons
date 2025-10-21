@@ -171,7 +171,7 @@ class SensorScheduler:
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to write sensor info to {sensor_info.node_id.name}"
+                f"received error {str(error)} trying to write sensor info to {sensor_info.node_id.name}"
             )
 
     async def send_read(
@@ -384,7 +384,7 @@ class SensorScheduler:
                 f"{SensorDataType.build(message.payload.sensor_data, message.payload.sensor).to_float()}"
             )
         if isinstance(message, ErrorMessage):
-            log.error(f"recieved error message {str(message)}")
+            log.error(f"received error message {str(message)}")
 
     @asynccontextmanager
     async def bind_sync(
@@ -411,7 +411,7 @@ class SensorScheduler:
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+                f"received error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
             )
 
         try:
@@ -436,7 +436,7 @@ class SensorScheduler:
             )
             if error != ErrorCode.ok:
                 log.error(
-                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                    f"received error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
                 )
 
     @asynccontextmanager
@@ -457,7 +457,7 @@ class SensorScheduler:
                     SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
                 )
             if isinstance(message, ErrorMessage):
-                log.error(f"Recieved error message {str(message)}")
+                log.error(f"Received error message {str(message)}")
 
         def _filter(arbitration_id: ArbitrationId) -> bool:
             return (
@@ -483,7 +483,7 @@ class SensorScheduler:
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
+                f"received error {str(error)} trying to bind sensor output on {str(target_sensor.node_id)}"
             )
 
         try:
@@ -505,7 +505,7 @@ class SensorScheduler:
             )
             if error != ErrorCode.ok:
                 log.error(
-                    f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
+                    f"received error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
                 )
 
     @asynccontextmanager
@@ -562,7 +562,7 @@ class SensorScheduler:
             )
             if error != ErrorCode.ok:
                 log.error(
-                    f"recieved error {str(error)} trying to bind sensor output on {str(sensor.node_id)}"
+                    f"received error {str(error)} trying to bind sensor output on {str(sensor.node_id)}"
                 )
 
         try:
@@ -586,5 +586,5 @@ class SensorScheduler:
                 )
                 if error != ErrorCode.ok:
                     log.error(
-                        f"recieved error {str(error)} trying to write unbind sensor output on {str(sensor.node_id)}"
+                        f"received error {str(error)} trying to write unbind sensor output on {str(sensor.node_id)}"
                     )

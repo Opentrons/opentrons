@@ -1,10 +1,11 @@
 import EventEmitter from 'events'
+import { vi } from 'vitest'
 
 import type { Browser, BrowserService, ServiceType } from 'mdns-js'
 
 export const mockBaseBrowser: Browser = Object.assign(new EventEmitter(), {
-  discover: jest.fn(),
-  stop: jest.fn(),
+  discover: vi.fn(),
+  stop: vi.fn(),
   networking: { connections: [] },
   connections: {},
 })
@@ -13,12 +14,12 @@ export const mockBrowserService: BrowserService = {
   addresses: ['192.168.1.42'],
   query: ['_http._tcp.local'],
   type: [
-    ({
+    {
       name: 'http',
       protocol: 'tcp',
       subtypes: [],
       description: 'Web Site',
-    } as unknown) as ServiceType,
+    } as unknown as ServiceType,
   ],
   txt: [''],
   port: 31950,
@@ -32,12 +33,12 @@ export const mockBrowserServiceWithRobotModel: BrowserService = {
   addresses: ['192.168.1.42'],
   query: ['_http._tcp.local'],
   type: [
-    ({
+    {
       name: 'http',
       protocol: 'tcp',
       subtypes: [],
       description: 'Web Site',
-    } as unknown) as ServiceType,
+    } as unknown as ServiceType,
   ],
   txt: ['robotModel=OT-2 Standard'],
   port: 31950,
@@ -51,12 +52,12 @@ export const mockBrowserServiceWithSurpriseTXT: BrowserService = {
   addresses: ['192.168.1.42'],
   query: ['_http._tcp.local'],
   type: [
-    ({
+    {
       name: 'http',
       protocol: 'tcp',
       subtypes: [],
       description: 'Web Site',
-    } as unknown) as ServiceType,
+    } as unknown as ServiceType,
   ],
   txt: [
     'robotModel=OT-3 Standard',
@@ -74,12 +75,12 @@ export const mockBrowserServiceWithoutTXT: BrowserService = {
   addresses: ['192.168.1.42'],
   query: ['_http._tcp.local'],
   type: [
-    ({
+    {
       name: 'http',
       protocol: 'tcp',
       subtypes: [],
       description: 'Web Site',
-    } as unknown) as ServiceType,
+    } as unknown as ServiceType,
   ],
   port: 31950,
   fullname: 'opentrons-dev._http._tcp.local',

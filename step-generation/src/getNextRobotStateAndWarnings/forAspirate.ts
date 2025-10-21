@@ -1,33 +1,58 @@
-import assert from 'assert'
-import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
+import range from 'lodash/range'
 import uniq from 'lodash/uniq'
+
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
+
 import {
   AIR,
+  getLocationTotalVolume,
+  getWellsForTips,
   mergeLiquid,
   splitLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+
+import type {
+  AspDispAirgapParams,
+  AspirateInPlaceParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forAspirate(
-  params: AspDispAirgapParams,
+  params: AspDispAirgapParams | AspirateInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, volume, labwareId } = params
+  const { pipetteId, volume } = params
   const { robotState, warnings } = robotStateAndWarnings
+  const labwareId =
+    'labwareId' in params
+      ? params.labwareId
+      : (robotState.pipettes[pipetteId].entityId ?? '')
+  const wellName =
+    'wellName' in params
+      ? params.wellName
+      : (robotState.pipettes[pipetteId].wellName ?? '')
   const { liquidState } = robotState
+  const nozzles = robotState.pipettes[pipetteId].nozzles
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
+  const isReservoir = labwareDef.metadata.displayCategory === 'reservoir'
+  let channels = pipetteSpec.channels
+  if (nozzles === COLUMN) {
+    channels = 8
+  } else if (nozzles === SINGLE) {
+    channels = 1
+  }
+
   const { allWellsShared, wellsForTips } = getWellsForTips(
-    pipetteSpec.channels,
+    channels,
     labwareDef,
-    params.wellName
+    wellName
   )
-  assert(
+
+  console.assert(
     // @ts-expect-error (sa, 2021-05-03): this assert is unnecessary
     uniq(wellsForTips).length === allWellsShared ? 1 : wellsForTips.length,
     `expected all wells to be shared, or no wells to be shared. Got: ${JSON.stringify(
@@ -35,12 +60,12 @@ export function forAspirate(
     )}`
   )
 
-  if (pipetteSpec.channels > 1 && allWellsShared) {
+  if (channels > 1 && allWellsShared) {
     // special case: trough-like "shared" well with multi-channel pipette
     const commonWell = wellsForTips[0]
     const sourceLiquidState = liquidState.labware[labwareId][commonWell]
     const isOveraspirate =
-      volume * pipetteSpec.channels > getLocationTotalVolume(sourceLiquidState)
+      volume * channels > getLocationTotalVolume(sourceLiquidState)
 
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
@@ -49,11 +74,11 @@ export function forAspirate(
     }
 
     const volumePerTip = isOveraspirate
-      ? getLocationTotalVolume(sourceLiquidState) / pipetteSpec.channels
+      ? getLocationTotalVolume(sourceLiquidState) / channels
       : volume
     // all tips get the same amount of the same liquid added to them, from the source well
     const newLiquidFromWell = splitLiquid(volumePerTip, sourceLiquidState).dest
-    range(pipetteSpec.channels).forEach((tipIndex): void => {
+    range(channels).forEach((tipIndex): void => {
       const pipette = liquidState.pipettes[pipetteId]
       const indexToString = tipIndex.toString()
       const tipLiquidState = pipette[indexToString]
@@ -71,21 +96,72 @@ export function forAspirate(
     })
     // Remove liquid from source well
     liquidState.labware[labwareId][commonWell] = splitLiquid(
-      volume * pipetteSpec.channels,
+      volume * channels,
       liquidState.labware[labwareId][commonWell]
     ).source
     return
   }
 
+  //  all wells in the reservoir are being used in this case but 8 channels per well
+  if (channels === 96 && isReservoir) {
+    //  for each well the 96 channels are aspirating into
+    wellsForTips.forEach(well => {
+      const sourceLiquidState = liquidState.labware[labwareId][well]
+      const isOveraspirate =
+        volume * 8 > getLocationTotalVolume(sourceLiquidState)
+
+      if (isEmpty(sourceLiquidState)) {
+        warnings.push(warningCreators.aspirateFromPristineWell())
+      } else if (isOveraspirate) {
+        warnings.push(warningCreators.aspirateMoreThanWellContents())
+      }
+
+      const volumePerTip = isOveraspirate
+        ? getLocationTotalVolume(sourceLiquidState) / 8
+        : volume
+
+      // all tips get the same amount of the same liquid added to them, from the source well
+      const newLiquidFromWell = splitLiquid(
+        volumePerTip,
+        sourceLiquidState
+      ).dest
+
+      range(channels).forEach(tipIndex => {
+        const pipette = liquidState.pipettes[pipetteId]
+        const indexToString = tipIndex.toString()
+        const tipLiquidState = pipette[indexToString]
+
+        // since volumePerTip is being calculated to avoid splitting unevenly across tips,
+        // AIR needs to be added in here if it's an over-aspiration
+        const nextTipLiquidState = isOveraspirate
+          ? mergeLiquid(tipLiquidState, {
+              ...newLiquidFromWell,
+              [AIR]: {
+                volume: volume - volumePerTip,
+              },
+            })
+          : mergeLiquid(tipLiquidState, newLiquidFromWell)
+
+        pipette[indexToString] = nextTipLiquidState
+      })
+      // Remove liquid from source well
+      liquidState.labware[labwareId][well] = splitLiquid(
+        volumePerTip * 8,
+        liquidState.labware[labwareId][well]
+      ).source
+    })
+
+    return
+  }
+
   // general case (no common well shared across all tips)
-  range(pipetteSpec.channels).forEach(tipIndex => {
+  range(channels).forEach(tipIndex => {
     const indexToString = tipIndex.toString()
     const pipette = liquidState.pipettes[pipetteId]
     const tipLiquidState = pipette[indexToString]
     const sourceLiquidState =
       liquidState.labware[labwareId][wellsForTips[tipIndex]]
     const newLiquidFromWell = splitLiquid(volume, sourceLiquidState).dest
-
     if (isEmpty(sourceLiquidState)) {
       warnings.push(warningCreators.aspirateFromPristineWell())
     } else if (volume > getLocationTotalVolume(sourceLiquidState)) {

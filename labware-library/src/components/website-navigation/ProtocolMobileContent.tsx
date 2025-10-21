@@ -1,9 +1,8 @@
-import * as React from 'react'
 import map from 'lodash/map'
-import { NavLink } from './NavLink'
-import styles from './styles.css'
 
 import { protocolLinkProps } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.module.css'
 
 export function ProtocolMobileContent(): JSX.Element {
   const links = map(protocolLinkProps)

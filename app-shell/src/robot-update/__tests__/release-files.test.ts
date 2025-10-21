@@ -1,10 +1,15 @@
 // TODO(mc, 2020-06-11): test all release-files functions
-import path from 'path'
 import { promises as fs } from 'fs'
+import path from 'path'
 import fse from 'fs-extra'
 import tempy from 'tempy'
+import { afterAll, describe, expect, it, vi } from 'vitest'
 
 import { cleanupReleaseFiles } from '../release-files'
+
+vi.mock('electron-updater')
+vi.mock('electron-store')
+vi.mock('../../log')
 
 describe('robot update release files utilities', () => {
   const tempDirs: string[] = []
@@ -15,7 +20,7 @@ describe('robot update release files utilities', () => {
   }
 
   afterAll(() => {
-    return Promise.all(tempDirs.map(d => fse.remove(d)))
+    return Promise.all(tempDirs.map(d => fse.remove(d))) as any
   })
 
   describe('cleanupReleaseFiles', () => {

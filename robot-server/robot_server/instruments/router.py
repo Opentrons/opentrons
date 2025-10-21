@@ -1,7 +1,8 @@
 """Instruments routes."""
-from typing import Optional, Dict, List, TYPE_CHECKING, cast
+from typing import Annotated, Optional, Dict, List, cast
 
-from fastapi import APIRouter, status, Depends
+from fastapi import status, Depends
+from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetSummary,
@@ -48,10 +49,9 @@ from .instrument_models import (
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import OT3HardwareControlAPI
 
-instruments_router = APIRouter()
+instruments_router = LightRouter()
 
 
 def _pipette_dict_to_pipette_res(
@@ -64,7 +64,7 @@ def _pipette_dict_to_pipette_res(
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         calibration_data = pipette_offset
-        return Pipette.construct(
+        return Pipette.model_construct(
             firmwareVersion=str(fw_version) if fw_version else None,
             ok=True,
             mount=MountType.from_hw_mount(mount).value,
@@ -76,7 +76,7 @@ def _pipette_dict_to_pipette_res(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
                 max_volume=pipette_dict["max_volume"],
-                calibratedOffset=InstrumentCalibrationData.construct(
+                calibratedOffset=InstrumentCalibrationData.model_construct(
                     offset=Vec3f(
                         x=calibration_data.offset.x,
                         y=calibration_data.offset.y,
@@ -85,9 +85,9 @@ def _pipette_dict_to_pipette_res(
                     source=calibration_data.source,
                     last_modified=calibration_data.last_modified,
                     reasonability_check_failures=[
-                        InconsistentCalibrationFailure.construct(
+                        InconsistentCalibrationFailure.model_construct(
                             offsets={
-                                k.name: Vec3f.construct(x=v.x, y=v.y, z=v.z)
+                                k.name: Vec3f.model_construct(x=v.x, y=v.y, z=v.z)
                                 for k, v in failure.offsets.items()
                             },
                             limit=failure.limit,
@@ -98,7 +98,7 @@ def _pipette_dict_to_pipette_res(
                 if calibration_data
                 else None,
             ),
-            state=PipetteState.parse_obj(pipette_state) if pipette_state else None,
+            state=PipetteState.model_validate(pipette_state) if pipette_state else None,
         )
 
 
@@ -107,7 +107,7 @@ def _gripper_dict_to_gripper_res(
 ) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
-    return Gripper.construct(
+    return Gripper.model_construct(
         firmwareVersion=str(fw_version) if fw_version else None,
         ok=True,
         mount=MountType.EXTENSION.value,
@@ -116,7 +116,7 @@ def _gripper_dict_to_gripper_res(
         subsystem=SubSystem.from_hw(HWSubSystem.of_mount(OT3Mount.GRIPPER)),
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
-            calibratedOffset=InstrumentCalibrationData.construct(
+            calibratedOffset=InstrumentCalibrationData.model_construct(
                 offset=Vec3f(
                     x=calibration_data.offset.x,
                     y=calibration_data.offset.y,
@@ -151,7 +151,7 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
 
 
 async def _get_gripper_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
@@ -167,7 +167,7 @@ async def _get_gripper_instrument_data(
 
 
 async def _get_pipette_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
 ) -> Optional[AttachedItem]:
@@ -193,7 +193,7 @@ async def _get_pipette_instrument_data(
 
 
 async def _get_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
 ) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
@@ -214,13 +214,13 @@ async def _get_instrument_data(
 
 
 async def _get_attached_instruments_ot3(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
-    await hardware.cache_instruments()
+    await hardware.cache_instruments(skip_if_would_block=True)
     response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),
@@ -244,7 +244,7 @@ async def _get_attached_instruments_ot2(
         if pipette_dict
     ]
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),
@@ -252,20 +252,31 @@ async def _get_attached_instruments_ot2(
     )
 
 
-@instruments_router.get(
+@PydanticResponse.wrap_route(
+    instruments_router.get,
     path="/instruments",
-    summary="Get attached instruments.",
-    description="Get a list of all instruments (pipettes & gripper) currently attached"
-    " to the robot.",
+    summary="Get attached instruments",
+    description=(
+        "Get a list of all instruments (pipettes & gripper) currently attached"
+        " to the robot."
+        "\n\n"
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots. For OT-2 robots, use `/pipettes` instead."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
-    """Get a list of all attached instruments."""
+    """Get a list of all attached instruments.
+
+    Note: This endpoint returns the full AttachedItem data for Flex instruments only.
+
+          On an OT-2, this endpoint will provide partial data of the OT-2 pipettes
+          (no pipette fw and calibration data), and will not fetch new data after
+          a pipette attachment/ removal.
+    """
     try:
-        # TODO (spp, 2023-01-06): revise according to
-        #  https://opentrons.atlassian.net/browse/RET-1295
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
         return await _get_attached_instruments_ot3(ot3_hardware)
     except HardwareNotSupportedError:

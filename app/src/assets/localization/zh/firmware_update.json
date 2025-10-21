@@ -1,0 +1,17 @@
+{
+  "firmware_out_of_date": "用于<bold>{{mount}}{{instrument}}</bold>的固件已过期。在运行使用此设备的协议之前，请更新该固件。",
+  "gantry_x": "龙门架X轴",
+  "gantry_y": "龙门架Y轴",
+  "gripper": "转板抓手",
+  "head": "头部组件",
+  "hepa_uv": "HEPA/UV模块",
+  "pipette_left": "左侧移液器",
+  "pipette_right": "右侧移液器",
+  "ready_to_use": "您的<bold>{{instrument}}</bold>已经准备就绪！",
+  "rear_panel": "后置面板",
+  "successful_update": "更新成功！",
+  "update_failed": "更新失败",
+  "update_firmware": "更新固件",
+  "update_needed": "需要更新设备固件",
+  "updating_firmware": "正在更新{{subsystem}}固件..."
+}

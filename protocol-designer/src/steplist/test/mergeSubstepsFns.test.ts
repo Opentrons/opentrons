@@ -1,6 +1,8 @@
+import { describe, expect, it } from 'vitest'
+
 import {
-  mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
+  mergeSubstepRowsSingleChannel,
 } from '../generateSubstepItem'
 
 const ingred1Id = 'ingred1Id'
@@ -154,6 +156,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
             preIngreds: {},
             postIngreds: { [ingred1Id]: 10 },
           },
+          dispenseVolume: 10,
+          aspirateVolume: 10,
           volume: 10,
         },
       ],
@@ -175,6 +179,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
         },
         // last asp + disp merged into single row
         {
+          aspirateVolume: 5,
+          dispenseVolume: 10,
           activeTips,
           source: {
             well: 'A2',
@@ -197,6 +203,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
       expected: [
         // first aspirate + disp merged into single row
         {
+          aspirateVolume: 10,
+          dispenseVolume: 5,
           activeTips,
           source: {
             well: 'A1',
@@ -223,7 +231,7 @@ describe('mergeSubstepRowsSingleChannel', () => {
       ],
     },
   ]
-  testCases.forEach(({ testName, showDispenseVol, substepRows, expected }) =>
+  testCases.forEach(({ testName, showDispenseVol, substepRows, expected }) => {
     it(testName, () => {
       const result = mergeSubstepRowsSingleChannel({
         substepRows,
@@ -231,15 +239,12 @@ describe('mergeSubstepRowsSingleChannel', () => {
       })
       expect(result).toEqual(expected)
     })
-  )
+  })
 })
 
 describe('mergeSubstepRowsMultiChannel', () => {
-  const {
-    transferRowsFixture,
-    consolidateRowsFixture,
-    distributeRowsFixture,
-  } = getFixtures({ isMulti: true })
+  const { transferRowsFixture, consolidateRowsFixture, distributeRowsFixture } =
+    getFixtures({ isMulti: true })
   const testCases: Array<{
     testName: string
     showDispenseVol: boolean
@@ -271,7 +276,7 @@ describe('mergeSubstepRowsMultiChannel', () => {
       substepRows: distributeRowsFixture,
     },
   ]
-  testCases.forEach(({ testName, isMixStep, showDispenseVol, substepRows }) =>
+  testCases.forEach(({ testName, isMixStep, showDispenseVol, substepRows }) => {
     it(testName, () => {
       const channels = 8
       const result = mergeSubstepRowsMultiChannel({
@@ -282,5 +287,5 @@ describe('mergeSubstepRowsMultiChannel', () => {
       })
       expect(result).toMatchSnapshot()
     })
-  )
+  })
 })

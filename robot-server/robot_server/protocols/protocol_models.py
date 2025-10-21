@@ -1,23 +1,31 @@
 """Protocol file models."""
+
 from datetime import datetime
-from pydantic import BaseModel, Extra, Field
+from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional
+from enum import Enum
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
     ProtocolFileRole as ProtocolFileRole,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
 
 
+class ProtocolKind(str, Enum):
+    """Kind of protocol, standard or quick-transfer."""
+
+    STANDARD = "standard"
+    QUICK_TRANSFER = "quick-transfer"
+
+
 class ProtocolFile(BaseModel):
     """A file in a protocol."""
 
-    # TODO(mc, 2021-11-12): add unique ID to file resource
     name: str = Field(..., description="The file's basename, including extension")
     role: ProtocolFileRole = Field(..., description="The file's role in the protocol.")
 
@@ -40,13 +48,7 @@ class Metadata(BaseModel):
     this should be considered an exception to the rule.
     """
 
-    # todo(mm, 2021-09-17): Revise these docs after specifying
-    # metadata more. github.com/Opentrons/opentrons/issues/8334
-
-    class Config:
-        """Tell Pydantic that metadata objects can have arbitrary fields."""
-
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 class Protocol(ResourceModel):
@@ -102,4 +104,17 @@ class Protocol(ResourceModel):
         ),
     )
 
-    key: Optional[str] = None
+    key: Optional[str] = Field(
+        None,
+        description=(
+            "An arbitrary client-defined string, set when this protocol was uploaded."
+            " See `POST /protocols`."
+        ),
+    )
+
+    protocolKind: Optional[ProtocolKind] = Field(
+        ...,
+        description="The kind of protocol (standard or quick-transfer)."
+        "The client provides this field when the protocol is uploaded."
+        " See `POST /protocols`.",
+    )

@@ -1,13 +1,13 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
 
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.types import RobotType
 from .api_support.definitions import MIN_SUPPORTED_VERSION
 from .api_support.types import APIVersion
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.protocol.dev_types import (
+    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.protocol.types import (
         JsonProtocol as JsonProtocolDef,
         Metadata as JsonProtocolMetadata,
     )
@@ -31,7 +31,13 @@ class StaticPythonInfo:
 
 @dataclass(frozen=True)
 class _ProtocolCommon:
-    text: str
+    text: Union[str, bytes]
+    """The original text of the protocol file in the format it was specified with.
+
+    This leads to a wide type but it is actually quite important that we do not ever
+    str.decode('utf-8') this because it will break the interpreter's understanding of
+    line numbers for if we have to format an exception.
+    """
 
     filename: Optional[str]
     """The original name of the main protocol file, if it had a name.
@@ -74,7 +80,7 @@ Protocol = Union[JsonProtocol, PythonProtocol]
 
 
 class BundleContents(NamedTuple):
-    protocol: str
+    protocol: Union[str, bytes]
     bundled_labware: Dict[str, "LabwareDefinition"]
     bundled_data: Dict[str, bytes]
     bundled_python: Dict[str, str]

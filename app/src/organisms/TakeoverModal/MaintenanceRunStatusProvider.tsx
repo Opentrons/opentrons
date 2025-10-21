@@ -1,5 +1,8 @@
-import * as React from 'react'
-import { useCurrentMaintenanceRun } from '@opentrons/react-api-client'
+import { createContext, useEffect, useMemo, useState } from 'react'
+
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+
+import type { ReactNode } from 'react'
 
 interface MaintenanceRunIds {
   currentRunId: string | null
@@ -11,35 +14,35 @@ export interface MaintenanceRunStatus {
   setOddRunIds: (state: MaintenanceRunIds) => void
 }
 
-export const MaintenanceRunContext = React.createContext<MaintenanceRunStatus>({
+export const MaintenanceRunContext = createContext<MaintenanceRunStatus>({
   getRunIds: () => ({ currentRunId: null, oddRunId: null }),
   setOddRunIds: () => {},
 })
 
 interface MaintenanceRunProviderProps {
-  children?: React.ReactNode
+  children?: ReactNode
 }
 
 export function MaintenanceRunStatusProvider(
   props: MaintenanceRunProviderProps
 ): JSX.Element {
-  const [oddRunIds, setOddRunIds] = React.useState<MaintenanceRunIds>({
+  const [oddRunIds, setOddRunIds] = useState<MaintenanceRunIds>({
     currentRunId: null,
     oddRunId: null,
   })
 
-  const currentRunIdQueryResult = useCurrentMaintenanceRun({
+  const currentRunIdQueryResult = useNotifyCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
 
-  React.useEffect(() => {
+  useEffect(() => {
     setOddRunIds(prevState => ({
       ...prevState,
       currentRunId: currentRunIdQueryResult ?? null,
     }))
   }, [currentRunIdQueryResult])
 
-  const maintenanceRunStatus = React.useMemo(
+  const maintenanceRunStatus = useMemo(
     () => ({
       getRunIds: () => oddRunIds,
       setOddRunIds,

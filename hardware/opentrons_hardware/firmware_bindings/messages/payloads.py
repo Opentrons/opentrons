@@ -1,4 +1,5 @@
 """Payloads of can bus messages."""
+
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
@@ -30,6 +31,7 @@ from .fields import (
     GearMotorIdField,
     OptionalRevisionField,
     MotorUsageTypeField,
+    BatchSensorDataField,
 )
 from .. import utils
 
@@ -128,7 +130,6 @@ class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
-    data: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -261,6 +262,14 @@ class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
 @dataclass(eq=False)
 class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     """Read motor driver register response payload."""
+
+    reg_addr: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class ReadMotorDriverErrorStatusResponsePayload(EmptyPayload):
+    """Read motor driver error status response payload."""
 
     reg_addr: utils.UInt8Field
     data: utils.UInt32Field
@@ -437,6 +446,14 @@ class ReadFromSensorResponsePayload(SensorPayload):
 
 
 @dataclass(eq=False)
+class BatchReadFromSensorResponsePayload(SensorPayload):
+    """A response for a batch of sensor responses."""
+
+    data_length: utils.UInt8Field
+    sensor_data: BatchSensorDataField
+
+
+@dataclass(eq=False)
 class SetSensorThresholdRequestPayload(SensorPayload):
     """A request to set the threshold value of a sensor."""
 
@@ -479,6 +496,15 @@ class BindSensorOutputResponsePayload(SensorPayload):
     """A response that sends back the current binding for a sensor."""
 
     binding: SensorOutputBindingField
+
+
+@dataclass(eq=False)
+class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
+    """A request to add a linear move that also requires sensor reading for its duration."""
+
+    sensor_id: SensorIdField
+    sensor_type: SensorTypeField
+    sensor_binding_flags: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -525,6 +551,13 @@ class GripperJawStatePayload(EmptyPayload):
     """A respones carrying info about the jaw state of a gripper."""
 
     state: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    holdoff_ms: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -620,3 +653,55 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         return inst
 
     usage_elements: List[MotorUsageTypeField]
+
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached hepa uv."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField
+
+
+@dataclass(eq=False)
+class SetHepaFanStateRequestPayload(EmptyPayload):
+    """A request to set the state and pwm of a the hepa fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaFanStatePayloadResponse(EmptyPayload):
+    """A response with the state and pwm of the fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+    fan_rpm: utils.UInt16Field
+
+
+@dataclass(eq=False)
+class SetHepaUVStateRequestPayload(EmptyPayload):
+    """A request to set the state and timeout in seconds of the hepa uv light."""
+
+    uv_duration_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaUVStatePayloadResponse(EmptyPayload):
+    """A response with the state and timeout in seconds of the hepa uv light."""
+
+    uv_duration_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+    remaining_time_s: utils.UInt32Field
+    uv_current_ma: utils.UInt16Field
+    safety_relay_active: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class SendAccumulatedSensorDataPayload(EmptyPayload):
+    """Send queued readings from a sensor."""
+
+    sensor_id: SensorIdField
+    sensor_type: SensorTypeField

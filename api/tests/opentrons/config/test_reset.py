@@ -4,10 +4,10 @@ from unittest.mock import MagicMock, patch
 
 from opentrons.config import reset
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import RobotModel
+    from opentrons_shared_data.deck.types import RobotModel
 
 
 @pytest.fixture

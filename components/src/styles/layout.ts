@@ -7,6 +7,7 @@ export const DISPLAY_FLEX = 'flex'
 export const DISPLAY_TABLE = 'table'
 export const DISPLAY_TABLE_ROW = 'table-row'
 export const DISPLAY_TABLE_CELL = 'table-cell'
+export const DISPLAY_GRID = 'grid'
 
 // powers-of-two size scale
 export const SIZE_AUTO = 'auto'
@@ -23,3 +24,8 @@ export const OVERFLOW_HIDDEN = 'hidden'
 export const OVERFLOW_CLIP = 'clip'
 export const OVERFLOW_SCROLL = 'scroll'
 export const OVERFLOW_AUTO = 'auto'
+
+// overflow wrap
+export const OVERFLOW_WRAP_ANYWHERE = 'anywhere'
+export const OVERFLOW_WRAP_BREAK_WORD = 'break-word'
+export const OVERFLOW_WRAP_NORMAL = 'normal'

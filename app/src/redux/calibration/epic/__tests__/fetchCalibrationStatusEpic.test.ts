@@ -1,7 +1,10 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
+
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
+import { calibrationEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { calibrationEpic } from '..'
 
 import type { Action } from '../../../types'
 
@@ -9,10 +12,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.fetchCalibrationStatus(robotName)
 
 describe('fetch calibration status epic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /calibration/status', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,

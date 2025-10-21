@@ -18,13 +18,15 @@ Vt = TypeVar("Vt")
 
 
 class GantryLoad(Enum):
-    HIGH_THROUGHPUT = "high_throughput"
+    HIGH_THROUGHPUT_1000 = "high_throughput_1000"
+    HIGH_THROUGHPUT_200 = "high_throughput_200"
     LOW_THROUGHPUT = "low_throughput"
 
 
 @dataclass
 class ByGantryLoad(Generic[Vt]):
-    high_throughput: Vt
+    high_throughput_1000: Vt
+    high_throughput_200: Vt
     low_throughput: Vt
 
     def __getitem__(self, key: GantryLoad) -> Vt:
@@ -118,18 +120,15 @@ class ZSenseSettings:
 
 @dataclass
 class LiquidProbeSettings:
-    starting_mount_height: float
-    max_z_distance: float
-    min_z_distance: float
     mount_speed: float
     plunger_speed: float
+    plunger_impulse_time: float
     sensor_threshold_pascals: float
-    expected_liquid_height: float
-    log_pressure: bool
     aspirate_while_sensing: bool
-    auto_zero_sensor: bool
-    num_baseline_reads: int
-    data_file: str
+    z_overlap_between_passes_mm: float
+    plunger_reset_offset: float
+    samples_for_baselining: int
+    sample_time_sec: float
 
 
 @dataclass(frozen=True)
@@ -174,7 +173,6 @@ class OT3Config:
     log_level: str
     motion_settings: OT3MotionSettings
     current_settings: OT3CurrentSettings
-    z_retract_distance: float
     safe_home_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset

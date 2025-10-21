@@ -1,25 +1,31 @@
 """Command models to wait for a Heater-Shaker Module's target temperature."""
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
+
 from typing_extensions import Literal, Type
-
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
 WaitForTemperatureCommandType = Literal["heaterShaker/waitForTemperature"]
 
 
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
+
+
 class WaitForTemperatureParams(BaseModel):
     """Input parameters to wait for a Heater-Shaker's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
-    celsius: Optional[float] = Field(
+    celsius: float | SkipJsonSchema[None] = Field(
         None,
         description="Target temperature in °C. If not specified, will "
         "default to the module's target temperature. "
@@ -27,6 +33,7 @@ class WaitForTemperatureParams(BaseModel):
         "could lead to unpredictable behavior and hence is not "
         "recommended for use. This parameter can be removed in a "
         "future version without prior notice.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -35,7 +42,7 @@ class WaitForTemperatureResult(BaseModel):
 
 
 class WaitForTemperatureImpl(
-    AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
+    AbstractCommandImpl[WaitForTemperatureParams, SuccessData[WaitForTemperatureResult]]
 ):
     """Execution implementation of a Heater-Shaker's wait for temperature command."""
 
@@ -50,7 +57,7 @@ class WaitForTemperatureImpl(
 
     async def execute(
         self, params: WaitForTemperatureParams
-    ) -> WaitForTemperatureResult:
+    ) -> SuccessData[WaitForTemperatureResult]:
         """Wait for a Heater-Shaker's target temperature to be reached."""
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
             module_id=params.moduleId
@@ -69,17 +76,19 @@ class WaitForTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.await_temperature(awaiting_temperature=target_temp)
 
-        return WaitForTemperatureResult()
+        return SuccessData(
+            public=WaitForTemperatureResult(),
+        )
 
 
 class WaitForTemperature(
-    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]
+    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult, ErrorOccurrence]
 ):
     """A command to wait for a Heater-Shaker's target temperature to be reached."""
 
     commandType: WaitForTemperatureCommandType = "heaterShaker/waitForTemperature"
     params: WaitForTemperatureParams
-    result: Optional[WaitForTemperatureResult]
+    result: Optional[WaitForTemperatureResult] = None
 
     _ImplementationCls: Type[WaitForTemperatureImpl] = WaitForTemperatureImpl
 

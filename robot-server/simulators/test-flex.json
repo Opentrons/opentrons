@@ -4,53 +4,96 @@
   "attached_instruments": {
     "right": {
       "model": "p1000_single_3.4",
-      "id": "321"
+      "id": "321_flex"
     },
     "left": {
       "model": "p50_single_3.4",
-      "id": "123"
+      "id": "123_flex"
+    },
+    "gripper": {
+      "model": "gripper_1.3",
+      "id": "1234_flex_gripper"
     }
   },
   "attached_modules": {
     "thermocycler": [
       {
-        "function_name": "set_temperature",
-        "kwargs": {
-          "temperature": 3,
-          "hold_time_seconds": 1,
-          "hold_time_minutes": 2,
-          "ramp_rate": 4,
-          "volume": 5
-        }
-      },
-      {
-        "function_name": "set_lid_temperature",
-        "kwargs": {
-          "temperature": 4
-        }
+        "model": "thermocyclerModuleV2",
+        "serial_number": "therm-123",
+        "calls": [
+          {
+            "function_name": "set_temperature",
+            "kwargs": {
+              "temperature": 3,
+              "hold_time_seconds": 1,
+              "hold_time_minutes": 2,
+              "volume": 5
+            }
+          },
+          {
+            "function_name": "set_lid_temperature",
+            "kwargs": {
+              "temperature": 4
+            }
+          }
+        ]
       }
     ],
-    "heatershaker": [],
+    "heatershaker": [
+      {
+        "model": "heaterShakerModuleV1",
+        "serial_number": "hs-123",
+        "calls": []
+      }
+    ],
+    "flexstacker": [
+      {
+        "model": "flexStackerModuleV1",
+        "serial_number": "EMPTYSN",
+        "calls": []
+      },
+      {
+        "model": "flexStackerModuleV1",
+        "serial_number": "FSTA1020250119001",
+        "calls": []
+      }
+    ],
     "tempdeck": [
       {
-        "function_name": "start_set_temperature",
-        "kwargs": {
-          "celsius": 3
-        }
+        "model": "temperatureModuleV2",
+        "serial_number": "temp-123",
+        "calls": [
+          {
+            "function_name": "start_set_temperature",
+            "kwargs": {
+              "celsius": 3
+            }
+          },
+          {
+            "function_name": "await_temperature",
+            "kwargs": {
+              "awaiting_temperature": null
+            }
+          }
+        ]
       },
       {
-        "function_name": "await_temperature",
-        "kwargs": {
-          "awaiting_temperature": null
-        }
-      }
-    ],
-    "magdeck": [
-      {
-        "function_name": "engage",
-        "kwargs": {
-          "height": 4
-        }
+        "model": "temperatureModuleV2",
+        "serial_number": "temp-1234",
+        "calls": [
+          {
+            "function_name": "start_set_temperature",
+            "kwargs": {
+              "celsius": 3
+            }
+          },
+          {
+            "function_name": "await_temperature",
+            "kwargs": {
+              "awaiting_temperature": null
+            }
+          }
+        ]
       }
     ]
   }

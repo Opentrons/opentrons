@@ -1,61 +1,76 @@
 """Router for /runs endpoints dealing with labware offsets and definitions."""
+
 import logging
-from typing import Union
+from typing import Annotated, Union
 
-from fastapi import APIRouter, Depends, status
+from fastapi import Depends, status
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition as SD_LabwareDefinition,
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
+from server_utils.fastapi_utils.light_router import LightRouter
+
+from opentrons.protocol_engine import (
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    LabwareOffset,
 )
 
-from opentrons.protocol_engine import LabwareOffsetCreate, LabwareOffset
-from opentrons.protocols.models import LabwareDefinition
-
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     PydanticResponse,
-    ResponseList,
 )
 
 from ..run_models import Run, LabwareDefinitionSummary
 from ..run_data_manager import RunDataManager, RunNotCurrentError
-from ..engine_store import EngineStore
-from ..dependencies import get_engine_store, get_run_data_manager
+from ..run_orchestrator_store import RunOrchestratorStore
+from ..dependencies import get_run_orchestrator_store, get_run_data_manager
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
-labware_router = APIRouter()
+labware_router = LightRouter()
 
 
-@labware_router.post(
+@PydanticResponse.wrap_route(
+    labware_router.post,
     path="/runs/{runId}/labware_offsets",
-    summary="Add a labware offset to a run",
+    summary="Add labware offsets to a run",
     description=(
-        "Add a labware offset to an existing run, returning the created offset."
+        "Add labware offsets to an existing run, returning the created offsets."
         "\n\n"
         "There is no matching `GET /runs/{runId}/labware_offsets` endpoint."
         " To read the list of labware offsets currently on the run,"
         " see the run's `labwareOffsets` field."
+        "\n\n"
+        "The response body's `data` will either be a single offset or a list of offsets,"
+        " depending on whether you provided a single offset or a list in the request body's `data`."
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[LabwareOffset]},
+        status.HTTP_201_CREATED: {
+            "model": SimpleBody[LabwareOffset | list[LabwareOffset]]
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def add_labware_offset(
-    request_body: RequestModel[LabwareOffsetCreate],
-    engine_store: EngineStore = Depends(get_engine_store),
-    run: Run = Depends(get_run_data_from_url),
-) -> PydanticResponse[SimpleBody[LabwareOffset]]:
-    """Add a labware offset to a run.
+    request_body: RequestModel[
+        LegacyLabwareOffsetCreate
+        | LabwareOffsetCreate
+        | list[LegacyLabwareOffsetCreate | LabwareOffsetCreate]
+    ],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
+) -> PydanticResponse[SimpleBody[LabwareOffset | list[LabwareOffset]]]:
+    """Add labware offsets to a run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     if run.current is False:
@@ -63,18 +78,34 @@ async def add_labware_offset(
             status.HTTP_409_CONFLICT
         )
 
-    added_offset = engine_store.engine.add_labware_offset(request_body.data)
-    log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
+    offsets_to_add = (
+        request_body.data
+        if isinstance(request_body.data, list)
+        else [request_body.data]
+    )
+
+    added_offsets: list[LabwareOffset] = []
+    for offset_to_add in offsets_to_add:
+        added_offset = run_orchestrator_store.add_labware_offset(offset_to_add)
+        added_offsets.append(added_offset)
+        log.info(f'Added labware offset "{added_offset.id}" to run "{run.id}".')
+
+    # Return a list if the client POSTed a list, or an object if the client POSTed an object.
+    # For some reason, mypy needs to be given the type annotation explicitly.
+    response_data: LabwareOffset | list[LabwareOffset] = (
+        added_offsets if isinstance(request_body.data, list) else added_offsets[0]
+    )
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=added_offset),
+        content=SimpleBody.model_construct(data=response_data),
         status_code=status.HTTP_201_CREATED,
     )
 
 
 # TODO(mc, 2022-02-28): add complementary GET endpoint
 # https://github.com/Opentrons/opentrons/issues/9427
-@labware_router.post(
+@PydanticResponse.wrap_route(
+    labware_router.post,
     path="/runs/{runId}/labware_definitions",
     summary="Add a labware definition to a run",
     description=(
@@ -82,21 +113,23 @@ async def add_labware_offset(
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[LabwareDefinitionSummary]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    engine_store: EngineStore = Depends(get_engine_store),
-    run: Run = Depends(get_run_data_from_url),
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.
 
     Args:
         request_body: New labware offset request data from request body.
-        engine_store: Engine storage interface.
+        run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     if run.current is False:
@@ -104,18 +137,19 @@ async def add_labware_definition(
             status.HTTP_409_CONFLICT
         )
 
-    uri = engine_store.engine.add_labware_definition(request_body.data)
+    uri = run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 
     return PydanticResponse(
-        content=SimpleBody.construct(
-            data=LabwareDefinitionSummary.construct(definitionUri=uri)
+        content=SimpleBody.model_construct(
+            data=LabwareDefinitionSummary.model_construct(definitionUri=uri)
         ),
         status_code=status.HTTP_201_CREATED,
     )
 
 
-@labware_router.get(
+@PydanticResponse.wrap_route(
+    labware_router.get,
     path="/runs/{runId}/loaded_labware_definitions",
     summary="Get the definitions of a run's loaded labware",
     description=(
@@ -127,14 +161,14 @@ async def add_labware_definition(
         " Repeated definitions will be deduplicated."
     ),
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_200_OK: {"model": SimpleBody[list[LabwareDefinition]]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def get_run_loaded_labware_definitions(
     runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[ResponseList[SD_LabwareDefinition]]]:
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleBody[list[LabwareDefinition]]]:
     """Get a run's loaded labware definition by the run ID.
 
     Args:
@@ -148,8 +182,7 @@ async def get_run_loaded_labware_definitions(
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
-    labware_definitions_result = ResponseList.construct(__root__=labware_definitions)
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=labware_definitions_result),
+        content=SimpleBody.model_construct(data=labware_definitions),
         status_code=status.HTTP_200_OK,
     )

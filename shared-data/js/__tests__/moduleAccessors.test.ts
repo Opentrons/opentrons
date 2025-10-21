@@ -1,24 +1,25 @@
-import {
-  getModuleDef2,
-  getModuleType,
-  getModuleDisplayName,
-  normalizeModuleModel,
-} from '../modules'
+import { describe, expect, it } from 'vitest'
 
 import {
+  MAGDECK,
+  MAGNETIC_MODULE_V1,
   MODULE_MODELS,
   MODULE_TYPES,
   TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
 } from '../constants'
+import {
+  getModuleDef,
+  getModuleDisplayName,
+  getModuleType,
+  normalizeModuleModel,
+} from '../modules'
 
 describe('all valid models work', () => {
   MODULE_MODELS.forEach(model => {
-    const loadedDef = getModuleDef2(model)
+    const loadedDef = getModuleDef(model)
 
     it('ensure valid models load', () => {
       expect(loadedDef).not.toBeNull()
@@ -36,15 +37,16 @@ describe('all valid models work', () => {
   })
 })
 
-describe('legacy models work too', () => {
+describe('legacy models', () => {
   const legacyEquivs = [
     [TEMPDECK, TEMPERATURE_MODULE_V1],
     [MAGDECK, MAGNETIC_MODULE_V1],
     [THERMOCYCLER, THERMOCYCLER_MODULE_V1],
   ] as const
-
-  legacyEquivs.forEach(([legacy, modern]) => {
-    const fromLegacy = normalizeModuleModel(legacy)
-    expect(fromLegacy).toEqual(modern)
+  it('legacy models work too', () => {
+    legacyEquivs.forEach(([legacy, modern]) => {
+      const fromLegacy = normalizeModuleModel(legacy)
+      expect(fromLegacy).toEqual(modern)
+    })
   })
 })

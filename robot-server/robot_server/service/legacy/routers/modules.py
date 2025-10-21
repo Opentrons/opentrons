@@ -9,7 +9,7 @@ from opentrons.hardware_control.modules import AbstractModule
 from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
 from opentrons_shared_data.errors.codes import ErrorCodes
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.models import V1BasicResponse
@@ -26,7 +26,7 @@ router = APIRouter()
 
 # NOTE(mc, 2022-03-22): replaced by robot_server.modules.router.get_attached_modules
 async def get_modules(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> Modules:
     attached_modules = hardware.attached_modules
     module_data = [
@@ -63,28 +63,32 @@ async def get_modules(
     description=(
         "Command a module to take an action. Valid actions "
         "depend on the specific module attached, which is "
-        "the model value from GET /modules/{serial}/data or "
-        "GET /modules"
+        "the model value from `GET /modules/{serial}/data` or "
+        "`GET /modules`."
+        "\n\n"
+        "**Deprecated:** Removed with `Opentrons-Version: 3`."
+        " Use `POST /commands` instead."
     ),
     response_model=SerialCommandResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
+    deprecated=True,
 )
 async def post_serial_command(
     command: SerialCommand,
-    serial: str = Path(..., description="Serial number of the module"),
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    requested_version: int = Depends(get_requested_version),
+    serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
+    requested_version: typing.Annotated[int, Depends(get_requested_version)],
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
     if requested_version >= 3:
         raise LegacyErrorResponse.from_exc(
             APIRemoved(
-                "/modules/{serial}",
-                "3",
-                "This endpoint has been removed. Use POST /commands instead.",
+                api_element="/modules/{serial}",
+                since_version="3",
+                extra_message="This endpoint has been removed. Use POST /commands instead.",
             ),
         ).as_error(status.HTTP_410_GONE)
 
@@ -140,8 +144,8 @@ async def post_serial_command(
     },
 )
 async def post_serial_update(
-    serial: str = Path(..., description="Serial number of the module"),
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    serial: typing.Annotated[str, Path(..., description="Serial number of the module")],
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules
@@ -158,7 +162,6 @@ async def post_serial_update(
                 modules.update_firmware(
                     matching_module,
                     matching_module.bundled_fw.path,
-                    asyncio.get_event_loop(),
                 ),
                 100,
             )

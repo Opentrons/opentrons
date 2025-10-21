@@ -1,10 +1,9 @@
+import pytest
+from typing import List
 from opentrons_hardware.hardware_control.motion_planning import Move
-from opentrons_hardware.hardware_control.motion import (
-    create_step,
-)
 from opentrons.hardware_control.backends import ot3utils
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount, OT3AxisKind
 from numpy import float64 as f64
 
 from opentrons.config import defaults_ot3, types as conf_types
@@ -37,31 +36,6 @@ def test_create_step() -> None:
         assert set(present_nodes) == set(step.keys())
 
 
-def test_get_moving_nodes() -> None:
-    """Test that we can filter out the nonmoving nodes."""
-    # Create a dummy group where X has velocity but no accel, and Y has accel but no velocity.
-    present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
-    move_group = [
-        create_step(
-            distance={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(100)},
-            velocity={NodeId.gantry_x: f64(100), NodeId.gantry_y: f64(0)},
-            acceleration={NodeId.gantry_x: f64(0), NodeId.gantry_y: f64(100)},
-            duration=f64(1),
-            present_nodes=present_nodes,
-        )
-    ]
-    assert len(move_group[0]) == 4
-
-    print(move_group)
-
-    moving_nodes = ot3utils.moving_axes_in_move_group(move_group)
-    assert len(moving_nodes) == 2
-    assert NodeId.gantry_x in moving_nodes
-    assert NodeId.gantry_y in moving_nodes
-    assert NodeId.head_l not in moving_nodes
-    assert NodeId.head_r not in moving_nodes
-
-
 def test_filter_zero_duration_step() -> None:
     origin = {
         Axis.X: 0,
@@ -72,7 +46,7 @@ def test_filter_zero_duration_step() -> None:
         Axis.P_R: 0,
     }
     moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
-    for block in moves[0].blocks:
+    for block in (moves[0].blocks[0], moves[0].blocks[1]):
         block.distance = f64(25.0)
         block.time = f64(1.0)
         block.initial_speed = f64(25.0)
@@ -84,7 +58,7 @@ def test_filter_zero_duration_step() -> None:
         moves=moves,
         present_nodes=present_nodes,
     )
-    assert len(move_group) == 3
+    assert len(move_group) == 2
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
 
@@ -119,3 +93,57 @@ def test_get_system_contraints_for_plunger() -> None:
     )
 
     assert updated_contraints[axis].max_acceleration == set_acceleration
+
+
+@pytest.mark.parametrize(["mount"], [[OT3Mount.LEFT], [OT3Mount.RIGHT]])
+def test_get_system_constraints_for_emulsifying_pipette(mount: OT3Mount) -> None:
+    set_max_speed = 90
+    config = defaults_ot3.build_with_defaults({})
+    pipette_ax = Axis.of_main_tool_actuator(mount)
+    default_pip_max_speed = config.motion_settings.default_max_speed[
+        conf_types.GantryLoad.LOW_THROUGHPUT
+    ][OT3AxisKind.P]
+    updated_constraints = ot3utils.get_system_constraints_for_emulsifying_pipette(
+        config.motion_settings, conf_types.GantryLoad.LOW_THROUGHPUT, mount
+    )
+    other_pipette = list(set(Axis.pipette_axes()) - {pipette_ax})[0]
+    assert updated_constraints[pipette_ax].max_speed == set_max_speed
+    assert updated_constraints[other_pipette].max_speed == default_pip_max_speed
+
+
+@pytest.mark.parametrize(
+    ["moving", "expected"],
+    [
+        [
+            [NodeId.gantry_x, NodeId.gantry_y, NodeId.gripper_g, NodeId.gripper_z],
+            [],
+        ],
+        [
+            [NodeId.head_l],
+            [NodeId.pipette_left],
+        ],
+        [
+            [NodeId.head_r],
+            [NodeId.pipette_right],
+        ],
+    ],
+)
+def test_moving_pipettes_in_move_group(
+    moving: List[NodeId], expected: List[NodeId]
+) -> None:
+    """Test that we can filter out the nonmoving nodes."""
+    present_nodes = [
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head_l,
+        NodeId.head_r,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+        NodeId.gripper_g,
+        NodeId.gripper_z,
+    ]
+
+    moving_pipettes = ot3utils.moving_pipettes_in_move_group(
+        set(present_nodes), set(moving)
+    )
+    assert set(moving_pipettes) == set(expected)

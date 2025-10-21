@@ -73,6 +73,25 @@ from .run_profile import (
     RunProfileCreate,
 )
 
+from .start_run_extended_profile import (
+    StartRunExtendedProfileCommandType,
+    StartRunExtendedProfileParams,
+    StartRunExtendedProfileStepParams,
+    StartRunExtendedProfileResult,
+    StartRunExtendedProfile,
+    StartRunExtendedProfileCreate,
+)
+
+from .run_extended_profile import (
+    RunExtendedProfileCommandType,
+    RunExtendedProfileParams,
+    RunExtendedProfileResult,
+    RunExtendedProfile,
+    RunExtendedProfileCreate,
+    ProfileCycle,
+    ProfileStep,
+)
+
 
 __all__ = [
     # Set target block temperature command models
@@ -130,4 +149,20 @@ __all__ = [
     "RunProfileResult",
     "RunProfile",
     "RunProfileCreate",
+    # Start run profile command models,
+    "StartRunExtendedProfileCommandType",
+    "StartRunExtendedProfileParams",
+    "StartRunExtendedProfileStepParams",
+    "StartRunExtendedProfileResult",
+    "StartRunExtendedProfile",
+    "StartRunExtendedProfileCreate",
+    # Run extended profile command models.
+    "RunExtendedProfileCommandType",
+    "RunExtendedProfileParams",
+    "RunExtendedProfileStepParams",
+    "RunExtendedProfileResult",
+    "RunExtendedProfile",
+    "RunExtendedProfileCreate",
+    "ProfileCycle",
+    "ProfileStep",
 ]

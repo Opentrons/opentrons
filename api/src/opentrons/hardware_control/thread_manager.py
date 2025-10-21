@@ -1,9 +1,9 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
+import functools
 import threading
 import logging
 import asyncio
 import inspect
-import functools
 import weakref
 from typing import (
     Any,
@@ -18,6 +18,7 @@ from typing import (
     AsyncGenerator,
     Union,
     Type,
+    ParamSpec,
 )
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
@@ -34,17 +35,14 @@ class ThreadManagerException(Exception):
 
 WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
 WrappedYield = TypeVar("WrappedYield", contravariant=True)
-WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
-WrappedAGenFunc = TypeVar(
-    "WrappedAGenFunc", bound=Callable[..., AsyncGenerator[WrappedYield, None]]
-)
+P = ParamSpec("P")
 
 
 async def call_coroutine_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    coro: WrappedCoro,
-    *args: Sequence[Any],
-    **kwargs: Mapping[str, Any],
+    coro: Callable[P, Awaitable[WrappedReturn]],
+    *args: P.args,
+    **kwargs: P.kwargs,
 ) -> WrappedReturn:
     fut = cast(
         "asyncio.Future[WrappedReturn]",
@@ -56,9 +54,9 @@ async def call_coroutine_threadsafe(
 
 async def execute_asyncgen_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    agenfunc: WrappedAGenFunc,
-    *args: Sequence[Any],
-    **kwargs: Mapping[str, Any],
+    agenfunc: Callable[P, AsyncGenerator[WrappedYield, None]],
+    *args: P.args,
+    **kwargs: P.kwargs,
 ) -> AsyncGenerator[WrappedYield, None]:
 
     # This function should bridge an async generator function between two asyncio
@@ -197,7 +195,10 @@ class ThreadManager(Generic[WrappedObj]):
 
     If you want to wait for the managed object's creation separately
     (with managed_thread_ready_blocking or managed_thread_ready_async)
-    then pass threadmanager_nonblocking=True as a kwarg
+     use the nonblocking_builder static method to add an attribute to the builder
+    function, i.e.
+
+    thread_manager = ThreadManager(ThreadManager.nonblocking_builder(builder), ...)
 
     Example
     -------
@@ -208,15 +209,52 @@ class ThreadManager(Generic[WrappedObj]):
     >>> api_single_thread.sync.home() # call as blocking sync
     """
 
+    Builder = ParamSpec("Builder")
+    Built = TypeVar("Built")
+
+    @staticmethod
+    def nonblocking_builder(
+        builder: Callable[Builder, Awaitable[Built]]
+    ) -> Callable[Builder, Awaitable[Built]]:
+        """Wrap an instance of a builder function to make initializes that use it nonblocking.
+
+        For instance, you can build a ThreadManager like this:
+
+        thread_manager = ThreadManager(ThreadManager.nonblocking_builder(API.build_hardware_controller), ...)
+
+        to make the initialize call return immediately so you can later wait on it via
+        managed_thread_ready_blocking or managed_thread_ready_async
+        """
+
+        @functools.wraps(builder)
+        async def wrapper(
+            *args: ThreadManager.Builder.args, **kwargs: ThreadManager.Builder.kwargs
+        ) -> ThreadManager.Built:
+            return await builder(*args, **kwargs)
+
+        setattr(wrapper, "nonblocking", True)
+        return wrapper
+
     def __init__(
         self,
-        builder: Callable[..., Awaitable[WrappedObj]],
-        *args: Any,
-        **kwargs: Any,
+        builder: Callable[Builder, Awaitable[WrappedObj]],
+        *args: Builder.args,
+        **kwargs: Builder.kwargs,
     ) -> None:
         """Build the ThreadManager.
 
-        :param builder: The API function to use
+        builder: The api function to use to build the instance.
+
+        The args and kwargs will be forwarded to the builder function.
+
+        Note: by default, this function will block until the managed thread is ready and the hardware controller
+        has been built. To make this function return immediately you can wrap its builder argument in
+        ThreadManager.nonblocking_builder(), like this:
+
+        thread_manager = ThreadManager(ThreadManager.nonblocking_builder(API.build_hardware_controller), ...)
+
+        Afterwards, you'll need to call ThreadManager.managed_thread_ready_blocking or its async variant before
+        you can actually use thei nstance.
         """
 
         self._loop: Optional[asyncio.AbstractEventLoop] = None
@@ -236,7 +274,7 @@ class ThreadManager(Generic[WrappedObj]):
             asyncio.get_child_watcher()
         except NotImplementedError:
             pass
-        blocking = not kwargs.pop("threadmanager_nonblocking", False)
+        blocking = not getattr(builder, "nonblocking", False)
         target = object.__getattribute__(self, "_build_and_start_loop")
         thread = threading.Thread(
             target=target,
@@ -295,7 +333,7 @@ class ThreadManager(Generic[WrappedObj]):
     def __repr__(self) -> str:
         return "<ThreadManager>"
 
-    def clean_up(self) -> None:
+    def clean_up_tm(self) -> None:
         try:
             loop = object.__getattribute__(self, "_loop")
             loop.call_soon_threadsafe(loop.stop)
@@ -348,7 +386,7 @@ class ThreadManager(Generic[WrappedObj]):
             wrapped_cleanup = getattr(
                 object.__getattribute__(self, "bridged_obj"), "clean_up"
             )
-            our_cleanup = object.__getattribute__(self, "clean_up")
+            our_cleanup = object.__getattribute__(self, "clean_up_tm")
 
             def call_both() -> None:
                 # the wrapped cleanup wants to happen in the managed thread,

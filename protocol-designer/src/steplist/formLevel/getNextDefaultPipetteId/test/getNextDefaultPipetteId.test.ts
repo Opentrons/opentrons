@@ -1,6 +1,10 @@
+import { describe, expect, it } from 'vitest'
+
 import { getNextDefaultPipetteId } from '../'
-import { FormData, StepIdType } from '../../../../form-types'
-import { PipetteOnDeck } from '../../../../step-forms'
+
+import type { FormData, StepIdType } from '/protocol-designer/form-types'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
+
 describe('getNextDefaultPipetteId', () => {
   describe('no previous forms', () => {
     const testCases: Array<{

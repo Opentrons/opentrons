@@ -1,8 +1,8 @@
-import { LabwareLiquidState } from '@opentrons/step-generation'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { getSelectedWellsCommonValues } from '../'
 
-jest.mock('../../../labware-defs/utils')
+import type { LabwareLiquidState } from '@opentrons/step-generation'
 
 let ingredLocations: LabwareLiquidState
 let selectedLabwareId: string

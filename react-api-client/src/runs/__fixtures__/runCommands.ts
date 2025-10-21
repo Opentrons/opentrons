@@ -1,4 +1,4 @@
-import { CommandsData, RunCommandSummary } from '@opentrons/api-client'
+import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 export const mockAnonLoadCommand: CreateCommand = {

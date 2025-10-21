@@ -1,0 +1,48 @@
+@import '@opentrons/components/styles';
+@import '../../styles/breakpoints.module.css';
+@import '../../styles/spacing.module.css';
+
+.analytics_modal {
+  /* NOTE: this z-index must beat the Nav z-index! */
+  z-index: 9999;
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+
+  & h2 {
+    padding-bottom: 1rem;
+    color: var(--c-font-dark); /* from legacy --font-default-dark */
+    font-size: var(--fs-default); /* from legacy --font-default-dark */
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-title);
+  }
+
+  & p {
+    line-height: var(--lh-copy);
+  }
+}
+
+.page_wrapper {
+  height: 100%;
+
+  /* nav height plus breadcrumbs */
+  padding-top: calc(var(--size-mobile-nav) + var(--size-breadcrumb-nav));
+
+  & h2 {
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  }
+}
+
+@media (--medium) {
+  .page_wrapper {
+    padding-top: calc(var(--size-main-nav) + var(--size-breadcrumb-nav));
+  }
+}
+
+@media (--large) {
+  .page_wrapper {
+    padding-top: calc(var(--size-total-nav) + var(--size-breadcrumb-nav));
+  }
+}

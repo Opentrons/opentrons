@@ -1,9 +1,14 @@
-import _multipleLiquidsProtocol from '../../../../../fixtures/protocol/5/multipleLiquids.json'
+import { describe, expect, it } from 'vitest'
+
+import _multipleLiquidsProtocol from '/protocol-designer/../fixtures/protocol/5/multipleLiquids.json'
+
 import { getLoadLiquidCommands } from '../getLoadLiquidCommands'
+
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type { DesignerApplicationData } from '../getLoadLiquidCommands'
 
-const multipleLiquidsProtocol = (_multipleLiquidsProtocol as unknown) as ProtocolFileV5<DesignerApplicationData>
+const multipleLiquidsProtocol =
+  _multipleLiquidsProtocol as unknown as ProtocolFileV5<DesignerApplicationData>
 
 describe('getLoadLiquidCommands', () => {
   it('creates loadLiquid commands', () => {

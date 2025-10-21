@@ -1,91 +1,95 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { TemperatureModuleData } from '../TemperatureModuleData'
-import { mockTemperatureModuleGen2 } from '../../../redux/modules/__fixtures__'
 
-jest.mock('../../../atoms/StatusLabel')
+import type { ComponentProps } from 'react'
 
-const mockStatusLabel = StatusLabel as jest.MockedFunction<typeof StatusLabel>
-
-const render = (props: React.ComponentProps<typeof TemperatureModuleData>) => {
-  return renderWithProviders(<TemperatureModuleData {...props} />, {
+const render = (props: ComponentProps<typeof TemperatureModuleData>) =>
+  renderWithProviders(<TemperatureModuleData {...props} />, {
     i18nInstance: i18n,
   })[0]
-}
 
 describe('TemperatureModuleData', () => {
-  let props: React.ComponentProps<typeof TemperatureModuleData>
+  let props: ComponentProps<typeof TemperatureModuleData>
   beforeEach(() => {
     props = {
-      moduleStatus: mockTemperatureModuleGen2.data.status,
-      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
+      moduleStatus: 'idle',
+      targetTemp: null,
+      currentTemp: 25,
     }
-    mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
-  it('renders an idle status', () => {
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: C_SILVER_GRAY'
-    )
+  it('renders idle status with text and temperature info', () => {
+    render(props)
+    const container = screen.getByTestId('temp_module_data')
+
+    screen.getByText('idle')
+    screen.getByTestId(`Chip_neutral`)
+
+    expect(
+      screen.queryByTestId('Chip_neutral_icon_animate')
+    ).not.toBeInTheDocument()
+
+    expect(container).toHaveTextContent('Target: N/A °C')
+    expect(container).toHaveTextContent(`Current: ${props.currentTemp} °C`)
   })
 
-  it('renders a holding at target status', () => {
-    props = {
-      moduleStatus: 'holding at target',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
-    }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: C_SKY_BLUE'
-    )
+  it('renders holding at target status with text and temperature info', () => {
+    props.moduleStatus = 'holding at target'
+    props.targetTemp = 30
+    render(props)
+    const container = screen.getByTestId('temp_module_data')
+
+    screen.getByText('holding at target')
+    screen.getByTestId(`Chip_info`)
+
+    expect(
+      screen.queryByTestId('Chip_info_icon_animate')
+    ).not.toBeInTheDocument()
+
+    expect(container).toHaveTextContent(`Target: ${props.targetTemp} °C`)
+    expect(container).toHaveTextContent(`Current: ${props.currentTemp} °C`)
   })
 
-  it('renders a cooling status', () => {
-    props = {
-      moduleStatus: 'cooling',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
-    }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: C_SKY_BLUE'
-    )
+  it('renders cooling status with text and temperature info', () => {
+    props.moduleStatus = 'cooling'
+    render(props)
+    const container = screen.getByTestId('temp_module_data')
+
+    screen.getByText('cooling')
+    screen.getByTestId(`Chip_info`)
+
+    const pulsingIcon = screen.getByTestId('Chip_info_icon_animate')
+    expect(pulsingIcon).toHaveAttribute('repeatCount', 'indefinite')
+
+    expect(container).toHaveTextContent('Target: N/A °C')
+    expect(container).toHaveTextContent(`Current: ${props.currentTemp} °C`)
   })
 
-  it('renders a heating status', () => {
-    props = {
-      moduleStatus: 'heating',
-      targetTemp: mockTemperatureModuleGen2.data.targetTemperature,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
-    }
-    const { getByText } = render(props)
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: C_SKY_BLUE'
-    )
+  it('renders heating status with text and temperature info', () => {
+    props.moduleStatus = 'heating'
+    render(props)
+    const container = screen.getByTestId('temp_module_data')
+
+    screen.getByText('heating')
+    screen.getByTestId(`Chip_info`)
+
+    const pulsingIcon = screen.getByTestId('Chip_info_icon_animate')
+    expect(pulsingIcon).toHaveAttribute('repeatCount', 'indefinite')
+
+    expect(container).toHaveTextContent('Target: N/A °C')
+    expect(container).toHaveTextContent(`Current: ${props.currentTemp} °C`)
   })
 
-  it('renders correct temperature information when target temp is null', () => {
-    const { getByText } = render(props)
-    getByText('Target: N/A')
-    getByText(`Current: ${props.currentTemp} °C`)
-  })
+  it('renders target temperature when available', () => {
+    props.targetTemp = 37
+    render(props)
 
-  it('renders correct temperature information when target temp is not null', () => {
-    props = {
-      moduleStatus: mockTemperatureModuleGen2.data.status,
-      targetTemp: 34,
-      currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
-    }
-    const { getByText } = render(props)
-    getByText(`Target: ${String(props.targetTemp)} °C`)
-    getByText(`Current: ${props.currentTemp} °C`)
+    screen.getByText(`Target: ${props.targetTemp} °C`)
+    screen.getByText(`Current: ${props.currentTemp} °C`)
   })
 })

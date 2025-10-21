@@ -1,41 +1,44 @@
+/* eslint-disable opentrons/no-imports-across-applications */
 // client entry point and application manifest
-import React from 'react'
-import ReactDom from 'react-dom'
+import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
+import { HashRouter } from 'react-router-dom'
 
-import { ConnectedRouter } from 'connected-react-router'
-
-import { I18nextProvider } from 'react-i18next'
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
-import { i18n } from './i18n'
+import { App } from './App'
 import { createLogger } from './logger'
-
 import { uiInitialized } from './redux/shell'
-import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import './styles.global.css'
+import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
+import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
+import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
+import '@opentrons/components/styles/global'
+
+// export public types so they can be accessed by external deps
+export * from './redux/types'
 
 // component tree
-import { App } from './App'
 
-const log = createLogger(__filename)
+const log = createLogger(new URL('', import.meta.url).pathname)
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
 
 log.info('Rendering app UI')
 
-ReactDom.render(
+const container = document.getElementById('root')
+if (container == null) throw new Error('Failed to find the root element')
+
+const root = ReactDom.createRoot(container)
+root.render(
   <Provider store={store}>
-    <ConnectedRouter history={history}>
+    <HashRouter>
       <ApiClientProvider>
-        <I18nextProvider i18n={i18n}>
-          <App />
-        </I18nextProvider>
+        <App />
       </ApiClientProvider>
-    </ConnectedRouter>
-  </Provider>,
-  document.getElementById('root')
+    </HashRouter>
+  </Provider>
 )

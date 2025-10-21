@@ -49,7 +49,9 @@ def module_identifier(decoy: Decoy) -> ModuleIdentifier:
 
 
 @pytest.fixture()
-def module_data_mapper(decoy: Decoy) -> ModuleDataMapper:
+def module_data_mapper(
+    decoy: Decoy,
+) -> ModuleDataMapper:
     """Get a mock module data mapper."""
     return decoy.mock(cls=ModuleDataMapper)
 
@@ -65,6 +67,8 @@ async def test_get_modules_empty(
     result = await get_attached_modules(
         requested_version=_HTTP_API_VERSION,
         hardware=hardware_api,
+        module_identifier=decoy.mock(cls=ModuleIdentifier),
+        module_data_mapper=decoy.mock(cls=ModuleDataMapper),
     )
 
     assert result.content.data == []
@@ -87,6 +91,7 @@ async def test_get_modules_maps_data_and_id(
         hasAvailableUpdate=True,
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel.MAGNETIC_MODULE_V1,
+        compatibleWithRobot=True,
         usbPort=UsbPort(
             port=42,
             hub=False,
@@ -94,7 +99,7 @@ async def test_get_modules_maps_data_and_id(
             hubPort=None,
             path="/dev/null",
         ),
-        moduleOffset=ModuleCalibrationData.construct(
+        moduleOffset=ModuleCalibrationData.model_construct(
             offset=Vec3f(x=0, y=0, z=0),
         ),
         data=MagneticModuleData(
@@ -166,7 +171,7 @@ async def test_get_modules_maps_data_and_id(
                 port_group=PortGroup.UNKNOWN,
                 hub_port=None,
             ),
-            module_offset=ModuleCalibrationData.construct(
+            module_offset=ModuleCalibrationData.model_construct(
                 offset=Vec3f(
                     x=calibration_offset.offset.x,
                     y=calibration_offset.offset.y,

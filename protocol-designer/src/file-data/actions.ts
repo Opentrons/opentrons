@@ -1,5 +1,6 @@
-import { FileMetadataFields, SaveFileMetadataAction } from './types'
-import { WorkerResponse } from '../timelineMiddleware/types'
+import type { WorkerResponse } from '../timelineMiddleware/types'
+import type { FileMetadataFields, SaveFileMetadataAction } from './types'
+
 export const saveFileMetadata = (
   payload: FileMetadataFields
 ): SaveFileMetadataAction => ({
@@ -9,9 +10,10 @@ export const saveFileMetadata = (
 export interface ComputeRobotStateTimelineRequestAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST'
 }
-export const computeRobotStateTimelineRequest = (): ComputeRobotStateTimelineRequestAction => ({
-  type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST',
-})
+export const computeRobotStateTimelineRequest =
+  (): ComputeRobotStateTimelineRequestAction => ({
+    type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST',
+  })
 export interface ComputeRobotStateTimelineSuccessAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS'
   payload: WorkerResponse

@@ -1,16 +1,40 @@
-import { uuid } from '../../utils'
+import {
+  getTrashBinAddressableAreaName,
+  getWasteChuteAddressableAreaNamePip,
+  uuid,
+} from '../../utils'
+
+import type {
+  AddressableAreaName,
+  CutoutId,
+  MoveToAddressableAreaParams,
+} from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export interface MoveToAddressableAreaArgs {
-  pipetteId: string
-  addressableAreaName: string
+interface MoveToAddressableAreaAtomicParams
+  extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {
+  fixtureId: string
 }
-export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { pipetteId, addressableAreaName } = args
+export const moveToAddressableArea: CommandCreator<
+  MoveToAddressableAreaAtomicParams
+> = (args, invariantContext, prevRobotState) => {
+  const { pipetteId, fixtureId, offset } = args
+  const { pipetteEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
+  const pipetteEntity = pipetteEntities[pipetteId]
+  const pipetteChannels = pipetteEntity.spec.channels
+  const pipettePythonName = pipetteEntity.pythonName
+  const fixtureEntity =
+    trashBinEntities[fixtureId] ?? wasteChuteEntities[fixtureId]
+  const fixturePythonName = fixtureEntity.pythonName
+
+  let addressableAreaName: AddressableAreaName =
+    getWasteChuteAddressableAreaNamePip(pipetteChannels)
+  if (trashBinEntities[fixtureId] != null) {
+    addressableAreaName = getTrashBinAddressableAreaName(
+      fixtureEntity.location as CutoutId
+    )
+  }
 
   const commands = [
     {
@@ -19,10 +43,12 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
       params: {
         pipetteId,
         addressableAreaName,
+        offset,
       },
     },
   ]
   return {
     commands,
+    python: `${pipettePythonName}.move_to(${fixturePythonName})`,
   }
 }

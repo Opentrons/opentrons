@@ -1,6 +1,11 @@
 import pytest
+import logging
+from typing import Optional
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocols.api_support.instrument import validate_takes_liquid
+from opentrons.protocols.api_support.instrument import (
+    validate_takes_liquid,
+    validate_tiprack,
+)
 from opentrons.types import Location, Point
 
 
@@ -59,7 +64,7 @@ def test_validate_takes_liquid(ctx: ProtocolContext, reject_module: bool) -> Non
 #
 # Find a different way to test this so that both paths are covered.
 @pytest.mark.apiv2_non_pe_only
-def test_validate_takes_liquid_module_location(ctx):
+def test_validate_takes_liquid_module_location(ctx: ProtocolContext) -> None:
     module = ctx.load_module("magdeck", 1)
 
     validate_takes_liquid(
@@ -80,7 +85,7 @@ def test_validate_takes_liquid_module_location(ctx):
 
 
 @pytest.mark.ot3_only
-def test_validate_takes_liquid_adapter(ctx):
+def test_validate_takes_liquid_adapter(ctx: ProtocolContext) -> None:
     well_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     adapter = ctx.load_adapter("opentrons_96_pcr_adapter", 2)
 
@@ -125,3 +130,35 @@ def test_validate_takes_liquid_adapter(ctx):
             reject_module=False,
             reject_adapter=True,
         )
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_name", "log_value"],
+    argvalues=[
+        ["p1000_96", None],
+        [
+            "p50_single_flex",
+            "The pipette p50_single_flex and its tip rack opentrons_flex_96_tiprack_200ul appear to be mismatched. Please check your protocol.",
+        ],
+        [
+            "p20_single_gen2",
+            "The pipette p20_single_gen2 and its tip rack opentrons_flex_96_tiprack_200ul appear to be mismatched. Please check your protocol.",
+        ],
+    ],
+)
+def test_validate_tiprack(
+    ctx: ProtocolContext,
+    caplog: pytest.LogCaptureFixture,
+    pipette_name: str,
+    log_value: Optional[str],
+) -> None:
+    tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_200ul", 2)
+
+    with caplog.at_level(logging.WARNING):
+        log = logging.getLogger(__name__)
+        validate_tiprack(pipette_name, tip_rack, log=log)
+
+    if log_value:
+        assert caplog.messages[0] == log_value
+    else:
+        assert caplog.records == []

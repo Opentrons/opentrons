@@ -1,0 +1,174 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+  getPipetteEntities,
+} from '/protocol-designer/step-forms/selectors'
+
+import { TipPositionModal } from '..'
+import { TipPositionSideView } from '../TipPositionSideView'
+
+import type { ComponentProps } from 'react'
+import type { MoveLiquidPrefixType } from '../../../../resources/types'
+
+vi.mock('../TipPositionSideView')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+const render = (props: ComponentProps<typeof TipPositionModal>) => {
+  return renderWithProviders(<TipPositionModal {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+const mockUpdateZSpec = vi.fn()
+const mockUpdateXSpec = vi.fn()
+const mockUpdateYSpec = vi.fn()
+
+describe('TipPositionModal', () => {
+  let props: ComponentProps<typeof TipPositionModal>
+
+  beforeEach(() => {
+    vi.mocked(getPipetteEntities).mockReturnValue({})
+    vi.mocked(getLabwareEntities).mockReturnValue({})
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
+    props = {
+      formData: {
+        stepType: 'moveLiquid',
+        id: 'mockFormId',
+      },
+      prefix: 'aspirate',
+      closeModal: vi.fn(),
+      wellDepthMm: 50,
+      wellXWidthMm: 10.3,
+      wellYWidthMm: 10.5,
+      isIndeterminate: false,
+      specs: {
+        z: {
+          name: 'aspirate_mmFromBottom',
+          value: 0,
+          updateValue: mockUpdateZSpec,
+        },
+        y: {
+          name: 'aspirate_y_position',
+          value: 0,
+          updateValue: mockUpdateXSpec,
+        },
+        x: {
+          name: 'aspirate_x_position',
+          value: 0,
+          updateValue: mockUpdateYSpec,
+        },
+      },
+    }
+    vi.mocked(TipPositionSideView).mockReturnValue(
+      <div>mock TipPositionSideView</div>
+    )
+  })
+  it('renders the modal text', () => {
+    render(props)
+    screen.getByText('Edit aspirate tip position')
+    fireEvent.click(screen.getByText('Cancel'))
+    expect(props.closeModal).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Save'))
+    expect(props.closeModal).toHaveBeenCalled()
+    expect(mockUpdateXSpec).toHaveBeenCalled()
+    expect(mockUpdateYSpec).toHaveBeenCalled()
+    expect(mockUpdateZSpec).toHaveBeenCalled()
+  })
+  it('renders the alert if the x/y position values are too close to the max/min for x value', () => {
+    props.specs.x.value = 9.7
+    render(props)
+    screen.getByText(
+      'Tip position is close to the edge of the well and may cause collisions.'
+    )
+  })
+  it('renders the alert if the x/y position values are too close to the max/min for y value', () => {
+    props.specs.y.value = -9.7
+    render(props)
+    screen.getByText(
+      'Tip position is close to the edge of the well and may cause collisions.'
+    )
+  })
+  describe('submerge/retract in well warning', () => {
+    const prefixes = [
+      'aspirate_submerge',
+      'dispense_submerge',
+      'aspirate_retract',
+      'dispense_retract',
+    ] as MoveLiquidPrefixType[]
+    prefixes.forEach(prefix => {
+      it(`renders the banner if the prefix is ${prefix} and the z value is inside the well`, () => {
+        props.prefix = prefix
+        props.specs.z.value = -1
+        props.specs.y.value = 0
+        props.specs.x.value = 0
+        render(props)
+        screen.getByText('The tip position may be inside the liquid')
+        screen.getByText(
+          'The tip must be above the ending height of the liquid for a valid transfer command'
+        )
+      })
+    })
+  })
+  it('renders the captions, and visual', () => {
+    render(props)
+    screen.getByText('X position')
+    screen.getByText('Must be between -5.1 and 5.1')
+    screen.getByText('Y position')
+    screen.getByText('Must be between -5.2 and 5.2')
+    screen.getByText('Z position')
+    screen.getByText('Must be between 0 and 52')
+    screen.getByText('mock TipPositionSideView')
+  })
+  it('renders a custom input field and clicks on it, calling the mock updates', () => {
+    render(props)
+    const xInputField = screen.getAllByRole('textbox', { name: '' })[0]
+    fireEvent.change(xInputField, { target: { value: 3 } })
+    const yInputField = screen.getAllByRole('textbox', { name: '' })[1]
+    fireEvent.change(yInputField, { target: { value: -2 } })
+    const zInputField = screen.getAllByRole('textbox', { name: '' })[2]
+    fireEvent.change(zInputField, { target: { value: 10 } })
+    fireEvent.click(screen.getByText('Save'))
+    expect(props.closeModal).toHaveBeenCalled()
+    expect(mockUpdateXSpec).toHaveBeenCalled()
+    expect(mockUpdateYSpec).toHaveBeenCalled()
+    expect(mockUpdateZSpec).toHaveBeenCalled()
+  })
+  it('renders custom input fields and displays error texts', () => {
+    props = {
+      ...props,
+      specs: {
+        z: {
+          name: 'aspirate_mmFromBottom',
+          value: 101,
+          updateValue: mockUpdateZSpec,
+        },
+        y: {
+          name: 'aspirate_y_position',
+          value: -500,
+          updateValue: mockUpdateXSpec,
+        },
+        x: {
+          name: 'aspirate_x_position',
+          value: 10.7,
+          updateValue: mockUpdateYSpec,
+        },
+      },
+    }
+    render(props)
+    fireEvent.click(screen.getByText('Save'))
+    const xInputField = screen.getAllByRole('textbox', { name: '' })[0]
+    fireEvent.change(xInputField, { target: { value: 3.55555 } })
+    fireEvent.click(screen.getByText('Save'))
+    //   display too many decimals error
+    screen.getByText('a max of 1 decimal place is allowed')
+  })
+})

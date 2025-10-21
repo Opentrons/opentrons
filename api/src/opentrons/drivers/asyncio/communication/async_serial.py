@@ -7,7 +7,7 @@ from functools import partial
 from typing import Optional, AsyncGenerator, Union
 from typing_extensions import Literal
 
-from serial import Serial, serial_for_url  # type: ignore[import]
+from serial import Serial, serial_for_url  # type: ignore[import-untyped]
 
 TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 
@@ -120,8 +120,12 @@ class AsyncSerial:
         """
         if self._reset_buffer_before_write:
             self._serial.reset_input_buffer()
-        self._serial.write(data=data)
-        self._serial.flush()
+        self._serial.write(data)
+        # flush can fail after entering dfu mode, ignore any exceptions.
+        try:
+            self._serial.flush()
+        except Exception:
+            pass
 
     async def open(self) -> None:
         """
@@ -154,6 +158,10 @@ class AsyncSerial:
     def reset_input_buffer(self) -> None:
         """Reset the input buffer"""
         self._serial.reset_input_buffer()
+
+    def reset_output_buffer(self) -> None:
+        """Reset the output buffer"""
+        self._serial.reset_output_buffer()
 
     @contextlib.asynccontextmanager
     async def timeout_override(

@@ -1,4 +1,4 @@
-import type { PipetteModel } from '@opentrons/shared-data'
+import type { PipetteChannels, PipetteModel } from '@opentrons/shared-data'
 
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 
@@ -13,7 +13,8 @@ export interface InconsistentCalibrationFailure {
   limit: number
 }
 
-export type CalibrationReasonabilityCheckFailure = InconsistentCalibrationFailure
+export type CalibrationReasonabilityCheckFailure =
+  InconsistentCalibrationFailure
 
 export interface SharedInstrumentData {
   mount: Mount
@@ -38,7 +39,7 @@ export interface GripperData {
 }
 export interface PipetteData {
   data: {
-    channels: number
+    channels: PipetteChannels
     min_volume: number
     max_volume: number
     calibratedOffset?: {

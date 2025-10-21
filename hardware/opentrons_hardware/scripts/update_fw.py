@@ -48,6 +48,7 @@ TARGETS: Final[Dict[str, FirmwareTarget]] = {
     "pipette-left": NodeId.pipette_left,
     "pipette-right": NodeId.pipette_right,
     "gripper": NodeId.gripper,
+    "hepa-uv": NodeId.hepa_uv,
     "rear-panel": USBTarget.rear_panel,
 }
 

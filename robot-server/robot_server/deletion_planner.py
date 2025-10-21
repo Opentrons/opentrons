@@ -29,10 +29,17 @@ is more important than preserving a linear history of protocols.
 This module only handles the abstract planning of what to delete.
 Actual storage access is handled elsewhere.
 """
-
-
+from dataclasses import dataclass
 from typing import Sequence, Set
 from typing_extensions import Protocol as InterfaceShape
+
+
+@dataclass(frozen=True)
+class FileUsageInfo:
+    """Information about whether a particular data file is being used by any runs or analyses."""
+
+    file_id: str
+    used_by_run_or_analysis: bool
 
 
 class ProtocolSpec(InterfaceShape):
@@ -132,3 +139,50 @@ class RunDeletionPlanner:  # noqa: D101
             return set(runs_to_delete)
 
         return set()
+
+
+class DataFileDeletionPlanner:
+    """Deletion planner for data files."""
+
+    def __init__(self, maximum_files: int) -> None:
+        """Return a configured data file deletion planner.
+
+        Args:
+            maximum_files: The maximum number of data files to allow.
+                Must be at least 1.
+        """
+        self._maximum_files = maximum_files
+
+    @property
+    def maximum_allowed_files(self) -> int:
+        """Return the max allowed files."""
+        return self._maximum_files
+
+    def plan_for_new_file(
+        self,
+        existing_files: Sequence[FileUsageInfo],
+    ) -> Set[str]:
+        """Choose which files to delete in order to make room for a new one.
+
+        Args:
+            existing_files: The IDs and usage info of all data files that currently exist.
+                Must be in order from oldest first!
+
+        Returns:
+            The IDs of files to delete.
+
+            After deleting these files, there will be at least one slot free
+            to add a new file without going over the configured limit.
+        """
+        unused_files = [
+            file for file in existing_files if not file.used_by_run_or_analysis
+        ]
+
+        files_after_new_addition = len(existing_files) + 1
+        if files_after_new_addition > self._maximum_files:
+            num_deletions_required = files_after_new_addition - self._maximum_files
+        else:
+            num_deletions_required = 0
+
+        files_to_delete = unused_files[:num_deletions_required]
+        return set(file.file_id for file in files_to_delete)

@@ -1,10 +1,12 @@
 import styled, { css } from 'styled-components'
 
 import * as Styles from '../styles'
-import { styleProps, isntStyleProp } from './style-props'
-
-import type { PrimitiveComponent } from './types'
 import { RESPONSIVENESS } from '../ui-style-constants'
+import { isntStyleProp, styleProps } from './style-props'
+
+import type { StyledComponent } from 'styled-components'
+import type { HTMLProps } from 'react'
+import type { StyleProps } from './types'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
@@ -16,15 +18,15 @@ const BUTTON_BASE_STYLE = css`
   border-width: 0;
   border-style: solid;
   background-color: transparent;
-  cursor: pointer;
+  cursor: ${Styles.CURSOR_POINTER};
 
   &:disabled,
   &.disabled {
-    cursor: default;
+    cursor: ${Styles.CURSOR_DEFAULT};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    cursor: default;
+    cursor: ${Styles.CURSOR_DEFAULT};
   }
 `
 
@@ -43,80 +45,20 @@ const BUTTON_VARIANT_STYLE = css`
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
-type BtnComponent = PrimitiveComponent<'button'>
-
 /**
  * Button primitive
  *
  * @component
  */
-export const Btn: BtnComponent = styled.button
-  .withConfig({
-    shouldForwardProp: isntStyleProp,
-  })
-  .attrs((props: React.HTMLProps<HTMLButtonElement>) => ({
-    type: props.type ?? BUTTON_TYPE_BUTTON,
-  }))`
+export const Btn: StyledComponent<'button', any, StyleProps, any> =
+  styled.button
+    .withConfig({
+      shouldForwardProp: isntStyleProp,
+    })
+    .attrs((props: HTMLProps<HTMLButtonElement>) => ({
+      type: props.type ?? BUTTON_TYPE_BUTTON,
+    }))`
   ${BUTTON_BASE_STYLE}
-  ${styleProps}
-`
-
-/**
- * Primary button variant
- *
- * @component
- */
-export const PrimaryBtn: BtnComponent = styled(Btn)`
-  ${BUTTON_VARIANT_STYLE}
-  background-color: ${Styles.C_DARK_GRAY};
-  color: ${Styles.C_WHITE};
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-
-  &:hover,
-  &:focus {
-    background-color: ${Styles.C_BLACK};
-  }
-
-  &:active {
-    background-color: ${Styles.C_MED_DARK_GRAY};
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: ${Styles.C_LIGHT_GRAY};
-    color: ${Styles.C_MED_GRAY};
-    box-shadow: none;
-  }
-
-  ${styleProps}
-`
-
-/**
- * Secondary button variant
- *
- * @component
- */
-export const SecondaryBtn: BtnComponent = styled(Btn)`
-  ${BUTTON_VARIANT_STYLE}
-  background-color: ${Styles.C_WHITE};
-  border-width: ${Styles.BORDER_WIDTH_DEFAULT};
-  color: ${Styles.C_DARK_GRAY};
-
-  &:hover,
-  &:focus {
-    background-color: ${Styles.C_LIGHT_GRAY};
-  }
-
-  &:active {
-    background-color: ${Styles.C_MED_LIGHT_GRAY};
-  }
-
-  &:disabled,
-  &.disabled {
-    background-color: ${Styles.C_WHITE};
-    color: ${Styles.C_MED_GRAY};
-  }
-
   ${styleProps}
 `
 
@@ -125,7 +67,10 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
+export const NewPrimaryBtn = styled(Btn)`
+  ${BUTTON_VARIANT_STYLE}
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
 
@@ -155,8 +100,10 @@ export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
  *
  * @component
  */
-export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+export const NewSecondaryBtn = styled(Btn)`
+  ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_WHITE};
+  border-width: ${Styles.BORDER_WIDTH_DEFAULT};
   color: ${Styles.C_BLUE};
 
   &:hover,
@@ -170,7 +117,6 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   &:active {
     border-width: '2px';
     background-color: ${Styles.C_WHITE};
-    color: ${Styles.C_BLUE};
     color: #004aaa;
     box-shadow: none;
   }
@@ -185,54 +131,17 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
 
   ${styleProps}
 `
+
 /**
- * Red primary button variant used in app
+ * Tertiary button variant
  *
  * @component
  */
-export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
-  background-color: ${Styles.C_ERROR_DARK};
-
-  &:hover,
-  &:focus {
-    background-color: ${Styles.C_ERROR_DARK};
-  }
-
-  &:active {
-    background-color: ${Styles.C_ERROR_LIGHT};
-  }
-
-  ${styleProps}
-`
-
-/**
- * Red secondary button variant used in app
- *
- * @component
- */
-export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
-  color: ${Styles.C_ERROR_DARK};
-
-  &:hover,
-  &:focus {
-    color: ${Styles.C_ERROR_DARK};
-  }
-
-  &:active {
-    color: ${Styles.C_ERROR_LIGHT};
-  }
-
-  ${styleProps}
-`
-
-/**
- * Light secondary button variant
- *
- * @component
- */
-export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+export const TertiaryBtn = styled(Btn)`
+  ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_TRANSPARENT};
   color: ${Styles.C_WHITE};
+  border-width: 0;
 
   &:hover,
   &:focus {
@@ -250,13 +159,4 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   }
 
   ${styleProps}
-`
-
-/**
- * Tertiary button variant
- *
- * @component
- */
-export const TertiaryBtn: BtnComponent = styled(LightSecondaryBtn)`
-  border-width: 0;
 `

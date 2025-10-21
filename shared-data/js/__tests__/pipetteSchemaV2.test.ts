@@ -1,9 +1,10 @@
+import path from 'path'
 import Ajv from 'ajv'
 import glob from 'glob'
-import path from 'path'
+import { describe, expect, it } from 'vitest'
 
-import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
 import geometrySpecsSchema from '../../pipette/schemas/2/pipetteGeometrySchema.json'
+import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
 import generalSpecsSchema from '../../pipette/schemas/2/pipettePropertiesSchema.json'
 
 const allGeometryDefinitions = path.join(
@@ -49,7 +50,7 @@ describe('test schema against all liquid specs definitions', () => {
     })
 
     it(`second parent dir matches pipette model: ${liquidPath}`, () => {
-      expect(['p10', 'p20', 'p50', 'p300', 'p1000']).toContain(
+      expect(['p10', 'p20', 'p50', 'p200', 'p300', 'p1000']).toContain(
         path.basename(path.dirname(path.dirname(liquidPath)))
       )
     })
@@ -72,7 +73,7 @@ describe('test schema against all geometry specs definitions', () => {
     })
 
     it(`parent dir matches pipette model: ${geometryPath}`, () => {
-      expect(['p10', 'p20', 'p50', 'p300', 'p1000']).toContain(
+      expect(['p10', 'p20', 'p50', 'p200', 'p300', 'p1000']).toContain(
         path.basename(path.dirname(geometryPath))
       )
     })
@@ -99,7 +100,7 @@ describe('test schema against all general specs definitions', () => {
     })
 
     it(`parent dir matches pipette model: ${generalPath}`, () => {
-      expect(['p10', 'p20', 'p50', 'p300', 'p1000']).toContain(
+      expect(['p10', 'p20', 'p50', 'p200', 'p300', 'p1000']).toContain(
         path.basename(path.dirname(generalPath))
       )
     })

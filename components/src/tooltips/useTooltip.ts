@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import uniqueId from 'lodash/uniqueId'
-import { usePopper } from './usePopper'
+
 import * as Styles from './styles'
+import { usePopper } from './usePopper'
 
 import type { CSSProperties } from 'react'
-import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
+import type { Placement, UseTooltipOptions, UseTooltipResult } from './types'
 
 interface TooltipState {
   placement: Placement | null
@@ -55,13 +56,22 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
     arrowStyle: Styles.INITIAL_ARROW_STYLE,
   })
 
-  const onStateUpdate = useCallback((placement, styles) => {
-    setTooltipState({
-      placement,
-      tooltipStyle: styles.popper ?? Styles.INITIAL_TOOLTIP_STYLE,
-      arrowStyle: styles.arrow ?? Styles.INITIAL_ARROW_STYLE,
-    })
-  }, [])
+  const onStateUpdate = useCallback(
+    (
+      placement: Placement | null,
+      styles: {
+        popper?: CSSProperties
+        arrow?: CSSProperties
+      }
+    ) => {
+      setTooltipState({
+        placement,
+        tooltipStyle: styles.popper ?? Styles.INITIAL_TOOLTIP_STYLE,
+        arrowStyle: styles.arrow ?? Styles.INITIAL_ARROW_STYLE,
+      })
+    },
+    []
+  )
 
   usePopper({
     target,

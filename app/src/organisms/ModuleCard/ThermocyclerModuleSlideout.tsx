@@ -1,31 +1,34 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  CELSIUS,
-  getModuleDisplayName,
-  TEMP_LID_MAX,
-  TEMP_LID_MIN,
-  TEMP_BLOCK_MAX,
-  TEMP_MIN,
-} from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  InputField,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_BLOCK_MAX,
+  TEMP_LID_MAX,
+  TEMP_LID_MIN,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 
-import type { ThermocyclerModule } from '../../redux/modules/types'
+import { SubmitPrimaryButton } from '/app/atoms/buttons'
+import { Slideout } from '/app/atoms/Slideout'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data'
+import type { ThermocyclerModule } from '/app/redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -39,11 +42,12 @@ export const ThermocyclerModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
-  const [tempValue, setTempValue] = React.useState<number | null>(null)
+  const [tempValue, setTempValue] = useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
+  const { reportModuleCommand } = useModuleCommandAnalytics()
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -78,13 +82,42 @@ export const ThermocyclerModuleSlideout = (
       }
       createLiveCommand({
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            saveLidCommand.commandType ?? saveBlockCommand.commandType
-          }: ${e.message}`
-        )
       })
+        .then(() => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand:
+              modulePart === 'Lid'
+                ? saveLidCommand.commandType
+                : saveBlockCommand.commandType,
+            result: { status: 'succeeded', data: undefined },
+            serialNumber: module.serialNumber,
+            temperature: tempValue,
+            errorDetails: '',
+            firmwareVersion: module.firmwareVersion,
+          })
+        })
+        .catch((e: Error) => {
+          reportModuleCommand({
+            kind: 'liveCommand',
+            moduleType: module.moduleType,
+            analyticCommand:
+              modulePart === 'Lid'
+                ? saveLidCommand.commandType
+                : saveBlockCommand.commandType,
+            result: { status: 'failed', data: undefined },
+            errorDetails: e.message,
+            serialNumber: module.serialNumber,
+            temperature: tempValue,
+            firmwareVersion: module.firmwareVersion,
+          })
+          console.error(
+            `error setting module status with command type ${
+              saveLidCommand.commandType ?? saveBlockCommand.commandType
+            }: ${e.message}`
+          )
+        })
     }
     setTempValue(null)
     onCloseClick()
@@ -110,7 +143,7 @@ export const ThermocyclerModuleSlideout = (
         />
       }
     >
-      <StyledText
+      <LegacyStyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing4}
@@ -121,20 +154,20 @@ export const ThermocyclerModuleSlideout = (
           min: tempRanges.min,
           max: tempRanges.max,
         })}
-      </StyledText>
+      </LegacyStyledText>
       <Flex
         marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
-        <StyledText
+        <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
-        </StyledText>
+        </LegacyStyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
             data-testid={`${String(module.moduleModel)}_${String(
@@ -144,7 +177,9 @@ export const ThermocyclerModuleSlideout = (
             units={CELSIUS}
             value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus
-            onChange={e => setTempValue(e.target.valueAsNumber)}
+            onChange={e => {
+              setTempValue(e.target.valueAsNumber)
+            }}
             type="number"
             caption={t('module_status_range', {
               min: tempRanges.min,

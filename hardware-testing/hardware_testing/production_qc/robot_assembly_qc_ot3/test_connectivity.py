@@ -1,10 +1,11 @@
 """Test Connectivity."""
 import asyncio
 from subprocess import run as run_subprocess
-from typing import List, Union, Optional, Tuple
+from typing import List, Union, Optional, Tuple, cast
 import re
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.system import nmcli
 from opentrons import config
 
@@ -109,11 +110,11 @@ DOOR_CONDITIONS.sync_engaged = False
 
 # Start UI Prompts
 PROMPT_UNPLUGGED = "ENSURE AUX TESTER IS NOT PLUGGED IN"
-PROMPT_AUX_1 = "PLUG IN AUX PORT 1 RIGHT"
-PROMPT_PLUGGED = "PLUG IN AUX PORT 2 LEFT"
+PROMPT_AUX_1 = "PLUG IN AUX PORT 1"
+PROMPT_PLUGGED = "PLUG IN AUX PORT 2"
 PROMPT_ESTOP_1 = "PRESS ESTOP 1"
 PROMPT_ESTOP_2 = "RELEASE ESTOP 1, PRESS ESTOP 2"
-PROMPT_AUX_2 = "UNPLUG AUX PORT 1 RIGHT"
+PROMPT_AUX_2 = "UNPLUG AUX PORT 1"
 PROMPT_DOOR = "UNPLUG AUX PORT 2 LEFT AND CLOSE DOOR"
 
 
@@ -301,10 +302,11 @@ async def _aux_subtest(
     api: OT3API, ui_promt: str, pass_states: RearPinState, sync_state: int
 ) -> Tuple[bool, str]:
     ui.get_user_ready(ui_promt)
-    await set_sync_pin(sync_state, api._backend._usb_messenger)  # type: ignore[union-attr]
-    result = await get_all_pin_state(api._backend._usb_messenger)  # type: ignore[union-attr]
+    backend = cast(OT3Controller, api._backend)
+    await set_sync_pin(sync_state, backend._usb_messenger)
+    result = await get_all_pin_state(backend._usb_messenger)
     LOG.info(f"Aux Result: {result}")
-    await set_sync_pin(0, api._backend._usb_messenger)  # type: ignore[union-attr]
+    await set_sync_pin(0, backend._usb_messenger)
 
     # format the state comparison nicely for csv output
     result_dict = vars(result)
@@ -383,9 +385,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await _test_wifi(report, section)
     else:
         report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
-        assert nmcli.iface_info
-        assert nmcli.configure
-        assert nmcli.wifi_disconnect
+        assert nmcli.iface_info is not None
+        assert nmcli.configure is not None
+        assert nmcli.wifi_disconnect is not None
 
     # USB-B-REAR
     ui.print_header("USB-B-REAR")

@@ -1,14 +1,13 @@
 // labware creator display card
-import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { getPublicPath } from '../../public-path'
+
 import {
   CUSTOM_LABWARE_PROMPT_NO_RESULTS,
   CUSTOM_LABWARE_PROMPT_W_RESULTS,
   CUSTOM_LABWARE_SUPPORT_BTN,
   LABWARE_CREATOR_BTN,
 } from '../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   isResultsEmpty?: boolean
@@ -33,7 +32,7 @@ export function CustomLabwareCard(props: Props): JSX.Element {
       >
         {CUSTOM_LABWARE_SUPPORT_BTN}
       </a>
-      <Link to={`${getPublicPath()}create`} className={styles.btn_blue}>
+      <Link to={'/create'} className={styles.btn_blue}>
         {LABWARE_CREATOR_BTN}
       </Link>
     </li>

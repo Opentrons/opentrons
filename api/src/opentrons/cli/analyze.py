@@ -1,13 +1,39 @@
 """Opentrons analyze CLI."""
+
 import click
 
-from anyio import run, Path as AsyncPath
+from anyio import run
+from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Any, Dict, List, Optional, Sequence, Union
-from typing_extensions import Literal
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    Literal,
+    Callable,
+    IO,
+    TypeVar,
+    Iterator,
+)
+import logging
+import sys
+import json
+import gc
 
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
+    EngineStatus,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -15,8 +41,14 @@ from opentrons.protocol_reader import (
     ProtocolType,
     JsonProtocolConfig,
     ProtocolFilesInvalidError,
+    ProtocolSource,
 )
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
+from opentrons.protocol_runner import RunResult
+from opentrons.protocol_runner.run_orchestrator import ParseMode
+
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -24,9 +56,28 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     LoadedModule,
     Liquid,
+    LiquidClassRecordWithId,
+    StateSummary,
+)
+from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.types import CommandAnnotation
+
+from opentrons_shared_data.robot.types import RobotType
+
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
 )
 
-from opentrons_shared_data.robot.dev_types import RobotType
+
+OutputKind = Literal["json", "human-json"]
+
+
+@dataclass(frozen=True)
+class _Output:
+    to_file: IO[bytes]
+    kind: OutputKind
 
 
 @click.command()
@@ -38,16 +89,147 @@ from opentrons_shared_data.robot.dev_types import RobotType
 )
 @click.option(
     "--json-output",
-    help="Return analysis results as machine-readable JSON.",
-    type=click.Path(path_type=AsyncPath),
+    help="Return analysis results as machine-readable JSON. Specify --json-output=- to use stdout, but be aware that Python protocols may contain print() which will make the output JSON invalid.",
+    type=click.File(mode="wb"),
 )
-def analyze(files: Sequence[Path], json_output: Optional[Path]) -> None:
+@click.option(
+    "--human-json-output",
+    help="Return analysis results as JSON, formatted for human eyes. Specify --human-json-output=- to use stdout, but be aware that Python protocols may contain print() which will make the output JSON invalid.",
+    type=click.File(mode="wb"),
+)
+@click.option(
+    "--leaks",
+    help="Fail (via exit code) if the analysis engine has not been garbage collected after analysis is complete.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--leaks-debug",
+    help="Drop into a PDB shell if a leak is detected",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--check",
+    help="Fail (via exit code) if the protocol had an error. If not specified, always succeed.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--log-output",
+    help="Where to send logs. Can be a path, - for stdout, or stderr for stderr.",
+    default="stderr",
+    type=str,
+)
+@click.option(
+    "--log-level",
+    help="Level of logs to capture.",
+    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"], case_sensitive=False),
+    default="WARNING",
+)
+@click.option(
+    "--rtp-values",
+    help="Serialized JSON of runtime parameter variable names to values.",
+    default="{}",
+    type=str,
+)
+@click.option(
+    "--rtp-files",
+    help="Serialized JSON of runtime parameter variable names to file paths.",
+    default="{}",
+    type=str,
+)
+def analyze(
+    files: Sequence[Path],
+    rtp_values: str,
+    rtp_files: str,
+    json_output: Optional[IO[bytes]],
+    human_json_output: Optional[IO[bytes]],
+    log_output: str,
+    log_level: str,
+    check: bool,
+    leaks: bool,
+    leaks_debug: bool,
+) -> int:
     """Analyze a protocol.
 
     You can use `opentrons analyze` to get a protocol's expected
     equipment and commands.
     """
-    run(_analyze, files, json_output)
+    outputs = _get_outputs(json=json_output, human_json=human_json_output)
+    if not outputs and not check:
+        raise click.UsageError(
+            message="Please specify at least --check or one of the output options."
+        )
+
+    try:
+        with _capture_logs(log_output, log_level):
+            sys.exit(
+                run(
+                    _analyze,
+                    files,
+                    rtp_values,
+                    rtp_files,
+                    outputs,
+                    check,
+                    leaks or leaks_debug,
+                    leaks_debug,
+                )
+            )
+    except click.ClickException:
+        raise
+    except Exception as e:
+        raise click.ClickException(str(e))
+
+
+@contextmanager
+def _capture_logs_to_stream(stream: IO[str]) -> Iterator[None]:
+    handler = logging.StreamHandler(stream)
+    logging.getLogger().addHandler(handler)
+    try:
+        yield
+    finally:
+        logging.getLogger().removeHandler(handler)
+
+
+@contextmanager
+def _capture_logs_to_file(filepath: Path) -> Iterator[None]:
+    handler = logging.FileHandler(filepath, mode="w")
+    logging.getLogger().addHandler(handler)
+    try:
+        yield
+    finally:
+        logging.getLogger().removeHandler(handler)
+
+
+@contextmanager
+def _capture_logs(write_to: str, log_level: str) -> Iterator[None]:
+    try:
+        level = getattr(logging, log_level)
+    except AttributeError:
+        raise click.ClickException(f"No such log level {log_level}")
+    logging.getLogger().setLevel(level)
+    if write_to in ("-", "stdout"):
+        with _capture_logs_to_stream(sys.stdout):
+            yield
+    elif write_to == "stderr":
+        with _capture_logs_to_stream(sys.stderr):
+            yield
+    else:
+        with _capture_logs_to_file(Path(write_to)):
+            yield
+
+
+def _get_outputs(
+    json: Optional[IO[bytes]],
+    human_json: Optional[IO[bytes]],
+) -> List[_Output]:
+    outputs: List[_Output] = []
+    if json:
+        outputs.append(_Output(to_file=json, kind="json"))
+    if human_json:
+        outputs.append(_Output(to_file=human_json, kind="human-json"))
+    return outputs
 
 
 def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
@@ -62,11 +244,146 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
     return results
 
 
-async def _analyze(
+def _get_runtime_parameter_values(
+    serialized_rtp_values: str,
+) -> PrimitiveRunTimeParamValuesType:
+    rtp_values = {}
+    try:
+        for variable_name, value in json.loads(serialized_rtp_values).items():
+            if not isinstance(value, (bool, int, float, str)):
+                raise click.BadParameter(
+                    f"Runtime parameter '{value}' is not of allowed type boolean, integer, float or string",
+                    param_hint="--rtp-values",
+                )
+            rtp_values[variable_name] = value
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-values"
+        )
+    return rtp_values
+
+
+def _get_runtime_parameter_paths(serialized_rtp_files: str) -> CSVRuntimeParamPaths:
+    try:
+        return {
+            variable_name: Path(path_string)
+            for variable_name, path_string in json.loads(serialized_rtp_files).items()
+        }
+    except json.JSONDecodeError as error:
+        raise click.BadParameter(
+            f"JSON decode error: {error}", param_hint="--rtp-files"
+        )
+
+
+R = TypeVar("R")
+
+
+def _call_for_output_of_kind(
+    kind: OutputKind, outputs: Sequence[_Output], fn: Callable[[IO[bytes]], R]
+) -> Optional[R]:
+    for output in outputs:
+        if output.kind == kind:
+            return fn(output.to_file)
+    return None
+
+
+def _get_return_code(analysis: RunResult) -> int:
+    if analysis.state_summary.errors:
+        return -1
+    return 0
+
+
+class UnexpectedAnalysisError(EnumeratedError):
+    """An error raised while setting up the runner for analysis."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, Exception]]] = None,
+    ) -> None:
+        """Build a UnexpectedAnalysisError exception."""
+
+        def _convert_exc() -> Iterator[EnumeratedError]:
+            if not wrapping:
+                return
+            for exc in wrapping:
+                if isinstance(exc, EnumeratedError):
+                    yield exc
+                else:
+                    yield PythonException(exc)
+
+        super().__init__(
+            code=ErrorCodes.GENERAL_ERROR,
+            message=message,
+            wrapping=[e for e in _convert_exc()],
+        )
+
+
+async def _do_analyze(
+    protocol_source: ProtocolSource,
+    rtp_values: PrimitiveRunTimeParamValuesType,
+    rtp_paths: CSVRuntimeParamPaths,
+) -> RunResult:
+
+    orchestrator = await create_simulating_orchestrator(
+        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
+    )
+    try:
+        await orchestrator.load(
+            protocol_source=protocol_source,
+            parse_mode=ParseMode.NORMAL,
+            run_time_param_values=rtp_values,
+            run_time_param_paths=rtp_paths,
+        )
+    except Exception as error:
+        err_id = "analysis-setup-error"
+        err_created_at = datetime.now(tz=timezone.utc)
+        if isinstance(error, EnumeratedError):
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=error
+            )
+        else:
+            enumerated_wrapper = UnexpectedAnalysisError(
+                message=str(error),
+                wrapping=[error],
+            )
+            error_occ = ErrorOccurrence.from_failed(
+                id=err_id, createdAt=err_created_at, error=enumerated_wrapper
+            )
+        analysis = RunResult(
+            commands=[],
+            state_summary=StateSummary(
+                errors=[error_occ],
+                status=EngineStatus.IDLE,
+                labware=[],
+                pipettes=[],
+                modules=[],
+                labwareOffsets=[],
+                liquids=[],
+                wells=[],
+                hasEverEnteredErrorRecovery=False,
+                files=[],
+                liquidClasses=[],
+            ),
+            parameters=[],
+            command_annotations=[],
+        )
+        return analysis
+    return await orchestrator.run(deck_configuration=[])
+
+
+async def _analyze(  # noqa: C901
     files_and_dirs: Sequence[Path],
-    json_output: Optional[AsyncPath],
-) -> None:
+    rtp_values: str,
+    rtp_files: str,
+    outputs: Sequence[_Output],
+    check: bool,
+    fail_on_leak: bool,
+    debug_on_leak: bool,
+) -> int:
     input_files = _get_input_files(files_and_dirs)
+    parsed_rtp_values = _get_runtime_parameter_values(rtp_values)
+    rtp_paths = _get_runtime_parameter_paths(rtp_files)
 
     try:
         protocol_source = await ProtocolReader().read_saved(
@@ -76,46 +393,98 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
-    runner = await create_simulating_runner(
-        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
-    )
-    analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
+    analysis = await _do_analyze(protocol_source, parsed_rtp_values, rtp_paths)
+    return_code = _get_return_code(analysis)
 
-    if json_output:
-        results = AnalyzeResults.construct(
-            createdAt=datetime.now(tz=timezone.utc),
-            files=[
-                ProtocolFile.construct(name=f.path.name, role=f.role)
-                for f in protocol_source.files
-            ],
-            config=(
-                JsonConfig.construct(
-                    schemaVersion=protocol_source.config.schema_version
-                )
-                if isinstance(protocol_source.config, JsonProtocolConfig)
-                else PythonConfig.construct(
-                    apiVersion=protocol_source.config.api_version
-                )
-            ),
-            metadata=protocol_source.metadata,
-            robotType=protocol_source.robot_type,
-            commands=analysis.commands,
-            errors=analysis.state_summary.errors,
-            labware=analysis.state_summary.labware,
-            pipettes=analysis.state_summary.pipettes,
-            modules=analysis.state_summary.modules,
-            liquids=analysis.state_summary.liquids,
+    # This ugly code checks to see if an engine remains past garbage collection
+    # after analysis is complete.
+    # It should be here and open coded to make it a little easier to present
+    # the debug option.
+    if fail_on_leak or debug_on_leak:
+        gc.collect()
+        leaked_engine = next(
+            (obj for obj in gc.get_objects() if isinstance(obj, ProtocolEngine)), None
         )
+        if leaked_engine:
+            if fail_on_leak:
+                print(
+                    "A ProtocolEngine instance exists even after garbage collection; "
+                    "some thing (likely in the protocol) has caused it to be leaked, "
+                    "likely by reference to the engine or something that refers to the "
+                    "engine after the run function ends.",
+                    file=sys.stderr,
+                )
+                return_code = -2
+            if debug_on_leak:
+                print(
+                    "You are now in an interactive PDB (https://docs.python.org/3.10/library/pdb.html) "
+                    "session; the leaked engine is bound to the variable leaked_engine."
+                )
+                breakpoint()
 
-        await json_output.write_text(
-            results.json(exclude_none=True),
-            encoding="utf-8",
-        )
+    if not outputs:
+        return return_code
 
+    if len(analysis.state_summary.errors) > 0:
+        if any(
+            code_in_error_tree(
+                root_error=error, code=ErrorCodes.RUNTIME_PARAMETER_VALUE_REQUIRED
+            )
+            for error in analysis.state_summary.errors
+        ):
+            result = AnalysisResult.PARAMETER_VALUE_REQUIRED
+        else:
+            result = AnalysisResult.NOT_OK
     else:
-        raise click.UsageError(
-            "Currently, this tool only supports JSON mode. Use `--json-output`."
-        )
+        result = AnalysisResult.OK
+
+    results = AnalyzeResults.model_construct(
+        createdAt=datetime.now(tz=timezone.utc),
+        files=[
+            ProtocolFile.model_construct(name=f.path.name, role=f.role)
+            for f in protocol_source.files
+        ],
+        config=(
+            JsonConfig.model_construct(
+                schemaVersion=protocol_source.config.schema_version
+            )
+            if isinstance(protocol_source.config, JsonProtocolConfig)
+            else PythonConfig.model_construct(
+                apiVersion=protocol_source.config.api_version
+            )
+        ),
+        result=result,
+        metadata=protocol_source.metadata,
+        robotType=protocol_source.robot_type,
+        runTimeParameters=analysis.parameters,
+        commands=analysis.commands,
+        errors=analysis.state_summary.errors,
+        labware=analysis.state_summary.labware,
+        pipettes=analysis.state_summary.pipettes,
+        modules=analysis.state_summary.modules,
+        liquids=analysis.state_summary.liquids,
+        commandAnnotations=analysis.command_annotations,
+        liquidClasses=analysis.state_summary.liquidClasses,
+    )
+
+    _call_for_output_of_kind(
+        "json",
+        outputs,
+        lambda to_file: to_file.write(
+            results.model_dump_json(exclude_none=True).encode("utf-8"),
+        ),
+    )
+    _call_for_output_of_kind(
+        "human-json",
+        outputs,
+        lambda to_file: to_file.write(
+            results.model_dump_json(exclude_none=True, indent=2).encode("utf-8")
+        ),
+    )
+    if check:
+        return return_code
+    else:
+        return 0
 
 
 class ProtocolFile(BaseModel):
@@ -139,6 +508,26 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
+class AnalysisResult(str, Enum):
+    """Result of a completed protocol analysis.
+
+    The result indicates whether the protocol is expected to run successfully.
+
+    Properties:
+        OK: No problems were found during protocol analysis.
+        NOT_OK: Problems were found during protocol analysis. Inspect
+            `analysis.errors` for error occurrences.
+        PARAMETER_VALUE_REQUIRED: A value is required to be set for a parameter
+            in order for the protocol to be analyzed/run. The absence of this does not
+            inherently mean there are no parameters, as there may be defaults for all
+            or unset parameters are not referenced or handled via try/except clauses.
+    """
+
+    OK = "ok"
+    NOT_OK = "not-ok"
+    PARAMETER_VALUE_REQUIRED = "parameter-value-required"
+
+
 class AnalyzeResults(BaseModel):
     """Results of a protocol analysis.
 
@@ -155,10 +544,14 @@ class AnalyzeResults(BaseModel):
     metadata: Dict[str, Any]
 
     # Fields that should match robot-server:
+    result: AnalysisResult
     robotType: RobotType
+    runTimeParameters: List[RunTimeParameter]
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
     liquids: List[Liquid]
+    liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
+    commandAnnotations: List[CommandAnnotation]

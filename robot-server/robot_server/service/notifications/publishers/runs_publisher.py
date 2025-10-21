@@ -1,0 +1,200 @@
+from fastapi import Depends
+from dataclasses import dataclass
+from typing import Annotated, Callable, Optional
+
+from opentrons.protocol_engine import CommandPointer, StateSummary, EngineStatus
+
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
+from ..notification_client import NotificationClient, get_notification_client
+from ..publisher_notifier import PublisherNotifier, get_pe_publisher_notifier
+from .. import topics
+
+
+@dataclass
+class _RunHooks:
+    """Generated during a protocol run. Utilized by RunsPublisher."""
+
+    run_id: str
+    get_current_command: Callable[[str], Optional[CommandPointer]]
+    get_recovery_target_command: Callable[[str], Optional[CommandPointer]]
+    get_state_summary: Callable[[str], Optional[StateSummary]]
+
+
+@dataclass
+class _EngineStateSlice:
+    """Protocol Engine state relevant to RunsPublisher."""
+
+    current_command: Optional[CommandPointer] = None
+    recovery_target_command: Optional[CommandPointer] = None
+    state_summary_status: Optional[EngineStatus] = None
+    state_summary_labware_offset_count: Optional[int] = None
+
+
+class RunsPublisher:
+    """Publishes protocol runs topics."""
+
+    def __init__(
+        self, client: NotificationClient, publisher_notifier: PublisherNotifier
+    ) -> None:
+        """Returns a configured Runs Publisher."""
+        self._client = client
+        #  Variables and callbacks related to PE state changes.
+
+        self._run_hooks: Optional[_RunHooks] = None
+        self._engine_state_slice: Optional[_EngineStateSlice] = None
+
+        publisher_notifier.register_publish_callbacks(
+            [
+                self._handle_current_command_change,
+                self._handle_recovery_target_command_change,
+                self._handle_relevant_engine_change,
+            ]
+        )
+
+    # TODO(jh, 08-01-25): Free run_hooks and engine_state_slice during run cleanup for more predictable protocol engine GC.
+    def start_publishing_for_run(
+        self,
+        run_id: str,
+        get_current_command: Callable[[str], Optional[CommandPointer]],
+        get_recovery_target_command: Callable[[str], Optional[CommandPointer]],
+        get_state_summary: Callable[[str], Optional[StateSummary]],
+    ) -> None:
+        """Initialize RunsPublisher with necessary information derived from the current run.
+
+        Args:
+            run_id: ID of the current run.
+            get_current_command: Callback to get the currently executing command, if any.
+            get_state_summary: Callback to get the current run's state summary, if any.
+        """
+        self._run_hooks = _RunHooks(
+            run_id=run_id,
+            get_current_command=get_current_command,
+            get_recovery_target_command=get_recovery_target_command,
+            get_state_summary=get_state_summary,
+        )
+        self._engine_state_slice = _EngineStateSlice()
+
+        self.publish_runs_advise_refetch(run_id=run_id)
+
+    def clean_up_run(self, run_id: str) -> None:
+        """Publish final refetch and unsubscribe flags for the given run."""
+        self.publish_runs_advise_refetch(run_id=run_id)
+        self._publish_runs_advise_unsubscribe(run_id=run_id)
+
+    def publish_runs_advise_refetch(self, run_id: str) -> None:
+        """Publish a refetch flag for relevant runs topics."""
+        self._client.publish_advise_refetch(topic=topics.RUNS)
+
+        if self._run_hooks is not None:
+            self._client.publish_advise_refetch(
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
+            )
+
+    def _publish_command_links(self) -> None:
+        """Publish an update to the run's command links.
+
+        Corresponds to the `links` field in `GET /runs/:runId/commands`
+        (regardless of query parameters).
+        """
+        self._client.publish_advise_refetch(topic=topics.RUNS_COMMANDS_LINKS)
+
+    def _publish_runs_advise_unsubscribe(self, run_id: str) -> None:
+        """Publish an unsubscribe flag for relevant runs topics."""
+        if self._run_hooks is not None:
+            self._client.publish_advise_unsubscribe(
+                topic=topics.TopicName(f"{topics.RUNS}/{run_id}")
+            )
+            self._client.publish_advise_unsubscribe(topic=topics.RUNS_COMMANDS_LINKS)
+            self._client.publish_advise_unsubscribe(
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
+            )
+
+    def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
+        """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
+        if self._run_hooks is not None:
+            self._client.publish_advise_refetch(
+                topic=topics.TopicName(
+                    f"{topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+                )
+            )
+
+    async def _handle_current_command_change(self) -> None:
+        """Publish a refetch flag if the current command has changed."""
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            new_current_command = self._run_hooks.get_current_command(
+                self._run_hooks.run_id
+            )
+            if self._engine_state_slice.current_command != new_current_command:
+                self._publish_command_links()
+                self._engine_state_slice.current_command = new_current_command
+
+    async def _handle_recovery_target_command_change(self) -> None:
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            new_recovery_target_command = self._run_hooks.get_recovery_target_command(
+                self._run_hooks.run_id
+            )
+            if (
+                self._engine_state_slice.recovery_target_command
+                != new_recovery_target_command
+            ):
+                self._publish_command_links()
+                self._engine_state_slice.recovery_target_command = (
+                    new_recovery_target_command
+                )
+
+    async def _handle_relevant_engine_change(self) -> None:
+        """Publish a refetch flag if relevant engine changes occur."""
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            new_state_summary = self._run_hooks.get_state_summary(
+                self._run_hooks.run_id
+            )
+
+            if new_state_summary is not None:
+                if (
+                    self._engine_state_slice.state_summary_status
+                    != new_state_summary.status
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_status = (
+                        new_state_summary.status
+                    )
+
+                elif self._engine_state_slice.state_summary_labware_offset_count != len(
+                    new_state_summary.labwareOffsets
+                ):
+                    self.publish_runs_advise_refetch(run_id=self._run_hooks.run_id)
+                    self._engine_state_slice.state_summary_labware_offset_count = len(
+                        new_state_summary.labwareOffsets
+                    )
+
+
+_runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
+    RunsPublisher
+]("runs_publisher")
+
+
+async def get_runs_publisher(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+    notification_client: Annotated[
+        NotificationClient, Depends(get_notification_client)
+    ],
+    publisher_notifier: Annotated[
+        PublisherNotifier, Depends(get_pe_publisher_notifier)
+    ],
+) -> RunsPublisher:
+    """Get a singleton RunsPublisher to publish runs topics."""
+    runs_publisher = _runs_publisher_accessor.get_from(app_state)
+
+    if runs_publisher is None:
+        runs_publisher = RunsPublisher(
+            client=notification_client, publisher_notifier=publisher_notifier
+        )
+        _runs_publisher_accessor.set_on(app_state, runs_publisher)
+
+    return runs_publisher

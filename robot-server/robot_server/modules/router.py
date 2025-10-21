@@ -1,6 +1,8 @@
 """Modules routes."""
-from fastapi import APIRouter, Depends, status
-from typing import List, Dict
+from typing import Annotated, List, Dict
+
+from fastapi import Depends, status
+from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration
@@ -21,10 +23,11 @@ from .module_models import AttachedModule, ModuleCalibrationData
 from .module_identifier import ModuleIdentifier
 from .module_data_mapper import ModuleDataMapper
 
-modules_router = APIRouter()
+modules_router = LightRouter()
 
 
-@modules_router.get(
+@PydanticResponse.wrap_route(
+    modules_router.get,
     path="/modules",
     summary="Get attached modules.",
     description="Get a list of all modules currently attached to the robot.",
@@ -33,15 +36,19 @@ modules_router = APIRouter()
     },
 )
 async def get_attached_modules(
-    requested_version: int = Depends(get_requested_version),
-    hardware: HardwareControlAPI = Depends(get_hardware),
-    module_identifier: ModuleIdentifier = Depends(ModuleIdentifier),
-    module_data_mapper: ModuleDataMapper = Depends(ModuleDataMapper),
+    requested_version: Annotated[int, Depends(get_requested_version)],
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    module_identifier: Annotated[ModuleIdentifier, Depends(ModuleIdentifier)],
+    module_data_mapper: Annotated[ModuleDataMapper, Depends(ModuleDataMapper)],
 ) -> PydanticResponse[SimpleMultiBody[AttachedModule]]:
     """Get a list of all attached modules."""
     if requested_version <= 2:
-        return await legacy_get_attached_modules(  # type: ignore[return-value]
+        # TODO: can we use a redirect here or something
+        legacy_data = await legacy_get_attached_modules(
             hardware=hardware,
+        )
+        return await PydanticResponse.create(
+            content=legacy_data  # type: ignore[arg-type]
         )
 
     # Load any the module calibrations
@@ -62,7 +69,7 @@ async def get_attached_modules(
                 module_identity=module_identity,
                 live_data=mod.live_data,
                 usb_port=mod.usb_port,
-                module_offset=ModuleCalibrationData.construct(
+                module_offset=ModuleCalibrationData.model_construct(
                     offset=Vec3f(
                         x=calibrated.offset.x,
                         y=calibrated.offset.y,
@@ -78,7 +85,7 @@ async def get_attached_modules(
         )
 
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),

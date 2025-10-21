@@ -1,45 +1,41 @@
-import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 
-import { i18n } from '../../../i18n'
-import { StatusLabel } from '../../../atoms/StatusLabel'
 import { MagneticModuleData } from '../MagneticModuleData'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 
-jest.mock('../../../atoms/StatusLabel')
+import type { ComponentProps } from 'react'
 
-const mockStatusLabel = StatusLabel as jest.MockedFunction<typeof StatusLabel>
-
-const render = (props: React.ComponentProps<typeof MagneticModuleData>) => {
+const render = (props: ComponentProps<typeof MagneticModuleData>) => {
   return renderWithProviders(<MagneticModuleData {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('MagneticModuleData', () => {
-  let props: React.ComponentProps<typeof MagneticModuleData>
+  let props: ComponentProps<typeof MagneticModuleData>
   beforeEach(() => {
     props = {
       moduleHeight: mockMagneticModule.data.height,
       moduleModel: mockMagneticModule.moduleModel,
       moduleStatus: mockMagneticModule.data.status,
     }
-    mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders a status', () => {
-    const { getByText } = render(props)
+    render(props)
+    screen.getByTestId('mag_module_data')
 
-    getByText('Mock StatusLabel')
+    const chip = screen.getByTestId('mag_module_chip')
+    expect(chip).toHaveTextContent(`${props.moduleStatus}`)
   })
 
   it('renders magnet height data', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText(`Height: ${props.moduleHeight}`)
+    screen.getByText(`Height: ${props.moduleHeight}`)
   })
 })

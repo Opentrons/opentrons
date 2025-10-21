@@ -9,26 +9,24 @@ import {
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { getFullConfig, handleConfigChange } from './config'
 import {
-  DISCOVERY_START,
+  CLEAR_CACHE,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
-  CLEAR_CACHE,
-} from '@opentrons/app/src/redux/discovery/actions'
-
-import { getFullConfig, handleConfigChange } from './config'
+  DISCOVERY_START,
+  UI_INITIALIZED,
+} from './constants'
 import { createLogger } from './log'
 
+import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 import type {
   Address,
+  DiscoveryClient,
   DiscoveryClientRobot,
   LegacyService,
-  DiscoveryClient,
 } from '@opentrons/discovery-client'
-
 import type { Action, Dispatch } from './types'
-import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 
 const log = createLogger('discovery')
 
@@ -146,20 +144,25 @@ export function registerDiscovery(
 
     switch (action.type) {
       case UI_INITIALIZED:
-      case DISCOVERY_START:
+      case DISCOVERY_START: {
         handleRobots()
-        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
+        client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
+        return
+      }
 
-      case DISCOVERY_FINISH:
-        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
+      case DISCOVERY_FINISH: {
+        client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
+        return
+      }
 
-      case DISCOVERY_REMOVE:
-        return client.removeRobot(
-          (action.payload as { robotName: string }).robotName
-        )
+      case DISCOVERY_REMOVE: {
+        client.removeRobot((action.payload as { robotName: string }).robotName)
+        return
+      }
 
-      case CLEAR_CACHE:
-        return clearCache()
+      case CLEAR_CACHE: {
+        clearCache()
+      }
     }
   }
 

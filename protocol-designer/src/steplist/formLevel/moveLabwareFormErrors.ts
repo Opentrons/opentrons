@@ -1,16 +1,14 @@
-import { LabwareLocation } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import {
-  COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
-  COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
-} from '../../utils/labwareModuleCompatibility'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+
+import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
+
+import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntity,
 } from '@opentrons/step-generation'
+import type { HydratedFormData } from '../../form-types'
 import type { ProfileFormError } from './profileErrors'
-
-type HydratedFormData = any
 
 const getMoveLabwareError = (
   labware: LabwareEntity,
@@ -18,30 +16,28 @@ const getMoveLabwareError = (
   invariantContext: InvariantContext
 ): string | null => {
   let errorString: string | null = null
-  if (labware == null || newLocation == null || newLocation === 'offDeck')
+  if (
+    labware == null ||
+    newLocation == null ||
+    newLocation === 'offDeck' ||
+    newLocation === 'systemLocation' ||
+    !getLabwareDefIsStandard(labware?.def)
+  )
     return null
-  const selectedLabwareDefUri = labware?.labwareDefURI
   if ('moduleId' in newLocation) {
-    const loadName = labware?.def.parameters.loadName
     const moduleType =
       invariantContext.moduleEntities[newLocation.moduleId].type
-    const modAllowList = COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
-    errorString = !modAllowList.includes(loadName)
-      ? i18n.t(
-          'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithMod'
-        )
+    errorString = !getLabwareCompatibleWithModule(labware.def, moduleType)
+      ? 'Labware incompatible with this module'
       : null
   } else if ('labwareId' in newLocation) {
-    const adapterValueDefUri =
+    const adapterLoadName =
       invariantContext.labwareEntities[newLocation.labwareId].def.parameters
         .loadName
-    const adapterAllowList =
-      COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterValueDefUri]
-    errorString = !adapterAllowList?.includes(selectedLabwareDefUri)
-      ? i18n.t(
-          'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithAdapter'
-        )
-      : null
+    errorString =
+      labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
+        ? 'Labware incompatible with this adapter'
+        : null
   }
   return errorString
 }
@@ -67,7 +63,9 @@ export const getMoveLabwareFormErrors = (
     ? ([
         {
           title: errorString,
-          dependentProfileFields: [],
+          dependentProfileFields: ['newLocation'],
+          location: 'field',
+          showOnReopen: true,
         },
       ] as ProfileFormError[])
     : []

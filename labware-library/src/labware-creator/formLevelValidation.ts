@@ -1,7 +1,8 @@
-import { FormikErrors } from 'formik'
 import { labwareFormSchemaBaseObject } from './labwareFormSchema'
-import type { LabwareFields } from './fields'
 import { getLabwareName } from './utils'
+
+import type { FormikErrors } from 'formik'
+import type { LabwareFields } from './fields'
 
 export const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
 export const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
@@ -81,11 +82,11 @@ const partialCast = <TKey extends keyof LabwareFields>(
   values: LabwareFields,
   keys: TKey[]
 ): Pick<
-  ReturnType<typeof labwareFormSchemaBaseObject['cast']>,
+  ReturnType<(typeof labwareFormSchemaBaseObject)['cast']>,
   TKey
 > | null => {
   const partialSchema = labwareFormSchemaBaseObject.pick(keys)
-  let castFields: ReturnType<typeof partialSchema['cast']> | null = null
+  let castFields: ReturnType<(typeof partialSchema)['cast']> | null = null
   try {
     castFields = partialSchema.cast(values)
   } catch (error) {
@@ -93,7 +94,11 @@ const partialCast = <TKey extends keyof LabwareFields>(
     // ignore them. We can sniff if something is a Yup error by checking error.name.
     // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
     // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-    if (error.name !== 'ValidationError' && error.name !== 'TypeError') {
+    if (
+      error instanceof Error &&
+      error.name !== 'ValidationError' &&
+      error.name !== 'TypeError'
+    ) {
       // TODO(IL, 2021-05-19): why are missing values for required fields giving TypeError instead of ValidationError?
       // Is this partial schema (from `pick`) not handing requireds correctly??
       throw error

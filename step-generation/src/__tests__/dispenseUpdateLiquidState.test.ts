@@ -1,18 +1,25 @@
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
-
+import produce from 'immer'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import produce from 'immer'
-import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
-  dispenseUpdateLiquidState,
-  DispenseUpdateLiquidStateArgs,
-} from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+  fixture12Trough as _fixture12Trough,
+  fixture96Plate as _fixture96Plate,
+  fixture384Plate as _fixture384Plate,
+} from '@opentrons/shared-data'
+
+import {
+  DEFAULT_PIPETTE,
+  getInitialRobotStateStandard,
+  makeContext,
+  SOURCE_LABWARE,
+} from '../fixtures'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { createEmptyLiquidState, createTipLiquidState } from '../utils'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { DispenseUpdateLiquidStateArgs } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 import type { InvariantContext, RobotState } from '../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
@@ -29,8 +36,12 @@ beforeEach(() => {
     pipetteId: DEFAULT_PIPETTE,
     volume: 150,
     useFullVolume: false,
-    labwareId: SOURCE_LABWARE,
+    entityId: SOURCE_LABWARE,
     wellName: 'A1',
+    robotStateAndWarnings: {
+      robotState: getInitialRobotStateStandard(invariantContext),
+      warnings: [],
+    },
   }
 })
 
@@ -363,6 +374,7 @@ describe('...8-channel pipette', () => {
           id: SOURCE_LABWARE,
           labwareDefURI: labwareType,
           def,
+          pythonName: 'mockPythonName',
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)
         const initialLiquidState = merge({}, blankLiquidState, {
@@ -389,11 +401,15 @@ describe('...8-channel pipette', () => {
         const result = getUpdatedLiquidState(
           {
             invariantContext: customInvariantContext,
-            labwareId: SOURCE_LABWARE,
+            entityId: SOURCE_LABWARE,
             pipetteId: 'p300MultiId',
             useFullVolume: false,
             volume: 150,
             wellName: 'A1',
+            robotStateAndWarnings: {
+              robotState: getInitialRobotStateStandard(invariantContext),
+              warnings: [],
+            },
           },
           initialLiquidState
         )

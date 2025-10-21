@@ -9,13 +9,18 @@ from opentrons.calibration_storage import types, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import OT3Mount
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
-    from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition as TypeDictLabwareDef,
+    from opentrons_shared_data.pipette.types import LabwareUri
+    from opentrons_shared_data.labware.types import (
+        LabwareDefinition2 as TypeDictLabwareDef2,
     )
+
+# These type aliases aid typechecking in tests that work the same on this and
+# the hardware_control.instruments.ot3 variant
+SourceType = types.SourceType
+CalibrationStatus = types.CalibrationStatus
 
 
 @dataclass
@@ -25,8 +30,8 @@ class PipetteOffsetByPipetteMount:
     """
 
     offset: Point
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     tiprack: typing.Optional[str] = None
     uri: typing.Optional[str] = None
     last_modified: typing.Optional[datetime] = None
@@ -44,15 +49,15 @@ class PipetteOffsetCalibration:
     tiprack: str
     uri: str
     last_modified: datetime
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
 
 
 @dataclass
 class TipLengthCalibration:
     tip_length: float
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     pipette: str
     tiprack: str
     last_modified: datetime
@@ -65,8 +70,8 @@ def load_pipette_offset(
     # load default if pipette offset data do not exist
     pip_cal_obj = PipetteOffsetByPipetteMount(
         offset=Point(*default_pipette_offset()),
-        source=types.SourceType.default,
-        status=types.CalibrationStatus(),
+        source=SourceType.default,
+        status=CalibrationStatus(),
     )
     # TODO this can be removed once we switch to using
     # ot3 pipette types in the ot3 hardware controller.
@@ -114,29 +119,31 @@ def save_pipette_offset_calibration(
 # TODO (lc 09-26-2022) We should ensure that only LabwareDefinition models are passed
 # into this function instead of a mixture of TypeDicts and BaseModels
 def load_tip_length_for_pipette(
-    pipette_id: str, tiprack: typing.Union["TypeDictLabwareDef", LabwareDefinition]
+    pipette_id: str, tiprack: typing.Union["TypeDictLabwareDef2", LabwareDefinition2]
 ) -> TipLengthCalibration:
-    if isinstance(tiprack, LabwareDefinition):
+    if isinstance(tiprack, LabwareDefinition2):
         tiprack = typing.cast(
-            "TypeDictLabwareDef", tiprack.dict(exclude_none=True, exclude_unset=True)
+            "TypeDictLabwareDef2",
+            tiprack.model_dump(
+                exclude_none=True,
+                exclude_unset=True
+                # todo(mm, 2025-02-13): Do we need by_alias=True here?
+            ),
         )
 
     tip_length_data = calibration_storage.load_tip_length_calibration(
         pipette_id, tiprack
     )
 
-    # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
-    # information we actually need from the labware definition and pass it into
-    # the `load_tip_length_calibration` function.
-    tiprack_hash = helpers.hash_labware_def(tiprack)
+    tiprack_uri = helpers.uri_from_definition(tiprack)
 
     return TipLengthCalibration(
         tip_length=tip_length_data.tipLength,
         source=tip_length_data.source,
         pipette=pipette_id,
-        tiprack=tiprack_hash,
+        tiprack=tip_length_data.definitionHash,
         last_modified=tip_length_data.lastModified,
-        uri=tip_length_data.uri,
+        uri=tiprack_uri,
         status=types.CalibrationStatus(
             markedAt=tip_length_data.status.markedAt,
             markedBad=tip_length_data.status.markedBad,

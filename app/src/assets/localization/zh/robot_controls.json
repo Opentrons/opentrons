@@ -1,0 +1,14 @@
+{
+  "confirm_location": "确认位置",
+  "drop_tips": "丢弃吸头",
+  "home_button": "归位",
+  "home_description": "将工作站返回起始位置。",
+  "home_label": "归位所有轴",
+  "lights_description": "控制灯光",
+  "lights_label": "灯光",
+  "recalibrate": "重新校准",
+  "restart_button": "重新启动",
+  "restart_description": "重新启动工作站。",
+  "restart_label": "重新启动工作站",
+  "title": "工作站控制"
+}

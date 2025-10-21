@@ -1,22 +1,21 @@
 import { createSelector } from 'reselect'
-import { isRealtekU2EAdapter, getDriverStatus } from './utils'
+
 import { NOT_APPLICABLE } from './constants'
+import { getDriverStatus, isRealtekU2EAdapter } from './utils'
 
 import type { State } from '../types'
-import type { UsbDevice, DriverStatus, U2EAnalyticsProps } from './types'
+import type { DriverStatus, U2EAnalyticsProps, UsbDevice } from './types'
 
-export const getU2EAdapterDevice: (
-  state: State
-) => UsbDevice | null = createSelector(
-  state => state.systemInfo.usbDevices,
-  usbDevices => usbDevices.find(isRealtekU2EAdapter) ?? null
-)
+export const getU2EAdapterDevice: (state: State) => UsbDevice | null =
+  createSelector(
+    state => state.systemInfo.usbDevices,
+    usbDevices => usbDevices.find(isRealtekU2EAdapter) ?? null
+  )
 
-export const getU2EWindowsDriverStatus: (
-  state: State
-) => DriverStatus = createSelector(getU2EAdapterDevice, device =>
-  device !== null ? getDriverStatus(device) : NOT_APPLICABLE
-)
+export const getU2EWindowsDriverStatus: (state: State) => DriverStatus =
+  createSelector(getU2EAdapterDevice, device =>
+    device !== null ? getDriverStatus(device) : NOT_APPLICABLE
+  )
 
 export const getU2EDeviceAnalyticsProps: (
   state: State
@@ -27,8 +26,8 @@ export const getU2EDeviceAnalyticsProps: (
     'U2E Vendor ID': device.vendorId,
     'U2E Product ID': device.productId,
     'U2E Serial Number': device.serialNumber,
-    'U2E Manufacturer': device.manufacturer,
-    'U2E Device Name': device.deviceName,
+    'U2E Manufacturer': device.manufacturerName,
+    'U2E Device Name': device.productName,
   }
 
   if (device.windowsDriverVersion) {

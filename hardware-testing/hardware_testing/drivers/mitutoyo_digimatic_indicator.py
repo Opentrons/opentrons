@@ -20,8 +20,8 @@ class Mitutoyo_Digimatic_Indicator:
         self.GCODE = {
             "READ": "r",
         }
-        self.gauge = serial.Serial()
-        self.packet = ""
+        self.gauge: serial.Serial | None = None
+        self.packet: str = ""
 
     def connect(self) -> None:
         """Connect communication ports."""
@@ -40,16 +40,20 @@ class Mitutoyo_Digimatic_Indicator:
 
     def disconnect(self) -> None:
         """Disconnect communication ports."""
-        self.gauge.close()
+        if self.gauge is not None:
+            self.gauge.close()
 
     def _send_packet(self, packet: str) -> None:
-        self.gauge.flush()
-        self.gauge.flushInput()
-        self.gauge.write(packet.encode("utf-8"))
+        if self.gauge is not None:
+            self.gauge.flush()
+            self.gauge.reset_input_buffer()
+            self.gauge.write(packet.encode())
 
     def _get_packet(self) -> str:
-        self.gauge.flushOutput()
-        packet = self.gauge.readline().decode("utf-8")
+        packet = ""
+        if self.gauge is not None:
+            self.gauge.reset_output_buffer()
+            packet = self.gauge.readline().decode("utf-8")
         return packet
 
     def read(self) -> float:
@@ -58,17 +62,23 @@ class Mitutoyo_Digimatic_Indicator:
         self._send_packet(self.packet)
         time.sleep(0.001)
         reading = True
+        value = 0.0  # Initialize value to avoid unbound error
         while reading:
             data = self._get_packet()
+            time.sleep(0.01)
             if data != "":
-                reading = False
-        return float(data)
+                try:
+                    value = float(data)
+                    reading = False
+                except ValueError:
+                    continue
+        return value
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""
-        then = time.time()
+        then = time.monotonic()
         values = [self.read(), self.read(), self.read(), self.read(), self.read()]
-        while (time.time() - then) < timeout:
+        while (time.monotonic() - then) < timeout:
             if numpy.allclose(values, list(reversed(values))):
                 return values[-1]
             values = values[1:] + [self.read()]
@@ -79,8 +89,8 @@ if __name__ == "__main__":
     print("Mitutoyo ABSOLUTE Digimatic Indicator")
     gauge = Mitutoyo_Digimatic_Indicator(port="/dev/ttyUSB0")
     gauge.connect()
-    start_time = time.time()
+    start_time = time.monotonic()
     while True:
-        elapsed_time = round(time.time() - start_time, 3)
+        elapsed_time = round(time.monotonic() - start_time, 3)
         distance = gauge.read()
         print("Time: {} Distance: {}".format(elapsed_time, distance))

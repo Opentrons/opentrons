@@ -1,4 +1,7 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
+
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { resetConfigEpic } from '../resetConfigEpic'
@@ -7,15 +10,14 @@ import type { Action } from '../../../types'
 
 const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {
-    foo: true,
-    bar: false,
+    resetLabwareOffsets: true,
+    settingsResets: {
+      foo: true,
+      bar: false,
+    },
   })
 
 describe('robotAdminEpic handles performing a "factory reset"', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls POST /settings/reset on RESET_CONFIG', () => {
     const mocks = setupEpicTestMocks<Action>(
       makeResetConfigAction,
@@ -30,6 +32,11 @@ describe('robotAdminEpic handles performing a "factory reset"', () => {
       expectObservable(output$)
       flush()
 
+      expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+        method: 'DELETE',
+        path: '/labwareOffsets',
+        body: {},
+      })
       expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
         method: 'POST',
         path: '/settings/reset',

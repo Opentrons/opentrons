@@ -2,20 +2,20 @@ import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-
+import type { RobotApiErrorResponse } from '../../robot-api/types'
+import type { Action, Epic } from '../../types'
 import type { UpdateModuleAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdateModuleAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  UpdateModuleAction
+> = action => ({
   method: POST,
   path: `${Constants.MODULES_PATH}/${action.payload.moduleId}/${Constants.MODULE_UPDATE_PATH_EXT}`,
 })
@@ -29,8 +29,18 @@ const mapResponseToAction: ResponseToActionMapper<UpdateModuleAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.updateModuleSuccess(host.name, moduleId, body.message, meta)
-    : Actions.updateModuleFailure(host.name, moduleId, body, meta)
+    ? Actions.updateModuleSuccess(
+        host.name,
+        moduleId,
+        body.message as string,
+        meta
+      )
+    : Actions.updateModuleFailure(
+        host.name,
+        moduleId,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 export const updateModuleEpic: Epic = (action$, state$) => {

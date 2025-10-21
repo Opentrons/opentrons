@@ -1,24 +1,18 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it, vi } from 'vitest'
 
-import * as SettingsSelectors from '../../../robot-settings/selectors'
-import * as DiscoveryActions from '../../../discovery/actions'
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import * as Fixtures from '../../__fixtures__'
+import * as DiscoveryActions from '../../../discovery/actions'
+import * as SettingsSelectors from '../../../robot-settings/selectors'
 import * as Actions from '../../actions'
 import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
 
 import type { Action } from '../../../types'
 
-jest.mock('../../../robot-settings/selectors')
-
-const mockGetRestartPath = SettingsSelectors.getRobotRestartPath as jest.MockedFunction<
-  typeof SettingsSelectors.getRobotRestartPath
->
+vi.mock('../../../robot-settings/selectors')
 
 describe('robotAdminEpic handles restarting', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls POST /server/restart', () => {
     const mocks = setupEpicTestMocks(
       robotName => Actions.restartRobot(robotName),
@@ -46,7 +40,7 @@ describe('robotAdminEpic handles restarting', () => {
       Fixtures.mockRestartSuccess
     )
 
-    mockGetRestartPath.mockReturnValue('/restart')
+    vi.mocked(SettingsSelectors.getRobotRestartPath).mockReturnValue('/restart')
 
     runEpicTest<Action>(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
@@ -56,7 +50,7 @@ describe('robotAdminEpic handles restarting', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRestartPath).toHaveBeenCalledWith(
+      expect(SettingsSelectors.getRobotRestartPath).toHaveBeenCalledWith(
         mocks.state,
         mocks.robot.name
       )

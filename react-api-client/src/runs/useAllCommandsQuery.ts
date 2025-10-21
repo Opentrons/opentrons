@@ -1,22 +1,21 @@
-import { UseQueryResult, useQuery } from 'react-query'
+import { useQuery } from 'react-query'
+
 import { getCommands } from '@opentrons/api-client'
+
 import { useHost } from '../api'
-import type { UseQueryOptions } from 'react-query'
+
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
-  GetCommandsParams,
-  HostConfig,
   CommandsData,
+  GetRunCommandsParamsRequest,
+  HostConfig,
 } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30
-export const DEFAULT_PARAMS: GetCommandsParams = {
-  cursor: null,
-  pageLength: DEFAULT_PAGE_LENGTH,
-}
 
 export function useAllCommandsQuery<TError = Error>(
   runId: string | null,
-  params: GetCommandsParams = DEFAULT_PARAMS,
+  params?: GetRunCommandsParamsRequest,
   options: UseQueryOptions<CommandsData, TError> = {}
 ): UseQueryResult<CommandsData, TError> {
   const host = useHost()
@@ -24,13 +23,20 @@ export function useAllCommandsQuery<TError = Error>(
     ...options,
     enabled: host !== null && runId != null && options.enabled !== false,
   }
-  const { cursor, pageLength } = params
+
+  const { cursor, pageLength, includeFixitCommands } = params ?? {}
+  const finalizedParams = {
+    ...params,
+    pageLength: params?.pageLength ?? DEFAULT_PAGE_LENGTH,
+  }
   const query = useQuery<CommandsData, TError>(
-    [host, 'runs', runId, 'commands', cursor, pageLength],
+    [host, 'runs', runId, 'commands', cursor, pageLength, includeFixitCommands],
     () => {
-      return getCommands(host as HostConfig, runId as string, params).then(
-        response => response.data
-      )
+      return getCommands(
+        host as HostConfig,
+        runId as string,
+        finalizedParams
+      ).then(response => response.data)
     },
     allOptions
   )

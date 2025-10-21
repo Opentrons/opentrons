@@ -1,17 +1,15 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as RobotApiHttp from '../../../robot-api/http'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { sessionsEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
+import * as RobotApiHttp from '../../../robot-api/http'
+import * as Actions from '../../actions'
 
 import type { Action } from '../../../types'
 
-jest.mock('../../../robot-api/http')
-
-const fetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
+vi.mock('../../../robot-api/http')
 
 const makeTriggerAction = (robotName: string): Action =>
   Actions.ensureSession(robotName, 'calibrationCheck', {
@@ -45,7 +43,7 @@ const mockEmptyFetchAllSuccess = {
 
 describe('ensureSessionEpic', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('calls GET /sessions', () => {
@@ -115,11 +113,11 @@ describe('ensureSessionEpic', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
     runEpicTest<Action>(mocks, ({ hot, cold, expectObservable, flush }) => {
-      fetchRobotApi.mockReturnValueOnce(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValueOnce(
         cold('r', { r: mockEmptyFetchAllSuccess })
       )
 
-      fetchRobotApi.mockReturnValueOnce(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValueOnce(
         cold('r', { r: Fixtures.mockCreateSessionSuccess })
       )
 
@@ -142,11 +140,11 @@ describe('ensureSessionEpic', () => {
     const mocks = setupEpicTestMocks(makeTriggerAction)
 
     runEpicTest<Action>(mocks, ({ hot, cold, expectObservable }) => {
-      fetchRobotApi.mockReturnValueOnce(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValueOnce(
         cold('r', { r: mockEmptyFetchAllSuccess })
       )
 
-      fetchRobotApi.mockReturnValueOnce(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValueOnce(
         cold('r', { r: Fixtures.mockCreateSessionFailure })
       )
 

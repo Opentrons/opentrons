@@ -14,6 +14,7 @@ import logging
 from typing import Optional, Dict, Any
 
 from . import API
+from .types import HardwareFeatureFlags
 from opentrons.config import robot_configs as rc
 from opentrons.config.types import RobotConfig
 
@@ -45,7 +46,9 @@ async def arun(
     :param port: Optional smoothie port override
     """
     rconf = config or rc.load()
-    hc = await API.build_hardware_controller(rconf, port)  # noqa: F841
+    hc = await API.build_hardware_controller(  # noqa: F841
+        config=rconf, port=port, feature_flags=HardwareFeatureFlags.build_from_ff()
+    )
 
 
 def run(config: Optional[RobotConfig] = None, port: Optional[str] = None) -> None:

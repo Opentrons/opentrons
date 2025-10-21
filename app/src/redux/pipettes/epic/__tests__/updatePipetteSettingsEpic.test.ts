@@ -1,43 +1,33 @@
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
-
+import * as DiscoverySelectors from '../../../discovery/selectors'
+import * as RobotApiHttp from '../../../robot-api/http'
 import * as Actions from '../../actions'
-import * as Types from '../../types'
 import { pipettesEpic } from '../../epic'
 
-import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
+import type * as Types from '../../types'
 
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
+vi.mock('../../../robot-api/http')
+vi.mock('../../../discovery/selectors')
 
 const mockState: State = { state: true } as any
 const { mockRobot, mockAttachedPipette: mockPipette } = Fixtures
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
 
 describe('updatePipetteSettingsEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot as any)
+    vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
+      mockRobot as any
+    )
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   describe('handles UPDATE_PIPETTE_SETTINGS', () => {
@@ -52,7 +42,7 @@ describe('updatePipetteSettingsEpic', () => {
 
     it('calls PATCH /settings/pipettes/:pipetteId', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('r', { r: Fixtures.mockFetchPipetteSettingsSuccess })
         )
 
@@ -63,11 +53,11 @@ describe('updatePipetteSettingsEpic', () => {
         expectObservable(output$)
         flush()
 
-        expect(mockGetRobotByName).toHaveBeenCalledWith(
+        expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
           mockState,
           mockRobot.name
         )
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(mockRobot, {
           method: 'PATCH',
           path: `/settings/pipettes/${mockPipette.id}`,
           body: { fields: { fieldA: { value: 42 }, fieldB: null } },
@@ -77,7 +67,7 @@ describe('updatePipetteSettingsEpic', () => {
 
     it('maps successful response to UPDATE_PIPETTE_SETTINGS_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('r', { r: Fixtures.mockUpdatePipetteSettingsSuccess })
         )
 
@@ -98,7 +88,7 @@ describe('updatePipetteSettingsEpic', () => {
 
     it('maps failed response to UPDATE_PIPETTE_SETTINGS_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('r', { r: Fixtures.mockUpdatePipetteSettingsFailure })
         )
 

@@ -8,10 +8,10 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
-# These variables can be overriden when make is invoked to customize the
+# These variables can be overridden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='protocol-designer/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage --pool=threads
 test_opts ?=
 
 # standard targets
@@ -34,7 +34,7 @@ clean:
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	webpack --profile
+	vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -50,19 +50,19 @@ benchmarks:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	vite serve
 
 # production assets server
 .PHONY: serve
 serve: all
-	node ../scripts/serve-static dist
+	vite preview
 
 # end to end tests
 .PHONY: test-e2e
-test-e2e:
-	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
-	"$(MAKE) dev CYPRESS=1" \
-	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+test-e2e: clean-downloads
+	concurrently --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
+	"$(MAKE) dev" \
+	"wait-on http://localhost:5178/ && cypress run --browser chrome --headless --record false --quiet"
 
 .PHONY: test
 test:
@@ -71,3 +71,53 @@ test:
 .PHONY: test-cov
 test-cov:
 	make -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+
+CYPRESS_ESLINT_GLOB := cypress/**/*.ts cypress.config.ts
+CYPRESS_PRETTIER_GLOB := cypress/**/*.{ts,md,json} cypress.config.ts
+
+.PHONY: cy-lint-check
+cy-lint-check: cy-lint-eslint-check cy-lint-prettier-check
+	@echo "Cypress lint check completed."
+
+.PHONY: cy-lint-fix
+cy-lint-fix: cy-lint-eslint-fix cy-lint-prettier-fix
+	@echo "Cypress lint fix applied."
+
+.PHONY: cy-lint-eslint-check
+cy-lint-eslint-check: clean-downloads clean-screenshots
+	yarn eslint --ignore-path ../.eslintignore $(CYPRESS_ESLINT_GLOB)
+	@echo "Cypress ESLint check completed."
+
+.PHONY: cy-lint-eslint-fix
+cy-lint-eslint-fix: clean-downloads clean-screenshots
+	yarn eslint --fix --ignore-pattern ../.eslintignore $(CYPRESS_ESLINT_GLOB)
+	@echo "Cypress ESLint fix applied."
+
+.PHONY: cy-lint-prettier-check
+cy-lint-prettier-check: clean-downloads clean-screenshots
+	yarn prettier --ignore-path ../.eslintignore --check $(CYPRESS_PRETTIER_GLOB)
+	@echo "Cypress Prettier check completed."
+
+.PHONY: cy-lint-prettier-fix
+cy-lint-prettier-fix: clean-downloads clean-screenshots
+	yarn prettier --ignore-path ../.eslintignore --write $(CYPRESS_PRETTIER_GLOB)
+	@echo "Cypress Prettier fix applied."
+
+.PHONY: cy-ui
+cy-ui:
+	@echo "Running Cypress UI"
+	@echo "Dev environment must be running"
+	yarn cypress open
+
+.PHONY: clean-downloads
+clean-downloads:
+	shx rm -rf cypress/downloads
+
+.PHONY: clean-screenshots
+clean-screenshots:
+	shx rm -rf cypress/screenshots
+
+# analyze bundle
+.PHONY: bundle-analyzer
+bundle-analyzer:
+	ANALYZE_DEBUG=true make build

@@ -19,10 +19,10 @@ The examples in this section apply to an OT-2 with a Magnetic Module GEN2 loaded
 
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module(
-          module_name='magnetic module gen2',
-          location='6')
+          module_name="magnetic module gen2",
+          location="6")
         plate = mag_mod.load_labware(
-          name='nest_96_wellplate_100ul_pcr_full_skirt')
+          name="nest_96_wellplate_100ul_pcr_full_skirt")
 
 .. versionadded:: 2.3
 

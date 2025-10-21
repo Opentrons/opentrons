@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
@@ -9,7 +11,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model
@@ -26,10 +28,8 @@ router = APIRouter()
     },
 )
 async def get_engaged_motors(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> model.EngagedMotors:
-    # TODO (spp, 2023-07-06): Implement fetching Flex's engaged motors
-    #  https://opentrons.atlassian.net/browse/RET-1371
     try:
         engaged_axes = hardware.engaged_axes
         axes_dict = {
@@ -51,7 +51,7 @@ async def get_engaged_motors(
     response_model=V1BasicResponse,
 )
 async def post_disengage_motors(
-    axes: model.Axes, hardware: HardwareControlAPI = Depends(get_hardware)
+    axes: model.Axes, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
 ) -> V1BasicResponse:
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
     try:

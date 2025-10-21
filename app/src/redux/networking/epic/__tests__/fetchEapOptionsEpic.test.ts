@@ -1,7 +1,10 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
+
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
+import { networkingEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { networkingEpic } from '..'
 
 import type { Action } from '../../../types'
 
@@ -9,10 +12,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.fetchEapOptions(robotName)
 
 describe('networking fetch eap option epic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /wifi/eap-options', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,

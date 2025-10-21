@@ -1,4 +1,5 @@
 import Ajv from 'ajv'
+
 import labwareV2Schema from '../../labware/schemas/2.json'
 import protocolSchemaV1 from '../../protocol/schemas/1.json'
 import protocolSchemaV2 from '../../protocol/schemas/2.json'
@@ -12,7 +13,7 @@ import type { JsonProtocolFile } from '../../protocol'
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 
 interface ProtocolParseErrorDetails {
-  rawError?: string
+  rawError?: unknown
   schemaErrors?: ErrorObject[] | null
 }
 
@@ -114,8 +115,8 @@ export function validateJsonProtocolFileContents(
 
       return parsedProtocol
     }
-  } catch (error) {
-    handleError && handleError('INVALID_JSON_FILE', { rawError: error })
+  } catch (error: any) {
+    handleError?.('INVALID_JSON_FILE', { rawError: String(error) })
     return null
   }
 }

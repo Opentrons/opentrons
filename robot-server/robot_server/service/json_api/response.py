@@ -1,9 +1,20 @@
 from __future__ import annotations
 from anyio import to_thread
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Sequence
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    TypeVar,
+    Sequence,
+    ParamSpec,
+    Callable,
+)
+from typing_extensions import get_args, override
 from pydantic import Field, BaseModel
-from pydantic.generics import GenericModel
 from fastapi.responses import JSONResponse
+from fastapi.dependencies.utils import get_typed_return_annotation
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 
@@ -29,24 +40,50 @@ class BaseResponseBody(BaseModel):
     JSON responses adhere to the server's generated OpenAPI Spec.
     """
 
-    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    @override
+    def model_dump(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """Always exclude `None` when serializing to an object.
 
-        The OpenAPI spec marks `Optional` BaseModel fields as omittable, but
-        not nullable. This `dict` method override ensures that `null` is never
-        returned in a response, which would violate the spec.
+        With Pydantic v1, the OpenAPI spec described `Optional`(i.e., possibly
+        `None`-valued) fields as omittable, but not nullable. This did not match
+        Pydantic's actual serialization behavior, which serialized Python `None` to
+        JSON `null` by default. This method override fixed the mismatch by making
+        Pydantic omit the field from serialization instead.
+
+        With Pydantic v2, the OpenAPI spec does describe `Optional` fields as nullable,
+        matching Pydantic's serialization behavior. We therefore no longer need this
+        override to make them match. However, removing this override and changing
+        serialization behavior at this point would risk breaking things on the client.
         """
+        kwargs["exclude_none"] = True
+        return super().model_dump(*args, **kwargs)
+
+    @override
+    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        """See notes in `model_dump()`."""
         kwargs["exclude_none"] = True
         return super().dict(*args, **kwargs)
 
+    @override
+    def model_dump_json(self, *args: Any, **kwargs: Any) -> str:
+        """See notes in `.model_dump()`."""
+        kwargs["exclude_none"] = True
+        return super().model_dump_json(*args, **kwargs)
 
-class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+    @override
+    def json(self, *args: Any, **kwargs: Any) -> str:
+        """See notes in `.model_dump()`."""
+        kwargs["exclude_none"] = True
+        return super().model_dump_json(*args, **kwargs)
+
+
+class SimpleBody(BaseResponseBody, Generic[ResponseDataT]):
     """A response that returns a single resource."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
-class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+class Body(BaseResponseBody, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
@@ -57,7 +94,7 @@ class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""
 
 
-class EmptyBody(BaseResponseBody, GenericModel, Generic[ResponseLinksT]):
+class EmptyBody(BaseResponseBody, Generic[ResponseLinksT]):
     """A response that returns no data except stateful links."""
 
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
@@ -77,7 +114,7 @@ class MultiBodyMeta(BaseModel):
     )
 
 
-class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+class SimpleMultiBody(BaseResponseBody, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
     data: Sequence[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
@@ -87,32 +124,34 @@ class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     # non-validating classmethod is taken from the type of this member, and there we really
     # want the arguments to be Sequence so they can accept narrower subtypes. For instance,
     # if you define a function as returning SimpleMultiBody[Union[A, B]], you should really
-    # be able to do return SimpleMultiBody.construct([A(), A(), A()]) or even
-    # SimpleMultiBody[Union[A, B]].construct([A(), A(), A()]). However, because construct's
+    # be able to do return SimpleMultiBody.model_construct([A(), A(), A()]) or even
+    # SimpleMultiBody[Union[A, B]].model_construct([A(), A(), A()]). However, because construct's
     # params are defined based on the dataclass fields, the only way to get the arguments
     # to be covariant is to make data the covariant Sequence protocol.
     meta: MultiBodyMeta = Field(
         ...,
-        description="Metadata about the colletion response.",
+        description="Metadata about the collection response.",
     )
 
 
-class MultiBody(
-    BaseResponseBody,
-    GenericModel,
-    Generic[ResponseDataT, ResponseLinksT],
-):
+class MultiBody(BaseResponseBody, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns multiple resources and stateful links."""
 
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
     meta: MultiBodyMeta = Field(
         ...,
-        description="Metadata about the colletion response.",
+        description="Metadata about the collection response.",
     )
 
 
 ResponseBodyT = TypeVar("ResponseBodyT", bound=BaseResponseBody)
+
+RouteMethodSig = ParamSpec("RouteMethodSig")
+DecoratedEndpoint = TypeVar("DecoratedEndpoint", bound=Callable[..., Any])
+RouteMethodReturn = TypeVar(
+    "RouteMethodReturn", bound=Callable[[DecoratedEndpoint], DecoratedEndpoint]
+)
 
 
 class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
@@ -121,6 +160,61 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     Returning this class from an endpoint function is much more performant
     than returning a plain Pydantic model and letting FastAPI serialize it.
     """
+
+    @classmethod
+    def wrap_route(
+        cls,
+        route_method: Callable[RouteMethodSig, RouteMethodReturn],
+        *route_args: RouteMethodSig.args,
+        **route_kwargs: RouteMethodSig.kwargs,
+    ) -> Callable[[DecoratedEndpoint], DecoratedEndpoint]:
+        """Use this classmethod as a decorator to wrap routes that return PydanticResponses.
+
+        The route method (i.e. the .post() method of the router) is the first argument and the rest of the
+        arguments are keyword args that are forwarded to the route handler.
+
+        For instance:
+        @PydanticResponse.wrap_route(
+            some_router.post,
+            path='/some/path',
+            ...
+        )
+        def my_some_path_handler(...) -> PydanticResponse[SimpleBody[whatever]]:
+            ...
+
+        The reason this exists is that if you do not specify a response_model, pydantic will parse the return
+        value annotation and try to stuff it in a pydantic field. Pydantic fields can't handle arbitrary classes,
+        like fastapi.JSONResponse; therefore, you get an exception while parsing the file (since this all happens
+        in a decorator). The fix for this is to always specify a response_model, even if you're also doing a return
+        value annotation and/or responses={} arguments.
+
+        This decorator does that for you! Just take any route handler that returns a PydanticResponse (you still have to
+        annotate it as such, and return PydanticResponse.create(...) yourself, this only handles the decorating part) and
+        replace its route decoration with this one, passing the erstwhile route decorator in.
+        """
+        # our outermost function exists to capture the arguments that you want to forward to the route decorator
+        assert (
+            "response_model" not in route_kwargs
+        ), "Do not use PydanticResponse.wrap_route if you are already specifying a response model"
+
+        def decorator(
+            endpoint_method: DecoratedEndpoint,
+        ) -> DecoratedEndpoint:
+            # the return annotation is e.g. PydanticResponse[SimpleBody[Whatever]]
+            return_annotation = get_typed_return_annotation(endpoint_method)
+            # the first arg of the outermost type is the argument to the generic,
+            # in this case SimpleBody[Whatever]
+            response_model = get_args(return_annotation)[0]
+            # and that's what we want to pass to the route method as response_model, so we do it and get the actual
+            # function transformer
+            route_decorator = route_method(
+                **route_kwargs, response_model=response_model
+            )
+            # which we then call on the endpoint method to get it registered with the router, and return the results
+            return route_decorator(endpoint_method)
+
+        # and finally we return our own function transformer with the route method args closed over
+        return decorator
 
     def __init__(
         self,
@@ -147,7 +241,7 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
 
     def render(self, content: ResponseBodyT) -> bytes:
         """Render the response body to JSON bytes."""
-        return content.json().encode(self.charset)
+        return content.model_dump_json().encode(self.charset)
 
 
 # TODO(mc, 2021-12-09): remove this model
@@ -158,11 +252,11 @@ class DeprecatedResponseDataModel(BaseModel):
         Prefer ResourceModel, which requires ID to be specified
     """
 
-    id: str = Field(None, description="Unique identifier for the resource object.")
+    id: str = Field(..., description="Unique identifier for the resource object.")
 
 
 # TODO(mc, 2021-12-09): remove this model
-class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
+class DeprecatedResponseModel(BaseModel, Generic[ResponseDataT]):
     """A response that returns a single resource and stateful links.
 
     This deprecated response model may serialize `Optional` fields to `null`,
@@ -181,7 +275,7 @@ class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
 
 # TODO(mc, 2021-12-09): remove this model
 class DeprecatedMultiResponseModel(
-    GenericModel,
+    BaseModel,
     Generic[ResponseDataT],
 ):
     """A response that returns multiple resources and stateful links.
@@ -200,7 +294,16 @@ class DeprecatedMultiResponseModel(
     )
 
 
-class ResponseList(BaseModel, Generic[ResponseDataT]):
-    """A response that returns a list resource."""
+class NotifyRefetchBody(BaseResponseBody):
+    """A notification response that returns a flag for refetching via HTTP."""
 
-    __root__: List[ResponseDataT]
+    refetch: bool = True
+
+
+class NotifyUnsubscribeBody(BaseResponseBody):
+    """A notification response.
+
+    Returns flags for unsubscribing from a topic.
+    """
+
+    unsubscribe: bool = True

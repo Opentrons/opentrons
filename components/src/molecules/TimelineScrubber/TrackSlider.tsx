@@ -1,0 +1,75 @@
+/* eslint-disable react/forbid-dom-props */
+import { useCallback, useRef, useState } from 'react'
+
+import styles from './timelinescrubber.module.css'
+
+import type { MouseEvent } from 'react'
+
+export interface TrackData {
+  id: string // unique id
+  value: number // 0-100%
+}
+
+interface TrackSliderProps {
+  track: TrackData
+  onChange: (id: string, newValue: number) => void
+}
+
+export function TrackSlider({
+  track,
+  onChange,
+}: TrackSliderProps): JSX.Element {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState<boolean>(false)
+
+  const calculateValue = useCallback((clientX: number) => {
+    if (trackRef.current == null) return 0
+
+    const rect = trackRef.current.getBoundingClientRect()
+    const x = clientX - rect.x
+    const width = rect.width
+    const value = Math.min(100, Math.max(0, (x / width) * 100))
+
+    return value
+  }, [])
+
+  const handleMouseMove = useCallback(
+    (e: globalThis.MouseEvent) => {
+      const currentValue = calculateValue(e.clientX)
+      onChange(track.id, currentValue)
+    },
+    [calculateValue, onChange, track.id]
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+
+    window.removeEventListener('mousemove', handleMouseMove)
+    window.removeEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove])
+
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>): void => {
+    setIsDragging(true)
+    const currentValue = calculateValue(e.clientX)
+    onChange(track.id, currentValue)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+  }
+
+  return (
+    <div
+      ref={trackRef}
+      className={`${styles.track_container} ${
+        isDragging ? styles.dragging : ''
+      }`}
+      onMouseDown={handleMouseDown}
+    >
+      <div className={styles.track_background} />
+      <div
+        className={styles.track_progress}
+        style={{ width: `${track.value}%` }}
+      />
+      <div className={styles.track_thumb} style={{ left: `${track.value}%` }} />
+    </div>
+  )
+}

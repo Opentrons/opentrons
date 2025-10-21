@@ -1,18 +1,19 @@
+import { describe, expect, it } from 'vitest'
+
+import * as Constants from '../../constants'
 // discovery client reducer
 import {
+  mockHealthErrorJsonResponse,
+  mockHealthFetchErrorResponse,
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
-  mockOT3ServerHealthResponse,
   mockOT2HealthResponse,
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
-  mockHealthErrorJsonResponse,
-  mockHealthFetchErrorResponse,
-} from '../../__fixtures__/health'
-
-import * as Constants from '../../constants'
+  mockOT3ServerHealthResponse,
+} from '../../fixtures/health'
 import * as Actions from '../actions'
-import { reducer, hostsByIpReducer } from '../reducer'
+import { hostsByIpReducer, reducer } from '../reducer'
 
 import type { Action } from '../types'
 

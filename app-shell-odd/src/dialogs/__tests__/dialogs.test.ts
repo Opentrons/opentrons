@@ -1,45 +1,52 @@
 import Electron from 'electron'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as Dialogs from '..'
 
-jest.mock('electron')
+vi.mock('electron')
 
-const mockShowOpenDialog = Electron.dialog
-  .showOpenDialog as jest.MockedFunction<typeof Electron.dialog.showOpenDialog>
-
-const mockMainWindow = ({
+const mockMainWindow = {
   mainWindow: true,
-} as unknown) as Electron.BrowserWindow
+} as unknown as Electron.BrowserWindow
 
 describe('dialog boxes', () => {
   describe('showOpenDirectoryDialog', () => {
     it('directory select with cancel', () => {
-      mockShowOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
+        canceled: true,
+        filePaths: [],
+      })
 
       return Dialogs.showOpenDirectoryDialog(mockMainWindow).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openDirectory', 'createDirectory'],
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openDirectory', 'createDirectory'],
+          }
+        )
         expect(filePaths).toEqual([])
       })
     })
 
     it('directory select with files', () => {
-      mockShowOpenDialog.mockResolvedValue({
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/dir'],
       })
 
       return Dialogs.showOpenDirectoryDialog(mockMainWindow).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openDirectory', 'createDirectory'],
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openDirectory', 'createDirectory'],
+          }
+        )
         expect(filePaths).toEqual(['/path/to/dir'])
       })
     })
 
     it('directory select with default location', () => {
-      mockShowOpenDialog.mockResolvedValue({
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/dir'],
       })
@@ -47,10 +54,13 @@ describe('dialog boxes', () => {
       return Dialogs.showOpenDirectoryDialog(mockMainWindow, {
         defaultPath: '/foo',
       }).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openDirectory', 'createDirectory'],
-          defaultPath: '/foo',
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openDirectory', 'createDirectory'],
+            defaultPath: '/foo',
+          }
+        )
         expect(filePaths).toEqual(['/path/to/dir'])
       })
     })
@@ -58,32 +68,41 @@ describe('dialog boxes', () => {
 
   describe('showOpenFileDialog', () => {
     it('file select with cancel', () => {
-      mockShowOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
+        canceled: true,
+        filePaths: [],
+      })
 
       return Dialogs.showOpenFileDialog(mockMainWindow).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openFile'],
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openFile'],
+          }
+        )
         expect(filePaths).toEqual([])
       })
     })
 
     it('file select with files', () => {
-      mockShowOpenDialog.mockResolvedValue({
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],
       })
 
       return Dialogs.showOpenFileDialog(mockMainWindow).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openFile'],
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openFile'],
+          }
+        )
         expect(filePaths).toEqual(['/path/to/file.json'])
       })
     })
 
     it('file select with filters', () => {
-      mockShowOpenDialog.mockResolvedValue({
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],
       })
@@ -92,7 +111,9 @@ describe('dialog boxes', () => {
 
       return Dialogs.showOpenFileDialog(mockMainWindow, options).then(
         filePaths => {
-          expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
+          expect(
+            vi.mocked(Electron.dialog.showOpenDialog)
+          ).toHaveBeenCalledWith(mockMainWindow, {
             properties: ['openFile'],
             filters: [{ name: 'JSON', extensions: ['json'] }],
           })
@@ -102,7 +123,7 @@ describe('dialog boxes', () => {
     })
 
     it('file select with default location', () => {
-      mockShowOpenDialog.mockResolvedValue({
+      vi.mocked(Electron.dialog.showOpenDialog).mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],
       })
@@ -110,10 +131,13 @@ describe('dialog boxes', () => {
       return Dialogs.showOpenFileDialog(mockMainWindow, {
         defaultPath: '/foo',
       }).then(filePaths => {
-        expect(mockShowOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          properties: ['openFile'],
-          defaultPath: '/foo',
-        })
+        expect(vi.mocked(Electron.dialog.showOpenDialog)).toHaveBeenCalledWith(
+          mockMainWindow,
+          {
+            properties: ['openFile'],
+            defaultPath: '/foo',
+          }
+        )
         expect(filePaths).toEqual(['/path/to/file.json'])
       })
     })

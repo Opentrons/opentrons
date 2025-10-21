@@ -1,24 +1,30 @@
 """Command models to wait for target temperature of a Temperature Module."""
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
+
 from typing_extensions import Literal, Type
-
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 WaitForTemperatureCommandType = Literal["temperatureModule/waitForTemperature"]
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
 
 
 class WaitForTemperatureParams(BaseModel):
     """Input parameters to wait for a Temperature Module's target temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Temperature Module.")
-    celsius: Optional[float] = Field(
+    celsius: float | SkipJsonSchema[None] = Field(
         None,
         description="Target temperature in °C. If not specified, will "
         "default to the module's target temperature. "
@@ -26,6 +32,7 @@ class WaitForTemperatureParams(BaseModel):
         "could lead to unpredictable behavior and hence is not "
         "recommended for use. This parameter can be removed in a "
         "future version without prior notice.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -34,7 +41,7 @@ class WaitForTemperatureResult(BaseModel):
 
 
 class WaitForTemperatureImpl(
-    AbstractCommandImpl[WaitForTemperatureParams, WaitForTemperatureResult]
+    AbstractCommandImpl[WaitForTemperatureParams, SuccessData[WaitForTemperatureResult]]
 ):
     """Execution implementation of Temperature Module's wait for temperature command."""
 
@@ -49,7 +56,7 @@ class WaitForTemperatureImpl(
 
     async def execute(
         self, params: WaitForTemperatureParams
-    ) -> WaitForTemperatureResult:
+    ) -> SuccessData[WaitForTemperatureResult]:
         """Wait for a Temperature Module's target temperature."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         module_substate = self._state_view.modules.get_temperature_module_substate(
@@ -71,17 +78,19 @@ class WaitForTemperatureImpl(
             await temp_hardware_module.await_temperature(
                 awaiting_temperature=target_temp
             )
-        return WaitForTemperatureResult()
+        return SuccessData(
+            public=WaitForTemperatureResult(),
+        )
 
 
 class WaitForTemperature(
-    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult]
+    BaseCommand[WaitForTemperatureParams, WaitForTemperatureResult, ErrorOccurrence]
 ):
     """A command to wait for a Temperature Module's target temperature."""
 
     commandType: WaitForTemperatureCommandType = "temperatureModule/waitForTemperature"
     params: WaitForTemperatureParams
-    result: Optional[WaitForTemperatureResult]
+    result: Optional[WaitForTemperatureResult] = None
 
     _ImplementationCls: Type[WaitForTemperatureImpl] = WaitForTemperatureImpl
 

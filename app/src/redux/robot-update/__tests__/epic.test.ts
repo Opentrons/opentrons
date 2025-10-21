@@ -1,34 +1,21 @@
 import { TestScheduler } from 'rxjs/testing'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mockRobot as robot } from '../../robot-api/__fixtures__'
+import * as Fixtures from '../__fixtures__'
 import { startDiscovery } from '../../discovery'
 import { restartRobotSuccess } from '../../robot-admin'
+import { mockRobot as robot } from '../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../robot-api/http'
-import * as Fixtures from '../__fixtures__'
-import * as epics from '../epic'
 import * as actions from '../actions'
+import * as epics from '../epic'
+import { INITIAL_STATE } from '../reducer'
 import * as selectors from '../selectors'
 
-import { INITIAL_STATE } from '../reducer'
-
+import type { RobotApiResponse } from '../../robot-api/types'
 import type { Action, State } from '../../types'
-import { RobotApiResponse } from '../../robot-api/types'
 
-jest.mock('../selectors')
-jest.mock('../../robot-api/http')
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-const getRobotUpdateRobot = selectors.getRobotUpdateRobot as jest.MockedFunction<
-  typeof selectors.getRobotUpdateRobot
->
-const getRobotUpdateSessionRobotName = selectors.getRobotUpdateSessionRobotName as jest.MockedFunction<
-  typeof selectors.getRobotUpdateSessionRobotName
->
-const getRobotUpdateSession = selectors.getRobotUpdateSession as jest.MockedFunction<
-  typeof selectors.getRobotUpdateSession
->
+vi.mock('../selectors')
+vi.mock('../../robot-api/http')
 
 const balenaRobot = { ...robot, serverHealth: {} } as any
 
@@ -76,13 +63,13 @@ describe('robot update epics', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('startUpdateEpic', () => {
     it('with ot2 system update robot and built-in system update sends read system file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(brRobotOt2)
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name),
@@ -98,7 +85,9 @@ describe('robot update epics', () => {
 
     it('with flex system update robot and built-in system update sends read system file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brRobotFlex)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          brRobotFlex
+        )
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name),
@@ -114,7 +103,7 @@ describe('robot update epics', () => {
 
     it('with ot2 system update robot and user system update sends read user file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(brRobotOt2)
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name, '/my/special/system/file'),
@@ -130,7 +119,9 @@ describe('robot update epics', () => {
 
     it('with flex system update robot and user system update sends read user file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brRobotFlex)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          brRobotFlex
+        )
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name, '/my/special/file'),
@@ -146,7 +137,9 @@ describe('robot update epics', () => {
 
     it('with ready-to-migrate robot sends read system file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          brReadyRobot
+        )
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name),
@@ -162,7 +155,9 @@ describe('robot update epics', () => {
 
     it('with ready-to-migrate robot and user system update sends read user file', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          brReadyRobot
+        )
 
         const action$ = hot<Action>('-a', {
           a: actions.startRobotUpdate(robot.name, '/my/special/system/file'),
@@ -180,7 +175,9 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startRobotUpdate(robot.name)
 
-        getRobotUpdateRobot.mockReturnValueOnce(balenaRobot)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          balenaRobot
+        )
 
         const action$ = hot<Action>('-a', { a: action })
         const state$ = hot<State>('a-', { a: state } as any)
@@ -199,7 +196,9 @@ describe('robot update epics', () => {
           '/my/special/system/file'
         )
 
-        getRobotUpdateRobot.mockReturnValueOnce(balenaRobot)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          balenaRobot
+        )
 
         const action$ = hot<Action>('-a', { a: action })
         const state$ = hot<State>('a-', { a: state } as any)
@@ -217,7 +216,9 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startRobotUpdate(robot.name)
 
-        getRobotUpdateRobot.mockReturnValueOnce(robot as any)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(
+          robot as any
+        )
 
         const action$ = hot<Action>('-a', { a: action })
         const state$ = hot<State>('a-', { a: state } as any)
@@ -237,7 +238,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginSuccess })
         )
 
@@ -254,7 +255,7 @@ describe('robot update epics', () => {
         })
 
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(robot, {
           method: 'POST',
           path: '/server/update/begin',
         })
@@ -265,7 +266,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi
+        vi.mocked(RobotApiHttp.fetchRobotApi)
           .mockReturnValueOnce(
             cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginConflict })
           )
@@ -279,7 +280,7 @@ describe('robot update epics', () => {
 
         expectObservable(output$).toBe('-a', { a: action })
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(robot, {
           method: 'POST',
           path: '/server/update/cancel',
         })
@@ -290,7 +291,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi
+        vi.mocked(RobotApiHttp.fetchRobotApi)
           .mockReturnValueOnce(
             cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
           )
@@ -304,7 +305,7 @@ describe('robot update epics', () => {
 
         expectObservable(output$).toBe('-a', { a: action })
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(robot, {
           method: 'POST',
           path: '/server/update/cancel',
         })
@@ -315,7 +316,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi
+        vi.mocked(RobotApiHttp.fetchRobotApi)
           .mockReturnValueOnce(
             cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginConflict })
           )
@@ -340,7 +341,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi
+        vi.mocked(RobotApiHttp.fetchRobotApi)
           .mockReturnValueOnce(
             cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
           )
@@ -365,7 +366,7 @@ describe('robot update epics', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi
+        vi.mocked(RobotApiHttp.fetchRobotApi)
           .mockReturnValueOnce(
             cold('r', { r: Fixtures.mockUpdateBeginConflict })
           )
@@ -389,13 +390,13 @@ describe('robot update epics', () => {
   describe('startUpdateAfterFileDownload', () => {
     it('should start the update after file download if the robot is a flex', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        const session: ReturnType<typeof getRobotUpdateSession> = {
+        const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
           stage: 'done',
           step: 'downloadFile',
         } as any
 
-        getRobotUpdateRobot.mockReturnValue(brRobotFlex)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotFlex)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
         const state$ = hot<State>('-a', { a: state })
         const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
@@ -408,13 +409,13 @@ describe('robot update epics', () => {
 
     it('should start the update after file download if the robot is a ot-2', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        const session: ReturnType<typeof getRobotUpdateSession> = {
+        const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
           stage: 'done',
           step: 'downloadFile',
         } as any
 
-        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
         const state$ = hot<State>('-a', { a: state })
         const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
@@ -428,9 +429,11 @@ describe('robot update epics', () => {
 
   it('retryAfterPremigrationEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
-      getRobotUpdateSessionRobotName.mockReturnValueOnce(brReadyRobot.name)
-      getRobotUpdateSession.mockReturnValueOnce({
+      vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(brReadyRobot)
+      vi.mocked(selectors.getRobotUpdateSessionRobotName).mockReturnValueOnce(
+        brReadyRobot.name
+      )
+      vi.mocked(selectors.getRobotUpdateSession).mockReturnValueOnce({
         robot: brReadyRobot.name,
         step: 'premigrationRestart',
       } as any)
@@ -456,11 +459,11 @@ describe('robot update epics', () => {
           },
         }
 
-        getRobotUpdateSession
+        vi.mocked(selectors.getRobotUpdateSession)
           .mockReturnValue({ stage: 'ready-for-restart' } as any)
           .mockReturnValueOnce({ stage: null } as any)
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('r', { r: Fixtures.mockStatusSuccess })
         )
 
@@ -484,12 +487,12 @@ describe('robot update epics', () => {
         flush()
 
         const request = { method: 'GET', path: '/server/update/foobar/status' }
-        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(
           1,
           brRobotOt2,
           request
         )
-        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(
           2,
           brRobotOt2,
           request
@@ -500,7 +503,7 @@ describe('robot update epics', () => {
 
   it('uploadFileEpic should work with migration', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const session: ReturnType<typeof getRobotUpdateSession> = {
+      const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
         pathPrefix: '/server/update/migration',
         token: 'tok',
         stage: 'awaiting-file',
@@ -512,8 +515,8 @@ describe('robot update epics', () => {
         },
       } as any
 
-      getRobotUpdateRobot.mockReturnValue(brReadyRobot)
-      getRobotUpdateSession.mockReturnValue(session)
+      vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brReadyRobot)
+      vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
       const action$ = null as any
       const state$ = hot<State>('-a', { a: state })
@@ -531,7 +534,7 @@ describe('robot update epics', () => {
 
   it('uploadFileEpic should work with ot2 normal updates', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const session: ReturnType<typeof getRobotUpdateSession> = {
+      const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
         pathPrefix: '/server/update',
         token: 'tok',
         stage: 'awaiting-file',
@@ -543,8 +546,8 @@ describe('robot update epics', () => {
         },
       } as any
 
-      getRobotUpdateRobot.mockReturnValue(brRobotOt2)
-      getRobotUpdateSession.mockReturnValue(session)
+      vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
+      vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
       const action$ = null as any
       const state$ = hot<State>('-a', { a: state })
@@ -562,7 +565,7 @@ describe('robot update epics', () => {
 
   it('uploadFileEpic should work with flex normal updates', () => {
     testScheduler.run(({ hot, expectObservable }) => {
-      const session: ReturnType<typeof getRobotUpdateSession> = {
+      const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
         pathPrefix: '/server/update',
         token: 'tok',
         stage: 'awaiting-file',
@@ -574,8 +577,8 @@ describe('robot update epics', () => {
         },
       } as any
 
-      getRobotUpdateRobot.mockReturnValue(brRobotFlex)
-      getRobotUpdateSession.mockReturnValue(session)
+      vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotFlex)
+      vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
       const action$ = null as any
       const state$ = hot<State>('-a', { a: state })
@@ -601,10 +604,10 @@ describe('robot update epics', () => {
 
     it('commit request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('-r', { r: Fixtures.mockCommitSuccess })
         )
 
@@ -617,7 +620,7 @@ describe('robot update epics', () => {
         })
 
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobotOt2, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(brRobotOt2, {
           method: 'POST',
           path: '/server/update/foobar/commit',
         })
@@ -626,10 +629,10 @@ describe('robot update epics', () => {
 
     it('commit request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('-r', { r: Fixtures.mockCommitFailure })
         )
 
@@ -655,10 +658,10 @@ describe('robot update epics', () => {
 
     it('restart request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobotFlex)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotFlex)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('-r', { r: Fixtures.mockRestartSuccess })
         )
 
@@ -673,7 +676,7 @@ describe('robot update epics', () => {
         })
 
         flush()
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobotFlex, {
+        expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(brRobotFlex, {
           method: 'POST',
           path: '/server/restart',
         })
@@ -682,10 +685,10 @@ describe('robot update epics', () => {
 
     it('restart request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
-        getRobotUpdateSession.mockReturnValue(session)
+        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
+        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
 
-        mockFetchRobotApi.mockReturnValue(
+        vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
           cold('-r', { r: Fixtures.mockRestartFailure })
         )
 

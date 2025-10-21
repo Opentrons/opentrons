@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 DeactivateTemperatureCommandType = Literal["temperatureModule/deactivate"]
@@ -25,7 +26,9 @@ class DeactivateTemperatureResult(BaseModel):
 
 
 class DeactivateTemperatureImpl(
-    AbstractCommandImpl[DeactivateTemperatureParams, DeactivateTemperatureResult]
+    AbstractCommandImpl[
+        DeactivateTemperatureParams, SuccessData[DeactivateTemperatureResult]
+    ]
 ):
     """Execution implementation of a Temperature Module's deactivate command."""
 
@@ -40,7 +43,7 @@ class DeactivateTemperatureImpl(
 
     async def execute(
         self, params: DeactivateTemperatureParams
-    ) -> DeactivateTemperatureResult:
+    ) -> SuccessData[DeactivateTemperatureResult]:
         """Deactivate a Temperature Module."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         module_substate = self._state_view.modules.get_temperature_module_substate(
@@ -54,18 +57,22 @@ class DeactivateTemperatureImpl(
 
         if temp_hardware_module is not None:
             await temp_hardware_module.deactivate()
-        return DeactivateTemperatureResult()
+        return SuccessData(
+            public=DeactivateTemperatureResult(),
+        )
 
 
 class DeactivateTemperature(
-    BaseCommand[DeactivateTemperatureParams, DeactivateTemperatureResult]
+    BaseCommand[
+        DeactivateTemperatureParams, DeactivateTemperatureResult, ErrorOccurrence
+    ]
 ):
     """A command to deactivate a Temperature Module."""
 
     commandType: DeactivateTemperatureCommandType = "temperatureModule/deactivate"
 
     params: DeactivateTemperatureParams
-    result: Optional[DeactivateTemperatureResult]
+    result: Optional[DeactivateTemperatureResult] = None
 
     _ImplementationCls: Type[DeactivateTemperatureImpl] = DeactivateTemperatureImpl
 

@@ -1,16 +1,21 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { InfoMessage } from '..'
 
-const render = (props: React.ComponentProps<typeof InfoMessage>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof InfoMessage>) => {
   return renderWithProviders(<InfoMessage {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('InfoMessage', () => {
-  let props: React.ComponentProps<typeof InfoMessage>
+  let props: ComponentProps<typeof InfoMessage>
 
   beforeEach(() => {
     props = {
@@ -18,16 +23,16 @@ describe('InfoMessage', () => {
     }
   })
   it('renders info message', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_information')
-    getByText('a message from otie')
+    render(props)
+    screen.getByLabelText('icon_information')
+    screen.getByText('a message from otie')
   })
   it('renders info message body', () => {
     props = {
       title: 'a message from otie',
       body: 'the run has started',
     }
-    const { getByText } = render(props)
-    getByText('the run has started')
+    render(props)
+    screen.getByText('the run has started')
   })
 })

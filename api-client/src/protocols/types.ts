@@ -1,7 +1,7 @@
 import type {
-  ProtocolResource,
-  PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
+  PendingProtocolAnalysis,
+  ProtocolResource,
 } from '@opentrons/shared-data'
 import type { ResourceLinks } from '../types'
 
@@ -23,7 +23,7 @@ export interface Protocol {
       {
         id: string
         href: string
-      }
+      },
     ]
   }
   data: ProtocolResource

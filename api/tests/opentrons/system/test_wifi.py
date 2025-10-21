@@ -18,7 +18,7 @@ def wifi_keys_tempdir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     return wifi_keys_dir
 
 
-def test_check_eap_config(wifi_keys_tempdir: Path):
+def test_check_eap_config(wifi_keys_tempdir: Path) -> None:
     wifi_key_id = "88188cafcf"
     os.mkdir(os.path.join(wifi_keys_tempdir, wifi_key_id))
     with open(os.path.join(wifi_keys_tempdir, wifi_key_id, "test.pem"), "w") as f:
@@ -69,7 +69,7 @@ def test_check_eap_config(wifi_keys_tempdir: Path):
         assert key in out
 
 
-def test_eap_check_option():
+def test_eap_check_option() -> None:
     # Required arguments that are not specified should raise
     with pytest.raises(wifi.ConfigureArgsError):
         wifi._eap_check_option_ok(
@@ -159,7 +159,7 @@ def test_eap_check_option():
     )
 
 
-async def test_list_keys(wifi_keys_tempdir):
+async def test_list_keys(wifi_keys_tempdir: Path) -> None:
     dummy_names = ["ad12d1df199bc912", "cbdda8124128cf", "812410990c5412"]
     for dn in dummy_names:
         os.mkdir(os.path.join(wifi_keys_tempdir, dn))
@@ -177,7 +177,7 @@ async def test_list_keys(wifi_keys_tempdir):
             raise KeyError(dn)
 
 
-async def test_key_lifecycle(wifi_keys_tempdir):
+async def test_key_lifecycle(wifi_keys_tempdir: Path) -> None:
     with tempfile.TemporaryDirectory() as source_td:
         keys = list(wifi.list_keys())
         assert keys == []
@@ -190,16 +190,16 @@ async def test_key_lifecycle(wifi_keys_tempdir):
                 f.write(str(random.getrandbits(2048)))
 
             # TODO(mc, 2021-09-12): use pathlib
-            with open(path, "rb") as f:  # type: ignore[assignment]
-                add_response = wifi.add_key(fn, f.read())  # type: ignore[arg-type]
+            with open(path, "rb") as f:
+                add_response = wifi.add_key(fn, f.read())
                 assert add_response.created is True
                 assert add_response.key.file == fn
                 results[fn] = add_response
 
         # We should not be able to upload a duplicate
         # TODO(mc, 2021-09-12): use pathlib
-        with open(os.path.join(source_td, "test1.pem"), "rb") as f:  # type: ignore[assignment]
-            add_response = wifi.add_key("test1.pem", f.read())  # type: ignore[arg-type]
+        with open(os.path.join(source_td, "test1.pem"), "rb") as f:
+            add_response = wifi.add_key("test1.pem", f.read())
             assert add_response.created is False
 
         # We should be able to see them all

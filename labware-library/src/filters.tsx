@@ -1,14 +1,13 @@
 // filter helpers
-import { useState, useLayoutEffect } from 'react'
-import queryString from 'query-string'
+import { useLayoutEffect, useState } from 'react'
 import flatMap from 'lodash/flatMap'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
+import queryString from 'query-string'
 
 import { getAllDefinitions } from './definitions'
-import { getPublicPath } from './public-path'
 
-import type { Location } from 'history'
+import type { Location } from 'react-router-dom'
 import type { FilterParams, LabwareDefinition, LabwareList } from './types'
 
 export const FILTER_OFF = 'all'
@@ -30,7 +29,7 @@ export function getAllManufacturers(): string[] {
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
 
-export function useFilters(location: Location): FilterParams {
+export function useFilters(location: Location<any>): FilterParams {
   const [params, setParams] = useState({
     category: FILTER_OFF,
     manufacturer: FILTER_OFF,
@@ -55,7 +54,7 @@ export function buildFiltersUrl(filters: FilterParams): string {
   const params = pickBy(filters, v => v !== FILTER_OFF)
 
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  return `${getPublicPath()}?${queryString.stringify(params)}`
+  return `/?${queryString.stringify(params)}`
 }
 
 export function getFilteredDefinitions(filters: FilterParams): LabwareList {

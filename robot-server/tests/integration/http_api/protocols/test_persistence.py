@@ -3,11 +3,17 @@ from pathlib import Path
 import secrets
 from typing import Callable, Dict, IO, List
 
+import anyio
 import pytest
 
+from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIRECTORY
+
 from tests.integration.dev_server import DevServer
-from tests.integration.robot_client import RobotClient
+from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
+
+
+pytestmark = pytest.mark.slow
 
 
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
@@ -23,14 +29,10 @@ async def test_protocols_and_analyses_persist(
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             # Must not be so high that the server runs out of room and starts
             # auto-deleting old protocols.
@@ -41,7 +43,7 @@ async def test_protocols_and_analyses_persist(
                     await robot_client.post_protocol([Path(file.name)])
 
             await asyncio.wait_for(
-                _wait_for_all_analyses_to_complete(robot_client), timeout=30
+                poll_until_all_analyses_complete(robot_client), timeout=30
             )
 
             # The protocols response will include analysis statuses. Fetch it
@@ -52,12 +54,10 @@ async def test_protocols_and_analyses_persist(
             analyses_before_restart = await _get_all_analyses(robot_client)
 
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
 
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocols_after_restart = (await robot_client.get_protocols()).json()[
                 "data"
@@ -89,14 +89,10 @@ async def test_protocol_labware_files_persist() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocol = await robot_client.post_protocol(
                 [
@@ -116,12 +112,17 @@ async def test_protocol_labware_files_persist() -> None:
             # we can ignore the whole field in this test to avoid the nondeterminism.
             del protocol_detail["analysisSummaries"]
 
+            with anyio.fail_after(30):
+                # todo(mm, 2024-09-20): This works around a bug where robot-server
+                # shutdown will hang if there is an ongoing analysis. This slows down
+                # this test and should be removed when that bug is fixed.
+                # https://opentrons.atlassian.net/browse/EXEC-716
+                await poll_until_all_analyses_complete(robot_client)
+
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             result = await robot_client.get_protocol(protocol_id)
             restarted_protocol_detail = result.json()["data"]
@@ -132,10 +133,10 @@ async def test_protocol_labware_files_persist() -> None:
             assert restarted_protocol_detail == protocol_detail
 
             four_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
+                f"{server.persistence_directory}/{LATEST_VERSION_DIRECTORY}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
             )
             six_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
+                f"{server.persistence_directory}/{LATEST_VERSION_DIRECTORY}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
             )
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()
@@ -178,16 +179,3 @@ async def _get_all_analyses(robot_client: RobotClient) -> Dict[str, List[object]
         analyses_by_protocol_id[protocol_id] = analyses_on_this_protocol
 
     return analyses_by_protocol_id
-
-
-async def _wait_for_all_analyses_to_complete(robot_client: RobotClient) -> None:
-    async def _all_analyses_are_complete() -> bool:
-        protocols = (await robot_client.get_protocols()).json()
-        for protocol in protocols["data"]:
-            for analysis_summary in protocol["analysisSummaries"]:
-                if analysis_summary["status"] != "completed":
-                    return False
-        return True
-
-    while not await _all_analyses_are_complete():
-        await asyncio.sleep(0.1)

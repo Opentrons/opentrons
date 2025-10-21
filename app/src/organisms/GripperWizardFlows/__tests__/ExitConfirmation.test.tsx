@@ -1,71 +1,67 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
-import { ExitConfirmation } from '../ExitConfirmation'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { ExitConfirmation } from '../ExitConfirmation'
+
+import type { ComponentProps } from 'react'
 
 describe('ExitConfirmation', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof ExitConfirmation>>
-  ) => ReturnType<typeof renderWithProviders>
+  const mockBack = vi.fn()
+  const mockExit = vi.fn()
 
-  const mockBack = jest.fn()
-  const mockExit = jest.fn()
-
-  beforeEach(() => {
-    render = (props = {}) => {
-      return renderWithProviders(
-        <ExitConfirmation
-          handleExit={mockExit}
-          handleGoBack={mockBack}
-          flowType={GRIPPER_FLOW_TYPES.ATTACH}
-          isRobotMoving={false}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
+  const render = (
+    props: Partial<ComponentProps<typeof ExitConfirmation>> = {}
+  ) => {
+    return renderWithProviders(
+      <ExitConfirmation
+        handleExit={mockExit}
+        handleGoBack={mockBack}
+        flowType={GRIPPER_FLOW_TYPES.ATTACH}
+        isRobotMoving={false}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
 
   it('clicking confirm exit calls exit', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'Exit' }).click()
+    render()
+    const button = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(button)
     expect(mockExit).toHaveBeenCalled()
   })
 
   it('clicking back calls back', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'Go back' }).click()
+    render()
+    const button = screen.getByRole('button', { name: 'Go back' })
+    fireEvent.click(button)
     expect(mockBack).toHaveBeenCalled()
   })
 
   it('renders correct text for attach flow', () => {
-    const { getByText } = render({
-      flowType: GRIPPER_FLOW_TYPES.ATTACH,
-    })[0]
-    getByText('Attach Gripper progress will be lost')
-    getByText('Are you sure you want to exit before completing Attach Gripper?')
+    render({ flowType: GRIPPER_FLOW_TYPES.ATTACH })
+    screen.getByText('Attach Gripper progress will be lost')
+    screen.getByText(
+      'Are you sure you want to exit before completing Attach Gripper?'
+    )
   })
 
   it('renders correct text for detach flow', () => {
-    const { getByText } = render({
-      flowType: GRIPPER_FLOW_TYPES.DETACH,
-    })[0]
-    getByText('Detach Gripper progress will be lost')
-    getByText('Are you sure you want to exit before completing Detach Gripper?')
+    render({ flowType: GRIPPER_FLOW_TYPES.DETACH })
+    screen.getByText('Detach Gripper progress will be lost')
+    screen.getByText(
+      'Are you sure you want to exit before completing Detach Gripper?'
+    )
   })
 
   it('renders correct text for recalibrate flow', () => {
-    const { getByText } = render({
-      flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-    })[0]
-    getByText('Gripper Recalibration progress will be lost')
-    getByText(
+    render({ flowType: GRIPPER_FLOW_TYPES.RECALIBRATE })
+    screen.getByText('Gripper Recalibration progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Gripper Recalibration?'
     )
   })

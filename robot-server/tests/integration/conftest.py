@@ -41,21 +41,6 @@ def pytest_tavern_beta_after_every_response(
 
 
 @pytest.fixture
-def ot2_server_set_disable_fast_analysis(
-    ot2_server_base_url: str,
-) -> Generator[None, None, None]:
-    """For integration tests that need to set then clear the
-    disableFastProtocolUpload feature flag"""
-    url = f"{ot2_server_base_url}/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    with _requests_session() as requests_session:
-        requests_session.post(url, json=data)
-        yield None
-        data["value"] = None
-        requests.post(url, json=data)
-
-
-@pytest.fixture
 def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
     """Return the URL for a running dev server.
 
@@ -136,13 +121,19 @@ def _wait_until_ready(base_url: str) -> None:
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
-            # Delete runs first because protocols can't be deleted if a run refers to them.
+            # Delete runs -> protocols -> data_files in that order because
+            # protocols can't be deleted if a run refers to them, and,
+            # data files can't be deleted if runs or protocol analyses refer to them.
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
+            await _delete_all_data_files(robot_client)
 
             await _delete_all_sessions(robot_client)
 
             await _reset_deck_configuration(robot_client)
+            await _reset_error_recovery_settings(robot_client)
+            await _delete_client_data(robot_client)
+            await _delete_labware_offsets(robot_client)
 
     asyncio.run(_clean_server_state_async())
 
@@ -156,11 +147,19 @@ async def _delete_all_runs(robot_client: RobotClient) -> None:
 
 
 async def _delete_all_protocols(robot_client: RobotClient) -> None:
-    """Delete all protocols on the robot server"""
+    """Delete all protocols on the robot server."""
     response = await robot_client.get_protocols()
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
         await robot_client.delete_protocol(protocol_id)
+
+
+async def _delete_all_data_files(robot_client: RobotClient) -> None:
+    """Delete all data files on the robot server."""
+    response = await robot_client.get_data_files()
+    file_ids = [file["id"] for file in response.json()["data"]]
+    for file_id in file_ids:
+        await robot_client.delete_data_file(file_id)
 
 
 async def _delete_all_sessions(robot_client: RobotClient) -> None:
@@ -170,5 +169,17 @@ async def _delete_all_sessions(robot_client: RobotClient) -> None:
         await robot_client.delete_session(session_id)
 
 
+async def _delete_client_data(robot_client: RobotClient) -> None:
+    await robot_client.delete_all_client_data()
+
+
 async def _reset_deck_configuration(robot_client: RobotClient) -> None:
     await robot_client.post_setting_reset_options({"deckConfiguration": True})
+
+
+async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
+    await robot_client.delete_error_recovery_settings()
+
+
+async def _delete_labware_offsets(robot_client: RobotClient) -> None:
+    await robot_client.delete_all_labware_offsets()

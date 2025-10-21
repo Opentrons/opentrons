@@ -1,14 +1,17 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { touchTip } from '../commandCreators/atomic/touchTip'
 import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  makeContext,
   getSuccessResult,
-  getErrorResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
+
 import type { InvariantContext, RobotState } from '../types'
 
 describe('touchTip', () => {
@@ -22,13 +25,15 @@ describe('touchTip', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
 
-  it('touchTip with tip, specifying offsetFromBottomMm', () => {
+  it('touchTip with tip, specifying offsetFromBottomMm, speed, and mmFromEdge', () => {
     const result = touchTip(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 10,
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        zOffsetFromTop: 10,
+        speed: 10,
+        mmFromEdge: 0.2,
       },
       invariantContext,
       robotStateWithTip
@@ -44,23 +49,46 @@ describe('touchTip', () => {
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: 10,
             },
           },
+          speed: 10,
+          mmFromEdge: 0.2,
         },
       },
     ])
+    expect(res.python).toBe(
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10, speed=10, mm_from_edge=0.2)`
+    )
+  })
+
+  it('touchTip for python with tip, with no offset or speed set', () => {
+    const result = touchTip(
+      {
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        zOffsetFromTop: 10,
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+
+    expect(res.python).toBe(
+      `mock_pipette.touch_tip(mock_source_plate["A1"], v_offset=10)`
+    )
   })
 
   it('touchTip with invalid pipette ID should throw error', () => {
     const result = touchTip(
       {
-        pipette: 'badPipette',
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 10,
+        pipetteId: 'badPipette',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        zOffsetFromTop: 10,
       },
       invariantContext,
       robotStateWithTip
@@ -73,10 +101,10 @@ describe('touchTip', () => {
   it('touchTip with no tip should throw error', () => {
     const result = touchTip(
       {
-        pipette: DEFAULT_PIPETTE,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 10,
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        zOffsetFromTop: 10,
       },
       invariantContext,
       initialRobotState

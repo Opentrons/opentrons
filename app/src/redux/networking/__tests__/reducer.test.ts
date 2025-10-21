@@ -1,6 +1,8 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
-import { networkingReducer } from '../reducer'
 import * as Actions from '../actions'
+import { networkingReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { NetworkingState } from '../types'

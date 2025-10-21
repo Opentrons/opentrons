@@ -68,7 +68,8 @@ stages:
           errors:
             - id: !anystr
               errorType: ExceptionInProtocolError
-              createdAt: !anystr
+              isDefined: false
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               detail: 'UnexpectedTipRemovalError [line 9]: Error 3005 UNEXPECTED_TIP_REMOVAL (UnexpectedTipRemovalError): Cannot perform PREPARE_ASPIRATE without a tip attached.'
               errorCode: '4000'
               errorInfo: !anydict
@@ -82,7 +83,14 @@ stages:
       status_code: 200
       json:
         links:
-          current: !anydict
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 3
+              key: !anystr
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
         meta:
           cursor: 0
           totalLength: 4
@@ -90,45 +98,50 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            params: {}
-          - id: !anystr
-            key: !anystr
+            params: !anydict
+            notes: !anylist
+          - id: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
+            key: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
             commandType: loadLabware
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
             params:
               location:
-                slotName: '1'
+                slotName: "1"
               loadName: opentrons_96_tiprack_300ul
               namespace: opentrons
               version: 1
-          - id: !anystr
-            key: !anystr
+            notes: !anylist
+          - id: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
+            key: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
             commandType: loadPipette
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
             params:
               pipetteName: p300_single
               mount: right
-          - id: !anystr
-            key: !anystr
+            notes: !anylist
+          - id: !re_fullmatch "command\\.ASPIRATE-\\d+"
+            key: !re_fullmatch "command\\.ASPIRATE-\\d+"
             commandType: aspirate
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: failed
+            notes: !anylist
             error:
               id: !anystr
               errorType: LegacyContextCommandError
-              createdAt: !anystr
+              isDefined: false
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               detail: 'Cannot perform PREPARE_ASPIRATE without a tip attached.'
               errorCode: '3005'
               errorInfo: !anydict
@@ -140,8 +153,9 @@ stages:
               wellLocation:
                 origin: top
                 offset:
-                  x: 0
-                  y: 0
-                  z: 0
-              flowRate: 150
-              volume: 100
+                  x: !anyfloat
+                  y: !anyfloat
+                  z: !anyfloat
+                volumeOffset: !anyfloat
+              flowRate: !anyfloat
+              volume: !anyfloat

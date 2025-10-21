@@ -9,10 +9,17 @@ import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
-import type { FetchStatusAction } from '../types'
+import type {
+  FetchStatusAction,
+  InterfaceStatus,
+  InternetStatus,
+} from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchStatusAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchStatusAction
+> = action => ({
   method: GET,
   path: Constants.STATUS_PATH,
 })
@@ -25,8 +32,13 @@ const mapResponseToAction: ResponseToActionMapper<FetchStatusAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchStatusSuccess(host.name, body.status, body.interfaces, meta)
-    : Actions.fetchStatusFailure(host.name, body, meta)
+    ? Actions.fetchStatusSuccess(
+        host.name,
+        body.status as InternetStatus,
+        body.interfaces as Record<string, InterfaceStatus>,
+        meta
+      )
+    : Actions.fetchStatusFailure(host.name, body as RobotApiErrorResponse, meta)
 }
 
 export const statusEpic: Epic = (action$, state$) => {

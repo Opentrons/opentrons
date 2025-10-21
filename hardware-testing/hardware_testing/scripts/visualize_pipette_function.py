@@ -31,7 +31,7 @@ from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette import model_config
-from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.pipette.types import PipetteModel
 
 
 def _user_select_model(model_includes: Optional[str] = None) -> str:
@@ -92,8 +92,8 @@ def _plot_table(model: str, table: List[List[float]]) -> None:
     plt.suptitle(model)
     plt.plot(*table)
     ax = plt.gca()
-    ax.set_xlim([min(table[0]), max(table[0])])
-    ax.set_ylim([min(table[1]), max(table[1])])
+    ax.set_xlim([min(table[0]), max(table[0])])  # type: ignore[arg-type]
+    ax.set_ylim([min(table[1]), max(table[1])])  # type: ignore[arg-type]
     plt.show()
 
 

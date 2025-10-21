@@ -1,5 +1,6 @@
 import { css } from 'styled-components'
-import { COLORS } from './'
+
+import { COLORS } from '../helix-design-system'
 
 // Font Sizes
 export const fontSize80 = '5rem' // 80px
@@ -15,7 +16,6 @@ export const fontSizeH4 = '0.813rem' //  13px
 export const fontSizeH6 = '0.563rem' // 9px
 export const fontSizeP = '0.8125rem' // 13px
 export const fontSizeLabel = '0.6875rem' // 11px
-// this is redundant but we need this for captions and it makes more sense to call it caption rather than re-using fsh6
 export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
@@ -35,6 +35,7 @@ export const lineHeight20 = '1.25rem' // 20px
 export const lineHeight18 = '1.125rem' // 18px
 export const lineHeight16 = '1rem' // 16px
 export const lineHeight12 = '0.75rem' // 12px
+export const lineHeightNormal = 'normal' // normal
 
 // font styles
 export const fontStyleNormal = 'normal'
@@ -125,10 +126,10 @@ export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   &:hover {
-    opacity: 70%;
+    color: ${COLORS.blue55};
   }
 `
 
@@ -233,9 +234,9 @@ export const darkLinkH4SemiBold = css`
   font-size: ${fontSizeH4};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   &:hover {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 
@@ -243,9 +244,9 @@ export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey60};
   &:hover {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 
@@ -253,6 +254,6 @@ export const darkLinkLabelSemiBoldDisabled = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.medGreyHover};
+  color: ${COLORS.grey60};
   cursor: not-allowed;
 `

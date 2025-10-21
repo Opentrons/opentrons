@@ -1,0 +1,60 @@
+{
+  "$otSharedSchema": "module/schemas/3",
+  "moduleType": "absorbanceReaderType",
+  "model": "absorbanceReaderV1",
+  "labwareOffset": {
+    "x": 2.0,
+    "y": 0.0,
+    "z": 0.65
+  },
+  "features": {},
+  "dimensions": {
+    "bareOverallHeight": 18.5,
+    "overLabwareHeight": 0.0,
+    "lidHeight": 60.0,
+    "xDimension": 155.3,
+    "yDimension": 95.5,
+    "labwareInterfaceXDimension": 127.76,
+    "labwareInterfaceYDimension": 85.48
+  },
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": -4.875,
+        "y": 4.875,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 150.425,
+        "y": -90.625,
+        "z": 18.5
+      }
+    }
+  },
+  "cornerOffsetFromSlot": {
+    "x": -4.875,
+    "y": -4.875,
+    "z": 0
+  },
+  "calibrationPoint": {
+    "x": 14.4,
+    "y": 64.93,
+    "z": 97.8
+  },
+  "displayName": "Absorbance Plate Reader Module GEN1",
+  "quirks": [],
+  "slotTransforms": {
+    "ot2_standard": {},
+    "ot2_short_trash": {},
+    "ot3_standard": {}
+  },
+  "orientation": {
+    "A3": "right",
+    "B3": "right",
+    "C3": "right",
+    "D3": "right"
+  },
+  "compatibleWith": [],
+  "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
+  "uniqueModuleData": {}
+}

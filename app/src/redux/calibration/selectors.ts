@@ -1,8 +1,8 @@
 import type { State } from '../types'
 import type {
   CalibrationStatus,
-  DeckCalibrationStatus,
   DeckCalibrationData,
+  DeckCalibrationStatus,
 } from './types'
 
 export const getCalibrationStatus = (
@@ -17,7 +17,7 @@ export const getDeckCalibrationStatus = (
   robotName: string | null
 ): DeckCalibrationStatus | null => {
   return robotName != null
-    ? getCalibrationStatus(state, robotName)?.deckCalibration.status ?? null
+    ? (getCalibrationStatus(state, robotName)?.deckCalibration.status ?? null)
     : null
 }
 
@@ -26,6 +26,6 @@ export const getDeckCalibrationData = (
   robotName: string | null
 ): DeckCalibrationData | null => {
   return robotName != null
-    ? getCalibrationStatus(state, robotName)?.deckCalibration.data ?? null
+    ? (getCalibrationStatus(state, robotName)?.deckCalibration.data ?? null)
     : null
 }

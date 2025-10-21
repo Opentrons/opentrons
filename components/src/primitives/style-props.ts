@@ -3,9 +3,10 @@
 
 import pick from 'lodash/pick'
 
-import * as Types from './types'
-
 import type { CSSObject } from 'styled-components'
+import type * as Types from './types'
+
+type Text = string | number
 
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity'] as const
 
@@ -54,13 +55,16 @@ const FLEXBOX_PROPS = [
   'alignItems',
   'justifyContent',
   'flexDirection',
+  'flexGrow',
   'flexWrap',
   'alignSelf',
   'whiteSpace',
+  'gap',
 ] as const
 
 const GRID_PROPS = [
   'columnGap',
+  'rowGap',
   'gridGap',
   'gridTemplateAreas',
   'gridTemplateRows',
@@ -72,6 +76,7 @@ const GRID_PROPS = [
 
 const LAYOUT_PROPS = [
   'display',
+  'visibility',
   'size',
   'width',
   'minWidth',
@@ -102,7 +107,7 @@ const POSITION_PROPS = [
 
 const TRANSITION_PROPS = ['transition'] as const
 
-const STYLE_PROPS = [
+export const STYLE_PROPS = [
   ...COLOR_PROPS,
   ...TYPOGRAPHY_PROPS,
   ...SPACING_PROPS,
@@ -164,8 +169,8 @@ const layoutStyles = (props: Types.StyleProps): CSSObject => {
   const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
   if (size != null) {
-    styles.width = styles.width ?? (size as typeof styles.width)
-    styles.height = styles.height ?? (size as typeof styles.height)
+    styles.width = styles.width ?? (size as unknown as typeof styles.width)
+    styles.height = styles.height ?? (size as unknown as typeof styles.height)
   }
 
   return styles
@@ -191,5 +196,5 @@ export const styleProps = (props: Types.StyleProps): CSSObject => ({
   ...transitionStyles(props),
 })
 
-export const isntStyleProp = (prop: string | React.ReactText): boolean =>
-  !STYLE_PROPS.includes(prop as any)
+export const isntStyleProp = (prop: string | Text): boolean =>
+  !STYLE_PROPS.includes(prop as (typeof STYLE_PROPS)[number])

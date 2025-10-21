@@ -1,17 +1,15 @@
-import {
-  HostConfig,
-  RunAction,
-  RUN_ACTION_TYPE_STOP,
-  createRunAction,
-} from '@opentrons/api-client'
 import { useMutation } from 'react-query'
+
+import { createRunAction, RUN_ACTION_TYPE_STOP } from '@opentrons/api-client'
+
 import { useHost } from '../api'
 
 import type {
-  UseMutationResult,
   UseMutateFunction,
   UseMutationOptions,
+  UseMutationResult,
 } from 'react-query'
+import type { HostConfig, RunAction } from '@opentrons/api-client'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,

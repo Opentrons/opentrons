@@ -1,4 +1,7 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Selectors from '../selectors'
+
 import type { State } from '../../types'
 
 interface SelectorSpec {

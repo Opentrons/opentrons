@@ -1,8 +1,9 @@
 """Test instrument context simulation."""
-from typing import Callable
+from typing import Callable, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
@@ -23,8 +24,8 @@ pytestmark = pytest.mark.ot2_only
         lazy_fixture("simulating_instrument_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> InstrumentCore:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def subject(request: SubRequest) -> InstrumentCore:
+    return cast(InstrumentCore, request.param)
 
 
 def test_same_pipette(
@@ -58,6 +59,7 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
             location=location,
             well_core=None,
             in_place=False,
+            correction_volume=0,
             push_out=None,
         )
 
@@ -105,6 +107,7 @@ def test_pick_up_tip_prep_after(
         rate=1,
         flow_rate=1,
         in_place=False,
+        correction_volume=0,
     )
     subject.dispense(
         volume=1,
@@ -113,6 +116,7 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        correction_volume=0,
         push_out=None,
     )
 
@@ -133,6 +137,7 @@ def test_pick_up_tip_prep_after(
         rate=1,
         flow_rate=1,
         in_place=False,
+        correction_volume=0,
     )
     subject.dispense(
         volume=1,
@@ -141,6 +146,7 @@ def test_pick_up_tip_prep_after(
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        correction_volume=0,
         push_out=None,
     )
 
@@ -172,6 +178,7 @@ def test_aspirate_too_much(
             rate=1,
             flow_rate=1,
             in_place=False,
+            correction_volume=0,
         )
 
 
@@ -223,6 +230,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=10,
         flow_rate=10,
         in_place=False,
+        correction_volume=0,
     )
 
 
@@ -236,6 +244,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=10,
         flow_rate=10,
         in_place=False,
+        correction_volume=0,
     )
     i.dispense(
         volume=2,
@@ -244,6 +253,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
         location=Location(point=Point(2, 2, 3), labware=None),
         well_core=labware.get_well_core("A2"),
         in_place=False,
+        correction_volume=0,
         push_out=None,
     )
 
@@ -258,6 +268,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
         rate=13,
         flow_rate=13,
         in_place=False,
+        correction_volume=0,
     )
     i.blow_out(
         location=Location(point=Point(1, 2, 3), labware=None),
@@ -269,7 +280,7 @@ def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
 @pytest.mark.parametrize(
     argnames=["side_effector"],
     argvalues=[
-        [lambda i, l: None],
+        [lambda i, l: None],  # noqa: E741
         [_aspirate],
         [_aspirate_dispense],
         [_aspirate_blowout],

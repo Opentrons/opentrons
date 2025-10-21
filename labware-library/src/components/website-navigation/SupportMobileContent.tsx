@@ -1,9 +1,8 @@
-import * as React from 'react'
 import map from 'lodash/map'
-import { NavLink } from './NavLink'
-import styles from './styles.css'
 
-import { supportLinkProps, salesLinkProps } from './nav-data'
+import { salesLinkProps, supportLinkProps } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.module.css'
 
 export function SupportMobileContent(): JSX.Element {
   const supportLinks = map(supportLinkProps)

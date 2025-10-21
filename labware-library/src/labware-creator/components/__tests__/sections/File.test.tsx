@@ -1,22 +1,18 @@
-import React from 'react'
-import { when } from 'jest-when'
-import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import '@testing-library/jest-dom/vitest'
+
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { File } from '../../sections/File'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -25,16 +21,16 @@ describe('File', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['loadName', 'displayName'], formikConfig.initialValues)
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render fields when fields are visible', () => {
@@ -57,9 +53,9 @@ describe('File', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['loadName', 'displayName'], formikConfig.initialValues)
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<File />, formikConfig))
     expect(container.firstChild).toBe(null)

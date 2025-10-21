@@ -1,26 +1,19 @@
-import React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { FormikConfig } from 'formik'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import {
-  getDefaultFormState,
-  getInitialStatus,
-  LabwareFields,
-} from '../../../fields'
-import { isEveryFieldHidden, getLabwareName } from '../../../utils'
+import { when } from 'vitest-when'
+
+import { getDefaultFormState, getInitialStatus } from '../../../fields'
+import { getLabwareName, isEveryFieldHidden } from '../../../utils'
 import { Regularity } from '../../sections/Regularity'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -29,23 +22,25 @@ describe('Regularity', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
-      .calledWith(['homogeneousWells'], formikConfig.initialValues)
-      .mockReturnValue(false)
+    when(vi.mocked(isEveryFieldHidden))
+      .calledWith(
+        ['homogeneousWells', 'hasLpcQuirk'],
+        formikConfig.initialValues
+      )
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render radio fields when fields are visible', () => {
-    when(getLabwareNameMock)
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+      .thenReturn('FAKE LABWARE NAME PLURAL')
 
     render(wrapInFormik(<Regularity />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/regularity/i)
@@ -53,17 +48,20 @@ describe('Regularity', () => {
     screen.getByText(
       'Are all your FAKE LABWARE NAME PLURAL the same shape and size?'
     )
-
+    screen.getByText(
+      'Do you want to exclude this labware from Labware Position Check?'
+    )
     const radioElements = screen.getAllByRole('radio')
-    expect(radioElements).toHaveLength(2)
-    screen.getByRole('radio', { name: /yes/i })
-    screen.getByRole('radio', { name: /no/i })
+    expect(radioElements).toHaveLength(4)
   })
 
   it('should render alert when error is present', () => {
     const FAKE_ERROR = 'ahh'
-    formikConfig.initialErrors = { homogeneousWells: FAKE_ERROR }
-    formikConfig.initialTouched = { homogeneousWells: true }
+    formikConfig.initialErrors = {
+      homogeneousWells: FAKE_ERROR,
+      hasLpcQuirk: FAKE_ERROR,
+    }
+    formikConfig.initialTouched = { homogeneousWells: true, hasLpcQuirk: true }
     render(wrapInFormik(<Regularity />, formikConfig))
 
     // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
@@ -71,9 +69,9 @@ describe('Regularity', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['homogeneousWells'], formikConfig.initialValues)
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Regularity />, formikConfig))
     expect(container.firstChild).toBe(null)

@@ -1,16 +1,23 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
 
-const render = (props: React.ComponentProps<typeof ErrorUpdateSoftware>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof ErrorUpdateSoftware>) => {
   return renderWithProviders(<ErrorUpdateSoftware {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('ErrorUpdateSoftware', () => {
-  let props: React.ComponentProps<typeof ErrorUpdateSoftware>
+  let props: ComponentProps<typeof ErrorUpdateSoftware>
 
   beforeEach(() => {
     props = {
@@ -24,12 +31,12 @@ describe('ErrorUpdateSoftware', () => {
   })
 
   it('should render text', () => {
-    const [{ getByText }] = render(props)
-    getByText('Software update error')
-    getByText('mock error message')
+    render(props)
+    screen.getByText('Software update error')
+    screen.getByText('mock error message')
   })
   it('should render provided children', () => {
-    const [{ getByText }] = render(props)
-    getByText('mock child')
+    render(props)
+    screen.getByText('mock child')
   })
 })

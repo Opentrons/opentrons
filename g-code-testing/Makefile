@@ -30,7 +30,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: test
 test:
@@ -59,12 +59,12 @@ test-g-code-omega:
 .PHONY: lint
 lint: lint-other
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
-	$(python) -m black --check g_code_parsing tests setup.py cli.py
-	$(python) -m flake8 g_code_parsing tests setup.py cli.py
+	$(python) -m black --check g_code_parsing tests cli.py
+	$(python) -m flake8 g_code_parsing tests cli.py
 
 .PHONY: format
 format: format-other
-	$(python) -m black g_code_parsing tests setup.py cli.py
+	$(python) -m black g_code_parsing tests cli.py
 
 
 .PHONY: get-g-code-configurations

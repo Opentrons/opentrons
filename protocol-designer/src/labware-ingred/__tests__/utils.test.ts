@@ -1,4 +1,7 @@
+import { describe, expect, it } from 'vitest'
+
 import { getNextNickname } from '../utils'
+
 describe('getNextNickname', () => {
   const testCases = [
     {

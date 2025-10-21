@@ -1,99 +1,120 @@
-import * as React from 'react'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { StyleProps, Svg } from '../../primitives'
-import { StyledDeck } from './StyledDeck'
+import { useRef } from 'react'
 
-import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
-import type { TrashCutoutId } from './FlexTrash'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { DeckFromLayers } from './DeckFromLayers'
+
+import type { CSSProperties, ReactNode } from 'react'
+import type { AddressableArea, DeckDefinition } from '@opentrons/shared-data'
 
 export interface RobotWorkSpaceRenderProps {
-  deckSlotsById: { [slotId: string]: DeckSlot }
-  getRobotCoordsFromDOMCoords: (
-    domX: number,
-    domY: number
-  ) => { x: number; y: number }
+  // todo(mm, 2025-06-05): Is this API still worthwhile? The parent of RobotWorkSpace
+  // already has access to the full DeckDefinition. Maybe it should iterate over
+  // the DeckDefinition's AddressableAreas itself?
+  addressableAreasById: { [addressableAreaId: string]: AddressableArea }
 }
 
-export interface RobotWorkSpaceProps extends StyleProps {
-  deckDef?: DeckDefinition
-  viewBox?: string | null
-  children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
-  deckFill?: string
+type BaseProps = {
+  children?: (props: RobotWorkSpaceRenderProps) => ReactNode
   deckLayerBlocklist?: string[]
-  // optional boolean to show the OT-2 deck from deck defintion layers
+  /** optional boolean to show the OT-2 deck from deck defintion layers */
   showDeckLayers?: boolean
-  // TODO(bh, 2023-10-09): remove
-  trashCutoutId?: TrashCutoutId
-  trashColor?: string
   id?: string
-}
+} & (
+  | // Require at least one of deckDef or viewBox,
+  {
+      deckDef: DeckDefinition
+    }
+  | {
+      /**
+       * The x/y area to show, in standard SVG `x y xDimension yDimension` syntax.
+       *
+       * Specify coordinates in the Opentrons orientation, not the standard SVG orientation.
+       * So (x, y) is the area's front-left, xDimension extends the viewed area to the
+       * right, and yDimension extends the viewed area to the back.
+       */
+      viewBox: string
+    }
+)
 
-type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
+export type RobotWorkSpaceProps = BaseProps & CSSProperties
 
-export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
+/**
+ * A wrapper for rendering the robot deck, labware, etc. from a top-down perspective.
+ *
+ * Child SVG components can render themselves in the Opentrons coordinate orientation
+ * (+x to the right of the robot, +y to the back of the robot) and this component will
+ * SVG-transform them so they're displayed the correct way. This is needed because
+ * SVG inverts y compared to Opentrons coordinates.
+ */
+export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
   const {
     children,
-    deckDef,
-    deckFill = '#CCCCCC',
     deckLayerBlocklist = [],
     showDeckLayers = false,
-    trashCutoutId,
-    viewBox,
-    trashColor,
     id,
     ...styleProps
   } = props
-  const wrapperRef = React.useRef<SVGSVGElement>(null)
+  const activeViewBox = getViewBoxFromProps(props)
+  const addressableAreasById = getAddressableAreasByIdFromProps(props)
+  const wrapperRef = useRef<SVGSVGElement>(null)
 
-  // NOTE: getScreenCTM in Chrome a DOMMatrix type,
-  // in Firefox the same fn returns a deprecated SVGMatrix.
-  // Until Firefox fixes this and conforms to SVG2 draft,
-  // it will suffer from inverted y behavior (ignores css transform)
-  const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
-    if (!wrapperRef.current) return { x: 0, y: 0 }
-
-    const cursorPoint = wrapperRef.current.createSVGPoint()
-
-    cursorPoint.x = x
-    cursorPoint.y = y
-
-    return cursorPoint.matrixTransform(
-      wrapperRef.current.getScreenCTM()?.inverse()
-    )
-  }
-  if (!deckDef && !viewBox) return null
-
-  let wholeDeckViewBox
-  let deckSlotsById = {}
-  if (deckDef != null) {
-    const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-    const [deckXDimension, deckYDimension] = deckDef.dimensions
-
-    deckSlotsById = deckDef.locations.addressableAreas.reduce(
-      (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
-      {}
-    )
-    wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-  }
   return (
-    <Svg
-      viewBox={viewBox || wholeDeckViewBox}
+    <svg
+      viewBox={activeViewBox}
       ref={wrapperRef}
       id={id}
-      /* reflect horizontally about the center of the DOM elem */
-      transform="scale(1, -1)"
-      {...styleProps}
+      style={{ ...styleProps }}
     >
-      {showDeckLayers ? (
-        <StyledDeck
-          deckFill={deckFill}
-          layerBlocklist={deckLayerBlocklist}
-          robotType={OT2_ROBOT_TYPE}
-          trashCutoutId={trashCutoutId}
-          trashColor={trashColor}
-        />
-      ) : null}
-      {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
-    </Svg>
+      <g
+        transform={
+          activeViewBox
+            ? `scale(1, -1) translate(0, ${
+                -1 *
+                (Number(activeViewBox?.split(' ')[3]) +
+                  2 * Number(activeViewBox?.split(' ')[1]))
+              })`
+            : undefined
+        }
+      >
+        {showDeckLayers ? (
+          <DeckFromLayers
+            layerBlocklist={deckLayerBlocklist}
+            robotType={OT2_ROBOT_TYPE}
+          />
+        ) : null}
+        {children?.({ addressableAreasById })}
+      </g>
+    </svg>
   )
+}
+
+function getAddressableAreasByIdFromProps(
+  props: RobotWorkSpaceProps
+): RobotWorkSpaceRenderProps['addressableAreasById'] {
+  if ('deckDef' in props) {
+    return Object.fromEntries(
+      props.deckDef.locations.addressableAreas.map(addressableArea => [
+        addressableArea.id,
+        addressableArea,
+      ])
+    )
+  } else {
+    return {}
+  }
+}
+
+function getViewBoxFromProps(props: RobotWorkSpaceProps): string {
+  if ('viewBox' in props) {
+    // An explicitly provided viewBox takes precedence.
+    return props.viewBox
+  } else {
+    return getWholeDeckViewBox(props.deckDef)
+  }
+}
+
+function getWholeDeckViewBox(deckDef: DeckDefinition): string {
+  const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
+  const [deckXDimension, deckYDimension] = deckDef.dimensions
+  return `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
 }

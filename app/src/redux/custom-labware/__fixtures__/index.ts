@@ -1,8 +1,8 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareWellGroupProperties } from '../../../pages/Labware/types'
-import * as Types from '../types'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
+import type * as Types from '../types'
 
-export const mockDefinition: LabwareDefinition2 = {
+export const mockDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'custom',
@@ -75,7 +75,7 @@ export const mockDuplicateLabware: Types.DuplicateLabwareFile = {
   },
 }
 
-export const mockTipRackDefinition: LabwareDefinition2 = {
+export const mockTipRackDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'custom',
@@ -98,33 +98,35 @@ export const mockTipRackDefinition: LabwareDefinition2 = {
   groups: [],
 }
 
-export const mockCircularLabwareWellGroupProperties: LabwareWellGroupProperties = {
-  shape: { shape: 'circular', diameter: 1 },
-  depth: 1,
-  metadata: { wellBottomShape: 'flat' },
-  xOffsetFromLeft: 1,
-  xSpacing: 1,
-  yOffsetFromTop: 1,
-  ySpacing: 1,
-  wellCount: 1,
-  totalLiquidVolume: 10,
-  brand: { brand: 'Opentrons' },
-}
+export const mockCircularLabwareWellGroupProperties: LabwareWellGroupProperties =
+  {
+    shape: { shape: 'circular', diameter: 1 },
+    depth: 1,
+    metadata: { wellBottomShape: 'flat' },
+    xOffsetFromLeft: 1,
+    xSpacing: 1,
+    yOffsetFromBack: 1,
+    ySpacing: 1,
+    wellCount: 1,
+    totalLiquidVolume: 10,
+    brand: { brand: 'Opentrons' },
+  }
 
-export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperties = {
-  shape: { shape: 'rectangular', xDimension: 1, yDimension: 2 },
-  depth: 1,
-  metadata: {},
-  xOffsetFromLeft: 1,
-  xSpacing: 1,
-  yOffsetFromTop: 1,
-  ySpacing: 1,
-  wellCount: 1,
-  totalLiquidVolume: 10,
-  brand: { brand: 'Opentrons' },
-}
+export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperties =
+  {
+    shape: { shape: 'rectangular', xDimension: 1, yDimension: 2 },
+    depth: 1,
+    metadata: {},
+    xOffsetFromLeft: 1,
+    xSpacing: 1,
+    yOffsetFromBack: 1,
+    ySpacing: 1,
+    wellCount: 1,
+    totalLiquidVolume: 10,
+    brand: { brand: 'Opentrons' },
+  }
 
-export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
+export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition = {
   version: 1,
   schemaVersion: 2,
   namespace: 'opentrons',

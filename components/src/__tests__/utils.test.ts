@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { truncateString } from '../utils'
 
 describe('truncateString', () => {

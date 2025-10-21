@@ -39,17 +39,17 @@ jobs:
   lint:
     name: 'usb-bridge linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -60,17 +60,17 @@ jobs:
     name: 'usb-bridge package tests'
     timeout-minutes: 10
     needs: [lint]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'usb-bridge'

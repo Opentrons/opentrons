@@ -1,0 +1,275 @@
+/* common styling for modals */
+@import '../index.module.css';
+
+.modal {
+  position: fixed;
+  z-index: 1;
+
+  /* from legacy --absolute-fill */
+  top: 0;
+
+  /* from legacy --absolute-fill */
+  right: 0;
+
+  /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
+
+  /* from legacy --absolute-fill */
+  display: flex;
+
+  /* from legacy --center-children */
+  align-items: center;
+
+  /* from legacy --center-children */
+
+  align-items: flex-start;
+
+  /* from legacy --center-children */
+  justify-content: center;
+  padding: 4rem;
+}
+
+.modal_page {
+  position: absolute;
+
+  /* from legacy --absolute-fill */
+  top: 0;
+
+  /* from legacy --absolute-fill */
+  right: 0;
+
+  /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
+
+  /* from legacy --absolute-fill */
+
+  display: flex;
+
+  /* from legacy --flex-start */
+
+  flex-direction: column;
+
+  /* from legacy --flex-start */
+  align-items: center;
+
+  /* from legacy --flex-start */
+  justify-content: flex-start;
+  padding: 4.5rem 3rem 1rem 3rem;
+}
+
+.overlay {
+  position: absolute;
+
+  /* from legacy --absolute-fill */
+  top: 0;
+
+  /* from legacy --absolute-fill */
+  right: 0;
+
+  /* from legacy --absolute-fill */
+  bottom: 0;
+
+  /* from legacy --absolute-fill */
+  left: 0;
+
+  /* from legacy --absolute-fill */
+
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.title_bar {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+}
+
+.modal_contents {
+  z-index: 1;
+
+  /* from legacy --modal-contents */
+  width: 100%;
+
+  /* from legacy --modal-contents */
+  max-width: 38rem;
+
+  /* from legacy --modal-contents */
+  padding: 1rem;
+
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+
+  /* from legacy --modal-contents */
+
+  background-color: white;
+}
+
+.modal_page_contents {
+  z-index: 1;
+
+  /* from legacy --modal-contents */
+  width: 100%;
+
+  /* from legacy --modal-contents */
+  max-width: 38rem;
+  max-height: 100%;
+
+  /* from legacy --modal-contents */
+  padding: 1rem;
+  padding-top: 1rem;
+
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+
+  /* from legacy --modal-contents */
+
+  background-color: white;
+  overflow-y: auto;
+}
+
+.modal_heading {
+  /* from legacy --font-header-dark */
+
+  margin-top: 0;
+  margin-bottom: 1rem;
+
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-header);
+
+  /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold);
+  text-transform: capitalize;
+}
+
+.alert_modal_wrapper {
+  position: relative;
+  max-height: 100%;
+  padding-top: 4rem;
+  border-radius: 0;
+}
+
+.alert_modal_heading.no_icon_heading {
+  padding-left: 2rem;
+}
+
+.no_alert_header {
+  padding-top: 1.5rem;
+}
+
+.spinner_modal_contents {
+  z-index: 4;
+
+  /* from legacy --modal-contents */
+  width: 100%;
+
+  /* from legacy --font-body-2-light */
+
+  max-width: 30rem;
+  flex-direction: column;
+
+  /* from legacy --modal-contents */
+  padding: 1rem;
+  padding-top: 3rem;
+
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+  background-color: transparent;
+
+  /* from legacy --font-body-2-light */
+  color: var(--c-font-light);
+
+  /* from legacy --modal-contents */
+  font-size: var(--fs-body-2);
+  font-style: italic;
+
+  /* from legacy --font-body-2-light */
+  font-weight: var(--fw-regular);
+  text-align: center;
+}
+
+.spinner_modal_icon {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.alert_modal {
+  z-index: 10;
+}
+
+.alert_modal_overlay {
+  background-color: rgba(115, 115, 115, 0.9);
+}
+
+.alert_modal_contents {
+  /* from legacy --font-body-2-dark */
+
+  width: 100%;
+  max-height: 100%;
+  padding: 1rem;
+
+  /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-body-2);
+
+  /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular);
+
+  & > p {
+    padding-bottom: 1rem;
+  }
+}
+
+.alert_modal_heading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #e0e0e0;
+
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  font-size: var(--fs-header);
+
+  /* from legacy --font-header-dark */
+
+  font-weight: normal;
+}
+
+.alert_modal_icon {
+  height: 1.125rem;
+  margin-right: 0.75rem;
+}
+
+.alert_modal_buttons {
+  margin-top: 1rem;
+  float: right;
+}
+
+.alert_button {
+  margin-left: 1rem;
+}

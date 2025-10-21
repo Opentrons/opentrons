@@ -1,0 +1,108 @@
+import { useTranslation } from 'react-i18next'
+
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  InfoScreen,
+  LiquidIcon,
+  ListItem,
+  ListItemDescriptor,
+  SPACING,
+  StyledText,
+  Tag,
+} from '@opentrons/components'
+
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
+
+import type {
+  AllIngredGroupFields,
+  IngredInputs,
+} from '../../labware-ingred/types'
+
+const getLiquidDescription = (liquid: IngredInputs): JSX.Element | null => {
+  const { description, liquidClass } = liquid
+  const liquidClassDisplayName = getLiquidClassDisplayName(liquidClass ?? null)
+  const liquidClassInfo =
+    liquidClassDisplayName == null ? null : (
+      <Tag text={liquidClassDisplayName} type="default" shrinkToContent />
+    )
+
+  return liquidClassInfo == null && !description ? null : (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      {description ? (
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          css={LINE_CLAMP_TEXT_STYLE(10)}
+        >
+          {description}
+        </StyledText>
+      ) : null}
+      {liquidClassInfo}
+    </Flex>
+  )
+}
+
+interface LiquidDefinitionsProps {
+  allIngredientGroupFields: AllIngredGroupFields
+}
+
+export function LiquidDefinitions({
+  allIngredientGroupFields,
+}: LiquidDefinitionsProps): JSX.Element {
+  const { t } = useTranslation('protocol_overview')
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+      <StyledText desktopStyle="headingSmallBold">
+        {t('liquid_defs')}
+      </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {Object.keys(allIngredientGroupFields).length > 0 ? (
+          Object.values(allIngredientGroupFields).map((liquid, index) => {
+            return (
+              <ListItem
+                type="default"
+                key={`${liquid.displayName}_${liquid.displayColor}_${index}`}
+              >
+                <ListItemDescriptor
+                  type="large"
+                  description={
+                    <Flex
+                      alignItems={ALIGN_CENTER}
+                      gridGap={SPACING.spacing8}
+                      minWidth="13.75rem"
+                      width="13.75rem"
+                    >
+                      <LiquidIcon color={liquid.displayColor} />
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        id="liquid-name"
+                        css={LINE_CLAMP_TEXT_STYLE(3)}
+                      >
+                        {liquid.displayName}
+                      </StyledText>
+                    </Flex>
+                  }
+                  content={
+                    getLiquidDescription(liquid) ?? (
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        alignSelf={ALIGN_CENTER}
+                      >
+                        {t('na')}
+                      </StyledText>
+                    )
+                  }
+                />
+              </ListItem>
+            )
+          })
+        ) : (
+          <InfoScreen content={t('no_liquids_defined')} />
+        )}
+      </Flex>
+    </Flex>
+  )
+}

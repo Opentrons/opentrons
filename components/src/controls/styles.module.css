@@ -1,0 +1,103 @@
+@import '../index.module.css';
+
+:root {
+  --mw-labeled-toggle: 25rem;
+}
+
+/* Toggle Button */
+.toggled_on {
+  color: #0ec9eb;
+  fill: #0ec9eb;
+}
+
+.toggled_off {
+  fill: var(--c-dark-gray);
+}
+
+.labeled_control_wrapper {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--c-light-gray);
+  }
+}
+
+.labeled_control {
+  display: block;
+}
+
+.stacked_labeled_control {
+  display: block;
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+}
+
+.stacked_labeled_control_label {
+  display: inline-block;
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_control_label {
+  display: inline-block;
+  max-width: var(--mw-labeled-toggle);
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-semibold);
+}
+
+.labeled_toggle_button {
+  width: 2rem;
+  padding: 0;
+  margin-right: 1rem;
+  float: right;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.labeled_button,
+.labeled_select {
+  width: 9rem;
+  margin-top: 0.5rem;
+  float: right;
+}
+
+.labeled_select {
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+}
+
+.labeled_checkbox {
+  float: right;
+}
+
+.stacked_control_info {
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+
+  & > p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+}
+
+.control_info {
+  max-width: var(--mw-labeled-toggle);
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+
+  & > p {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+}

@@ -1,17 +1,16 @@
 import { uuid } from '../../utils'
-import type { CommandCreator } from '../../types'
-export interface DropTipInPlaceArgs {
-  pipetteId: string
-}
 
-export const dropTipInPlace: CommandCreator<DropTipInPlaceArgs> = (
+import type { DropTipInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
+
+export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   const { pipetteId } = args
   // No-op if there is no tip
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
     return {
       commands: [],
     }

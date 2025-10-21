@@ -1,62 +1,66 @@
-import * as React from 'react'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { COLORS, renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { i18n } from '../../../i18n'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { Results } from '../Results'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { useIsOEMMode } from '/app/resources/robot-settings/hooks'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { FLOWS } from '../constants'
+import { Results } from '../Results'
 
-jest.mock('@opentrons/react-api-client')
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
 
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/resources/robot-settings/hooks')
 
-const render = (props: React.ComponentProps<typeof Results>) => {
+const render = (props: ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('Results', () => {
-  let props: React.ComponentProps<typeof Results>
+  let props: ComponentProps<typeof Results>
   let pipettePromise: Promise<void>
-  let mockRefetchInstruments: jest.Mock
+  let mockRefetchInstruments: Mock
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve()),
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi.fn().mockImplementationOnce(() => Promise.resolve()),
       isRobotMoving: false,
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       flowType: FLOWS.CALIBRATE,
-      handleCleanUpAndClose: jest.fn(),
+      handleCleanUpAndClose: vi.fn(),
       currentStepIndex: 2,
       totalStepCount: 6,
       isOnDevice: false,
       isFetching: false,
-      setFetching: jest.fn(),
+      setFetching: vi.fn(),
       hasCalData: false,
     }
     pipettePromise = Promise.resolve()
-    mockRefetchInstruments = jest.fn(() => pipettePromise)
-    mockUseInstrumentsQuery.mockReturnValue({
+    mockRefetchInstruments = vi.fn(() => pipettePromise)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetchInstruments,
     } as any)
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     props = {
@@ -65,13 +69,15 @@ describe('Results', () => {
       totalStepCount: 6,
       hasCalData: true,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
 
-    getByText('Exit')
-    const exit = getByRole('button', { name: 'Results_exit' })
+    screen.getByText('Exit')
+    const exit = screen.getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
@@ -81,13 +87,15 @@ describe('Results', () => {
       ...props,
       flowType: FLOWS.ATTACH,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(getByText('Calibrate pipette'))
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    screen.getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(screen.getByText('Calibrate pipette'))
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
@@ -112,13 +120,13 @@ describe('Results', () => {
   it('calls setShowErrorMessage when chainRunCommands fails', async () => {
     props = {
       ...props,
-      chainRunCommands: jest
+      chainRunCommands: vi
         .fn()
         .mockImplementationOnce(() => Promise.reject(new Error('error'))),
       flowType: FLOWS.ATTACH,
     }
-    const { getByRole } = render(props)
-    const exit = getByRole('button', { name: 'Results_exit' })
+    render(props)
+    const exit = screen.getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
@@ -147,12 +155,12 @@ describe('Results', () => {
       attachedPipettes: { left: null, right: null },
       flowType: FLOWS.ATTACH,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Unable to detect pipette')
-    expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+    render(props)
+    screen.getByText('Unable to detect pipette')
+    expect(screen.getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${String(COLORS.red50)}`
     )
-    getByRole('button', { name: 'Try again' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })
@@ -163,12 +171,14 @@ describe('Results', () => {
       currentStepIndex: 6,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette successfully detached')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    const exit = getByRole('button', { name: 'Results_exit' })
+    render(props)
+    screen.getByText('Pipette successfully detached')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    const exit = screen.getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
@@ -177,12 +187,12 @@ describe('Results', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-Channel 1000 μL still attached')
-    expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
+    expect(screen.getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${String(COLORS.red50)}`
     )
-    getByRole('button', { name: 'Try again' })
+    screen.getByRole('button', { name: 'Try again' })
   })
   it('renders the error exit as disabled when is Fetching is true', () => {
     props = {
@@ -190,8 +200,10 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
       isFetching: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Results_errorExit' })).toBeDisabled()
+    render(props)
+    expect(
+      screen.getByRole('button', { name: 'Results_errorExit' })
+    ).toBeDisabled()
   })
   it('does not render error exit when is on device', () => {
     props = {
@@ -210,12 +222,12 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Flex 1-Channel 1000 μL still attached')
-    expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
+    expect(screen.getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${String(COLORS.red50)}`
     )
-    getByRole('button', { name: 'Try again' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
   })
   it('renders the correct information when pipette wizard is a success for detaching before 96 channel attach flow', () => {
@@ -225,13 +237,15 @@ describe('Results', () => {
       attachedPipettes: { left: null, right: null },
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('All pipettes successfully detached')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByText('attach pipette')
-    const exit = getByRole('button', { name: 'Results_exit' })
+    render(props)
+    screen.getByText('All pipettes successfully detached')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    screen.getByText('attach pipette')
+    const exit = screen.getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
   })
@@ -240,12 +254,14 @@ describe('Results', () => {
       ...props,
       flowType: FLOWS.CALIBRATE,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByRole('button', { name: 'Results_exit' }).click()
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    fireEvent.click(screen.getByRole('button', { name: 'Results_exit' }))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel with pipette attached initially ', () => {
@@ -255,12 +271,14 @@ describe('Results', () => {
       currentStepIndex: 9,
       totalStepCount: 9,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByRole('button', { name: 'Results_exit' }).click()
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    fireEvent.click(screen.getByRole('button', { name: 'Results_exit' }))
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow single mount', () => {
@@ -270,12 +288,14 @@ describe('Results', () => {
       currentStepIndex: 5,
       totalStepCount: 5,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByRole('button', { name: 'Results_exit' }).click()
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    fireEvent.click(screen.getByRole('button', { name: 'Results_exit' }))
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
   it('renders the correct information for success pipette cal on ODD', () => {
@@ -284,12 +304,14 @@ describe('Results', () => {
       isOnDevice: true,
       hasCalData: true,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully recalibrated')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
-    getByRole('button', { name: 'SmallButton_primary' }).click()
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
+    fireEvent.click(screen.getByRole('button'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for attach flow on ODD', async () => {
@@ -299,12 +321,12 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
       isOnDevice: true,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Unable to detect pipette')
-    expect(getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+    render(props)
+    screen.getByText('Unable to detect pipette')
+    expect(screen.getByLabelText('ot-alert')).toHaveStyle(
+      `color: ${String(COLORS.red50)}`
     )
-    getByRole('button', { name: 'SmallButton_primary' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })
@@ -318,11 +340,13 @@ describe('Results', () => {
         mount: LEFT,
       },
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
-    getByRole('img', { name: 'Success Icon' })
+    render(props)
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
+    screen.getByRole('img', { name: 'Success Icon' })
   })
   it('renders the correct information when attaching wrong pipette for run setup', async () => {
     props = {
@@ -334,10 +358,10 @@ describe('Results', () => {
         mount: LEFT,
       },
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Wrong instrument installed')
-    getByText('Install Flex 8-Channel 50 μL instead')
-    getByRole('button', { name: 'Detach and retry' }).click()
+    render(props)
+    screen.getByText('Wrong instrument installed')
+    screen.getByText('Install Flex 8-Channel 50 µL instead')
+    fireEvent.click(screen.getByRole('button', { name: 'Detach and retry' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })

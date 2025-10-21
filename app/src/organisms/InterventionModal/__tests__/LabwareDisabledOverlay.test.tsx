@@ -1,31 +1,35 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
 
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const mockLabwareDef = {
+  schemaVersion: 2,
   dimensions: {
     xDimension: 84,
     yDimension: 42,
   },
-} as LabwareDefinition2
+} as LabwareDefinition
 
 describe('LabwareDisabledOverlay', () => {
   it("renders correctly for a given labware definition's dimensions", () => {
-    const { getByTestId } = render(
+    render(
       <svg>
         <LabwareDisabledOverlay definition={mockLabwareDef} />
       </svg>
     )
 
-    const overlayBg = getByTestId('overlay_rect')
-    const overlayIcon = getByTestId('overlay_icon')
+    const overlayBg = screen.getByTestId('overlay_rect')
+    const overlayIcon = screen.getByTestId('overlay_icon')
 
     expect(overlayBg).toHaveAttribute('width', '84')
     expect(overlayBg).toHaveAttribute('height', '42')
-    expect(overlayBg).toHaveAttribute('fill', '#ffffff')
+    expect(overlayBg).toHaveAttribute('fill', '#FFFFFF')
     expect(overlayBg).toHaveAttribute('fill-opacity', '0.9')
-    expect(overlayIcon).toHaveAttribute('stroke', '#bf0000')
+    expect(overlayIcon).toHaveAttribute('stroke', COLORS.red50)
   })
 })

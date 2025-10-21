@@ -1,15 +1,15 @@
 import {
   CONNECTABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   REACHABLE,
   UNREACHABLE,
-  HEALTH_STATUS_OK,
-  HEALTH_STATUS_NOT_OK,
 } from '../constants'
 
 import type {
   BaseRobot,
-  Robot,
   ReachableRobot,
+  Robot,
   UnreachableRobot,
 } from '../types'
 
@@ -18,6 +18,7 @@ export const mockHealthResponse = {
   api_version: '0.0.0-mock',
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
+  robot_serial: 'mock-serial',
   logs: [] as string[],
   protocol_api_version: [2, 0] as [number, number],
 }

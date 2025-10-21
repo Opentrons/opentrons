@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Generator, List, TextIO, cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 
@@ -26,13 +27,13 @@ HERE = Path(__file__).parent
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
-def api_version(request: pytest.FixtureRequest) -> APIVersion:
+def api_version(request: SubRequest) -> APIVersion:
     """Return an API version to test with.
 
     Newer API versions execute through Protocol Engine, and older API versions don't.
     The two codepaths are very different, so we need to test them both.
     """
-    return request.param  # type: ignore[attr-defined,no-any-return]
+    return cast(APIVersion, request.param)
 
 
 @pytest.mark.parametrize(
@@ -87,6 +88,13 @@ def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> No
                 "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
                 "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
                 "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
+            ],
+        ),
+        (
+            "ot2_drop_tip.py",
+            [
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 5",
+                "Dropping tip into Trash Bin on slot 12",
             ],
         ),
     ],
@@ -286,6 +294,45 @@ def test_get_protocol_api_usable_without_homing(api_version: APIVersion) -> None
     pipette = protocol.load_instrument("p300_single_gen2", mount="left")
     tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
     pipette.pick_up_tip(tip_rack["A1"])  # Should not raise.
+
+
+def test_liquid_probe_get_protocol_api() -> None:
+    """Covers `simulate.get_protocol_api()`-specific issues with liquid probes.
+
+    See https://opentrons.atlassian.net/browse/EXEC-646.
+    """
+    protocol = simulate.get_protocol_api(version="2.20", robot_type="Flex")
+    pipette = protocol.load_instrument("flex_1channel_1000", mount="left")
+    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "A1")
+    well_plate = protocol.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+    )
+    pipette.pick_up_tip(tip_rack["A1"])
+    pipette.require_liquid_presence(well_plate["A1"])  # Should not raise MustHomeError.
+
+
+def test_liquid_probe_simulate_file() -> None:
+    """Covers `opentrons_simulate`-specific issues with liquid probes.
+
+    See https://opentrons.atlassian.net/browse/EXEC-646.
+    """
+    protocol_contents = textwrap.dedent(
+        """\
+        requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+        def run(protocol):
+            pipette = protocol.load_instrument("flex_1channel_1000", mount="left")
+            tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "A1")
+            well_plate = protocol.load_labware(
+                "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+            )
+            pipette.pick_up_tip(tip_rack["A1"])
+            pipette.require_liquid_presence(well_plate["A1"])
+        """
+    )
+    protocol_contents_stream = io.StringIO(protocol_contents)
+    simulate.simulate(
+        protocol_file=protocol_contents_stream
+    )  # Should not raise MustHomeError.
 
 
 class TestGetProtocolAPILabware:

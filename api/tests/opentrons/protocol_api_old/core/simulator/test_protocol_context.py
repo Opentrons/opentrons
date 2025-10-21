@@ -1,8 +1,10 @@
 """Test instrument context simulation."""
+from typing import cast
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.types import Location, Mount
 from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore
@@ -14,8 +16,8 @@ from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore
         lazy_fixture("simulating_protocol_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> ProtocolCore:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def subject(request: SubRequest) -> ProtocolCore:
+    return cast(ProtocolCore, request.param)
 
 
 @pytest.mark.ot2_only
@@ -52,3 +54,11 @@ def test_replacing_instrument_tip_state(
 
     assert pip1.has_tip() is False
     assert pip2.has_tip() is False
+
+
+@pytest.mark.ot2_only
+def test_load_instrument_raises(simulating_protocol_context: ProtocolCore) -> None:
+    with pytest.raises(ValueError):
+        simulating_protocol_context.load_instrument(
+            instrument_name=PipetteNameType.P1000_SINGLE_FLEX, mount=Mount.RIGHT
+        )

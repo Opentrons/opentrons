@@ -1,61 +1,74 @@
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
+  absorbanceReaderCollision,
+  formatPyStr,
+  formatPyWellLocation,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getIsSafePipetteMovement,
+  getLabwareSlot,
+  getSlotInLocationStack,
   modulePipetteCollision,
-  thermocyclerPipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getLabwareSlot,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  thermocyclerPipetteCollision,
   uuid,
 } from '../../utils'
-import { COLUMN_4_SLOTS } from '../../constants'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { MoveToWellParams as v6MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+
+import type { CreateCommand, MoveToWellParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import type { Point } from '../../utils'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
-export const moveToWell: CommandCreator<v5MoveToWellParams> = (
+export const moveToWell: CommandCreator<MoveToWellParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, labware, well, offset, minimumZHeight, forceDirect } = args
+  const {
+    pipetteId,
+    labwareId,
+    wellName,
+    wellLocation,
+    minimumZHeight,
+    forceDirect,
+    speed,
+  } = args
   const actionName = 'moveToWell'
   const errors: CommandCreatorError[] = []
-  // TODO(2020-07-30, IL): the below is duplicated or at least similar
-  // across aspirate/dispense/blowout, we can probably DRY it up
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const labwareState = prevRobotState.labware
+  const { pipetteEntities, labwareEntities } = invariantContext
+  const pipetteSpec = pipetteEntities[pipetteId]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
 
-  const slotName = getLabwareSlot(
-    labware,
-    prevRobotState.labware,
-    prevRobotState.modules
-  )
+  const slotName = getLabwareSlot(labwareId, prevRobotState.labware)
 
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName,
-        pipette,
+        pipette: pipetteId,
       })
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
-        labware,
+        labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (
+    getSlotInLocationStack(prevRobotState.labware[labwareId].stack) ===
+    'offDeck'
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   }
 
@@ -63,12 +76,19 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'move to well' })
     )
+  } else if (labwareState[slotName] != null) {
+    const adapterSlot = getSlotInLocationStack(labwareState[slotName].stack)
+    if (COLUMN_4_SLOTS.includes(adapterSlot)) {
+      errors.push(
+        errorCreators.pipettingIntoColumn4({ typeOfStep: actionName })
+      )
+    }
   }
 
   if (
     modulePipetteCollision({
-      pipette,
-      labware,
+      pipette: pipetteId,
+      labware: labwareId,
       invariantContext,
       prevRobotState,
     })
@@ -80,7 +100,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     thermocyclerPipetteCollision(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.thermocyclerLidClosed())
@@ -90,28 +110,41 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     pipetteIntoHeaterShakerLatchOpen(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.heaterShakerLatchOpen())
   }
 
   if (
+    absorbanceReaderCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labwareId
+    )
+  ) {
+    errors.push(errorCreators.absorbanceReaderLidClosed())
+  }
+
+  if (
     pipetteIntoHeaterShakerWhileShaking(
       prevRobotState.modules,
       prevRobotState.labware,
-      labware
+      labwareId
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
   if (!isFlexPipette) {
-    if (
-      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
-    ) {
-      errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
-    }
-
     if (
       getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
     ) {
@@ -133,7 +166,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
         prevRobotState.modules,
         slotName,
         pipetteSpec,
-        invariantContext.labwareEntities[labware]
+        labwareEntities[labwareId]
       )
     ) {
       errors.push(
@@ -141,47 +174,60 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
       )
     }
   }
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+
+  if (
+    isMultiChannelPipette &&
+    !getIsSafePipetteMovement({
+      robotState: prevRobotState,
+      invariantContext,
+      pipetteId,
+      labwareId,
+      wellLocationOffset: (wellLocation?.offset as Point) ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      wellTargetName: wellName,
+    })
+  ) {
+    errors.push(errorCreators.possiblePipetteCollision())
+  }
   if (errors.length > 0) {
     return {
       errors,
     }
   }
 
-  const requiredParams: v6MoveToWellParams = {
-    pipetteId: pipette,
-    labwareId: labware,
-    wellName: well,
-  }
-
-  const wellLocationParams: Pick<v6MoveToWellParams, 'wellLocation'> = {
-    wellLocation: {
-      origin: 'bottom',
-      offset,
-    },
-  }
-
-  const params = {
-    ...requiredParams,
-    ...(offset != null && wellLocationParams),
-  }
-
-  // add optional fields only if specified
-  if (forceDirect != null) {
-    params.forceDirect = forceDirect
-  }
-
-  if (minimumZHeight != null) {
-    params.minimumZHeight = minimumZHeight
-  }
+  const pipettePythonName = pipetteEntities[pipetteId].pythonName
+  const labwarePythonName = labwareEntities[labwareId].pythonName
 
   const commands: CreateCommand[] = [
     {
       commandType: 'moveToWell',
       key: uuid(),
-      params,
+      params: {
+        pipetteId,
+        labwareId,
+        wellName,
+        wellLocation,
+        ...(forceDirect != null ? { forceDirect } : {}),
+        ...(minimumZHeight != null ? { minimumZHeight } : {}),
+        ...(speed != null ? { speed } : null),
+      },
     },
+  ]
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}]${formatPyWellLocation(
+      wellLocation
+    )}`,
+    ...(forceDirect ? [`force_direct=True`] : []),
+    ...(minimumZHeight ? [`minimum_z_height=${minimumZHeight}`] : []),
+    ...(speed ? [`speed=${speed}`] : []),
   ]
   return {
     commands,
+    python: `${pipettePythonName}.move_to(${pythonArgs.join(', ')})`,
   }
 }

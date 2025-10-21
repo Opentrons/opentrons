@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 

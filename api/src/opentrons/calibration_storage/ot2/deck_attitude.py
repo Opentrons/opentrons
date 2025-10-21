@@ -79,7 +79,7 @@ def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
         pass
     except (json.JSONDecodeError, ValidationError):
         log.warning(
-            "Deck calibration is malformed. Please factory reset your calibrations."
+            "Deck calibration is malformed. Please factory reset your calibrations.",
+            exc_info=True,
         )
-        pass
     return None

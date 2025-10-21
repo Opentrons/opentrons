@@ -23,16 +23,17 @@ HERE = os.path.dirname(__file__)
 CWD = HERE or '.'
 
 package_entries = {
+    'abr-testing': PackageEntry('abr_testing'),
     'api': PackageEntry('opentrons_api'),
     'update-server': PackageEntry('update_server'),
     'robot-server': PackageEntry('robot_server'),
     'shared-data': PackageEntry('shared_data'),
-    'notify-server': PackageEntry('notify_server'),
     'hardware': PackageEntry('opentrons_hardware'),
     'hardware-testing': PackageEntry('hardware_testing'),
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
+    'performance-metrics': PackageEntry('performance_metrics'),
     'ipc-messenger': PackageEntry('ipc_messenger'),
 }
 
@@ -56,9 +57,18 @@ def normalize_version(package, project, extra_tag='', git_dir=None):
     # the way they vendor dependencies, like the packaging module that
     # provides the way to normalize version numbers for wheel file names. So
     # we try all the possible ways to find it.
+    # Since 71.0.0 they have removed the need for extern
+    # So depending on the version of 3.10 you're building on you may or may not
+    # need to use the extern or import it directly
     try:
-        # new way
-        from setuptools.extern import packaging
+        import setuptools
+        major, minor, patch = [int(x, 10) for x in setuptools.__version__.split('.')]
+        if major < 71:
+            # new way
+            from setuptools.extern import packaging
+        else:
+            # new new way
+            import packaging
     except ImportError:
         # old way
         from pkg_resources.extern import packaging

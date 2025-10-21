@@ -8,16 +8,18 @@ import json
 from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
-    from .dev_types import (
+    from .types import (
         DeckSchema,
         DeckDefinition,
         DeckDefinitionV3,
         DeckSchemaVersion3,
         DeckDefinitionV4,
         DeckSchemaVersion4,
+        DeckDefinitionV5,
+        DeckSchemaVersion5,
     )
 
-DEFAULT_DECK_DEFINITION_VERSION: Final = 4
+DEFAULT_DECK_DEFINITION_VERSION: Final = 5
 
 
 class Offset(NamedTuple):
@@ -39,12 +41,22 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
 
 
 @overload
+def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5":
+    ...
+
+
+@overload
 def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":
     ...
 
 
 @overload
 def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
+    ...
+
+
+@overload
+def load(name: str) -> "DeckDefinitionV5":
     ...
 
 

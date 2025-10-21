@@ -3,22 +3,38 @@ from .tempdeck import TempDeck
 from .magdeck import MagDeck
 from .thermocycler import Thermocycler
 from .heater_shaker import HeaterShaker
+from .absorbance_reader import AbsorbanceReader
+from .flex_stacker import FlexStacker
 from .update import update_firmware
 from .utils import MODULE_TYPE_BY_NAME, build
 from .types import (
     ThermocyclerStep,
     UploadFunction,
     BundledFirmware,
-    UpdateError,
     ModuleAtPort,
+    SimulatingModuleAtPort,
+    SimulatingModule,
     ModuleType,
     ModuleModel,
     TemperatureStatus,
     MagneticStatus,
     HeaterShakerStatus,
+    AbsorbanceReaderStatus,
+    PlatformState,
+    StackerAxisState,
+    FlexStackerStatus,
     SpeedStatus,
     LiveData,
+    ModuleData,
+    ModuleDataValidator,
+    module_model_from_string,
 )
+
+from .errors import (
+    UpdateError,
+    AbsorbanceReaderDisconnectedError,
+)
+
 
 __all__ = [
     "MODULE_TYPE_BY_NAME",
@@ -33,6 +49,8 @@ __all__ = [
     "BundledFirmware",
     "UpdateError",
     "ModuleAtPort",
+    "SimulatingModuleAtPort",
+    "SimulatingModule",
     "HeaterShaker",
     "ModuleType",
     "ModuleModel",
@@ -41,4 +59,14 @@ __all__ = [
     "HeaterShakerStatus",
     "SpeedStatus",
     "LiveData",
+    "ModuleData",
+    "ModuleDataValidator",
+    "AbsorbanceReader",
+    "AbsorbanceReaderStatus",
+    "AbsorbanceReaderDisconnectedError",
+    "FlexStacker",
+    "FlexStackerStatus",
+    "PlatformState",
+    "StackerAxisState",
+    "module_model_from_string",
 ]

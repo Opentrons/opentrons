@@ -1,10 +1,12 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
+import type { AddressableAreaName } from '../../deck'
 import type {
-  Coordinates,
+  GantryMount,
   MotorAxes,
   MotorAxis,
-  GantryMount,
+  Vector3D,
 } from '../../js/types'
+import type { WellLocation } from './support'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -42,7 +44,7 @@ export interface MoveRelativeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveRelativeCreateCommand {
   result?: {
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
@@ -54,7 +56,7 @@ export interface SavePositionRunTimeCommand
     SavePositionCreateCommand {
   result?: {
     positionId: string
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface HomeCreateCommand extends CommonCommandCreateInfo {
@@ -124,16 +126,10 @@ export interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  wellLocation?: {
-    origin?: 'top' | 'bottom'
-    offset?: {
-      x?: number
-      y?: number
-      z?: number
-    }
-  }
+  wellLocation?: WellLocation
   minimumZHeight?: number
   forceDirect?: boolean
+  speed?: number
 }
 
 interface MoveToCoordinatesParams {
@@ -156,6 +152,7 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+  failOnNotHomed?: boolean // Defaults to true if blank. Require every possible axis to be homed to save.
 }
 
 interface HomeParams {
@@ -167,10 +164,17 @@ interface RetractAxisParams {
   axis: MotorAxis
 }
 
+export interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
 export interface MoveToAddressableAreaParams {
   pipetteId: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
+  offset: AddressableOffsetVector
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean
+  stayAtHighestPossibleZ?: boolean
 }

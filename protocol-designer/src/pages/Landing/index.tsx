@@ -1,0 +1,161 @@
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { NavLink, useNavigate } from 'react-router-dom'
+
+import {
+  BasicButton,
+  COLORS,
+  INFO_TOAST,
+  LargeButton,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
+import { getHasOptedIn } from '../../analytics/selectors'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import { AnnouncementModal } from '../../components/organisms'
+import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
+import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
+import { ACCEPTED_PROTOCOL_FILE_TYPES } from '../../constants'
+import { getFileMetadata } from '../../file-data/selectors'
+import { actions as loadFileActions } from '../../load-file'
+import { toggleNewProtocolModal } from '../../navigation/actions'
+import {
+  getLocalStorageItem,
+  localStorageAnnouncementKey,
+  setLocalStorageItem,
+} from '../../persist'
+import styles from './landing.module.css'
+
+import type { ChangeEvent } from 'react'
+import type { ThunkDispatch } from '../../types'
+
+import welcomeImage from '../../assets/images/welcome_page.png'
+
+export function Landing(): JSX.Element {
+  const { t } = useTranslation('shared')
+  const dispatch: ThunkDispatch<any> = useDispatch()
+  const metadata = useSelector(getFileMetadata)
+  const navigate = useNavigate()
+  const [showAnnouncementModal, setShowAnnouncementModal] =
+    useState<boolean>(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
+  const { bakeToast, eatToast } = useKitchen()
+  const announcements = useAnnouncements()
+  const lastAnnouncement = announcements[announcements.length - 1]
+  const announcementKey = lastAnnouncement
+    ? lastAnnouncement.announcementKey
+    : null
+
+  const userHasNotSeenAnnouncement =
+    getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey &&
+    hasOptedIn != null
+
+  useEffect(() => {
+    if (
+      userHasNotSeenAnnouncement &&
+      appVersion != null &&
+      hasOptedIn != null
+    ) {
+      const toastId = bakeToast(
+        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
+        INFO_TOAST,
+        {
+          heading: t('updated_protocol_designer'),
+          closeButton: true,
+          linkText: t('view_release_notes'),
+          onClose: () => {
+            setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
+          },
+          onLinkClick: () => {
+            eatToast(toastId)
+            setShowAnnouncementModal(true)
+          },
+          disableTimeout: true,
+          justifyContent: 'center',
+        }
+      )
+    }
+  }, [userHasNotSeenAnnouncement, appVersion, hasOptedIn])
+
+  useEffect(() => {
+    if (metadata?.created != null) {
+      console.warn('protocol already exists, navigating to overview')
+      navigate('/overview')
+    }
+  }, [metadata, navigate])
+
+  const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
+    dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+  }
+
+  const handleImportClick = (): void => {
+    if (fileInputRef.current != null) {
+      fileInputRef.current.click()
+    }
+  }
+
+  return (
+    <>
+      {showAnnouncementModal ? (
+        <AnnouncementModal
+          isViewReleaseNotes={showAnnouncementModal}
+          onClose={() => {
+            setShowAnnouncementModal(false)
+          }}
+        />
+      ) : null}
+      <div data-cy="landing-page" className={styles.landing_page}>
+        <div className={styles.content_section}>
+          <img
+            src={welcomeImage}
+            height="132px"
+            width="548px"
+            aria-label="welcome image"
+          />
+          <div className={styles.text_section}>
+            <StyledText desktopStyle="headingLargeBold">
+              {t('welcome')}
+            </StyledText>
+            <StyledText
+              desktopStyle="headingSmallRegular"
+              color={COLORS.grey60}
+              maxWidth="34.25rem"
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
+              {t('no-code-required')}
+            </StyledText>
+          </div>
+        </div>
+        <NavLink to="/createNew" className={styles.nav_link}>
+          <LargeButton
+            onClick={() => {
+              dispatch(toggleNewProtocolModal(true))
+            }}
+            buttonText={
+              <span className={styles.button_text}>
+                {t('create_a_protocol')}
+              </span>
+            }
+          />
+        </NavLink>
+        <label className={styles.label}>
+          <BasicButton onClick={handleImportClick} underLine>
+            {t('import_existing_protocol')}
+          </BasicButton>
+          <input
+            type="file"
+            onChange={loadFile}
+            ref={fileInputRef}
+            aria-label={`${t('import')}_from_landing`}
+            className={styles.hiddenInput}
+            accept={ACCEPTED_PROTOCOL_FILE_TYPES}
+          />
+        </label>
+      </div>
+      <EndUserAgreementFooter />
+    </>
+  )
+}

@@ -1,21 +1,15 @@
 import { TestScheduler } from 'rxjs/testing'
+import { expect, vi } from 'vitest'
 
-import * as RobotApiHttp from '../http'
+import { mockRequestMeta, mockRobot } from '../__fixtures__'
 import * as DiscoverySelectors from '../../discovery/selectors'
-import { mockRobot, mockRequestMeta } from '../__fixtures__'
+import * as RobotApiHttp from '../http'
 
 import type { State } from '../../types'
-import type { RobotHost, RobotApiResponse } from '../types'
+import type { RobotApiResponse, RobotHost } from '../types'
 
-jest.mock('../http')
-jest.mock('../../discovery/selectors')
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
+vi.mock('../http')
+vi.mock('../../discovery/selectors')
 
 export interface EpicTestMocks<A, R> {
   state: State
@@ -23,8 +17,8 @@ export interface EpicTestMocks<A, R> {
   response: R | undefined
   robot: RobotHost
   meta: typeof mockRequestMeta
-  getRobotByName: typeof mockGetRobotByName
-  fetchRobotApi: typeof mockFetchRobotApi
+  getRobotByName: typeof RobotApiHttp.fetchRobotApi
+  fetchRobotApi: typeof DiscoverySelectors.getRobotByName
   testScheduler: TestScheduler
 }
 
@@ -52,12 +46,14 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
     ...triggerAction,
     meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
-  mockGetRobotByName.mockImplementation((state: State, robotName: string) => {
-    expect(state).toBe(mockState)
-    expect(robotName).toBe(mockRobot.name)
+  vi.mocked(DiscoverySelectors.getRobotByName).mockImplementation(
+    (state: State, robotName: string) => {
+      expect(state).toBe(mockState)
+      expect(robotName).toBe(mockRobot.name)
 
-    return mockRobot
-  })
+      return mockRobot
+    }
+  )
 
   const testScheduler = new TestScheduler((actual, expected) => {
     expect(actual).toEqual(expected)
@@ -69,8 +65,8 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
     response: mockResponse,
     robot: mockRobot,
     meta: mockRequestMeta,
-    getRobotByName: mockGetRobotByName,
-    fetchRobotApi: mockFetchRobotApi,
+    getRobotByName: DiscoverySelectors.getRobotByName as any,
+    fetchRobotApi: RobotApiHttp.fetchRobotApi as any,
     testScheduler,
   }
 }
@@ -85,8 +81,8 @@ export const runEpicTest = <A, R = RobotApiResponse>(
     const { cold } = schedulerArgs
 
     if (response) {
-      fetchRobotApi.mockReturnValue(
-        cold<RobotApiResponse>('r', { r: response } as any)
+      vi.mocked(fetchRobotApi as any).mockReturnValue(
+        cold<RobotApiResponse>('(r|)', { r: response } as any)
       )
     }
 

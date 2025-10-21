@@ -1,22 +1,14 @@
-import * as React from 'react'
-import { NavLink, NavButton } from './NavLink'
-import { supportLinkProps, salesLinkProps } from './nav-data'
-import styles from './styles.css'
+import { salesLinkProps, supportLinkProps } from './nav-data'
+import { NavButton, NavLink } from './NavLink'
+import styles from './styles.module.css'
 
 interface Props {
   active: boolean
 }
 export function SupportMenu(props: Props): JSX.Element {
   const { active } = props
-  const {
-    start,
-    help,
-    github,
-    labware,
-    app,
-    warranty,
-    support,
-  } = supportLinkProps
+  const { start, help, github, labware, app, warranty, support } =
+    supportLinkProps
   const { order, sales, demo } = salesLinkProps
 
   return (

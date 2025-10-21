@@ -1,13 +1,14 @@
 import {
-  LabwareDefinition2,
-  ModuleDefinition,
+  getModuleDef,
   SPAN7_8_10_11_SLOT,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import thermocyclerModuleV1 from '@opentrons/shared-data/module/definitions/3/thermocyclerModuleV1.json'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
+  LabwareDefinition,
   LabwareDefinitionsByUri,
+  Liquid,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
@@ -97,7 +98,21 @@ export const mockMoveLabwareCommandToOffDeck = {
     labwareId: 'offDeckMove',
     newLocation: 'offDeck',
   },
-  strategy: 'manualMoveWithPause',
+} as any
+
+export const mockEmptyStackerCommand = {
+  commandType: 'flexStacker/empty',
+  params: {
+    moduleId: 'mockModuleID',
+  },
+} as any
+
+export const mockFillStackerCommand = {
+  commandType: 'flexStacker/fill',
+  params: {
+    moduleId: 'mockModuleID',
+    quantity: 4,
+  },
 } as any
 
 export const mockLabwareOnModule: LoadedLabware = {
@@ -125,7 +140,7 @@ export const mockLabwareOffDeck: LoadedLabware = {
   location: 'offDeck',
 }
 
-export const mockLabwareDefinition = ({
+export const mockLabwareDefinition = {
   schemaVersion: 2,
   version: 1,
   namespace: 'opentrons',
@@ -152,7 +167,7 @@ export const mockLabwareDefinition = ({
     zDimension: 15.7,
     xDimension: 127.76,
   },
-} as unknown) as LabwareDefinition2
+} as unknown as LabwareDefinition
 
 export const mockLabwareDefinitionsByUri = {
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockLabwareDefinition,
@@ -176,6 +191,12 @@ export const mockThermocyclerModule: LoadedModule = {
   serialNumber: 'dummySerialTC',
 }
 
+export const mockLiquid: Liquid = {
+  id: 'mockLiquid',
+  displayName: 'mock liquid',
+  description: 'this is my mock liquid description',
+}
+
 export const mockRunData: RunData = {
   id: 'mockRunData',
   createdAt: '',
@@ -185,9 +206,12 @@ export const mockRunData: RunData = {
   status: 'running',
   actions: [],
   errors: [],
+  hasEverEnteredErrorRecovery: false,
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],
+  liquids: [mockLiquid],
+  runTimeParameters: [],
 }
 
 export const mockLabwareRenderInfo = [
@@ -204,7 +228,7 @@ export const mockModuleRenderInfoWithLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
   },
@@ -215,7 +239,7 @@ export const mockModuleRenderInfoWithoutLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: null,
     nestedLabwareId: null,
   },

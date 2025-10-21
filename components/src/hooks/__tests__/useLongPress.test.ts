@@ -1,4 +1,6 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { useLongPress } from '../useLongPress'
 
 describe('useLongPress', () => {
@@ -12,13 +14,13 @@ describe('useLongPress', () => {
 
   it('when callling disable, isEnabled true', () => {
     const { result } = renderHook(() => useLongPress())
-    result.current.enable()
-    expect(result.current.isEnabled).toBe(true)
+    act(() => result.current.enable())
+    waitFor(() => expect(result.current.isEnabled).toBe(true))
   })
 
   it('when callling disable, isEnabled false', () => {
     const { result } = renderHook(() => useLongPress())
-    result.current.disable()
-    expect(result.current.isEnabled).toBe(false)
+    act(() => result.current.disable())
+    waitFor(() => expect(result.current.isEnabled).toBe(false))
   })
 })

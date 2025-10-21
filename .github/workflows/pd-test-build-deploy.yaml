@@ -1,4 +1,4 @@
-# Run tests, build PD, and deploy it to sandbox
+# Run tests, build PD, and deploy
 
 name: 'PD test, build, and deploy'
 
@@ -9,23 +9,21 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
+      - 'scripts/static-deploy/**'
+      - 'scripts/git-version-protocol-designer.mjs'
   push:
-    paths:
-      - 'protocol-designer/**'
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'components/**'
-      - 'webpack-config/**'
-      - 'package.json'
-      - '.github/workflows/pd-test-build-deploy.yaml'
     branches:
-      - '**'
+      - 'edge'
+      - 'chore_release*'
     tags:
       - 'protocol-designer*'
-  workflow_dispatch:
+      - 'staging-protocol-designer*'
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
@@ -36,175 +34,231 @@ defaults:
     shell: bash
 
 env:
-  CI: true
+  CI: 'true'
+  # This is the artifact directory as a relative path
+  # to the working-directory of our tools: scripts/static-deploy
+  # our script deploy_ci_config.py expects this ENV variable is set
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
-  js-unit-test:
-    name: 'protocol designer unit tests'
-    runs-on: 'ubuntu-22.04'
-    timeout-minutes: 30
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
-      - uses: 'actions/checkout@v3'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
         with:
-          node-version: '16'
-      - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v2
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
-      - name: 'run PD unit tests'
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
+  unit-test:
+    name: 'protocol designer unit tests'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 20
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/js/setup
+      - name: 'run unit tests'
         run: make -C protocol-designer test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/lcov.info
           flags: protocol-designer
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   e2e-test:
-    name: 'pd e2e tests'
-    needs: ['js-unit-test']
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        os: ['ubuntu-22.04']
-    runs-on: '${{ matrix.os }}'
+    name: 'protocol designer e2e tests'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 20
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
-      - uses: 'actions/checkout@v3'
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - name: 'install udev for usb-detection'
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
-      - name: 'test-e2e'
+          fetch-depth: 0 # PD needs to see labware in other release branches
+      - uses: ./.github/actions/js/setup
+      - name: 'run test-e2e'
         run: make -C protocol-designer test-e2e
+
   build-pd:
-    name: 'build protocol designer artifact'
-    needs: ['js-unit-test']
-    runs-on: 'ubuntu-22.04'
-    if: github.event_name != 'pull_request'
+    timeout-minutes: 20
+    name: 'build protocol designer'
+    needs:
+      - determine-deploy-config
+      - unit-test
+      - e2e-test
+    runs-on: 'ubuntu-24.04'
+    if: always() && (needs.unit-test.result == 'success' || needs.unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped')
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+          fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
+      - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:
+          NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
+          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
+          OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
         run: |
-          make -C protocol-designer
+          make -C protocol-designer NODE_ENV=${{ needs.determine-deploy-config.outputs.environment == 'production' && 'production' || 'development' }}
+      - name: 'upload sourcemaps to Sentry'
+        # Only on production releases (tagged with protocol-designer*)
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/protocol-designer')
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          sourcemaps: protocol-designer/dist
+          set_commits: auto
+          ignore_missing: true
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
+
   deploy-pd:
-    name: 'deploy PD artifact to S3'
-    runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-pd']
-    if: github.event_name != 'pull_request'
+    timeout-minutes: 10
+    name: 'deploy protocol designer'
+    needs:
+      - determine-deploy-config
+      - build-pd
+    runs-on: 'ubuntu-24.04'
+    if: always() && needs.build-pd.result == 'success' && needs.determine-deploy-config.result == 'success'
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: 'actions/checkout@v3'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          aws-region: us-east-2
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: resolve-tag
+        uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
         run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - name: 'install udev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
+          make setup
+
       - name: 'download PD build'
-        uses: 'actions/download-artifact@v3'
+        uses: 'actions/download-artifact@v4'
         with:
           name: pd-artifact
-          path: ./dist
-      - name: 'configure ot3 s3 deploy creds and deploy'
+          path: ./dist # in the default workspace
+          # RELATIVE_ARTIFACT_DIR is set to ../../dist
+          # because that is the relative path from scripts/static-deploy
+          # to the this location
+      - name: Deploy to S3
+        working-directory: scripts/static-deploy
+        run: make deploy \
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
+      - name: 'notify Sentry of prod deploy'
+        # Only on production releases (tagged with protocol-designer*)
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/protocol-designer')
+        uses: getsentry/action-release@v3
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PD_S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PD_S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-1
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.PD_S3_SANDBOX_KEY_ID }} --profile identity
-          aws configure set aws_secret_access_key ${{ secrets.PD_S3_SANDBOX_SECRET }} --profile identity
-          aws configure set region us-east-2 --profile identity
-          aws configure set output json --profile identity
-          aws configure set region us-east-2 --profile deploy
-          aws configure set role_arn ${{ secrets.OT_PD_DEPLOY_ROLE }} --profile deploy
-          aws configure set source_profile identity --profile deploy
-          aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read --profile=deploy
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          # version is deprecated, use release instead
+          release: ${{ steps.resolve-tag.outputs.tag }}
+          environment: production
+
+  # Notification jobs for tagged builds
+  notify-success:
+    name: 'Notify Build Success'
+    runs-on: 'ubuntu-latest'
+    needs: [unit-test, e2e-test, build-pd, deploy-pd]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'success' || needs.unit-test.result == 'skipped') && (needs.e2e-test.result == 'success' || needs.e2e-test.result == 'skipped') && needs.build-pd.result == 'success' && needs.deploy-pd.result == 'success'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send success alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'success'
+          workflow_name: 'PD test, build, and deploy'
+
+  notify-failure:
+    name: 'Notify Build Failure'
+    runs-on: 'ubuntu-latest'
+    needs: [unit-test, e2e-test, build-pd, deploy-pd]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'failure' || needs.e2e-test.result == 'failure' || needs.build-pd.result == 'failure' || needs.deploy-pd.result == 'failure')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Determine failed jobs'
+        id: failed-jobs
         shell: bash
+        run: |
+          failed_jobs=()
+          if [[ "${{ needs.unit-test.result }}" == "failure" ]]; then
+            failed_jobs+=("unit-test")
+          fi
+          if [[ "${{ needs.e2e-test.result }}" == "failure" ]]; then
+            failed_jobs+=("e2e-test")
+          fi
+          if [[ "${{ needs.build-pd.result }}" == "failure" ]]; then
+            failed_jobs+=("build-pd")
+          fi
+          if [[ "${{ needs.deploy-pd.result }}" == "failure" ]]; then
+            failed_jobs+=("deploy-pd")
+          fi
+          
+          IFS=','
+          echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
+
+      - name: 'Send failure alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'failure'
+          workflow_name: 'PD test, build, and deploy'
+          failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+
+  notify-cancelled:
+    name: 'Notify Build Cancelled'
+    runs-on: 'ubuntu-latest'
+    needs: [unit-test, e2e-test, build-pd, deploy-pd]
+    if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'cancelled' || needs.e2e-test.result == 'cancelled' || needs.build-pd.result == 'cancelled' || needs.deploy-pd.result == 'cancelled')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: 'Send cancelled alert'
+        uses: ./.github/actions/simple-build-alert
+        with:
+          status: 'cancelled'
+          workflow_name: 'PD test, build, and deploy'

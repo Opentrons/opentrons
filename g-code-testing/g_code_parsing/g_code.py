@@ -94,6 +94,7 @@ class GCode:
         THERMOCYCLER_G_CODE.DEACTIVATE_BLOCK.name: thermocycler.DeactivateBlockGCodeFunctionalityDef,
         THERMOCYCLER_G_CODE.DEACTIVATE_ALL.name: thermocycler.DeactivateAllGCodeFunctionalityDef,
         THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name: thermocycler.EditPIDParamsGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_ERROR_STATE.name: thermocycler.GetErrorStatusFunctionalityDef,
     }
 
     HEATER_SHAKER_G_CODE_EXPLANATION_MAPPING = {
@@ -106,6 +107,7 @@ class GCode:
         HEATER_SHAKER_G_CODE.OPEN_LABWARE_LATCH.name: heater_shaker.OpenLabwareLatchGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.CLOSE_LABWARE_LATCH.name: heater_shaker.CloseLabwareLatchGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.GET_LABWARE_LATCH_STATE.name: heater_shaker.GetLabwareLatchStateGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_ERROR_STATE.name: heater_shaker.GetErrorStatusFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters
@@ -158,6 +160,8 @@ class GCode:
         THERMOCYCLER_G_CODE.GET_LID_TEMP.value,
         THERMOCYCLER_G_CODE.GET_PLATE_TEMP.value,
         THERMOCYCLER_G_CODE.GET_LID_STATUS.value,
+        THERMOCYCLER_G_CODE.GET_ERROR_STATE.value,
+        HEATER_SHAKER_G_CODE.GET_ERROR_STATE.value,
     ]
 
     @classmethod

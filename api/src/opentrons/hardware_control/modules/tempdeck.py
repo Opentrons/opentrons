@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Mapping, Optional
+from typing import Dict, Optional, Callable
 
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    TemperatureStatus,
+)
 from opentrons.hardware_control.poller import Reader, Poller
 from typing_extensions import Final
 from opentrons.drivers.types import Temperature
@@ -15,7 +19,7 @@ from opentrons.drivers.temp_deck import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.modules import update, mod_abc, types
+from opentrons.hardware_control.modules import update, mod_abc, types, errors
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +30,7 @@ SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 class TempDeck(mod_abc.AbstractModule):
     """Hardware control interface for an attached Temperature Module."""
 
-    MODULE_TYPE = types.ModuleType.TEMPERATURE
+    MODULE_TYPE = types.ModuleType["TEMPERATURE"]
     FIRST_GEN2_REVISION = 20
 
     @classmethod
@@ -34,11 +38,14 @@ class TempDeck(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "TempDeck":
         """
         Build a TempDeck
@@ -46,11 +53,12 @@ class TempDeck(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             Tempdeck instance
@@ -60,7 +68,9 @@ class TempDeck(mod_abc.AbstractModule):
             driver = await TempDeckDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or TEMP_POLL_INTERVAL_SECS
         else:
-            driver = SimulatingDriver(sim_model=sim_model)
+            driver = SimulatingDriver(
+                sim_model=sim_model, serial_number=sim_serial_number
+            )
             poll_interval_seconds = poll_interval_seconds or SIM_TEMP_POLL_INTERVAL_SECS
 
         reader = TempDeckReader(driver=driver)
@@ -74,6 +84,8 @@ class TempDeck(mod_abc.AbstractModule):
             poller=poller,
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -87,12 +99,14 @@ class TempDeck(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractTempDeckDriver,
         reader: TempDeckReader,
         poller: Poller,
-        device_info: Mapping[str, str],
+        device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -100,11 +114,14 @@ class TempDeck(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver
         self._reader = reader
         self._poller = poller
+        self._reader.set_error_callback(self.error_callback)
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
@@ -179,14 +196,18 @@ class TempDeck(mod_abc.AbstractModule):
         await self._reader.read()
 
     @property
-    def device_info(self) -> Mapping[str, str]:
+    def device_info(self) -> Dict[str, str]:
         return self._device_info
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.TemperatureModuleData = {
+            "currentTemp": self.temperature,
+            "targetTemp": self.target,
+        }
         return {
             "status": self.status,
-            "data": {"currentTemp": self.temperature, "targetTemp": self.target},
+            "data": data,
         }
 
     @property
@@ -208,7 +229,7 @@ class TempDeck(mod_abc.AbstractModule):
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get("model")
         if model in ("temp_deck_v1", "temp_deck_v1.1", "temp_deck_v2"):
-            raise types.UpdateError(
+            raise errors.UpdateError(
                 "This Temperature Module can't be updated."
                 "Please contact Opentrons Support."
             )
@@ -278,7 +299,21 @@ class TempDeckReader(Reader):
     def __init__(self, driver: AbstractTempDeckDriver) -> None:
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
+        self._error_callback: Optional[Callable[[Exception], None]] = None
 
     async def read(self) -> None:
         """Read the module's current and target temperatures."""
         self.temperature = await self._driver.get_temperature()
+
+    def set_error_callback(
+        self, error_callback: Callable[[Exception], None]
+    ) -> Callable[[], None]:
+        self._error_callback = error_callback
+        return self._remove_error_callback
+
+    def _remove_error_callback(self) -> None:
+        self._error_callback = None
+
+    def on_error(self, exception: Exception) -> None:
+        if self._error_callback:
+            self._error_callback(exception)

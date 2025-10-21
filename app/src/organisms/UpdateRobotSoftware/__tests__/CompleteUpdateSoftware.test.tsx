@@ -1,18 +1,25 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
 
-jest.mock('../../../redux/robot-admin')
+import type { ComponentProps } from 'react'
 
-const render = (props: React.ComponentProps<typeof CompleteUpdateSoftware>) => {
+vi.mock('/app/redux/robot-admin')
+
+const render = (props: ComponentProps<typeof CompleteUpdateSoftware>) => {
   return renderWithProviders(<CompleteUpdateSoftware {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('CompleteUpdateSoftware', () => {
-  let props: React.ComponentProps<typeof CompleteUpdateSoftware>
+  let props: ComponentProps<typeof CompleteUpdateSoftware>
 
   beforeEach(() => {
     props = {
@@ -21,10 +28,10 @@ describe('CompleteUpdateSoftware', () => {
   })
 
   it('should render text, progress bar and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Update complete!')
-    getByText('Install complete, robot restarting...')
-    const bar = getByTestId('ProgressBar_Bar')
+    render(props)
+    screen.getByText('Update complete!')
+    screen.getByText('Install complete, robot restarting...')
+    const bar = screen.getByTestId('ProgressBar_Bar')
     expect(bar).toHaveStyle('width: 100%')
   })
 })

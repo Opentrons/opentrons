@@ -1,5 +1,7 @@
-import { renderHook } from '@testing-library/react-hooks'
-import { useSwipe } from '..'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import { useSwipe } from '../useSwipe'
 
 describe('useSwipe hook', () => {
   it('useSwipe returns UseSwipeResult object', () => {
@@ -17,7 +19,9 @@ describe('useSwipe hook', () => {
 
   it('When calling disable, isEnabled false', () => {
     const { result } = renderHook(() => useSwipe())
-    result.current.disable()
+    act(() => {
+      result.current.disable()
+    })
     expect(result.current.isEnabled).toBe(false)
   })
 })

@@ -1,15 +1,17 @@
+import { differenceInSeconds, parseISO, subSeconds } from 'date-fns'
 import cloneDeep from 'lodash/cloneDeep'
-import set from 'lodash/set'
 import get from 'lodash/get'
-import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
+import set from 'lodash/set'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
+import {
+  mockFetchSystemTimeFailure,
+  mockFetchSystemTimeSuccess,
+} from '../../__fixtures__'
 import { GET, PUT } from '../../../robot-api'
 import { syncSystemTime } from '../../actions'
-import {
-  mockFetchSystemTimeSuccess,
-  mockFetchSystemTimeFailure,
-} from '../../__fixtures__'
 import { syncSystemTimeEpic } from '../syncSystemTimeEpic'
 
 const createTimeSuccessResponse = (
@@ -33,7 +35,7 @@ const createEpicOutput = (
 
 describe('syncSystemTimeEpic', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it("should fetch the robot's time on sync system time request", () => {
@@ -59,18 +61,20 @@ describe('syncSystemTimeEpic', () => {
     const mocks = setupEpicTestMocks(syncSystemTime)
 
     runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
-      mocks.fetchRobotApi.mockImplementation((robot, request) => {
-        if (request.method === GET && request.path === '/system/time') {
-          const robotDate = subSeconds(new Date(), 61)
-          return cold('r', { r: createTimeSuccessResponse(robotDate) })
-        }
+      ;(mocks as any).fetchRobotApi.mockImplementation(
+        (robot: any, request: any) => {
+          if (request.method === GET && request.path === '/system/time') {
+            const robotDate = subSeconds(new Date(), 61)
+            return cold('r', { r: createTimeSuccessResponse(robotDate) })
+          }
 
-        if (request.method === PUT && request.path === '/system/time') {
-          return cold('r', { r: createTimeSuccessResponse(new Date()) })
-        }
+          if (request.method === PUT && request.path === '/system/time') {
+            return cold('r', { r: createTimeSuccessResponse(new Date()) })
+          }
 
-        return cold('#')
-      })
+          return cold('#')
+        }
+      )
 
       const output$ = createEpicOutput(mocks, hot)
       expectObservable(output$, '---')
@@ -88,7 +92,7 @@ describe('syncSystemTimeEpic', () => {
       })
 
       const updatedTime = get(
-        mocks.fetchRobotApi.mock.calls[1][1],
+        (mocks as any).fetchRobotApi.mock.calls[1][1],
         'body.data.systemTime'
       )
 

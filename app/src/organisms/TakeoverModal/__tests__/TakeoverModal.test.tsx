@@ -1,32 +1,40 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { TakeoverModal } from '../TakeoverModal'
 
-const render = (props: React.ComponentProps<typeof TakeoverModal>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof TakeoverModal>) => {
   return renderWithProviders(<TakeoverModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('TakeoverModal', () => {
-  let props: React.ComponentProps<typeof TakeoverModal>
+  let props: ComponentProps<typeof TakeoverModal>
   beforeEach(() => {
     props = {
       showConfirmTerminateModal: false,
-      setShowConfirmTerminateModal: jest.fn(),
-      confirmTerminate: jest.fn(),
+      setShowConfirmTerminateModal: vi.fn(),
+      confirmTerminate: vi.fn(),
       terminateInProgress: false,
+      title: 'Robot is busy',
     }
   })
 
   it('renders information for Robot is busy modal', () => {
-    const { getByText } = render(props)
-    getByText('Robot is busy')
-    getByText(
+    render(props)
+    screen.getByText('Robot is busy')
+    screen.getByText(
       'A computer with the Opentrons App is currently controlling this robot.'
     )
-    getByText('Terminate remote activity').click()
+    fireEvent.click(screen.getByText('Terminate remote activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
   })
 
@@ -35,16 +43,14 @@ describe('TakeoverModal', () => {
       ...props,
       showConfirmTerminateModal: true,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('Terminate remote activity?')
-    getByText(
+    render(props)
+    screen.getByText('Terminate remote activity?')
+    screen.getByText(
       'This will immediately stop the activity begun on a computer. You, or another user, may lose progress or see an error in the Opentrons App.'
     )
-    getByText('Continue activity')
-    getByText('Terminate activity')
-    getByLabelText('SmallButton_primary').click()
+    fireEvent.click(screen.getByText('Continue activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
-    getByLabelText('SmallButton_alert').click()
+    fireEvent.click(screen.getByText('Terminate activity'))
     expect(props.confirmTerminate).toHaveBeenCalled()
   })
 })

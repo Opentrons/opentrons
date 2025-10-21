@@ -1967,7 +1967,7 @@
   "commands": [
     {
       "commandType": "loadPipette",
-      "id": "0abc1",
+      "key": "0abc1",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
         "mount": "left"
@@ -1978,7 +1978,7 @@
     },
     {
       "commandType": "loadPipette",
-      "id": "0abc2",
+      "key": "0abc2",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "mount": "right"
@@ -1989,7 +1989,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "0abc3",
+      "key": "0abc3",
       "params": {
         "labwareId": "fixedTrash",
         "location": { "slotName": "12" }
@@ -2043,7 +2043,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "0abc4",
+      "key": "0abc4",
       "params": {
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
         "location": { "slotName": "1" }
@@ -3069,7 +3069,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "0abc5",
+      "key": "0abc5",
       "params": {
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "location": { "slotName": "10" }
@@ -3266,7 +3266,7 @@
     },
     {
       "commandType": "loadLabware",
-      "id": "0abc6",
+      "key": "0abc6",
       "params": {
         "labwareId": "e24818a0-0042-11ec-8258-f7ffdf5ad45a",
         "location": { "slotName": "2" }
@@ -4291,7 +4291,7 @@
       }
     },
     {
-      "id": "0",
+      "key": "0",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
@@ -4300,7 +4300,7 @@
       }
     },
     {
-      "id": "1",
+      "key": "1",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
@@ -4311,14 +4311,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 46.43,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 46.43
       }
     },
     {
-      "id": "2",
+      "key": "2",
       "commandType": "dispense",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
@@ -4329,14 +4326,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 46.43,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 46.43
       }
     },
     {
-      "id": "3",
+      "key": "3",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
@@ -4345,7 +4339,7 @@
       }
     },
     {
-      "id": "4",
+      "key": "4",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4354,7 +4348,7 @@
       }
     },
     {
-      "id": "5",
+      "key": "5",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4365,14 +4359,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "6",
+      "key": "6",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4383,14 +4374,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "7",
+      "key": "7",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4399,7 +4387,7 @@
       }
     },
     {
-      "id": "8",
+      "key": "8",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4408,7 +4396,7 @@
       }
     },
     {
-      "id": "9",
+      "key": "9",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4419,14 +4407,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "10",
+      "key": "10",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4437,14 +4422,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "11",
+      "key": "11",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4453,7 +4435,7 @@
       }
     },
     {
-      "id": "12",
+      "key": "12",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4462,7 +4444,7 @@
       }
     },
     {
-      "id": "13",
+      "key": "13",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4473,14 +4455,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "14",
+      "key": "14",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4491,14 +4470,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "15",
+      "key": "15",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4507,7 +4483,7 @@
       }
     },
     {
-      "id": "16",
+      "key": "16",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4516,7 +4492,7 @@
       }
     },
     {
-      "id": "17",
+      "key": "17",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4527,14 +4503,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "18",
+      "key": "18",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4545,14 +4518,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "19",
+      "key": "19",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4561,7 +4531,7 @@
       }
     },
     {
-      "id": "20",
+      "key": "20",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4570,7 +4540,7 @@
       }
     },
     {
-      "id": "21",
+      "key": "21",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4581,14 +4551,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "22",
+      "key": "22",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4599,14 +4566,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "23",
+      "key": "23",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4615,7 +4579,7 @@
       }
     },
     {
-      "id": "24",
+      "key": "24",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4624,7 +4588,7 @@
       }
     },
     {
-      "id": "25",
+      "key": "25",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4635,14 +4599,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "26",
+      "key": "26",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4653,14 +4614,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "27",
+      "key": "27",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4669,7 +4627,7 @@
       }
     },
     {
-      "id": "28",
+      "key": "28",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4678,7 +4636,7 @@
       }
     },
     {
-      "id": "29",
+      "key": "29",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4689,14 +4647,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "30",
+      "key": "30",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4707,14 +4662,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "31",
+      "key": "31",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4723,7 +4675,7 @@
       }
     },
     {
-      "id": "32",
+      "key": "32",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4732,7 +4684,7 @@
       }
     },
     {
-      "id": "33",
+      "key": "33",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4743,14 +4695,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "34",
+      "key": "34",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4761,14 +4710,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "35",
+      "key": "35",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4777,7 +4723,7 @@
       }
     },
     {
-      "id": "36",
+      "key": "36",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4786,7 +4732,7 @@
       }
     },
     {
-      "id": "37",
+      "key": "37",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4797,14 +4743,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "38",
+      "key": "38",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4815,14 +4758,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "39",
+      "key": "39",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4831,7 +4771,7 @@
       }
     },
     {
-      "id": "40",
+      "key": "40",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4840,7 +4780,7 @@
       }
     },
     {
-      "id": "41",
+      "key": "41",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4851,14 +4791,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "42",
+      "key": "42",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4869,14 +4806,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "43",
+      "key": "43",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4885,7 +4819,7 @@
       }
     },
     {
-      "id": "44",
+      "key": "44",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4894,7 +4828,7 @@
       }
     },
     {
-      "id": "45",
+      "key": "45",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4905,14 +4839,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "46",
+      "key": "46",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4923,14 +4854,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "47",
+      "key": "47",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4939,7 +4867,7 @@
       }
     },
     {
-      "id": "48",
+      "key": "48",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4948,7 +4876,7 @@
       }
     },
     {
-      "id": "49",
+      "key": "49",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4959,14 +4887,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
-      "id": "50",
+      "key": "50",
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -4983,14 +4908,14 @@
       }
     },
     {
-      "id": "51",
+      "key": "51",
       "commandType": "delay",
       "params": {
         "seconds": 1
       }
     },
     {
-      "id": "52",
+      "key": "52",
       "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -5001,14 +4926,11 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
-      "id": "53",
+      "key": "53",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",

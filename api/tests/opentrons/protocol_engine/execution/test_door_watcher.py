@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )
@@ -68,7 +68,7 @@ async def test_event_forwarding(
 ) -> None:
     """It should forward events that come from a different thread."""
     handler_captor = matchers.Captor()
-    unsubscribe_callback = decoy.mock()
+    unsubscribe_callback = decoy.mock(name="unsubscribe_callback")
     decoy.when(hardware_control_api.register_callback(handler_captor)).then_return(
         unsubscribe_callback
     )
@@ -97,6 +97,35 @@ async def test_event_forwarding(
         times=0,
     )
 
+    decoy.reset()
+
+    decoy.when(state_store.commands.get_is_running()).then_return(True)
+
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.OPEN, module_serial="magical_module"
+    )
+    expected_action_to_forward_module = DoorChangeAction(
+        DoorState.OPEN, module_serial="magical_module"
+    )
+
+    await to_thread.run_sync(captured_handler, input_event_module)
+
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        action_dispatcher.dispatch(expected_action_to_forward_module),
+        times=1,
+    )
+
+    decoy.reset()
+    input_event_module = DoorStateNotification(
+        new_state=DoorState.CLOSED, module_serial="magical_module"
+    )
+    await to_thread.run_sync(captured_handler, input_event_module)
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        times=0,
+    )
+
 
 async def test_one_subscribe_one_unsubscribe(
     decoy: Decoy,
@@ -104,8 +133,8 @@ async def test_one_subscribe_one_unsubscribe(
     subject: DoorWatcher,
 ) -> None:
     """Multiple start()s and stop()s should be collapsed."""
-    unsubscribe = decoy.mock()
-    wrong_unsubscribe = decoy.mock()
+    unsubscribe = decoy.mock(name="unsubscribe_callback")
+    wrong_unsubscribe = decoy.mock(name="wrong_unsubscribe")
 
     decoy.when(hardware_control_api.register_callback(matchers.Anything())).then_return(
         unsubscribe, wrong_unsubscribe

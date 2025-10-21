@@ -1,284 +1,400 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  ALIGN_CENTER,
-  BORDERS,
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
+  FixtureOption,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
+  ListTable,
+  Modal,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  getCutoutDisplayName,
+  getAADisplayName,
   getFixtureDisplayName,
-  STAGING_AREA_CUTOUTS,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  TRASH_BIN_ADAPTER_FIXTURE,
+  getWasteChuteOptions,
+  replaceCutoutFixtureWithComboFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+  SINGLE_CENTER_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { useModuleUSBPort } from '/app/local-resources/modules'
+import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
+import { OddModal } from '/app/molecules/OddModal'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
+import {
+  getFixtureOptions,
+  getModuleOptions,
+  getOptions,
+} from '../DeviceDetailsDeckConfiguration/utils'
+import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
+
+import type { TFunction } from 'i18next'
+import type { AttachedModule } from '@opentrons/api-client'
+import type { ModalProps } from '@opentrons/components'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutConfig,
-  CutoutId,
+  CutoutConfigMap,
   CutoutFixtureId,
-  DeckConfiguration,
+  CutoutId,
+  DeckDefinition,
 } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
-const GENERIC_WASTE_CHUTE_OPTION = 'WASTE_CHUTE'
+const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
+const MODULE_IDENTIFY_TIME_MS = 10000
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
-  setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
-  providedFixtureOptions?: CutoutFixtureId[]
+  addressableAreaId: AddressableAreaNamesWithFakes
+  closeModal: () => void
+  deckDef: DeckDefinition
   isOnDevice?: boolean
+  existingCutoutFixtureId?: CutoutFixtureId
 }
+type OptionStage =
+  | 'modulesOrFixtures'
+  | 'fixtureOptions'
+  | 'moduleOptions'
+  | 'wasteChuteOptions'
+  | 'providedOptions'
 
 export function AddFixtureModal({
   cutoutId,
-  setShowAddFixtureModal,
-  setCurrentDeckConfig,
-  providedFixtureOptions,
+  addressableAreaId,
+  closeModal,
   isOnDevice = false,
+  deckDef,
+  existingCutoutFixtureId,
 }: AddFixtureModalProps): JSX.Element {
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation([
+    'device_details',
+    'shared',
+    'deck_configuration',
+  ])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
-  const [showWasteChuteOptions, setShowWasteChuteOptions] = React.useState(
-    false
-  )
+  const { data: modulesData } = useModulesQuery()
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(cutoutId),
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
+  const unconfiguredMods =
+    modulesData?.data.filter(
+      attachedMod =>
+        !deckConfig.some(
+          ({ opentronsModuleSerialNumber }) =>
+            attachedMod.serialNumber === opentronsModuleSerialNumber
+        )
+    ) ?? []
+  const initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
+    ? 'moduleOptions'
+    : 'modulesOrFixtures'
+  const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
+
+  // Bind allFixtureOptions with useEffect
+  const [allFixtureOptions, setAllFixtureOptions] = useState<
+    CutoutConfigMap[][]
+  >([])
+  const [allModuleOptions, setAllModuleOptions] = useState<CutoutConfigMap[][]>(
+    []
+  )
+  useEffect(() => {
+    const options = [
+      ...getFixtureOptions(
+        cutoutId,
+        addressableAreaId,
+        existingCutoutFixtureId
+      ),
+      ...getWasteChuteOptions(cutoutId),
+    ]
+    setAllFixtureOptions(options)
+    const moduleOptions = [
+      ...getModuleOptions(
+        cutoutId,
+        unconfiguredMods,
+        addressableAreaId,
+        deckDef
+      ),
+    ]
+    setAllModuleOptions(moduleOptions)
+  }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
+
+  const modalHeader: OddModalHeaderBaseProps = {
+    title: t('add_to', {
+      slotName: getAADisplayName(addressableAreaId),
     }),
     hasExitIcon: true,
-    onClick: () => setShowAddFixtureModal(false),
+    onClick: closeModal,
   }
 
-  const modalProps: LegacyModalProps = {
-    title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(cutoutId),
+  const modalProps: ModalProps = {
+    title: t('add_to', {
+      slotName: getAADisplayName(addressableAreaId),
     }),
-    onClose: () => setShowAddFixtureModal(false),
+    onClose: closeModal,
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
   }
 
-  const availableFixtures: CutoutFixtureId[] = [TRASH_BIN_ADAPTER_FIXTURE]
-  if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-    availableFixtures.push(STAGING_AREA_RIGHT_SLOT_FIXTURE)
-  }
+  const availableOptions = getOptions(
+    cutoutId,
+    unconfiguredMods,
+    optionStage,
+    addressableAreaId,
+    deckDef,
+    existingCutoutFixtureId
+  )
 
-  const handleAddODD = (requiredFixtureId: CutoutFixtureId): void => {
-    if (setCurrentDeckConfig != null)
-      setCurrentDeckConfig(
-        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: CutoutConfig) =>
-            fixture.cutoutId === cutoutId
-              ? { ...fixture, cutoutFixtureId: requiredFixtureId }
-              : fixture
-          )
-      )
-
-    setShowAddFixtureModal(false)
-  }
-
-  const fixtureOptions = providedFixtureOptions ?? availableFixtures
-  const fixtureOptionsWithDisplayNames: Array<
-    [CutoutFixtureId | 'WASTE_CHUTE', string]
-  > = fixtureOptions.map(fixture => [fixture, getFixtureDisplayName(fixture)])
-
-  const showSelectWasteChuteOptions = cutoutId === WASTE_CHUTE_CUTOUT
-  if (showSelectWasteChuteOptions) {
-    fixtureOptionsWithDisplayNames.push([
-      GENERIC_WASTE_CHUTE_OPTION,
-      t('waste_chute'),
-    ])
-  }
-
-  fixtureOptionsWithDisplayNames.sort((a, b) => a[1].localeCompare(b[1]))
-
-  const wasteChuteOptionsWithDisplayNames = WASTE_CHUTE_FIXTURES.map(
-    fixture => [fixture, getFixtureDisplayName(fixture)]
-  ).sort((a, b) => a[1].localeCompare(b[1])) as Array<[CutoutFixtureId, string]>
-
-  const displayedFixtureOptions = showWasteChuteOptions
-    ? wasteChuteOptionsWithDisplayNames
-    : fixtureOptionsWithDisplayNames
-
-  const handleAddDesktop = (requiredFixtureId: CutoutFixtureId): void => {
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
-        : fixture
+  let nextStageOptions = null
+  if (optionStage === 'modulesOrFixtures') {
+    nextStageOptions = isOnDevice ? (
+      <>
+        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ? null : (
+          <ODDFixtureOption
+            key="fixturesOption"
+            optionName="Fixtures"
+            buttonText={t('select_options')}
+            onClickHandler={() => {
+              setOptionStage('fixtureOptions')
+            }}
+          />
+        )}
+        <ODDFixtureOption
+          key="modulesOption"
+          optionName="Modules"
+          buttonText={t('select_options')}
+          onClickHandler={() => {
+            setOptionStage('moduleOptions')
+          }}
+        />
+      </>
+    ) : (
+      <>
+        {SINGLE_CENTER_CUTOUTS.includes(cutoutId) ||
+        allFixtureOptions.length === 0 ? null : (
+          <FixtureOption
+            key="fixturesOption"
+            optionName="Fixtures"
+            buttonText={t('select_options')}
+            onClickHandler={() => {
+              setOptionStage('fixtureOptions')
+            }}
+          />
+        )}
+        {allModuleOptions.length > 0 && (
+          <FixtureOption
+            key="modulesOption"
+            optionName="Modules"
+            buttonText={t('select_options')}
+            onClickHandler={() => {
+              setOptionStage('moduleOptions')
+            }}
+          />
+        )}
+      </>
     )
-
-    updateDeckConfiguration(newDeckConfig)
-    setShowAddFixtureModal(false)
+  } else if (
+    optionStage === 'fixtureOptions' &&
+    cutoutId === WASTE_CHUTE_CUTOUT &&
+    addressableAreaId === 'D3'
+  ) {
+    nextStageOptions = (
+      <>
+        <FixtureOption
+          key="wasteChuteStageOption"
+          optionName="Waste chute"
+          buttonText={t('select_options')}
+          onClickHandler={() => {
+            setOptionStage('wasteChuteOptions')
+          }}
+        />
+      </>
+    )
   }
+
+  const sendIdentifyStacker = useSendIdentifyStacker()
+  const { parseModuleUSBPort } = useModuleUSBPort()
+  const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
+  const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
+
+  const handleAddFixture = (
+    addedCutoutConfigs: CutoutConfigMap[],
+    fixtureSerialNumber?: string
+  ): void => {
+    const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
+      addedCutoutConfigs,
+      deckConfigWithAA,
+      cutoutId
+    )
+    const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
+      return (
+        addedCutoutConfigsWithCombo.find(
+          c => c.cutoutId === fixture.cutoutId
+        ) ?? fixture
+      )
+    }) as CutoutConfig[] // we can do this bc we are mapping each aa to the proper fixture
+
+    if (fixtureSerialNumber) {
+      const module =
+        unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
+        null
+      if (module !== null) {
+        sendIdentifyStacker(module, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+      }
+    }
+    updateDeckConfiguration(newDeckConfig)
+    closeModal()
+  }
+
+  const stackerIdentifyHandler = (module: AttachedModule): void => {
+    // Identify the stacker module
+    sendIdentifyStacker(module, true, 'blue')
+    // Ensure that the module reverts after a set time
+    setIdentifyInUse(module.serialNumber)
+    const timeoutID = setTimeout(() => {
+      sendIdentifyStacker(module, false)
+      setIdentifyInUse(null)
+    }, MODULE_IDENTIFY_TIME_MS)
+    setTimeoutID(timeoutID)
+  }
+
+  const handleIdentifyFixture = (fixtureSerialNumber: string): void => {
+    const module =
+      unconfiguredMods.find(m => m.serialNumber === fixtureSerialNumber) ?? null
+    if (identifyInUse === null && module !== null) {
+      stackerIdentifyHandler(module)
+    } else if (
+      identifyInUse !== fixtureSerialNumber &&
+      identifyInUse !== null
+    ) {
+      const previousModule =
+        unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
+      if (previousModule !== null && module !== null) {
+        sendIdentifyStacker(previousModule, false)
+        if (identifyTimeout !== null) {
+          clearTimeout(identifyTimeout)
+        }
+        stackerIdentifyHandler(module)
+      }
+    }
+  }
+
+  const fixtureOptions = availableOptions.map(cutoutConfigs => {
+    const matchedModule =
+      (modulesData?.data ?? []).find(
+        m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
+      ) ?? null
+    const portDisplay = parseModuleUSBPort(matchedModule)
+    const fixtureSerialNumber = cutoutConfigs[0].opentronsModuleSerialNumber
+    if (
+      fixtureSerialNumber !== undefined &&
+      cutoutConfigs[0].cutoutFixtureId.includes(FLEX_STACKER_FIXTURE)
+    ) {
+      return isOnDevice ? (
+        <ODDFixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            t as TFunction,
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs, fixtureSerialNumber)
+          }}
+          secondaryButtonText={t('identify')}
+          secondaryOnClickHandler={() => {
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
+        />
+      ) : (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            t as TFunction,
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs, fixtureSerialNumber)
+          }}
+          secondaryButtonText={t('identify')}
+          secondaryOnClickHandler={() => {
+            handleIdentifyFixture(fixtureSerialNumber)
+          }}
+        />
+      )
+    } else {
+      return isOnDevice ? (
+        <ODDFixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            t as TFunction,
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs)
+          }}
+        />
+      ) : (
+        <FixtureOption
+          key={cutoutConfigs[0].cutoutFixtureId}
+          optionName={getFixtureDisplayName(
+            t as TFunction,
+            cutoutConfigs[0].cutoutFixtureId,
+            portDisplay
+          )}
+          buttonText={t('add')}
+          onClickHandler={() => {
+            handleAddFixture(cutoutConfigs)
+          }}
+        />
+      )
+    }
+  })
 
   return (
     <>
       {isOnDevice ? (
-        <Modal
-          header={modalHeader}
-          onOutsideClick={() => setShowAddFixtureModal(false)}
-        >
+        <OddModal header={modalHeader} onOutsideClick={closeModal}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <StyledText as="p">{t('add_to_slot_description')}</StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {displayedFixtureOptions.map(
-                ([cutoutFixtureOption, fixtureDisplayName]) => {
-                  const onClickHandler =
-                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                      ? () => setShowWasteChuteOptions(true)
-                      : () => handleAddODD(cutoutFixtureOption)
-                  const buttonText =
-                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                      ? t('select_options')
-                      : t('add')
-
-                  return (
-                    <React.Fragment key={cutoutFixtureOption}>
-                      <Btn
-                        onClick={onClickHandler}
-                        display="flex"
-                        justifyContent={JUSTIFY_SPACE_BETWEEN}
-                        flexDirection={DIRECTION_ROW}
-                        alignItems={ALIGN_CENTER}
-                        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                        css={FIXTURE_BUTTON_STYLE}
-                      >
-                        <StyledText
-                          as="p"
-                          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                        >
-                          {fixtureDisplayName}
-                        </StyledText>
-                        <StyledText as="p">{buttonText}</StyledText>
-                      </Btn>
-                    </React.Fragment>
-                  )
-                }
-              )}
-            </Flex>
+            <StyledText oddStyle="bodyTextRegular">
+              {t('add_fixture_description')}
+            </StyledText>
+            <ListTable>
+              {fixtureOptions}
+              {nextStageOptions}
+            </ListTable>
+          </Flex>
+        </OddModal>
+      ) : (
+        <Modal {...modalProps}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('add_fixture_description')}
+            </StyledText>
+            <ListTable>
+              {fixtureOptions}
+              {nextStageOptions}
+            </ListTable>
           </Flex>
         </Modal>
-      ) : (
-        <LegacyModal {...modalProps}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <StyledText as="p">{t('add_fixture_description')}</StyledText>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {displayedFixtureOptions.map(
-                ([cutoutFixtureOption, fixtureDisplayName]) => {
-                  const onClickHandler =
-                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                      ? () => setShowWasteChuteOptions(true)
-                      : () => handleAddDesktop(cutoutFixtureOption)
-                  const buttonText =
-                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                      ? t('select_options')
-                      : t('add')
-
-                  return (
-                    <React.Fragment key={cutoutFixtureOption}>
-                      <Flex
-                        flexDirection={DIRECTION_ROW}
-                        alignItems={ALIGN_CENTER}
-                        justifyContent={JUSTIFY_SPACE_BETWEEN}
-                        padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={COLORS.medGreyEnabled}
-                        borderRadius={BORDERS.borderRadiusSize1}
-                      >
-                        <StyledText css={TYPOGRAPHY.pSemiBold}>
-                          {fixtureDisplayName}
-                        </StyledText>
-                        <TertiaryButton onClick={onClickHandler}>
-                          {buttonText}
-                        </TertiaryButton>
-                      </Flex>
-                    </React.Fragment>
-                  )
-                }
-              )}
-            </Flex>
-          </Flex>
-          {showWasteChuteOptions ? (
-            <Btn
-              onClick={() => setShowWasteChuteOptions(false)}
-              aria-label="back"
-              paddingX={SPACING.spacing16}
-              marginTop={'1.44rem'}
-              marginBottom={'0.56rem'}
-            >
-              <StyledText css={GO_BACK_BUTTON_STYLE}>
-                {t('shared:go_back')}
-              </StyledText>
-            </Btn>
-          ) : null}
-        </LegacyModal>
       )}
     </>
   )
 }
-
-const FIXTURE_BUTTON_STYLE = css`
-  background-color: ${COLORS.light1};
-  cursor: default;
-  border-radius: ${BORDERS.borderRadiusSize3};
-  box-shadow: none;
-
-  &:focus {
-    background-color: ${COLORS.light1Pressed};
-    box-shadow: none;
-  }
-
-  &:hover {
-    border: none;
-    box-shadow: none;
-    background-color: ${COLORS.light1};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.light1};
-  }
-
-  &:active {
-    background-color: ${COLORS.light1Pressed};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlack60};
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
-
-  &:hover {
-    opacity: 70%;
-  }
-`

@@ -75,9 +75,7 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     """
 
     def build_400(msg: str) -> web.Response:
-        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-            data={"message": msg}, status=400
-        )
+        return web.json_response(data={"message": msg}, status=400)
 
     try:
         body = await request.json()
@@ -97,9 +95,7 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
     name_synchronizer = get_name_synchronizer(request)
     new_name = await name_synchronizer.set_name(new_name=name_to_set)
 
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"name": new_name}, status=200
-    )
+    return web.json_response(data={"name": new_name}, status=200)
 
 
 async def get_name_endpoint(request: web.Request) -> web.Response:
@@ -111,7 +107,7 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
     GET /server/name -> 200 OK, {'name': robot name}
     """
     name_synchronizer = get_name_synchronizer(request)
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         data={"name": await name_synchronizer.get_name()}, status=200
     )
 

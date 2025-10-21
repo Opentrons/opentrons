@@ -20,23 +20,27 @@ router = APIRouter()
     summary="Get the pipettes currently attached",
     description="This endpoint lists properties of the pipettes "
     "currently attached to the robot like name, model, "
-    "and mount. It queries a cached value unless the "
-    "refresh query parameter is set to true, in which "
-    "case it will actively scan for pipettes. This "
-    "requires disabling the pipette motors (which is done "
-    "automatically) and therefore should only be done "
-    "through user intent.",
+    "and mount."
+    "\n\n"
+    "If you're controlling a Flex, and not an OT-2, you might prefer the"
+    " `GET /instruments` endpoint instead.",
     response_model=pipettes.PipettesByMount,
 )
 async def get_pipettes(
-    refresh: typing.Optional[bool] = Query(
-        False,
-        description="If true, actively scan for attached pipettes. Note:"
-        " this requires  disabling the pipette motors and"
-        " should only be done when no  protocol is running "
-        "and you know  it won't cause a problem",
-    ),
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: typing.Annotated[HardwareControlAPI, Depends(get_hardware)],
+    refresh: typing.Annotated[
+        typing.Optional[bool],
+        Query(
+            description="If `false`, query a cached value. If `true`, actively scan for"
+            " attached pipettes."
+            "\n\n"
+            "**Warning:** Actively scanning disables the pipette motors and should only be done"
+            " when no protocol is running and you know it won't cause a problem."
+            "\n\n"
+            "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
+            " unnecessary, and the behavior is currently undefined.",
+        ),
+    ] = False,
 ) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
@@ -55,7 +59,9 @@ async def get_pipettes(
 
     attached = hardware.attached_instruments
 
-    def make_pipette(mount: Mount, pipette_dict: PipetteDict, is_ot2: bool):
+    def make_pipette(
+        mount: Mount, pipette_dict: PipetteDict, is_ot2: bool
+    ) -> pipettes.AttachedPipette:
         if is_ot2:
             mount_axis = ot2_axis_to_string(Axis.by_mount(mount))
             plunger_axis = ot2_axis_to_string(Axis.of_plunger(mount))

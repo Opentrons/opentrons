@@ -1,0 +1,7 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+
+src/opentrons/_version.py
+tests/**/*.temp

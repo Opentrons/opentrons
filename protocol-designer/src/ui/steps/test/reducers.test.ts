@@ -1,145 +1,19 @@
+import { describe, expect, it, vi } from 'vitest'
+
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import {
   _allReducers,
-  SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
+  SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  SelectableItem,
 } from '../reducers'
-import { SelectMultipleStepsAction } from '../actions/types'
 
-jest.mock('../../../labware-defs/utils')
+import type { SelectMultipleStepsAction } from '../actions/types'
+import type { SelectableItem } from '../reducers'
 
-const { collapsedSteps, selectedItem } = _allReducers
+vi.mock('../../../labware-defs/utils')
 
-describe('collapsedSteps reducer', () => {
-  it('should add a collapsed step when a new step is saved for the first time', () => {
-    const state = { '1': true, '2': false }
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: { id: '3' },
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '2': false,
-      '3': false,
-    })
-  })
-  it('should not update when an existing step form is saved', () => {
-    const state = { '1': true, '2': false }
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: { id: '1' },
-    }
-    expect(collapsedSteps(state, action)).toBe(state)
-  })
-  it('should remove the collapsed step when deleted', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': true,
-    }
-    const action = {
-      type: 'DELETE_STEP',
-      payload: '3',
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '2': false,
-      '4': true,
-    })
-  })
-  it('should remove multiple collapsed steps when multiple steps get deleted', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': true,
-    }
-    const action = {
-      type: 'DELETE_MULTIPLE_STEPS',
-      payload: ['2', '3'],
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '4': true,
-    })
-  })
-  it('should toggle step on->off upon TOGGLE_STEP_COLLAPSED', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': true,
-    }
-    const action = {
-      type: 'TOGGLE_STEP_COLLAPSED',
-      payload: '3',
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '2': false,
-      '3': false,
-      '4': true,
-    })
-  })
-
-  it('should toggle step off-> on upon TOGGLE_STEP_COLLAPSED', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': true,
-    }
-    const action = {
-      type: 'TOGGLE_STEP_COLLAPSED',
-      payload: '2',
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '2': true,
-      '3': true,
-      '4': true,
-    })
-  })
-  it('should expand multiple steps upon EXPAND_MULTIPLE_STEPS', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': false,
-    }
-    const action = {
-      type: 'EXPAND_MULTIPLE_STEPS',
-      payload: ['1', '2', '3', '4'],
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': false,
-      '2': false,
-      '3': false,
-      '4': false,
-    })
-  })
-  it('should collapse multiple steps upon COLLAPSE_MULTIPLE_STEPS', () => {
-    const state = {
-      '1': true,
-      '2': false,
-      '3': true,
-      '4': false,
-    }
-    const action = {
-      type: 'COLLAPSE_MULTIPLE_STEPS',
-      payload: ['1', '2', '3', '4'],
-    }
-    expect(collapsedSteps(state, action)).toEqual({
-      '1': true,
-      '2': true,
-      '3': true,
-      '4': true,
-    })
-  })
-})
+const { selectedItem } = _allReducers
 
 describe('selectedItem reducer', () => {
   it('should select the presaved step item on ADD_STEP', () => {

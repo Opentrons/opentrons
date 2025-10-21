@@ -1,7 +1,8 @@
-import type { State } from '../../types'
 import { SESSION_TYPE_TIP_LENGTH_CALIBRATION } from '../constants'
-import type { Session, TipLengthCalibrationSession } from '../types'
 import { getRobotSessionOfType } from '../selectors'
+
+import type { State } from '../../types'
+import type { Session, TipLengthCalibrationSession } from '../types'
 
 export const getTipLengthCalibrationSession: (
   state: State,

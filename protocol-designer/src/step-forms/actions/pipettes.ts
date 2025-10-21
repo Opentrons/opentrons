@@ -1,5 +1,6 @@
-import { NormalizedPipetteById } from '@opentrons/step-generation'
-import { StepIdType } from '../../form-types'
+import type { NormalizedPipetteById } from '@opentrons/step-generation'
+import type { StepIdType } from '../../form-types'
+
 export interface CreatePipettesAction {
   type: 'CREATE_PIPETTES'
   payload: NormalizedPipetteById
@@ -30,6 +31,8 @@ export interface SubstituteStepFormPipettesAction {
     endStepId: StepIdType
     // old pipette id -> new id
     substitutionMap: Record<string, string>
+    //  1st assosciated tiprack with the pipetteId
+    newTiprackURI: string
   }
 }
 export const substituteStepFormPipettes = (

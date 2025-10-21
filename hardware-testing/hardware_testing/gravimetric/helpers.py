@@ -1,8 +1,9 @@
 """Opentrons helper methods."""
+
 import asyncio
 from random import random, randint
 from types import MethodType
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple, Union
 from statistics import stdev
 from . import config
 from .liquid_class.defaults import get_liquid_class
@@ -15,20 +16,37 @@ from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocol_api._types import OffDeckType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
-from opentrons.types import Point, Location
-
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons import execute, simulate
+from opentrons.types import Point, Location, Mount
+from opentrons.config.types import OT3Config, RobotConfig
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
-from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
+from .workarounds import (
+    get_sync_hw_api,
+    get_latest_offset_for_labware,
+)
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+from opentrons.protocol_engine.types import LabwareOffset
+
+import opentrons.protocol_engine.execution.pipetting as PE_pipetting
+from opentrons.protocol_engine.notes import CommandNoteAdder
+
+from opentrons.protocol_engine import StateView
+from opentrons.protocol_api.core.engine import pipette_movement_conflict
 
 
 def _add_fake_simulate(
@@ -68,7 +86,17 @@ def get_api_context(
     """Get api context."""
 
     async def _thread_manager_build_hw_api(
-        *args: Any, loop: asyncio.AbstractEventLoop, **kwargs: Any
+        attached_instruments: Optional[
+            Dict[Union[Mount, OT3Mount], Dict[str, Optional[str]]]
+        ] = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Union[OT3Config, RobotConfig, None] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
+        update_firmware: bool = True,
+        status_bar_enabled: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3API:
         return await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=is_simulating,
@@ -79,13 +107,26 @@ def get_api_context(
             stall_detection_enable=stall_detection_enable,
         )
 
-    return protocol_api.create_protocol_context(
-        api_version=APIVersion.from_string(api_level),
-        hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
-        deck_type="ot3_standard",
-        extra_labware=extra_labware,
-        deck_version=2,
-    )
+    papi: protocol_api.ProtocolContext
+    if is_simulating:
+        papi = simulate.get_protocol_api(
+            version=APIVersion.from_string(api_level),
+            extra_labware=extra_labware,
+            hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
+            robot_type="Flex",
+            # use_virtual_hardware=False makes this simulation work unlike
+            # opentrons_simulate, app-side analysis, and server-side analysis.
+            # We need to do this because some of our hardware testing scripts still
+            # interact directly with the OT3API and there is no way to tell Protocol
+            # Engine's hardware virtualization about those updates.
+            use_virtual_hardware=False,
+        )
+    else:
+        papi = execute.get_protocol_api(
+            version=APIVersion.from_string(api_level), extra_labware=extra_labware
+        )
+
+    return papi
 
 
 def well_is_reservoir(well: protocol_api.labware.Well) -> bool:
@@ -137,7 +178,7 @@ def _jog_to_find_liquid_height(
     ctx: ProtocolContext, pipette: InstrumentContext, well: Well
 ) -> float:
     _well_depth = well.depth
-    _liquid_height = _well_depth
+    _liquid_height = _well_depth + 2
     _jog_size = -1.0
     if ctx.is_simulating():
         return _liquid_height - 1
@@ -169,11 +210,11 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
     liq_height = probed_z - well.bottom().point.z
-    if abs(liq_height - lps.max_z_distance) < 0.01:
+    if abs(liq_height - well.depth) < 0.01:
         raise RuntimeError("unable to probe liquid, reach max travel distance")
     return liq_height
 
@@ -201,6 +242,50 @@ def _check_if_software_supports_high_volumes() -> bool:
     modified_a = "# assert new_volume <= self.working_volume" in src_a
     modified_b = "return True" in src_b
     return modified_a and modified_b
+
+
+def _override_set_current_volume(self, new_volume: float) -> None:  # noqa: ANN001
+    assert new_volume >= 0
+    # assert new_volume <= self.working_volume
+    self._current_volume = new_volume
+
+
+def _override_add_current_volume(self, volume_incr: float) -> None:  # noqa: ANN001
+    self._current_volume += volume_incr
+
+
+def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN001
+    return True
+
+
+def _override_validate_asp_vol(
+    state_view: StateView,
+    pipette_id: str,
+    aspirate_volume: float,
+    command_note_adder: CommandNoteAdder,
+) -> float:
+    return aspirate_volume
+
+
+def _override_check_safe_for_pipette_movement(
+    engine_state: StateView,
+    pipette_id: str,
+    labware_id: str,
+    well_name: str,
+    well_location: object,
+) -> None:
+    pass
+
+
+def _override_software_supports_high_volumes() -> None:
+    # yea so ok this is pretty ugly but this is super helpful for us
+    # with this we don't need to apply patches, and can run the testing scripts
+    # without pushing modified code to the robot
+
+    Pipette.set_current_volume = _override_set_current_volume  # type: ignore[assignment]
+    Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
+    Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
+    PE_pipetting._validate_aspirate_volume = _override_validate_asp_vol  # type: ignore[assignment]
 
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
@@ -252,23 +337,6 @@ def _get_tip_batch(is_simulating: bool, tip: int) -> str:
         return "simulation-tip-batch"
 
 
-def _apply(labware: Labware, cfg: config.VolumetricConfig) -> None:
-    o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-    ui.print_info(
-        f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
-        f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
-    )
-    labware.set_calibration(o)
-
-
-def _apply_labware_offsets(
-    cfg: config.VolumetricConfig,
-    labwares: List[Labware],
-) -> None:
-    for lw in labwares:
-        _apply(lw, cfg)
-
-
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -280,8 +348,6 @@ def _pick_up_tip(
         f"from slot #{location.labware.parent.parent}"
     )
     pipette.pick_up_tip(location)
-    if pipette.channels == 96:
-        get_sync_hw_api(ctx).retract(OT3Mount.LEFT)
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
     if cfg.increment:
@@ -293,16 +359,15 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-    pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0
+    pipette: InstrumentContext,
+    return_tip: bool,
+    offset: Optional[Point] = None,
 ) -> None:
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
         pipette.drop_tip(home_after=False)
-    if minimum_z_height > 0:
-        cur_location = pipette._get_last_location_by_api_version()
-        if cur_location is not None:
-            pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
+    pipette._retract()
 
 
 def _get_volumes(
@@ -337,11 +402,8 @@ def _get_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )
     if not _check_if_software_supports_high_volumes():
-        if ctx.is_simulating():
-            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, pipette_volume, channels, tip_volume
-            )
-        else:
+        _override_software_supports_high_volumes()
+        if not _check_if_software_supports_high_volumes():
             raise RuntimeError("you are not the correct branch")
     return test_volumes
 
@@ -352,7 +414,6 @@ def _load_pipette(
     pipette_volume: int,
     pipette_mount: str,
     increment: bool,
-    photometric: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
@@ -364,6 +425,7 @@ def _load_pipette(
         return loaded_pipettes[pipette_mount]
 
     pipette = ctx.load_instrument(pip_name, pipette_mount)
+    loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
         f"expected {pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
@@ -373,13 +435,23 @@ def _load_pipette(
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not increment and not photometric:
-        hwapi = get_sync_hw_api(ctx)
-        mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
-        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette._config.pick_up_tip_configurations.press_fit.current_by_tip_count[
-            8
-        ] = 0.2
+    if pipette.channels == 8 and not increment:
+        pipette._core.configure_nozzle_layout(
+            style=NozzleLayout.SINGLE,
+            primary_nozzle="A1",
+            front_right_nozzle="A1",
+            back_left_nozzle="A1",
+        )
+        # override pipette movement conflict checking 'cause we specially lay out our tipracks
+        pipette_movement_conflict.check_safe_for_pipette_movement = (
+            _override_check_safe_for_pipette_movement
+        )
+    try:
+        trash = pipette.trash_container
+    except NoTrashDefinedError:
+        trash = ctx.load_trash_bin("A3")
+        pipette.trash_container = trash
+        pass
     return pipette
 
 
@@ -397,28 +469,34 @@ def _get_tag_from_pipette(
     return pipette_tag
 
 
+def _get_offsets_from_ctx(ctx: ProtocolContext) -> List[LabwareOffset]:
+    state = ctx._core._engine_client._transport._engine.state_view  # type: ignore[attr-defined]
+    ctx_offsets = state._labware_store._state.labware_offsets_by_id
+    return [_o for _o in ctx_offsets.values()]
+
+
 def _load_tipracks(
     ctx: ProtocolContext,
     cfg: config.VolumetricConfig,
     use_adapters: bool = False,
 ) -> List[Labware]:
-    adp_str = "_adp" if use_adapters else ""
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
-            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul{adp_str}",
+            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul",
         )
         for slot in cfg.slots_tiprack
     ]
+    print(f"LOAD TIPRack{use_adapters}")
     for ls in tiprack_load_settings:
         ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
-    if use_adapters:
-        tiprack_namespace = "custom_beta"
-    else:
-        tiprack_namespace = "opentrons"
 
+    adapter: Optional[str] = (
+        "opentrons_flex_96_tiprack_adapter" if use_adapters else None
+    )
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
+    print(f"Loaded labwares {loaded_labwares}")
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
         if ls[0] in loaded_labwares.keys():
@@ -430,15 +508,30 @@ def _load_tipracks(
                 ui.print_info(
                     f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
                 )
-                del ctx._core.get_deck()[ls[0]]  # type: ignore[attr-defined]
+                ctx._core.move_labware(
+                    loaded_labwares[ls[0]]._core,
+                    new_location=OffDeckType.OFF_DECK,
+                    use_gripper=False,
+                    pause_for_manual_move=False,
+                    pick_up_offset=None,
+                    drop_offset=None,
+                )
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
-    tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
-        for ls in tiprack_load_settings
-    ]
-    _apply_labware_offsets(cfg, tipracks)
+    tipracks: List[Labware] = []
+    for ls in tiprack_load_settings:
+        if ctx.deck[ls[0]] is not None:
+            tipracks.append(
+                ctx.deck[ls[0]].load_labware(ls[1])  # type: ignore[union-attr]
+            )
+        else:
+            tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
+
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        for tiprack in tipracks:
+            offset = get_latest_offset_for_labware(_get_offsets_from_ctx(ctx), tiprack)
+            tiprack.set_offset(offset.x, offset.y, offset.z)
     return tipracks
 
 
@@ -448,22 +541,16 @@ def get_test_volumes(
     """Get test volumes."""
     volumes: List[float] = []
     print(f"Finding volumes for p {pipette} {volume} with tip {tip}, extra: {extra}")
-    if kind is config.ConfigType.photometric:
-        for t, vls in config.QC_VOLUMES_P[pipette][volume]:
-            if t == tip:
-                volumes = vls
-                break
+    if extra:
+        cfg = config.QC_VOLUMES_EXTRA_G
     else:
-        if extra:
-            cfg = config.QC_VOLUMES_EXTRA_G
-        else:
-            cfg = config.QC_VOLUMES_G
+        cfg = config.QC_VOLUMES_G
 
-        for t, vls in cfg[pipette][volume]:
-            print(f"tip {t} volumes {vls}")
-            if t == tip:
-                volumes = vls
-                break
+    for t, vls in cfg[pipette][volume]:
+        print(f"tip {t} volumes {vls}")
+        if t == tip:
+            volumes = vls
+            break
     print(f"final volumes: {volumes}")
     return volumes
 

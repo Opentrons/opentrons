@@ -1,8 +1,10 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
 
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
+import { sessionsEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { sessionsEpic } from '..'
 
 import type { Action } from '../../../types'
 
@@ -10,10 +12,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.createSession(robotName, 'calibrationCheck')
 
 describe('createSessionEpic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   const expectedRequest = {
     method: 'POST',
     path: '/sessions',

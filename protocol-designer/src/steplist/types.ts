@@ -1,21 +1,25 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import {
+import type { ModuleType } from '@opentrons/shared-data'
+import type {
   CommandCreatorArgs,
+  CommentArgs,
   MoveLabwareArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
-import { ModuleType } from '@opentrons/shared-data'
-import { StepIdType } from '../form-types'
-import { FormError } from './formLevel/errors'
+import type { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type { StepIdType } from '../form-types'
+import type { FormError } from './formLevel/errors'
+
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
 export const PRESAVED_STEP_ID: '__presaved_step__' = '__presaved_step__'
+export const HARDWARE_ID: '__hardware__' = '__hardware__'
 export type TerminalItemId =
   | typeof START_TERMINAL_ITEM_ID
   | typeof END_TERMINAL_ITEM_ID
   | typeof PRESAVED_STEP_ID
+  | typeof HARDWARE_ID
 export type WellIngredientNames = Record<string, string>
 // TODO: IL 2019-11-26 untangle single vs multi-channel data types for substeps.
 // We tried to unify them with Maybes and Unions, but really they should be
@@ -65,6 +69,8 @@ export interface StepItemSourceDestRow {
   substepIndex?: number
   source?: SubstepWellData
   dest?: SubstepWellData
+  aspirateVolume?: number
+  dispenseVolume?: number
   volume?: number | null
   channelId?: number
 }
@@ -105,12 +111,19 @@ export interface TemperatureSubstepItem {
   substepType: 'temperature'
   temperature: number | null
   labwareNickname: string | null | undefined
+  moduleId: string | null
   message?: string
 }
 export interface PauseSubstepItem {
   substepType: 'pause'
   pauseStepArgs: PauseArgs // Pause substeps use same data as processed form
 }
+
+export interface CommentSubstepItem {
+  substepType: 'comment'
+  commentStepArgs: CommentArgs
+}
+
 export interface MoveLabwareSubstepItem {
   substepType: 'moveLabware'
   moveLabwareArgs: MoveLabwareArgs // Move labware substeps use same data as processed form
@@ -163,6 +176,7 @@ export type SubstepItemData =
   | ThermocyclerStateSubstepItem
   | HeaterShakerSubstepItem
   | MoveLabwareSubstepItem
+  | CommentSubstepItem
 export type Substeps = Record<StepIdType, SubstepItemData | null | undefined>
 export type StepFormErrors = FormError[]
 export interface StepArgsAndErrors {

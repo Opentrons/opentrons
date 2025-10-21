@@ -5,13 +5,15 @@
 **/build/**
 **/venv/**
 .opentrons_config
-
+**/tsconfig*.json
+**/vite.config.mts
 # prettier
 **/package.json
 **/CHANGELOG.md
-lerna.json
 !api/release-notes.md
 !app-shell/build/release-notes.md
+**/.yarn-cache/**
+protocol-designer/cypress/downloads/**
 
 # components library
 storybook-static
@@ -25,9 +27,27 @@ storybook-static
 api/**
 update-server/**
 robot-server/**
-notify-server/**
 shared-data/python/**
 hardware-testing/**
 
-# app-testing don't format the json protocols
-app-testing/files
+# abr-testing don't format the json protocols
+abr-testing/protocols/**
+
+# analyses-snapshot-testing don't format the json protocols
+analyses-snapshot-testing/files
+# don't format the snapshots
+analyses-snapshot-testing/tests/__snapshots__
+analyses-snapshot-testing/analysis_results
+analyses-snapshot-testing/chunks
+
+opentrons-ai-server/package
+opentrons-ai-server/api/storage/
+
+# Leave Markdown formatting alone because some of it is load-bearing for MkDocs.
+# Note that this is a Prettier thing, not an ESLint thing. Prettier shares this config file.
+/docs/**/*.md
+# And ignore non-semantic formatting issues in mkdocs YAML configuration files.
+/docs/**/*.yml
+
+# CSS files should not be linted by ESLint (CSS files are linted by stylelint)
+**/*.css

@@ -1,55 +1,58 @@
 import groupBy from 'lodash/groupBy'
+
 import {
+  getAllDefinitions as _getAllDefinitions,
+  getAllLegacyDefinitions,
   getLabwareDefURI,
   PD_DO_NOT_LIST,
+} from '@opentrons/shared-data'
+
+import type {
+  LabwareDefinition1,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from './types'
+import type { LabwareDefByDefURI } from './types'
 
-// TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
-// should reconcile differences & make a general util fn imported from shared-data
-// require all definitions in the labware/definitions/2 directory
-const definitionsContext = require.context(
-  '@opentrons/shared-data/labware/definitions/2',
-  true, // traverse subdirectories
-  /\.json$/, // import filter
-  'sync' // load every definition into one synchronous chunk
-)
+export function getLegacyLabwareDef(
+  loadName: string | null | undefined
+): LabwareDefinition1 | null {
+  if (loadName != null) {
+    return getAllLegacyDefinitions()[loadName]
+  }
+  return null
+}
 
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
-  // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
-  // also, more convenient & performant to make a map {labwareDefURI: def} not an array
-  if (!_definitions) {
-    _definitions = definitionsContext.keys().reduce((acc, filename) => {
-      const def: LabwareDefinition2 = definitionsContext(filename)
-      const labwareDefURI = getLabwareDefURI(def)
-      return PD_DO_NOT_LIST.includes(def.parameters.loadName)
-        ? acc
-        : { ...acc, [labwareDefURI]: def }
-    }, {})
+  if (_definitions == null) {
+    _definitions = _getAllDefinitions(PD_DO_NOT_LIST)
   }
-
   return _definitions
 }
-// filter out all but the latest version of each labware
-// NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
-// has the {labwareDefURI: def} shape, instead of an array of labware defs
+// filter out all but the latest version of each labware according to the latest
+// robot-stack version.
 let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
+  const latestLoadnamesByVersion = _OT_PD_LATEST_LABWARE_VERSIONS_
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
     const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
-      d => `${d.namespace}/${d.parameters.loadName}`
+      d => d.parameters.loadName
     )
     _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
+        const version = latestLoadnamesByVersion[groupKey]
+
+        //  if the labware is new to a higher up robot-stack version
+        //  do not list it with the labware definition at all
+        if (version == null) {
+          return acc
+        }
+
         const group = labwareDefGroups[groupKey]
-        const allVersions = group.map(d => d.version)
-        const highestVersionNum = Math.max(...allVersions)
-        const resultIdx = group.findIndex(d => d.version === highestVersionNum)
+        const resultIdx = group.findIndex(d => d.version === version)
         const latestDefInGroup = group[resultIdx]
         return {
           ...acc,

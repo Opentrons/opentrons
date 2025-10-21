@@ -1,21 +1,31 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+
+import '@testing-library/jest-dom/vitest'
+
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders, COLORS } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { CardButton } from '..'
 
-const mockPush = jest.fn()
+import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    useNavigate: () => mockNavigate,
   }
 })
 
-const render = (props: React.ComponentProps<typeof CardButton>) => {
+const render = (props: ComponentProps<typeof CardButton>) => {
   return renderWithProviders(
     <MemoryRouter>
       <CardButton {...props} />
@@ -27,7 +37,7 @@ const render = (props: React.ComponentProps<typeof CardButton>) => {
 }
 
 describe('CardButton', () => {
-  let props: React.ComponentProps<typeof CardButton>
+  let props: ComponentProps<typeof CardButton>
 
   beforeEach(() => {
     props = {
@@ -39,17 +49,13 @@ describe('CardButton', () => {
     }
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('should render text and icon', () => {
-    const [{ getByText, getByTestId, getByRole }] = render(props)
-    getByText('Wi-Fi')
-    getByText('Find a network in your lab or enter your own.')
-    expect(getByTestId('cardButton_icon_wifi')).toBeInTheDocument()
-    const button = getByRole('button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
+    render(props)
+    screen.getByText('Wi-Fi')
+    screen.getByText('Find a network in your lab or enter your own.')
+    expect(screen.getByTestId('cardButton_icon_wifi')).toBeInTheDocument()
+    const button = screen.getByRole('button')
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue35}`)
   })
 
   it('renders the button as disabled', () => {
@@ -57,14 +63,14 @@ describe('CardButton', () => {
       ...props,
       disabled: true,
     }
-    const [{ getByRole }] = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
 
   it('should call mock function with path when tapping a card', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button')
+    render(props)
+    const button = screen.getByRole('button')
     fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/mockPath')
+    expect(mockNavigate).toHaveBeenCalledWith('/mockPath')
   })
 })

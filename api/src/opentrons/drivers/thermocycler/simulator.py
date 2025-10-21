@@ -10,7 +10,9 @@ from opentrons.drivers.asyncio.communication.errors import ErrorResponse
 class SimulatingDriver(AbstractThermocyclerDriver):
     DEFAULT_TEMP = 23
 
-    def __init__(self, model: Optional[str] = None) -> None:
+    def __init__(
+        self, model: Optional[str] = None, serial_number: Optional[str] = None
+    ) -> None:
         self._ramp_rate: Optional[float] = None
         self._lid_status = ThermocyclerLidStatus.OPEN
         self._lid_temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
@@ -18,6 +20,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             current=self.DEFAULT_TEMP, target=None, hold=None
         )
         self._model = model if model else "thermocyclerModuleV1"
+        self._serial_number = serial_number
 
     def model(self) -> str:
         return self._model
@@ -64,10 +67,12 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         self._plate_temperature.target = temp
         self._plate_temperature.current = temp
         self._plate_temperature.hold = 0
+        self._ramp_rate = ramp_rate
 
     @ensure_yield
     async def get_plate_temperature(self) -> PlateTemperature:
@@ -103,7 +108,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     @ensure_yield
     async def get_device_info(self) -> Dict[str, str]:
         return {
-            "serial": "dummySerialTC",
+            "serial": self._serial_number if self._serial_number else "dummySerialTC",
             "model": "dummyModelTC",
             "version": "dummyVersionTC",
         }
@@ -121,3 +126,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             if angle < 0
             else ThermocyclerLidStatus.OPEN
         )
+
+    @ensure_yield
+    async def get_error_state(self) -> None:
+        return

@@ -1,69 +1,89 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import {
-  createStore,
-  combineReducers,
   applyMiddleware,
+  combineReducers,
   compose,
-  Store,
-  Reducer,
+  legacy_createStore,
 } from 'redux'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
+
+import { rootReducer as analyticsReducer } from './analytics'
 import { trackEventMiddleware } from './analytics/middleware'
-import { makePersistSubscriber, rehydratePersistedAction } from './persist'
+import { rootReducer as dismissReducer } from './dismiss'
+import { rootReducer as featureFlagsReducer } from './feature-flags'
+import { rootReducer as fileDataReducer } from './file-data'
+import { rootReducer as labwareIngredReducer } from './labware-ingred/reducers'
+import { rootReducer as loadFileReducer } from './load-file'
 import { fileUploadMessage } from './load-file/actions'
+import { rootReducer as navigationReducer } from './navigation'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
+import { rootReducer as stepFormsReducer } from './step-forms'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-import { BaseState, Action } from './types'
+import { rootReducer as tutorialReducer } from './tutorial'
+import { rootReducer as uiReducer } from './ui'
+import { rootReducer as wellSelectionReducer } from './well-selection/reducers'
+
+import type { Middleware, Reducer, Store, StoreEnhancer } from 'redux'
+import type { ThunkMiddleware } from 'redux-thunk'
+import type { Action, BaseState } from './types'
+
 const timelineMiddleware = makeTimelineMiddleware()
-const ReselectTools =
-  process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
+
+type ReducerMap = {
+  [K in keyof BaseState]: Reducer<BaseState[K], Action>
+}
 
 function getRootReducer(): Reducer<BaseState, Action> {
-  const rootReducer = combineReducers<BaseState>({
-    analytics: require('./analytics').rootReducer,
-    dismiss: require('./dismiss').rootReducer,
-    featureFlags: require('./feature-flags').rootReducer,
-    fileData: require('./file-data').rootReducer,
-    labwareIngred: require('./labware-ingred/reducers').rootReducer,
-    loadFile: require('./load-file').rootReducer,
-    navigation: require('./navigation').rootReducer,
-    stepForms: require('./step-forms').rootReducer,
-    tutorial: require('./tutorial').rootReducer,
-    ui: require('./ui').rootReducer,
-    wellSelection: require('./well-selection/reducers').rootReducer,
-  })
+  const reducers: ReducerMap = {
+    analytics: analyticsReducer,
+    dismiss: dismissReducer,
+    featureFlags: featureFlagsReducer,
+    fileData: fileDataReducer,
+    labwareIngred: labwareIngredReducer,
+    loadFile: loadFileReducer,
+    navigation: navigationReducer,
+    stepForms: stepFormsReducer,
+    tutorial: tutorialReducer,
+    ui: uiReducer,
+    wellSelection: wellSelectionReducer,
+  }
+
+  const combinedReducer = combineReducers(reducers)
+
   // TODO: Ian 2019-06-25 consider making file loading non-committal
   // so UNDO_LOAD_FILE doesnt' just reset Redux state
-  return (state: any, action) => {
+  return (state, action) => {
     if (
       action.type === 'LOAD_FILE' ||
       action.type === 'CREATE_NEW_PROTOCOL' ||
       action.type === 'UNDO_LOAD_FILE'
     ) {
       // reset entire state, rehydrate from localStorage
-      const resetState = rootReducer(undefined, rehydratePersistedAction())
+      const resetState = combinedReducer(undefined, rehydratePersistedAction())
 
       if (action.type === 'LOAD_FILE') {
         try {
-          return rootReducer(resetState, action)
+          return combinedReducer(resetState, action)
         } catch (e) {
           console.error(e)
-          // something in the reducers went wrong, show it to the user for bug report
-          return rootReducer(
-            state,
-            fileUploadMessage({
-              isError: true,
-              errorType: 'INVALID_JSON_FILE',
-              errorMessage: e.message,
-            })
-          )
+          if (e instanceof Error) {
+            // something in the reducers went wrong, show it to the user for bug report
+            return combinedReducer(
+              state || resetState,
+              fileUploadMessage({
+                isError: true,
+                errorType: 'INVALID_JSON_FILE',
+                errorMessage: e.message,
+              })
+            )
+          }
         }
       }
 
-      return rootReducer(resetState, action)
+      return combinedReducer(resetState, action)
     }
 
     // pass-thru
-    return rootReducer(state, action)
+    return combinedReducer(state, action)
   }
 }
 
@@ -73,15 +93,18 @@ export function configureStore(): StoreType {
   const reducer = getRootReducer()
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-  const store = createStore(
+  const store = legacy_createStore(
     reducer,
     /* preloadedState, */
     composeEnhancers(
-      applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
-    )
+      applyMiddleware(
+        timelineMiddleware as Middleware<BaseState, Record<string, any>, any>,
+        thunk as ThunkMiddleware<BaseState, Action>,
+        trackEventMiddleware as Middleware<BaseState, Record<string, any>, any>
+      )
+    ) as StoreEnhancer
   )
-  // give reselect tools access to state if in dev env
-  if (ReselectTools) ReselectTools.getStateWith(() => store.getState())
+
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
@@ -93,32 +116,6 @@ export function configureStore(): StoreType {
         PRERELEASE_MODE: true,
       },
     })
-  }
-
-  function replaceReducers(): void {
-    const nextRootReducer = getRootReducer()
-    store.replaceReducer(nextRootReducer)
-  }
-
-  if (module.hot) {
-    // Enable Webpack hot module replacement for reducers
-    module.hot.accept(
-      [
-        './analytics/reducers',
-        './dismiss/reducers',
-        './feature-flags/reducers',
-        './file-data/reducers',
-        './labware-defs/reducers', // NOTE: labware-defs is nested inside step-forms, so it doesn't need to go directly into getRootReducer fn above
-        './labware-ingred/reducers',
-        './load-file/reducers',
-        './navigation/reducers',
-        './step-forms/reducers',
-        './tutorial/reducers',
-        './ui/steps/reducers',
-        './well-selection/reducers',
-      ],
-      replaceReducers
-    )
   }
 
   return store

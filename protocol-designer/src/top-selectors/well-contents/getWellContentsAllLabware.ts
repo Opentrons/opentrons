@@ -1,19 +1,21 @@
-import { createSelector } from 'reselect'
 import reduce from 'lodash/reduce'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { createSelector } from 'reselect'
+
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
-  getSelectedWells,
   getHighlightedWells,
+  getSelectedWells,
 } from '../../well-selection/selectors'
-import { WellGroup } from '@opentrons/components'
-import { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import { SingleLabwareLiquidState } from '@opentrons/step-generation'
-import { Selector } from '../../types'
-import {
+
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
+import type { Selector } from '../../types'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
@@ -50,39 +52,40 @@ const _getWellContents = (
   )
 }
 
-export const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  labwareIngredSelectors.getLiquidsByLabwareId,
-  labwareIngredSelectors.getSelectedLabwareId,
-  getSelectedWells,
-  getHighlightedWells,
-  (
-    labwareEntities,
-    liquidsByLabware,
-    selectedLabwareId,
-    selectedWells,
-    highlightedWells
-  ) => {
-    const allLabwareIds: string[] = Object.keys(labwareEntities)
-    return allLabwareIds.reduce(
-      (
-        acc: WellContentsByLabware,
-        labwareId: string
-      ): WellContentsByLabware => {
-        const liquidsForLabware = liquidsByLabware[labwareId]
-        const isSelectedLabware = selectedLabwareId === labwareId
+export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
+  createSelector(
+    stepFormSelectors.getLabwareEntities,
+    labwareIngredSelectors.getLiquidsByLabwareId,
+    labwareIngredSelectors.getSelectedLabwareId,
+    getSelectedWells,
+    getHighlightedWells,
+    (
+      labwareEntities,
+      liquidsByLabware,
+      selectedLabwareId,
+      selectedWells,
+      highlightedWells
+    ) => {
+      const allLabwareIds: string[] = Object.keys(labwareEntities)
+      return allLabwareIds.reduce(
+        (
+          acc: WellContentsByLabware,
+          labwareId: string
+        ): WellContentsByLabware => {
+          const liquidsForLabware = liquidsByLabware[labwareId]
+          const isSelectedLabware = selectedLabwareId === labwareId
 
-        const wellContents = _getWellContents(
-          labwareEntities[labwareId].def,
-          liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? selectedWells : null,
-          isSelectedLabware ? highlightedWells : null
-        )
+          const wellContents = _getWellContents(
+            labwareEntities[labwareId].def,
+            liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
+            isSelectedLabware ? selectedWells : null,
+            isSelectedLabware ? highlightedWells : null
+          )
 
-        // Skip labware ids with no liquids
-        return wellContents ? { ...acc, [labwareId]: wellContents } : acc
-      },
-      {}
-    )
-  }
-)
+          // Skip labware ids with no liquids
+          return wellContents ? { ...acc, [labwareId]: wellContents } : acc
+        },
+        {}
+      )
+    }
+  )

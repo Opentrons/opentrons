@@ -1,15 +1,16 @@
 """Test the tool-sensor coordination code."""
 import logging
-from mock import patch, ANY, AsyncMock, call
+from mock import patch, AsyncMock, call
 import pytest
 from contextlib import asynccontextmanager
-from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict
+from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Callable
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ExecuteMoveGroupRequest,
     MoveCompleted,
     ReadFromSensorResponse,
     Acknowledgement,
     BindSensorOutputRequest,
+    AddLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -49,8 +50,9 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
     SensorOutputBinding,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -130,44 +132,110 @@ async def test_liquid_probe(
         sensor_type=SensorType.pressure, sensor_id=SensorId.S0, node_id=target_node
     )
 
+    def check_first_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(0),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(1),
+                    )
+                ),
+                target_node,
+            )
+        ]
+
+    def check_second_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(1),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(2),
+                    )
+                ),
+                motor_node,
+            ),
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(1),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(2),
+                    )
+                ),
+                target_node,
+            ),
+        ]
+
+    def check_third_move(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        return [
+            (
+                NodeId.host,
+                MoveCompleted(
+                    payload=MoveCompletedPayload(
+                        group_id=UInt8Field(0),
+                        seq_id=UInt8Field(0),
+                        current_position_um=UInt32Field(14000),
+                        encoder_position_um=Int32Field(14000),
+                        position_flags=MotorPositionFlagsField(0),
+                        ack_id=UInt8Field(1),
+                    )
+                ),
+                motor_node,
+            )
+        ]
+
+    def get_responder() -> Iterator[
+        Callable[
+            [NodeId, MessageDefinition], List[Tuple[NodeId, MessageDefinition, NodeId]]
+        ]
+    ]:
+        yield check_first_move
+        yield check_second_move
+        yield check_third_move
+
+    responder_getter = get_responder()
+    z_offset_for_plunger_prep = 2.0
+    mount_speed = 10.0
+    expected_raise_duration = (
+        interrupts_per_sec * z_offset_for_plunger_prep / mount_speed
+    )
+
     def move_responder(
         node_id: NodeId, message: MessageDefinition
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         message.payload.serialize()
         if isinstance(message, ExecuteMoveGroupRequest):
-            ack_payload = EmptyPayload()
-            ack_payload.message_index = message.payload.message_index
-            return [
-                (
-                    NodeId.host,
-                    MoveCompleted(
-                        payload=MoveCompletedPayload(
-                            group_id=UInt8Field(0),
-                            seq_id=UInt8Field(0),
-                            current_position_um=UInt32Field(14000),
-                            encoder_position_um=Int32Field(14000),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(2),
-                        )
-                    ),
-                    motor_node,
-                ),
-                (
-                    NodeId.host,
-                    MoveCompleted(
-                        payload=MoveCompletedPayload(
-                            group_id=UInt8Field(0),
-                            seq_id=UInt8Field(0),
-                            current_position_um=UInt32Field(14000),
-                            encoder_position_um=Int32Field(14000),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(2),
-                        )
-                    ),
-                    target_node,
-                ),
-            ]
+            responder = next(responder_getter)
+            return responder(node_id, message)
         else:
+            if isinstance(message, AddLinearMoveRequest):
+                if message.payload.velocity_mm.value < 0:
+                    # value < 0 means the raise z move
+                    assert message.payload.duration.value == expected_raise_duration
+                    velocity = int(-1 * mount_speed / interrupts_per_sec * 2**31)
+                    assert message.payload.velocity_mm.value == velocity
             return []
 
     message_send_loopback.add_responder(move_responder)
@@ -176,13 +244,13 @@ async def test_liquid_probe(
         messenger=mock_messenger,
         tool=target_node,
         head_node=motor_node,
-        max_z_distance=40,
-        mount_speed=10,
+        max_p_distance=70,
+        mount_speed=mount_speed,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
-        log_pressure=False,
-        auto_zero_sensor=True,
-        num_baseline_reads=8,
+        plunger_impulse_time=0.2,
+        num_baseline_reads=20,
+        z_offset_for_plunger_prep=z_offset_for_plunger_prep,
         sensor_id=SensorId.S0,
     )
     assert position[motor_node].positions_only()[0] == 14
@@ -191,34 +259,6 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
-    mock_bind_output.assert_called_once()
-    assert mock_bind_output.call_args_list[0][0][3] == [SensorOutputBinding.sync]
-
-    with patch(
-        "opentrons_hardware.hardware_control.tool_sensors", LogListener
-    ) as mock_log:
-
-        mock_log.__aenter__ = AsyncMock(return_value=mock_log)  # type: ignore
-        mock_log.__aexit__ = AsyncMock(return_value=None)  # type: ignore
-
-        await liquid_probe(
-            messenger=mock_messenger,
-            tool=target_node,
-            head_node=motor_node,
-            max_z_distance=40,
-            mount_speed=10,
-            plunger_speed=8,
-            threshold_pascals=threshold_pascals,
-            log_pressure=True,
-            auto_zero_sensor=True,
-            num_baseline_reads=8,
-            sensor_id=SensorId.S0,
-        )
-        mock_bind_output.assert_called()
-        assert mock_bind_output.call_args_list[1][0][3] == [
-            SensorOutputBinding.sync,
-            SensorOutputBinding.report,
-        ]
 
 
 @pytest.mark.parametrize(
@@ -235,7 +275,6 @@ async def test_capacitive_probe(
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    mock_bind_sync: AsyncMock,
     target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
@@ -275,6 +314,25 @@ async def test_capacitive_probe(
                     ),
                     motor_node,
                 ),
+                (
+                    NodeId.host,
+                    Acknowledgement(payload=ack_payload),
+                    target_node,
+                ),
+                (
+                    NodeId.host,
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            group_id=UInt8Field(0),
+                            seq_id=UInt8Field(0),
+                            current_position_um=UInt32Field(10000),
+                            encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                        )
+                    ),
+                    target_node,
+                ),
             ]
         else:
             return []
@@ -291,13 +349,6 @@ async def test_capacitive_probe(
         sensor=sensor_info,
         data=SensorDataType.build(1.0, sensor_info.sensor_type),
         mode=SensorThresholdMode.auto_baseline,
-    )
-    # this mock assert is annoying because, see below
-    mock_bind_sync.assert_called_once_with(
-        ANY,  # this is a mock of a function on a class not a method so this is self
-        sensor_info,
-        ANY,
-        do_log=ANY,
     )
 
 

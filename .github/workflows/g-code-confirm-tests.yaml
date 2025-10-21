@@ -1,4 +1,4 @@
-name: "G-Code-Confirm"
+name: 'G-Code-Confirm'
 
 on:
   # Run on any change to the api directory
@@ -30,32 +30,36 @@ concurrency:
 jobs:
   confirm-g-code:
     strategy:
+      fail-fast: false
       matrix:
-        command: [
-          '2-modules',
-          'swift-smoke',
-          'swift-turbo',
-          'omega',
-          'fast'
-        ]
+        command: ['2-modules', 'swift-smoke', 'swift-turbo', 'omega', 'fast']
     name: 'Confirm G-Code (${{ matrix.command }})'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
           node-version: '12'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
 
-      - name: "Verify no missing comparison files"
+      - name: 'Verify no missing comparison files'
         run: make -C g-code-testing check-for-missing-comparison-files
 
       - name: 'Run & Compare to comparison files'
-        run: make -C g-code-testing test-g-code-${{ matrix.command }}
+        id: run_tests
+        run: make -C g-code-testing test-g-code-${{ matrix.command }} test_opts="-s"
+
+      - name: 'Upload test results'
+        if: failure() && steps.run_tests.conclusion == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: g-code-test-results-${{ matrix.command }}
+          path: g-code-testing/results
+          retention-days: 14

@@ -1,3 +1,4 @@
+from typing import Annotated, Optional
 import logging
 
 from starlette import status as http_status_codes
@@ -44,15 +45,21 @@ def get_session(manager: SessionManager, session_id: IdentifierType) -> BaseSess
 
 @router.post(
     "/sessions",
-    description="Create a session",
+    summary="Create an OT-2 calibration session",
+    description=(
+        "Create a session to perform a calibration procedure on an OT-2."
+        "\n\n"
+        "**Warning:** These `/sessions/` endpoints are tightly coupled to the"
+        " Opentrons App and are not intended for general public use."
+    ),
+    deprecated=True,
     response_model=SessionResponse,
     status_code=http_status_codes.HTTP_201_CREATED,
 )
 async def create_session_handler(
     create_request: SessionCreateRequest,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
-    """Create a session"""
     session_type = create_request.data.sessionType
     create_params = create_request.data.createParams
 
@@ -68,13 +75,19 @@ async def create_session_handler(
 
 
 @router.delete(
-    PATH_SESSION_BY_ID, description="Delete a session", response_model=SessionResponse
+    PATH_SESSION_BY_ID,
+    summary="Delete an OT-2 calibration session",
+    description=(
+        "**Warning:** These `/sessions/` endpoints are tightly coupled to the"
+        " Opentrons App and are not intended for general public use."
+    ),
+    deprecated=True,
+    response_model=SessionResponse,
 )
 async def delete_session_handler(
     sessionId: IdentifierType,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
-    """Delete a session"""
     session_obj = get_session(manager=session_manager, session_id=sessionId)
     await session_manager.remove(session_obj.meta.identifier)
 
@@ -85,11 +98,18 @@ async def delete_session_handler(
 
 
 @router.get(
-    PATH_SESSION_BY_ID, description="Get session", response_model=SessionResponse
+    PATH_SESSION_BY_ID,
+    summary="Get an OT-2 calibration session",
+    description=(
+        "**Warning:** These `/sessions/` endpoints are tightly coupled to the"
+        " Opentrons App and are not intended for general public use."
+    ),
+    deprecated=True,
+    response_model=SessionResponse,
 )
 async def get_session_handler(
     sessionId: IdentifierType,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> SessionResponse:
     session_obj = get_session(manager=session_manager, session_id=sessionId)
 
@@ -100,15 +120,22 @@ async def get_session_handler(
 
 
 @router.get(
-    "/sessions", description="Get all the sessions", response_model=MultiSessionResponse
+    "/sessions",
+    summary="Get all OT-2 calibration sessions",
+    description=(
+        "**Warning:** These `/sessions/` endpoints are tightly coupled to the"
+        " Opentrons App and are not intended for general public use."
+    ),
+    deprecated=True,
+    response_model=MultiSessionResponse,
 )
 async def get_sessions_handler(
-    session_type: SessionType = Query(
-        None, description="Will limit the results to only this session type"
-    ),
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
+    session_type: Annotated[
+        Optional[SessionType],
+        Query(description="Will limit the results to only this session type"),
+    ] = None,
 ) -> MultiSessionResponse:
-    """Get multiple sessions"""
     sessions = session_manager.get(session_type=session_type)
     return MultiSessionResponse(
         data=[session.get_response_model() for session in sessions],
@@ -118,17 +145,19 @@ async def get_sessions_handler(
 
 @router.post(
     f"{PATH_SESSION_BY_ID}/commands/execute",
-    description="Create and execute a command immediately",
+    summary="Execute an OT-2 calibration command",
+    description=(
+        "**Warning:** These `/sessions/` endpoints are tightly coupled to the"
+        " Opentrons App and are not intended for general public use."
+    ),
+    deprecated=True,
     response_model=CommandResponse,
 )
 async def session_command_execute_handler(
     sessionId: IdentifierType,
     command_request: CommandRequest,
-    session_manager: SessionManager = Depends(get_session_manager),
+    session_manager: Annotated[SessionManager, Depends(get_session_manager)],
 ) -> CommandResponse:
-    """
-    Execute a session command
-    """
     session_obj = get_session(manager=session_manager, session_id=sessionId)
     if not session_manager.is_active(session_obj.meta.identifier):
         raise CommandExecutionException(
@@ -140,7 +169,7 @@ async def session_command_execute_handler(
 
     log.debug(f"Command result: {command_result}")
 
-    return CommandResponse(
+    return CommandResponse.model_construct(
         data=command_result, links=get_valid_session_links(sessionId, router)
     )
 

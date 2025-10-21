@@ -5,7 +5,10 @@
     "composite": true,
     "emitDeclarationOnly": false,
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/app/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*.json"],
   "exclude": ["**/*.ts", "**/*.tsx"]

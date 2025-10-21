@@ -1,53 +1,40 @@
-import { InnerDelayArgs } from '@opentrons/step-generation'
-import { getDefaultMmFromBottom } from '../../../components/StepEditForm/fields/TipPositionField/utils'
-import {
-  DelayCheckboxFields,
-  DelaySecondFields,
+import type { InnerDelayArgs } from '@opentrons/step-generation'
+import type {
+  DelayCheckboxBaseFields,
+  DelayCheckboxMoveLiquidFields,
+  DelaySecondsBaseFields,
+  DelaySecondsMoveLiquidFields,
+  HydratedMixFormData,
   HydratedMoveLiquidFormData,
-  HydratedMixFormDataLegacy,
 } from '../../../form-types'
-export function getMoveLiquidDelayData(
-  hydratedFormData: HydratedMoveLiquidFormData['fields'],
-  checkboxField: DelayCheckboxFields,
-  secondsField: DelaySecondFields,
-  mmFromBottomField:
-    | 'aspirate_delay_mmFromBottom'
-    | 'dispense_delay_mmFromBottom'
-): InnerDelayArgs | null {
-  const checkbox = hydratedFormData[checkboxField]
-  const seconds = hydratedFormData[secondsField]
-  let mmFromBottom: number | undefined
-  const mmFromBottomFormValue = hydratedFormData[mmFromBottomField]
-  if (typeof mmFromBottomFormValue === 'number') {
-    mmFromBottom = mmFromBottomFormValue
-  } else if (mmFromBottomFormValue === null) {
-    mmFromBottom = getDefaultMmFromBottom({
-      name: mmFromBottomField,
-      wellDepthMm: 0 /* NOTE: `wellDepthMm` should not be used for delay offsets */,
-    })
-  }
-  if (
-    checkbox &&
-    typeof seconds === 'number' &&
-    seconds > 0 &&
-    typeof mmFromBottom === 'number' &&
-    mmFromBottom >= 0
-  ) {
+import type { GetCastFormData } from '../../fieldLevel'
+
+export const getMoveLiquidDelayData = (args: {
+  castFormData: GetCastFormData<HydratedMoveLiquidFormData>
+  secondsField: DelaySecondsMoveLiquidFields
+  checkboxField?: DelayCheckboxMoveLiquidFields
+}): InnerDelayArgs | null => {
+  const { castFormData: hydratedFormData, checkboxField, secondsField } = args
+  const checkbox =
+    checkboxField != null ? (hydratedFormData[checkboxField] ?? false) : true
+  const seconds = hydratedFormData[secondsField] ?? 0
+
+  if (checkbox && seconds > 0) {
     return {
       seconds,
-      mmFromBottom,
     }
   }
 
   return null
 }
-export function getMixDelayData(
-  hydratedFormData: HydratedMixFormDataLegacy,
-  checkboxField: DelayCheckboxFields,
-  secondsField: DelaySecondFields
-): number | null {
-  const checkbox = hydratedFormData[checkboxField]
-  const seconds = hydratedFormData[secondsField]
+
+export const getMixDelayData = (
+  castFormData: GetCastFormData<HydratedMixFormData>,
+  checkboxField: DelayCheckboxBaseFields,
+  secondsField: DelaySecondsBaseFields
+): number | null => {
+  const checkbox = castFormData[checkboxField]
+  const seconds = castFormData[secondsField]
 
   if (checkbox && typeof seconds === 'number' && seconds > 0) {
     return seconds

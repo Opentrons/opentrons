@@ -1,0 +1,138 @@
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { getEnableCameraSupport } from '/protocol-designer/feature-flags/selectors'
+
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../assets/localization'
+import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
+import {
+  getFileMetadata,
+  getRobotStateTimeline,
+  getRobotType,
+} from '../../../file-data/selectors'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getArgsAndErrorsByStepId,
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
+import { getDismissedHints } from '../../../tutorial/selectors'
+import { ProtocolOverview } from '../index'
+import { InputDeviceInfo } from '../InputDeviceInfo'
+import { InstrumentsInfo } from '../InstrumentsInfo'
+import { LiquidDefinitions } from '../LiquidDefinitions'
+import { ProtocolMetadata } from '../ProtocolMetadata'
+import { StartingDeck } from '../StartingDeck'
+import { StepsInfo } from '../StepsInfo'
+
+import type { NavigateFunction } from 'react-router-dom'
+
+vi.mock('../../../step-forms/selectors')
+vi.mock('../../../tutorial/selectors')
+vi.mock('../../../file-data/selectors')
+vi.mock('../../../components/organisms/MaterialsListModal')
+vi.mock('../../../labware-ingred/selectors')
+vi.mock('../../../load-file/actions')
+vi.mock('../../../feature-flags/selectors')
+vi.mock('../../../components/organisms')
+vi.mock('../ProtocolMetadata')
+vi.mock('../LiquidDefinitions')
+vi.mock('../InstrumentsInfo')
+vi.mock('../StepsInfo')
+vi.mock('../StartingDeck')
+vi.mock('../InputDeviceInfo')
+
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
+
+const render = () => {
+  return renderWithProviders(<ProtocolOverview />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('ProtocolOverview', () => {
+  beforeEach(() => {
+    vi.mocked(getRobotStateTimeline).mockReturnValue({ timeline: [] })
+    vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getSavedStepForms).mockReturnValue({
+      __INITIAL_DECK_SETUP_STEP__: {} as any,
+    })
+    vi.mocked(labwareIngredSelectors.allIngredientGroupFields).mockReturnValue(
+      {}
+    )
+    vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({})
+    vi.mocked(getDismissedHints).mockReturnValue([])
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      modules: {},
+      labware: {},
+    })
+    vi.mocked(getFileMetadata).mockReturnValue({
+      protocolName: 'mockName',
+      author: 'mockAuthor',
+      description: 'mockDescription',
+      created: 123,
+    })
+    vi.mocked(getEnableCameraSupport).mockReturnValue(true)
+    vi.mocked(MaterialsListModal).mockReturnValue(
+      <div>mock MaterialsListModal</div>
+    )
+    vi.mocked(LiquidDefinitions).mockReturnValue(
+      <div>mock LiquidDefinitions</div>
+    )
+    vi.mocked(InstrumentsInfo).mockReturnValue(<div>mock InstrumentsInfo</div>)
+    vi.mocked(StepsInfo).mockReturnValue(<div>mock StepsInfo</div>)
+    vi.mocked(ProtocolMetadata).mockReturnValue(
+      <div>mock ProtocolMetadata</div>
+    )
+    vi.mocked(InputDeviceInfo).mockReturnValue(<div>mock InputDevices</div>)
+    vi.mocked(StartingDeck).mockReturnValue(<div>mock StartingDeck</div>)
+  })
+
+  it('renders each section with text', () => {
+    render()
+    // buttons
+    screen.getByRole('button', { name: 'Edit protocol' })
+    screen.getByRole('button', { name: 'Export protocol' })
+
+    //  metadata
+    screen.getByText('mockName')
+    screen.getByText('mock ProtocolMetadata')
+
+    //  instruments
+    screen.getByText('mock InstrumentsInfo')
+
+    //   liquids
+    screen.getByText('mock LiquidDefinitions')
+
+    //   input devices
+    screen.getByText('mock InputDevices')
+
+    //  steps
+    screen.getByText('mock StepsInfo')
+
+    // starting deck
+    screen.getByText('mock StartingDeck')
+  })
+
+  it('navigates to starting deck state', () => {
+    render()
+    const button = screen.getByRole('button', { name: 'Edit protocol' })
+    fireEvent.click(button)
+    expect(mockNavigate).toHaveBeenCalledWith('/designer')
+  })
+})

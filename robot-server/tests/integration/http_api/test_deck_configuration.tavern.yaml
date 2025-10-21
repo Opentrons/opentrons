@@ -86,7 +86,7 @@ stages:
     response:
       json:
         data:
-          lastModifiedAt: !anystr
+          lastModifiedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           cutoutFixtures: *expectedNonDefaultCutoutFixtures
       save:
         json:
@@ -153,7 +153,12 @@ stages:
       method: POST
       json:
         deckConfiguration: true
-    response: {} # Expecting any non-error response.
+    response:
+      json: !anydict
+    # Retry on failure because if this request comes in before the server's persistence
+    # layer has fully initialized, it will return 503.
+    max_retries: 5
+    delay_after: 0.5
 
   - name: Get the deck configuration after the reset and make sure it's immediately gone back to the default
     request:

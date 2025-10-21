@@ -449,7 +449,7 @@ BinaryMessageDefinition = Union[
 ]
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=100)
 def get_binary_definition(
     message_id: BinaryMessageId,
 ) -> Optional[Type[BinaryMessageDefinition]]:

@@ -1,6 +1,5 @@
 // opentrons components library
 
-export * from './constants'
 export * from './hooks'
 export * from './utils'
 
@@ -19,24 +18,28 @@ export * from './lists'
 export * from './modals'
 export * from './nav'
 export * from './primitives'
-export * from './tabbedNav'
 export * from './slotmap'
 export * from './structure'
 export * from './tooltips'
+export * from './organisms'
 
 // styles
 export * from './styles'
 // new ui-overhaul style vars
 export * from './ui-style-constants'
 
+// helix design system
+export * from './helix-design-system'
+
 // Pure Types
 export * from './robot-types'
-
-// testing utilities
-export * from './testing/utils'
 
 //  Molecules
 export * from './molecules'
 
 // Atoms
 export * from './atoms'
+
+//  for i18n
+export { baseI18nConfig } from './i18n'
+export { shared_en_resources, shared_zh_resources } from './assets'

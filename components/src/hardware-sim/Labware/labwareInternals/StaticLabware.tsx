@@ -1,76 +1,154 @@
 // Render labware definition to SVG. XY is in robot coordinates.
-import assert from 'assert'
-import * as React from 'react'
+import { Fragment, memo } from 'react'
 import flatMap from 'lodash/flatMap'
+import styled from 'styled-components'
 
+import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'
+import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
+import { TipStatus } from './Tips'
 import { Well } from './Well'
-import styles from './StaticLabware.css'
 
-import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './types'
+import type { CSSProperties } from 'styled-components'
+import type { MemoExoticComponent } from 'react'
+import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
+import type { TipType, WellMouseEvent, WellStroke } from './types'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
-  definition: LabwareDefinition2
+  definition: LabwareDefinition
   /** Add thicker blurred blue border to labware, defaults to false */
   highlight?: boolean
+  /** adds a drop shadow to the highlight border */
+  highlightShadow?: boolean
   /** Optional callback to be executed when entire labware element is clicked */
   onLabwareClick?: () => void
   /** Optional callback to be executed when mouse enters a well element */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** [legacy] css class to be added to well component if it is selectable */
-  selectableWellClass?: string
+  fill?: CSSProperties['fill']
+  showRadius?: boolean
+  wellStroke?: WellStroke
+  /** optional show of labware border, defaulted to true */
+  showBorder?: boolean
+  borderStroke?: CSSProperties['stroke']
+  tipStatusByWellName?: Record<string, TipType>
+  handleClickWell?: (wellName: string) => void
+  selectedTipsByIndex?: Record<string, number>
 }
 
-const TipDecoration = React.memo(function TipDecoration(props: {
+const TipDecoration = memo(function TipDecoration(props: {
   well: LabwareWell
 }) {
   const { well } = props
-  if ('diameter' in well && well.diameter != null) {
+  if (well.shape === 'circular') {
     const radius = well.diameter / 2
     return (
-      <circle className={styles.tip} cx={well.x} cy={well.y} r={radius - 1} />
+      <circle
+        {...STYLE_BY_WELL_CONTENTS.tipPresent}
+        cx={well.x}
+        cy={well.y}
+        r={radius - 1}
+      />
     )
   }
-  assert(false, `TipDecoration expects a circular well with a diameter`)
   return null
 })
 
+const LabwareDetailGroup = styled.g`
+  fill: none;
+  stroke: ${COLORS.black90};
+  stroke-width: 1;
+`
+
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
-  const { isTiprack } = props.definition.parameters
+  const {
+    definition,
+    highlight,
+    highlightShadow,
+    onLabwareClick,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+    fill,
+    showRadius = true,
+    wellStroke = {},
+    showBorder = true,
+    tipStatusByWellName,
+    handleClickWell,
+    selectedTipsByIndex,
+    borderStroke,
+  } = props
+  const { isTiprack } = definition.parameters
   return (
-    <g onClick={props.onLabwareClick}>
-      <g className={styles.labware_detail_group}>
-        <LabwareOutline
-          definition={props.definition}
-          highlight={props.highlight}
-        />
-      </g>
+    <g onClick={onLabwareClick}>
+      {!showBorder ? null : (
+        <LabwareDetailGroup>
+          <LabwareOutline
+            definition={definition}
+            highlight={highlight}
+            highlightShadow={highlightShadow}
+            fill={fill}
+            showRadius={showRadius}
+            stroke={borderStroke}
+          />
+        </LabwareDetailGroup>
+      )}
       <g>
         {flatMap(
-          props.definition.ordering,
+          definition.ordering,
           (row: string[], i: number, c: string[][]) => {
             return row.map(wellName => {
+              const well = definition.wells[wellName]
+              const wellWidth =
+                well.shape === 'circular' ? well.diameter : well.xDimension
+              const wellHeight =
+                well.shape === 'circular' ? well.diameter : well.yDimension
               return (
-                <React.Fragment key={wellName}>
-                  <Well
-                    className={isTiprack ? styles.tip : null}
-                    wellName={wellName}
-                    well={props.definition.wells[wellName]}
-                    onMouseEnterWell={props.onMouseEnterWell}
-                    onMouseLeaveWell={props.onMouseLeaveWell}
-                    selectableWellClass={props.selectableWellClass}
-                  />
+                <Fragment key={wellName}>
+                  {tipStatusByWellName == null ? (
+                    <>
+                      <Well
+                        wellName={wellName}
+                        well={well}
+                        onMouseEnterWell={onMouseEnterWell}
+                        onMouseLeaveWell={onMouseLeaveWell}
+                        {...(isTiprack
+                          ? STYLE_BY_WELL_CONTENTS.tipPresent
+                          : STYLE_BY_WELL_CONTENTS.defaultWell)}
+                        fill={fill}
+                        stroke={wellStroke[wellName] ?? undefined}
+                      />
 
-                  {/* Tip inner circle decoration.
-                   TODO: Ian 2019-05-03 SOMEDAY, use WellDecoration and include decorations in the def */}
-                  {isTiprack && (
-                    <TipDecoration well={props.definition.wells[wellName]} />
+                      {isTiprack ? (
+                        <TipDecoration well={definition.wells[wellName]} />
+                      ) : null}
+                    </>
+                  ) : (
+                    <svg
+                      x={well.x - wellWidth / 2}
+                      y={well.y - wellHeight / 2}
+                      onMouseEnter={e =>
+                        onMouseEnterWell?.({ wellName, event: e })
+                      }
+                      onMouseLeave={e =>
+                        onMouseLeaveWell?.({ wellName, event: e })
+                      }
+                      onClick={() => handleClickWell?.(wellName)} // TODO: add select logic
+                    >
+                      <TipStatus
+                        type={tipStatusByWellName[wellName]}
+                        text={
+                          selectedTipsByIndex != null &&
+                          wellName in selectedTipsByIndex
+                            ? (selectedTipsByIndex[wellName] + 1).toString()
+                            : undefined
+                        }
+                        size={`${wellWidth}px`} // wellWidth for tips will equal wellHeight, so using width here is arbitrary
+                      />
+                    </svg>
                   )}
-                </React.Fragment>
+                </Fragment>
               )
             })
           }
@@ -80,6 +158,5 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   )
 }
 
-export const StaticLabware: React.MemoExoticComponent<
-  typeof StaticLabwareComponent
-> = React.memo(StaticLabwareComponent)
+export const StaticLabware: MemoExoticComponent<typeof StaticLabwareComponent> =
+  memo(StaticLabwareComponent)

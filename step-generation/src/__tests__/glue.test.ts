@@ -1,15 +1,20 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_CONFIG } from '../fixtures'
 import {
-  getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
+  getNextRobotStateAndWarningsSingleCommand,
 } from '../getNextRobotStateAndWarnings'
 import {
-  curryCommandCreator,
-  reduceCommandCreators,
   commandCreatorsTimeline,
+  curryCommandCreator,
+  curryWithoutPython,
+  reduceCommandCreators,
 } from '../utils'
-import { DEFAULT_CONFIG } from '../fixtures'
+
 import type { InvariantContext } from '../types'
-jest.mock('../getNextRobotStateAndWarnings')
+
+vi.mock('../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext
 
@@ -32,6 +37,7 @@ interface CountCommand {
     value: number
   }
 }
+
 const addCreator: any = (
   params: CountParams,
   invariantContext: InvariantContext,
@@ -59,6 +65,17 @@ const addCreatorWithWarning: any = (
     ],
   }
 }
+
+/* This command creator emits both JSON and Python commands. */
+const addHalfCreator: any = (
+  params: CountParams,
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
+  commands: [{ command: 'add', params: { value: params.value / 2 } }],
+  warnings: [],
+  python: `protocol.add_to_count(${params.value / 2})`,
+})
 
 const multiplyCreator: any = (
   params: CountParams,
@@ -89,6 +106,30 @@ const divideCreator: any = (
   return {
     commands: [{ command: 'divide', params: { value } }],
     warnings: [],
+  }
+}
+
+const pythonHelloWorldCreator: any = (
+  params: CountParams,
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
+  return {
+    commands: [],
+    warnings: [],
+    python: 'print("Hello world")',
+  }
+}
+
+const pythonGoodbyeWorldCreator: any = (
+  params: CountParams,
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
+  return {
+    commands: [],
+    warnings: [],
+    python: 'print("Goodbye world")',
   }
 }
 
@@ -153,7 +194,11 @@ beforeEach(() => {
     labwareEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
-    additionalEquipmentEntities: {},
+    trashBinEntities: {},
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    gripperEntities: {},
+    liquidEntities: {},
     config: DEFAULT_CONFIG,
   }
 })
@@ -176,6 +221,32 @@ describe('reduceCommandCreators', () => {
         { command: 'multiply', params: { value: 2 } },
       ],
       warnings: [],
+      // Note no `python` field here.
+      // Existing CommandCreators that don't emit Python should behave exactly the same as before.
+      // This test makes sure we do NOT produce results like `python:'undefined'` or `python:''` or `python:'\n'`.
+    })
+  })
+
+  it('curryCommandCreator and curryWithoutPython', () => {
+    const initialState: any = { count: 0 }
+    const result: any = reduceCommandCreators(
+      [
+        // We expect the first addHalfCreator to emit both JSON and Python.
+        // The second addHalfCreator should only emit JSON with no Python.
+        curryCommandCreator(addHalfCreator, { value: 5 }),
+        curryWithoutPython(addHalfCreator, { value: 6 }),
+      ],
+      invariantContext,
+      initialState
+    )
+
+    expect(result).toEqual({
+      commands: [
+        { command: 'add', params: { value: 2.5 } },
+        { command: 'add', params: { value: 3 } },
+      ],
+      warnings: [],
+      python: 'protocol.add_to_count(2.5)',
     })
   })
 
@@ -225,6 +296,43 @@ describe('reduceCommandCreators', () => {
       ],
     })
   })
+
+  it('Python commands are joined together', () => {
+    const initialState: any = {}
+    const result: any = reduceCommandCreators(
+      [
+        curryCommandCreator(pythonHelloWorldCreator, {}),
+        curryCommandCreator(pythonGoodbyeWorldCreator, {}),
+      ],
+      invariantContext,
+      initialState
+    )
+
+    expect(result).toEqual({
+      commands: [],
+      warnings: [],
+      python: 'print("Hello world")\nprint("Goodbye world")',
+    })
+  })
+
+  it('Python commands mixed with non-Python commands', () => {
+    const initialState: any = {}
+    const result: any = reduceCommandCreators(
+      [
+        curryCommandCreator(addCreator, { value: 1 }),
+        curryCommandCreator(pythonHelloWorldCreator, {}),
+      ],
+      invariantContext,
+      initialState
+    )
+
+    expect(result).toEqual({
+      commands: [{ command: 'add', params: { value: 1 } }],
+      warnings: [],
+      python: 'print("Hello world")',
+      // should only get 1 line of Python with no stray newlines or `undefined`s.
+    })
+  })
 })
 
 describe('commandCreatorsTimeline', () => {
@@ -235,6 +343,7 @@ describe('commandCreatorsTimeline', () => {
         curryCommandCreator(addCreatorWithWarning, { value: 4 }),
         curryCommandCreator(divideCreator, { value: 0 }),
         curryCommandCreator(multiplyCreator, { value: 3 }),
+        curryCommandCreator(pythonHelloWorldCreator, {}),
       ],
       invariantContext,
       initialState
@@ -254,6 +363,7 @@ describe('commandCreatorsTimeline', () => {
         {
           robotState: { count: 5 + 4 },
           commands: [{ command: 'add', params: { value: 4 } }],
+          stepInfo: {},
           warnings: [
             {
               message: 'adding 4 with warning example',
@@ -262,6 +372,7 @@ describe('commandCreatorsTimeline', () => {
           ],
         },
         // no more steps in the timeline, stopped by error
+        // python output is suppressed too
       ],
     })
   })
@@ -274,6 +385,7 @@ describe('commandCreatorsTimeline', () => {
         curryCommandCreator(addCreatorWithWarning, { value: 3 }),
         curryCommandCreator(multiplyCreator, { value: 2 }),
         curryCommandCreator(addCreatorWithWarning, { value: 1 }),
+        curryCommandCreator(pythonHelloWorldCreator, {}),
       ],
       invariantContext,
       initialState
@@ -284,6 +396,7 @@ describe('commandCreatorsTimeline', () => {
       {
         robotState: { count: 8 },
         commands: [{ command: 'add', params: { value: 3 } }],
+        stepInfo: {},
         warnings: [
           {
             message: 'adding 3 with warning example',
@@ -295,18 +408,28 @@ describe('commandCreatorsTimeline', () => {
       {
         robotState: { count: 16 },
         commands: [{ command: 'multiply', params: { value: 2 } }],
+        stepInfo: {},
         warnings: [],
       },
       // add 1 w/ warning
       {
         robotState: { count: 17 },
         commands: [{ command: 'add', params: { value: 1 } }],
+        stepInfo: {},
         warnings: [
           {
             message: 'adding 1 with warning example',
             type: 'ADD_WARNING',
           },
         ],
+      },
+      // Python hello world
+      {
+        robotState: { count: 17 },
+        stepInfo: {},
+        commands: [],
+        warnings: [],
+        python: 'print("Hello world")',
       },
     ])
   })

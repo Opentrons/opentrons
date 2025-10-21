@@ -1,9 +1,11 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
 
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { sessionsEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
 import { mockRobot } from '../../../robot-api/__fixtures__'
+import * as Actions from '../../actions'
 
 import type { Action } from '../../../types'
 
@@ -11,10 +13,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.fetchAllSessions(robotName)
 
 describe('fetchAllSessionsEpic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   const expectedRequest = {
     method: 'GET',
     path: '/sessions',

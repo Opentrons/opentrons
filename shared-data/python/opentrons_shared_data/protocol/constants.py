@@ -3,7 +3,7 @@ from enum import Enum
 
 
 if TYPE_CHECKING:
-    from .dev_types import (
+    from .types import (
         DelayCommandId,
         BlowoutCommandId,
         PickUpTipCommandId,

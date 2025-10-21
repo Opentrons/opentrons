@@ -1,13 +1,25 @@
 """Opentrons helper methods."""
 import asyncio
+import atexit
+import logging
+
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from math import pi
 from subprocess import run, Popen
 from time import time
-from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
-import atexit
+from typing import (
+    Callable,
+    Coroutine,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+    Sequence,
+)
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -19,9 +31,9 @@ from opentrons_shared_data.labware import load_definition as load_labware
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
 from opentrons.hardware_control.types import SubSystem
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     sensor_node_for_mount,
-    axis_convert,
 )
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
@@ -29,6 +41,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
 from .types import (
@@ -39,6 +52,23 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+
+# Supress logging.exception messages as they can be confusing when running scripts.
+class StripExceptionMessageHandler(logging.StreamHandler):
+    """Custom StreamHandler to strip logging.exception messages."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, but supress logging.exception logs."""
+        if record.exc_info:
+            # Remove the msg, traceback if it's an exception
+            record.msg = ""
+            record.exc_info = None
+        super().emit(record)
+
+
+logger = logging.getLogger()
+logger.addHandler(StripExceptionMessageHandler())
 
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5
@@ -83,9 +113,7 @@ def stop_server_ot3() -> None:
 def restart_server_ot3() -> None:
     """Start opentrons-robot-server on the OT3."""
     print('Starting "opentrons-robot-server"...')
-    Popen(
-        ["systemctl", "restart", "opentrons-robot-server", "&"],
-    )
+    Popen(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 def start_server_ot3() -> None:
@@ -110,9 +138,17 @@ def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[s
         return None
     items = model.split("_")
     assert len(items) == 3
-    size = "P1K" if items[0] == "p1000" else "P50"
+    match items[0]:
+        case "p1000":
+            size = "P1K"
+            version = 35
+        case "p50":
+            size = "P50"
+            version = 35
+        case "p200":
+            size = "P2H"
+            version = 30
     channels = "S" if items[1] == "single" else "M"
-    version = items[2].upper().replace(".", "")
     date = datetime.now().strftime("%y%m%d")
     unique_number = 1 if mount == OT3Mount.LEFT else 2
     return f"{size}{channels}{version}{date}A0{unique_number}"
@@ -139,7 +175,7 @@ def _create_attached_instruments_dict(
 
 
 async def update_firmware(
-    api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None
+    api: OT3API, force: bool = False, subsystems: Optional[Sequence[SubSystem]] = None
 ) -> None:
     """Update firmware of OT3."""
     if not api.is_simulator:
@@ -206,10 +242,11 @@ async def reset_api(api: OT3API) -> None:
     """Reset OT3API."""
     print(f"Firmware: v{api.fw_version}")
     if not api.is_simulator:
-        await api._backend.engage_sync()  # type: ignore[union-attr]
-        await api._backend.release_estop()  # type: ignore[union-attr]
+        backend = cast(OT3Controller, api._backend)
+        await backend.engage_sync()
+        await backend.release_estop()
         await update_firmware(api)
-        await api._backend.probe_network()  # type: ignore[union-attr]
+        await backend.probe_network()
     await api.cache_instruments()
     await api.refresh_positions()
 
@@ -232,7 +269,7 @@ async def build_async_ot3_hardware_api(
         except ValueError as e:
             print(e)
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
-    kwargs = {"config": config}
+    kwargs = {"config": config, "feature_flags": HardwareFeatureFlags.build_from_ff()}
     if is_simulating:
         # This Callable type annotation works around mypy complaining about slight mismatches
         # between the signatures of build_hardware_simulator() and build_hardware_controller().
@@ -335,10 +372,13 @@ def set_gantry_per_axis_setting_ot3(
 ) -> None:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        settings.high_throughput[axis_kind] = value
-    else:
-        settings.low_throughput[axis_kind] = value
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_1000[axis_kind] = value
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            settings.high_throughput_200[axis_kind] = value
+        case GantryLoad.LOW_THROUGHPUT:
+            settings.low_throughput[axis_kind] = value
 
 
 def get_gantry_per_axis_setting_ot3(
@@ -346,9 +386,13 @@ def get_gantry_per_axis_setting_ot3(
 ) -> float:
     """Set a value in an OT3 Gantry's per-axis-settings."""
     axis_kind = Axis.to_kind(axis)
-    if load == GantryLoad.HIGH_THROUGHPUT:
-        return settings.high_throughput[axis_kind]
-    return settings.low_throughput[axis_kind]
+    match load:
+        case GantryLoad.HIGH_THROUGHPUT_1000:
+            return settings.high_throughput_1000[axis_kind]
+        case GantryLoad.HIGH_THROUGHPUT_200:
+            return settings.high_throughput_200[axis_kind]
+        case GantryLoad.LOW_THROUGHPUT:
+            return settings.low_throughput[axis_kind]
 
 
 async def set_gantry_load_per_axis_current_settings_ot3(
@@ -556,19 +600,25 @@ async def update_pick_up_current(
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.current_by_tip_count = {
-        k: current for k in config_model.current_by_tip_count.keys()
-    }
+    for map_key in config_model.configuration_by_nozzle_map.keys():
+        for tip_type in config_model.configuration_by_nozzle_map[map_key].keys():
+            config_model.configuration_by_nozzle_map[map_key][
+                tip_type
+            ].current = current
     pipette.pick_up_configurations.press_fit = config_model
 
 
 async def update_pick_up_distance(
     api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
-    """Update pick-up-tip current."""
+    """Update pick-up-tip distance."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.distance = distance
+    for map_key in config_model.configuration_by_nozzle_map.keys():
+        for tip_type in config_model.configuration_by_nozzle_map[map_key].keys():
+            config_model.configuration_by_nozzle_map[map_key][
+                tip_type
+            ].distance = distance
     pipette.pick_up_configurations.press_fit = config_model
 
 
@@ -598,6 +648,11 @@ async def move_plunger_absolute_ot3(
             await _move_coro
 
 
+async def home_tip_motors(api: OT3API, back_off: bool = True) -> None:
+    """Homes the tip motors with backoff option broken out."""
+    await api._backend.home_tip_motors(distance=50, velocity=5, back_off=back_off)
+
+
 async def move_tip_motor_relative_ot3(
     api: OT3API,
     distance: float,
@@ -608,18 +663,13 @@ async def move_tip_motor_relative_ot3(
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
 
-    current_gear_pos_float = axis_convert(api._backend.gear_motor_position, 0.0)[
-        Axis.P_L
-    ]
-    current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
-    target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
+    current_gear_pos = api._backend.gear_motor_position or 0.0
+    target_pos = current_gear_pos + distance
 
-    if speed is not None and distance < 0:
-        speed *= -1
+    # if speed is not None and distance < 0:
+    #     speed *= -1
 
-    tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict)
-
-    _move_coro = api._backend.tip_action(moves=tip_motor_move[0])
+    _move_coro = api._backend.tip_action(current_gear_pos, [(target_pos, speed or 400)])
     if motor_current is None:
         await _move_coro
     else:
@@ -653,7 +703,7 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
     """Get the endstop's position per mount."""
-    carriage_pos = api._deck_from_machine(api._backend.home_position())
+    carriage_pos = api.get_deck_from_machine(api._backend.home_position())
     pos_at_home = api._effector_pos_from_carriage_pos(
         OT3Mount.from_mount(mount), carriage_pos, None
     )
@@ -863,7 +913,7 @@ async def get_temperature_humidity_ot3(
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
-    messenger = api._backend._messenger  # type: ignore[union-attr]
+    messenger = cast(OT3Controller, api._backend)._messenger
     return await _get_temp_humidity(messenger, mount, sensor_id)
 
 
@@ -907,7 +957,10 @@ async def get_capacitance_ot3(
     capacitive = sensor_types.CapacitiveSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        api._backend._messenger, capacitive, offset=False, timeout=2  # type: ignore[union-attr]
+        cast(OT3Controller, api._backend)._messenger,
+        capacitive,
+        offset=False,
+        timeout=2,
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")
@@ -924,7 +977,7 @@ async def get_pressure_ot3(
     pressure = sensor_types.PressureSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        api._backend._messenger, pressure, offset=False, timeout=2  # type: ignore[union-attr]
+        cast(OT3Controller, api._backend)._messenger, pressure, offset=False, timeout=2
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")
@@ -997,13 +1050,13 @@ def set_pipette_offset_ot3(api: OT3API, mount: OT3Mount, offset: Point) -> None:
 
 def get_gripper_offset_ot3(api: OT3API) -> Point:
     """Get gripper offset OT3."""
-    assert api.has_gripper, "No gripper found"
+    assert api.has_gripper(), "No gripper found"
     return api._gripper_handler._gripper._calibration_offset.offset  # type: ignore[union-attr]
 
 
 def set_gripper_offset_ot3(api: OT3API, offset: Point) -> None:
     """Set gripper offset OT3."""
-    assert api.has_gripper, "No gripper found"
+    assert api.has_gripper(), "No gripper found"
     api._gripper_handler._gripper._calibration_offset.offset = offset  # type: ignore[union-attr]
 
 
@@ -1087,8 +1140,14 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     """Get pipette serial number."""
     model = pipette.model
     volume = model.split("_")[0].replace("p", "")
-    volume = "1K" if volume == "1000" else volume
+    # volume = "1K" if volume == "1000" else volume
+    if volume == "1000":
+        volume = "1K"
+    elif volume == "200":
+        volume = "2H"
     channels = "S" if "single" in model else "M"
+    if "96" in model:
+        channels = "H"
     version = model.split("v")[-1].strip().replace(".", "")
     assert pipette.pipette_id, f"no pipette_id found for pipette: {pipette}"
     if "P" in pipette.pipette_id:
@@ -1102,7 +1161,7 @@ def get_robot_serial_ot3(api: OT3API) -> str:
     """Get robot serial number."""
     if api.is_simulator:
         return "FLXA1000000000000"
-    robot_id = api._backend.eeprom_data.serial_number
+    robot_id = cast(OT3Controller, api._backend).eeprom_data.serial_number
     if not robot_id:
         robot_id = ""
     return robot_id
@@ -1120,6 +1179,8 @@ def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
         pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(1)
     elif "p1000" in pip.model.lower():
         pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(4.5)
+    elif "p200" in pip.model.lower():
+        pip_nominal_ul_per_mm = _ul_per_mm_of_shaft_diameter(2)
     else:
         raise RuntimeError(f"unexpected pipette model: {pip.model}")
     # 10000 is an arbitrarily large volume that none of our pipettes can reach

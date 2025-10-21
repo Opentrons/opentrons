@@ -1,8 +1,8 @@
 import * as Constants from './constants'
-import * as Types from './types'
 
-import type { RobotApiRequestMeta } from '../robot-api/types'
 import type { Mount } from '../pipettes/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
+import type * as Types from './types'
 
 export const fetchLights = (robotName: string): Types.FetchLightsAction => ({
   type: Constants.FETCH_LIGHTS,
@@ -66,6 +66,9 @@ type HomeActionCreator = ((
 ) => Types.HomeAction) &
   ((robotName: string, target: 'pipette', mount: Mount) => Types.HomeAction)
 
+/**
+ * @deprecated: Prefer performing single robot commands via maintenance run. See useRobotControlCommands.
+ */
 export const home: HomeActionCreator = (
   robotName: string,
   target: 'robot' | 'pipette',
@@ -98,6 +101,9 @@ export const homeFailure = (
   meta,
 })
 
+/**
+ * @deprecated: Prefer performing single robot commands via maintenance run. See useRobotControlCommands.
+ */
 export const move = (
   robotName: string,
   position: Types.MovePosition,

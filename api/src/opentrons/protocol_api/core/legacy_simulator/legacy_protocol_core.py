@@ -1,7 +1,12 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.pipette_load_name_conversions import (
+    convert_to_pipette_name_type,
+)
+from opentrons_shared_data.pipette.types import PipetteGenerationType
+
 from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
@@ -11,6 +16,7 @@ from ..legacy.legacy_module_core import LegacyModuleCore
 from ..legacy.load_info import InstrumentLoadInfo
 
 from .legacy_instrument_core import LegacyInstrumentCoreSimulator
+from .tasks import LegacyTaskCore
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +24,31 @@ logger = logging.getLogger(__name__)
 class LegacyProtocolCoreSimulator(
     LegacyProtocolCore,
     AbstractProtocol[
-        LegacyInstrumentCoreSimulator, LegacyLabwareCore, LegacyModuleCore
+        LegacyInstrumentCoreSimulator,
+        LegacyLabwareCore,
+        LegacyModuleCore,
+        LegacyTaskCore,
     ],
 ):
     _instruments: Dict[Mount, Optional[LegacyInstrumentCoreSimulator]]  # type: ignore[assignment]
 
     def load_instrument(  # type: ignore[override]
-        self, instrument_name: PipetteNameType, mount: Mount
+        self,
+        instrument_name: PipetteNameType,
+        mount: Mount,
+        liquid_presence_detection: bool = False,
     ) -> LegacyInstrumentCoreSimulator:
         """Create a simulating instrument context."""
+        pipette_generation = convert_to_pipette_name_type(
+            instrument_name.value
+        ).pipette_generation
+
+        if pipette_generation not in [
+            PipetteGenerationType.GEN1,
+            PipetteGenerationType.GEN2,
+        ]:
+            raise ValueError(f"{instrument_name} is not a valid OT-2 pipette.")
+
         existing_instrument = self._instruments[mount]
 
         if (
@@ -65,3 +87,11 @@ class LegacyProtocolCoreSimulator(
         )
 
         return new_instr
+
+        def wait_for_tasks(self, task: Sequence[LegacyTaskCore]) -> None:
+            """Wait for list of tasks to complete before executing subsequent commands."""
+            assert False, "wait_for_tasks only supported on engine core"
+
+        def create_timer(self, seconds: float) -> LegacyTaskCore:
+            """Create a timer task that runs in the background."""
+            assert False, "create_timer only supported on engine core"

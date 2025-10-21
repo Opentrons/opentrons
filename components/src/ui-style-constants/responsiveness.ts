@@ -4,3 +4,12 @@
 // before the release of this code to prevent Funny desktop app behavior when the viewport
 // is precisely 600x1024
 export const touchscreenMediaQuerySpecs = '(height: 600px) and (width: 1024px)'
+
+// This needs to be recalculated on-render to work with storybook viewport settings, so
+// if you need to support both media types in js use the function
+export const isTouchscreenDynamic = (): boolean =>
+  typeof window === 'object' && window.matchMedia != null
+    ? window.matchMedia(touchscreenMediaQuerySpecs).matches
+    : false
+
+export const isTouchscreen = isTouchscreenDynamic()

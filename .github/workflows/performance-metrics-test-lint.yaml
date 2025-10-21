@@ -1,0 +1,54 @@
+# This workflow runs lint on pull requests that touch anything in the performance-metrics directory
+
+name: 'performance-metrics test & lint'
+
+on:
+  pull_request:
+    paths:
+      - 'performance-metrics/**'
+      - '.github/workflows/performance-metrics-test-lint.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'performance-metrics test & lint'
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v4'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v5'
+        with:
+          python-version: '3.10'
+          cache: 'pipenv'
+          cache-dependency-path: performance-metrics/Pipfile.lock
+
+      - name: "Install Python deps"
+        uses: './.github/actions/python/setup'
+        with:
+          project: 'performance-metrics'
+
+      - name: Setup
+        id: install
+        working-directory: ./performance-metrics
+        run: make setup
+
+      - name: Test
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./performance-metrics
+        run: make test
+
+      - name: Lint
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./performance-metrics
+        run: make lint

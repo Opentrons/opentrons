@@ -1,27 +1,27 @@
 // labware library entry
-import * as React from 'react'
 import { hydrate, render } from 'react-dom'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
 
-import { getPublicPath } from './public-path'
-import './styles.global.css'
+import './styles.global.module.css'
+
+export * from './labware-creator'
 
 const $root = document.getElementById('root')
 
 if (!$root) {
-  throw new Error('fatal: #root not found')
+  throw new Error('fatal: :root not found')
 }
 
 const Root = (): JSX.Element => (
-  <BrowserRouter>
-    <Switch>
-      <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
-      <Route component={App} />
-    </Switch>
-  </BrowserRouter>
+  <HashRouter>
+    <Routes>
+      <Route path={'/create'} element={<LabwareCreator />} />
+      <Route path={'*'} element={<App />} />
+    </Routes>
+  </HashRouter>
 )
 
 if ($root.hasChildNodes()) {

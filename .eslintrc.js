@@ -7,9 +7,23 @@ module.exports = {
     project: require('path').join(__dirname, 'tsconfig-eslint.json'),
   },
 
-  extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
+  extends: [
+    'standard-with-typescript',
+    'plugin:react/recommended',
+    'prettier',
+    'plugin:json/recommended',
+    'plugin:storybook/recommended',
+    'plugin:react/jsx-runtime',
+  ],
 
-  plugins: ['react', 'react-hooks', 'json', 'jest'],
+  plugins: [
+    'react',
+    'react-hooks',
+    'json',
+    'testing-library',
+    'opentrons',
+    '@eslint-react',
+  ],
 
   rules: {
     camelcase: 'off',
@@ -22,6 +36,7 @@ module.exports = {
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/default-param-last': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
@@ -32,6 +47,30 @@ module.exports = {
     'no-case-declarations': 'warn',
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
+    'react/jsx-curly-brace-presence': 'warn',
+
+    // Enforce notification hooks
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@opentrons/react-api-client',
+            importNames: [
+              'useAllRunsQuery',
+              'useRunQuery',
+              'useAllCommandsQuery',
+              'useCurrentMaintenanceRun',
+              'useDeckConfigurationQuery',
+              'useAllCommandsAsPreSerializedList',
+              'useSearchLabwareOffsets',
+            ],
+            message:
+              'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
+          },
+        ],
+      },
+    ],
   },
 
   globals: {},
@@ -50,7 +89,15 @@ module.exports = {
   overrides: [
     {
       files: ['**/*.js'],
-      parser: '@babel/eslint-parser',
+      extends: ['plugin:@typescript-eslint/disable-type-checked'],
+      parserOptions: {
+        project: require('path').join(__dirname, 'tsconfig-eslint.json'),
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'warn',
+        '@typescript-eslint/no-unused-vars': 'warn',
+      },
     },
     {
       // TODO(mc, 2021-03-18): remove to default these rules back to errors
@@ -65,6 +112,29 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
+        '@typescript-eslint/ban-types': 'warn',
+        '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
+        '@typescript-eslint/await-thenable': 'warn',
+        '@typescript-eslint/ban-ts-comment': 'warn',
+        '@typescript-eslint/unbound-method': 'warn',
+        '@typescript-eslint/consistent-generic-constructors': 'warn',
+        '@typescript-eslint/no-misused-promises': 'warn',
+        // need this to be able to pass in css prop into raw elements (babel adds this at build time for styled-components)
+        'react/no-unknown-property': [
+          'error',
+          { ignore: ['css', 'indeterminate'] },
+        ],
+      },
+    },
+    {
+      files: [
+        './app/src/**/*.@(ts|tsx)',
+        './opentrons-ai-client/src/**/*.@(ts|tsx)',
+        './protocol-designer/src/**/*.@(ts|tsx)',
+      ],
+      rules: {
+        'import/no-absolute-path': 'off',
+        '@eslint-react/no-nested-component-definitions': 'error',
       },
     },
     {
@@ -74,26 +144,22 @@ module.exports = {
         '**/__mocks__/**.@(js|ts|tsx)',
         '**/__utils__/**.@(js|ts|tsx)',
         '**/__fixtures__/**.@(js|ts|tsx)',
+        '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
+        '**/**test.@(js|ts|tsx)',
       ],
-      env: {
-        jest: true,
-      },
-      extends: ['plugin:jest/recommended'],
       rules: {
-        'jest/expect-expect': 'off',
-        'jest/no-standalone-expect': 'off',
-        'jest/no-disabled-tests': 'error',
-        'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+        '@typescript-eslint/no-confusing-void-expression': 'warn',
         'node/handle-callback-err': 'off',
-        // TODO(mc, 2021-01-29): fix these and remove warning overrides
-        'jest/no-deprecated-functions': 'warn',
-        'jest/valid-title': 'warn',
-        'jest/no-conditional-expect': 'warn',
       },
+    },
+    {
+      files: ['**/__tests__/**test.tsx'],
+      extends: ['plugin:testing-library/react'],
     },
     {
       files: ['**/*.stories.tsx'],
@@ -105,6 +171,75 @@ module.exports = {
     {
       files: ['**/cypress/**'],
       extends: ['plugin:cypress/recommended'],
+      rules: {
+        'cypress/unsafe-to-chain-command': 'warn',
+      },
+    },
+    // Allow HTTP hooks in notification wrappers and tests
+    {
+      files: ['app/src/resources/**', '**/__tests__/**test**'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    // Apply tree-of-life import requirements to app as errors
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'error',
+      },
+    },
+    {
+      files: ['./protocol-designer/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+        '@eslint-react/no-nested-component-definitions': 'error',
+      },
+    },
+    // apply application structure import requirements to app
+    {
+      files: ['./app/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-across-applications': 'error',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['./opentrons-ai-client/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['./components/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['**/*.tsx'],
+      excludedFiles: ['**/*.stories.tsx'],
+      rules: {
+        // TODO: Switch this rule to 'error' once the CSS modules migration is complete.
+        'react/forbid-dom-props': [
+          'warn',
+          {
+            forbid: [
+              {
+                propName: 'style',
+                message:
+                  'Inline styles are not allowed. Use CSS modules instead.',
+              },
+            ],
+          },
+        ],
+      },
     },
   ],
 }

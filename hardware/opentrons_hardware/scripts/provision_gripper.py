@@ -43,9 +43,7 @@ async def flash_serials(
 ) -> None:
     """Flash serials in a loop."""
     while True:
-        should_quit = await get_and_update_serial_once(messenger, base_log, trace_log)
-        if should_quit:
-            return
+        await get_and_update_serial_once(messenger, base_log, trace_log)
 
 
 def _read_input_and_confirm(prompt: str) -> str:

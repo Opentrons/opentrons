@@ -1,8 +1,8 @@
 import * as Constants from './constants'
 
-import type { Action } from '../types'
-import type { PipettesState, PerRobotPipettesState } from './types'
 import type { Reducer } from 'redux'
+import type { Action } from '../types'
+import type { PerRobotPipettesState, PipettesState } from './types'
 
 const INITIAL_STATE: PipettesState = {}
 

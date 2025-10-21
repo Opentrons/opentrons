@@ -3,6 +3,9 @@ import contextlib
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
+from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons.drivers.asyncio.communication.errors import SerialException
 
 
 log = logging.getLogger(__name__)
@@ -35,19 +38,20 @@ class Poller:
         self._poll_forever_task: Optional["asyncio.Task[None]"] = None
 
     async def start(self) -> None:
-        assert self._poll_forever_task is None, "Poller already started"
-        self._poll_forever_task = asyncio.create_task(self._poll_forever())
-        await self.wait_next_poll()
+        if self._poll_forever_task is None:
+            self._poll_forever_task = asyncio.create_task(self._poll_forever())
+            await self.wait_next_poll()
 
     async def stop(self) -> None:
         """Stop polling."""
         task = self._poll_forever_task
-
-        assert task is not None, "Poller never started"
-
-        async with self._use_read_lock():
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
+        if task is not None:
+            async with self._use_read_lock():
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+            for waiter in self._poll_waiters:
+                waiter.cancel(msg="Module was removed")
+            self._poll_forever_task = None
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.
@@ -56,6 +60,9 @@ class Poller:
         the next complete read. If a read raises an exception,
         it will be passed through to `wait_next_poll`.
         """
+        if not self._poll_forever_task or self._poll_forever_task.done():
+            raise ModuleCommunicationError(message="Module was removed")
+
         poll_future = asyncio.get_running_loop().create_future()
         self._poll_waiters.append(poll_future)
         await poll_future
@@ -82,6 +89,18 @@ class Poller:
         except asyncio.InvalidStateError:
             log.warning("Poller waiter was already cancelled")
 
+    def _error_callback(self, exc: Exception) -> None:
+        try:
+            self._reader.on_error(exc)
+        except Exception:
+            log.exception("Exception in reader callback")
+
+    def _complete_all(
+        self, exc: Exception | None, previous: List["asyncio.Future[None]"]
+    ) -> None:
+        for waiter in previous:
+            Poller._set_waiter_complete(waiter, exc)
+
     async def _poll_once(self) -> None:
         """Trigger a single read, notifying listeners of success or error."""
         previous_waiters = self._poll_waiters
@@ -92,11 +111,16 @@ class Poller:
                 await self._reader.read()
         except asyncio.CancelledError:
             raise
+        except AbsorbanceReaderDisconnectedError as e:
+            self._error_callback(e)
+            self._complete_all(e, previous_waiters)
+        except SerialException as se:
+            log.error(f"Polling gcode error: {se}")
+            self._error_callback(se)
+            self._complete_all(se, previous_waiters)
         except Exception as e:
             log.exception("Polling exception")
-            self._reader.on_error(e)
-            for waiter in previous_waiters:
-                Poller._set_waiter_complete(waiter, e)
+            self._error_callback(e)
+            self._complete_all(e, previous_waiters)
         else:
-            for waiter in previous_waiters:
-                Poller._set_waiter_complete(waiter)
+            self._complete_all(None, previous_waiters)

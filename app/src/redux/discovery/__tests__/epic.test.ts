@@ -1,4 +1,5 @@
 import { TestScheduler } from 'rxjs/testing'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import * as Shell from '../../shell'
 import * as Actions from '../actions'

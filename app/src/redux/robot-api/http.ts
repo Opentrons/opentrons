@@ -1,20 +1,21 @@
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of, from } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
-import mapValues from 'lodash/mapValues'
-import toString from 'lodash/toString'
-import omitBy from 'lodash/omitBy'
 import inRange from 'lodash/inRange'
+import mapValues from 'lodash/mapValues'
+import omitBy from 'lodash/omitBy'
+import toString from 'lodash/toString'
+import { from, of } from 'rxjs'
+import { catchError, map, switchMap } from 'rxjs/operators'
 
-import { OPENTRONS_USB } from '../../redux/discovery'
-import { appShellRequestor } from '../../redux/shell/remote'
+import { OPENTRONS_USB } from '../discovery'
+import { appShellRequestor } from '../shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
+import type { AxiosError } from 'axios'
 import type { Observable } from 'rxjs'
 import type {
-  RobotHost,
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotHost,
 } from './types'
 
 const checkEmpty = (val: unknown): boolean => val == null || val === ''
@@ -62,15 +63,27 @@ export function fetchRobotApi(
           url,
           data: options.body,
         })
+          .then(response => ({
+            isError: false as const,
+            response,
+          }))
+          .catch(err => ({
+            isError: true as const,
+            ...(err as AxiosError<unknown>),
+          }))
       ).pipe(
-        map(response => ({
+        map(result => ({
           host,
           path,
           method,
-          body: response?.data,
-          status: response?.status,
+          body: result?.response?.data,
+          // FIXME(sf) this doesn't seem right, but also the type interface isn't written to allow for request
+          // failures that don't come from valid connections
+          status: result?.response?.status ?? 444,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok: inRange(response?.status, 200, 300),
+          ok: result.isError
+            ? false
+            : inRange(result?.response?.status, 200, 300),
         }))
       )
     : from(fetch(url, options)).pipe(

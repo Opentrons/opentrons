@@ -1,16 +1,23 @@
 """Common test fixtures for runs route tests."""
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 import pytest
 from decoy import Decoy
 
-from robot_server.protocols import ProtocolStore
+from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore
-from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.maintenance_runs import MaintenanceEngineStore
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+)
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
+from robot_server.file_provider.provider import FileProviderExecutor
+from robot_server.camera.provider import CameraProviderWrapper
+
 from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.resources import FileProvider, CameraProvider
 
 
 @pytest.fixture()
@@ -26,9 +33,9 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 
 
 @pytest.fixture()
-def mock_engine_store(decoy: Decoy) -> EngineStore:
+def mock_run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Get a mock EngineStore interface."""
-    return decoy.mock(cls=EngineStore)
+    return decoy.mock(cls=RunOrchestratorStore)
 
 
 @pytest.fixture()
@@ -50,12 +57,48 @@ def mock_run_auto_deleter(decoy: Decoy) -> RunAutoDeleter:
 
 
 @pytest.fixture()
-def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
-    """Get a mock MaintenanceEngineStore interface."""
-    return decoy.mock(cls=MaintenanceEngineStore)
+def mock_maintenance_run_orchestrator_store(
+    decoy: Decoy,
+) -> MaintenanceRunOrchestratorStore:
+    """Get a mock MaintenanceRunOrchestratorStore interface."""
+    return decoy.mock(cls=MaintenanceRunOrchestratorStore)
 
 
 @pytest.fixture
 def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
     """Get a mock DeckConfigurationStore."""
     return decoy.mock(cls=DeckConfigurationStore)
+
+
+@pytest.fixture()
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
+    """Return a mock FileProviderExecutor."""
+    return decoy.mock(cls=FileProviderExecutor)
+
+
+@pytest.fixture()
+def mock_file_provider(
+    decoy: Decoy, mock_file_provider_wrapper: FileProviderExecutor
+) -> FileProvider:
+    """Return a mock FileProvider."""
+    return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
+@pytest.fixture
+def mock_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock HardwareControlAPI."""
+    return decoy.mock(cls=OT3HardwareControlAPI)

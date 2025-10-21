@@ -14,7 +14,6 @@ on:
       - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
-      - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/robot-server-lint-test.yaml'
@@ -34,7 +33,6 @@ on:
       - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
-      - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/robot-server-lint-test.yaml'
@@ -53,20 +51,20 @@ jobs:
   lint-test:
     name: 'robot server package linting and tests'
     timeout-minutes: 40
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     strategy:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -83,7 +81,7 @@ jobs:
         name: Test with opentrons_hardware
         run: make -C robot-server test-cov
       - name: Ensure assets build
-        run: make -C robot-server sdist wheel
+        run: make -C robot-server wheel
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:

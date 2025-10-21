@@ -2,6 +2,7 @@
 from typing import cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.types import Mount
@@ -18,9 +19,9 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 
 
 @pytest.fixture(params=[Mount.LEFT, Mount.RIGHT])
-def mount(request: pytest.FixtureRequest) -> Mount:
+def mount(request: SubRequest) -> Mount:
     """Set the subject's mount."""
-    return cast(Mount, request.param)  # type: ignore[attr-defined]
+    return cast(Mount, request.param)
 
 
 @pytest.fixture

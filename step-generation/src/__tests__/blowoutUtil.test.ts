@@ -1,40 +1,41 @@
-import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import { blowout } from '../commandCreators/atomic/blowout'
-import { InvariantContext } from '../types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { blowOutInWell } from '../commandCreators/atomic'
+import { blowOutInWasteChute } from '../commandCreators/compound'
 import {
-  blowoutUtil,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-  wasteChuteCommandsUtil,
-} from '../utils'
-import { curryCommandCreator } from '../utils/curryCommandCreator'
-import {
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  TROUGH_LABWARE,
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
+  DEFAULT_PIPETTE,
+  DEST_LABWARE,
+  getInitialRobotStateStandard,
   makeContext,
+  SOURCE_LABWARE,
 } from '../fixtures'
-jest.mock('../utils/curryCommandCreator')
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  mixBlowoutLocationHelper,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '../utils'
+import { curryCommandCreator } from '../utils/curryCommandCreator'
 
-const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
-  typeof curryCommandCreator
->
+import type { BlowoutParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
+
+vi.mock('../utils/curryCommandCreator')
 
 let blowoutArgs: {
-  pipette: BlowoutParams['pipette']
+  pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
-  sourceWell: BlowoutParams['well']
+  sourceWell: BlowoutParams['wellName']
   destLabwareId: string
-  destWell: BlowoutParams['well']
+  destWell: BlowoutParams['wellName']
   blowoutLocation: string | null | undefined
   flowRate: number
   offsetFromTopMm: number
   invariantContext: InvariantContext
+  prevRobotState: RobotState
 }
-describe('blowoutUtil', () => {
+describe('blowoutLocationHelper', () => {
   let invariantContext: InvariantContext
 
   beforeEach(() => {
@@ -50,83 +51,95 @@ describe('blowoutUtil', () => {
       offsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
       invariantContext,
       blowoutLocation: null,
+      prevRobotState: getInitialRobotStateStandard(invariantContext),
     }
-    curryCommandCreatorMock.mockClear()
+    vi.mocked(curryCommandCreator).mockClear()
   })
-  it('blowoutUtil curries blowout with source well params', () => {
-    blowoutUtil({
+  it('mixBlowoutLocationHelper curries blowout with source well params', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: blowoutArgs.sourceLabwareId,
-      well: blowoutArgs.sourceWell,
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
+      pipetteId: blowoutArgs.pipette,
+      labwareId: blowoutArgs.sourceLabwareId,
+      wellName: blowoutArgs.sourceWell,
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        origin: 'top',
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
-  it('blowoutUtil curries waste chute commands when there is no well', () => {
+  it('mixBlowoutLocationHelper curries waste chute commands when there is no well', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
-          location: 'D3',
+          location: 'cutoutD3',
+          pythonName: 'mock_waste_chute',
         },
       },
     }
-    blowoutUtil({
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       destLabwareId: wasteChuteId,
       invariantContext: invariantContext,
       destWell: null,
       blowoutLocation: wasteChuteId,
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
-      wasteChuteCommandsUtil,
-      {
-        addressableAreaName: '1and8ChannelWasteChute',
-        type: 'blowOut',
-        pipetteId: blowoutArgs.pipette,
-        flowRate: 2.3,
-      }
-    )
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWasteChute, {
+      pipetteId: blowoutArgs.pipette,
+      flowRate: 2.3,
+      wasteChuteId,
+    })
   })
-  it('blowoutUtil curries blowout with dest plate params', () => {
-    blowoutUtil({
+  it('mixBlowoutLocationHelper curries blowout with dest plate params', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: blowoutArgs.destLabwareId,
-      well: blowoutArgs.destWell,
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
+      pipetteId: blowoutArgs.pipette,
+      labwareId: blowoutArgs.destLabwareId,
+      wellName: blowoutArgs.destWell,
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        origin: 'top',
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
-  it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
-    blowoutUtil({
+  it('mixBlowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
+    mixBlowoutLocationHelper({
       ...blowoutArgs,
-      blowoutLocation: TROUGH_LABWARE,
+      blowoutLocation: 'dest_well',
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: TROUGH_LABWARE,
-      well: 'A1',
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
+      pipetteId: blowoutArgs.pipette,
+      labwareId: 'destPlateId',
+      wellName: 'A2',
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        origin: 'top',
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
-  it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
-    const result = blowoutUtil({
+  it('mixBlowoutLocationHelper returns an empty array if not given a blowoutLocation', () => {
+    const result = mixBlowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: null,
     })
-    expect(curryCommandCreatorMock).not.toHaveBeenCalled()
+    expect(curryCommandCreator).not.toHaveBeenCalled()
     expect(result).toEqual([])
   })
 })

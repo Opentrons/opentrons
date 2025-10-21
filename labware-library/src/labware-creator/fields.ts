@@ -1,9 +1,11 @@
 import capitalize from 'lodash/capitalize'
+
+import { displayAsTube, getLabwareName } from './utils'
+
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
-import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -17,6 +19,7 @@ export const SUGGESTED_XY_RANGE = 1
 
 export const MAX_Z_DIMENSION = 195
 export const MAX_SUGGESTED_Z = 124
+export const MAX_SUGGESTED_GRIPPER_Z = 129
 
 export const DISPLAY_VOLUME_UNITS = 'µL'
 
@@ -30,11 +33,6 @@ export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 
 export const LABWARE_TOO_SMALL_ERROR = 'LABWARE_TOO_SMALL_ERROR'
 export const LABWARE_TOO_LARGE_ERROR = 'LABWARE_TOO_LARGE_ERROR'
-
-export const LINK_CUSTOM_LABWARE_FORM = 'https://lqilf9ng.paperform.co/'
-
-export const LINK_REQUEST_ADAPTER_FORM =
-  'https://docs.google.com/forms/d/e/1FAIpQLScvsHlXQrtIhIQYO0zr6mYwmzOCGpYPqepeDIorFIyj2jT-UQ/viewform'
 
 export type ImportErrorKey =
   | 'INVALID_FILE_TYPE'
@@ -113,6 +111,7 @@ export interface LabwareFields {
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
   labwareZDimension: string | null | undefined
+  stackedLabwareZDimension: number | null | undefined
 
   gridRows: string | null | undefined
   gridColumns: string | null | undefined
@@ -122,6 +121,7 @@ export interface LabwareFields {
   gridOffsetY: string | null | undefined
 
   homogeneousWells: BooleanString | null | undefined
+  hasLpcQuirk: BooleanString | null | undefined
   regularRowSpacing: BooleanString | null | undefined
   regularColumnSpacing: BooleanString | null | undefined
 
@@ -145,8 +145,10 @@ export interface LabwareFields {
   loadName: string | null | undefined
   displayName: string | null | undefined
 
-  // fields for test protocol
-  pipetteName: string | null | undefined
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
@@ -164,6 +166,7 @@ export interface ProcessedLabwareFields {
   footprintXDimension: number
   footprintYDimension: number
   labwareZDimension: number
+  stackedLabwareZDimension: number
 
   gridRows: number
   gridColumns: number
@@ -180,7 +183,7 @@ export interface ProcessedLabwareFields {
   wellBottomShape: WellBottomShape | null
   wellDepth: number
   wellShape: WellShape
-
+  hasLpcQuirk: BooleanString
   // used with circular well shape only
   wellDiameter: number
 
@@ -197,36 +200,41 @@ export interface ProcessedLabwareFields {
   loadName: string
   displayName: string
 
-  // fields for test protocol
-  pipetteName: string
+  // used with adapters
+  compatibleAdapters: Record<string, number>
+  // used with modules
+  compatibleModules: Record<string, number>
 }
 
 export const tubeRackInsertOptions: Options = [
   {
     name: 'Opentrons 6 tubes',
     value: '6tubes',
-    imgSrc: require('./images/6x50mL_insert_large.png'),
+    imgSrc: new URL('./images/6x50mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 15 tubes',
     value: '15tubes',
-    imgSrc: require('./images/15x15mL_insert_large.png'),
+    imgSrc: new URL('./images/15x15mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 24 tubes',
     value: '24tubesSnapCap',
-    imgSrc: require('./images/24x1_5mL_insert_large.png'),
+    imgSrc: new URL('./images/24x1_5mL_insert_large.png', import.meta.url).href,
   },
   {
     name: 'Opentrons 10 tubes',
     value: '10tubes',
-    imgSrc: require('./images/6x15mL_and_4x50mL_insert_large.png'),
+    imgSrc: new URL(
+      './images/6x15mL_and_4x50mL_insert_large.png',
+      import.meta.url
+    ).href,
     disabled: true, // 6 + 4 tube rack not yet supported
   },
   {
     name: 'Non-Opentrons tube rack',
     value: 'customTubeRack',
-    imgSrc: require('./images/blank_insert_large.png'),
+    imgSrc: new URL('./images/blank_insert_large.png', import.meta.url).href,
   },
 ]
 
@@ -286,17 +294,26 @@ export const aluminumBlockTypeOptions: Options = [
   {
     name: '96 well',
     value: '96well',
-    imgSrc: require('./images/opentrons_96_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_96_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
   },
   {
     name: '24 well',
     value: '24well',
-    imgSrc: require('./images/opentrons_24_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_24_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
   },
   {
     name: 'Flat - not available',
     value: 'flat',
-    imgSrc: require('./images/opentrons_flat_aluminumblock_side_view.png'),
+    imgSrc: new URL(
+      './images/opentrons_flat_aluminumblock_side_view.png',
+      import.meta.url
+    ).href,
     disabled: true,
   },
 ]
@@ -373,14 +390,14 @@ export const getDefaultFormState = (): LabwareFields => ({
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
-
+  stackedLabwareZDimension: null,
   gridRows: null,
   gridColumns: null,
   gridSpacingX: null,
   gridSpacingY: null,
   gridOffsetX: null,
   gridOffsetY: null,
-
+  hasLpcQuirk: 'false',
   homogeneousWells: null,
   regularRowSpacing: null,
   regularColumnSpacing: null,
@@ -404,9 +421,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   loadName: null,
   displayName: null,
-
-  // fields for test protocol
-  pipetteName: null,
+  compatibleAdapters: {},
+  compatibleModules: {},
 })
 
 export const LABELS: Record<keyof LabwareFields, string> = {
@@ -416,6 +432,8 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
   handPlacedTipFit: 'Fit',
   homogeneousWells: 'Are all your wells the same shape and size?',
+  hasLpcQuirk:
+    'Do you want to exclude this labware from Labware Position Check?',
   footprintXDimension: 'Length',
   footprintYDimension: 'Width',
   labwareZDimension: 'Height',
@@ -440,7 +458,9 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
-  pipetteName: 'Test Pipette',
+  compatibleAdapters: 'Is this labware compatible with an adapter?',
+  compatibleModules: 'Is this labware compatible with a module?',
+  stackedLabwareZDimension: 'Stacked Labware Height',
 }
 
 export const getLabel = (

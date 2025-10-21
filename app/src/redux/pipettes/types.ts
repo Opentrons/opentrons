@@ -1,14 +1,17 @@
+import type { PipetteData } from '@opentrons/api-client'
 import type {
-  LabwareDefinition2,
+  LabwareDefinition,
   PipetteChannels,
   PipetteModel,
   PipetteModelSpecs,
+  PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '../calibration/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
+import type { INCOMPATIBLE, INEXACT_MATCH, MATCH } from './constants'
 
 // common types
 
@@ -249,7 +252,7 @@ export type ProtocolPipettesMatchByMount = {
 export interface TipRackCalibrationData {
   displayName: string
   lastModifiedDate: string | null
-  tipRackDef: LabwareDefinition2
+  tipRackDef: LabwareDefinition
 }
 
 export interface ProtocolPipetteTipRackCalData {
@@ -261,4 +264,18 @@ export interface ProtocolPipetteTipRackCalData {
 
 export type ProtocolPipetteTipRackCalDataByMount = {
   [mount in Mount]: ProtocolPipetteTipRackCalData | null
+}
+
+export interface PipetteInfo {
+  pipetteSpecs: PipetteNameSpecs
+  tipRacksForPipette: TipRackCalibrationData[]
+  requestedPipetteMatch:
+    | typeof MATCH
+    | typeof INEXACT_MATCH
+    | typeof INCOMPATIBLE
+  pipetteCalDate: string | null
+}
+
+export interface PipetteInformation extends PipetteData {
+  displayName: string
 }

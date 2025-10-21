@@ -1,23 +1,27 @@
-import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
-import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
-const mockFunc = jest.fn()
-const mockGoBack = jest.fn()
+import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockFunc = vi.fn()
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
   return {
-    ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    ...actual,
+    useNavigate: () => mockNavigate,
   }
 })
 
 const render = (
-  props: React.ComponentProps<typeof DeckConfigurationDiscardChangesModal>
+  props: ComponentProps<typeof DeckConfigurationDiscardChangesModal>
 ) => {
   return renderWithProviders(
     <DeckConfigurationDiscardChangesModal {...props} />,
@@ -28,7 +32,7 @@ const render = (
 }
 
 describe('DeckConfigurationDiscardChangesModal', () => {
-  let props: React.ComponentProps<typeof DeckConfigurationDiscardChangesModal>
+  let props: ComponentProps<typeof DeckConfigurationDiscardChangesModal>
 
   beforeEach(() => {
     props = {
@@ -36,25 +40,25 @@ describe('DeckConfigurationDiscardChangesModal', () => {
     }
   })
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('Changes will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Changes will be lost')
+    screen.getByText(
       'Are you sure you want to exit without saving your deck configuration?'
     )
-    getByText('Discard changes')
-    getByText('Continue editing')
+    screen.getByText('Discard changes')
+    screen.getByText('Continue editing')
   })
 
   it('should call a mock function when tapping discard changes button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Discard changes').click()
+    render(props)
+    fireEvent.click(screen.getByText('Discard changes'))
     expect(mockFunc).toHaveBeenCalledWith(false)
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping continue editing button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Continue editing').click()
+    render(props)
+    fireEvent.click(screen.getByText('Continue editing'))
     expect(mockFunc).toHaveBeenCalledWith(false)
   })
 })

@@ -1,13 +1,17 @@
+import { differenceInSeconds, parseISO } from 'date-fns'
 import { ofType } from 'redux-observable'
-import { filter, map, switchMap, ignoreElements } from 'rxjs/operators'
-import { parseISO, differenceInSeconds } from 'date-fns'
+import { filter, ignoreElements, map, switchMap } from 'rxjs/operators'
 
-import { GET, PUT, fetchRobotApi } from '../../robot-api'
+import { fetchRobotApi, GET, PUT } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
 import * as Constants from '../constants'
 
+import type { OperatorFunction } from 'rxjs'
+import type {
+  RobotApiRequestOptions,
+  RobotApiResponse,
+} from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
-import type { RobotApiRequestOptions } from '../../robot-api/types'
 import type { SyncSystemTimeAction } from '../types'
 
 const SYNC_THRESHOLD_SEC = 60
@@ -43,7 +47,7 @@ export const syncSystemTimeEpic: Epic = (action$, state$) => {
         filter(response => response.ok),
         map(response => response.body.data.systemTime),
         filter(systemTimeString => {
-          const systemTime = parseISO(systemTimeString)
+          const systemTime = parseISO(systemTimeString as string)
           const drift = differenceInSeconds(systemTime, new Date())
           return Math.abs(drift) > SYNC_THRESHOLD_SEC
         }),
@@ -53,6 +57,6 @@ export const syncSystemTimeEpic: Epic = (action$, state$) => {
         })
       )
     }),
-    ignoreElements()
+    ignoreElements() as OperatorFunction<RobotApiResponse, Action>
   )
 }

@@ -31,10 +31,14 @@ class PipetteOffsetCalibration(DeprecatedResponseDataModel):
     pipette: str = Field(..., description="The pipette ID")
     mount: str = Field(..., description="The pipette mount")
     offset: typing.List[float] = Field(
-        ..., description="The pipette offset vector", max_items=3, min_items=3
+        ..., description="The pipette offset vector", max_length=3, min_length=3
     )
     tiprack: str = Field(
-        ..., description="The sha256 hash of the tiprack used " "in this calibration"
+        ...,
+        description="A hash of the labware definition of the tip rack"
+        " that was used in this calibration."
+        " This is deprecated because it was prone to bugs where semantically identical"
+        " definitions had different hashes. Use `tiprackUri` instead.",
     )
     tiprackUri: str = Field(
         ...,

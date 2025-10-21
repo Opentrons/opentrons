@@ -1,22 +1,26 @@
-import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteNameSpecFixtures.json'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { get96Channel384WellPlateWells, orderWells } from '..'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
-import { makeWellSetHelpers } from '../wellSets'
+import {
+  fixtureP10MultiV2Specs,
+  fixtureP10SingleV2Specs,
+  fixtureP100096V2Specs,
+} from '../../pipettes'
 import { findWellAt } from '../getWellNamePerMultiTip'
-import { get96Channel384WellPlateWells, orderWells } from '..'
+import { makeWellSetHelpers } from '../wellSets'
 
-import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
+import type { LabwareDefinition } from '../../types'
 import type { WellSetHelpers } from '../wellSets'
 
-const fixtureP10Single = pipetteNameSpecsFixtures.p10_single as PipetteNameSpecs
-const fixtureP10Multi = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
-const fixtureP100096 = (pipetteNameSpecsFixtures.p1000_96 as any) as PipetteNameSpecs
-const fixture12Trough = fixture_12_trough as LabwareDefinition2
-const fixture96Plate = fixture_96_plate as LabwareDefinition2
-const fixture384Plate = fixture_384_plate as LabwareDefinition2
-const fixtureOverlappyWellplate = fixture_overlappy_wellplate as LabwareDefinition2
+const fixture12Trough = fixture_12_trough as LabwareDefinition
+const fixture96Plate = fixture_96_plate as LabwareDefinition
+const fixture384Plate = fixture_384_plate as LabwareDefinition
+const fixtureOverlappyWellplate =
+  fixture_overlappy_wellplate as LabwareDefinition
 const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [
@@ -198,8 +202,8 @@ describe('canPipetteUseLabware', () => {
 
   it('returns false when wells are too close together for multi channel pipettes', () => {
     const labwareDef = fixtureOverlappyWellplate
-    const pipette = fixtureP10Multi
-    const pipette96 = fixtureP100096
+    const pipette = fixtureP10MultiV2Specs
+    const pipette96 = fixtureP100096V2Specs
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
     expect(canPipetteUseLabware(pipette96, labwareDef)).toBe(false)
@@ -207,7 +211,7 @@ describe('canPipetteUseLabware', () => {
 
   it('returns true when pipette is single channel', () => {
     const labwareDef = fixtureOverlappyWellplate
-    const pipette = fixtureP10Single
+    const pipette = fixtureP10SingleV2Specs
 
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })
@@ -224,53 +228,45 @@ describe('getWellSetForMultichannel (integration test)', () => {
   it('96-flat', () => {
     const labwareDef = fixture96Plate
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'B1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'B1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'H1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'B1',
-      'C1',
-      'D1',
-      'E1',
-      'F1',
-      'G1',
-      'H1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'H1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
-      'A2',
-      'B2',
-      'C2',
-      'D2',
-      'E2',
-      'F2',
-      'G2',
-      'H2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(wellsFor96WellPlate)
   })
 
@@ -278,38 +274,40 @@ describe('getWellSetForMultichannel (integration test)', () => {
     const labwareDef = fixture96Plate
 
     expect(
-      getWellSetForMultichannel(labwareDef, 'A13', EIGHT_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A13',
+        channels: EIGHT_CHANNEL,
+      })
     ).toBeFalsy()
   })
 
   it('trough-12row', () => {
     const labwareDef = fixture12Trough
 
-    expect(getWellSetForMultichannel(labwareDef, 'A1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-      'A1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'A2', EIGHT_CHANNEL)).toEqual([
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-      'A2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, 'A1', NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'A1',
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(wellsForReservoir)
   })
 
@@ -322,31 +320,181 @@ describe('getWellSetForMultichannel (integration test)', () => {
       well96Channel
     )
 
-    expect(getWellSetForMultichannel(labwareDef, 'C1', EIGHT_CHANNEL)).toEqual([
-      'A1',
-      'C1',
-      'E1',
-      'G1',
-      'I1',
-      'K1',
-      'M1',
-      'O1',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'C1',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'])
 
-    expect(getWellSetForMultichannel(labwareDef, 'F2', EIGHT_CHANNEL)).toEqual([
-      'B2',
-      'D2',
-      'F2',
-      'H2',
-      'J2',
-      'L2',
-      'N2',
-      'P2',
-    ])
+    expect(
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: 'F2',
+        channels: EIGHT_CHANNEL,
+      })
+    ).toEqual(['B2', 'D2', 'F2', 'H2', 'J2', 'L2', 'N2', 'P2'])
 
     //  96-channel
     expect(
-      getWellSetForMultichannel(labwareDef, well96Channel, NINETY_SIX_CHANNEL)
+      getWellSetForMultichannel({
+        labwareDef,
+        wellName: well96Channel,
+        channels: NINETY_SIX_CHANNEL,
+      })
     ).toEqual(ninetySixChannelWells)
+  })
+})
+
+describe('getWellSetForMultichannel with pipetteNozzleDetails', () => {
+  let getWellSetForMultichannel: ReturnType<
+    typeof makeWellSetHelpers
+  >['getWellSetForMultichannel']
+
+  const labwareDef = fixture96Plate
+
+  beforeEach(() => {
+    const helpers = makeWellSetHelpers()
+    getWellSetForMultichannel = helpers.getWellSetForMultichannel
+  })
+
+  it('returns full column for 8-channel pipette with no config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns full column for 8-channel pipette with full config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'full',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns single well for 8-channel pipette with single nozzle config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'single',
+        activeNozzleCount: 1,
+      },
+    })
+    expect(result).toEqual(['C1'])
+  })
+
+  it('returns null for 8-channel pipette with row nozzle config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'row',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(null)
+  })
+
+  it('returns null for 8-channel pipette with subrect nozzle config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'subrect',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(null)
+  })
+
+  it('returns partial column for 8-channel pipette with partial column config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'G1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 4,
+      },
+    })
+    expect(result).toEqual(['D1', 'E1', 'F1', 'G1'])
+  })
+
+  it('handles edge cases for 8-channel partial column selection', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 8,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 4,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1'])
+  })
+
+  it('returns full plate for 96-channel pipette with no config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'A1',
+      channels: 96,
+    })
+    expect(result?.length).toBe(96)
+    expect(result?.[0]).toBe('A1')
+    expect(result?.[95]).toBe('H12')
+  })
+
+  it('returns full plate for 96-channel pipette with full config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'A1',
+      channels: 96,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'full',
+        activeNozzleCount: 96,
+      },
+    })
+    expect(result?.length).toBe(96)
+    expect(result?.[0]).toBe('A1')
+    expect(result?.[95]).toBe('H12')
+  })
+
+  it('returns single column for 96-channel pipette with column config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 96,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'column',
+        activeNozzleCount: 8,
+      },
+    })
+    expect(result).toEqual(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
+  })
+
+  it('returns null for 8-channel pipette with subrect nozzle config', () => {
+    const result = getWellSetForMultichannel({
+      labwareDef: labwareDef,
+      wellName: 'C1',
+      channels: 96,
+      pipetteNozzleDetails: {
+        nozzleConfig: 'subrect',
+        activeNozzleCount: 96,
+      },
+    })
+    expect(result).toEqual(null)
   })
 })

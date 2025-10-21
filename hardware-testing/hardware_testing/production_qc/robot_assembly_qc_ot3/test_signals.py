@@ -76,16 +76,16 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
     runner = MoveGroupRunner(move_groups=[[_move_group_nsync]])
     if api.is_simulator:
         # test that the required functionality exists
-        assert runner.run
+        assert runner.run is not None
     else:
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
         if sig_name == "nsync":
-            engage = api._backend.release_sync  # type: ignore[union-attr]
-            release = api._backend.engage_sync  # type: ignore[union-attr]
+            engage = backend.release_sync
+            release = backend.engage_sync
         elif sig_name == "estop":
-            engage = api._backend.engage_estop  # type: ignore[union-attr]
-            release = api._backend.release_estop  # type: ignore[union-attr]
+            engage = backend.engage_estop
+            release = backend.release_estop
 
         async def _sleep_then_activate_stop_signal() -> None:
             if "external" in sig_name:
@@ -104,6 +104,7 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
             finally:
                 print(f"deactivating {sig_name}")
                 await release()
+                backend.estop_acknowledge_and_clear()
                 await asyncio.sleep(0.5)
 
         async def _do_the_moving() -> None:
@@ -112,6 +113,10 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
                 await runner.run(can_messenger=messenger)
             except MotionFailedError:
                 print("caught MotionFailedError from estop")
+            except Exception:
+                # Ensure we have cleared the estop
+                await backend.release_estop()
+                backend.estop_acknowledge_and_clear()
 
         await asyncio.sleep(0.25)  # what is this doing?
         move_coro = _do_the_moving()
@@ -130,6 +135,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         except RuntimeError as e:
             print(e)
             ui.get_user_ready("release the E-STOP")
+            await _home()
+        except Exception:
+            # Ensure we have cleared the estop
+            backend: OT3Controller = api._backend  # type: ignore[assignment]
+            await backend.release_estop()
+            backend.estop_acknowledge_and_clear()
             await _home()
 
     for sig_name in SIGNAL_TEST_NAMES:

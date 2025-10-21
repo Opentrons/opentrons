@@ -1,9 +1,10 @@
-import * as Actions from '../actions'
+import { describe, expect, it } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
+import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
+import * as Actions from '../actions'
 
 import type { SessionsAction } from '../types'
-
-import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 
 interface ActionSpec {
   name: string

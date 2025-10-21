@@ -1,17 +1,19 @@
-import * as React from 'react'
 import { wellBottomShapeOptions, wellShapeOptions } from '../../fields'
+import styles from './optionsWithImages.module.css'
+
+import type * as React from 'react'
 import type { Options } from '../../fields'
-import styles from './optionsWithImages.css'
 
 const WELL_SHAPE_IMAGES = {
-  rectangular: require('../../../images/rectangularWell.svg'),
-  circular: require('../../../images/circularWell.svg'),
+  rectangular: new URL('../../../images/rectangularWell.svg', import.meta.url)
+    .href,
+  circular: new URL('../../../images/circularWell.svg', import.meta.url).href,
 }
 
 const WELL_BOTTOM_IMAGES = {
-  flat: require('../../../images/wellShapeFlat.svg'),
-  u: require('../../../images/wellShapeU.svg'),
-  v: require('../../../images/wellShapeV.svg'),
+  flat: new URL('../../../images/wellShapeFlat.svg', import.meta.url).href,
+  u: new URL('../../../images/wellShapeU.svg', import.meta.url).href,
+  v: new URL('../../../images/wellShapeV.svg', import.meta.url).href,
 }
 
 interface ImageOption {
@@ -37,12 +39,8 @@ const makeOptionsWithImages = (
     ),
   }))
 
-export const wellShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
-  wellShapeOptions,
-  WELL_SHAPE_IMAGES
-)
+export const wellShapeOptionsWithIcons: OptionsWithImages =
+  makeOptionsWithImages(wellShapeOptions, WELL_SHAPE_IMAGES)
 
-export const wellBottomShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
-  wellBottomShapeOptions,
-  WELL_BOTTOM_IMAGES
-)
+export const wellBottomShapeOptionsWithIcons: OptionsWithImages =
+  makeOptionsWithImages(wellBottomShapeOptions, WELL_BOTTOM_IMAGES)

@@ -1,10 +1,26 @@
+from asyncio import Queue
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
+from typing import (
+    cast,
+    Tuple,
+    Union,
+    List,
+    Callable,
+    Dict,
+    TypeVar,
+    Type,
+    TYPE_CHECKING,
+)
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
+from opentrons_shared_data.errors.exceptions import EnumeratedError
+from opentrons.config import feature_flags
+
+if TYPE_CHECKING:
+    from .modules.types import ModuleModel
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -231,6 +247,13 @@ class Axis(enum.Enum):
         """
         return cls.of_main_tool_actuator(mount)
 
+    @classmethod
+    def node_axes(cls) -> List["Axis"]:
+        """
+        Get a list of axes that are backed by flex canbus nodes.
+        """
+        return [cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.P_L, cls.P_R, cls.Z_G, cls.G]
+
 
 class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -246,6 +269,7 @@ class SubSystem(enum.Enum):
     gripper = 5
     rear_panel = 6
     motor_controller_board = 7
+    hepa_uv = 8
 
     def __str__(self) -> str:
         return self.name
@@ -374,6 +398,8 @@ class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
     ERROR_MESSAGE = enum.auto()
     ESTOP_CHANGE = enum.auto()
+    ASYNCHRONOUS_MODULE_ERROR = enum.auto()
+    MODULE_DISCONNECTED = enum.auto()
 
 
 @dataclass
@@ -383,12 +409,26 @@ class EstopOverallStatus:
     right_physical_state: EstopPhysicalStatus
 
 
+@dataclass
+class HepaFanState:
+    fan_on: bool
+    duty_cycle: int
+
+
+@dataclass
+class HepaUVState:
+    light_on: bool
+    uv_duration_s: int
+    remaining_time_s: int
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    module_serial: str | None = None
 
 
 @dataclass(frozen=True)
@@ -404,13 +444,39 @@ class ErrorMessageNotification:
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
 
 
+@dataclass(frozen=True)
+class AsynchronousModuleErrorNotification:
+    exception: EnumeratedError
+    module_serial: str | None
+    module_model: "ModuleModel"
+    port: str
+    event: Literal[
+        HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+    ] = HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+
+
+@dataclass(frozen=True)
+class ModuleDisconnectedNotification:
+    module_serial: str | None
+    module_model: "ModuleModel"
+    port: str
+    event: Literal[
+        HardwareEventType.MODULE_DISCONNECTED
+    ] = HardwareEventType.MODULE_DISCONNECTED
+
+
 # new event types get new dataclasses
 # when we add more event types we add them here
 HardwareEvent = Union[
-    DoorStateNotification, ErrorMessageNotification, EstopStateNotification
+    DoorStateNotification,
+    ErrorMessageNotification,
+    EstopStateNotification,
+    AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
+HardwareEventUnsubscriber = Callable[[], None]
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
@@ -479,6 +545,13 @@ class CriticalPoint(enum.Enum):
     point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
+    INSTRUMENT_XY_CENTER = enum.auto()
+    """
+    The INSTRUMENT_XY_CENTER means the critical point under consideration is
+    the XY center of the entire pipette, regardless of configuration.
+    No pipettes, single or multi, will change their instrument center point.
+    """
+
     FRONT_NOZZLE = enum.auto()
     """
     The end of the front-most nozzle of a multipipette with a tip attached.
@@ -502,6 +575,16 @@ class CriticalPoint(enum.Enum):
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.
+    """
+
+    Y_CENTER = enum.auto()
+    """
+    Y_CENTER means the critical point under consideration is at the same X
+    coordinate as the default nozzle point (i.e. TIP | NOZZLE | FRONT_NOZZLE)
+    but halfway in between the Y axis bounding box of the pipette - it is the
+    XY center of the first column in the pipette. It's really only relevant for
+    the 96; it will produce the same position as XY_CENTER on an eight or one
+    channel pipette.
     """
 
 
@@ -532,17 +615,23 @@ class PauseType(enum.Enum):
 
 
 class StatusBarState(enum.Enum):
-    IDLE = 0
-    RUNNING = 1
-    PAUSED = 2
-    HARDWARE_ERROR = 3
-    SOFTWARE_ERROR = 4
-    CONFIRMATION = 5
-    RUN_COMPLETED = 6
-    UPDATING = 7
-    ACTIVATION = 8
-    DISCO = 9
-    OFF = 10
+    """Semantic status bar states.
+
+    These mostly correspond to cases listed out in the Flex manual.
+    """
+
+    IDLE = enum.auto()
+    RUNNING = enum.auto()
+    PAUSED = enum.auto()
+    HARDWARE_ERROR = enum.auto()
+    SOFTWARE_ERROR = enum.auto()
+    ERROR_RECOVERY = enum.auto()
+    CONFIRMATION = enum.auto()
+    RUN_COMPLETED = enum.auto()
+    UPDATING = enum.auto()
+    ACTIVATION = enum.auto()
+    DISCO = enum.auto()
+    OFF = enum.auto()
 
     def transient(self) -> bool:
         return self.value in {
@@ -551,6 +640,16 @@ class StatusBarState(enum.Enum):
             StatusBarState.ACTIVATION.value,
             StatusBarState.DISCO.value,
         }
+
+
+@dataclass(frozen=True)
+class StatusBarUpdateEvent:
+    state: StatusBarState
+    enabled: bool
+
+
+StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
+StatusBarUpdateUnsubscriber = Callable[[], None]
 
 
 @dataclass
@@ -579,11 +678,20 @@ class GripperJawState(enum.Enum):
     #: the gripper is actively force-control gripping something
     HOLDING = enum.auto()
     #: the gripper is in position-control mode
+    STOPPED = enum.auto()
+    #: the gripper has been homed before but is stopped now
 
 
 class InstrumentProbeType(enum.Enum):
     PRIMARY = enum.auto()
     SECONDARY = enum.auto()
+    BOTH = enum.auto()
+
+
+class TipScrapeType(enum.Enum):
+    NONE = enum.auto()
+    RIGHT_ONE_COL = enum.auto()
+    LEFT_ONE_COL = enum.auto()
 
 
 class GripperProbe(enum.Enum):
@@ -606,6 +714,40 @@ class TipStateType(enum.Enum):
         return self.name
 
 
+@dataclass
+class HardwareFeatureFlags:
+    """
+    Hardware configuration options that can be passed to API instances.
+    Some options may not be relevant to every robot.
+
+    These generally map to the feature flag options in the opentrons.config
+    module.
+    """
+
+    use_old_aspiration_functions: bool = (
+        False  # To support pipette backwards compatability
+    )
+    require_estop: bool = True
+    stall_detection_enabled: bool = True
+    overpressure_detection_enabled: bool = True
+
+    @classmethod
+    def build_from_ff(cls) -> "HardwareFeatureFlags":
+        """Build from the feature flags configuration file on disc.
+
+        Note that, if this class is built from the default constructor, the values
+        of all of the flags are just the default values instead of the values in the
+        feature_flags file or environment variables. Use this constructor to ensure
+        the right values are pulled in.
+        """
+        return HardwareFeatureFlags(
+            use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
+            require_estop=feature_flags.require_estop(),
+            stall_detection_enabled=feature_flags.stall_detection_enabled(),
+            overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
+        )
+
+
 class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
 
@@ -619,25 +761,73 @@ class EarlyLiquidSenseTrigger(RuntimeError):
         )
 
 
-class LiquidNotFound(RuntimeError):
-    """Error raised if liquid sensing move completes without detecting liquid."""
-
-    def __init__(
-        self, position: Dict[Axis, float], max_z_pos: Dict[Axis, float]
-    ) -> None:
-        """Initialize LiquidNotFound error."""
-        super().__init__(
-            f"Liquid threshold not found, current_position = {position}"
-            f"position at max travel allowed = {max_z_pos}"
-        )
-
-
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
-    def __init__(self, tip_state_type: TipStateType, actual_state: int) -> None:
+    def __init__(
+        self, expected_state: TipStateType, actual_state: TipStateType
+    ) -> None:
         """Initialize FailedTipStateCheck error."""
         super().__init__(
-            f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
-            f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"
+            f"Expected tip state {expected_state}, but received {actual_state}."
         )
+
+
+@enum.unique
+class PipetteSensorId(int, enum.Enum):
+    """Sensor IDs available.
+
+    Not to be confused with SensorType. This is the ID value that separate
+    two or more of the same type of sensor within a system.
+
+    Note that this is a copy of an enum defined in opentrons_hardware.firmware_bindings.constants. That version
+    is authoritative; this version is here because this data is exposed above the hardware control layer and
+    therefore needs a typing source here so that we don't create a dependency on the internal hardware package.
+    """
+
+    S0 = 0x0
+    S1 = 0x1
+    UNUSED = 0x2
+    BOTH = 0x3
+
+
+@enum.unique
+class PipetteSensorType(int, enum.Enum):
+    """Sensor types available.
+
+    Note that this is a copy of an enum defined in opentrons_hardware.firmware_bindings.constants. That version
+    is authoritative; this version is here because this data is exposed above the hardware control layer and
+    therefore needs a typing source here so that we don't create a dependency on the internal hardware package.
+    """
+
+    tip = 0x00
+    capacitive = 0x01
+    environment = 0x02
+    pressure = 0x03
+    pressure_temperature = 0x04
+    humidity = 0x05
+    temperature = 0x06
+
+
+@dataclass(frozen=True)
+class PipetteSensorData:
+    """Sensor data from a monitored sensor.
+
+    Note that this is a copy of an enum defined in opentrons_hardware.firmware_bindings.constants. That version
+    is authoritative; this version is here because this data is exposed above the hardware control layer and
+    therefore needs a typing source here so that we don't create a dependency on the internal hardware package.
+    """
+
+    sensor_type: PipetteSensorType
+    _as_int: int
+    _as_float: float
+
+    def to_float(self) -> float:
+        return self._as_float
+
+    @property
+    def to_int(self) -> int:
+        return self._as_int
+
+
+PipetteSensorResponseQueue = Queue[Dict[PipetteSensorId, List[PipetteSensorData]]]

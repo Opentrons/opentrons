@@ -1,6 +1,6 @@
 """ Type definitions for modules in this tree """
 from dataclasses import dataclass
-from typing import Dict, NamedTuple, Optional
+from typing import Any, Dict, List, NamedTuple, Optional
 from enum import Enum
 
 
@@ -58,3 +58,50 @@ class ThermocyclerLidStatus(str, Enum):
     IN_BETWEEN = "in_between"
     OPEN = "open"
     MAX = "max"
+
+
+class AbsorbanceReaderLidStatus(str, Enum):
+    """Absorbance reader lid status."""
+
+    UNKNOWN = "unknown"
+    ON = "on"
+    OFF = "off"
+
+
+class AbsorbanceReaderPlatePresence(str, Enum):
+    """Absorbance reader plate presence."""
+
+    UNKNOWN = "unknown"
+    PRESENT = "present"
+    ABSENT = "absent"
+
+
+class AbsorbanceReaderDeviceState(str, Enum):
+    """Absorbance reader device state."""
+
+    UNKNOWN = "unknown"
+    OK = "ok"
+    BROKEN_FW = "broken_fw"
+    ERROR = "error"
+
+
+class ABSMeasurementMode(Enum):
+    """The current mode configured for reading the Absorbance Reader."""
+
+    SINGLE = "single"
+    MULTI = "multi"
+
+
+@dataclass
+class ABSMeasurementConfig:
+    measure_mode: ABSMeasurementMode
+    sample_wavelengths: List[int]
+    reference_wavelength: Optional[int]
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        return {
+            "measureMode": self.measure_mode.value,
+            "sampleWavelengths": self.sample_wavelengths,
+            "referenceWavelength": self.reference_wavelength,
+        }

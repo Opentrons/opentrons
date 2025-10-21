@@ -114,6 +114,26 @@
       "detail": "Execution Cancelled",
       "category": "roboticsControlError"
     },
+    "2015": {
+      "detail": "Gripper Pickup Failed",
+      "category": "roboticsControlError"
+    },
+    "2016": {
+      "detail": "Motor Driver Error",
+      "category": "roboticsControlError"
+    },
+    "2017": {
+      "detail": "Liquid Not Found",
+      "category": "roboticsControlError"
+    },
+    "2018": {
+      "detail": "Tip Hit Well Bottom",
+      "category": "roboticsControlError"
+    },
+    "2019": {
+      "detail": "Flex Stacker Stall or Collision Detected",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -186,6 +206,26 @@
       "detail": "Tip Detector Not Created",
       "category": "roboticsInteractionError"
     },
+    "3019": {
+      "detail": "HEPA UV Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3020": {
+      "detail": "Flex Stacker Shuttle Missing",
+      "category": "roboticsInteractionError"
+    },
+    "3021": {
+      "detail": "Flex Stacker Shuttle Labware Detection Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3022": {
+      "detail": "Flex Stacker Hopper Labware Detection Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3023": {
+      "detail": "Flex Stacker Shuttle Occupied",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -216,6 +256,30 @@
     },
     "4007": {
       "detail": "API Command is misconfigured",
+      "category": "generalError"
+    },
+    "4008": {
+      "detail": "Invalid stored data",
+      "category": "generalError"
+    },
+    "4009": {
+      "detail": "Missing configuration data",
+      "category": "generalError"
+    },
+    "4010": {
+      "detail": "Runtime Parameter Value Required",
+      "category": "generalError"
+    },
+    "4011": {
+      "detail": "Incorrect API Version",
+      "category": "generalError"
+    },
+    "4012": {
+      "detail": "Labware Locating Feature Error",
+      "category": "generalError"
+    },
+    "4013": {
+      "detail": "Camera Related Error",
       "category": "generalError"
     }
   }

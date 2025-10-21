@@ -203,6 +203,15 @@ CONFIG_ELEMENTS = (
         "relative path it will be relative to log_dir",
     ),
     ConfigElement(
+        "sensor_log_file",
+        "Sensor Log File",
+        Path("logs") / "sensor.log",
+        ConfigElementType.FILE,
+        "The location of the file to save sensor logs to. If this is an"
+        " absolute path, it will be used directly. If it is a "
+        "relative path it will be relative to log_dir",
+    ),
+    ConfigElement(
         "serial_log_file",
         "Serial Log File",
         Path("logs") / "serial.log",
@@ -278,11 +287,32 @@ CONFIG_ELEMENTS = (
         "The dir where gripper calibration is stored",
     ),
     ConfigElement(
+        "gripper_jaw_width_dir",
+        "Gripper Jaw Width Directory",
+        Path("robot") / "gripper_jaw_width_data",
+        ConfigElementType.DIR,
+        "The dir where gripper jaw width data is stored",
+    ),
+    ConfigElement(
         "module_calibration_dir",
         "Module Calibration Directory",
         Path("robot") / "modules",
         ConfigElementType.DIR,
         "The dir where module calibration is stored",
+    ),
+    ConfigElement(
+        "performance_metrics_dir",
+        "Performance Metrics Directory",
+        Path("performance_metrics_data"),
+        ConfigElementType.DIR,
+        "The dir where performance metrics are stored",
+    ),
+    ConfigElement(
+        "live_stream_configuration_file",
+        "Live Stream Configuration",
+        Path("opentrons-live-stream.conf"),
+        ConfigElementType.FILE,
+        "The file storing the Opentrons Live Stream Configuration values.",
     ),
 )
 #: The available configuration file elements to modify. All of these can be
@@ -602,3 +632,7 @@ def get_tip_length_cal_path() -> Path:
 
 def get_custom_tiprack_def_path() -> Path:
     return get_opentrons_path("custom_tiprack_dir")
+
+
+def get_performance_metrics_data_dir() -> Path:
+    return get_opentrons_path("performance_metrics_dir")

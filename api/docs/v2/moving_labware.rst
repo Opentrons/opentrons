@@ -17,8 +17,8 @@ Use the :py:meth:`.ProtocolContext.move_labware` method to initiate a move, rega
     :substitutions:
         
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D1')
-        protocol.move_labware(labware=plate, new_location='D2')
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
+        protocol.move_labware(labware=plate, new_location="D2")
         
 .. versionadded:: 2.15
 
@@ -26,11 +26,12 @@ The required arguments of ``move_labware()`` are the ``labware`` you want to mov
 
 When the move step is complete, the API updates the labware's location, so you can move the plate multiple times::
 
-    protocol.move_labware(labware=plate, new_location='D2')
-    protocol.move_labware(labware=plate, new_location='D3')
+    protocol.move_labware(labware=plate, new_location="D2")
+    protocol.move_labware(labware=plate, new_location="D3")
     
 For the first move, the API knows to find the plate in its initial load location, slot D1. For the second move, the API knows to find the plate in D2.
 
+.. _automatic-manual-moves:
 
 Automatic vs Manual Moves
 =========================
@@ -45,23 +46,23 @@ The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` deter
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D1')
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
         
         # have the gripper move the plate from D1 to D2
-        protocol.move_labware(labware=plate, new_location='D2', use_gripper=True)
+        protocol.move_labware(labware=plate, new_location="D2", use_gripper=True)
         
         # pause to move the plate manually from D2 to D3
-        protocol.move_labware(labware=plate, new_location='D3', use_gripper=False)
+        protocol.move_labware(labware=plate, new_location="D3", use_gripper=False)
         
         # pause to move the plate manually from D3 to C1
-        protocol.move_labware(labware=plate, new_location='C1')
+        protocol.move_labware(labware=plate, new_location="C1")
 
 .. versionadded:: 2.15
 
 .. note::
     Don't add a ``pause()`` command before ``move_labware()``. When ``use_gripper`` is unset or ``False``, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
 
-The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_labware=True``.
+The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_gripper=True``.
 
 If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise an error.
 
@@ -92,7 +93,14 @@ You can manually move any standard or custom labware. Using the gripper to move 
           * ``opentrons_flex_96_filtertiprack_50ul``
           * ``opentrons_flex_96_filtertiprack_200ul``
           * ``opentrons_flex_96_filtertiprack_1000ul``
+    * - Opentrons labware lids 
+      - 
+          * ``opentrons_tough_pcr_auto_sealing_lid``
+          * ``opentrons_tough_universal_lid``
+          * ``opentrons_flex_tiprack_lid``
     
+You can move compatible Opentrons lids manually or with the Flex Gripper, but some restrictions apply. For more information, see :ref:`moving-lids`.
+
 The gripper may work with other ANSI/SLAS standard labware, but this is not recommended.
 
 .. note::
@@ -105,7 +113,7 @@ The gripper may work with other ANSI/SLAS standard labware, but this is not reco
 Movement with Modules
 =====================
 
-Moving labware on and off of modules lets you precisely control when the labware is in contact with the hot, cold, or magnetic surfaces of the modules — all within a single protocol.
+Moving labware on and off of modules lets you precisely control when the labware is in contact with the hot, cold, or magnetic surfaces of the modules.
 
 When moving labware anywhere that isn't an empty deck slot, consider what physical object the labware will rest on following the move. That object should be the value of ``new_location``, and you need to make sure it's already loaded before the move. For example, if you want to move a 96-well flat plate onto a Heater-Shaker module, you actually want to have it rest on top of the Heater-Shaker's 96 Flat Bottom Adapter. Pass the adapter, not the module or the slot, as the value of ``new_location``::
 
@@ -129,6 +137,64 @@ Also note the ``hs_mod.open_labware_latch()`` command in the above example. To m
     
 If the labware is inaccessible, the API will raise an error. 
 
+Movement into the Waste Chute
+=============================
+
+Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first :ref:`configure the waste chute <configure-waste-chute>` in your protocol. Then use the loaded :py:class:`.WasteChute` object as the value of ``new_location``::
+
+    chute = protocol.load_waste_chute()
+    protocol.move_labware(
+        labware=plate, new_location=chute, use_gripper=True
+    )
+
+.. versionadded:: 2.16
+
+This will pick up ``plate`` from its current location and drop it into the chute.
+
+Always specify ``use_gripper=True`` when moving labware into the waste chute. The chute is not designed for manual movement. You can still manually move labware to other locations, including off-deck, with the chute installed.
+
+.. _moving-lids:
+
+Moving Lids
+===========
+
+You can use :py:meth:`.ProtocolContext.move_lid` to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough Universal Lid, the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler), and the Opentrons Flex Tip Rack Lid.
+
+You can move the auto-sealing lids between deck slots, lid stacks, or compatible labware loaded in your protocol. This example loads a stack of lids and then moves one to a PCR plate on the Thermocycler.
+
+.. code-block:: python
+
+    # load Thermocycler and plate
+    tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
+    plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
+
+    # load lid stack
+    lid_stack = protocol.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
+        location="B2",
+        quantity=4
+    )
+
+    # move one lid to a compatible well plate in the Thermocycler
+    tc_mod.open_lid()
+    protocol.move_lid(
+        source_location=lid_stack,
+        new_location=plate,
+        use_gripper=True
+    )
+
+When you're done with a lid, use ``move_lid()`` to dispose of it in the waste chute or a trash bin::
+
+    protocol.move_lid(
+        source_location=plate,
+        new_location=trash,
+        use_gripper=True
+    )
+
+To work with tip rack lids, first :ref:`load the tip rack lid <loading-lids>` using the ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware`. Once loaded, you can only move a tip rack lid to another, unlidded tip rack or to a trash container. If you try setting another ``new_location``, the API will raise an error.
+
+.. versionadded:: 2.23
+
 .. _off-deck-location:
 
 The Off-Deck Location
@@ -144,31 +210,34 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
 
 Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise an error.
 
-You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one::
+You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it *onto* the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one:
 
-    from opentrons import protocol_api
+    .. code-block:: python
+        :substitutions:
 
-    metadata = {"apiLevel": "2.15", "protocolName": "Tip rack replacement"}
-    requirements = {"robotType": "OT-2"}
+        from opentrons import protocol_api
+
+        metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
+        requirements = {"robotType": "OT-2"}
 
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
-        # load another tip rack but don't put it in a slot yet
-        tips2 = protocol.load_labware(
-            "opentrons_96_tiprack_1000ul", protocol_api.OFF_DECK
-        )
-        pipette = protocol.load_instrument(
-            "p1000_single_gen2", "left", tip_racks=[tips1, tips2]
-        )
-        # use all the on-deck tips
-        for i in range(96):
+        def run(protocol: protocol_api.ProtocolContext):
+            tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
+            # load another tip rack but don't put it in a slot yet
+            tips2 = protocol.load_labware(
+                "opentrons_96_tiprack_1000ul", protocol_api.OFF_DECK
+            )
+            pipette = protocol.load_instrument(
+                "p1000_single_gen2", "left", tip_racks=[tips1, tips2]
+            )
+            # use all the on-deck tips
+            for i in range(96):
+                pipette.pick_up_tip()
+                pipette.drop_tip()
+            # pause to move the spent tip rack off-deck
+            protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
+            # pause to move the fresh tip rack on-deck
+            protocol.move_labware(labware=tips2, new_location=1)
             pipette.pick_up_tip()
-            pipette.drop_tip()
-        # pause to move the spent tip rack off-deck
-        protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
-        # pause to move the fresh tip rack on-deck
-        protocol.move_labware(labware=tips2, new_location=1)
-        pipette.pick_up_tip()
 
 Using the off-deck location to remove or replace labware lets you continue your workflow in a single protocol, rather than needing to end a protocol, reset the deck, and start a new protocol run.

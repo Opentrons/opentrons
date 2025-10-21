@@ -1,5 +1,6 @@
 import * as Constants from './constants'
-import * as Types from './types'
+
+import type * as Types from './types'
 
 // request a config value update
 export const updateConfigValue = (
@@ -55,6 +56,7 @@ export const configInitialized = (
 ): Types.ConfigInitializedAction => ({
   type: Constants.INITIALIZED,
   payload: { config },
+  meta: { shell: true },
 })
 
 // config value has been updated
@@ -64,6 +66,7 @@ export const configValueUpdated = (
 ): Types.ConfigValueUpdatedAction => ({
   type: Constants.VALUE_UPDATED,
   payload: { path, value },
+  meta: { shell: true },
 })
 
 export function toggleDevtools(): Types.ToggleConfigValueAction {
@@ -74,10 +77,6 @@ export function toggleDevInternalFlag(
   flag: Types.DevInternalFlag
 ): Types.ToggleConfigValueAction {
   return toggleConfigValue(`devInternal.${flag}`)
-}
-
-export function toggleHistoricOffsets(): Types.ToggleConfigValueAction {
-  return toggleConfigValue('protocols.applyHistoricOffsets')
 }
 
 // TODO(mc, 2020-02-05): move to `discovery` module

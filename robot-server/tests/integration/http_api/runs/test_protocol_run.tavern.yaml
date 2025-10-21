@@ -28,11 +28,13 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           status: idle
           current: True
           actions: []
           errors: []
+          hasEverEnteredErrorRecovery: False
           pipettes: []
           modules: []
           labware:
@@ -41,8 +43,11 @@ stages:
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
           labwareOffsets: []
+          runTimeParameters: []
+          outputFileIds: []
           protocolId: '{protocol_id}'
           liquids: []
+          liquidClasses: []
       save:
         json:
           original_run_data: data
@@ -96,10 +101,13 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
             slotName: '1'
+          locationSequence:
+            - kind: 'onAddressableArea'
+              addressableAreaName: '1'
           vector:
             x: 1.11
             y: 2.22
@@ -121,7 +129,7 @@ stages:
         data:
           id: !anystr
           actionType: play
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
       save:
         json:
           play_action_id: data.id
@@ -151,7 +159,14 @@ stages:
       status_code: 200
       json:
         links:
-          current: !anydict
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 1
+              key: !anystr
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
         meta:
           cursor: 0
           totalLength: 2
@@ -159,24 +174,26 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            params: { }
+            notes: []
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '1'
               loadName: 'biorad_96_wellplate_200ul_pcr'
               namespace: 'opentrons'
               version: 1
-            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
       save:
         json:
           load_labware_command_id: data[1].id
@@ -193,6 +210,7 @@ stages:
           key: !anystr
           commandType: loadLabware
           status: succeeded
+          notes: []
           params:
             location:
               slotName: '1'
@@ -205,9 +223,10 @@ stages:
             # so we just trust that this is correct.
             definition: !anydict
             offsetId: '{labware_offset_id}'
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            locationSequence: !anylist
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
 
   - name: Mark the run as not-current and check its final data
     request:
@@ -222,11 +241,16 @@ stages:
         data:
           # Unchanged from when we originally POSTed the resource:
           id: '{run_id}'
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          ok: True
+          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           liquids: []
-          completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          liquidClasses: []
+          runTimeParameters: []
+          outputFileIds: []
+          completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
           errors: []
+          hasEverEnteredErrorRecovery: False
           pipettes: []
           modules: []
           protocolId: '{protocol_id}'
@@ -235,15 +259,18 @@ stages:
           # Changed when we POSTed a play action:
           actions:
             - id: '{play_action_id}'
-              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               actionType: play
           # Changed when we POSTed a labware offset:
           labwareOffsets:
             - id: '{labware_offset_id}'
-              createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
               definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
               location:
                 slotName: '1'
+              locationSequence:
+                - kind: 'onAddressableArea'
+                  addressableAreaName: '1'
               vector:
                 x: 1.11
                 y: 2.22

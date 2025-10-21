@@ -1,31 +1,41 @@
-import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Btn,
-  Icon,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
-import { StyledText } from '../text'
 
+import type { ReactElement, ReactNode } from 'react'
+
+export interface MultiSlideoutSpecs {
+  currentStep: number
+  maxSteps: number
+}
 export interface SlideoutProps {
-  title: string | React.ReactElement
-  children: React.ReactNode
-  onCloseClick: () => unknown
+  title: string | ReactElement
+  children: ReactNode
+  onCloseClick: () => void
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
-  footer?: React.ReactNode
+  footer?: ReactNode
+  multiSlideoutSpecs?: MultiSlideoutSpecs
 }
 
 const SHARED_STYLE = css`
@@ -99,19 +109,26 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
 export const Slideout = (props: SlideoutProps): JSX.Element => {
-  const { isExpanded, title, onCloseClick, children, footer } = props
-  const slideOutRef = React.useRef<HTMLDivElement>(null)
-  const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
-
-  const hasBeenExpanded = React.useRef<boolean>(isExpanded ?? false)
+  const {
+    isExpanded,
+    title,
+    onCloseClick,
+    children,
+    footer,
+    multiSlideoutSpecs,
+  } = props
+  const { t } = useTranslation('shared')
+  const slideOutRef = useRef<HTMLDivElement>(null)
+  const [isReachedBottom, setIsReachedBottom] = useState<boolean>(false)
+  const hasBeenExpanded = useRef<boolean>(isExpanded ?? false)
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
     const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
@@ -122,7 +139,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     handleScroll()
   }, [slideOutRef])
 
@@ -143,12 +160,12 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
       <Overlay
         onClick={handleClose}
         css={`
-          ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
+          ${(isExpanded ?? false) ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.black90}
       />
       <Box
-        css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        css={(isExpanded ?? false) ? EXPANDED_STYLE : collapsedStyle}
         cursor="auto"
         position={POSITION_FIXED}
         right="0"
@@ -165,6 +182,19 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
+          {multiSlideoutSpecs === undefined ? null : (
+            <LegacyStyledText
+              as="p"
+              color={COLORS.grey60}
+              alignItems={ALIGN_CENTER}
+              paddingX={SPACING.spacing16}
+            >
+              {t('step', {
+                current: multiSlideoutSpecs.currentStep,
+                max: multiSlideoutSpecs.maxSteps,
+              })}
+            </LegacyStyledText>
+          )}
           {typeof title === 'string' ? (
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -173,14 +203,14 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               paddingX={SPACING.spacing16}
               marginBottom={SPACING.spacing16}
             >
-              <StyledText
+              <LegacyStyledText
                 as="h2"
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
                 {title}
-              </StyledText>
+              </LegacyStyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size="1.5rem"
@@ -195,7 +225,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGreyEnabled} />
+          <Divider marginY={0} color={COLORS.grey30} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

@@ -32,18 +32,21 @@ env:
 
 jobs:
   js-unit-test:
-    name: 'react-api-client unit tests'
+    name: 'api-client and react-api-client unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - name: 'install libudev for usb-detection'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: |
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -56,8 +59,8 @@ jobs:
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
           make setup-js
-      - name: 'run react-api-client unit tests'
-        run: make -C react-api-client test-cov
+      - name: 'run api-client and react-api-client unit tests'
+        run: make -C api-client test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

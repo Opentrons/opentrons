@@ -1,47 +1,48 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { InProgressModal } from '../InProgressModal'
 
-jest.mock('../../../redux/config')
+import type { ComponentProps } from 'react'
 
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
+vi.mock('/app/redux/config')
 
-const render = (props: React.ComponentProps<typeof InProgressModal>) => {
+const render = (props: ComponentProps<typeof InProgressModal>) => {
   return renderWithProviders(<InProgressModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 describe('InProgressModal', () => {
-  let props: React.ComponentProps<typeof InProgressModal>
+  let props: ComponentProps<typeof InProgressModal>
   beforeEach(() => {
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
   it('renders the correct text with no child', () => {
-    const { getByLabelText } = render(props)
-    getByLabelText('spinner')
+    render(props)
+    screen.getByLabelText('spinner')
   })
   it('renders the correct info for on device', () => {
-    const { getByLabelText } = render(props)
-    mockGetIsOnDevice.mockReturnValue(true)
-    getByLabelText('spinner')
+    render(props)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    screen.getByLabelText('spinner')
   })
   it('renders the correct text with child', () => {
     props = {
       children: <div>Moving gantry...</div>,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('Moving gantry...')
-    getByLabelText('spinner')
+    render(props)
+    screen.getByText('Moving gantry...')
+    screen.getByLabelText('spinner')
   })
   it('renders the correct info when spinner is overriden', () => {
     props = {
       alternativeSpinner: <div>alternative spinner</div>,
     }
-    const { getByText } = render(props)
-    getByText('alternative spinner')
+    render(props)
+    screen.getByText('alternative spinner')
   })
 })

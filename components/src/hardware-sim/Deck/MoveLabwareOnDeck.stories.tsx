@@ -1,19 +1,20 @@
-import * as React from 'react'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
+  fixture96Plate,
   FLEX_ROBOT_TYPE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
+
 import { MoveLabwareOnDeck as MoveLabwareOnDeckComponent } from './MoveLabwareOnDeck'
-import type {
-  DeckConfiguration,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type * as React from 'react'
+import type {
+  DeckConfiguration,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 
 const meta: Meta<React.ComponentProps<typeof MoveLabwareOnDeckComponent>> = {
   component: MoveLabwareOnDeckComponent,
@@ -77,7 +78,7 @@ const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
 export const MoveLabwareOnDeck: Story = {
   render: args => (
     <MoveLabwareOnDeckComponent
-      movedLabwareDef={fixture_96_plate as LabwareDefinition2}
+      movedLabwareDef={fixture96Plate as LabwareDefinition}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}

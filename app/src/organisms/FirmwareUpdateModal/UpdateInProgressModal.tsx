@@ -1,61 +1,70 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
+  LegacyStyledText,
+  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ProgressBar } from '../../atoms/ProgressBar'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
-import { Subsystem } from '@opentrons/api-client'
+
+import { OddModal } from '/app/molecules/OddModal'
+
+import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
-  percentComplete: number
   subsystem: Subsystem
 }
 
-const OUTER_STYLES = css`
-  background: ${COLORS.medGreyEnabled};
-  width: 100%;
+const SPINNER_STYLE = css`
+  color: ${COLORS.grey50};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.black90};
+    opacity: 70%;
+  }
 `
 
 export function UpdateInProgressModal(
   props: UpdateInProgressModalProps
 ): JSX.Element {
-  const { percentComplete, subsystem } = props
+  const { subsystem } = props
   const { t } = useTranslation('firmware_update')
 
   return (
-    <Modal>
+    <OddModal>
       <Flex
         height="17.25rem"
         width="100%"
-        backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.borderRadiusSize3}
+        backgroundColor={COLORS.grey35}
+        borderRadius={BORDERS.borderRadius12}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}
         justifyContent={ALIGN_CENTER}
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}
       >
-        <StyledText
+        <LegacyStyledText
           as="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
-        </StyledText>
-        <ProgressBar
-          percentComplete={percentComplete}
-          outerStyles={OUTER_STYLES}
+        </LegacyStyledText>
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size="6.25rem"
+          css={SPINNER_STYLE}
+          spin
         />
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }

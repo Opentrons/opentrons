@@ -3,12 +3,19 @@ from typing_extensions import Final
 import enum
 
 
-# TODO (tz, 5-18-23): think about a better name for it that would also work when we include staging area slots in the type.
+# Implemented with an enum to support type narrowing via `== OFF_DECK`.
 class OffDeckType(enum.Enum):
+    """The type of the :py:obj:`OFF_DECK` constant.
+
+    Do not use directly, except in type annotations and ``isinstance`` calls.
+    """
+
     OFF_DECK = "off-deck"
+    WASTE_CHUTE = "waste-chute"
 
 
 OFF_DECK: Final = OffDeckType.OFF_DECK
+WASTE_CHUTE: Final = OffDeckType.WASTE_CHUTE
 
 # Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
 # the constant definition, Sphinx has trouble picking it up.
@@ -19,33 +26,25 @@ See :ref:`off-deck-location` for details on using ``OFF_DECK`` with :py:obj:`Pro
 """
 
 
-# TODO(jbl 11-17-2023) move this away from being an Enum and make this a NewType or something similar
-class StagingSlotName(enum.Enum):
-    """Staging slot identifiers."""
+class PlungerPositionTypes(enum.Enum):
+    PLUNGER_TOP = "top"
+    PLUNGER_BOTTOM = "bottom"
+    PLUNGER_BLOWOUT = "blow_out"
+    PLUNGER_DROPTIP = "drop_tip"
 
-    SLOT_A4 = "A4"
-    SLOT_B4 = "B4"
-    SLOT_C4 = "C4"
-    SLOT_D4 = "D4"
 
-    @classmethod
-    def from_primitive(cls, value: str) -> StagingSlotName:
-        str_val = value.upper()
-        return cls(str_val)
+PLUNGER_TOP: Final = PlungerPositionTypes.PLUNGER_TOP
+PLUNGER_BOTTOM: Final = PlungerPositionTypes.PLUNGER_BOTTOM
+PLUNGER_BLOWOUT: Final = PlungerPositionTypes.PLUNGER_BLOWOUT
+PLUNGER_DROPTIP: Final = PlungerPositionTypes.PLUNGER_DROPTIP
 
-    @property
-    def id(self) -> str:
-        """This slot's unique ID, as it appears in the deck definition.
 
-        This can be used to look up slot details in the deck definition.
+class PipetteActionTypes(enum.Enum):
+    ASPIRATE_ACTION = "aspirate"
+    DISPENSE_ACTION = "dispense"
+    BLOWOUT_ACTION = "blowout"
 
-        This is preferred over `.value` or `.__str__()` for explicitness.
-        """
-        return self.value
 
-    def __str__(self) -> str:
-        """Stringify to the unique ID.
-
-        For explicitness, prefer using `.id` instead.
-        """
-        return self.id
+ASPIRATE_ACTION: Final = PipetteActionTypes.ASPIRATE_ACTION
+DISPENSE_ACTION: Final = PipetteActionTypes.DISPENSE_ACTION
+BLOWOUT_ACTION: Final = PipetteActionTypes.BLOWOUT_ACTION

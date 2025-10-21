@@ -1,3 +1,6 @@
+import { describe, expect, it, vi } from 'vitest'
+
+import { getDefaultFormState } from '../fields'
 import {
   FORM_LEVEL_ERRORS,
   formLevelValidation,
@@ -5,10 +8,10 @@ import {
   WELLS_OUT_OF_BOUNDS_X,
   WELLS_OUT_OF_BOUNDS_Y,
 } from '../formLevelValidation'
-import { getDefaultFormState } from '../fields'
+
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)
-jest.mock('../../definitions')
+vi.mock('../../definitions')
 
 describe('getWellGridBoundingBox', () => {
   it('should get the bounding box for circular wells: single-well case', () => {

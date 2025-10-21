@@ -1,16 +1,14 @@
-import {
-  TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-  ModuleType,
-} from '@opentrons/shared-data'
-
 import type {
-  MagneticModuleModel,
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
+  AbsorbanceReaderModel,
   HeaterShakerModuleModel,
+  MAGDECK,
+  MagneticModuleModel,
   ModuleModel,
+  ModuleType,
+  TEMPDECK,
+  TemperatureModuleModel,
+  THERMOCYCLER,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
@@ -18,6 +16,7 @@ export interface PhysicalPort {
   path: string | null
   port: number
   hub: boolean
+  hubPort?: number
   portGroup: PortGroup
 }
 
@@ -80,6 +79,19 @@ export interface HeaterShakerData {
   errorDetails: string | null
   status: HeaterShakerStatus
 }
+export interface AbsorbanceReaderData {
+  lidStatus: 'on' | 'off' | 'unknown'
+  platePresence: 'present' | 'absent' | 'unknown'
+  sampleWavelength: number | null
+  status: AbsorbanceReaderStatus
+}
+export interface FlexStackerData {
+  latchState: 'opened' | 'closed' | 'unknown'
+  platformState: 'extended' | 'retracted' | 'unknown' | 'missing'
+  hopperDoorState: 'opened' | 'closed' | 'unknown'
+  installDetected: boolean
+  status: FlexStackerStatus
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -112,6 +124,10 @@ export type LatchStatus =
   | 'idle_closed'
   | 'idle_unknown'
   | 'unknown'
+
+export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
+
+export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'
 
 export interface ApiTemperatureModule extends ApiBaseModule {
   moduleModel: TemperatureModuleModel
@@ -152,11 +168,17 @@ export interface ApiHeaterShakerModule extends ApiBaseModule {
   data: HeaterShakerData
 }
 
+export interface ApiAbsorbanceReaderModule extends ApiBaseModule {
+  moduleModel: AbsorbanceReaderModel
+  data: AbsorbanceReaderData
+}
+
 export type ApiAttachedModule =
   | ApiThermocyclerModule
   | ApiMagneticModule
   | ApiTemperatureModule
   | ApiHeaterShakerModule
+  | ApiAbsorbanceReaderModule
 
 export type ApiAttachedModuleLegacy =
   | ApiThermocyclerModuleLegacy

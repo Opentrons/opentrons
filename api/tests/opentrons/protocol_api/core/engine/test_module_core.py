@@ -1,4 +1,5 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
+
 import pytest
 import inspect
 from decoy import Decoy
@@ -11,6 +12,7 @@ from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, validation as mock_validation
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.types import DeckSlotName
 
 
@@ -40,10 +42,17 @@ def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> No
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     api_version: APIVersion,
     mock_sync_module_hardware: SynchronousAdapter[AbstractModule],
+    mock_protocol_core: ProtocolCore,
 ) -> ModuleCore:
     """Get a ModuleCore test subject."""
     return ModuleCore(
@@ -51,6 +60,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=api_version,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -107,7 +117,7 @@ def test_get_display_name(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
     """It should return the module display name."""
-    module_definition = ModuleDefinition.construct(  # type: ignore[call-arg]
+    module_definition = ModuleDefinition.model_construct(  # type: ignore[call-arg]
         displayName="abra kadabra",
     )
     decoy.when(mock_engine_client.state.modules.get_definition("1234")).then_return(

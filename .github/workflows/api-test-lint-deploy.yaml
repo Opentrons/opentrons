@@ -7,27 +7,28 @@ on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
     paths:
-      - 'api/**/*'
+      - 'api/**'
       - 'Makefile'
-      - 'shared-data/**/*'
+      - 'shared-data/**'
       - '!shared-data/js/**'
-      - 'hardware/**/*'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'hardware/**'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/api-test-lint-deploy.yaml'
-      - '.github/actions/python/**/*'
+      - '.github/actions/python/**'
       - '.github/workflows/utils.js'
+      - 'package-testing/**'
   push:
     paths:
       - 'api/**'
       - 'Makefile'
-      - 'shared-data/**/*'
-      - '!shared-data/js/**/*'
-      - 'hardware/**/*'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
+      - 'hardware/**'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
       - '.github/workflows/api-test-lint-deploy.yaml'
-      - '.github/actions/python/**/*'
+      - '.github/actions/python/**'
       - '.github/workflows/utils.js'
     branches:
       - 'edge'
@@ -49,17 +50,17 @@ jobs:
   lint:
     name: 'opentrons package linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -67,28 +68,22 @@ jobs:
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}, ot-hardware ${{ matrix.with-ot-hardware }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
-        # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
-        # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
+        os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
+        python: ['3.10']
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
             with-ot-hardware: 'true'
           - os: 'macos-latest'
             with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            python: '3.10'
-          - python: '3.10'
-            with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
@@ -97,9 +92,9 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
@@ -132,13 +127,67 @@ jobs:
           files: ./api/coverage.xml
           flags: api
 
+  test-package:
+    name: 'installed package tests on ${{ matrix.os }}'
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        os: ['ubuntu-24.04', 'macos-latest', 'windows-2022']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v4'
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.10'
+      - name: Set up package-testing
+        id: setup
+        if: ${{ matrix.os != 'windows-2022' }}
+        working-directory: package-testing
+        shell: bash
+        run: make setup
+      - name: Set up package-testing (Windows)
+        id: setup-windows
+        if: ${{ matrix.os == 'windows-2022' }}
+        working-directory: package-testing
+        shell: pwsh
+        run: make setup-windows
+      - name: Run the tests
+        if: ${{ matrix.os != 'windows-2022' }}
+        shell: bash
+        id: test
+        working-directory: package-testing
+        run: make test
+      - name: Run the tests (Windows)
+        shell: pwsh
+        id: test-windows
+        working-directory: package-testing
+        run: make test-windows
+      - name: Save the test results
+        if: ${{ always() && steps.setup.outcome == 'success' || steps.setup-windows.outcome == 'success' }}
+        id: results
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-test-results-${{ matrix.os }}
+          path: package-testing/results
+      - name: Set job summary
+        if: ${{ always() }}
+        run: |
+          echo "## Opentrons Package Test Results ${{matrix.os}}" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Outcome: Unixy ${{ steps.test.outcome }} Windows: ${{ steps.test-windows.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "[Download the test results artifact](${{steps.results.outputs.artifact-url}})" >> $GITHUB_STEP_SUMMARY
+
   deploy:
     name: 'deploy opentrons package'
     needs: [test]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
@@ -147,12 +196,12 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v3'
+      - uses: 'actions/setup-node@v4'
         with:
-          node-version: '16'
+          node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -169,11 +218,11 @@ jobs:
         with:
           project: 'api'
           repository_url: 'https://test.pypi.org/legacy/'
-          password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
+          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to real pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
           project: 'api'
           repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.OT_PYPI_PASSWORD }}'
+          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS }}'

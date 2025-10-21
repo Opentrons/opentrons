@@ -1,17 +1,22 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import { BackgroundOverlay } from '..'
 
-const render = (props: React.ComponentProps<typeof BackgroundOverlay>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof BackgroundOverlay>) => {
   return renderWithProviders(<BackgroundOverlay {...props} />)[0]
 }
 
 describe('BackgroundOverlay', () => {
-  let props: React.ComponentProps<typeof BackgroundOverlay>
+  let props: ComponentProps<typeof BackgroundOverlay>
   it('renders background overlay', () => {
-    props = { onClick: jest.fn() }
-    const { getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay').click()
+    props = { onClick: vi.fn() }
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

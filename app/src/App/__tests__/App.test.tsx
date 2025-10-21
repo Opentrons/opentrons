@@ -1,36 +1,30 @@
-import * as React from 'react'
-import '@testing-library/jest-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getConfig } from '/app/redux/config'
 
-import { i18n } from '../../i18n'
-import { getIsOnDevice, getConfig } from '../../redux/config'
-
-import { DesktopApp } from '../DesktopApp'
-import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { App } from '../'
+import { DesktopApp } from '../DesktopApp'
+import { useWindowType } from '../hooks'
+import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
+import { SecondaryWindowApp } from '../SecondaryWindowApp'
 
-import type { State } from '../../redux/types'
+import type { State } from '/app/redux/types'
 
-jest.mock('../../redux/config')
-jest.mock('../DesktopApp')
-jest.mock('../OnDeviceDisplayApp')
+vi.mock('/app/redux/config')
+vi.mock('../DesktopApp')
+vi.mock('../hooks')
+vi.mock('../OnDeviceDisplayApp')
+vi.mock('../SecondaryWindowApp')
 
 const MOCK_STATE: State = {
   config: {
     isOnDevice: true,
   },
 } as any
-
-const mockDesktopApp = DesktopApp as jest.MockedFunction<typeof DesktopApp>
-const mockOnDeviceDisplayApp = OnDeviceDisplayApp as jest.MockedFunction<
-  typeof OnDeviceDisplayApp
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const render = () => {
   return renderWithProviders(<App />, {
@@ -41,33 +35,44 @@ const render = () => {
 
 describe('App', () => {
   beforeEach(() => {
-    mockDesktopApp.mockReturnValue(<div>mock DesktopApp</div>)
-    mockOnDeviceDisplayApp.mockReturnValue(<div>mock OnDeviceDisplayApp</div>)
-    when(mockGetConfig)
+    vi.mocked(DesktopApp).mockReturnValue(<div>mock DesktopApp</div>)
+    vi.mocked(OnDeviceDisplayApp).mockReturnValue(
+      <div>mock OnDeviceDisplayApp</div>
+    )
+    vi.mocked(SecondaryWindowApp).mockReturnValue(
+      <div>mock SecondaryWindowApp</div>
+    )
+    vi.mocked(useWindowType).mockReturnValue('desktop-main')
+    when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
-      .mockReturnValue(MOCK_STATE.config)
-    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(false)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+      .thenReturn(MOCK_STATE.config)
   })
 
   it('renders null before config initializes', () => {
-    when(mockGetConfig).calledWith(MOCK_STATE).mockReturnValue(null)
+    when(vi.mocked(getConfig)).calledWith(MOCK_STATE).thenReturn(null)
     const [{ container }] = render()
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders a DesktopApp component when not on device', () => {
-    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(false)
-    const [{ getByText }] = render()
-    getByText('mock DesktopApp')
+  it('renders a SecondaryWindowApp component when window type is secondary', () => {
+    vi.mocked(useWindowType).mockReturnValue('secondary')
+
+    render()
+
+    screen.getByText('mock SecondaryWindowApp')
   })
 
-  it('renders an OnDeviceDisplayApp component when on device', () => {
-    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('mock OnDeviceDisplayApp')
+  it('renders a DesktopApp component when not on device and window type is main', () => {
+    render()
+
+    screen.getByText('mock DesktopApp')
+  })
+
+  it('renders an OnDeviceDisplayApp component when on device and window type is main', () => {
+    vi.mocked(useWindowType).mockReturnValue('odd-main')
+
+    render()
+
+    screen.getByText('mock OnDeviceDisplayApp')
   })
 })

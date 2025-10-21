@@ -1,9 +1,11 @@
 """Test retractAxis command."""
 from decoy import Decoy
 
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.protocol_engine.execution import MovementHandler
 
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.retract_axis import (
     RetractAxisParams,
     RetractAxisResult,
@@ -21,5 +23,8 @@ async def test_retract_axis_implementation(
     data = RetractAxisParams(axis=MotorAxis.Y)
     result = await subject.execute(data)
 
-    assert result == RetractAxisResult()
+    assert result == SuccessData(
+        public=RetractAxisResult(),
+        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR),
+    )
     decoy.verify(await movement.retract_axis(axis=MotorAxis.Y))

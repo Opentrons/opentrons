@@ -1,4 +1,4 @@
-""" opentrons.protocol_api.labware: classes and functions for labware handling
+"""opentrons.protocol_api.labware: classes and functions for labware handling
 
 This module provides things like :py:class:`Labware`, and :py:class:`Well`
 to encapsulate labware instances used in protocols
@@ -7,24 +7,53 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
+
 from __future__ import annotations
 
 import logging
 
 from itertools import dropwhile
-from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    List,
+    Dict,
+    Optional,
+    Tuple,
+    cast,
+    Sequence,
+    Mapping,
+    Union,
+    Literal,
+    Callable,
+)
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareParameters2,
+    LabwareParameters3,
+)
 
-from opentrons.types import Location, Point
+from opentrons.types import (
+    Location,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+    Mount,
+)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import requires_version, APIVersionError
+from opentrons.protocols.api_support.util import (
+    requires_version,
+    APIVersionError,
+    UnsupportedAPIError,
+)
+from opentrons.protocol_engine.types import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
 from opentrons.protocols.labware import (  # noqa: F401
     get_labware_definition as get_labware_definition,
-    get_all_labware_definitions as get_all_labware_definitions,
     verify_definition as verify_definition,
     save_definition as save_definition,
 )
@@ -33,7 +62,10 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
-from .core.engine import ENGINE_CORE_API_VERSION
+from .core.engine import (
+    ENGINE_CORE_API_VERSION,
+    SET_OFFSET_RESTORED_API_VERSION,
+)
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap
@@ -72,7 +104,7 @@ class Well:
 
         - Calculating positions relative to the well. See :ref:`position-relative-labware` for details.
 
-        - Returning well measurements. see :ref:`new-labware-well-properties` for details.
+        - Returning well measurements. See :ref:`new-labware-well-properties` for details.
 
         - Specifying what liquid should be in the well at the beginning of a protocol. See :ref:`labeling-liquids` for details.
     """
@@ -85,21 +117,37 @@ class Well:
         self._core = core
         self._api_version = api_version
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
+        """The :py:class:`.Labware` object that the well is a part of."""
         return self._parent
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def has_tip(self) -> bool:
-        """Whether this well contains a tip. Always ``False`` if the parent labware
-        isn't a tip rack."""
+        """Whether this well contains an unused tip.
+
+        From API v2.2 on:
+
+        - Returns ``False`` if:
+
+          - the well has no tip present, or
+          - the well has a tip that's been used by the protocol previously
+
+        - Returns ``True`` if the well has an unused tip.
+
+        Before API v2.2:
+
+        - Returns ``True`` as long as the well has a tip, even if it is used.
+
+        Always ``False`` if the parent labware isn't a tip rack.
+        """
         return self._core.has_tip()
 
     @has_tip.setter
@@ -113,15 +161,19 @@ class Well:
 
     @property
     def max_volume(self) -> float:
+        """The maximum volume, in µL, that the well can hold.
+
+        This amount is set by the JSON labware definition, specifically the ``totalLiquidVolume`` property of the particular well.
+        """
         return self._core.get_max_volume()
 
     @property
     def geometry(self) -> WellGeometry:
         if isinstance(self._core, LegacyWellCore):
             return self._core.geometry
-        raise APIVersionError("Well.geometry has been deprecated.")
+        raise UnsupportedAPIError(api_element="Well.geometry")
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         """
@@ -130,7 +182,7 @@ class Well:
         """
         return self._core.diameter
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def length(self) -> Optional[float]:
         """
@@ -139,7 +191,7 @@ class Well:
         """
         return self._core.length
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def width(self) -> Optional[float]:
         """
@@ -148,7 +200,7 @@ class Well:
         """
         return self._core.width
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def depth(self) -> float:
         """
@@ -159,11 +211,24 @@ class Well:
 
     @property
     def display_name(self) -> str:
+        """A human-readable name for the well, including labware and deck location.
+
+        For example, "A1 of Corning 96 Well Plate 360 µL Flat on slot D1". Run log
+        entries use this format for identifying wells. See
+        :py:meth:`.ProtocolContext.commands`.
+        """
         return self._core.get_display_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 7)
     def well_name(self) -> str:
+        """A string representing the well's coordinates.
+
+        For example, "A1" or "H12".
+
+        The format of strings that this property returns is the same format as the key
+        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
+        """
         return self._core.get_name()
 
     @requires_version(2, 0)
@@ -197,6 +262,24 @@ class Well:
             absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
+
+    @requires_version(2, 21)
+    def meniscus(
+        self, z: float = 0.0, target: Literal["start", "end", "dynamic"] = "end"
+    ) -> Location:
+        """
+        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
+            negative offsets are lower.
+        :param target: The relative position of the liquid meniscus inside the well to target when performing a liquid handling operation.
+
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the liquid meniscus, plus a target position and ``z`` offset as specified.
+
+        """
+        return Location(
+            point=Point(x=0, y=0, z=z),
+            labware=self,
+            _meniscus_tracking=MeniscusTrackingTarget(target),
+        )
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
@@ -244,11 +327,60 @@ class Well:
 
         :param Liquid liquid: The liquid to load into the well.
         :param float volume: The volume of liquid to load, in µL.
+
+        .. deprecated:: 2.22
+            Use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, or :py:meth:`.Labware.load_empty` instead.
+
         """
         self._core.load_liquid(
             liquid=liquid,
             volume=volume,
         )
+
+    @requires_version(2, 21)
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Get the current liquid height in a well."""
+        return self._core.current_liquid_height()
+
+    @requires_version(2, 21)
+    def current_liquid_volume(self) -> LiquidTrackingType:
+        """Get the current liquid volume in a well."""
+        return self._core.get_liquid_volume()
+
+    @requires_version(2, 27)
+    def has_tracked_liquid(self) -> bool:
+        """Get the current liquid volume in a well."""
+        return self._core.has_tracked_liquid()
+
+    @requires_version(2, 24)
+    def volume_from_height(self, height: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the volume contained in a well at any height."""
+        return self._core.volume_from_height(height)
+
+    @requires_version(2, 24)
+    def height_from_volume(self, volume: LiquidTrackingType) -> LiquidTrackingType:
+        """Return the height in a well corresponding to a given volume."""
+        return self._core.height_from_volume(volume)
+
+    @requires_version(2, 21)
+    def estimate_liquid_height_after_pipetting(
+        self,
+        mount: Mount | str,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Check the height of the liquid within a well.
+
+        :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+
+        projected_final_height = self._core.estimate_liquid_height_after_pipetting(
+            operation_volume=operation_volume, mount=mount
+        )
+        return projected_final_height
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -278,29 +410,22 @@ class Well:
 
 class Labware:
     """
-    This class represents a labware, such as a PCR plate, a tube rack,
-    reservoir, tip rack, etc. It defines the physical geometry of the labware,
-    and provides methods for accessing wells within the labware.
+    This class represents a piece of labware.
 
-    It is commonly created by calling ``ProtocolContext.load_labware()``.
+    Labware available in the API generally fall under two categories.
 
-    To access a labware's wells, you can use its well accessor methods:
-    :py:meth:`wells_by_name`, :py:meth:`wells`, :py:meth:`columns`,
-    :py:meth:`rows`, :py:meth:`rows_by_name`, and :py:meth:`columns_by_name`.
-    You can also use an instance of a labware as a Python dictionary, accessing
-    wells by their names. The following example shows how to use all of these
-    methods to access well A1:
+      - Consumable labware: well plates, tubes in racks, reservoirs, tip racks, etc.
+      - Adapters: durable items that hold other labware, either on modules or directly
+        on the deck.
 
-    .. code-block :: python
+    The ``Labware`` class defines the physical geometry of the labware
+    and provides methods for :ref:`accessing wells <new-well-access>` within the labware.
 
-       labware = context.load_labware('corning_96_wellplate_360ul_flat', 1)
-       labware['A1']
-       labware.wells_by_name()['A1']
-       labware.wells()[0]
-       labware.rows()[0][0]
-       labware.columns()[0][0]
-       labware.rows_by_name()['A'][0]
-       labware.columns_by_name()[0][0]
+    Create ``Labware`` objects by calling the appropriate ``load_labware()`` method,
+    depending on where you are loading the labware. For example, to load labware on a
+    Thermocycler Module, use :py:meth:`.ThermocyclerContext.load_labware`. To load
+    labware directly on the deck, use :py:meth:`.ProtocolContext.load_labware`. See
+    :ref:`loading-labware`.
 
     """
 
@@ -341,7 +466,11 @@ class Labware:
     @property
     def separate_calibration(self) -> bool:
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.separate_calibration has been removed")
+            raise UnsupportedAPIError(
+                api_element="Labware.separate_calibration",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
@@ -349,44 +478,65 @@ class Labware:
         )
         return False
 
-    @property  # type: ignore
+    @classmethod
+    def _builder_for_core_map(
+        cls,
+        api_version: APIVersion,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
+    ) -> Callable[[AbstractLabware[Any]], Labware]:
+        def _do_build(core: AbstractLabware[Any]) -> Labware:
+            return Labware(
+                core=core,
+                api_version=api_version,
+                protocol_core=protocol_core,
+                core_map=core_map,
+            )
+
+        return _do_build
+
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
+        """See :py:obj:`.ProtocolContext.api_version`."""
         return self._api_version
 
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def uri(self) -> str:
         """A string fully identifying the labware.
 
-        :returns: The uri, ``"namespace/loadname/version"``
+        The URI has three parts and follows the pattern ``"namespace/load_name/version"``.
+        For example, ``opentrons/corning_96_wellplate_360ul_flat/2``.
         """
         return self._core.get_uri()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
-        """The parent of this labware---where this labware is loaded.
+        """Where the labware is loaded.
+
+        This corresponds to the physical object that the labware *directly* rests upon.
 
         Returns:
-            If the labware is directly on the robot's deck, the `str` name of the deck slot,
+            If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
             like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
 
-            If the labware is on a module, a :py:class:`ModuleContext`.
+            If the labware is on a module, a module context.
 
             If the labware is on a labware or adapter, a :py:class:`Labware`.
 
             If the labware is off-deck, :py:obj:`OFF_DECK`.
 
         .. versionchanged:: 2.14
-            Return type for module parent changed to :py:class:`ModuleContext`.
-            Prior to this version, an internal geometry interface is returned.
+            Return type for module parent changed.
+            Formerly, the API returned an internal geometry interface.
         .. versionchanged:: 2.15
-            Will return a :py:class:`Labware` if the labware was loaded onto a labware/adapter.
-            Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
+            Returns a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
+            Returns :py:obj:`OFF_DECK` if the labware is off-deck.
             Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
             this would return where it was before its removal.
         """
@@ -403,11 +553,16 @@ class Labware:
 
         return labware_location
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def name(self) -> str:
-        """Can either be the canonical name of the labware, which is used to
-        load it, or the label of the labware specified by a user."""
+        """The display name of the labware.
+
+        If you specified a value for ``label`` when loading the labware, ``name`` is
+        that value.
+
+        Otherwise, it is the :py:obj:`~.Labware.load_name` of the labware.
+        """
         return self._core.get_name()
 
     @name.setter
@@ -418,26 +573,30 @@ class Labware:
             Set the name of labware in `load_labware` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.name setter has been deprecated")
+            raise UnsupportedAPIError(
+                api_element="Labware.name setter",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
         # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_name(new_name)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def load_name(self) -> str:
-        """The API load name of the labware definition"""
+        """The API load name of the labware definition."""
         return self._core.load_name
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
-    def parameters(self) -> "LabwareParameters":
-        """Internal properties of a labware including type and quirks"""
+    def parameters(self) -> "LabwareParameters2 | LabwareParameters3":
+        """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """Quirks specific to this labware."""
@@ -446,7 +605,7 @@ class Labware:
     # TODO(mm, 2023-02-08):
     # Specify units and origin after we resolve RSS-110.
     # Remove warning once we resolve RSS-109 more broadly.
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         """Return the default magnet engage height that
@@ -471,7 +630,7 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def child(self) -> Optional[Labware]:
         """The labware (if any) present on this labware."""
@@ -483,8 +642,12 @@ class Labware:
         self,
         name: str,
         label: Optional[str] = None,
+        lid: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        *,
+        lid_namespace: Optional[str] = None,
+        lid_version: Optional[int] = None,
     ) -> Labware:
         """Load a compatible labware onto the labware using its load parameters.
 
@@ -495,6 +658,24 @@ class Labware:
 
         :returns: The initialized and loaded labware object.
         """
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
         labware_core = self._protocol_core.load_labware(
             load_name=name,
             label=label,
@@ -512,19 +693,46 @@ class Labware:
 
         self._core_map.add(labware_core, labware)
 
+        if lid is not None:
+            if self._api_version < validation.LID_STACK_VERSION_GATE:
+                raise APIVersionError(
+                    api_element="Loading a Lid on a Labware",
+                    until_version="2.23",
+                    current_version=f"{self._api_version}",
+                )
+            if (
+                self._api_version
+                < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+            ):
+                checked_lid_namespace = namespace
+                checked_lid_version = version
+            else:
+                # This is currently impossible to reach because of the
+                # `if self._api_version < validation.validation.LID_STACK_VERSION_GATE`
+                # check above. This is here for now in case that check is removed in
+                # the future, and for symmetry with the other labware load methods.
+                checked_lid_namespace = lid_namespace
+                checked_lid_version = lid_version
+            self._protocol_core.load_lid(
+                load_name=lid,
+                location=labware_core,
+                namespace=checked_lid_namespace,
+                version=checked_lid_version,
+            )
+
         return labware
 
     @requires_version(2, 15)
     def load_labware_from_definition(
         self, definition: LabwareDefinition, label: Optional[str] = None
     ) -> Labware:
-        """Load a labware onto the module using an inline definition.
+        """Load a compatible labware onto the labware using an inline definition.
 
         :param definition: The labware definition.
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons App.
+        :param str label: An optional special name to give the labware. If specified,
+            this is how the labware will appear in the run log, Labware Position
+            Check, and elsewhere in the Opentrons App and on the touchscreen.
+
         :returns: The initialized and loaded labware object.
         """
         load_params = self._protocol_core.add_labware_definition(definition)
@@ -536,17 +744,77 @@ class Labware:
             label=label,
         )
 
+    @requires_version(2, 23)
+    def load_lid_stack(
+        self,
+        load_name: str,
+        quantity: int,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """
+        Load a stack of Opentrons Tough Auto-Sealing Lids onto a valid deck location or adapter.
+
+        :param str load_name: A string to use for looking up a lid definition.
+            You can find the ``load_name`` for any standard lid on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+        :param int quantity: The quantity of lids to be loaded in the stack.
+        :param str namespace: The namespace that the lid labware definition belongs to.
+            If unspecified, the API will automatically search two namespaces:
+
+              - ``"opentrons"``, to load standard Opentrons labware definitions.
+              - ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`__.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons-verified
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let ``load_lid_stack()`` choose a version
+            automatically.
+
+        :return:  The initialized and loaded labware object representing the lid stack.
+        """
+        if self._api_version < validation.LID_STACK_VERSION_GATE:
+            raise APIVersionError(
+                api_element="Loading a Lid Stack",
+                until_version="2.23",
+                current_version=f"{self._api_version}",
+            )
+
+        load_location = self._core
+
+        load_name = validation.ensure_lowercase_name(load_name)
+
+        result = self._protocol_core.load_lid_stack(
+            load_name=load_name,
+            location=load_location,
+            quantity=quantity,
+            namespace=namespace,
+            version=version,
+        )
+
+        labware = Labware(
+            core=result,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
+        return labware
+
     def set_calibration(self, delta: Point) -> None:
         """
-        An internal, deprecated method used for updating the offset on the object.
+        An internal, deprecated method used for updating the labware offset.
 
         .. deprecated:: 2.14
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
-                " Use a lower apiLevel"
-                " or use the Opentrons App's Labware Position Check."
+            raise UnsupportedAPIError(
+                api_element="Labware.set_calibration()",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="Try using the Opentrons App's Labware Position Check.",
             )
         self._core.set_calibration(delta)
 
@@ -555,48 +823,73 @@ class Labware:
         """Set the labware's position offset.
 
         The offset is an x, y, z vector in deck coordinates
-        (see :ref:`protocol-api-deck-coords`) that the motion system
-        will add to any movement targeting this labware instance.
+        (see :ref:`protocol-api-deck-coords`).
 
-        The offset will *not* apply to any other labware instances,
-        even if those labware are of the same type.
+        How the motion system applies the offset depends on the API level of the protocol.
 
-        .. caution::
-            This method is *only* for use with mechanisms like
+        .. list-table::
+            :header-rows: 1
+            :widths: 1 5
+
+            * - API level
+              - Offset behavior
+            * - 2.12–2.13
+              - Offsets only apply to the exact :py:class:`.Labware` instance.
+
+                If your protocol has multiple instances of the same type of labware,
+                you must either use ``set_offset()`` on all of them or none of them.
+            * - 2.14–2.17
+              - ``set_offset()`` is not available, and the API raises an error.
+            * - 2.18--2.22
+              -
+                - Offsets apply to any labware of the same type, in the same on-deck location.
+                - Offsets can't be set on labware that is currently off-deck.
+                - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
+            * - 2.23 and newer
+              -
+                On Flex, offsets can apply to all labware of the same type, regardless of their on-deck location.
+
+        .. note::
+
+            Setting offsets with this method will override any labware offsets set
+            by running Labware Position Check in the Opentrons App.
+
+            This method is designed for use with mechanisms like
             :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
             to adjust labware offsets. (See :ref:`advanced-control`.)
 
-            If you're uploading a protocol via the Opentrons App, don't use this method,
-            because it will produce undefined behavior.
-            Instead, use Labware Position Check in the app.
+        .. versionchanged:: 2.14
+            Temporarily removed.
 
-            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
-            can currently *only* be uploaded via the Opentrons App, it doesn't make
-            sense to use this method with them. Trying to do so will raise an exception.
+        .. versionchanged:: 2.18
+            Restored, and now applies to labware type–location pairs.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            # TODO(mm, 2023-02-13): See Jira RCORE-535.
-            #
-            # Until that issue is resolved, the only way to simulate or run a
-            # >=ENGINE_CORE_API_VERSION protocol is through the Opentrons App.
-            # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
-            # there's no legitimate way to use this method.
+        if (
+            self._api_version >= ENGINE_CORE_API_VERSION
+            and self._api_version < SET_OFFSET_RESTORED_API_VERSION
+        ):
             raise APIVersionError(
-                "Labware.set_offset() is not supported when apiLevel is 2.14 or higher."
-                " Use a lower apiLevel"
-                " or use the Opentrons App's Labware Position Check."
+                api_element="Labware.set_offset()",
+                until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="This feature not available in versions 2.14 thorugh 2.17. You can also use the Opentrons App's Labware Position Check.",
             )
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
+        """The front-left-bottom corner of the labware, including its labware offset.
+
+        When running a protocol in the Opentrons App or on the touchscreen, Labware
+        Position Check sets the labware offset.
+        """
         return self._core.get_calibrated_offset()
 
     @requires_version(2, 0)
     def well(self, idx: Union[int, str]) -> Well:
-        """Deprecated---use result of `wells` or `wells_by_name`"""
+        """Deprecated. Use result of :py:meth:`wells` or :py:meth:`wells_by_name`."""
         if isinstance(idx, int):
             return self.wells()[idx]
         elif isinstance(idx, str):
@@ -609,20 +902,21 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function used to generate a list of wells in top -> down,
-        left -> right order. This is representative of moving down `rows` and
-        across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
+        Accessor function to navigate a labware top to bottom, left to right.
 
-        With indexing one can treat it as a typical python
-        list. To access well A1, for example, write: labware.wells()[0]
+        i.e., this method returns a list ordered A1, B1, C1…A2, B2, C2….
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.wells(1, 4, 8)` or `self.wells('A1', 'B2')`, but
-        `self.wells('A1', 4)` is invalid.
+        Use indexing to access individual wells contained in the list.
+        For example, access well A1 with ``labware.wells()[0]``.
 
-        :return: Ordered list of all wells in a labware
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
+
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.wells(1, 4)`` or ``.wells("1", "4")`` is
+            valid, but ``.wells("1", 4)`` is not.
+
+        :return: Ordered list of all wells in a labware.
         """
         if not args:
             return list(self._wells_by_name.values())
@@ -644,13 +938,12 @@ class Labware:
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
-        Accessor function used to create a look-up table of Wells by name.
+        Accessor function used to navigate through a labware by well name.
 
-        With indexing one can treat it as a typical python
-        dictionary whose keys are well names. To access well A1, for example,
-        write: labware.wells_by_name()['A1']
+        Use indexing to access individual wells contained in the dictionary.
+        For example, access well A1 with ``labware.wells_by_name()["A1"]``.
 
-        :return: Dictionary of well objects keyed by well name
+        :return: Dictionary of :py:class:`.Well` objects keyed by well name.
         """
         return dict(self._wells_by_name)
 
@@ -668,19 +961,20 @@ class Labware:
     @requires_version(2, 0)
     def rows(self, *args: Union[int, str]) -> List[List[Well]]:
         """
-        Accessor function used to navigate through a labware by row.
+        Accessor function to navigate through a labware by row.
 
-        With indexing one can treat it as a typical python nested list.
-        To access row A for example, write: labware.rows()[0]. This
-        will output ['A1', 'A2', 'A3', 'A4'...]
+        Use indexing to access individual rows or wells contained in the nested list.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.rows(1, 4, 8)` or `self.rows('A', 'B')`, but  `self.rows('A', 4)`
-        is invalid.
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
 
-        :return: A list of row lists
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.rows(1, 4)`` or ``.rows("1", "4")`` is
+            valid, but ``.rows("1", 4)`` is not.
+
+        :return: A list of row lists.
         """
         if not args:
             return [
@@ -705,13 +999,14 @@ class Labware:
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by row name.
+        Accessor function to navigate through a labware by row name.
 
-        With indexing one can treat it as a typical python dictionary.
-        To access row A for example, write: labware.rows_by_name()['A']
-        This will output ['A1', 'A2', 'A3', 'A4'...].
+        Use indexing to access individual rows or wells contained in the dictionary.
+        For example, access row A with ``labware.rows_by_name()["A"]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
-        :return: Dictionary of Well lists keyed by row name
+        :return: Dictionary of :py:class:`.Well` lists keyed by row name.
         """
         return {
             row_name: [self._wells_by_name[well_name] for well_name in row]
@@ -730,20 +1025,21 @@ class Labware:
     @requires_version(2, 0)
     def columns(self, *args: Union[int, str]) -> List[List[Well]]:
         """
-        Accessor function used to navigate through a labware by column.
+        Accessor function to navigate through a labware by column.
 
-        With indexing one can treat it as a typical python nested list.
-        To access row A for example,
-        write: labware.columns()[0]
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        Use indexing to access individual columns or wells contained in the nested list.
+        For example, access column 1 with ``labware.columns()[0]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through H1.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.columns(1, 4, 8)` or `self.columns('1', '2')`, but
-        `self.columns('1', 4)` is invalid.
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
 
-        :return: A list of column lists
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.columns(1, 4)`` or ``.columns("1", "4")`` is
+            valid, but ``.columns("1", 4)`` is not.
+
+        :return: A list of column lists.
         """
         if not args:
             return [
@@ -768,14 +1064,14 @@ class Labware:
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by column name.
+        Accessor function to navigate through a labware by column name.
 
-        With indexing one can treat it as a typical python dictionary.
-        To access row A for example,
-        write: labware.columns_by_name()['1']
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        Use indexing to access individual columns or wells contained in the dictionary.
+        For example, access column 1 with ``labware.columns_by_name()["1"]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through H1.
 
-        :return: Dictionary of Well lists keyed by column name
+        :return: Dictionary of :py:class:`.Well` lists keyed by column name.
         """
         return {
             column_name: [self._wells_by_name[well_name] for well_name in column]
@@ -791,14 +1087,14 @@ class Labware:
         _log.warning("columns_by_index is deprecated. Use columns_by_name instead.")
         return self.columns_by_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def highest_z(self) -> float:
         """
-        The z-coordinate of the tallest single point anywhere on the labware.
+        The z-coordinate of the highest single point anywhere on the labware.
 
-        This is drawn from the 'dimensions'/'zDimension' elements of the
-        labware definition and takes into account the calibration offset.
+        This is taken from the ``zDimension`` property of the ``dimensions`` object in the
+        labware definition and takes into account the labware offset.
         """
         return self._core.highest_z
 
@@ -807,19 +1103,34 @@ class Labware:
         """as is_tiprack but not subject to version checking for speed"""
         return self._core.is_tip_rack()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
+        """Whether the labware behaves as a tip rack.
+
+        Returns ``True`` if the labware definition specifies ``isTiprack`` as ``True``.
+        """
         return self._is_tiprack
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def is_adapter(self) -> bool:
+        """Whether the labware behaves as an adapter.
+
+        Returns ``True`` if the labware definition specifies ``adapter`` as one of the
+        labware's ``allowedRoles``.
+        """
         return self._core.is_adapter()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
+        """For a tip rack labware, the length of the tips it holds, in mm.
+
+        This is taken from the ``tipLength`` property of the ``parameters`` object in the labware definition.
+
+        This method will raise an exception if you call it on a labware that isn’t a tip rack.
+        """
         return self._core.get_tip_length()
 
     @tip_length.setter
@@ -832,16 +1143,24 @@ class Labware:
             and/or use the Opentrons App's tip length calibration feature.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError("Labware.tip_length setter has been deprecated")
+            raise UnsupportedAPIError(
+                api_element="Labware.tip_length setter",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+            )
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # invvestigate if upgrading mypy allows the `cast` to be removed
+        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_tip_length(length)
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
-        self, num_tips: int = 1, starting_tip: Optional[Well] = None
+        self,
+        num_tips: int = 1,
+        starting_tip: Optional[Well] = None,
+        *,
+        nozzle_map: Optional[NozzleMapInterface] = None,
     ) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
@@ -862,6 +1181,7 @@ class Labware:
         well_name = self._core.get_next_tip(
             num_tips=num_tips,
             starting_tip=starting_tip._core if starting_tip else None,
+            nozzle_map=nozzle_map,
         )
 
         return self._wells_by_name[well_name] if well_name is not None else None
@@ -890,9 +1210,11 @@ class Labware:
             Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.use_tips has been deprecated."
-                " To modify tip state, use Labware.reset"
+            raise UnsupportedAPIError(
+                api_element="Labware.use_tips",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="To modify tip state, use Labware.reset.",
             )
 
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
@@ -934,8 +1256,10 @@ class Labware:
             This method has been removed.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.previous_tip is unsupported in this API version."
+            raise UnsupportedAPIError(
+                api_element="Labware.previous_tip",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
             )
 
         # This logic is the inverse of :py:meth:`next_tip`
@@ -976,9 +1300,11 @@ class Labware:
             This method has been removed. Use :py:meth:`.reset` instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise APIVersionError(
-                "Labware.return_tips() is unsupported in this API version."
-                " Use Labware.reset() instead."
+            raise UnsupportedAPIError(
+                api_element="Labware.return_tips()",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
+                current_version=f"{self._api_version}",
+                extra_message="Use Labware.reset() instead.",
             )
 
         # This logic is the inverse of :py:meth:`use_tips`
@@ -993,13 +1319,135 @@ class Labware:
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tip rack.
+        """Reset tip tracking for a tip rack.
+
+        After resetting, the API treats all wells on the rack as if they contain unused tips.
+        This is useful if you want to reuse tips after calling :py:meth:`.return_tip()`.
+
+        If you need to physically replace an empty tip rack in the middle of your protocol,
+        use :py:meth:`.move_labware()` instead. See :ref:`off-deck-location` for an example.
 
         .. versionchanged:: 2.14
             This method will raise an exception if you call it on a labware that isn't
             a tip rack. Formerly, it would do nothing.
         """
         self._core.reset_tips()
+
+    @requires_version(2, 22)
+    def load_liquid(
+        self, wells: Sequence[Union[str, Well]], volume: float, liquid: Liquid
+    ) -> None:
+        """Mark several wells as containing the same amount of liquid.
+
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling operations begin. Loading liquids is required for liquid tracking functionality. If a well
+        hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+
+        :param wells: The wells to load the liquid into.
+        :type wells: List of string well names or list of :py:class:`.Well` objects (e.g., from :py:meth:`~Labware.wells`).
+
+        :param volume: The volume of liquid to load into each well.
+        :type volume: float
+
+        :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
+        :type liquid: Liquid
+        """
+        well_names: List[str] = []
+        for well in wells:
+            if isinstance(well, str):
+                if well not in self.wells_by_name():
+                    raise KeyError(
+                        f"{well} is not a well in labware {self.name}. The elements of wells should name wells in this labware."
+                    )
+                well_names.append(well)
+            elif isinstance(well, Well):
+                if well.parent is not self:
+                    raise KeyError(
+                        f"{well.well_name} is not a well in labware {self.name}. The elements of wells should be wells of this labware."
+                    )
+                well_names.append(well.well_name)
+            else:
+                raise TypeError(
+                    f"Unexpected type for element {repr(well)}. The elements of wells should be Well instances or well names."
+                )
+            if not isinstance(volume, (float, int)):
+                raise TypeError(
+                    f"Unexpected type for volume {repr(volume)}. Volume should be a number in microliters."
+                )
+        self._core.load_liquid({well_name: volume for well_name in well_names}, liquid)
+
+    @requires_version(2, 22)
+    def load_liquid_by_well(
+        self, volumes: Mapping[Union[str, Well], float], liquid: Liquid
+    ) -> None:
+        """Mark several wells as containing unique volumes of liquid.
+
+        This method should be called at the beginning of a protocol, soon after loading labware and before
+        liquid handling begins. Loading liquids is required for liquid tracking functionality. If a well hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
+        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+
+        :param volumes: A dictionary of well names (or :py:class:`Well` objects, for instance from ``labware['A1']``)
+        :type wells: Dict[Union[str, Well], float]
+
+        :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
+        :type liquid: Liquid
+        """
+        verified_volumes: Dict[str, float] = {}
+        for well, volume in volumes.items():
+            if isinstance(well, str):
+                if well not in self.wells_by_name():
+                    raise KeyError(
+                        f"{well} is not a well in {self.name}. The keys of volumes should name wells in this labware"
+                    )
+                verified_volumes[well] = volume
+            elif isinstance(well, Well):
+                if well.parent is not self:
+                    raise KeyError(
+                        f"{well.well_name} is not a well in {self.name}. The keys of volumes should be wells of this labware"
+                    )
+                verified_volumes[well.well_name] = volume
+            else:
+                raise TypeError(
+                    f"Unexpected type for well name {repr(well)}. The keys of volumes should be Well instances or well names."
+                )
+            if not isinstance(volume, (float, int)):
+                raise TypeError(
+                    f"Unexpected type for volume {repr(volume)}. The values of volumes should be numbers in microliters."
+                )
+        self._core.load_liquid(verified_volumes, liquid)
+
+    @requires_version(2, 22)
+    def load_empty(self, wells: Sequence[Union[Well, str]]) -> None:
+        """Mark several wells as empty.
+
+        This method should be called at the beginning of a protocol, after loading the labware and before liquid handling
+        begins. Loading liquids is required for liquid tracking functionality. If a well in a labware hasn't been assigned a starting volume with :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
+        volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+
+        :param wells: The list of wells to mark empty. To mark all wells as empty, pass ``labware.wells()``. You can also specify
+                      wells by their names (for instance, ``labware.load_empty(['A1', 'A2'])``).
+        :type wells: Union[List[Well], List[str]]
+        """
+        well_names: List[str] = []
+        for well in wells:
+            if isinstance(well, str):
+                if well not in self.wells_by_name():
+                    raise KeyError(
+                        f"{well} is not a well in {self.name}. The elements of wells should name wells in this labware."
+                    )
+                well_names.append(well)
+            elif isinstance(well, Well):
+                if well.parent is not self:
+                    raise KeyError(
+                        f"{well.well_name} is not a well in {self.name}. The elements of wells should be wells of this labware."
+                    )
+                well_names.append(well.well_name)
+            else:
+                raise TypeError(
+                    f"Unexpected type for well name {repr(well)}. The elements of wells should be Well instances or well names."
+                )
+        self._core.load_empty(well_names)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -1013,7 +1461,11 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def select_tiprack_from_list(
-    tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
+    tip_racks: List[Labware],
+    num_channels: int,
+    starting_point: Optional[Well] = None,
+    *,
+    nozzle_map: Optional[NozzleMapInterface] = None,
 ) -> Tuple[Labware, Well]:
     try:
         first, rest = split_tipracks(tip_racks)
@@ -1022,18 +1474,20 @@ def select_tiprack_from_list(
 
     if starting_point and starting_point.parent != first:
         raise TipSelectionError(
-            "The starting tip you selected " f"does not exist in {first}"
+            f"The starting tip you selected does not exist in {first}"
         )
     elif starting_point:
         first_well = starting_point
+    elif nozzle_map:
+        first_well = None
     else:
         first_well = first.wells()[0]
 
-    next_tip = first.next_tip(num_channels, first_well)
+    next_tip = first.next_tip(num_channels, first_well, nozzle_map=nozzle_map)
     if next_tip:
         return first, next_tip
     else:
-        return select_tiprack_from_list(rest, num_channels)
+        return select_tiprack_from_list(rest, num_channels, None, nozzle_map=nozzle_map)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -1045,21 +1499,30 @@ def filter_tipracks_to_start(
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def next_available_tip(
-    starting_tip: Optional[Well], tip_racks: List[Labware], channels: int
+    starting_tip: Optional[Well],
+    tip_racks: List[Labware],
+    channels: int,
+    *,
+    nozzle_map: Optional[NozzleMapInterface] = None,
 ) -> Tuple[Labware, Well]:
     start = starting_tip
     if start is None:
-        return select_tiprack_from_list(tip_racks, channels)
+        return select_tiprack_from_list(
+            tip_racks, channels, None, nozzle_map=nozzle_map
+        )
     else:
         return select_tiprack_from_list(
-            filter_tipracks_to_start(start, tip_racks), channels, start
+            filter_tipracks_to_start(start, tip_racks),
+            channels,
+            start,
+            nozzle_map=nozzle_map,
         )
 
 
 # TODO(mc, 2022-11-09): implementation detail, move somewhere else
 # only used in old calibration flows by robot-server
 def load_from_definition(
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
     parent: Location,
     label: Optional[str] = None,
     api_level: Optional[APIVersion] = None,
@@ -1103,8 +1566,8 @@ def load(
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
-    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
+    extra_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
     api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """
@@ -1141,5 +1604,15 @@ def load(
         bundled_defs=bundled_defs,
         extra_defs=extra_defs,
     )
+
+    # The legacy `load_from_definition()` function that we're calling only supports
+    # schemaVersion==2 labware. Fortunately, when robot-server calls this function,
+    # we only expect it to try to load schemaVersion==2 labware, so we never expect
+    # this ValueError to be raised in practice.
+    if definition["schemaVersion"] != 2:
+        raise ValueError(
+            f"{namespace}/{load_name}/{version} has schema {definition['schemaVersion']}."
+            " Only schema 2 is supported."
+        )
 
     return load_from_definition(definition, parent, label, api_level)

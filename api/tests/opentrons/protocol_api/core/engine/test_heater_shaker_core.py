@@ -1,4 +1,5 @@
 """Tests for the engine based Protocol API module core implementations."""
+
 import pytest
 from decoy import Decoy
 
@@ -10,8 +11,11 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     ModuleType,
 )
+from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
 from opentrons.protocol_api.core.engine.module_core import HeaterShakerModuleCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
 SyncHeaterShakerHardware = SynchronousAdapter[HeaterShaker]
@@ -30,9 +34,16 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncHeaterShakerHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> HeaterShakerModuleCore:
     """Get a HeaterShakerModuleCore test subject."""
     return HeaterShakerModuleCore(
@@ -40,6 +51,7 @@ def subject(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
@@ -47,6 +59,7 @@ def test_create(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
+    mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should be able to create a heater shaker module core."""
     result = HeaterShakerModuleCore(
@@ -54,6 +67,7 @@ def test_create(
         engine_client=mock_engine_client,
         api_version=MAX_SUPPORTED_VERSION,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
     assert result.module_id == "1234"
@@ -63,15 +77,17 @@ def test_create(
 def test_set_target_temperature(
     decoy: Decoy, mock_engine_client: EngineClient, subject: HeaterShakerModuleCore
 ) -> None:
-    """It should set the target temperature with the engine client."""
-    subject.set_target_temperature(celsius=42.0)
-
-    decoy.verify(
-        mock_engine_client.heater_shaker_set_target_temperature(
-            module_id="1234", celsius=42.0
-        ),
-        times=1,
-    )
+    """It should set the target temperature with the engine client and return a EngineTaskCore."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.heater_shaker.SetTargetTemperatureParams(moduleId="1234", celsius=42.0)
+        )
+    ).then_return(cmd.heater_shaker.SetTargetTemperatureResult(taskId="taskId"))
+    task_mock._id = "taskId"
+    result = subject.set_target_temperature(42.0)
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_wait_for_target_temperature(
@@ -81,7 +97,10 @@ def test_wait_for_target_temperature(
     subject.wait_for_target_temperature()
 
     decoy.verify(
-        mock_engine_client.heater_shaker_wait_for_temperature(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.WaitForTemperatureParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -92,11 +111,29 @@ def test_set_and_wait_for_shake_speed(
     subject.set_and_wait_for_shake_speed(rpm=1337)
 
     decoy.verify(
-        mock_engine_client.heater_shaker_set_and_wait_for_shake_speed(
-            module_id="1234", rpm=1337
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.SetAndWaitForShakeSpeedParams(moduleId="1234", rpm=1337)
         ),
         times=1,
     )
+
+
+def test_shake_speed(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: HeaterShakerModuleCore
+) -> None:
+    """It should set and wait for shake speed with the engine client."""
+    task_mock = decoy.mock(cls=EngineTaskCore)
+    decoy.when(
+        mock_engine_client.execute_command_without_recovery(
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId="1234", rpm=1337)
+        )
+    ).then_return(
+        cmd.heater_shaker.SetShakeSpeedResult(taskId="taskId", pipetteRetracted=True)
+    )
+    task_mock._id = "taskId"
+    result = subject.set_shake_speed(1337)
+    assert isinstance(result, EngineTaskCore)
+    assert result._id == "taskId"
 
 
 def test_open_labware_latch(
@@ -106,7 +143,10 @@ def test_open_labware_latch(
     subject.open_labware_latch()
 
     decoy.verify(
-        mock_engine_client.heater_shaker_open_labware_latch(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.OpenLabwareLatchParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -117,7 +157,10 @@ def test_close_labware_latch(
     subject.close_labware_latch()
 
     decoy.verify(
-        mock_engine_client.heater_shaker_close_labware_latch(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.CloseLabwareLatchParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -128,7 +171,10 @@ def test_deactivate_shaker(
     subject.deactivate_shaker()
 
     decoy.verify(
-        mock_engine_client.heater_shaker_deactivate_shaker(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.DeactivateShakerParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 
@@ -139,7 +185,10 @@ def test_deactivate_heater(
     subject.deactivate_heater()
 
     decoy.verify(
-        mock_engine_client.heater_shaker_deactivate_heater(module_id="1234"), times=1
+        mock_engine_client.execute_command(
+            cmd.heater_shaker.DeactivateHeaterParams(moduleId="1234")
+        ),
+        times=1,
     )
 
 

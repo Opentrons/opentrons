@@ -1,4 +1,6 @@
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from '../fieldMasks'
+import { describe, expect, it } from 'vitest'
+
+import { makeMaskToDecimal, maskLoadName, maskToInteger } from '../fieldMasks'
 
 // TODO(Ian, 2019-07-23): some fancy util could make these tests much less verbose
 

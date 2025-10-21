@@ -1,32 +1,37 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+
 import { ODDBackButton } from '..'
 
-const render = (props: React.ComponentProps<typeof ODDBackButton>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof ODDBackButton>) => {
   return renderWithProviders(<ODDBackButton {...props} />)[0]
 }
 
 describe('ODDBackButton', () => {
-  let props: React.ComponentProps<typeof ODDBackButton>
+  let props: ComponentProps<typeof ODDBackButton>
 
   beforeEach(() => {
     props = {
       label: 'button label',
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('should render text and icon', () => {
-    const { getByText, getByTestId, getByRole } = render(props)
-    getByText('button label')
-    expect(getByTestId('back_icon')).toBeInTheDocument()
-    const button = getByRole('button')
+    render(props)
+    screen.getByText('button label')
+    expect(screen.getByTestId('back_icon')).toBeInTheDocument()
+    const button = screen.getByRole('button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
-    button.click()
+    fireEvent.click(button)
     expect(props.onClick).toHaveBeenCalled()
   })
 })

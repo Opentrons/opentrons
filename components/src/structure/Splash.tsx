@@ -1,9 +1,8 @@
 /** A full-page icon in a muted color */
-import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import styles from './Splash.css'
+import styles from './Splash.module.css'
 
 import type { IconName } from '../icons'
 

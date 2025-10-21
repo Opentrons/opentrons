@@ -1,3 +1,59 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hardware_testing"
+description = "Tools for running hardware tests."
+requires-python = "~=3.10"
+license = "Apache-2.0"
+authors = [
+    { name = "Opentrons", email = "engineering@opentrons.com" },
+]
+keywords = ["robots", "automation", "testing", "hardware"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.urls]
+"Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/hardware-testing"
+
+[tool.hatch.build.hooks.vcs-tunable]
+version-file = "hardware_testing/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
+
+[tool.hatch.version]
+source = 'vcs-tunable'
+
+[tool.hatch.version.raw-options]
+root = '..'
+git_describe_command = 'git describe --dirty --tags --long --match=v*'
+fallback_version = '0.0.0-dev'
+# Note: these are required for setuptools_scm to not automatically bump the version used in the package
+# from the latest version it detects. This would actually be kind of useful, but we can only do it if
+# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
+
+[tool.hatch.build.targets.wheel]
+packages = ["hardware_testing"]
+exclude = [
+    "tests",
+    "tests.*",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ['hardware_testing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+
+[tool.hatch.build.targets.wheel.force_include]
+'LICENSE' = 'hardware_testing/LICENSE'

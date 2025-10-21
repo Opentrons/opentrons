@@ -7,8 +7,8 @@ import { TIP_LENGTH_CALIBRATIONS_PATH } from '../constants'
 
 import type { ResponseFixtures } from '../../../robot-api/__fixtures__'
 import type {
-  TipLengthCalibration,
   AllTipLengthCalibrations,
+  TipLengthCalibration,
 } from '../../api-types'
 
 export const mockTipLengthCalibration1: TipLengthCalibration = {
@@ -23,6 +23,7 @@ export const mockTipLengthCalibration1: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockTipLengthCalibration2: TipLengthCalibration = {
@@ -37,6 +38,7 @@ export const mockTipLengthCalibration2: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockTipLengthCalibration3: TipLengthCalibration = {
@@ -51,6 +53,7 @@ export const mockTipLengthCalibration3: TipLengthCalibration = {
     markedAt: '',
   },
   id: 'someID',
+  uri: 'test-uri',
 }
 
 export const mockPipetteMatchTipLengthCalibration: AllTipLengthCalibrations = {

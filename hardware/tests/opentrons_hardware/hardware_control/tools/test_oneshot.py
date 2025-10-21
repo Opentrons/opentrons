@@ -64,7 +64,7 @@ async def test_suppresses_undefined(
     assert tools.gripper is None
     # Only the tools request should be sent - no followups for mounts with nothing on
     # them
-    assert await mock_messenger.send.called_once_with(
+    mock_messenger.send.assert_called_once_with(
         node_id=NodeId.head,
         message=message_definitions.AttachedToolsRequest(),
     )
@@ -107,7 +107,7 @@ async def test_handles_not_attached(
 
     # Only the tools request should be sent - no followups for mounts with nothing on
     # them
-    assert await mock_messenger.send.called_once_with(
+    mock_messenger.send.assert_called_once_with(
         node_id=NodeId.head,
         message=message_definitions.AttachedToolsRequest(
             payload=payloads.EmptyPayload()

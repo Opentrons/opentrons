@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import json
 import os
 import pathlib
@@ -15,7 +16,7 @@ import pytest
 from fastapi import routing
 from starlette.testclient import TestClient
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
@@ -36,17 +37,21 @@ from opentrons.calibration_storage.ot2 import (
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
-from robot_server import app
+from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
-from robot_server.persistence import get_sql_engine, create_sql_engine
+from robot_server.persistence.database import sql_engine_ctx
+from robot_server.persistence.tables import metadata
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.dependencies import get_run_data_manager
 
 test_router = routing.APIRouter()
 
 
-@test_router.get("/alwaysRaise")
+@test_router.get("/alwaysRaise", response_model=None)
 async def always_raise() -> NoReturn:
     raise RuntimeError
 
@@ -104,6 +109,11 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
+def run_data() -> MagicMock:
+    return MagicMock(spec=RunDataManager)
+
+
+@pytest.fixture
 def versions() -> MagicMock:
     m = MagicMock(spec=get_versions)
     m.return_value = ComponentVersions(
@@ -150,11 +160,22 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
 def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_ot2_hardware_override() -> API:
         """Override for the get_ot2_hardware FastAPI dependency."""
-        return MagicMock(spec=API)
+        return hardware
 
     app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
     yield
     del app.dependency_overrides[get_ot2_hardware]
+
+
+@pytest.fixture
+def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
+    async def get_run_data_manager_override() -> RunDataManager:
+        """Override for the get_run_data_manager FastAPI dependency."""
+        return run_data
+
+    app.dependency_overrides[get_run_data_manager] = get_run_data_manager_override
+    yield
+    del app.dependency_overrides[get_run_data_manager]
 
 
 @pytest.fixture
@@ -165,7 +186,24 @@ def api_client(
     _override_ot2_hardware_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
-    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
+    return client
+
+
+@pytest.fixture
+def api_client_camera_overrides(
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
+    _override_version_with_mock: None,
+    _override_ot2_hardware_with_mock: None,
+    _override_run_data_manager_with_mock: None,
+) -> TestClient:
+    client = TestClient(app)
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
     return client
 
 
@@ -176,7 +214,9 @@ def api_client_no_errors(
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
-    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
     return client
 
 
@@ -233,6 +273,7 @@ def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     tip_length_list = [30.5, 31.5]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
+    assert definition["schemaVersion"] == 2  # Required by create_tip_length_data().
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
         cal_data = create_tip_length_data(definition, tip_len)
         save_tip_length_calibration(pip, cal_data)
@@ -326,13 +367,19 @@ def minimal_labware_def() -> LabwareDefinition:
 @pytest.fixture
 def custom_tiprack_def() -> LabwareDefinition:
     return {
-        "metadata": {"displayName": "minimal labware"},
+        "metadata": {
+            "displayName": "minimal labware",
+            "displayCategory": "tipRack",
+            "displayVolumeUnits": "µL",
+        },
         "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
         "parameters": {
             "isTiprack": True,
             "tipLength": 55.3,
             "tipOverlap": 2.8,
             "loadName": "minimal_labware_def",
+            "format": "96Standard",
+            "isMagneticModuleCompatible": False,
         },
         "ordering": [["A1"], ["A2"]],
         "wells": {
@@ -388,7 +435,35 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = create_sql_engine(db_file_path)
-    yield sql_engine
-    sql_engine.dispose()
+    with make_sql_engine(tmp_path) as engine:
+        yield engine
+
+
+@contextmanager
+def make_sql_engine(parent_dir: Path) -> Generator[SQLEngine, None, None]:
+    """Like sql_engine, but not a pytest fixture."""
+    db_file_path = parent_dir / "test.db"
+    with sql_engine_ctx(db_file_path) as engine:
+        metadata.create_all(engine)
+        yield engine
+
+
+def datetime_to_zulu_iso8601(dt: datetime) -> str:
+    """Serialize a datetime to an ISO8601 string.
+
+    If the timezone is UTC, represent that with "Z", which matches what Pydantic does,
+    instead instead of with "+00:00", which is Python's default.
+
+    e.g. "2024-12-10T19:40:55.984327Z" vs. "2024-12-10T19:40:55.984327+00:00".
+    """
+    return dt.isoformat().replace("+00:00", "Z")
+
+
+# todo(mm, 2024-12-10):
+# In Python 3.11+, we can replace this with just datetime.fromisoformat().
+def zulu_iso8601_to_datetime(iso8601_str: str) -> datetime:
+    """Parse an ISO8601 datetime string with a "Z" timezone.
+
+    See `datetime_to_zulu_iso8601()`.
+    """
+    return datetime.fromisoformat(iso8601_str.replace("Z", "+00:00"))

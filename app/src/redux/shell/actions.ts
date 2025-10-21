@@ -1,12 +1,19 @@
 import type {
-  UiInitializedAction,
-  UsbRequestsAction,
   AppRestartAction,
-  SendLogAction,
-  UpdateBrightnessAction,
+  CameraPhotoOpenAction,
+  CameraStreamOpenAction,
+  NotifySubscribeAction,
+  NotifyTopic,
+  ReloadUiAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
+  SendLogAction,
+  StepDetailViewerOpenAction,
+  StepDetailViewerUpdateAction,
+  UiInitializedAction,
+  UpdateBrightnessAction,
+  UsbRequestsAction,
 } from './types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'
@@ -15,6 +22,7 @@ export const USB_HTTP_REQUESTS_START: 'shell:USB_HTTP_REQUESTS_START' =
 export const USB_HTTP_REQUESTS_STOP: 'shell:USB_HTTP_REQUESTS_STOP' =
   'shell:USB_HTTP_REQUESTS_STOP'
 export const APP_RESTART: 'shell:APP_RESTART' = 'shell:APP_RESTART'
+export const RELOAD_UI: 'shell:RELOAD_UI' = 'shell:RELOAD_UI'
 export const SEND_LOG: 'shell:SEND_LOG' = 'shell:SEND_LOG'
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'
@@ -24,6 +32,14 @@ export const ROBOT_MASS_STORAGE_DEVICE_REMOVED: 'shell:ROBOT_MASS_STORAGE_DEVICE
   'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED'
 export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED' =
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
+  'shell:NOTIFY_SUBSCRIBE'
+export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
+export const CAMERA_STREAM_OPEN = 'shell:CAMERA_STREAM_OPEN' as const
+export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
+export const STEP_DETAIL_VIEWER_OPEN = 'shell:STEP_DETAIL_VIEWER_OPEN' as const
+export const STEP_DETAIL_VIEWER_UPDATE =
+  'shell:STEP_DETAIL_VIEWER_UPDATE' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -42,6 +58,14 @@ export const usbRequestsStop = (): UsbRequestsAction => ({
 
 export const appRestart = (message: string): AppRestartAction => ({
   type: APP_RESTART,
+  payload: {
+    message: message,
+  },
+  meta: { shell: true },
+})
+
+export const reloadUi = (message: string): ReloadUiAction => ({
+  type: RELOAD_UI,
   payload: {
     message: message,
   },
@@ -93,5 +117,50 @@ export const robotMassStorageDeviceEnumerated = (
     rootPath,
     filePaths,
   },
+  meta: { shell: true },
+})
+
+export const notifySubscribeAction = (
+  hostname: string,
+  topic: NotifyTopic
+): NotifySubscribeAction => ({
+  type: NOTIFY_SUBSCRIBE,
+  payload: {
+    hostname,
+    topic,
+  },
+  meta: { shell: true },
+})
+
+export const cameraStreamOpenAction = (
+  hostname: string,
+  robotName: string
+): CameraStreamOpenAction => ({
+  type: CAMERA_STREAM_OPEN,
+  payload: { hostname, robotName },
+  meta: { shell: true },
+})
+
+export const cameraPhotoOpenAction = (
+  payload: CameraPhotoOpenAction['payload']
+): CameraPhotoOpenAction => ({
+  type: CAMERA_PHOTO_OPEN,
+  payload,
+  meta: { shell: true },
+})
+
+export const stepDetailViewerOpenAction = (
+  payload: StepDetailViewerOpenAction['payload']
+): StepDetailViewerOpenAction => ({
+  type: STEP_DETAIL_VIEWER_OPEN,
+  payload,
+  meta: { shell: true },
+})
+
+export const stepDetailViewerUpdateAction = (
+  payload: StepDetailViewerUpdateAction['payload']
+): StepDetailViewerUpdateAction => ({
+  type: STEP_DETAIL_VIEWER_UPDATE,
+  payload,
   meta: { shell: true },
 })

@@ -3,9 +3,10 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
+
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from textwrap import dedent
 
 import pytest
 from decoy import matchers
@@ -19,27 +20,35 @@ from opentrons.protocol_engine import (
     DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner.create_simulating_orchestrator import (
+    create_simulating_orchestrator,
+)
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.types import MountType, DeckSlotName
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 
-async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:
+async def simulate_and_get_commands(protocol_file: Path) -> list[commands.Command]:
     """Simulate a protocol, make sure it succeeds, and return its commands."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[protocol_file],
         directory=None,
     )
-    subject = await create_simulating_runner(
-        robot_type="OT-2 Standard",
-        protocol_config=protocol_source.config,
+    subject = await create_simulating_orchestrator(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     assert result.state_summary.errors == []
     assert result.state_summary.status == EngineStatus.SUCCEEDED
-    return result.commands
+    commands = [command for command in result.commands]
+    await subject.finish(
+        drop_tips_after_run=False,
+        set_run_status=False,
+        post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+    )
+    return commands
 
 
 # TODO(mm, 2023-01-09): Split this up into smaller, more focused tests.
@@ -157,7 +166,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
 
     assert len(commands_result) == 32
 
-    assert commands_result[0] == commands.Home.construct(
+    assert commands_result[0] == commands.Home.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -165,9 +174,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.HomeParams(axes=None),
+        notes=[],
         result=commands.HomeResult(),
     )
-    assert commands_result[1] == commands.LoadLabware.construct(
+    assert commands_result[1] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -180,9 +190,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             namespace="opentrons",
             version=1,
         ),
+        notes=[],
         result=tiprack_1_result_captor,
     )
-    assert commands_result[2] == commands.LoadLabware.construct(
+    assert commands_result[2] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -195,9 +206,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             namespace="opentrons",
             version=1,
         ),
+        notes=[],
         result=tiprack_2_result_captor,
     )
-    assert commands_result[3] == commands.LoadModule.construct(
+    assert commands_result[3] == commands.LoadModule.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -209,9 +221,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
             moduleId="module-0",
         ),
+        notes=[],
         result=module_1_result_captor,
     )
-    assert commands_result[4] == commands.LoadLabware.construct(
+    assert commands_result[4] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -224,9 +237,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             namespace="opentrons",
             version=1,
         ),
+        notes=[],
         result=well_plate_1_result_captor,
     )
-    assert commands_result[5] == commands.LoadLabware.construct(
+    assert commands_result[5] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -239,10 +253,11 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             namespace="opentrons",
             version=1,
         ),
+        notes=[],
         result=module_plate_1_result_captor,
     )
 
-    assert commands_result[6] == commands.LoadPipette.construct(
+    assert commands_result[6] == commands.LoadPipette.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -252,10 +267,11 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         params=commands.LoadPipetteParams(
             pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
         ),
+        notes=[],
         result=pipette_left_result_captor,
     )
 
-    assert commands_result[7] == commands.LoadPipette.construct(
+    assert commands_result[7] == commands.LoadPipette.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -265,19 +281,18 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         params=commands.LoadPipetteParams(
             pipetteName=PipetteNameType.P300_MULTI, mount=MountType.RIGHT
         ),
+        notes=[],
         result=pipette_right_result_captor,
     )
 
-    # TODO(mc, 2021-11-11): not sure why I have to dict-access these properties
-    # might be a bug in Decoy, might be something weird that Pydantic does
-    tiprack_1_id = tiprack_1_result_captor.value["labwareId"]
-    tiprack_2_id = tiprack_2_result_captor.value["labwareId"]
-    well_plate_1_id = well_plate_1_result_captor.value["labwareId"]
-    module_plate_1_id = module_plate_1_result_captor.value["labwareId"]
-    pipette_left_id = pipette_left_result_captor.value["pipetteId"]
-    pipette_right_id = pipette_right_result_captor.value["pipetteId"]
+    tiprack_1_id = tiprack_1_result_captor.value.labwareId
+    tiprack_2_id = tiprack_2_result_captor.value.labwareId
+    well_plate_1_id = well_plate_1_result_captor.value.labwareId
+    module_plate_1_id = module_plate_1_result_captor.value.labwareId
+    pipette_left_id = pipette_left_result_captor.value.pipetteId
+    pipette_right_id = pipette_right_result_captor.value.pipetteId
 
-    assert commands_result[8] == commands.PickUpTip.construct(
+    assert commands_result[8] == commands.PickUpTip.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -289,11 +304,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
-    assert commands_result[9] == commands.PickUpTip.construct(
+    assert commands_result[9] == commands.PickUpTip.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -305,12 +321,13 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_2_id,
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
 
-    assert commands_result[10] == commands.DropTip.construct(
+    assert commands_result[10] == commands.DropTip.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -322,10 +339,11 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId="fixedTrash",
             wellName="A1",
         ),
+        notes=[],
         result=commands.DropTipResult(position=DeckPoint(x=0, y=0, z=0)),
     )
 
-    assert commands_result[11] == commands.PickUpTip.construct(
+    assert commands_result[11] == commands.PickUpTip.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -337,11 +355,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="B1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
-    assert commands_result[12] == commands.Aspirate.construct(
+    assert commands_result[12] == commands.Aspirate.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -355,9 +374,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=40,
             flowRate=150,
         ),
+        notes=[],
         result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[13] == commands.Dispense.construct(
+    assert commands_result[13] == commands.Dispense.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -371,9 +391,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=35,
             flowRate=360,
         ),
+        notes=[],
         result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[14] == commands.Aspirate.construct(
+    assert commands_result[14] == commands.Aspirate.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -387,9 +408,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=40,
             flowRate=150.0,
         ),
+        notes=[],
         result=commands.AspirateResult(volume=40, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[15] == commands.Dispense.construct(
+    assert commands_result[15] == commands.Dispense.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -403,9 +425,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=35,
             flowRate=300,
         ),
+        notes=[],
         result=commands.DispenseResult(volume=35, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[16] == commands.BlowOut.construct(
+    assert commands_result[16] == commands.BlowOut.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -418,9 +441,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
+        notes=[],
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[17] == commands.Aspirate.construct(
+    assert commands_result[17] == commands.Aspirate.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -434,9 +458,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=150,
         ),
+        notes=[],
         result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[18] == commands.Dispense.construct(
+    assert commands_result[18] == commands.Dispense.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -450,9 +475,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=300,
         ),
+        notes=[],
         result=commands.DispenseResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[19] == commands.BlowOut.construct(
+    assert commands_result[19] == commands.BlowOut.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -465,9 +491,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
+        notes=[],
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[20] == commands.Aspirate.construct(
+    assert commands_result[20] == commands.Aspirate.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -481,9 +508,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=300,
             flowRate=150,
         ),
+        notes=[],
         result=commands.AspirateResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[21] == commands.Dispense.construct(
+    assert commands_result[21] == commands.Dispense.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -497,9 +525,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=300,
             flowRate=300,
         ),
+        notes=[],
         result=commands.DispenseResult(volume=300, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[22] == commands.BlowOut.construct(
+    assert commands_result[22] == commands.BlowOut.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -512,10 +541,11 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
             flowRate=1000.0,
         ),
+        notes=[],
         result=commands.BlowOutResult(position=DeckPoint(x=0, y=0, z=0)),
     )
     #   TODO:(jr, 15.08.2022): this should map to move_to when move_to is mapped in a followup ticket RSS-62
-    assert commands_result[23] == commands.Custom.construct(
+    assert commands_result[23] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -526,11 +556,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Moving to (100, 100, 10)",
             legacyCommandType="command.MOVE_TO",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
     #   TODO:(jr, 15.08.2022): aspirate commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[24] == commands.Custom.construct(
+    assert commands_result[24] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -541,11 +572,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Aspirating 300.0 uL from (100, 100, 10) at 150.0 uL/sec",
             legacyCommandType="command.ASPIRATE",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
     #   TODO:(jr, 15.08.2022): dispense commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[25] == commands.Custom.construct(
+    assert commands_result[25] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -556,11 +588,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Dispensing 300.0 uL into (100, 100, 10) at 300.0 uL/sec",
             legacyCommandType="command.DISPENSE",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
     #   TODO:(jr, 15.08.2022): blow_out commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[26] == commands.Custom.construct(
+    assert commands_result[26] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -571,9 +604,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Blowing out at (100, 100, 10)",
             legacyCommandType="command.BLOW_OUT",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
-    assert commands_result[27] == commands.Aspirate.construct(
+    assert commands_result[27] == commands.Aspirate.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -587,9 +621,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=150,
         ),
+        notes=[],
         result=commands.AspirateResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
-    assert commands_result[28] == commands.Dispense.construct(
+    assert commands_result[28] == commands.Dispense.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -603,11 +638,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             volume=50,
             flowRate=300,
         ),
+        notes=[],
         result=commands.DispenseResult(volume=50, position=DeckPoint(x=0, y=0, z=0)),
     )
     #   TODO:(jr, 15.08.2022): aspirate commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[29] == commands.Custom.construct(
+    assert commands_result[29] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -618,11 +654,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Aspirating 50.0 uL from Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3 at 150.0 uL/sec",
             legacyCommandType="command.ASPIRATE",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
     #   TODO:(jr, 15.08.2022): dispense commands with no labware get filtered
     #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[30] == commands.Custom.construct(
+    assert commands_result[30] == commands.Custom.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -633,9 +670,10 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             legacyCommandText="Dispensing 50.0 uL into Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3 at 300.0 uL/sec",
             legacyCommandType="command.DISPENSE",
         ),
+        notes=[],
         result=commands.CustomResult(),
     )
-    assert commands_result[31] == commands.DropTip.construct(
+    assert commands_result[31] == commands.DropTip.model_construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -647,6 +685,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
+        notes=[],
         result=commands.DropTipResult(position=DeckPoint(x=0, y=0, z=0)),
     )
 
@@ -720,4 +759,74 @@ async def test_zero_volume_dispense_commands(
         pipetteId=load_pipette.result.pipetteId,
         labwareId=load_well_plate.result.labwareId,
         wellName="D7",
+    )
+
+
+async def test_air_gap(tmp_path: Path) -> None:
+    """An `air_gap()` should be mapped to an `aspirate`.
+
+    This covers RQA-2621.
+    """
+    path = tmp_path / "protocol.py"
+    path.write_text(
+        dedent(
+            """\
+            metadata = {"apiLevel": "2.13"}
+            def run(protocol):
+                    # Prep:
+                    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+                    well_plate = protocol.load_labware("biorad_96_wellplate_200ul_pcr", 2)
+                    pipette = protocol.load_instrument("p300_single_gen2", mount="left", tip_racks=[tip_rack])
+                    pipette.pick_up_tip()
+
+                    # Test:
+                    pipette.move_to(well_plate["A1"].top())
+                    pipette.air_gap(100)
+            """
+        )
+    )
+    result_commands = await simulate_and_get_commands(path)
+    [
+        initial_home,
+        load_tip_rack,
+        load_well_plate,
+        load_pipette,
+        pick_up_tip,
+        move_to_well,
+        air_gap_aspirate,
+    ] = result_commands
+    assert isinstance(initial_home, commands.Home)
+    assert isinstance(load_tip_rack, commands.LoadLabware)
+    assert isinstance(load_well_plate, commands.LoadLabware)
+    assert isinstance(load_pipette, commands.LoadPipette)
+    assert isinstance(pick_up_tip, commands.PickUpTip)
+    # TODO(mm, 2024-04-23): This commands.Custom looks wrong. This should be a commands.MoveToWell.
+    assert isinstance(move_to_well, commands.Custom)
+    assert isinstance(air_gap_aspirate, commands.Aspirate)
+
+
+async def test_comment(tmp_path: Path) -> None:
+    """A `ProtocolContext.comment()` should be mapped to a `comment` command."""
+    path = tmp_path / "protocol.py"
+    path.write_text(
+        dedent(
+            """\
+            metadata = {"apiLevel": "2.13"}
+            def run(protocol):
+                protocol.comment("oy.")
+            """
+        )
+    )
+    result_commands = await simulate_and_get_commands(path)
+    [initial_home, comment] = result_commands
+    assert comment == commands.Comment.model_construct(
+        status=commands.CommandStatus.SUCCEEDED,
+        params=commands.CommentParams(message="oy."),
+        notes=[],
+        result=commands.CommentResult(),
+        createdAt=matchers.Anything(),
+        startedAt=matchers.Anything(),
+        completedAt=matchers.Anything(),
+        id=matchers.Anything(),
+        key=matchers.Anything(),
     )

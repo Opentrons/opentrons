@@ -1,37 +1,38 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
+import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
-import find from 'lodash/find'
+import orderBy from 'lodash/orderBy'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
 import {
+  CONNECTABLE,
   HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
-  RE_HOSTNAME_IPV6_LL,
+  OPENTRONS_USB,
   RE_HOSTNAME_IPV4_LL,
+  RE_HOSTNAME_IPV6_LL,
   RE_HOSTNAME_LOCALHOST,
   RE_HOSTNAME_LOOPBACK,
-  CONNECTABLE,
-  REACHABLE,
-  UNREACHABLE,
-  RE_ROBOT_MODEL_OT3,
   RE_ROBOT_MODEL_OT2,
+  RE_ROBOT_MODEL_OT3,
+  REACHABLE,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
-  OPENTRONS_USB,
+  UNREACHABLE,
 } from './constants'
 
 import type { State } from '../types'
-import {
+import type {
   DiscoveredRobot,
   DiscoveryClientRobotAddress,
-  Robot,
   ReachableRobot,
+  Robot,
+  RobotModel,
   UnreachableRobot,
   ViewableRobot,
-  RobotModel,
 } from './types'
 
 type GetConnectableRobots = (state: State) => Robot[]
@@ -83,83 +84,102 @@ export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 
-export const getDiscoveredRobots: (
-  state: State
-) => DiscoveredRobot[] = createSelector(
-  state => state.discovery.robotsByName,
-  robotsMap => {
-    return Object.keys(robotsMap).map((robotName: string) => {
-      const robot = robotsMap[robotName]
-      const { addresses, ...robotState } = robot
-      const { health, serverHealth } = robotState
-      const addr = head(addresses)
-      const advertisedModel = addr?.advertisedModel ?? null
-      const ip = addr?.ip ? ipToHostname(addr.ip) : null
-      const port = addr?.port ?? null
-      const healthStatus = addr?.healthStatus ?? null
-      const serverHealthStatus = addr?.serverHealthStatus ?? null
-      const baseRobot = {
-        ...robotState,
-        displayName: makeDisplayName(robotName),
-        local: ip !== null ? isLocal(ip) : null,
-        seen: addr?.seen === true,
-        robotModel: makeRobotModel(
-          health?.robot_model ?? null,
-          serverHealth?.robotModel ?? null,
-          advertisedModel ?? null
-        ),
-      }
+export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
+  createSelector(
+    state => state.discovery.robotsByName,
+    robotsMap => {
+      return Object.keys(robotsMap).map((robotName: string) => {
+        const robot = robotsMap[robotName]
+        const { addresses, ...robotState } = robot
+        const { health, serverHealth } = robotState
+        const addr = head(addresses)
+        const advertisedModel = addr?.advertisedModel ?? null
+        const ip = addr?.ip ? ipToHostname(addr.ip) : null
+        const port = addr?.port ?? null
+        const healthStatus = addr?.healthStatus ?? null
+        const serverHealthStatus = addr?.serverHealthStatus ?? null
+        const baseRobot = {
+          ...robotState,
+          displayName: makeDisplayName(robotName),
+          local: ip !== null ? isLocal(ip) : null,
+          seen: addr?.seen === true,
+          robotModel: makeRobotModel(
+            health?.robot_model ?? null,
+            serverHealth?.robotModel ?? null,
+            advertisedModel ?? null
+          ),
+        }
 
-      if (ip !== null && port !== null && healthStatus && serverHealthStatus) {
-        if (health && healthStatus === HEALTH_STATUS_OK) {
-          return {
-            ...baseRobot,
-            ip,
-            port,
-            health,
-            serverHealthStatus,
-            healthStatus: HEALTH_STATUS_OK,
-            status: CONNECTABLE,
+        if (
+          ip !== null &&
+          port !== null &&
+          healthStatus &&
+          serverHealthStatus
+        ) {
+          if (health && healthStatus === HEALTH_STATUS_OK) {
+            return {
+              ...baseRobot,
+              ip,
+              port,
+              health,
+              serverHealthStatus,
+              healthStatus: HEALTH_STATUS_OK,
+              status: CONNECTABLE,
+            }
+          }
+
+          if (healthStatus !== HEALTH_STATUS_UNREACHABLE || addr?.seen) {
+            return {
+              ...baseRobot,
+              ip,
+              port,
+              healthStatus,
+              serverHealthStatus,
+              status: REACHABLE,
+            }
           }
         }
 
-        if (healthStatus !== HEALTH_STATUS_UNREACHABLE || addr?.seen) {
-          return {
-            ...baseRobot,
-            ip,
-            port,
-            healthStatus,
-            serverHealthStatus,
-            status: REACHABLE,
-          }
+        return {
+          ...baseRobot,
+          ip,
+          port,
+          healthStatus,
+          serverHealthStatus,
+          status: UNREACHABLE,
         }
-      }
-
-      return {
-        ...baseRobot,
-        ip,
-        port,
-        healthStatus,
-        serverHealthStatus,
-        status: UNREACHABLE,
-      }
-    })
-  }
-)
+      })
+    }
+  )
 
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === CONNECTABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getReachableRobots: GetReachableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === REACHABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === UNREACHABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getAllRobots: GetAllRobots = createSelector(
@@ -167,13 +187,22 @@ export const getAllRobots: GetAllRobots = createSelector(
   getReachableRobots,
   getUnreachableRobots,
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
-    concat<DiscoveredRobot>(cr, rr, ur)
+    orderBy(
+      concat<DiscoveredRobot>(cr, rr, ur),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
-  (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
+  (cr: ViewableRobot[], rr: ViewableRobot[]) =>
+    orderBy(
+      concat<ViewableRobot>(cr, rr),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getLocalRobot: GetLocalRobot = createSelector(

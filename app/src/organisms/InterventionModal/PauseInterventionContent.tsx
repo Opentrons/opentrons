@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -10,13 +10,13 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   useInterval,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { EMPTY_TIMESTAMP } from '../Devices/constants'
-import { formatInterval } from '../RunTimeControl/utils'
+import { EMPTY_TIMESTAMP } from '/app/resources/runs'
+import { formatInterval } from '/app/transformations/commands'
+
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
 const PAUSE_INTERVENTION_CONTENT_STYLE = css`
@@ -47,31 +47,17 @@ export function PauseInterventionContent({
 
 const PAUSE_HEADER_STYLE = css`
   align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.fundamentalsBackground};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  background-color: ${COLORS.grey10};
+  border-radius: ${BORDERS.borderRadius4};
   grid-gap: ${SPACING.spacing6};
   padding: ${SPACING.spacing16};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
-    background-color: ${COLORS.light1};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    background-color: ${COLORS.grey35};
+    border-radius: ${BORDERS.borderRadius8};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};
     min-width: 36.5rem;
-  }
-`
-
-const PAUSE_TEXT_STYLE = css`
-  ${TYPOGRAPHY.h1Default}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level4HeaderSemiBold}
-  }
-`
-
-const PAUSE_TIME_STYLE = css`
-  ${TYPOGRAPHY.h1Default}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level1Header}
   }
 `
 
@@ -81,18 +67,29 @@ interface PauseHeaderProps {
 
 function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
   const { t, i18n } = useTranslation('run_details')
-  const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
+  const [now, setNow] = useState(Date())
+  useInterval(
+    () => {
+      setNow(Date())
+    },
+    500,
+    true
+  )
 
   const runTime =
     startedAt != null ? formatInterval(startedAt, now) : EMPTY_TIMESTAMP
 
   return (
     <Flex css={PAUSE_HEADER_STYLE}>
-      <StyledText css={PAUSE_TEXT_STYLE}>
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        oddStyle="level4HeaderSemiBold"
+      >
         {i18n.format(t('paused_for'), 'capitalize')}
       </StyledText>
-      <StyledText css={PAUSE_TIME_STYLE}>{runTime}</StyledText>
+      <StyledText desktopStyle="bodyDefaultSemiBold" oddStyle="level1Header">
+        {runTime}
+      </StyledText>
     </Flex>
   )
 }

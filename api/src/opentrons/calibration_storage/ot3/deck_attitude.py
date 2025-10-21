@@ -77,7 +77,7 @@ def get_robot_belt_attitude() -> Optional[v1.BeltCalibrationModel]:
         pass
     except (json.JSONDecodeError, ValidationError):
         log.warning(
-            "Belt calibration is malformed. Please factory reset your calibrations."
+            "Belt calibration is malformed. Please factory reset your calibrations.",
+            exc_info=True,
         )
-        pass
     return None

@@ -1,72 +1,74 @@
-import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
+
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { getIsOnDevice } from '../../../redux/config'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { GenericWizardTile } from '..'
 
-jest.mock('../../../redux/config')
+import type { ComponentProps } from 'react'
 
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
+vi.mock('/app/redux/config')
 
-const render = (props: React.ComponentProps<typeof GenericWizardTile>) => {
+const render = (props: ComponentProps<typeof GenericWizardTile>) => {
   return renderWithProviders(<GenericWizardTile {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('GenericWizardTile', () => {
-  let props: React.ComponentProps<typeof GenericWizardTile>
+  let props: ComponentProps<typeof GenericWizardTile>
 
   beforeEach(() => {
     props = {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       proceedButtonText: <div>Continue</div>,
       header: 'header',
       getHelp: 'getHelpUrl',
     }
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
   it('renders correct generic tile information with a help link', () => {
-    const { getByText } = render(props)
-    getByText('body')
-    const btn = getByText('Continue')
-    getByText('header')
+    render(props)
+    screen.getByText('body')
+    const btn = screen.getByText('Continue')
+    screen.getByText('header')
     fireEvent.click(btn)
     expect(props.proceed).toHaveBeenCalled()
-    getByText('Need help?')
+    screen.getByText('Need help?')
     expect(screen.queryByText('Go back')).not.toBeInTheDocument()
   })
   it('renders correct generic tile information for on device display', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByLabelText } = render(props)
-    getByText('body')
-    getByText('header')
-    getByLabelText('SmallButton_primary').click()
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    render(props)
+    screen.getByText('body')
+    screen.getByText('header')
+    fireEvent.click(screen.getByRole('button'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct generic tile information with a back button', () => {
     props = {
       ...props,
-      back: jest.fn(),
+      back: vi.fn(),
     }
-    const { getByText } = render(props)
-    const btn = getByText('Go back')
+    render(props)
+    const btn = screen.getByText('Go back')
     fireEvent.click(btn)
     expect(props.back).toHaveBeenCalled()
   })
   it('renders correct generic tile information with back button disabled', () => {
     props = {
       ...props,
-      back: jest.fn(),
+      back: vi.fn(),
       backIsDisabled: true,
     }
-    const { getByLabelText } = render(props)
-    const btn = getByLabelText('back')
+    render(props)
+    const btn = screen.getByLabelText('back')
     fireEvent.click(btn)
     expect(btn).toBeDisabled()
   })

@@ -1,5 +1,5 @@
 import type { ProtocolFile as V3ProtocolFile } from './schemaV3'
-import type { Command as V4Command, FileModule } from './schemaV4'
+import type { FileModule, Command as V4Command } from './schemaV4'
 
 export interface MoveToWellParams {
   pipette: string

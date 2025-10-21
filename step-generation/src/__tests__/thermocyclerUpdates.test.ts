@@ -1,28 +1,37 @@
 import merge from 'lodash/merge'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+
+import { makeImmutableStateUpdater } from '../__utils__'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import {
-  forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
-  forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
   forThermocyclerAwaitBlockTemperature as _forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature as _forThermocyclerAwaitLidTemperature,
+  forThermocyclerCloseLid as _forThermocyclerCloseLid,
   forThermocyclerDeactivateBlock as _forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid as _forThermocyclerDeactivateLid,
-  forThermocyclerRunProfile as _forThermocyclerRunProfile,
-  forThermocyclerCloseLid as _forThermocyclerCloseLid,
   forThermocyclerOpenLid as _forThermocyclerOpenLid,
+  forThermocyclerRunProfile as _forThermocyclerRunProfile,
+  forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
+  forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
-import type { ImmutableStateUpdater } from '../__utils__'
-import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+
 import type {
   ModuleOnlyParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
+import type { ImmutableStateUpdater } from '../__utils__'
+import type {
+  InvariantContext,
+  RobotState,
+  ThermocyclerModuleState,
+} from '../types'
+
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
 )
@@ -59,6 +68,7 @@ beforeEach(() => {
     id: moduleId,
     type: THERMOCYCLER_MODULE_TYPE,
     model: THERMOCYCLER_MODULE_V1,
+    pythonName: 'mockPythonName',
   }
   lidOpenRobotState = getInitialRobotStateStandard(invariantContext)
   lidOpenRobotState.modules[moduleId] = {
@@ -80,23 +90,24 @@ interface TestCase<P> {
 }
 type TestCases<P> = Array<TestCase<P>>
 describe('thermocycler state updaters', () => {
-  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> = [
-    {
-      params: {
-        moduleId,
-        celsius: 42,
+  const blockTempTestCase: TestCases<ThermocyclerSetTargetBlockTemperatureParams> =
+    [
+      {
+        params: {
+          moduleId,
+          celsius: 42,
+        },
+        moduleStateBefore: {
+          blockTargetTemp: null,
+        },
+        expectedUpdate: {
+          blockTargetTemp: 42,
+        },
+        fn: forThermocyclerSetTargetBlockTemperature,
+        testName:
+          'forThermocyclerSetBlockTemperature should update the block temp',
       },
-      moduleStateBefore: {
-        blockTargetTemp: null,
-      },
-      expectedUpdate: {
-        blockTargetTemp: 42,
-      },
-      fn: forThermocyclerSetTargetBlockTemperature,
-      testName:
-        'forThermocyclerSetBlockTemperature should update the block temp',
-    },
-  ]
+    ]
   const temperatureParamsCases: TestCases<TemperatureParams> = [
     {
       params: {

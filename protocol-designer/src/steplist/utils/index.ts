@@ -1,15 +1,17 @@
 import { mergeWhen } from './mergeWhen'
 import { getOrderedWells } from './orderWells'
-import { StepIdType } from '../../form-types'
+
+import type { StepIdType } from '../../form-types'
+
 export { mergeWhen, getOrderedWells }
 
 export type WellRatio = 'n:n' | '1:many' | 'many:1'
 export function getWellRatio(
   sourceWells?: string[] | null,
   destWells?: string[] | null,
-  isDispensingIntoWasteChute?: boolean
+  isDispensingIntoTrash?: boolean
 ): WellRatio | null | undefined {
-  if (isDispensingIntoWasteChute) {
+  if (isDispensingIntoTrash) {
     if (!Array.isArray(sourceWells) || sourceWells.length === 0) {
       return null
     }

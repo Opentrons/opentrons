@@ -1,10 +1,19 @@
-import * as React from 'react'
+import { css } from 'styled-components'
+
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 
-export interface BackgroundOverlayProps
-  extends React.ComponentProps<typeof Flex> {
+import type { ComponentProps, MouseEventHandler } from 'react'
+
+const BACKGROUND_OVERLAY_STYLE = css`
+  position: ${POSITION_FIXED};
+  inset: 0;
+  z-index: 4;
+  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
+`
+
+export interface BackgroundOverlayProps extends ComponentProps<typeof Flex> {
   //  onClick handler so when you click anywhere in the overlay, the modal/menu closes
-  onClick: React.MouseEventHandler
+  onClick: MouseEventHandler
 }
 
 export function BackgroundOverlay(props: BackgroundOverlayProps): JSX.Element {
@@ -13,13 +22,7 @@ export function BackgroundOverlay(props: BackgroundOverlayProps): JSX.Element {
   return (
     <Flex
       aria-label="BackgroundOverlay"
-      position={POSITION_FIXED}
-      left="0"
-      right="0"
-      top="0"
-      bottom="0"
-      zIndex="3"
-      backgroundColor={COLORS.darkBlack60}
+      css={BACKGROUND_OVERLAY_STYLE}
       onClick={onClick}
       {...flexProps}
     />

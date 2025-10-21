@@ -3,7 +3,8 @@ import logging
 import numpy as np
 from numpy import insert, dot
 from numpy.linalg import inv
-from typing import TYPE_CHECKING, List, Tuple, Union
+from numpy.typing import NDArray
+from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
 
@@ -17,12 +18,8 @@ SolvePoints = Tuple[
     Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]
 ]
 
-# TODO(mc, 2022-02-23): numpy.typing is not available on the version
-# of numpy we ship on the OT-2. We should update that numpy version.
-if TYPE_CHECKING:
-    import numpy.typing as npt
-
-    DoubleArray = npt.NDArray[np.double]
+DoubleArray = NDArray[np.double]
+DoubleMatrix = NDArray[np.double]
 
 
 def identity_deck_transform() -> DoubleArray:
@@ -31,11 +28,11 @@ def identity_deck_transform() -> DoubleArray:
 
 
 def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix:
-    ex = np.array([list(point) for point in expected]).transpose()
-    ac = np.array([list(point) for point in actual]).transpose()
-    t = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
+    ex: DoubleMatrix = np.array([list(point) for point in expected]).transpose()
+    ac: DoubleMatrix = np.array([list(point) for point in actual]).transpose()
+    t = np.dot(ac, inv(ex))
 
-    mask_transform = np.array(
+    mask_transform: NDArray[np.bool_] = np.array(
         [[True, True, False], [True, True, False], [False, False, False]]
     )
     masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore[var-annotated, no-untyped-call]
@@ -97,15 +94,15 @@ def solve(
     # [ (x1, y1),
     #   (x2, y2),
     #   (x3, y3) ]
-    ex = np.array([list(point) + [1] for point in expected]).transpose()
+    ex: DoubleMatrix = np.array([list(point) + [1] for point in expected]).transpose()
 
-    ac = np.array([list(point) + [1] for point in actual]).transpose()
+    ac: DoubleMatrix = np.array([list(point) + [1] for point in actual]).transpose()
     # Shape of `ex` and `ac`:
     # [ x1 x2 x3 ]
     # [ y1 y2 y3 ]
     # [  1  1  1 ]
 
-    transform = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
+    transform = np.dot(ac, inv(ex))
     # `dot` in numpy is a misnomer. When both arguments are square, N-
     # dimensional arrays, the return type is the result of performing matrix
     # multiplication, rather than the dot-product (so the return here will be
@@ -132,21 +129,21 @@ def add_z(xy: DoubleArray, z: float) -> DoubleArray:
             [ 0  0  0  1 ]
     """
     # First, insert a column of zeros as into the input matrix
-    interm = insert(xy, 2, [0, 0, 0], axis=1)  # type: ignore[no-untyped-call]
+    interm = insert(xy, 2, [0, 0, 0], axis=1)
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  0  1 ]
 
     # Then, insert the z row to create a properly formed 3-D transform matrix:
-    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)  # type: ignore[no-untyped-call]
+    xyz: DoubleMatrix = insert(interm, 2, [0, 0, 1, z], axis=0)
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  1  z ]
     # [ 0  0  0  1 ]
 
-    return xyz.round(11)  # type: ignore[no-any-return]
+    return xyz.round(11)
 
 
 def add_matrices(
@@ -155,7 +152,7 @@ def add_matrices(
     """
     Simple method to convert tuples to numpy arrays and add them.
     """
-    return tuple(np.asarray(t1) + np.asarray(t2))  # type: ignore
+    return tuple(np.asarray(t1) + np.asarray(t2))
 
 
 def apply_transform(
@@ -170,7 +167,7 @@ def apply_transform(
     :param pos: XYZ point in space A
     :return: corresponding XYZ point in space B
     """
-    return tuple(dot(t, list(pos))[:3])  # type: ignore
+    return tuple(dot(t, list(pos))[:3])
 
 
 def apply_reverse(
@@ -178,4 +175,4 @@ def apply_reverse(
     pos: AxisPosition,
 ) -> Tuple[float, float, float]:
     """Like apply_transform but inverts the transform first"""
-    return apply_transform(inv(t), pos)  # type: ignore[no-untyped-call]
+    return apply_transform(inv(t), pos)

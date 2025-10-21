@@ -1,31 +1,34 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
+
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  Btn,
   ALIGN_START,
-  PrimaryButton,
+  Banner,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
-import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+
+import { Slideout } from '../../atoms/Slideout'
+
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   isExpanded: boolean
-  firmwareUpdateClick: () => unknown
+  firmwareUpdateClick: () => void
 }
 
 const ALERT_ITEM_STYLE = css`
@@ -40,7 +43,7 @@ export const AboutModuleSlideout = (
   const { i18n, t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
-  const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const [showBanner, setShowBanner] = useState<boolean>(true)
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
@@ -60,12 +63,12 @@ export const AboutModuleSlideout = (
           onClick={onCloseClick}
           data-testid={`AboutModuleSlideout_btn_${module.serialNumber}`}
         >
-          <StyledText
+          <LegacyStyledText
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
             {t('shared:close')}
-          </StyledText>
+          </LegacyStyledText>
         </PrimaryButton>
       }
     >
@@ -77,9 +80,11 @@ export const AboutModuleSlideout = (
             )}`}
             css={ALERT_ITEM_STYLE}
             type="warning"
-            onCloseClick={() => setShowBanner(false)}
+            onCloseClick={() => {
+              setShowBanner(false)
+            }}
           >
-            {t('firmware_update_available')}
+            {t('firmware_update_available_period')}
             <Btn
               textAlign={ALIGN_START}
               paddingLeft={SPACING.spacing4}
@@ -98,39 +103,39 @@ export const AboutModuleSlideout = (
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${String(module.moduleModel)}`}
           >
-            <StyledText
+            <LegacyStyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
-            </StyledText>
-            <StyledText
+            </LegacyStyledText>
+            <LegacyStyledText
               as="p"
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
               {module.firmwareVersion}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         </Flex>
-        <StyledText
+        <LegacyStyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey60}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="p"
           paddingTop={SPACING.spacing4}
           data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
           {module.serialNumber}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
     </Slideout>
   )

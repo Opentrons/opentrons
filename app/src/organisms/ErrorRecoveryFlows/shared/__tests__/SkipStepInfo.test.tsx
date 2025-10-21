@@ -1,0 +1,186 @@
+import { screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { clickButtonLabeled } from '/app/organisms/ErrorRecoveryFlows/__tests__/util'
+
+import { RECOVERY_MAP } from '../../constants'
+import { SkipStepInfo } from '../SkipStepInfo'
+
+import type { Mock } from 'vitest'
+import type { ComponentProps } from 'react'
+
+describe('SkipStepInfo', () => {
+  let props: ComponentProps<typeof SkipStepInfo>
+  let mockHandleMotionRouting: Mock
+  let mockSkipFailedCommand: Mock
+  let mockManualRetrieve: Mock
+  let mockManualStore: Mock
+
+  beforeEach(() => {
+    mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+    mockSkipFailedCommand = vi.fn(() => Promise.resolve())
+    mockManualRetrieve = vi.fn(() => Promise.resolve())
+    mockManualStore = vi.fn(() => Promise.resolve())
+
+    props = {
+      routeUpdateActions: {
+        handleMotionRouting: mockHandleMotionRouting,
+      } as any,
+      recoveryCommands: {
+        skipFailedCommand: mockSkipFailedCommand,
+        manualRetrieve: mockManualRetrieve,
+        manualStore: mockManualStore,
+      } as any,
+      currentRecoveryOptionUtils: {
+        selectedRecoveryOption: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
+      } as any,
+      stepCounts: { hasRunDiverged: false },
+    } as any
+  })
+
+  const render = (props: ComponentProps<typeof SkipStepInfo>) => {
+    return renderWithProviders(<SkipStepInfo {...props} />, {
+      i18nInstance: i18n,
+    })[0]
+  }
+
+  it('calls correct functions when primary button is clicked', async () => {
+    render(props)
+
+    clickButtonLabeled('Continue run now')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockSkipFailedCommand).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+        mockSkipFailedCommand.mock.invocationCallOrder[0]
+      )
+    })
+  })
+
+  it(`renders correct title and body text for ${RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step')
+    screen.getByText(
+      "First, inspect the robot to ensure it's prepared to continue the run from the next step."
+    )
+    screen.getByText('Then, close the robot door before proceeding.')
+  })
+
+  it(`renders correct title and body text for ${RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step with same tips')
+    screen.getByText(
+      'The failed dispense step will not be completed. The run will continue from the next step with the attached tips.'
+    )
+    screen.getByText('Close the robot door before proceeding.')
+  })
+
+  it(`renders correct title and body text for ${RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.SKIP_STEP_WITH_NEW_TIPS.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step with new tips')
+    screen.getByText(
+      'The failed dispense step will not be completed. The run will continue from the next step with the attached tips.'
+    )
+    screen.getByText('Close the robot door before proceeding.')
+  })
+
+  it(`renders correct title and body text for ${RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE
+    render(props)
+
+    screen.getByText('Skip to next step')
+    screen.getByText(
+      'Take any necessary actions to prepare the robot to continue the run from the next step.'
+    )
+    screen.getByText('Close the robot door before proceeding.')
+  })
+
+  it('renders error message for unexpected recovery option', () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      'UNEXPECTED_ROUTE' as any
+    render(props)
+
+    expect(screen.getAllByText('UNEXPECTED STEP')[0]).toBeInTheDocument()
+  })
+
+  it.each([
+    RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+    RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE,
+  ])('calls manualRetreive when the route is %s', async route => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption = route
+    props.failedCommand = {
+      byRunRecord: { commandType: 'flexStacker/retrieve' as any },
+    } as any
+    render(props)
+
+    clickButtonLabeled('Continue run now')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockManualRetrieve).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+        mockManualRetrieve.mock.invocationCallOrder[0]
+      )
+    })
+  })
+
+  it.each([
+    RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
+  ])('calls manualStore when the route is %s', async route => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption = route
+    props.failedCommand = {
+      byRunRecord: { commandType: 'flexStacker/store' as any },
+    } as any
+    render(props)
+
+    clickButtonLabeled('Continue run now')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockManualStore).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+        mockManualStore.mock.invocationCallOrder[0]
+      )
+    })
+  })
+})

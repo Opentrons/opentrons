@@ -7,7 +7,7 @@ import {
 } from '../../robot-api/__fixtures__'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { NetworkingStatusResponse, InterfaceStatus } from '../types'
+import type { InterfaceStatus, NetworkingStatusResponse } from '../types'
 
 export const mockWifiInterface: InterfaceStatus = {
   ipAddress: '192.168.43.97/24',
@@ -38,17 +38,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  NetworkingStatusResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: GET,
-  path: '/networking/status',
-  successStatus: 200,
-  successBody: mockNetworkingStatus,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<NetworkingStatusResponse, { message: string }> =
+  makeResponseFixtures({
+    method: GET,
+    path: '/networking/status',
+    successStatus: 200,
+    successBody: mockNetworkingStatus,
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockNetworkingStatusSuccessMeta,

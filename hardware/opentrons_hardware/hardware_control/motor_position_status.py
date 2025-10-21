@@ -152,11 +152,7 @@ async def update_motor_position_estimation(
                 log.warning("Update motor position estimation timed out")
                 raise CommandTimedOutError(
                     "Update motor position estimation timed out",
-                    detail={
-                        "missing-nodes": ", ".join(
-                            node.name for node in set(nodes).difference(set(data))
-                        )
-                    },
+                    detail={"missing-node": node.name},
                 )
 
     return data

@@ -1,0 +1,180 @@
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+
+import { MaterialsListModal } from '..'
+
+import type { ComponentProps } from 'react'
+import type { InfoScreen } from '@opentrons/components'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
+
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: () => <div>mock InfoScreen</div>,
+  }
+})
+
+const mockSetShowMaterialsListModal = vi.fn()
+
+const mockHardWare = [
+  {
+    id: 'mockHardware',
+    model: 'temperatureModuleV2',
+    moduleState: {
+      type: 'temperatureModuleType',
+      status: 'TEMPERATURE_DEACTIVATED',
+      targetTemperature: null,
+    },
+    slot: 'C1',
+    type: 'temperatureModuleType',
+  },
+] as ModuleOnDeck[]
+
+const mockFixture = [
+  { location: 'cutoutB3', name: 'trashBin', id: 'mockId:trashBin' },
+] as AdditionalEquipmentEntity[]
+
+const mockLabware = [
+  {
+    def: {
+      metadata: {
+        displayCategory: 'tipRack',
+        displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
+        displayVolumeUnits: 'µL',
+        tags: [],
+        namespace: 'opentrons',
+      } as any,
+    },
+    id: 'mockLabware',
+    labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+    stack: ['mockLabware', 'D3'],
+    pythonName: 'mockPythonName',
+  },
+] as LabwareOnDeck[]
+
+const render = (props: ComponentProps<typeof MaterialsListModal>) => {
+  return renderWithProviders(<MaterialsListModal {...props} />, {
+    i18nInstance: i18n,
+  })
+}
+
+describe('MaterialsListModal', () => {
+  let props: ComponentProps<typeof MaterialsListModal>
+
+  beforeEach(() => {
+    props = {
+      hardware: [],
+      fixtures: [],
+      labware: [],
+      liquids: {},
+      setShowMaterialsListModal: mockSetShowMaterialsListModal,
+    }
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
+    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
+  })
+
+  it('should render render text', () => {
+    render(props)
+    screen.getByText('Materials list')
+    screen.getByText('Deck hardware')
+    screen.getByText('Labware')
+    screen.getByText('Liquids')
+  })
+
+  it('should render InfoScreen component', () => {
+    render(props)
+    expect(screen.getAllByText('mock InfoScreen').length).toBe(3)
+  })
+
+  it('should render hardware info', () => {
+    props = {
+      ...props,
+      hardware: mockHardWare,
+      fixtures: mockFixture,
+    }
+    render(props)
+    screen.getByText('C1')
+    screen.getByText('Temperature Module GEN2')
+    screen.getByText('B3')
+    screen.getByText('Trash Bin')
+  })
+  it('should render labware info', () => {
+    props = {
+      ...props,
+      labware: mockLabware,
+    }
+    render(props)
+    screen.getByText('D3')
+    screen.getByText('Opentrons Flex 96 Filter Tip Rack 50 µL')
+  })
+
+  it('should render 7,8,10,11 when a robot is ot-2 and a module is tc', () => {
+    vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+    const mockHardwareForOt2 = [
+      {
+        id: 'mockHardware-tc',
+        model: 'thermocyclerModuleV1',
+        moduleState: {
+          type: 'thermocyclerModuleType',
+          blockTargetTemp: null,
+          lidTargetTemp: null,
+          lidOpen: false,
+        },
+        slot: '7',
+        type: 'thermocyclerModuleType',
+        pythonName: 'mockPythonName',
+      },
+    ] as ModuleOnDeck[]
+    props = {
+      ...props,
+      hardware: mockHardwareForOt2,
+    }
+    render(props)
+    screen.getByText('7,8,10,11')
+  })
+
+  it('should render liquids info', () => {
+    const mockId = 'mockId'
+    vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({
+      labware1: { well1: { [mockId]: { volume: 10 } } },
+    })
+    props = {
+      ...props,
+
+      liquids: {
+        [mockId]: {
+          liquidGroupId: mockId,
+          displayName: 'mockName',
+          displayColor: 'mockDisplayColor',
+          description: null,
+          pythonName: 'mockPythonName',
+        },
+      },
+    }
+    render(props)
+    screen.getByText('Liquids')
+    screen.getByText('Name')
+    screen.getByText('Total Well Volume')
+    screen.getByText('mockName')
+    screen.getByText('10 uL')
+  })
+})

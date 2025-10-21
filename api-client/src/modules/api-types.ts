@@ -1,6 +1,4 @@
-import { ModuleType } from '@opentrons/shared-data'
-
-import type { Coordinates, ModuleModel } from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType, Vector3D } from '@opentrons/shared-data'
 
 type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
@@ -8,6 +6,7 @@ interface PhysicalPort {
   port: number
   hub: boolean
   portGroup: PortGroup
+  hubPort?: number
 }
 
 type ModuleOffsetSource =
@@ -19,7 +18,7 @@ type ModuleOffsetSource =
   | 'unknown'
 
 export interface ModuleOffset {
-  offset: Coordinates
+  offset: Vector3D
   slot?: string
   source?: ModuleOffsetSource
   last_modified?: string
@@ -34,6 +33,7 @@ export interface ApiBaseModule {
   firmwareVersion: string
   hasAvailableUpdate: boolean
   usbPort: PhysicalPort
+  compatibleWithRobot?: boolean
   moduleOffset?: ModuleOffset
 }
 
@@ -77,6 +77,19 @@ export interface HeaterShakerData {
   errorDetails: string | null
   status: HeaterShakerStatus
 }
+export interface AbsorbanceReaderData {
+  lidStatus: 'on' | 'off' | 'unknown'
+  platePresence: 'present' | 'absent' | 'unknown'
+  sampleWavelength: number | null
+  status: AbsorbanceReaderStatus
+}
+export interface FlexStackerData {
+  latchState: 'opened' | 'closed' | 'unknown'
+  platformState: 'extended' | 'retracted' | 'unknown' | 'missing'
+  hopperDoorState: 'opened' | 'closed' | 'unknown'
+  installDetected: boolean
+  status: FlexStackerStatus
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -109,3 +122,7 @@ export type LatchStatus =
   | 'idle_closed'
   | 'idle_unknown'
   | 'unknown'
+
+export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
+
+export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'

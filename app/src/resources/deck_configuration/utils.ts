@@ -1,233 +1,56 @@
-import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
-  FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-  getAddressableAreaFromSlotId,
-  getDeckDefFromRobotType,
+  FLEX_STACKER_ADDRESSABLE_AREAS,
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
+  MAGNETIC_BLOCK_FIXTURES,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_SLOT_FIXTURES,
+  STAGING_AREA_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import type {
-  CutoutConfig,
-  CutoutId,
-  RunTimeCommand,
-  CutoutFixture,
-  AddressableAreaName,
-  DeckDefinition,
-  DeckConfiguration,
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from './hooks'
 
-export interface CutoutConfigProtocolSpec extends CutoutConfig {
-  requiredAddressableAreas: AddressableAreaName[]
-}
-
-export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
-  { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
-  { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
-  { cutoutId: 'cutoutC1', cutoutFixtureId: 'singleLeftSlot' },
-  { cutoutId: 'cutoutD1', cutoutFixtureId: 'singleLeftSlot' },
-  { cutoutId: 'cutoutA2', cutoutFixtureId: 'singleCenterSlot' },
-  { cutoutId: 'cutoutB2', cutoutFixtureId: 'singleCenterSlot' },
-  { cutoutId: 'cutoutC2', cutoutFixtureId: 'singleCenterSlot' },
-  { cutoutId: 'cutoutD2', cutoutFixtureId: 'singleCenterSlot' },
-  { cutoutId: 'cutoutA3', cutoutFixtureId: 'singleRightSlot' },
-  { cutoutId: 'cutoutB3', cutoutFixtureId: 'singleRightSlot' },
-  { cutoutId: 'cutoutC3', cutoutFixtureId: 'singleRightSlot' },
-  { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
-]
-
-export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] = FLEX_SIMPLEST_DECK_CONFIG.map(
-  config => ({ ...config, requiredAddressableAreas: [] })
-)
-
-export function getSimplestDeckConfigForProtocolCommands(
-  protocolAnalysisCommands: RunTimeCommand[]
-): CutoutConfigProtocolSpec[] {
-  // TODO(BC, 2023-11-06): abstract out the robot type
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
-  const addressableAreas = parseAllAddressableAreas(protocolAnalysisCommands)
-  const simplestDeckConfig = addressableAreas.reduce<
-    CutoutConfigProtocolSpec[]
-  >((acc, addressableArea) => {
-    const cutoutFixturesForAddressableArea = getCutoutFixturesForAddressableAreas(
-      [addressableArea],
-      deckDef.cutoutFixtures
-    )
-    const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
-      addressableArea,
-      cutoutFixturesForAddressableArea
-    )
-    const cutoutFixturesForCutoutId =
-      cutoutIdForAddressableArea != null
-        ? getCutoutFixturesForCutoutId(
-            cutoutIdForAddressableArea,
-            deckDef.cutoutFixtures
-          )
-        : null
-
-    const existingCutoutConfig = acc.find(
-      cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
-    )
-
-    if (
-      existingCutoutConfig != null &&
-      cutoutFixturesForCutoutId != null &&
-      cutoutIdForAddressableArea != null
-    ) {
-      const indexOfExistingFixture = cutoutFixturesForCutoutId.findIndex(
-        ({ id }) => id === existingCutoutConfig.cutoutFixtureId
-      )
-      const accIndex = acc.findIndex(
-        ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
-      )
-      const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
-      const allNextRequiredAddressableAreas = previousRequiredAAs.includes(
-        addressableArea
-      )
-        ? previousRequiredAAs
-        : [...previousRequiredAAs, addressableArea]
-      const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
-        cutoutIdForAddressableArea,
-        allNextRequiredAddressableAreas,
-        cutoutFixturesForCutoutId
-      )
-      const indexOfCurrentFixture = cutoutFixturesForCutoutId.findIndex(
-        ({ id }) => id === nextCompatibleCutoutFixture?.id
-      )
-
-      if (
-        nextCompatibleCutoutFixture != null &&
-        indexOfCurrentFixture > indexOfExistingFixture
-      ) {
-        return [
-          ...acc.slice(0, accIndex),
-          {
-            cutoutId: cutoutIdForAddressableArea,
-            cutoutFixtureId: nextCompatibleCutoutFixture.id,
-            requiredAddressableAreas: allNextRequiredAddressableAreas,
-          },
-          ...acc.slice(accIndex + 1),
-        ]
-      }
-    }
-    return acc
-  }, FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
-
-  return simplestDeckConfig
-}
-
-export function getCutoutFixturesForAddressableAreas(
-  addressableAreas: AddressableAreaName[],
-  cutoutFixtures: CutoutFixture[]
-): CutoutFixture[] {
-  return cutoutFixtures.filter(cutoutFixture =>
-    Object.values(cutoutFixture.providesAddressableAreas).some(providedAAs =>
-      addressableAreas.every(aa => providedAAs.includes(aa))
-    )
-  )
-}
-
-export function getCutoutFixturesForCutoutId(
-  cutoutId: CutoutId,
-  cutoutFixtures: CutoutFixture[]
-): CutoutFixture[] {
-  return cutoutFixtures.filter(cutoutFixture =>
-    cutoutFixture.mayMountTo.some(mayMountTo => mayMountTo.includes(cutoutId))
-  )
-}
-
-export function getCutoutIdForSlotName(
-  slotName: string,
-  deckDef: DeckDefinition
-): CutoutId | null {
-  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
-  const cutoutIdForSlotName =
-    addressableArea != null
-      ? getCutoutIdForAddressableArea(
-          addressableArea.id,
-          deckDef.cutoutFixtures
-        )
-      : null
-
-  return cutoutIdForSlotName
-}
-
-export function getCutoutIdForAddressableArea(
-  addressableArea: AddressableAreaName,
-  cutoutFixtures: CutoutFixture[]
-): CutoutId | null {
-  return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
-    const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
-      ) ?? []
-    return (cutoutId as CutoutId) ?? acc
-  }, null)
-}
-
-export function getSimplestFixtureForAddressableAreas(
-  cutoutId: CutoutId,
-  requiredAddressableAreas: AddressableAreaName[],
-  allCutoutFixtures: CutoutFixture[]
-): CutoutFixture | null {
-  const cutoutFixturesForCutoutId = getCutoutFixturesForCutoutId(
-    cutoutId,
-    allCutoutFixtures
-  )
-  const nextCompatibleCutoutFixtures = getCutoutFixturesForAddressableAreas(
-    requiredAddressableAreas,
-    cutoutFixturesForCutoutId
-  )
-  return nextCompatibleCutoutFixtures?.[0] ?? null
-}
-
-export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
-  deckConfigProtocolSpec: T[]
-): T[] {
-  const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes a non-single-slot AA
-      !requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
-      )
-  )
-  // fixture includes at least 1 required AA
-  const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
-    fixture => fixture.requiredAddressableAreas.length > 0
-  )
-
-  return requiredDeckConfigProtocolSpec
-}
-
-export function getUnmatchedSingleSlotFixtures(
+// filter down the list of current deck configuration cutouts to include
+// only those that must provide addressable areas for the protocol
+// exclude single slot fixtures unless they are missing from deck config
+export function getRequiredDeckConfig(
   deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
 ): CutoutConfigAndCompatibility[] {
-  const singleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes only single-slot AA
-      requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+  return deckConfigProtocolSpec.filter(fixture => {
+    const isSingleSlotFixture = fixture.requiredAddressableAreas.every(aa =>
+      FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+    )
+    const hasMissingSingleSlotFixture =
+      isSingleSlotFixture &&
+      !isMatchedFixture(
+        fixture.cutoutFixtureId,
+        fixture.compatibleCutoutFixtureIds
       )
-  )
-  // fixture includes at least 1 required AA
-  const unmatchedSingleSlotDeckConfigCompatibility = singleSlotDeckConfigCompatibility.filter(
-    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
-      !isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
-  )
 
-  return unmatchedSingleSlotDeckConfigCompatibility
+    return (
+      fixture.requiredAddressableAreas.length > 0 &&
+      (!isSingleSlotFixture || hasMissingSingleSlotFixture)
+    )
+  })
 }
 
 export function getIsFixtureMismatch(
   deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
 ): boolean {
   const isFixtureMismatch = !deckConfigProtocolSpec.every(
-    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
-      isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) => {
+      return isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+    }
   )
   return isFixtureMismatch
 }
@@ -240,4 +63,169 @@ function isMatchedFixture(
     cutoutFixtureId == null ||
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
   )
+}
+
+interface CutoutConfigAndCompatibilityWithPartial
+  extends CutoutConfigAndCompatibility {
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
+}
+
+export const getFilteredDeckConfigFixtureCompatibility = (
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
+): CutoutConfigAndCompatibilityWithPartial[] => {
+  // if both A1 and B1 need to be empty but the thermocycler is attached, only
+  // show a conflict for A1 to avoid redundancy
+  const hasTwoLabwareThermocyclerConflicts =
+    deckConfigCompatibility.some(
+      ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE &&
+        compatibleCutoutFixtureIds.some(fixtureId =>
+          SINGLE_SLOT_FIXTURES.includes(fixtureId)
+        )
+    ) &&
+    deckConfigCompatibility.some(
+      ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+        cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE &&
+        compatibleCutoutFixtureIds.some(fixtureId =>
+          SINGLE_SLOT_FIXTURES.includes(fixtureId)
+        )
+    )
+  return deckConfigCompatibility
+    .filter(({ cutoutFixtureId }) => {
+      return (
+        !hasTwoLabwareThermocyclerConflicts ||
+        !(cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE)
+      )
+    })
+    .reduce<CutoutConfigAndCompatibilityWithPartial[]>(
+      (acc, compatabilityItem) => {
+        // filter out all fixtures that only provide usb module addressable areas
+        // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table
+        if (
+          compatabilityItem.requiredAddressableAreas.every(raa =>
+            FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+          ) ||
+          (compatabilityItem.requiredAddressableAreas.some(raa =>
+            FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa)
+          ) &&
+            !compatabilityItem.requiredAddressableAreas.some(raa =>
+              MAGNETIC_BLOCK_ADDRESSABLE_AREAS.includes(raa)
+            ) &&
+            !compatabilityItem.requiredAddressableAreas.some(raa =>
+              FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(raa)
+            ))
+        ) {
+          return acc
+        }
+        // if there is a magnetic block combination fixture, separate it out
+        // and show two line items in the table
+        if (
+          compatabilityItem.compatibleCutoutFixtureIds.every(fixtureId =>
+            MAGNETIC_BLOCK_FIXTURES.includes(fixtureId)
+          )
+        ) {
+          const magBlockRequirement = {
+            ...compatabilityItem,
+            partialRequiredCutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+          }
+          acc.push(magBlockRequirement)
+          if (
+            compatabilityItem.compatibleCutoutFixtureIds.length === 1 &&
+            compatabilityItem.compatibleCutoutFixtureIds[0] ===
+              STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+          ) {
+            const stagingAreaRequirement = {
+              ...compatabilityItem,
+              partialRequiredCutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+            }
+            acc.push(stagingAreaRequirement)
+          }
+          return acc
+        } else if (
+          compatabilityItem.requiredAddressableAreas.some(
+            raa =>
+              FLEX_STACKER_ADDRESSABLE_AREAS.includes(raa) &&
+              compatabilityItem.requiredAddressableAreas.some(raa =>
+                FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(raa)
+              )
+          )
+        ) {
+          const rightSlotRequirement = {
+            ...compatabilityItem,
+            partialRequiredCutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+          }
+          if (
+            compatabilityItem.cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE &&
+            compatabilityItem.cutoutFixtureId !== SINGLE_RIGHT_SLOT_FIXTURE
+          )
+            acc.push(rightSlotRequirement)
+          return acc
+        } else {
+          acc.push(compatabilityItem)
+          return acc
+        }
+      },
+      []
+    )
+}
+
+/**
+ * This function determines if the currently configured fixture is compatible
+ * with the required fixture for a protocol
+ * @param cutoutFixtureId: currently configured fixtureId
+ * @param compatibleCutoutFixtureIds: array of fixtureIds that are compatible for this cutout in the protocol
+ * @param partialRequiredCutoutFixtureId: required fixtureId that may fulfill a subset of the requirement for
+ * one of the compatible cutout fixtureIds
+ * @returns boolean indicating if the current fixture conflicts with the required fixture
+ */
+export const isFixtureCompatible = (
+  cutoutFixtureId: CutoutFixtureId,
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
+): boolean => {
+  if (partialRequiredCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
+    return MAGNETIC_BLOCK_FIXTURES.includes(cutoutFixtureId)
+  } else if (
+    partialRequiredCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+  ) {
+    return STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
+  } else {
+    return (
+      cutoutFixtureId != null &&
+      compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+    )
+  }
+}
+
+/**
+ * Assuming the current fixture is not compatible, this function checks if there
+ * is a conflicting fixture configured, or if the fixture is just missing.
+ * @param cutoutFixtureId: currently configured fixtureId
+ * @param partialRequiredCutoutFixtureId: required fixtureId that may be able to coexist with
+ * a non-single slot fixture in the same cutout
+ * @returns boolean indicating if the current fixture conflicts with the required fixture
+ */
+export const isConflictingFixtureConfigured = (
+  cutoutFixtureId: CutoutFixtureId,
+  partialRequiredCutoutFixtureId?: CutoutFixtureId
+): boolean => {
+  if (partialRequiredCutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
+    return (
+      !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) &&
+      cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE &&
+      cutoutFixtureId !== FLEX_STACKER_V1_FIXTURE
+    )
+  } else if (
+    partialRequiredCutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+  ) {
+    return (
+      !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) &&
+      cutoutFixtureId !== MAGNETIC_BLOCK_V1_FIXTURE
+    )
+  } else {
+    return (
+      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+    )
+  }
 }

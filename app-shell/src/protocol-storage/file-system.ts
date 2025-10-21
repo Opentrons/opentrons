@@ -1,12 +1,12 @@
 import path from 'path'
+import { app, shell } from 'electron'
 import fs from 'fs-extra'
 import uuid from 'uuid/v4'
 
-import { app, shell } from 'electron'
-
-import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
-import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
+
+import type { Dirent } from 'fs'
+import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -109,7 +109,7 @@ export function addProtocolFile(
   protocolsDirPath: string
 ): Promise<string> {
   const protocolKey = uuid()
-  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey as string)
 
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
   const analysisDirPath = path.join(

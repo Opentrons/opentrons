@@ -1,24 +1,24 @@
 // filter labware by manufacturer
-import * as React from 'react'
-import { withRouter } from 'react-router-dom'
-import { SelectField } from '@opentrons/components'
-import { getAllManufacturers, buildFiltersUrl } from '../../filters'
-import styles from './styles.css'
+import { useNavigate } from 'react-router-dom'
 
+import { SelectField } from '@opentrons/components'
+
+import { buildFiltersUrl, getAllManufacturers } from '../../filters'
 import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
+import styles from './styles.module.css'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
-import type { RouteComponentProps } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
-export interface FilterManufacturerProps extends RouteComponentProps {
+export interface FilterManufacturerProps {
   filters: FilterParams
 }
 
-export function FilterManufacturerComponent(
+export function FilterManufacturer(
   props: FilterManufacturerProps
 ): JSX.Element {
-  const { history, filters } = props
+  const { filters } = props
+  const navigate = useNavigate()
   const manufacturers = getAllManufacturers()
   const options: SelectOptionOrGroup[] = manufacturers.map(value => ({
     value,
@@ -37,12 +37,10 @@ export function FilterManufacturerComponent(
         options={options}
         onValueChange={(_, value) => {
           if (value) {
-            history.push(buildFiltersUrl({ ...filters, manufacturer: value }))
+            navigate(buildFiltersUrl({ ...filters, manufacturer: value }))
           }
         }}
       />
     </label>
   )
 }
-
-export const FilterManufacturer = withRouter(FilterManufacturerComponent)

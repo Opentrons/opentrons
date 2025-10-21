@@ -1,15 +1,27 @@
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
-import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
-import { FormData } from '../../../../form-types'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { ALL } from '@opentrons/shared-data'
+import {
+  fixture_96_plate,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+  fixture_trash,
+} from '@opentrons/shared-data/labware/fixtures/2'
+import { AUTOMATIC } from '@opentrons/step-generation'
+
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
+
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
 
-const fixture96Plate = _fixture_96_plate as LabwareDefinition2
-const fixtureTrash = _fixture_trash as LabwareDefinition2
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
+
+const fixture96Plate = fixture_96_plate as LabwareDefinition2
+const fixtureTrash = fixture_trash as LabwareDefinition2
 const fixtureTipRack10ul = fixture_tiprack_10_ul as LabwareDefinition2
 const fixtureTipRack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
@@ -76,7 +88,7 @@ describe('well selection should update', () => {
       volume: '2',
       pipette: 'pipetteId',
       mix_mmFromBottom: 1.2,
-      mix_touchTip_mmFromBottom: 2.3,
+      mix_touchTip_mmFromTop: 2.3,
     }
   })
   it('pipette cleared', () => {
@@ -88,6 +100,11 @@ describe('well selection should update', () => {
       wells: [],
       aspirate_flowRate: null,
       dispense_flowRate: null,
+      nozzles: null,
+      tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette single -> multi', () => {
@@ -99,6 +116,11 @@ describe('well selection should update', () => {
       wells: [],
       aspirate_flowRate: null,
       dispense_flowRate: null,
+      nozzles: ALL,
+      tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette multi -> single', () => {
@@ -111,6 +133,11 @@ describe('well selection should update', () => {
       wells: ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'],
       aspirate_flowRate: null,
       dispense_flowRate: null,
+      nozzles: null,
+      tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('select single-well labware', () => {
@@ -120,8 +147,9 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, form)).toEqual({
       ...patch,
       wells: ['A1'],
-      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-      mix_touchTip_mmFromBottom: null,
+      mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
+      mix_touchTip_mmFromTop: null,
+      mix_touchTip_checkbox: false,
     })
   })
   it('select labware with multiple wells', () => {
@@ -132,8 +160,9 @@ describe('well selection should update', () => {
     expect(handleFormHelper(patch, trashLabwareForm)).toEqual({
       ...patch,
       wells: [],
-      mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-      mix_touchTip_mmFromBottom: null,
+      mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
+      mix_touchTip_mmFromTop: null,
+      mix_touchTip_checkbox: false,
     })
   })
 })

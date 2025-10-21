@@ -1,21 +1,17 @@
-import {
-  setupEpicTestMocks,
-  runEpicTest,
-} from '../../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
+
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
+import { tipLengthCalibrationsEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { tipLengthCalibrationsEpic } from '..'
 
-import type { Action } from '../../../../types'
+import type { Action } from '/app/redux/types'
 
 const makeTriggerActionAllCalibrations = (robotName: string) =>
   Actions.fetchTipLengthCalibrations(robotName)
 
 describe('fetch pipette offset calibration epics', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /calibrations/tip_length', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerActionAllCalibrations,

@@ -1,34 +1,43 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
+import { css } from 'styled-components'
+
 import {
-  Flex,
-  TYPOGRAPHY,
+  AnimationVideo,
+  Banner,
   COLORS,
-  SPACING,
+  Flex,
+  LegacyStyledText,
   RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
-  useDeckConfigurationQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
-import { getPipetteAnimations } from './utils'
+  SimpleWizardBody,
+  SimpleWizardInProgressBody,
+} from '/app/molecules/SimpleWizardBody'
+
+import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import type { PipetteData } from '@opentrons/api-client'
+import {
+  getPipetteAnimations,
+  isWasteChuteOnDeck,
+  startCalibrationOnClick,
+} from './utils'
+
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
+  deckConfig: UseQueryResult<DeckConfiguration>
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -44,96 +53,37 @@ const IN_PROGRESS_STYLE = css`
 
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
-    proceed,
     attachedPipettes,
-    chainRunCommands,
     mount,
     isRobotMoving,
     goBack,
+    proceed,
     isExiting,
-    setShowErrorMessage,
     errorMessage,
     isOnDevice,
     flowType,
+    deckConfig,
   } = props
+
+  const handleOnClick = (): void => {
+    proceed()
+  }
+
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [isPending, setIsPending] = React.useState<boolean>(false)
-  const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
-    false
-  )
-
+  const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
   const pipetteId = attachedPipettes[mount]?.serialNumber
+  if (pipetteId == null) return null
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
-  const calSlotNum = 'C2'
-  const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
-    enabled: false,
-    onSettled: () => {
-      setIsPending(false)
-    },
-  })
-  const attachedPipette = attachedInstrumentsData?.data.find(
-    (instrument): instrument is PipetteData =>
-      instrument.ok && instrument.mount === mount
+  const startCalibration = startCalibrationOnClick(
+    props,
+    setShowUnableToDetect,
+    pipetteId
   )
-  const deckConfig = useDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
 
-  if (pipetteId == null) return null
-  const handleOnClick = (): void => {
-    setIsPending(true)
-    refetch()
-      .then(() => {
-        if (is96Channel || attachedPipette?.state?.tipDetected) {
-          chainRunCommands?.(
-            [
-              {
-                commandType: 'home' as const,
-                params: {
-                  axes: axes,
-                },
-              },
-              {
-                commandType: 'home' as const,
-                params: {
-                  skipIfMountPositionOk: mount,
-                },
-              },
-              {
-                commandType: 'calibration/calibratePipette' as const,
-                params: {
-                  mount: mount,
-                },
-              },
-              {
-                commandType: 'calibration/moveToMaintenancePosition' as const,
-                params: {
-                  mount: mount,
-                },
-              },
-            ],
-            false
-          )
-            .then(() => {
-              proceed()
-            })
-            .catch(error => {
-              setShowErrorMessage(error.message)
-            })
-        } else {
-          setShowUnableToDetect(true)
-        }
-      })
-      .catch(error => {
-        setShowErrorMessage(error.message)
-      })
-  }
-
+  const calSlotNum = 'C2'
   let src = pipetteProbe1
   if (is8Channel) {
     src = pipetteProbe8
@@ -149,24 +99,21 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const pipetteProbeVid = (
     <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-      <video
+      <AnimationVideo
         css={css`
           max-width: 100%;
           max-height: 100%;
         `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
         data-testid={src}
       >
         <source src={src} />
-      </video>
+      </AnimationVideo>
     </Flex>
   )
 
   if (isRobotMoving)
     return (
-      <InProgressModal
+      <SimpleWizardInProgressBody
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
         description={
           isExiting
@@ -177,28 +124,31 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         }
       >
         {isExiting ? undefined : (
-          <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
-            <StyledText css={IN_PROGRESS_STYLE}>
+          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
+            <LegacyStyledText css={IN_PROGRESS_STYLE}>
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </StyledText>
+            </LegacyStyledText>
           </Flex>
         )}
-      </InProgressModal>
+      </SimpleWizardInProgressBody>
     )
   else if (showUnableToDetect)
     return (
       <ProbeNotAttached
-        handleOnClick={handleOnClick}
+        handleOnClick={
+          is96Channel && isWasteChuteOnDeck(deckConfig)
+            ? handleOnClick
+            : startCalibration
+        }
         setShowUnableToDetect={setShowUnableToDetect}
         isOnDevice={isOnDevice ?? false}
-        isPending={isPending}
       />
     )
 
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans
@@ -206,9 +156,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           i18nKey={'return_probe_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <StyledText as="p" />,
+            block: <LegacyStyledText as="p" />,
             bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+              <LegacyStyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              />
             ),
           }}
         />
@@ -223,7 +176,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })}
       bodyText={
         <>
-          <StyledText css={BODY_STYLE}>
+          <LegacyStyledText css={BODY_STYLE}>
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -232,23 +185,28 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </StyledText>
-          {is96Channel && (
+          </LegacyStyledText>
+          {is96Channel && !isWasteChuteOnDeck(deckConfig) && (
             <Banner
-              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              type="warning"
               size={isOnDevice ? '1.5rem' : '1rem'}
               marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
             >
-              {isWasteChuteOnDeck
-                ? t('waste_chute_error')
-                : t('waste_chute_warning')}
+              {t('waste_chute_warning_probe')}
             </Banner>
           )}
         </>
       }
-      proceedButtonText={t('begin_calibration')}
-      proceed={handleOnClick}
-      proceedIsDisabled={isPending}
+      proceedButtonText={
+        is96Channel && isWasteChuteOnDeck(deckConfig)
+          ? capitalize('shared:continue')
+          : t('begin_calibration')
+      }
+      proceed={
+        is96Channel && isWasteChuteOnDeck(deckConfig)
+          ? handleOnClick
+          : startCalibration
+      }
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

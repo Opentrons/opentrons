@@ -1,15 +1,19 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { fixtureP300SingleV2Specs } from '@opentrons/shared-data'
+import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
-import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import { PipetteEntities } from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
 
-const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PipetteEntities } from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
+
+const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
@@ -21,8 +25,8 @@ describe('utils', () => {
       } as any
       pipetteEntities = {
         p300_single: {
-          spec: fixtureP300Single,
-          tiprackLabwareDef: fixtureTiprack300ul,
+          spec: fixtureP300SingleV2Specs,
+          tiprackLabwareDef: [fixtureTiprack300ul],
         },
       } as any
     })
@@ -39,8 +43,7 @@ describe('utils', () => {
           expected: true,
         },
         {
-          msg:
-            '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiDispense',
             volume: '150',
@@ -106,8 +109,7 @@ describe('utils', () => {
           expected: false,
         },
         {
-          msg:
-            '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiAspirate',
             volume: '150',

@@ -3,7 +3,7 @@ from __future__ import annotations
 """ Classes and functions for gripper state tracking
 """
 import logging
-from typing import Any, Optional, Set, Dict, Tuple
+from typing import Any, Optional, Set, Dict, Tuple, Final
 
 from opentrons.types import Point
 from opentrons.config import gripper_config
@@ -19,10 +19,16 @@ from .instrument_calibration import (
     GripperCalibrationOffset,
     load_gripper_calibration_offset,
     save_gripper_calibration_offset,
+    save_gripper_jaw_width_data,
+    load_gripper_jaw_width,
 )
+
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    MotionFailedError,
+)
 
 from opentrons_shared_data.gripper import (
     GripperDefinition,
@@ -30,8 +36,9 @@ from opentrons_shared_data.gripper import (
     Geometry,
 )
 
-RECONFIG_KEYS = {"quirks"}
+RECONFIG_KEYS = {"quirks", "grip_force_profile"}
 
+MAX_ACCEPTABLE_JAW_DISPLACEMENT: Final = 20
 
 mod_log = logging.getLogger(__name__)
 
@@ -79,6 +86,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+        self._encoder_position_at_jaw_closed: Optional[float] = None
 
     @property
     def grip_force_profile(self) -> GripForceProfile:
@@ -102,9 +110,36 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._attached_probe = None
 
     @property
+    def max_allowed_grip_error(self) -> float:
+        return self._geometry.max_allowed_grip_error
+
+    @property
+    def _jaw_min(self) -> float:
+        return self._config.geometry.jaw_width["min"]
+
+    @property
+    def _jaw_nominal_max(self) -> float:
+        return self._config.geometry.jaw_width["max"]
+
+    @property
+    def _jaw_max_offset(self) -> float | None:
+        if self._encoder_position_at_jaw_closed is None:
+            return None
+        return self._jaw_min - (
+            self._jaw_nominal_max - (self._encoder_position_at_jaw_closed * 2)
+        )
+
+    @property
+    def max_jaw_width(self) -> float:
+        return self._config.geometry.jaw_width["max"] + (self._jaw_max_offset or 0)
+
+    @property
+    def min_jaw_width(self) -> float:
+        return self._config.geometry.jaw_width["min"]
+
+    @property
     def jaw_width(self) -> float:
-        jaw_max = self.geometry.jaw_width["max"]
-        return jaw_max - (self.current_jaw_displacement * 2.0)
+        return self.max_jaw_width - (self.current_jaw_displacement * 2.0)
 
     @property
     def current_jaw_displacement(self) -> float:
@@ -113,7 +148,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
-        max_mm = self._max_jaw_displacement() + 2.0
+        max_mm = self.max_jaw_displacement() + 2.0
         if mm > max_mm:
             self._log.warning(
                 f"jaw displacement {round(mm, 1)} mm exceeds max expected value: "
@@ -133,9 +168,9 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def default_home_force(self) -> float:
         return self.grip_force_profile.default_home_force
 
-    def _max_jaw_displacement(self) -> float:
+    def max_jaw_displacement(self) -> float:
         geometry = self._config.geometry
-        return (geometry.jaw_width["max"] - geometry.jaw_width["min"]) / 2
+        return (self.max_jaw_width - geometry.jaw_width["min"]) / 2
 
     @property
     def state(self) -> GripperJawState:
@@ -163,6 +198,57 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def reload_configurations(self) -> None:
         return None
 
+    def update_jaw_open_position_from_closed_position(
+        self, jaw_at_closed: float | None
+    ) -> None:
+        """Update the estimation of the jaw position at open based on reading it at closed.
+
+        This is necessary because the gripper jaw has a well-defined positional hard stop
+        when fully closed and empty but _not_ when open. The open position can vary unit to
+        unit. You can calibrate this out by reading the position of the encoder when the jaw
+        is closed, and then altering the logical open position so that it is whatever it needs
+        to be for the logical closed position to be the same as the config.
+        """
+        if jaw_at_closed is None:
+            self._encoder_position_at_jaw_closed = jaw_at_closed
+            return
+        if (
+            abs((jaw_at_closed * 2) - (self._jaw_nominal_max - self._jaw_min))
+            > MAX_ACCEPTABLE_JAW_DISPLACEMENT
+        ):
+            raise MotionFailedError(
+                message="Gripper jaw calibration out of bounds",
+                detail={
+                    "type": "gripper-jaw-calibration-out-of-bounds",
+                    "actual-displacement": str(jaw_at_closed * 2),
+                    "nominal-displacement": str(self._jaw_nominal_max - self._jaw_min),
+                },
+            )
+        save_gripper_jaw_width_data(
+            gripper_id=self._gripper_id,
+            encoder_position_at_closed=jaw_at_closed,
+        )
+        self._encoder_position_at_jaw_closed = jaw_at_closed
+        self._log.info(
+            f"Gripper max jaw offset is now {self._jaw_max_offset} from input position {jaw_at_closed}"
+        )
+
+    @property
+    def has_jaw_width_calibration(self) -> bool:
+        if self._encoder_position_at_jaw_closed is not None:
+            return True
+        else:
+            load_gripper_jaw_width_data = load_gripper_jaw_width(
+                gripper_id=self._gripper_id
+            )
+            if load_gripper_jaw_width_data.encoder_position_at_jaw_closed is not None:
+                # update class members with data from the robot
+                self.update_jaw_open_position_from_closed_position(
+                    jaw_at_closed=load_gripper_jaw_width_data.encoder_position_at_jaw_closed
+                )
+                return True
+        return False
+
     def reset_offset(self, to_default: bool) -> None:
         """Tempoarily reset the gripper offsets to default values."""
         if to_default:
@@ -171,6 +257,16 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             self._calibration_offset = load_gripper_calibration_offset(
                 gripper_id=self._gripper_id
             )
+
+    def reset_jaw_width_calibration(self, to_default: bool) -> None:
+        """Reset the gripper jaw width measurement in the protocol engine."""
+        if to_default:
+            loaded_jaw_width_data = load_gripper_jaw_width(gripper_id=None)
+        else:
+            loaded_jaw_width_data = load_gripper_jaw_width(gripper_id=self._gripper_id)
+        self.update_jaw_open_position_from_closed_position(
+            jaw_at_closed=loaded_jaw_width_data.encoder_position_at_jaw_closed
+        )
 
     def save_offset(self, delta: Point) -> GripperCalibrationOffset:
         """Save a new gripper offset."""
@@ -220,6 +316,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 self._front_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 + Point(y=self.current_jaw_displacement)
+                - Point(y=(self._jaw_max_offset or 0))
             )
         elif cp == CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN:
             self.check_calibration_pin_location_is_accurate()
@@ -227,6 +324,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 self._rear_calibration_pin_offset
                 + Point(*self._calibration_offset.offset)
                 - Point(y=self.current_jaw_displacement)
+                + Point(y=(self._jaw_max_offset or 0))
             )
         else:
             raise InvalidCriticalPoint(cp.name, "gripper")
@@ -264,14 +362,15 @@ def _reload_gripper(
         # Same config, good enough
         return attached_instr, True
     else:
-        newdict = new_config.dict()
-        olddict = attached_instr.config.dict()
+        newdict = new_config.model_dump()
+        olddict = attached_instr.config.model_dump()
         changed: Set[str] = set()
         for k in newdict.keys():
             if newdict[k] != olddict[k]:
                 changed.add(k)
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
+            # we shoud recalibrate the jaw as well
             return (
                 Gripper(
                     new_config,

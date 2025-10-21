@@ -1,4 +1,7 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Actions from '../actions'
+
 import type { RobotApiAction } from '../types'
 
 interface ActionSpec {
@@ -18,6 +21,12 @@ describe('robot admin actions', () => {
         type: 'robotApi:DISMISS_REQUEST',
         payload: { requestId: 'requestId' },
       },
+    },
+    {
+      name: 'robotApi:DISMISS_ALL_REQUESTS',
+      creator: Actions.dismissAllRequests,
+      args: [],
+      expected: { type: 'robotApi:DISMISS_ALL_REQUESTS' },
     },
   ]
 

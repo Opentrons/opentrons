@@ -1,19 +1,9 @@
+import type {
+  RobotSettings,
+  RobotSettingsField,
+  RobotSettingsResponse,
+} from '@opentrons/api-client'
 import type { RobotApiRequestMeta } from '../robot-api/types'
-
-export interface RobotSettingsField {
-  id: string
-  title: string
-  description: string
-  value: boolean | null
-  restart_required?: boolean
-}
-
-export type RobotSettings = RobotSettingsField[]
-
-export interface RobotSettingsResponse {
-  settings: RobotSettings
-  links?: { restart?: string }
-}
 
 export interface PerRobotRobotSettingsState {
   settings: RobotSettings
@@ -94,3 +84,6 @@ export type RobotSettingsAction =
   | UpdateSettingAction
   | UpdateSettingSuccessAction
   | UpdateSettingFailureAction
+
+// TODO(bh, 2024-03-26): update type imports elsewhere to @opentrons/api-client
+export type { RobotSettings, RobotSettingsField, RobotSettingsResponse }

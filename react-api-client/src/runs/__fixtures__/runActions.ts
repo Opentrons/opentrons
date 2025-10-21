@@ -1,9 +1,11 @@
 import {
-  RunAction,
-  RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
+  RUN_ACTION_TYPE_PLAY,
+  RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
   RUN_ACTION_TYPE_STOP,
 } from '@opentrons/api-client'
+
+import type { RunAction } from '@opentrons/api-client'
 
 export const mockPlayRunAction: RunAction = {
   id: '1',
@@ -21,4 +23,10 @@ export const mockStopRunAction: RunAction = {
   id: '3',
   createdAt: '2021-10-25T13:23:31.366581+00:00',
   actionType: RUN_ACTION_TYPE_STOP,
+}
+
+export const mockResumeFromRecoveryAction: RunAction = {
+  id: '4',
+  createdAt: '2021-10-25T13:23:31.366581+00:00',
+  actionType: RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
 }

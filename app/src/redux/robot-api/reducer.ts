@@ -4,7 +4,14 @@
 // be fairly broken; make sure you have unit tests in place when changing
 
 import omit from 'lodash/omit'
-import { PENDING, SUCCESS, FAILURE, DISMISS_REQUEST } from './constants'
+
+import {
+  DISMISS_ALL_REQUESTS,
+  DISMISS_REQUEST,
+  FAILURE,
+  PENDING,
+  SUCCESS,
+} from './constants'
 
 import type { Action } from '../types'
 import type { RobotApiState } from './types'
@@ -15,6 +22,8 @@ export function robotApiReducer(
 ): RobotApiState {
   if (action.type === DISMISS_REQUEST) {
     return omit(state, action.payload.requestId)
+  } else if (action.type === DISMISS_ALL_REQUESTS) {
+    return {}
   }
   // @ts-expect-error(sa, 2021-05-17): type guard action.meta
   const meta = action.meta ? action.meta : {}

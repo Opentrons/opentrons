@@ -1,5 +1,6 @@
 // mock logger for tests
 import path from 'path'
+
 import type { Logger } from '../logger'
 
 export function createLogger(filename: string): Logger {

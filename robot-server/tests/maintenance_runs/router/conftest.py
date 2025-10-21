@@ -2,8 +2,8 @@
 import pytest
 from decoy import Decoy
 
-from robot_server.maintenance_runs.maintenance_engine_store import (
-    MaintenanceEngineStore,
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
@@ -13,14 +13,16 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
 @pytest.fixture()
-def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
-    """Get a mock MaintenanceEngineStore interface."""
-    return decoy.mock(cls=MaintenanceEngineStore)
+def mock_maintenance_run_orchestrator_store(
+    decoy: Decoy,
+) -> MaintenanceRunOrchestratorStore:
+    """Get a mock MaintenanceRunOrchestratorStore interface."""
+    return decoy.mock(cls=MaintenanceRunOrchestratorStore)
 
 
 @pytest.fixture()
 def mock_protocol_engine(decoy: Decoy) -> ProtocolEngine:
-    """Get a mock MaintenanceEngineStore interface."""
+    """Get a mock MaintenanceRunOrchestratorStore interface."""
     return decoy.mock(cls=ProtocolEngine)
 
 

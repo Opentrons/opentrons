@@ -5,10 +5,11 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ...errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state import StateView
+    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 DeactivateShakerCommandType = Literal["heaterShaker/deactivateShaker"]
@@ -25,7 +26,7 @@ class DeactivateShakerResult(BaseModel):
 
 
 class DeactivateShakerImpl(
-    AbstractCommandImpl[DeactivateShakerParams, DeactivateShakerResult]
+    AbstractCommandImpl[DeactivateShakerParams, SuccessData[DeactivateShakerResult]]
 ):
     """Execution implementation of a Heater-Shaker's deactivate shaker command."""
 
@@ -38,7 +39,9 @@ class DeactivateShakerImpl(
         self._state_view = state_view
         self._equipment = equipment
 
-    async def execute(self, params: DeactivateShakerParams) -> DeactivateShakerResult:
+    async def execute(
+        self, params: DeactivateShakerParams
+    ) -> SuccessData[DeactivateShakerResult]:
         """Deactivate shaker for a Heater-Shaker."""
         # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         hs_module_substate = self._state_view.modules.get_heater_shaker_module_substate(
@@ -55,15 +58,19 @@ class DeactivateShakerImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.deactivate_shaker()
 
-        return DeactivateShakerResult()
+        return SuccessData(
+            public=DeactivateShakerResult(),
+        )
 
 
-class DeactivateShaker(BaseCommand[DeactivateShakerParams, DeactivateShakerResult]):
+class DeactivateShaker(
+    BaseCommand[DeactivateShakerParams, DeactivateShakerResult, ErrorOccurrence]
+):
     """A command to deactivate shaker for a Heater-Shaker."""
 
     commandType: DeactivateShakerCommandType = "heaterShaker/deactivateShaker"
     params: DeactivateShakerParams
-    result: Optional[DeactivateShakerResult]
+    result: Optional[DeactivateShakerResult] = None
 
     _ImplementationCls: Type[DeactivateShakerImpl] = DeactivateShakerImpl
 

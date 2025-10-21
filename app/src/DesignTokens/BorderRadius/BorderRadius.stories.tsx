@@ -1,18 +1,16 @@
-import * as React from 'react'
 import {
-  Flex,
-  COLORS,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
-  Box,
   ALIGN_FLEX_START,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  LegacyStyledText,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
-
-import { StyledText } from '../../atoms/text'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/BorderRadius',
@@ -23,9 +21,14 @@ interface BorderRadiusStorybookProps {
 }
 
 const Template: Story<BorderRadiusStorybookProps> = args => {
-  const targetBorderRadiuses = args.borderRadius.filter(s =>
-    s[0].includes('borderRadiusSize')
-  )
+  const targetBorderRadiuses = args.borderRadius
+    .filter(s => s[0].includes('borderRadius'))
+    .sort((a, b) => {
+      const aValue = parseInt(a[1])
+      const bValue = parseInt(b[1])
+      return aValue - bValue
+    })
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -42,13 +45,13 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </StyledText>
+          </LegacyStyledText>
           <Box
             width="10rem"
             height="4rem"
-            backgroundColor={COLORS.blueEnabled}
+            backgroundColor={COLORS.blue50}
             borderRadius={br[1]}
           />
         </Flex>

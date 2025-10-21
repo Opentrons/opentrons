@@ -1,5 +1,18 @@
 """Exception hierarchy for error codes."""
-from typing import Dict, Any, Optional, List, Iterator, Union, Sequence
+
+from __future__ import annotations
+from typing import (
+    Dict,
+    Any,
+    Optional,
+    List,
+    Iterator,
+    Union,
+    Sequence,
+    overload,
+    Type,
+    TypeVar,
+)
 from logging import getLogger
 from traceback import format_exception_only, format_tb
 import inspect
@@ -14,6 +27,18 @@ log = getLogger(__name__)
 
 class EnumeratedError(Exception):
     """The root class of error-code-bearing exceptions."""
+
+    @classmethod
+    def ensure(cls: Type[_ET], exception: Exception) -> _ET:
+        """Ensure that an exception is enumerated.
+
+        If the passed exception is an EnumeratedError, returns it; otherwise, wraps it in an appropriate
+        child class.
+        """
+        if isinstance(exception, cls):
+            return exception
+        else:
+            return PythonException(exception)  # type: ignore[return-value]
 
     def __init__(
         self,
@@ -47,6 +72,9 @@ class EnumeratedError(Exception):
             and self.detail == other.detail
             and self.wrapping == other.wrapping
         )
+
+
+_ET = TypeVar("_ET", bound=EnumeratedError, covariant=True)
 
 
 class CommunicationError(EnumeratedError):
@@ -382,6 +410,28 @@ class StallOrCollisionDetectedError(RoboticsControlError):
         )
 
 
+class FlexStackerStallError(RoboticsControlError):
+    """An error indicating that a stall or collision occurred in the flex stacker."""
+
+    def __init__(
+        self,
+        serial: str,
+        axis: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        self.serial = serial
+        self.axis = axis
+        super().__init__(
+            ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED,
+            message,
+            detail,
+            wrapping,
+        )
+
+
 class MotionPlanningFailureError(RoboticsControlError):
     """An error indicating that motion planning failed."""
 
@@ -443,6 +493,24 @@ class CalibrationStructureNotFoundError(RoboticsControlError):
             ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
             f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
             detail,
+            wrapping,
+        )
+
+
+class FailedGripperPickupError(RoboticsControlError):
+    """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FailedGripperPickupError."""
+        super().__init__(
+            ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
+            message or "Expected to grip labware, but none found.",
+            details,
             wrapping,
         )
 
@@ -540,11 +608,9 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
         """Build an UnmatchedTipPresenceStatesError."""
         format_tip_state = {0: "not detected", 1: "detected"}
         msg = (
-            "Received two differing tip presence statuses:"
-            "\nRear Sensor tips"
-            + format_tip_state[states[0]]
-            + "\nFront Sensor tips"
-            + format_tip_state[states[1]]
+            f"Received two differing tip presence statuses."
+            f" Rear Sensor tips: {format_tip_state[states[0]]}."
+            f" Front Sensor tips: {format_tip_state[states[1]]}."
         )
         if detail:
             msg += str(detail)
@@ -580,6 +646,55 @@ class ExecutionCancelledError(RoboticsControlError):
     ) -> None:
         """Build a ExecutionCancelledError."""
         super().__init__(ErrorCodes.EXECUTION_CANCELLED, message, detail, wrapping)
+
+
+class MotorDriverError(RoboticsControlError):
+    """An error indicating that a motor driver is in error state."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MotorDriverError."""
+        super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
+
+
+class PipetteLiquidNotFoundError(RoboticsControlError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Initialize PipetteLiquidNotFoundError."""
+        super().__init__(
+            ErrorCodes.PIPETTE_LIQUID_NOT_FOUND,
+            message,
+            detail,
+            wrapping,
+        )
+
+
+class TipHitWellBottomError(RoboticsControlError):
+    """Error raised if tip hits bottom of well while trying to detect liquid level."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Initialize TipHitWellBottomError."""
+        super().__init__(
+            ErrorCodes.TIP_HIT_WELL_BOTTOM,
+            message,
+            detail,
+            wrapping,
+        )
 
 
 class LabwareDroppedError(RoboticsInteractionError):
@@ -660,6 +775,138 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         checked_detail["mount"] = mount
         message = f"Cannot perform {action} with a tip already attached."
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
+
+
+class HepaUVFailedError(RoboticsInteractionError):
+    """An error indicating that the HEPA UV module has errored."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an HepaUVFailedError."""
+        super().__init__(ErrorCodes.HEPA_UV_FAILED, message, detail, wrapping)
+
+
+class FlexStackerShuttleMissingError(RoboticsInteractionError):
+    """An error indicating the Flex Stacker shuttle cannot be detected."""
+
+    def __init__(
+        self,
+        serial: str,
+        expected_state: str,
+        shuttle_state: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["expected_state"] = expected_state
+        checked_detail["shuttle_state"] = shuttle_state
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = (
+                "Flex Stacker shuttle not detected in state "
+                f"{expected_state}, found {shuttle_state}."
+            )
+        super().__init__(
+            ErrorCodes.STACKER_SHUTTLE_MISSING,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
+class FlexStackerShuttleLabwareError(RoboticsInteractionError):
+    """An error occurred during Flex Stacker shuttle labware detection."""
+
+    def __init__(
+        self,
+        serial: str,
+        shuttle_state: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["shuttle_state"] = shuttle_state
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = (
+                f"Labware {'not' if labware_expected else ''} detected on shuttle"
+            )
+        super().__init__(
+            ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
+class FlexStackerHopperLabwareError(RoboticsInteractionError):
+    """An error occurred when detecting labware inside the Flex Stacker hopper."""
+
+    def __init__(
+        self,
+        serial: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Labware {'not' if labware_expected else ''} detected in Flex Stacker hopper"
+        super().__init__(
+            ErrorCodes.STACKER_HOPPER_LABWARE_FAILED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
+class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
+    """An error occurred when the Flex Stacker Shuttle is not empty when it should be."""
+
+    def __init__(
+        self,
+        serial: str,
+        shuttle_state: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerShuttleNotEmptyError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["shuttle_state"] = shuttle_state
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Flex Stacker {serial} shuttle is not empty."
+        super().__init__(
+            ErrorCodes.STACKER_SHUTTLE_OCCUPIED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
 
 
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
@@ -822,11 +1069,37 @@ class TipDetectorNotFound(RoboticsInteractionError):
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 
+    @overload
+    def __init__(  # noqa: D107
+        self,
+        *,
+        api_element: Optional[str] = None,
+        since_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    @overload
+    def __init__(  # noqa: D107
+        self,
+        message: Optional[str] = None,
+        *,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
     def __init__(
         self,
-        api_element: str,
-        since_version: str,
         message: Optional[str] = None,
+        *,
+        api_element: Optional[str] = None,
+        since_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
@@ -834,12 +1107,98 @@ class APIRemoved(GeneralError):
         checked_detail: Dict[str, Any] = detail or {}
         checked_detail["identifier"] = api_element
         checked_detail["since_version"] = since_version
-        checked_message = (
-            message
-            or f"{api_element} is no longer available since version {since_version}."
-        )
+        checked_detail["current_version"] = current_version
+
+        checked_api_element = api_element if api_element is not None else "This feature"
+
+        if message is not None:
+            checked_message = message
+        else:
+            if since_version is not None and current_version is not None:
+                checked_message = (
+                    f"{checked_api_element} is not available after API version {since_version}."
+                    f" You are currently using API version {current_version}."
+                )
+            elif since_version is not None and current_version is None:
+                checked_message = f"{checked_api_element} is not available after API version {since_version}."
+            elif since_version is None and current_version is not None:
+                checked_message = f"{checked_api_element} is not available in API version {current_version}."
+            else:
+                checked_message = f"{checked_api_element} is no longer available in the API version in use."
+
+            if extra_message is not None:
+                checked_message += " " + extra_message
+
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
+        )
+
+
+class IncorrectAPIVersion(GeneralError):
+    """An error indicating that a command was issued that is not supported by the API version in use."""
+
+    @overload
+    def __init__(  # noqa: D107
+        self,
+        *,
+        api_element: Optional[str] = None,
+        until_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    @overload
+    def __init__(  # noqa: D107
+        self,
+        message: Optional[str] = None,
+        *,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        pass
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        *,
+        api_element: Optional[str] = None,
+        until_version: Optional[str] = None,
+        current_version: Optional[str] = None,
+        extra_message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an IncorrectAPIVersion error."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = api_element
+        checked_detail["until_version"] = until_version
+        checked_detail["current_version"] = current_version
+
+        checked_api_element = api_element if api_element is not None else "This feature"
+
+        if message is not None:
+            checked_message = message
+        else:
+            if until_version is not None and current_version is not None:
+                checked_message = (
+                    f"{checked_api_element} is not available until API version {until_version}."
+                    f" You are currently using API version {current_version}."
+                )
+            elif until_version is not None and current_version is None:
+                checked_message = f"{checked_api_element} is not available until API version {until_version}."
+            elif until_version is None and current_version is not None:
+                checked_message = f"{checked_api_element} is not available in API version {current_version}."
+            else:
+                checked_message = f"{checked_api_element} is not yet available in the API version in use."
+
+            if extra_message is not None:
+                checked_message += " " + extra_message
+
+        super().__init__(
+            ErrorCodes.INCORRECT_API_VERSION, checked_message, checked_detail, wrapping
         )
 
 
@@ -909,7 +1268,41 @@ class InvalidProtocolData(GeneralError):
         self,
         message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
     ) -> None:
         """Build an InvalidProtocolData."""
         super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)
+
+
+class InvalidStoredData(GeneralError):
+    """An error indicating that some stored data is invalid.
+
+    This will usually be because it was saved by a future version of the software.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidStoredData."""
+        super().__init__(ErrorCodes.INVALID_STORED_DATA, message, detail, wrapping)
+
+
+class MissingConfigurationData(GeneralError):
+    """An error indicating that provided configuration data is missing or invalid.
+
+    This will usually be because a pipette configuration does not match the ones provided by the pipette definition.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an MissingConfigurationData."""
+        super().__init__(
+            ErrorCodes.MISSING_CONFIGURATION_DATA, message, detail, wrapping
+        )

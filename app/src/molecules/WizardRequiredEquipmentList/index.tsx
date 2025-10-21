@@ -1,32 +1,44 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import {
-  Flex,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  JUSTIFY_SPACE_AROUND,
-  TYPOGRAPHY,
-  Box,
-  BORDERS,
-} from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import {
+  ALIGN_CENTER,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  OVERFLOW_WRAP_ANYWHERE,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { labwareImages } from '@opentrons/shared-data'
+
+import { Divider } from '/app/atoms/structure'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { equipmentImages } from './equipmentImages'
 
+import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'
+
 interface WizardRequiredEquipmentListProps extends StyleProps {
-  equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
+  equipmentList: Array<ComponentProps<typeof RequiredEquipmentCard>>
   footer?: string
 }
+
+const StyledEquipmentImage = styled.img<{ isEquipmentImage: boolean }>`
+  max-width: 100%;
+  max-height: 100%;
+  flex: ${props => (props.isEquipmentImage ? '0' : '0 1 5rem')};
+  display: block;
+`
+
 export function WizardRequiredEquipmentList(
   props: WizardRequiredEquipmentListProps
 ): JSX.Element {
@@ -41,18 +53,18 @@ export function WizardRequiredEquipmentList(
     >
       {isOnDevice ? (
         <>
-          <StyledText
+          <LegacyStyledText
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="1.5rem"
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </StyledText>
+          </LegacyStyledText>
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius8}
             width="428px"
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
@@ -61,13 +73,17 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
+                <LegacyStyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  paddingY={SPACING.spacing12}
+                  overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+                >
                   {requiredEquipmentProps.displayName}
-                </StyledText>
+                </LegacyStyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.black90}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>
@@ -76,13 +92,13 @@ export function WizardRequiredEquipmentList(
         </>
       ) : (
         <>
-          <StyledText
+          <LegacyStyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
-          </StyledText>
+          </LegacyStyledText>
           <Divider />
           {equipmentList.map(requiredEquipmentProps => (
             <RequiredEquipmentCard
@@ -91,13 +107,13 @@ export function WizardRequiredEquipmentList(
             />
           ))}
           {footer != null ? (
-            <StyledText
+            <LegacyStyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey60}
             >
               {footer}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </>
       )}
@@ -117,7 +133,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
 
   let imageSrc: string | null = null
   if (loadName in labwareImages) {
-    imageSrc = labwareImages[loadName as keyof typeof labwareImages]
+    imageSrc = labwareImages[loadName as keyof typeof labwareImages][0]
   } else if (loadName in equipmentImages) {
     imageSrc = equipmentImages[loadName as keyof typeof equipmentImages]
   }
@@ -137,28 +153,23 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             marginRight={SPACING.spacing16}
           >
-            <img
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-                flex: ${loadName in equipmentImages ? `0` : `0 1 5rem`};
-                display: block;
-              `}
+            <StyledEquipmentImage
+              isEquipmentImage={loadName in equipmentImages}
               src={imageSrc}
               alt={displayName}
             />
           </Flex>
         ) : null}
         <Flex
-          flex="0 1 70%"
+          flex={imageSrc == null ? '0 1 100%' : '0 1 70%'}
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_AROUND}
         >
-          <StyledText as="p">{displayName}</StyledText>
+          <LegacyStyledText as="p">{displayName}</LegacyStyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <LegacyStyledText as="p" color={COLORS.grey50}>
               {subtitle}
-            </StyledText>
+            </LegacyStyledText>
           ) : null}
         </Flex>
       </Flex>

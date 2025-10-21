@@ -1,35 +1,41 @@
-import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
-  Icon,
-  Flex,
+  ALIGN_CENTER,
   Box,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
   SIZE_1,
-  ALIGN_CENTER,
-  IconName,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+
+import type { ReactNode } from 'react'
+import type { IconName } from '@opentrons/components'
 
 interface CollapsibleProps {
   expanded: boolean
-  title: React.ReactNode
+  title: ReactNode
   expandedIcon?: IconName
   collapsedIcon?: IconName
   toggleExpanded: () => void
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const EXPANDED_STYLE = css`
-  transition: max-height 300ms ease-in, visibility 400ms ease;
+  transition:
+    max-height 300ms ease-in,
+    visibility 400ms ease;
   visibility: visible;
   max-height: 100vh;
   overflow: hidden;
 `
 const COLLAPSED_STYLE = css`
-  transition: max-height 500ms ease-out, visibility 600ms ease;
+  transition:
+    max-height 500ms ease-out,
+    visibility 600ms ease;
   visibility: hidden;
   max-height: 0vh;
   overflow: hidden;
@@ -53,7 +59,7 @@ export function Collapsible({
         onClick={toggleExpanded}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h5">{title}</StyledText>
+          <LegacyStyledText as="h5">{title}</LegacyStyledText>
         </Flex>
         <Icon
           size={SIZE_1}

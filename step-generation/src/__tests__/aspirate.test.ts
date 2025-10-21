@@ -1,61 +1,51 @@
-import { when } from 'jest-when'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import {
+  getLabwareDefURI,
+  getPipetteSpecsV2,
+  OT2_ROBOT_TYPE,
+  fixtureTiprack10ul as tip10,
+  fixtureTiprack1000ul as tip1000,
+} from '@opentrons/shared-data'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
-import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
-import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import {
-  pipetteIntoHeaterShakerLatchOpen,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
   DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
+  getErrorResult,
+  getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
+  getRobotStateWithTipStandard,
+  getSuccessResult,
+  makeContext,
+  SOURCE_LABWARE,
 } from '../fixtures'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import {
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+
+import type {
+  AspDispAirgapParams,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../'
 
-const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
-const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
+const fixtureTiprack10ul = tip10 as LabwareDefinition2
+const fixtureTiprack1000ul = tip1000 as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
-jest.mock('../utils/thermocyclerPipetteCollision')
-jest.mock('../utils/heaterShakerCollision')
-
-const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
-  typeof thermocyclerPipetteCollision
->
-const mockPipetteIntoHeaterShakerLatchOpen = pipetteIntoHeaterShakerLatchOpen as jest.MockedFunction<
-  typeof pipetteIntoHeaterShakerLatchOpen
->
-const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShaking as jest.MockedFunction<
-  typeof pipetteIntoHeaterShakerWhileShaking
->
-const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
-  typeof getIsHeaterShakerEastWestWithLatchOpen
->
-const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWestMultiChannelPipette as jest.MockedFunction<
-  typeof getIsHeaterShakerEastWestMultiChannelPipette
->
-const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
-  typeof pipetteAdjacentHeaterShakerWhileShaking
->
-const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
-  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
->
+vi.mock('../utils/absorbanceReaderCollision')
+vi.mock('../utils/thermocyclerPipetteCollision')
+vi.mock('../utils/heaterShakerCollision')
 
 describe('aspirate', () => {
   let initialRobotState: RobotState
@@ -68,20 +58,27 @@ describe('aspirate', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
     flowRateAndOffsets = {
       flowRate: 6,
-      offsetFromBottomMm: 5,
+      wellLocation: {
+        origin: 'bottom',
+        offset: { z: 5, y: 0, x: 0 },
+      },
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('aspirate normally (with tip)', () => {
     const params = {
-      ...flowRateAndOffsets,
-      pipette: DEFAULT_PIPETTE,
-      volume: 50,
-      labware: SOURCE_LABWARE,
-      well: 'A1',
-    } as AspDispAirgapParams
+      ...({
+        ...flowRateAndOffsets,
+        pipetteId: DEFAULT_PIPETTE,
+        volume: 50,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      } as AspDispAirgapParams),
+      tipRack: 'tiprack1Id',
+      nozzles: null,
+    }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -96,28 +93,42 @@ describe('aspirate', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: 5,
             },
           },
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_pipette.aspirate(
+    volume=50,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
+)`.trimStart()
+    )
   })
   it('aspirate with volume > tip max volume should throw error', () => {
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack10ul)
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixtureTiprack10ul
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [
+      getLabwareDefURI(fixtureTiprack10ul),
+    ]
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackLabwareDef = [
+      fixtureTiprack10ul,
+    ]
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 201,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 201,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tiprack1Id',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -128,20 +139,24 @@ describe('aspirate', () => {
   })
   it('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack1000ul)
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixtureTiprack1000ul
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [
+      getLabwareDefURI(fixtureTiprack1000ul),
+    ]
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackLabwareDef = [
+      fixtureTiprack1000ul,
+    ]
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 301,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 301,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -153,12 +168,16 @@ describe('aspirate', () => {
   it('aspirate with invalid pipette ID should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: 'badPipette',
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: 'badPipette',
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -167,12 +186,16 @@ describe('aspirate', () => {
   it('aspirate with no tip should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       initialRobotState
     )
@@ -184,12 +207,16 @@ describe('aspirate', () => {
   it('aspirate from nonexistent labware should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: 'problematicLabwareId',
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: 'problemaaticLabwareId',
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -198,42 +225,22 @@ describe('aspirate', () => {
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
-  it('should return an error when aspirating from the 4th column', () => {
-    robotStateWithTip = {
-      ...robotStateWithTip,
-      labware: {
-        [SOURCE_LABWARE]: { slot: 'A4' },
-      },
-    }
-    const result = aspirate(
-      {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
-      invariantContext,
-      robotStateWithTip
-    )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'PIPETTING_INTO_COLUMN_4',
-    })
-  })
   it('should return an error when aspirating from labware off deck', () => {
-    initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
-      invariantContext
-    )
+    initialRobotState =
+      getInitialRobotStateWithOffDeckLabwareStandard(invariantContext)
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       initialRobotState
     )
@@ -243,7 +250,7 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating from thermocycler with pipette collision', () => {
-    mockThermocyclerPipetteCollision.mockImplementationOnce(
+    vi.mocked(thermocyclerPipetteCollision).mockImplementationOnce(
       (
         modules: RobotState['modules'],
         labware: RobotState['labware'],
@@ -257,12 +264,16 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -272,7 +283,7 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating from heaterShaker with latch opened', () => {
-    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+    vi.mocked(pipetteIntoHeaterShakerLatchOpen).mockImplementationOnce(
       (
         modules: RobotState['modules'],
         labware: RobotState['labware'],
@@ -286,12 +297,16 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -302,12 +317,11 @@ describe('aspirate', () => {
   })
   it('should return an error when aspirating from heaterShaker with latch opened for Flex', () => {
     if (FlexPipetteNameSpecs != null) {
-      invariantContext.pipetteEntities[
-        DEFAULT_PIPETTE
-      ].spec = FlexPipetteNameSpecs
+      invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+        FlexPipetteNameSpecs
     }
 
-    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+    vi.mocked(pipetteIntoHeaterShakerLatchOpen).mockImplementationOnce(
       (
         modules: RobotState['modules'],
         labware: RobotState['labware'],
@@ -321,12 +335,16 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -336,7 +354,7 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating from heaterShaker when it is shaking', () => {
-    mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+    vi.mocked(pipetteIntoHeaterShakerWhileShaking).mockImplementationOnce(
       (
         modules: RobotState['modules'],
         labware: RobotState['labware'],
@@ -350,12 +368,16 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -366,12 +388,11 @@ describe('aspirate', () => {
   })
   it('should return an error when aspirating from heaterShaker when it is shaking for flex', () => {
     if (FlexPipetteNameSpecs != null) {
-      invariantContext.pipetteEntities[
-        DEFAULT_PIPETTE
-      ].spec = FlexPipetteNameSpecs
+      invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+        FlexPipetteNameSpecs
     }
 
-    mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+    vi.mocked(pipetteIntoHeaterShakerWhileShaking).mockImplementationOnce(
       (
         modules: RobotState['modules'],
         labware: RobotState['labware'],
@@ -385,12 +406,16 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -400,22 +425,26 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating east/west of a heater shaker with a multi channel pipette', () => {
-    when(mockGetIsHeaterShakerEastWestMultiChannelPipette)
+    when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything()
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -425,21 +454,25 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating east/west of a heater shaker with its latch open', () => {
-    when(mockGetIsHeaterShakerEastWestWithLatchOpen)
+    when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -448,22 +481,27 @@ describe('aspirate', () => {
       type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
     })
   })
-  it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking', () => {
-    when(mockPipetteAdjacentHeaterShakerWhileShaking)
+  it('should return an error when aspirating north/south/east/west of a heater shaker while it is shaking for ot-2', () => {
+    when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
+        OT2_ROBOT_TYPE
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -473,23 +511,27 @@ describe('aspirate', () => {
     })
   })
   it('should return an error when aspirating north/south of a heater shaker from a non tiprack using a multi channel pipette', () => {
-    when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+    when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
         expect.anything(),
         expect.anything()
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipetteId: DEFAULT_PIPETTE,
+          volume: 50,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        nozzles: null,
+      },
       invariantContext,
       robotStateWithTip
     )

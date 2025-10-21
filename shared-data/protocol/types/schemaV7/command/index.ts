@@ -1,23 +1,23 @@
 import type {
-  PipettingRunTimeCommand,
-  PipettingCreateCommand,
-} from './pipetting'
-import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
-import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
-import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
-import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
+  AnnotationCreateCommand,
+  AnnotationRunTimeCommand,
+} from './annotation'
+import type {
+  CalibrationCreateCommand,
+  CalibrationRunTimeCommand,
+} from './calibration'
+import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
 import type {
   IncidentalCreateCommand,
   IncidentalRunTimeCommand,
 } from './incidental'
+import type { ModuleCreateCommand, ModuleRunTimeCommand } from './module'
 import type {
-  AnnotationRunTimeCommand,
-  AnnotationCreateCommand,
-} from './annotation'
-import type {
-  CalibrationRunTimeCommand,
-  CalibrationCreateCommand,
-} from './calibration'
+  PipettingCreateCommand,
+  PipettingRunTimeCommand,
+} from './pipetting'
+import type { SetupCreateCommand, SetupRunTimeCommand } from './setup'
+import type { TimingCreateCommand, TimingRunTimeCommand } from './timing'
 
 export * from './annotation'
 export * from './calibration'

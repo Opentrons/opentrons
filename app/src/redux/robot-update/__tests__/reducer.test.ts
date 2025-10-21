@@ -1,5 +1,8 @@
+import { describe, expect, it } from 'vitest'
+
 import { mockRobot } from '../../robot-api/__fixtures__'
 import { INITIAL_STATE, robotUpdateReducer } from '../reducer'
+
 import type { Action } from '../../types'
 import type { RobotUpdateState } from '../types'
 
@@ -154,8 +157,7 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name:
-        'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
+      name: 'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
       action: {
         type: 'robotUpdate:DOWNLOAD_DONE',
         payload: 'ot2',
@@ -177,8 +179,7 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name:
-        'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
+      name: 'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
       action: {
         type: 'robotUpdate:DOWNLOAD_DONE',
         payload: 'ot2',

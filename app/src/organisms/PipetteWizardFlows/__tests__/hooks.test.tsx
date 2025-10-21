@@ -1,19 +1,24 @@
-import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
+  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
-  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
+
+import { i18n } from '/app/i18n'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
+} from '/app/redux/pipettes/__fixtures__'
+
 import { FLOWS } from '../constants'
 import { usePipetteFlowWizardHeaderText } from '../hooks'
+
+import type { FunctionComponent, ReactNode } from 'react'
 
 const BASE_PROPS_FOR_RUN_SETUP = {
   flowType: FLOWS.CALIBRATE,
@@ -22,14 +27,14 @@ const BASE_PROPS_FOR_RUN_SETUP = {
 }
 
 describe('usePipetteFlowWizardHeaderText', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: FunctionComponent<{ children: ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should return correct title for calibrating single mount', () => {
     const { result } = renderHook(
@@ -198,7 +203,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette'
+      'Detach Flex 1-Channel 1000 µL and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching single mount', () => {

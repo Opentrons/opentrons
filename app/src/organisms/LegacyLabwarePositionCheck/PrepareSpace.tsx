@@ -1,0 +1,160 @@
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
+
+import {
+  ALIGN_FLEX_START,
+  BaseDeck,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SecondaryButton,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { getModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
+import { SmallButton } from '/app/atoms/buttons'
+import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration/getStandardDeckViewLayerBlockList'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { getIsOnDevice } from '/app/redux/config'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+
+import type { ReactNode } from 'react'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { CheckLabwareStep } from './types'
+
+const LPC_HELP_LINK_URL =
+  'https://support.opentrons.com/s/article/creating-labware-offsets'
+
+const TILE_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  flex: 1;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 29.5rem;
+  }
+`
+
+const Title = styled.h1`
+  ${TYPOGRAPHY.h1Default};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold};
+  }
+`
+interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
+  section:
+    | 'CHECK_LABWARE'
+    | 'CHECK_TIP_RACKS'
+    | 'PICK_UP_TIP'
+    | 'RETURN_TIP'
+    | 'CHECK_POSITIONS'
+  labwareDef: LabwareDefinition
+  protocolData: CompletedProtocolAnalysis
+  confirmPlacement: () => void
+  onSkip: () => void
+  header: ReactNode
+  body: ReactNode
+  robotType: RobotType
+}
+export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
+  const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
+  const {
+    location,
+    labwareDef,
+    protocolData,
+    header,
+    body,
+    robotType,
+    section,
+    onSkip,
+  } = props
+
+  const isOnDevice = useSelector(getIsOnDevice)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+
+  if (protocolData == null || robotType == null) return null
+
+  return (
+    <Flex css={TILE_CONTAINER_STYLE}>
+      <Flex flex="1" flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
+        <Flex
+          flex="2"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+        >
+          <Title>{header}</Title>
+          {body}
+        </Flex>
+        <Flex
+          flex="3"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_FLEX_START}
+        >
+          <BaseDeck
+            robotType={robotType}
+            deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+            modulesOnDeck={protocolData.modules.map(mod => ({
+              moduleModel: mod.model,
+              moduleLocation: mod.location,
+              nestedLabwareDefsBottomToTop:
+                'moduleModel' in location && location.moduleModel != null
+                  ? [labwareDef]
+                  : [],
+              innerProps:
+                'moduleModel' in location &&
+                location.moduleModel != null &&
+                getModuleType(location.moduleModel) === THERMOCYCLER_MODULE_TYPE
+                  ? { lidMotorState: 'open' }
+                  : {},
+            }))}
+            labwareOnDeck={[
+              {
+                labwareLocation: location,
+                definition: labwareDef,
+              },
+            ].filter(
+              () => !('moduleModel' in location && location.moduleModel != null)
+            )}
+            deckConfig={deckConfig}
+          />
+        </Flex>
+      </Flex>
+      {isOnDevice ? (
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
+          <SmallButton
+            buttonText={i18n.format(
+              t('shared:confirm_placement'),
+              'capitalize'
+            )}
+            onClick={props.confirmPlacement}
+          />
+        </Flex>
+      ) : (
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <NeedHelpLink href={LPC_HELP_LINK_URL} />
+          <Flex gap={SPACING.spacing8}>
+            {section !== 'PICK_UP_TIP' && section !== 'RETURN_TIP' && (
+              <SecondaryButton onClick={onSkip}>{t('skip')}</SecondaryButton>
+            )}
+            <PrimaryButton onClick={props.confirmPlacement}>
+              {i18n.format(t('shared:confirm_placement'), 'capitalize')}
+            </PrimaryButton>
+          </Flex>
+        </Flex>
+      )}
+    </Flex>
+  )
+}

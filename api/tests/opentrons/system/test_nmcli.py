@@ -1,9 +1,11 @@
 import pytest
+from pytest import MonkeyPatch
+from typing import List, Optional, Tuple
 
 from opentrons.system import nmcli
 
 
-def test_parse_colonsep():
+def test_parse_colonsep() -> None:
     assert nmcli._parse_colonsep_response(
         "dank mimos\\: slow zone:100:yes:wpa2\n"
         "some other network:20:no:wep\n"
@@ -15,7 +17,7 @@ def test_parse_colonsep():
     ]
 
 
-def test_sanitize_args():
+def test_sanitize_args() -> None:
     cmd = [
         "nmcli",
         "connection",
@@ -39,7 +41,7 @@ def test_sanitize_args():
     assert "test-password" not in sanitized
 
 
-def test_output_transformations():
+def test_output_transformations() -> None:
     fields = ["name", "type", "autorun", "active", "iface", "state"]
     should_have = [
         ["static-eth0", "802-3-ethernet", "yes", "yes", "eth0", "activated"],
@@ -67,7 +69,7 @@ wifi-wlan0:802-11-wireless:yes:no:wlan0:--
     assert split[1]["active"] is False
 
 
-async def test_available_ssids(monkeypatch):
+async def test_available_ssids(monkeypatch: MonkeyPatch) -> None:
     mock_nmcli_output = """mock_wpa2:90:no:WPA2
 mock_no_security:80:no:
 mock_enterprise:70:no:WPA1 WPA2 802.1X
@@ -128,7 +130,9 @@ mock_bad_security:50:no:foobar
         # note entry for 'ssid': '--' is expected to be filterd out
     ]
 
-    async def mock_call(cmd, suppress_err=False):
+    async def mock_call(
+        cmd: List[str], suppress_err: Optional[bool] = False
+    ) -> Tuple[str, str]:
         assert cmd == next(expected_cmds)
         return mock_nmcli_output, ""
 
@@ -137,8 +141,8 @@ mock_bad_security:50:no:foobar
     assert result == expected
 
 
-async def test_networking_status(monkeypatch):
-    async def mock_call(cmd):
+async def test_networking_status(monkeypatch: MonkeyPatch) -> None:
+    async def mock_call(cmd: List[str]) -> Tuple[str, str]:
         # Command: `nmcli networking connectivity`
         if "connectivity" in cmd:
             res = "full"
@@ -180,7 +184,7 @@ GENERAL.STATE:100 (connected)"""
         "type": "ethernet",
     }
 
-    async def dummy_error_mock_call(cmd):
+    async def dummy_error_mock_call(cmd: List[str]) -> Tuple[str, str]:
         if "connectivity" in cmd:
             return "full", ""
         else:

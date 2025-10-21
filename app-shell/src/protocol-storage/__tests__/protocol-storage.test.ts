@@ -3,13 +3,17 @@
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 import {
   fetchProtocols,
-  getUnixTimeFromAnalysisPath,
   getParsedAnalysisFromPath,
+  getUnixTimeFromAnalysisPath,
 } from '../'
+import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
+
+vi.mock('electron-store')
+vi.mock('../../log')
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -20,20 +24,17 @@ describe('protocol storage directory utilities', () => {
   beforeEach(() => {
     mockAnalysisFilePath = tempy.file({ extension: 'json' })
     protocolsDir = path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
-    mockDispatch = jest.fn()
+    mockDispatch = vi.fn()
     requiredRmdir = true
   })
 
   afterEach(() => {
     return requiredRmdir
-      ? Promise.all([
+      ? (Promise.all([
           fs.rmdir(protocolsDir, { recursive: true }),
           fs.rm(mockAnalysisFilePath, { force: true }),
-        ])
+        ]) as any)
       : fs.rm(mockAnalysisFilePath, { force: true })
-  })
-  afterAll(() => {
-    jest.resetAllMocks()
   })
 
   describe('fetchProtocols', () => {
@@ -118,6 +119,8 @@ describe('protocol storage directory utilities', () => {
         pipettes: [],
         modules: [],
         labware: [],
+        runTimeParameters: [],
+        result: 'not-ok',
       })
     })
   })

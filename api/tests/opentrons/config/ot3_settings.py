@@ -11,7 +11,15 @@ ot3_dummy_settings = {
                 "P": 15,
                 "Z_G": 5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
+                "Q": 5,
+                "Z_G": 5,
+            },
+            "high_throughput_200": {
                 "X": 3,
                 "Y": 2,
                 "Z": 15,
@@ -28,7 +36,15 @@ ot3_dummy_settings = {
                 "P": 4,
                 "Z_G": 5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
+                "Q": 5,
+                "Z_G": 6,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -45,7 +61,15 @@ ot3_dummy_settings = {
                 "P": 40,
                 "Z_G": 50,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
+                "Q": 5,
+                "Z_G": 7,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -62,7 +86,15 @@ ot3_dummy_settings = {
                 "P": 20,
                 "Z_G": 15,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 6,
+                "Q": 5,
+                "Z_G": 15,
+            },
+            "high_throughput_200": {
                 "X": 1,
                 "Y": 2,
                 "Z": 3,
@@ -81,7 +113,15 @@ ot3_dummy_settings = {
                 "P": 0.8,
                 "Z_G": 0.5,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 0.7,
+                "Y": 0.7,
+                "Z": 0.7,
+                "P": 0.8,
+                "Q": 0.3,
+                "Z_G": 0.5,
+            },
+            "high_throughput_200": {
                 "X": 0.7,
                 "Y": 0.7,
                 "Z": 0.7,
@@ -98,7 +138,15 @@ ot3_dummy_settings = {
                 "P": 5.0,
                 "Z_G": 5.0,
             },
-            "high_throughput": {
+            "high_throughput_1000": {
+                "X": 0.2,
+                "Y": 0.5,
+                "Z": 0.4,
+                "P": 2.0,
+                "Q": 0.3,
+                "Z_G": 0.5,
+            },
+            "high_throughput_200": {
                 "X": 0.2,
                 "Y": 0.5,
                 "Z": 0.4,
@@ -109,7 +157,6 @@ ot3_dummy_settings = {
         },
     },
     "log_level": "NADA",
-    "z_retract_distance": 10,
     "safe_home_distance": 5,
     "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
     "carriage_offset": (1, 2, 3),
@@ -117,18 +164,15 @@ ot3_dummy_settings = {
     "left_mount_offset": (2, 2, 2),
     "gripper_mount_offset": (1, 1, 1),
     "liquid_sense": {
-        "starting_mount_height": 80,
-        "max_z_distance": 20,
-        "min_z_distance": 3,
         "mount_speed": 10,
         "plunger_speed": 10,
+        "plunger_impulse_time": 0.2,
         "sensor_threshold_pascals": 17,
-        "expected_liquid_height": 90,
-        "log_pressure": True,
         "aspirate_while_sensing": False,
-        "auto_zero_sensor": True,
-        "num_baseline_reads": 10,
-        "data_file": "/var/pressure_sensor_data.csv",
+        "z_overlap_between_passes_mm": 0.1,
+        "plunger_reset_offset": 2.0,
+        "samples_for_baselining": 20,
+        "sample_time_sec": 0.004,
     },
     "calibration": {
         "z_offset": {

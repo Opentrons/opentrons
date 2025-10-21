@@ -1,0 +1,69 @@
+import {
+  verifyImportProtocolPage,
+  verifyOldProtocolModal,
+} from '../support/Import'
+import { MixSteps, MixVerifications } from '../support/MixSteps'
+import { SetupSteps } from '../support/SetupSteps'
+import { StepExecutor } from '../support/StepBuilder'
+import { getTestFile, TestFilePath } from '../support/TestFiles'
+import { UniversalSteps } from '../support/UniversalSteps'
+
+describe('Redesigned Mixing Steps - Happy Path', () => {
+  beforeEach(() => {
+    cy.visit('/')
+    cy.closeAnalyticsModal()
+    const protocol = getTestFile(TestFilePath.DoItAllV8)
+    cy.importProtocol(protocol.path)
+    verifyImportProtocolPage(protocol)
+    verifyOldProtocolModal()
+    cy.contains('Edit protocol').click()
+    cy.get('[id="AddStepButton"]').contains('Add Step').click()
+    cy.verifyOverflowBtn()
+  })
+
+  it('should verify the working function of every permutation of mix checkboxes', () => {
+    const se = new StepExecutor()
+    se.execute(MixSteps.SelectMix())
+    se.execute(UniversalSteps.Snapshot())
+    se.execute(MixVerifications.PartOne())
+    se.execute(MixSteps.SelectLabware())
+    se.execute(MixSteps.SelectWellInputField())
+    se.execute(MixVerifications.WellSelectPopout())
+    se.execute(SetupSteps.WellSelector(['A1', 'A2']))
+    se.execute(UniversalSteps.Snapshot())
+    se.execute(MixSteps.Save())
+    se.execute(MixSteps.EnterVolume())
+    se.execute(MixSteps.EnterMixReps())
+    se.execute(UniversalSteps.Snapshot())
+    se.execute(MixSteps.Continue())
+    se.execute(MixVerifications.PartTwo())
+    se.execute(MixSteps.Continue())
+    se.execute(MixVerifications.PartThreeAsp())
+    se.execute(MixSteps.AspirateFlowRate())
+    se.execute(MixSteps.AspWellOrder())
+    se.execute(MixVerifications.AspWellOrder())
+    se.execute(MixSteps.AspMixTipPos())
+    se.execute(MixVerifications.AspMixTipPos())
+    se.execute(MixSteps.Delay())
+    se.execute(MixSteps.Dispense())
+    se.execute(MixVerifications.PartThreeDisp())
+    se.execute(MixSteps.DispenseFlowRate())
+    se.execute(MixSteps.Delay())
+    se.execute(MixSteps.PushOut())
+    se.execute(MixSteps.BlowoutLocation())
+    se.execute(MixSteps.BlowoutFlowRate())
+    se.execute(MixSteps.BlowoutPosFromTop())
+    se.execute(MixVerifications.BlowoutPopout())
+    se.execute(MixVerifications.Blowout())
+    se.execute(MixSteps.Continue())
+    se.execute(MixSteps.SelectTipHandling())
+    // steps.add(MixSteps.TouchTip())
+    // steps.add(MixVerifications.TouchTipPopout())
+    // steps.add(MixSteps.Save())
+    // steps.add(MixVerifications.TouchTip())
+    se.execute(MixSteps.Rename())
+    se.execute(MixSteps.Save())
+    se.execute(MixVerifications.Rename())
+    se.execute(MixSteps.Save())
+  })
+})

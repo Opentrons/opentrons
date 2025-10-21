@@ -1,28 +1,24 @@
-import * as React from 'react'
 import {
-  getModuleDef2,
-  LabwareDefinition2,
+  ABSORBANCE_READER_V1,
+  fixture96Plate,
+  FLEX_STACKER_MODULE_V1,
+  getModuleDef,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
-  ModuleModel,
-  OT2_STANDARD_DECKID,
-  FLEX_STANDARD_DECKID,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
-import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 
 import { LabwareRender } from '../Labware'
-import { Module as ModuleComponent } from './'
+import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
+import { AlignLabwareToModule, Module as ModuleComponent } from './'
 
-import type { RobotWorkSpaceRenderProps } from '../Deck'
-import type { Story, Meta } from '@storybook/react'
-
-const slots = ['1', '3', '4', '6', '7', '9', '10']
+import type { Meta, Story } from '@storybook/react'
+import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
 
 const moduleModels: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
@@ -31,76 +27,106 @@ const moduleModels: ModuleModel[] = [
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
 ]
 
+const moduleModelOptions = {
+  'Temperature Module V2': TEMPERATURE_MODULE_V2,
+  'Temperature Module V1': TEMPERATURE_MODULE_V1,
+  'Thermocycler Module V1': THERMOCYCLER_MODULE_V1,
+  'Thermocycler Module V2': THERMOCYCLER_MODULE_V2,
+  'Magnetic Module V1': MAGNETIC_MODULE_V1,
+  'Magnetic Module V2': MAGNETIC_MODULE_V2,
+  'Heater-Shaker Module V1': HEATERSHAKER_MODULE_V1,
+  'Magnetic Block V1': MAGNETIC_BLOCK_V1,
+  'Absorbance Reader V1': ABSORBANCE_READER_V1,
+  'Flex Stacker Module V1': FLEX_STACKER_MODULE_V1,
+}
+
 export default {
-  title: 'Library/Molecules/Simulation/Modules/Module',
+  title: 'Library/Molecules/Simulation/Module',
 } as Meta
 
 const Template: Story<{
-  slot: string
   model: ModuleModel
   orientation: 'left' | 'right'
   hasLabware: boolean
-  deckType: typeof OT2_STANDARD_DECKID | typeof FLEX_STANDARD_DECKID
+  innerProps: {}
 }> = args => {
+  // Add null check and default to first module model if undefined
+  const moduleModel = args.model || moduleModels[0]
+  const moduleDef = getModuleDef(moduleModel)
+  const labwareDef = args.hasLabware
+    ? (fixture96Plate as LabwareDefinition)
+    : null
+
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions()[args.deckType]}>
-      {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
-        const slot = deckSlotsById[args.slot]
-        return (
-          <ModuleComponent
-            def={getModuleDef2(args.model)}
-            x={slot.position[0]}
-            y={slot.position[1]}
-            innerProps={{ lidMotorState: 'open' }}
-            orientation={args.orientation}
+    <RobotCoordinateSpace height="100vh" width="100vw" viewBox="0 -50 200 320">
+      <ModuleComponent
+        def={moduleDef}
+        x={0}
+        y={0}
+        innerProps={args.innerProps}
+        orientation={args.orientation}
+        targetSlotId={null}
+        targetDeckId={null}
+        childrenPositioningMode="passThrough"
+      >
+        {labwareDef != null ? (
+          <AlignLabwareToModule
+            deckId={null}
+            slotId={null}
+            moduleDefinition={moduleDef}
+            labwareDefinition={labwareDef}
           >
-            {args.hasLabware ? (
-              <LabwareRender
-                definition={fixture_96_plate as LabwareDefinition2}
-              />
-            ) : null}
-          </ModuleComponent>
-        )
-      }}
-    </RobotWorkSpace>
+            <LabwareRender
+              definition={labwareDef}
+              positioningMode="passThrough"
+            />
+          </AlignLabwareToModule>
+        ) : null}
+      </ModuleComponent>
+    </RobotCoordinateSpace>
   )
 }
+
 export const Module = Template.bind({})
-Module.argTypes = {
-  slot: {
-    control: {
-      type: 'select',
-      options: slots,
-    },
-    defaultValue: slots[slots.length - 1],
+Module.args = {
+  model: TEMPERATURE_MODULE_V2,
+  orientation: 'left',
+  hasLabware: false,
+  innerProps: {
+    lidMotorState: 'open',
+    blockTargetTemp: 90,
+    targetTemperature: 4,
+    targetTemp: 40,
   },
+}
+
+Module.argTypes = {
   model: {
     control: {
       type: 'select',
-      options: moduleModels,
     },
-    defaultValue: moduleModels[0],
+    options: moduleModelOptions,
   },
   orientation: {
     control: {
       type: 'select',
-      options: ['left', 'right'],
     },
-    defaultValue: 'left',
+    options: ['left', 'right'],
   },
   hasLabware: {
     control: {
       type: 'boolean',
     },
-    defaultValue: false,
   },
-  deckType: {
+  innerProps: {
     control: {
-      type: 'select',
-      options: [OT2_STANDARD_DECKID, FLEX_STANDARD_DECKID],
+      type: 'object',
     },
-    defaultValue: 'left',
   },
 }

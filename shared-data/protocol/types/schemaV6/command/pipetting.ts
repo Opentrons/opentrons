@@ -1,4 +1,5 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
+
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
   | DispenseRunTimeCommand

@@ -1,4 +1,5 @@
 import execa from 'execa'
+
 import { createLogger } from '../log'
 
 const log = createLogger('protocol-analysis/executeAnalyzeCli')
@@ -25,6 +26,6 @@ export function executeAnalyzeCli(
           ? error.stderr
           : error.message
 
-      throw new Error(message)
+      throw new Error(message as string)
     })
 }

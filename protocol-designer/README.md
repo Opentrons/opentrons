@@ -1,10 +1,10 @@
-# Opentrons Protocol Designer Beta
+# Opentrons Protocol Designer
 
 ## Overview
 
 Protocol Designer is a tool for scientists and technicians to create protocols for their [OT-2 personal pipetting robot][ot-2] without having to write any code. It provides visual feedback including liquid tracking and tip tracking to allow users to see exactly what their protocol will do at each step. The protocols are saved to Opentrons JSON Protocol files, which can be uploaded to the Opentrons Desktop App to run on a robot.
 
-Protocol Designer Beta is optimized for [Chrome][chrome] browser. Other browsers are not fully supported.
+Protocol Designer is optimized for [Chrome][chrome] browser. Other browsers are not fully supported.
 
 ## Build setup for development
 
@@ -33,13 +33,17 @@ It uses [shared-data](../shared-data) for data about labware and pipettes and fo
 - `protocol-designer/src/steplist` - contains Redux actions, reducers, and selectors that make up the bulk of the logic for the behavior of Step Forms and the protocol Timeline.
 - `protocol-designer/src/ui` - Redux actions, reducers, and selectors that are purely concerned with UI and not with the "domain layer" of the protocol itself
 
-## Environment variable feature flags
+## Environment variables
 
-Any env var that starts with `OT_PD_` will be picked up by `webpack.EnvironmentPlugin` and made available to use in the app code with `process.env`. Webpack bakes the values of these env vars **at compile time, as strings**.
+### Feature flags
 
-Right now we are using them as feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`.
+We have an evolving set of feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`. You can either set them through the UI, or through environment variables that are baked in at build time.
 
-Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
+The environment variables start with `OT_PD_`. See the code for the current list. Use them like:
+
+```
+OT_PD_COOL_FLAG=1 OT_PD_SWAG_FLAG=1 make dev
+```
 
 ### `OT_PD_VERSION`
 

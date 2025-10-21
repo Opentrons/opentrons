@@ -1,10 +1,19 @@
 import re
-from typing import List, Dict, Tuple, Optional
-from pydantic import BaseModel, Field, validator
-from typing_extensions import Literal
+from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar
+from pydantic import (
+    field_validator,
+    BaseModel,
+    Field,
+    BeforeValidator,
+    PlainSerializer,
+)
 from dataclasses import dataclass
 
-from . import types as pip_types, dev_types
+from . import types as pip_types, types
+
+# The highest and lowest existing overlap version values.
+TIP_OVERLAP_VERSION_MINIMUM = 0
+TIP_OVERLAP_VERSION_MAXIMUM = 3
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
@@ -12,6 +21,17 @@ PLUNGER_CURRENT_MAXIMUM = 1.5
 NOZZLE_MAP_NAMES = re.compile(r"(?P<row>[A-Z]+)(?P<column>[0-9]+)")
 COLUMN_NAMES = re.compile(r"[0-9]+")
 ROW_NAMES = re.compile(r"[A-Z]+")
+OT_TIPRACK_NAMES = re.compile(r"opentrons/[a-z0-9._]+/[0-9]")
+
+
+def validate_opentrons_tiprack(v: str) -> str:
+    if not OT_TIPRACK_NAMES.match(v):
+        raise ValueError("{v} is not a valid tiprack name.")
+    return v
+
+
+EnumType = TypeVar("EnumType")
+EnumSerializer = Annotated[EnumType, PlainSerializer(lambda v: v.value)]
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -21,9 +41,15 @@ class PipetteNameType:
     pipette_type: pip_types.PipetteModelType
     pipette_channels: pip_types.PipetteChannelType
     pipette_generation: pip_types.PipetteGenerationType
+    oem_type: pip_types.PipetteOEMType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
+        oem_name = (
+            f"_{self.oem_type.value}"
+            if self.oem_type != pip_types.PipetteOEMType.OT
+            else ""
+        )
+        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}{oem_name}"
         if self.pipette_generation == pip_types.PipetteGenerationType.GEN1:
             return base_name
         elif self.pipette_channels == pip_types.PipetteChannelType.NINETY_SIX_CHANNEL:
@@ -45,9 +71,15 @@ class PipetteModelVersionType:
     pipette_type: pip_types.PipetteModelType
     pipette_channels: pip_types.PipetteChannelType
     pipette_version: pip_types.PipetteVersionType
+    oem_type: pip_types.PipetteOEMType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
+        oem_name = (
+            f"_{self.oem_type.value}"
+            if self.oem_type != pip_types.PipetteOEMType.OT
+            else ""
+        )
+        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}{oem_name}"
 
         return f"{base_name}_v{self.pipette_version}"
 
@@ -72,17 +104,17 @@ class SupportedTipsDefinition(BaseModel):
 
     default_aspirate_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in aspirations by default.",
+        description="The flowrate used in aspirations by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultAspirateFlowRate",
     )
     default_dispense_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in dispenses by default.",
+        description="The flowrate used in dispenses by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultDispenseFlowRate",
     )
     default_blowout_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in blowouts by default.",
+        description="The flowrate used in blowouts by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultBlowOutFlowRate",
     )
     default_flow_acceleration: float = Field(
@@ -110,6 +142,13 @@ class SupportedTipsDefinition(BaseModel):
         ...,
         description="The default volume for a push-out during dispense.",
         alias="defaultPushOutVolume",
+    )
+    ui_max_flow_rate: float = Field(
+        float(
+            "inf"
+        ),  # some pipettes (GEN1, unreleased prototype models) don't have a max flow rate
+        description="The lowest volume max flow rate for a pipette's given supported tip, minus 2 percent for safety.",
+        alias="uiMaxFlowRate",
     )
 
 
@@ -152,6 +191,33 @@ class PlungerHomingConfigurations(BaseModel):
     )
 
 
+class ValidNozzleMaps(BaseModel):
+    maps: Dict[str, List[str]] = Field(
+        ...,
+        description="Dictionary of predetermined nozzle maps for partial tip configurations.",
+    )
+
+
+class PressAndCamConfigurationValues(BaseModel):
+    speed: float = Field(
+        ...,
+        description="The speed to move the Z axis for each force pickup of a given tip configuration for a given tip type.",
+    )
+    distance: float = Field(
+        ...,
+        description="The starting distance to begin a pick up tip from, based on tip configuration and tip type.",
+    )
+    current: float = Field(
+        ...,
+        description="The current used by a given tip configuration by tip type.",
+    )
+    versioned_tip_overlap_dictionary: Dict[str, Dict[str, float]] = Field(
+        ...,
+        description="Versioned default tip overlap dictionaries associated with this tip type by configuration.",
+        alias="tipOverlaps",
+    )
+
+
 class PressFitPickUpTipConfiguration(BaseModel):
     presses: int = Field(
         ...,
@@ -161,36 +227,32 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ...,
         description="The increment to move the pipette down on each force tip pickup press",
     )
-    distance: float = Field(
-        ..., description="The starting distance to begin a pick up tip from"
-    )
-    speed: float = Field(
-        ..., description="The speed to move the Z axis for each force pickup"
-    )
-    current_by_tip_count: Dict[int, float] = Field(
+    configuration_by_nozzle_map: Dict[
+        str, Dict[str, PressAndCamConfigurationValues]
+    ] = Field(
         ...,
-        description="A current dictionary look-up by partial tip configuration.",
-        alias="currentByTipCount",
+        description="The speed, distance, current and tip overlap configurations for a given pipette configuration. Double dictionary is keyed by Valid Nozzle Map Key and Tip Type.",
+        alias="configurationsByNozzleMap",
     )
 
 
 class CamActionPickUpTipConfiguration(BaseModel):
-    distance: float = Field(..., description="How far to move the cams once engaged")
-    speed: float = Field(..., description="How fast to move the cams when engaged")
     prep_move_distance: float = Field(
         ..., description="How far to move the cams to engage the rack"
     )
     prep_move_speed: float = Field(
         ..., description="How fast to move the cams when moving to the rack"
     )
-    current_by_tip_count: Dict[int, float] = Field(
-        ...,
-        description="A current dictionary look-up by partial tip configuration.",
-        alias="currentByTipCount",
-    )
     connect_tiprack_distance_mm: float = Field(
         description="The distance to move the head down to connect with the tiprack before clamping.",
         alias="connectTiprackDistanceMM",
+    )
+    configuration_by_nozzle_map: Dict[
+        str, Dict[str, PressAndCamConfigurationValues]
+    ] = Field(
+        ...,
+        description="The speed, distance, current and overlap configurations for a given partial tip configuration by tip type.",
+        alias="configurationsByNozzleMap",
     )
 
 
@@ -223,10 +285,12 @@ class CamActionDropTipConfiguration(BaseModel):
 
 class DropTipConfigurations(BaseModel):
     plunger_eject: Optional[PlungerEjectDropTipConfiguration] = Field(
-        description="Configuration for tip drop via plunger eject", alias="plungerEject"
+        None,
+        description="Configuration for tip drop via plunger eject",
+        alias="plungerEject",
     )
     cam_action: Optional[CamActionDropTipConfiguration] = Field(
-        description="Configuration for tip drop via cam action", alias="camAction"
+        None, description="Configuration for tip drop via cam action", alias="camAction"
     )
 
 
@@ -253,7 +317,7 @@ class PartialTipDefinition(BaseModel):
         description="Whether partial tip pick up is supported.",
         alias="partialTipSupported",
     )
-    available_configurations: List[int] = Field(
+    available_configurations: Optional[List[int]] = Field(
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
@@ -268,17 +332,17 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The display or full product name of the pipette.",
         alias="displayName",
     )
-    pipette_backcompat_names: List[dev_types.PipetteName] = Field(
+    pipette_backcompat_names: List[types.PipetteName] = Field(
         ...,
         description="A list of pipette names that are compatible with this pipette.",
         alias="backCompatNames",
     )
-    pipette_type: pip_types.PipetteModelType = Field(
+    pipette_type: EnumSerializer[pip_types.PipetteModelType] = Field(
         ...,
         description="The pipette model type (related to number of channels).",
         alias="model",
     )
-    display_category: pip_types.PipetteGenerationType = Field(
+    display_category: EnumSerializer[pip_types.PipetteGenerationType] = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
     pick_up_tip_configurations: PickUpTipConfigurations = Field(
@@ -300,7 +364,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
     )
-    channels: pip_types.PipetteChannelType = Field(
+    channels: EnumSerializer[pip_types.PipetteChannelType] = Field(
         ..., description="The maximum number of channels on the pipette."
     )
     shaft_diameter: float = Field(
@@ -316,7 +380,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance of backlash on the plunger motor.",
         alias="backlashDistance",
     )
-    quirks: List[pip_types.Quirks] = Field(
+    quirks: List[EnumSerializer[pip_types.Quirks]] = Field(
         ..., description="The list of quirks available for the loaded configuration"
     )
     tip_presence_check_distance_mm: float = Field(
@@ -324,51 +388,48 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance the high throughput tip motors will travel to check tip status.",
         alias="tipPresenceCheckDistanceMM",
     )
-
     end_tip_action_retract_distance_mm: float = Field(
         default=0.0,
         description="The distance to move the head up after a tip drop or pickup.",
         alias="endTipActionRetractDistanceMM",
     )
 
-    @validator("pipette_type", pre=True)
+    @field_validator("pipette_type", mode="before")
+    @classmethod
     def convert_pipette_model_string(cls, v: str) -> pip_types.PipetteModelType:
         return pip_types.PipetteModelType(v)
 
-    @validator("channels", pre=True)
+    @field_validator("channels", mode="before")
+    @classmethod
     def convert_channels(cls, v: int) -> pip_types.PipetteChannelType:
         return pip_types.PipetteChannelType(v)
 
-    @validator("display_category", pre=True)
+    @field_validator("display_category", mode="before")
+    @classmethod
     def convert_display_category(cls, v: str) -> pip_types.PipetteGenerationType:
         if not v:
             return pip_types.PipetteGenerationType.GEN1
         return pip_types.PipetteGenerationType(v)
 
-    @validator("quirks", pre=True)
+    @field_validator("quirks", mode="before")
+    @classmethod
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
 
-    @validator("plunger_positions_configurations", pre=True)
+    @field_validator("plunger_positions_configurations", mode="before")
+    @classmethod
     def convert_plunger_positions(
         cls, v: Dict[str, PlungerPositions]
     ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
         return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
-
-    class Config:
-        json_encoders = {
-            pip_types.PipetteChannelType: lambda v: v.value,
-            pip_types.PipetteModelType: lambda v: v.value,
-            pip_types.PipetteGenerationType: lambda v: v.value,
-            pip_types.Quirks: lambda v: v.value,
-        }
 
 
 class PipetteRowDefinition(BaseModel):
     key: str
     ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
 
-    @validator("key")
+    @field_validator("key")
+    @classmethod
     def check_key_is_row(cls, v: str) -> str:
         if not ROW_NAMES.search(v):
             raise ValueError(f"{v} is not a valid row name")
@@ -379,11 +440,17 @@ class PipetteColumnDefinition(BaseModel):
     key: str
     ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
 
-    @validator("key")
+    @field_validator("key")
+    @classmethod
     def check_key_is_column(cls, v: str) -> str:
         if not COLUMN_NAMES.search(v):
             raise ValueError(f"{v} is not a valid column name")
         return v
+
+
+class PipetteBoundingBoxOffsetDefinition(BaseModel):
+    back_left_corner: List[float] = Field(..., alias="backLeftCorner")
+    front_right_corner: List[float] = Field(..., alias="frontRightCorner")
 
 
 class PipetteGeometryDefinition(BaseModel):
@@ -396,10 +463,15 @@ class PipetteGeometryDefinition(BaseModel):
         alias="pathTo3D",
     )
     nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition = Field(
+        ..., alias="pipetteBoundingBoxOffsets"
+    )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
+    lld_settings: Dict[str, Dict[str, float]] = Field(..., alias="lldSettings")
 
-    @validator("nozzle_map", pre=True)
+    @field_validator("nozzle_map", mode="before")
+    @classmethod
     def check_nonempty_strings(
         cls, v: Dict[str, List[float]]
     ) -> Dict[str, List[float]]:
@@ -417,11 +489,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     supported_tips: Dict[pip_types.PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
-    tip_overlap_dictionary: Dict[str, float] = Field(
-        ...,
-        description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlapDictionary",
-    )
     max_volume: int = Field(
         ...,
         description="The maximum supported volume of the pipette.",
@@ -432,14 +499,16 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="The minimum supported volume of the pipette.",
         alias="minVolume",
     )
-    default_tipracks: List[str] = Field(
+    default_tipracks: List[
+        Annotated[str, BeforeValidator(validate_opentrons_tiprack)]
+    ] = Field(
         ...,
         description="A list of default tiprack paths.",
-        regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
     )
 
-    @validator("supported_tips", pre=True)
+    @field_validator("supported_tips", mode="before")
+    @classmethod
     def convert_aspirate_key_to_channel_type(
         cls, v: Dict[str, SupportedTipsDefinition]
     ) -> Dict[pip_types.PipetteTipType, SupportedTipsDefinition]:
@@ -464,7 +533,8 @@ class PipetteConfigurations(
         ..., description="A dictionary of liquid properties keyed by liquid classes."
     )
 
-    @validator("liquid_properties", pre=True)
+    @field_validator("liquid_properties", mode="before")
+    @classmethod
     def convert_liquid_properties_key(
         cls, v: Dict[str, PipetteLiquidPropertiesDefinition]
     ) -> Dict[pip_types.LiquidClasses, PipetteLiquidPropertiesDefinition]:

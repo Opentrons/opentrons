@@ -1,62 +1,67 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
+
 import { CheckPipetteButton } from '../CheckPipetteButton'
+import { FLOWS } from '../constants'
 import { MountPipette } from '../MountPipette'
 
-jest.mock('../CheckPipetteButton')
+import type { ComponentProps } from 'react'
 
-const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
-  typeof CheckPipetteButton
->
+vi.mock('../CheckPipetteButton')
 
-const render = (props: React.ComponentProps<typeof MountPipette>) => {
+const render = (props: ComponentProps<typeof MountPipette>) => {
   return renderWithProviders(<MountPipette {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('MountPipette', () => {
-  let props: React.ComponentProps<typeof MountPipette>
+  let props: ComponentProps<typeof MountPipette>
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
-      setFetching: jest.fn(),
+      setFetching: vi.fn(),
       isOnDevice: false,
     }
-    mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
+    vi.mocked(CheckPipetteButton).mockReturnValue(
+      <div>mock check pipette button</div>
+    )
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByTestId, getByLabelText } = render(props)
-    getByText('Connect and secure pipette')
-    getByText(
+    render(props)
+    screen.getByText('Connect and secure pipette')
+    screen.getByText(
       'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
-    getByTestId('Pipette_Attach_1_8_L.webm')
-    const backBtn = getByLabelText('back')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
+    )
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
-    getByText('mock check pipette button')
+    screen.getByText('mock check pipette button')
   })
 
   it('returns the correct information, buttons work as expected for 96 channel pipettes', () => {
@@ -64,28 +69,30 @@ describe('MountPipette', () => {
       ...props,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByTestId, getByLabelText } = render(props)
-    getByText('Connect and attach 96-channel pipette')
-    getByText(
+    render(props)
+    screen.getByText('Connect and attach 96-channel pipette')
+    screen.getByText(
       'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
     )
-    getByText(
+    screen.getByText(
       'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
-    getByTestId('Pipette_Attach_96.webm')
-    const backBtn = getByLabelText('back')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
+    )
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
-    getByText('mock check pipette button')
+    screen.getByText('mock check pipette button')
   })
   it('returns skeletons and disabled buttons when isFetching is true', () => {
     props = {
       ...props,
       isFetching: true,
     }
-    const { getAllByTestId, getByLabelText } = render(props)
-    getAllByTestId('Skeleton')
-    const backBtn = getByLabelText('back')
+    render(props)
+    screen.getAllByTestId('Skeleton')
+    const backBtn = screen.getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })
 })

@@ -1,19 +1,23 @@
-import * as React from 'react'
 import { css } from 'styled-components'
+
 import {
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
+  ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
+  CURSOR_DEFAULT,
+  DIRECTION_ROW,
   Flex,
   Icon,
-  DIRECTION_ROW,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
+
 import { ODD_FOCUS_VISIBLE } from './constants'
+
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 export type SmallButtonTypes =
@@ -27,13 +31,15 @@ export type ButtonCategory = 'default' | 'rounded'
 
 export type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
-  onClick: React.MouseEventHandler
+  onClick: MouseEventHandler
   buttonType?: SmallButtonTypes
-  buttonText: React.ReactNode
+  buttonText: ReactNode
   iconPlacement?: IconPlacement | null
   iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
+  /** aria-disabled for displaying snack bar, used for ODD only at this time. */
+  ariaDisabled?: boolean
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
@@ -44,6 +50,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     disabled,
     iconPlacement,
     iconName,
+    ariaDisabled = false,
     ...buttonProps
   } = props
 
@@ -58,39 +65,43 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   > = {
     secondary: {
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      activeBackgroundColor: COLORS.mediumBluePressed,
-      disabledBackgroundColor: `${COLORS.darkBlack20}`,
-      disabledColor: `${COLORS.darkBlack60}`,
+      defaultColor: COLORS.black90,
+      defaultBackgroundColor: COLORS.blue35,
+      activeBackgroundColor: COLORS.blue40,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
     },
+
     alert: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.red2,
-      activeBackgroundColor: COLORS.red2Pressed,
-      disabledBackgroundColor: `${COLORS.darkBlack20}`,
-      disabledColor: `${COLORS.darkBlack60}`,
+      defaultBackgroundColor: COLORS.red50,
+      activeBackgroundColor: COLORS.red55,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
     },
+
     primary: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: COLORS.bluePressed,
-      disabledBackgroundColor: `${COLORS.darkBlack20}`,
-      disabledColor: `${COLORS.darkBlack60}`,
+      defaultBackgroundColor: COLORS.blue50,
+      activeBackgroundColor: COLORS.blue60,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryHighLight: {
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      activeBackgroundColor: `${COLORS.darkBlack20}`,
-      disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlack60}`,
+      defaultColor: COLORS.black90,
+      defaultBackgroundColor: `${COLORS.blue50}00`,
+      activeBackgroundColor: `${COLORS.grey35}`,
+      disabledBackgroundColor: `${COLORS.blue50}00`,
+      disabledColor: `${COLORS.grey50}`,
     },
+
     tertiaryLowLight: {
-      defaultColor: `${COLORS.darkBlack70}`,
-      defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      activeBackgroundColor: `${COLORS.darkBlack20}`,
-      disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlack60}`,
+      defaultColor: `${COLORS.grey60}`,
+      defaultBackgroundColor: ` ${COLORS.blue50}00`,
+      activeBackgroundColor: `${COLORS.grey35}`,
+      disabledBackgroundColor: `${COLORS.blue50}00`,
+      disabledColor: `${COLORS.grey50}`,
     },
   }
 
@@ -98,10 +109,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
-    cursor: default;
+    cursor: ${CURSOR_DEFAULT};
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadiusSize5
-      : BORDERS.borderRadiusSize4};
+      ? BORDERS.borderRadius40
+      : BORDERS.borderRadius16};
     box-shadow: none;
     ${TYPOGRAPHY.pSemiBold}
 
@@ -133,19 +144,25 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         .disabledBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
+
+    &[aria-disabled='true'] {
+      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
+      color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
+    }
   `
 
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
-      aria-label={`SmallButton_${buttonType}`}
-      disabled={disabled}
+      disabled={ariaDisabled ? false : disabled}
       padding={
         iconPlacement != null
           ? SPACING.spacing16
           : `${SPACING.spacing16} ${SPACING.spacing24}`
       }
       {...buttonProps}
+      aria-disabled={ariaDisabled}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -153,7 +170,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginRight={SPACING.spacing8}
@@ -164,14 +185,17 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         ) : null}
 
         <StyledText
-          fontSize="1.375rem"
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          oddStyle="bodyTextSemiBold"
+          desktopStyle="bodyDefaultSemiBold"
         >
           {buttonText}
         </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginLeft={SPACING.spacing8}

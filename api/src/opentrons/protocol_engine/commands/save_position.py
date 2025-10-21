@@ -1,18 +1,25 @@
 """Save pipette position command request, result, and implementation models."""
 
 from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, Type, Any
+
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
 
 from ..types import DeckPoint
 from ..resources import ModelUtils
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..errors.error_occurrence import ErrorOccurrence
 
 if TYPE_CHECKING:
     from ..execution import GantryMover
 
 SavePositionCommandType = Literal["savePosition"]
+
+
+def _remove_default(s: dict[str, Any]) -> None:
+    s.pop("default", None)
 
 
 class SavePositionParams(BaseModel):
@@ -21,10 +28,16 @@ class SavePositionParams(BaseModel):
     pipetteId: str = Field(
         ..., description="Unique identifier of the pipette in question."
     )
-    positionId: Optional[str] = Field(
+    positionId: str | SkipJsonSchema[None] = Field(
         None,
         description="An optional ID to assign to this command instance. "
         "Auto-assigned if not defined.",
+        json_schema_extra=_remove_default,
+    )
+    failOnNotHomed: bool | SkipJsonSchema[None] = Field(
+        True,
+        description="Require all axes to be homed before saving position.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -42,38 +55,47 @@ class SavePositionResult(BaseModel):
 
 
 class SavePositionImplementation(
-    AbstractCommandImpl[SavePositionParams, SavePositionResult]
+    AbstractCommandImpl[SavePositionParams, SuccessData[SavePositionResult]]
 ):
     """Save position command implementation."""
 
     def __init__(
         self,
         gantry_mover: GantryMover,
-        model_utils: Optional[ModelUtils] = None,
+        model_utils: ModelUtils,
         **kwargs: object,
     ) -> None:
         self._gantry_mover = gantry_mover
-        self._model_utils = model_utils or ModelUtils()
+        self._model_utils = model_utils
 
-    async def execute(self, params: SavePositionParams) -> SavePositionResult:
+    async def execute(
+        self, params: SavePositionParams
+    ) -> SuccessData[SavePositionResult]:
         """Check the requested pipette's current position."""
         position_id = self._model_utils.ensure_id(params.positionId)
+        fail_on_not_homed = (
+            params.failOnNotHomed if params.failOnNotHomed is not None else True
+        )
         x, y, z = await self._gantry_mover.get_position(
-            pipette_id=params.pipetteId, fail_on_not_homed=True
+            pipette_id=params.pipetteId, fail_on_not_homed=fail_on_not_homed
         )
 
-        return SavePositionResult(
-            positionId=position_id,
-            position=DeckPoint(x=x, y=y, z=z),
+        return SuccessData(
+            public=SavePositionResult(
+                positionId=position_id,
+                position=DeckPoint(x=x, y=y, z=z),
+            ),
         )
 
 
-class SavePosition(BaseCommand[SavePositionParams, SavePositionResult]):
+class SavePosition(
+    BaseCommand[SavePositionParams, SavePositionResult, ErrorOccurrence]
+):
     """Save Position command model."""
 
     commandType: SavePositionCommandType = "savePosition"
     params: SavePositionParams
-    result: Optional[SavePositionResult]
+    result: Optional[SavePositionResult] = None
 
     _ImplementationCls: Type[SavePositionImplementation] = SavePositionImplementation
 

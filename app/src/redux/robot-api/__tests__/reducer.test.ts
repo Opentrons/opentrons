@@ -1,7 +1,9 @@
+import { describe, expect, it } from 'vitest'
+
+import { mockFailedRequestState } from '../__fixtures__'
 import { robotApiReducer } from '../reducer'
 
 import type { RobotApiState } from '../types'
-import { mockFailedRequestState } from '../__fixtures__'
 
 interface ReducerSpec {
   name: string
@@ -63,6 +65,15 @@ const SPECS: ReducerSpec[] = [
     expected: {
       def: { status: 'pending' },
     },
+  },
+  {
+    name: 'handles a dismiss all request action',
+    state: { abc: mockFailedRequestState, def: { status: 'pending' } },
+    action: {
+      type: 'robotApi:DISMISS_ALL_REQUESTS',
+      payload: { requestId: 'abc' },
+    },
+    expected: {},
   },
 ]
 

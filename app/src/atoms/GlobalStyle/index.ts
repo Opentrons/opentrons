@@ -1,31 +1,31 @@
 import { createGlobalStyle } from 'styled-components'
-import { COLORS } from '@opentrons/components'
+
+import { COLORS, PRODUCT } from '@opentrons/components'
+
 import 'typeface-open-sans'
 import '@fontsource/dejavu-sans'
 import '@fontsource/public-sans'
 import '@fontsource/public-sans/600.css'
 import '@fontsource/public-sans/700.css'
+import '@fontsource-variable/reddit-mono'
 
 // TODO(ew, 06/19/23): The main font is Public Sans but it does not have subscript glyphs,
 // needed to display chemical formulae on the liquids page. I've added DejaVu Sans, which
 // does have the glyphs, as a fallback so subscripts will get displayed. Mel and the design
 // team will want to revisit the fonts we use at some point in the future.
-export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
+export const GlobalStyle = createGlobalStyle<{}>`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: ${props =>
-      props.isOnDevice ?? false
-        ? 'Public Sans, DejaVu Sans'
-        : 'Open Sans'}, sans-serif;
+    font-family: ${PRODUCT.TYPOGRAPHY.fontFamily}, 'DejaVu Sans', sans-serif;
   }
 
   html,
   body {
     width: 100%;
     height: 100%;
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 
   a {

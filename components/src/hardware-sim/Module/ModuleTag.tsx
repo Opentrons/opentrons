@@ -1,18 +1,19 @@
-import * as React from 'react'
 import {
-  RobotCoordsForeignDiv,
-  C_MED_LIGHT_GRAY,
-  SPACING_1,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  C_MED_LIGHT_GRAY,
+  JUSTIFY_CENTER,
+  RobotCoordsForeignDiv,
+  SPACING_1,
 } from '../../'
+
+import type { ReactNode } from 'react'
 
 export interface ModuleTagProps {
   x: number
   y: number
   height: number
   width: number
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export const ModuleTag = (props: ModuleTagProps): JSX.Element => {

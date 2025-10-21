@@ -1,22 +1,42 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
+import dns from 'dns'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
+import electronDebug from 'electron-debug'
+import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 
-import { createUi } from './ui'
-import { initializeMenu } from './menu'
-import { createLogger } from './log'
-import { registerProtocolAnalysis } from './protocol-analysis'
-import { registerDiscovery } from './discovery'
+import { getConfig, getOverrides, getStore, registerConfig } from './config'
+import {
+  initializeDiscovery,
+  registerDiscoveryMainWindow,
+  registerDiscoverySecondaryWindow,
+  unregisterDiscovery,
+} from './discovery'
 import { registerLabware } from './labware'
-import { registerUpdate } from './update'
-import { registerRobotUpdate } from './robot-update'
-import { registerSystemInfo } from './system-info'
+import { createLogger } from './log'
+import { initializeMenu } from './menu'
+import { closeAllNotifyConnections, registerNotify } from './notifications'
+import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { registerRobotUpdate } from './robot-update'
+import {
+  closeSecondaryWindows,
+  registerCameraStream,
+} from './secondary-windows'
+import { registerSystemInfo } from './system-info'
+import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
+import { registerUpdate } from './update'
 import { registerUsb } from './usb'
 
-import type { BrowserWindow } from 'electron'
-import type { Dispatch, Logger } from './types'
+import type { LogEntry } from 'winston'
+import type { Action, Dispatch, Logger } from './types'
+
+/**
+ * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
+ * setting the default to IPv4 fixes the issue
+ * https://github.com/node-fetch/node-fetch/issues/1624
+ */
+dns.setDefaultResultOrder('ipv4first')
 
 const config = getConfig()
 const log = createLogger('main')
@@ -29,12 +49,19 @@ log.debug('App config', {
 
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('electron-debug')({ isEnabled: true, showDevTools: true })
+  electronDebug({ isEnabled: true, showDevTools: true })
 }
 
 // hold on to references so they don't get garbage collected
 let mainWindow: BrowserWindow | null | undefined
 let rendererLogger: Logger
+
+interface HandlerSet {
+  handlers: Dispatch[]
+  dispatch: Dispatch
+}
+// Handler caching using window ID as key
+const handlerSets = new Map<string, HandlerSet>()
 
 // prepended listener is important here to work around Electron issue
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
@@ -45,7 +72,74 @@ if (config.devtools) app.once('ready', installDevtools)
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
   app.quit()
+  closeAllNotifyConnections()
+    .then(() => {
+      app.quit()
+    })
+    .catch(error => {
+      log.warn('Failed to properly close MQTT connections:', error)
+      app.quit()
+    })
 })
+
+function isMainWindow(window: BrowserWindow): boolean {
+  return mainWindow != null && window.id === mainWindow.id
+}
+
+function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
+  const windowId = `${window.id}`
+
+  if (!handlerSets.has(windowId)) {
+    const dispatch = createDispatchForWindow(window)
+
+    const handlers: Dispatch[] = isMainWindow(window)
+      ? [
+          registerConfig(dispatch),
+          registerDiscoveryMainWindow(dispatch),
+          registerProtocolAnalysis(dispatch, window),
+          registerUpdate(dispatch),
+          registerRobotUpdate(dispatch),
+          registerLabware(dispatch, window),
+          registerSystemInfo(dispatch),
+          registerProtocolStorage(dispatch),
+          registerUsb(dispatch),
+          registerNotify(dispatch, window),
+          registerReloadUi(window),
+          registerSystemLanguage(dispatch),
+          registerCameraStream(dispatch),
+        ]
+      : // Only register necessary subset for secondary windows.
+        [
+          registerConfig(dispatch),
+          registerDiscoverySecondaryWindow(dispatch),
+          registerUsb(dispatch),
+          registerSystemInfo(dispatch),
+          registerNotify(dispatch, window),
+          registerReloadUi(window),
+          registerSystemLanguage(dispatch),
+          registerCameraStream(dispatch),
+        ]
+
+    handlerSets.set(windowId, { handlers, dispatch })
+
+    window.on('closed', () => {
+      unregisterDiscovery(dispatch)
+      handlerSets.delete(windowId)
+      log.debug(`Cleaned up handlers for ${windowId}`)
+    })
+
+    log.debug(
+      `Created handler set for ${windowId}, isMain: ${isMainWindow(window)}`
+    )
+  }
+
+  const handlerSet = handlerSets.get(windowId)
+  if (handlerSet == null) {
+    log.error('Attempted to access dispatches for unhandled window.')
+  }
+
+  return handlerSet ?? null
+}
 
 function startUp(): void {
   log.info('Starting App')
@@ -54,10 +148,14 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
+  initializeDiscovery()
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
-  mainWindow.once('closed', () => (mainWindow = null))
+  mainWindow.once('closed', () => {
+    mainWindow = null
+    closeSecondaryWindows()
+  })
 
   contextMenu({
     menu: actions => {
@@ -69,30 +167,28 @@ function startUp(): void {
 
   initializeMenu()
 
-  // wire modules to UI dispatches
-  const dispatch: Dispatch = action => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (mainWindow) {
-      log.silly('Sending action via IPC to renderer', { action })
-      mainWindow.webContents.send('dispatch', action)
-    }
-  }
-
-  const actionHandlers: Dispatch[] = [
-    registerConfig(dispatch),
-    registerDiscovery(dispatch),
-    registerProtocolAnalysis(dispatch, mainWindow),
-    registerUpdate(dispatch),
-    registerRobotUpdate(dispatch),
-    registerLabware(dispatch, mainWindow),
-    registerSystemInfo(dispatch),
-    registerProtocolStorage(dispatch),
-    registerUsb(dispatch),
-  ]
-
-  ipcMain.on('dispatch', (_, action) => {
+  ipcMain.on('dispatch', (event, action) => {
     log.debug('Received action via IPC from renderer', { action })
-    actionHandlers.forEach(handler => handler(action))
+
+    const senderWindow = BrowserWindow.getAllWindows().find(
+      win => win.webContents === event.sender
+    )
+
+    if (senderWindow != null) {
+      const handlerSet = getOrCreateHandlerSet(senderWindow)
+
+      if (handlerSet != null) {
+        const { handlers } = handlerSet
+
+        handlers.forEach(handler => {
+          handler(action as Action)
+        })
+      }
+    } else {
+      log.error(
+        `Could not find requested window from IPC dispatch: ${event.sender.getURL()}`
+      )
+    }
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
@@ -102,26 +198,51 @@ function createRendererLogger(): Logger {
   log.info('Creating renderer logger')
 
   const logger = createLogger('renderer')
-  ipcMain.on('log', (_, info) => logger.log(info))
+  ipcMain.on('log', (_, info) => logger.log(info as LogEntry))
 
   return logger
 }
 
-function installDevtools(): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const devtools = require('electron-devtools-installer')
-  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.default
+function installDevtools(): Promise<Logger> {
+  const extensions = [
+    electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
+    electronDevtoolsInstaller.REDUX_DEVTOOLS,
+  ]
+  // @ts-expect-error the types for electron-devtools-installer are not correct
+  // when importing the default export via commmon JS. the installer is actually nested in
+  // another default object
+  const install = electronDevtoolsInstaller.default?.default
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')
 
-  return install(extensions, forceReinstall)
-    .then(() => log.debug('Devtools extensions installed'))
-    .catch((error: unknown) => {
-      log.warn('Failed to install devtools extensions', {
-        forceReinstall,
-        error,
-      })
+  if (typeof install === 'function') {
+    return install(extensions, {
+      loadExtensionOptions: { allowFileAccess: true },
+      forceDownload: forceReinstall,
     })
+      .then(() => log.debug('Devtools extensions installed'))
+      .catch((error: unknown) => {
+        log.warn('Failed to install devtools extensions', {
+          forceReinstall,
+          error,
+        })
+      })
+  } else {
+    log.warn('could not resolve electron dev tools installer')
+    return Promise.reject(
+      new Error('could not resolve electron dev tools installer')
+    )
+  }
+}
+
+const createDispatchForWindow = (
+  targetWindow: BrowserWindow | null | undefined
+): Dispatch => {
+  return (action: Action) => {
+    if (targetWindow && !targetWindow.isDestroyed()) {
+      log.silly('Sending action via IPC to renderer', { action })
+      targetWindow.webContents.send('dispatch', action)
+    }
+  }
 }

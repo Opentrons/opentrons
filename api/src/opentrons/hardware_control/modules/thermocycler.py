@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Callable, Optional, List, Dict, Mapping
+from typing import Callable, Optional, List, Dict, Mapping, Union, cast
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
-from opentrons.hardware_control.modules.types import TemperatureStatus
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    TemperatureStatus,
+)
 from opentrons.hardware_control.poller import Reader, Poller
 
 from ..execution_manager import ExecutionManager
@@ -18,6 +22,7 @@ from opentrons.drivers.thermocycler import (
     ThermocyclerDriverV2,
     ThermocyclerDriverFactory,
 )
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 
 
 log = logging.getLogger(__name__)
@@ -32,6 +37,8 @@ DFU_PID = "df11"
 
 _TC_PLATE_LIFT_OPEN_DEGREES = 20
 _TC_PLATE_LIFT_RETURN_DEGREES = 23
+
+_TC_RAMP_RATE_ADDED_VERSION = (1, 0, 8)  # v1.0.8
 
 
 class ThermocyclerError(Exception):
@@ -58,11 +65,14 @@ class Thermocycler(mod_abc.AbstractModule):
         cls,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
@@ -70,12 +80,13 @@ class Thermocycler(mod_abc.AbstractModule):
         Args:
             port: The port to connect to
             usb_port: USB Port
-            execution_manager: Execution manager.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: Execution manager.
             poll_interval_seconds: Poll interval override.
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
 
         Returns:
             Thermocycler instance.
@@ -87,7 +98,7 @@ class Thermocycler(mod_abc.AbstractModule):
             )
             poll_interval_seconds = poll_interval_seconds or POLLING_FREQUENCY_SEC
         else:
-            driver = SimulatingDriver(model=sim_model)
+            driver = SimulatingDriver(model=sim_model, serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIM_POLLING_FREQUENCY_SEC
 
         reader = ThermocyclerReader(driver=driver)
@@ -101,6 +112,8 @@ class Thermocycler(mod_abc.AbstractModule):
             device_info=await driver.get_device_info(),
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -114,12 +127,14 @@ class Thermocycler(mod_abc.AbstractModule):
         self,
         port: str,
         usb_port: USBPort,
-        execution_manager: ExecutionManager,
         driver: AbstractThermocyclerDriver,
         reader: ThermocyclerReader,
         poller: Poller,
         device_info: Dict[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         """
         Constructor
@@ -127,12 +142,13 @@ class Thermocycler(mod_abc.AbstractModule):
         Args:
             port: The port the thermocycler is connected to.
             usb_port: The USB port.
-            execution_manager: The hardware execution manager.
             driver: The thermocycler driver.
             reader: An interface to read data from the Thermocycler.
             poller: A poll controller for reads.
             device_info: The thermocycler device info.
             hw_control_loop: The event loop running in the hardware control thread.
+            execution_manager: The hardware execution manager.
+            disconnected_callback: Callback to inform the module controller that the device was disconnected
         """
         self._driver = driver
         super().__init__(
@@ -140,6 +156,8 @@ class Thermocycler(mod_abc.AbstractModule):
             usb_port=usb_port,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
+            disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._reader = reader
@@ -149,10 +167,13 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
         self._error: Optional[str] = None
-        self._reader.register_error_handler(self._enter_error_state)
+        self._unsubscribe_reader = self._reader.register_error_handler(
+            self._enter_error_state
+        )
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
+        self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
 
@@ -255,6 +276,19 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.open()
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
+    def can_use_ramp_rate(self) -> bool:
+        version_string = self._device_info.get("version", "v")
+        if version_string.startswith("v"):
+            version_string = version_string[1:]
+        try:
+            version_tuple = tuple(int(c) for c in version_string.split("."))
+            return version_tuple >= _TC_RAMP_RATE_ADDED_VERSION
+        except (ValueError, IndexError):
+            log.error(
+                f"Invalid version from device: {self._device_info.get('version', '')}"
+            )
+            return False
+
     async def set_temperature(
         self,
         temperature: float,
@@ -280,6 +314,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Returns: None
         """
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
+
         await self.wait_for_is_running()
         await self._set_temperature_no_pause(
             temperature=temperature,
@@ -302,11 +341,13 @@ class Thermocycler(mod_abc.AbstractModule):
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
 
-        if ramp_rate is not None:
-            await self._driver.set_ramp_rate(ramp_rate=ramp_rate)
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
 
         await self._driver.set_plate_temperature(
-            temp=temperature, hold_time=hold_time, volume=volume
+            temp=temperature, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
         )
 
         task = self._loop.create_task(self._wait_for_block_target())
@@ -353,6 +394,39 @@ class Thermocycler(mod_abc.AbstractModule):
         self.make_cancellable(task)
         await task
 
+    async def execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float] = None,
+    ) -> None:
+        """Begin a set temperature profile, with both repeating and non-repeating steps.
+
+        Args:
+            profile: The temperature profile to follow.
+            volume: Optional volume
+
+        Returns: None
+        """
+        await self.wait_for_is_running()
+        self._total_cycle_count = 0
+        self._total_step_count = 0
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            if "steps" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                self._total_cycle_count += this_cycle["repetitions"]
+                self._total_step_count += (
+                    len(this_cycle["steps"]) * this_cycle["repetitions"]
+                )
+            else:
+                self._total_step_count += 1
+                self._total_cycle_count += 1
+        task = self._loop.create_task(self._execute_profile(profile, volume))
+        self.make_cancellable(task)
+        await task
+
     async def set_lid_temperature(self, temperature: float) -> None:
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
@@ -376,6 +450,7 @@ class Thermocycler(mod_abc.AbstractModule):
         celsius: float,
         hold_time_seconds: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Set the Thermocycler's target block temperature.
 
@@ -385,10 +460,17 @@ class Thermocycler(mod_abc.AbstractModule):
             celsius: The target block temperature, in degrees celsius.
         """
         await self.wait_for_is_running()
+
+        if ramp_rate and not self.can_use_ramp_rate():
+            raise ThermocyclerError(
+                "Ramp rate is not supported by this thermocycler's firmware version, please update."
+            )
+
         await self._driver.set_plate_temperature(
             temp=celsius,
             hold_time=hold_time_seconds,
             volume=volume,
+            ramp_rate=ramp_rate,
         )
         await self._reader.read_block_temperature()
 
@@ -501,22 +583,23 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.ThermocyclerData = {
+            "lid": self.lid_status,
+            "lidTarget": self.lid_target,
+            "lidTemp": self.lid_temp,
+            "lidTempStatus": self.lid_temp_status,
+            "currentTemp": self.temperature,
+            "targetTemp": self.target,
+            "holdTime": self.hold_time,
+            "rampRate": self.ramp_rate,
+            "currentCycleIndex": self.current_cycle_index,
+            "totalCycleCount": self.total_cycle_count,
+            "currentStepIndex": self.current_step_index,
+            "totalStepCount": self.total_step_count,
+        }
         return {
             "status": self.status,
-            "data": {
-                "lid": self.lid_status,
-                "lidTarget": self.lid_target,
-                "lidTemp": self.lid_temp,
-                "lidTempStatus": self.lid_temp_status,
-                "currentTemp": self.temperature,
-                "targetTemp": self.target,
-                "holdTime": self.hold_time,
-                "rampRate": self.ramp_rate,
-                "currentCycleIndex": self.current_cycle_index,
-                "totalCycleCount": self.total_cycle_count,
-                "currentStepIndex": self.current_step_index,
-                "totalStepCount": self.total_step_count,
-            },
+            "data": data,
         }
 
     @property
@@ -552,11 +635,12 @@ class Thermocycler(mod_abc.AbstractModule):
         temperature = step.get("temperature")
         hold_time_minutes = step.get("hold_time_minutes", None)
         hold_time_seconds = step.get("hold_time_seconds", None)
+        ramp_rate = step.get("ramp_rate", None)
         await self._set_temperature_no_pause(
             temperature=temperature,  # type: ignore
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,
-            ramp_rate=None,
+            ramp_rate=ramp_rate,
             volume=volume,
         )
 
@@ -564,7 +648,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self,
         steps: List[types.ThermocyclerStep],
         repetitions: int,
-        volume: Optional[float] = None,
+        volume: Optional[float],
     ) -> None:
         """
         Execute cycles.
@@ -581,6 +665,30 @@ class Thermocycler(mod_abc.AbstractModule):
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._execute_cycle_step(step, volume)
+
+    async def _execute_profile(
+        self,
+        profile: List[Union[types.ThermocyclerCycle, types.ThermocyclerStep]],
+        volume: Optional[float],
+    ) -> None:
+        """
+        Execute profiles.
+
+        Profiles command a thermocycler pattern that can contain multiple cycles and out-of-cycle steps.
+        """
+        self._current_cycle_index = 0
+        self._current_step_index = 0
+        for step_or_cycle in profile:
+            self._current_cycle_index += 1
+            if "repetitions" in step_or_cycle:
+                # basically https://github.com/python/mypy/issues/14766
+                this_cycle = cast(types.ThermocyclerCycle, step_or_cycle)
+                for rep in range(this_cycle["repetitions"]):
+                    for step in this_cycle["steps"]:
+                        self._current_step_index += 1
+                        await self._execute_cycle_step(step, volume)
+            else:
+                await self._execute_cycle_step(step_or_cycle, volume)
 
     # TODO(mc, 2022-10-13): why does this exist?
     # Do the driver and poller really need to be disconnected?
@@ -604,7 +712,7 @@ class Thermocycler(mod_abc.AbstractModule):
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
         )
-        asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
+        self.error_callback(error)
 
 
 class ThermocyclerReader(Reader):
@@ -642,14 +750,31 @@ class ThermocyclerReader(Reader):
         if self._handle_error is not None:
             self._handle_error(exception)
 
-    def register_error_handler(self, handle_error: Callable[[Exception], None]) -> None:
+    def register_error_handler(
+        self, handle_error: Callable[[Exception], None]
+    ) -> Callable[[], None]:
         self._handle_error = handle_error
+        return self._unsubscribe_error_handler
+
+    def _unsubscribe_error_handler(self) -> None:
+        self._handle_error = None
 
     async def read(self) -> None:
         """Poll the thermocycler."""
         await self.read_lid_status()
         await self.read_lid_temperature()
         await self.read_block_temperature()
+        await self._read_errors()
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.
 
     async def read_lid_status(self) -> None:
         self.lid_status = await self._driver.get_lid_status()

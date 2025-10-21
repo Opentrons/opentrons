@@ -1,14 +1,16 @@
-import * as React from 'react'
 import { useFormikContext } from 'formik'
+
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { LabwareFields } from '../../fields'
+import styles from '../../styles.module.css'
 import { isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { XYDimensionAlerts } from '../alerts/XYDimensionAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import type { LabwareFields } from '../../fields'
+
+import footprintImage from '../../images/footprint.svg'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
@@ -37,10 +39,7 @@ const Content = (props: ContentProps): JSX.Element => {
         </p>
       </div>
       <div className={styles.diagram_column}>
-        <img
-          src={require('../../images/footprint.svg')}
-          alt="labware footprint"
-        />
+        <img src={footprintImage} alt="labware footprint" />
       </div>
       <div className={styles.form_fields_column}>
         <TextField

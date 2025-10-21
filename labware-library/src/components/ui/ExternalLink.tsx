@@ -1,6 +1,8 @@
-import * as React from 'react'
 import { Icon } from '@opentrons/components'
-import styles from './styles.css'
+
+import styles from './styles.module.css'
+
+import type * as React from 'react'
 
 export interface ExternalLinkProps {
   href: string

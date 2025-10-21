@@ -26,6 +26,7 @@ class SubSystem(enum.Enum):
     pipette_right = "pipette_right"
     gripper = "gripper"
     rear_panel = "rear_panel"
+    hepa_uv = "hepa_uv"
     motor_controller_board = "motor_controller_board"
 
     @classmethod
@@ -46,6 +47,7 @@ _HW_SUBSYSTEM_TO_SUBSYSTEM: Dict[HWSubSystem, SubSystem] = {
     HWSubSystem.pipette_right: SubSystem.pipette_right,
     HWSubSystem.rear_panel: SubSystem.rear_panel,
     HWSubSystem.gripper: SubSystem.gripper,
+    HWSubSystem.hepa_uv: SubSystem.hepa_uv,
     HWSubSystem.motor_controller_board: SubSystem.motor_controller_board,
 }
 
@@ -57,6 +59,7 @@ _SUBSYSTEM_TO_HW_SUBSYSTEM: Dict[SubSystem, HWSubSystem] = {
     SubSystem.pipette_right: HWSubSystem.pipette_right,
     SubSystem.rear_panel: HWSubSystem.rear_panel,
     SubSystem.gripper: HWSubSystem.gripper,
+    SubSystem.hepa_uv: HWSubSystem.hepa_uv,
     SubSystem.motor_controller_board: HWSubSystem.motor_controller_board,
 }
 

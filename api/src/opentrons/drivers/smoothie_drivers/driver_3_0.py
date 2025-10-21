@@ -12,13 +12,13 @@ import asyncio
 import contextlib
 import logging
 from os import environ
-from time import time
+from time import monotonic
 from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
 
 from math import isclose
 
 from opentrons.drivers.serial_communication import get_ports_by_name
-from serial.serialutil import SerialException  # type: ignore[import]
+from serial.serialutil import SerialException  # type: ignore[import-untyped]
 
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
@@ -803,6 +803,8 @@ class SmoothieDriver:
         This methods writes a sequence of newline characters, which will
         guarantee Smoothieware responds with 'ok\r\nok\r\n' within 3 seconds
         """
+        if self._connection:
+            await self._connection.flush_input()
         await self._send_command(_command_builder(), timeout=SMOOTHIE_BOOT_TIMEOUT)
 
     async def _reset_from_error(self) -> None:
@@ -1667,7 +1669,7 @@ class SmoothieDriver:
         self.push_active_current()
         self.set_active_current(
             {
-                ax: self._config.high_current["default"][ax]  # type: ignore[misc]
+                ax: self._config.high_current["default"][ax]  # type: ignore[literal-required]
                 for ax in axes
             }
         )
@@ -1848,7 +1850,7 @@ class SmoothieDriver:
             await asyncio.sleep(0.25)
             self.run_flag.set()
 
-    async def update_firmware(  # noqa: C901
+    async def update_firmware(
         self,
         filename: str,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -1896,15 +1898,15 @@ class SmoothieDriver:
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
         }
-        if loop:
-            kwargs["loop"] = loop
+        # if loop:
+        #    kwargs["loop"] = loop
         log.info(update_cmd)
-        before = time()
+        before = monotonic()
         proc = await asyncio.create_subprocess_shell(update_cmd, **kwargs)
-        created = time()
+        created = monotonic()
         log.info(f"created lpc21isp subproc in {created-before}")
         out_b, err_b = await proc.communicate()
-        done = time()
+        done = monotonic()
         log.info(f"ran lpc21isp subproc in {done-created}")
         if proc.returncode != 0:
             log.error(

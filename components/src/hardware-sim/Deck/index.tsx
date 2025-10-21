@@ -1,6 +1,5 @@
 export * from './DeckFromLayers'
 export * from './FlexTrash'
-export * from './getDeckDefinitions'
 export * from './MoveLabwareOnDeck'
 export * from './RobotCoordsForeignDiv'
 export * from './RobotCoordsForeignObject'

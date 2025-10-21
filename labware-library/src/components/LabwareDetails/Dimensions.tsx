@@ -1,13 +1,14 @@
 // labware dimensions for details page
-import * as React from 'react'
 import round from 'lodash/round'
+
 import { getFootprintDiagram } from '@opentrons/components'
+
 import {
   FOOTPRINT,
-  MM,
   LABWARE_X_DIM,
   LABWARE_Y_DIM,
   LABWARE_Z_DIM,
+  MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 

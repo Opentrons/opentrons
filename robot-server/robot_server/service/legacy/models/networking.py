@@ -1,7 +1,14 @@
 import typing
 from enum import Enum
 
-from pydantic import BaseModel, Field, SecretStr, validator, root_validator
+from pydantic import (
+    field_validator,
+    model_validator,
+    ConfigDict,
+    BaseModel,
+    Field,
+    SecretStr,
+)
 from opentrons.system import wifi
 
 
@@ -21,19 +28,19 @@ class ConnectionType(str, Enum):
 class InterfaceStatus(BaseModel):
     """Status for an interface"""
 
-    ipAddress: str = Field(
+    ipAddress: typing.Optional[str] = Field(
         None,
         description="The interface IP address with CIDR subnet appended "
         "(e.g. 10.0.0.1/24)",
     )
-    macAddress: str = Field(
+    macAddress: typing.Optional[str] = Field(
         None,
         description="The MAC address of this interface (at least when "
         "connected to this network - it may change due to "
         "NetworkManager's privacy functionality when "
         "disconnected or connected to a different network)",
     )
-    gatewayAddress: str = Field(
+    gatewayAddress: typing.Optional[str] = Field(
         None, description="The address of the configured gateway"
     )
     state: str = Field(
@@ -53,9 +60,8 @@ class NetworkingStatus(BaseModel):
         description="Per-interface networking status. Properties are "
         "named for network interfaces",
     )
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "status": "full",
                 "interfaces": {
@@ -76,6 +82,7 @@ class NetworkingStatus(BaseModel):
                 },
             }
         }
+    )
 
 
 class NetworkingSecurityType(str, Enum):
@@ -98,11 +105,11 @@ class WifiNetworkFull(WifiNetwork):
 
     signal: int = Field(
         ...,
-        description="A unitless signal strength; a higher number is a " "better signal",
+        description="A unitless signal strength; a higher number is a better signal",
     )
     active: bool = Field(..., description="Whether there is a connection active")
     security: str = Field(
-        ..., description="The raw NetworkManager output about the wifi " "security"
+        ..., description="The raw NetworkManager output about the Wi-Fi security"
     )
     securityType: NetworkingSecurityType
 
@@ -111,9 +118,8 @@ class WifiNetworks(BaseModel):
     """The list of networks"""
 
     list: typing.List[WifiNetworkFull]
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "list": [
                     {
@@ -126,6 +132,7 @@ class WifiNetworks(BaseModel):
                 ]
             }
         }
+    )
 
 
 class WifiConfiguration(BaseModel):
@@ -133,38 +140,41 @@ class WifiConfiguration(BaseModel):
         ...,
         description="The SSID to connect to. If this isn't an SSID that "
         "is being broadcast by a network, you "
-        "should also set hidden to true.",
+        "should also set `hidden` to `true`.",
     )
     hidden: typing.Optional[bool] = Field(
         False,
-        description="True if the network is hidden (not broadcasting an "
-        "ssid). False (default if key is not "
-        "present) otherwise",
+        description="`true` if the network is hidden (not broadcasting an SSID). "
+        "`false` (default if key is not "
+        "present) otherwise.",
     )
-    securityType: typing.Optional[NetworkingSecurityType]
+    securityType: typing.Optional[NetworkingSecurityType] = None
 
-    psk: SecretStr = Field(
+    psk: typing.Optional[SecretStr] = Field(
         None,
-        description="If this is a PSK-secured network (securityType is "
-        "wpa-psk), the PSK",
+        description="If this is a PSK-secured network (`securityType` is "
+        '`"wpa-psk"`), the PSK',
     )
     eapConfig: typing.Optional[typing.Dict[str, str]] = Field(
         None,
         description="All options required to configure EAP access to the"
-        " wifi. All options should match one of the cases "
-        "described in /wifi/eap-options; for instance, "
+        " Wi-Fi. All options should match one of the cases "
+        "described in `/wifi/eap-options`; for instance, "
         "configuring for peap/mschapv2 should have "
-        '"peap/mschapv2" as the eapType; it should have '
-        '"identity" and "password" props, both of which '
-        "are identified as mandatory in /wifi/eap-options; "
-        'and it may also have "anonymousIdentity" and '
-        '"caCert" properties, both of which are identified'
+        '`"peap/mschapv2"` as the `eapType`; it should have '
+        '`"identity"` and `"password"` props, both of which '
+        "are identified as mandatory in `/wifi/eap-options`; "
+        'and it may also have `"anonymousIdentity"` and '
+        '`"caCert"` properties, both of which are identified'
         " as present but not required.",
-        required=["eapType"],
+        json_schema_extra={"required": ["eapType"]},
     )
 
-    @validator("eapConfig")
-    def eap_config_validate(cls, v):
+    @field_validator("eapConfig")
+    @classmethod
+    def eap_config_validate(
+        cls, v: typing.Optional[typing.Dict[str, str]]
+    ) -> typing.Optional[typing.Dict[str, str]]:
         """Custom validator for the eapConfig field"""
         if v is not None:
             if not v.get("eapType"):
@@ -176,8 +186,13 @@ class WifiConfiguration(BaseModel):
 
         return v
 
-    @root_validator(pre=True)
-    def validate_configuration(cls, values):
+    @model_validator(mode="before")
+    @classmethod
+    def validate_configuration(
+        cls,
+        # todo(mm, 2025-03-18): I think values can actually be other types, like str or bool.
+        values: typing.Dict[str, object],
+    ) -> typing.Dict[str, object]:
         """Validate the configuration"""
         security_type = values.get("securityType")
         psk = values.get("psk")
@@ -199,59 +214,33 @@ class WifiConfiguration(BaseModel):
             raise ValueError("If securityType is wpa-eap, eapConfig must be specified")
         return values
 
-    class Config:
-        schema_extra = {
-            "examples": {
-                "unsecuredNetwork": {
-                    "summary": "Connect to an unsecured network",
-                    "value": {"ssid": "linksys"},
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {"ssid": "linksys"},
+                {
+                    "ssid": "linksys",
+                    "securityType": "wpa-psk",
+                    "psk": "psksrock",
                 },
-                "pskNetwork": {
-                    "summary": "Connect to a WPA2-PSK secured network",
-                    "description": 'This is the "standard" way to set up a WiFi '
-                    "router, and is where you provide a password",
-                    "value": {
-                        "ssid": "linksys",
-                        "securityType": "wpa-psk",
-                        "psk": "psksrock",
+                {
+                    "ssid": "cantseeme",
+                    "securityType": "wpa-psk",
+                    "psk": "letmein",
+                    "hidden": True,
+                },
+                {
+                    "ssid": "Eduroam",
+                    "securityType": "wpa-eap",
+                    "eapConfig": {
+                        "eapType": "peap/mschapv2",
+                        "identity": "scientist@biology.org",
+                        "password": "leeuwenhoek",
                     },
                 },
-                "hiddenNetwork": {
-                    "summary": "Connect to a network not broadcasting its SSID, "
-                    "with a PSK",
-                    "value": {
-                        "ssid": "cantseeme",
-                        "securityType": "wpa-psk",
-                        "psk": "letmein",
-                        "hidden": True,
-                    },
-                },
-                "eapNetwork": {
-                    "summary": "Connect to a network secured by WPA2-EAP using "
-                    "PEAP/MSCHAPv2",
-                    "description": "WPA2 Enterprise network security is based "
-                    "around the EAP protocol, which is a very "
-                    " comple tunneled authentication protocol. It "
-                    "can be configured in many different ways. The "
-                    "OT-2 supports several but by no means all of "
-                    "these variants. The variants supported on a "
-                    "given OT-2 can be found by GET "
-                    "/wifi/eap-options. This example describes how "
-                    "to set up PEAP/MSCHAPv2, which is an older EAP"
-                    " variant that was at one time the mechanism "
-                    "securing Eduroam.",
-                    "value": {
-                        "ssid": "Eduroam",
-                        "securityType": "wpa-eap",
-                        "eapConfig": {
-                            "eapType": "peap/mschapv2",
-                            "identity": "scientist@biology.org",
-                            "password": "leeuwenhoek",
-                        },
-                    },
-                },
-            }
+            ]
         }
+    )
 
 
 class WifiConfigurationResponse(BaseModel):
@@ -284,7 +273,7 @@ class WifiKeyFile(BaseModel):
 class AddWifiKeyFileResponse(WifiKeyFile):
     """Response to add wifi key file"""
 
-    message: typing.Optional[str]
+    message: typing.Optional[str] = None
 
 
 class WifiKeyFiles(BaseModel):
@@ -293,9 +282,8 @@ class WifiKeyFiles(BaseModel):
     wifi_keys: typing.List[WifiKeyFile] = Field(
         [], alias="keys", description="A list of keys in the system"
     )
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "keys": [
                     {
@@ -306,6 +294,7 @@ class WifiKeyFiles(BaseModel):
                 ]
             }
         }
+    )
 
 
 class EapConfigOptionType(str, Enum):
@@ -354,9 +343,8 @@ class EapOptions(BaseModel):
     """An object describing all supported EAP variants and their parameters"""
 
     options: typing.List[EapVariant]
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "options": [
                     {
@@ -392,3 +380,4 @@ class EapOptions(BaseModel):
                 ]
             }
         }
+    )

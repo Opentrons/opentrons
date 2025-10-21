@@ -1,26 +1,27 @@
+import * as errorCreators from '../../errorCreators'
+import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerStateDiff } from '../../utils/thermocyclerStateDiff'
-import { thermocyclerStateGetter } from '../../robotStateSelectors'
-import * as errorCreators from '../../errorCreators'
-import { thermocyclerWaitForBlockTemperature } from '../atomic/thermocyclerWaitForBlockTemperature'
-import { thermocyclerWaitForLidTemperature } from '../atomic/thermocyclerWaitForLidTemperature'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../atomic/thermocyclerDeactivateLid'
 import { thermocyclerOpenLid } from '../atomic/thermocyclerOpenLid'
 import { thermocyclerSetTargetBlockTemperature } from '../atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
+
 import type {
   CommandCreator,
   CurriedCommandCreator,
   ThermocyclerStateStepArgs,
 } from '../../types'
-export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const thermocyclerState = thermocyclerStateGetter(prevRobotState, args.module)
+
+export const thermocyclerStateStep: CommandCreator<
+  ThermocyclerStateStepArgs
+> = (args, invariantContext, prevRobotState) => {
+  const thermocyclerState = thermocyclerStateGetter(
+    prevRobotState,
+    args.moduleId
+  )
 
   if (thermocyclerState === null) {
     return {
@@ -42,7 +43,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (lidOpen) {
     commandCreators.push(
       curryCommandCreator(thermocyclerOpenLid, {
-        module: args.module,
+        moduleId: args.moduleId,
       })
     )
   }
@@ -50,7 +51,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (lidClosed) {
     commandCreators.push(
       curryCommandCreator(thermocyclerCloseLid, {
-        module: args.module,
+        moduleId: args.moduleId,
       })
     )
   }
@@ -58,7 +59,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (deactivateBlockTemperature) {
     commandCreators.push(
       curryCommandCreator(thermocyclerDeactivateBlock, {
-        module: args.module,
+        moduleId: args.moduleId,
       })
     )
   }
@@ -66,14 +67,8 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (blockTargetTemp !== null && setBlockTemperature) {
     commandCreators.push(
       curryCommandCreator(thermocyclerSetTargetBlockTemperature, {
-        module: args.module,
-        temperature: blockTargetTemp,
-      })
-    )
-    commandCreators.push(
-      curryCommandCreator(thermocyclerWaitForBlockTemperature, {
-        module: args.module,
-        temperature: blockTargetTemp,
+        moduleId: args.moduleId,
+        celsius: blockTargetTemp,
       })
     )
   }
@@ -81,7 +76,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (deactivateLidTemperature) {
     commandCreators.push(
       curryCommandCreator(thermocyclerDeactivateLid, {
-        module: args.module,
+        moduleId: args.moduleId,
       })
     )
   }
@@ -89,14 +84,8 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
   if (lidTargetTemp !== null && setLidTemperature) {
     commandCreators.push(
       curryCommandCreator(thermocyclerSetTargetLidTemperature, {
-        module: args.module,
-        temperature: lidTargetTemp,
-      })
-    )
-    commandCreators.push(
-      curryCommandCreator(thermocyclerWaitForLidTemperature, {
-        module: args.module,
-        temperature: lidTargetTemp,
+        moduleId: args.moduleId,
+        celsius: lidTargetTemp,
       })
     )
   }

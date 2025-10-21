@@ -1,62 +1,51 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-import type { AspirateInPlaceArgs } from '../commandCreators/atomic/aspirateInPlace'
-import type { BlowOutInPlaceArgs } from '../commandCreators/atomic/blowOutInPlace'
-import type { DispenseInPlaceArgs } from '../commandCreators/atomic/dispenseInPlace'
-import type { DropTipInPlaceArgs } from '../commandCreators/atomic/dropTipInPlace'
+
+import type {
+  BlowoutInPlaceParams,
+  DropTipInPlaceParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
-export const forAspirateInPlace = (
-  params: AspirateInPlaceArgs,
-  invariantContext: InvariantContext,
-  robotStateAndWarnings: RobotStateAndWarnings
-): void => {
-  //   TODO(jr, 11/6/23): update state
-}
-
-export const forDispenseInPlace = (
-  params: DispenseInPlaceArgs,
-  invariantContext: InvariantContext,
-  robotStateAndWarnings: RobotStateAndWarnings
-): void => {
-  const { pipetteId, volume } = params
-  const { robotState } = robotStateAndWarnings
-  dispenseUpdateLiquidState({
-    invariantContext,
-    pipetteId,
-    prevLiquidState: robotState.liquidState,
-    useFullVolume: false,
-    volume,
-  })
-}
-
 export const forBlowOutInPlace = (
-  params: BlowOutInPlaceArgs,
+  params: BlowoutInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
+  const entityId = robotState.pipettes[pipetteId].entityId ?? ''
+
   dispenseUpdateLiquidState({
     invariantContext,
     pipetteId,
     prevLiquidState: robotState.liquidState,
     useFullVolume: true,
+    robotStateAndWarnings,
+    entityId,
   })
 }
 
 export const forDropTipInPlace = (
-  params: DropTipInPlaceArgs,
+  params: DropTipInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
-  robotState.tipState.pipettes[pipetteId] = false
+  const entityId = robotState.pipettes[pipetteId].entityId ?? ''
+  robotState.tipState.pipettes[pipetteId] = {
+    hasTip: false,
+    tiprackURI: null,
+  }
 
   dispenseUpdateLiquidState({
     invariantContext,
     prevLiquidState: robotState.liquidState,
     pipetteId,
     useFullVolume: true,
+    robotStateAndWarnings,
+    entityId,
   })
+
+  robotState.pipettes[pipetteId].tiprackId = undefined
 }

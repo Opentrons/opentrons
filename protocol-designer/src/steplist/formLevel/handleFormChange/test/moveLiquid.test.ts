@@ -1,24 +1,32 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  fixtureP10Single,
-  fixtureP300Single,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
+} from '@opentrons/shared-data'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
+import {
   DEST_WELL_BLOWOUT_DESTINATION,
-  PipetteEntities,
-  LabwareEntities,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
+
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
 
-const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
-const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
+
+const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 let pipetteEntities: PipetteEntities
 let labwareEntities: LabwareEntities
@@ -28,17 +36,19 @@ beforeEach(() => {
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
-      spec: fixtureP10Single,
+      spec: fixtureP10SingleV2Specs,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
-      tiprackModel: 'tiprack-10ul',
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackModel: ['tiprack-10ul'],
+      tiprackLabwareDef: [fixtureTiprack10ul],
+      pythonName: 'mockPythonName',
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
-      spec: fixtureP300Single,
+      spec: fixtureP300SingleV2Specs,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
-      tiprackModel: 'tiprack-300ul',
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackModel: ['tiprack-300ul'],
+      tiprackLabwareDef: [fixtureTiprack300ul],
+      pythonName: 'mockPythonName',
     },
   }
   labwareEntities = {}
@@ -55,7 +65,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('no-op cases should pass through the patch unchanged', () => {
@@ -177,14 +187,9 @@ describe('path should update...', () => {
                 volume: '1',
               }
             )
-            const pathPatch =
-              path === expectedPath ? {} : { path: expectedPath }
 
-            const volumeChangeExpected = { volume, ...pathPatch }
-            const airGapChangeExpected = {
-              aspirate_airGap_volume,
-              ...pathPatch,
-            }
+            const volumeChangeExpected = { volume }
+            const airGapChangeExpected = { aspirate_airGap_volume }
             expect(airGapChange).toMatchObject(airGapChangeExpected)
             expect(volumeChange).toMatchObject(volumeChangeExpected)
           })
@@ -248,6 +253,8 @@ describe('disposal volume should update...', () => {
       path: 'single',
       disposalVolume_checkbox: false,
       disposalVolume_volume: null,
+      conditioning_volume: null,
+      conditioning_checkbox: false,
     })
   })
 
@@ -308,6 +315,7 @@ describe('disposal volume should update...', () => {
         dispense_mix_checkbox: false,
         dispense_mix_times: null,
         dispense_mix_volume: null,
+        blowout_checkbox: false,
       })
     })
 
@@ -359,6 +367,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
+        preWetTip: false,
       })
     })
   })

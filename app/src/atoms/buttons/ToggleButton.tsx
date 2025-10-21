@@ -1,39 +1,39 @@
-import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
+import { Btn, COLORS, Icon } from '@opentrons/components'
 
+import type { MouseEvent } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey55};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey30};
   }
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   &:hover {
-    color: ${COLORS.blueHover};
+    color: ${COLORS.blue55};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey30};
   }
 `
 
@@ -42,7 +42,7 @@ interface ToggleButtonProps extends StyleProps {
   toggledOn: boolean
   disabled?: boolean | null
   id?: string
-  onClick?: (e: React.MouseEvent) => unknown
+  onClick?: (e: MouseEvent) => unknown
 }
 
 export const ToggleButton = (props: ToggleButtonProps): JSX.Element => {
@@ -55,12 +55,12 @@ export const ToggleButton = (props: ToggleButtonProps): JSX.Element => {
       role="switch"
       aria-label={label}
       aria-checked={toggledOn}
-      size={size ?? SIZE_2}
+      size={size ?? '2rem'}
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
     >
       {/* TODO(bh, 2022-10-05): implement small and large sizes from design system */}
-      <Icon name={iconName} height={SIZE_1} />
+      <Icon name={iconName} height="1rem" />
     </Btn>
   )
 }

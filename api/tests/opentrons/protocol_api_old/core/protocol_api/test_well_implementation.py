@@ -13,7 +13,7 @@ from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
         ["B0100", "B", "0100"],
     ],
 )
-def test_row_column(name, row, col):
+def test_row_column(name: str, row: str, col: str) -> None:
     w = LegacyWellCore(
         well_geometry=None,  # type: ignore[arg-type]
         display_name=None,  # type: ignore[arg-type]
@@ -33,7 +33,7 @@ def test_row_column(name, row, col):
         ["A 1"],
     ],
 )
-def test_row_column_fail(name):
+def test_row_column_fail(name: str) -> None:
     with pytest.raises(AssertionError, match=f"could not match '{name}'"):
         LegacyWellCore(
             well_geometry=None,  # type: ignore[arg-type]

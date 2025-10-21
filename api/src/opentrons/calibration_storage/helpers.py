@@ -5,7 +5,7 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import json
-from typing import Any, Union, List, Dict, TYPE_CHECKING, cast
+from typing import Any, Union, List, Dict, TYPE_CHECKING, cast, Tuple
 from dataclasses import is_dataclass, asdict
 
 
@@ -14,14 +14,11 @@ from hashlib import sha256
 from . import types as local_types
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
+    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.pipette.types import LabwareUri
 
 
-DictionaryFactoryType = Union[List, Dict]
-
-
-def dict_filter_none(data: DictionaryFactoryType) -> Dict[str, Any]:
+def dict_filter_none(data: List[Tuple[str, Any]]) -> Dict[str, Any]:
     """
     Helper function to filter out None keys from a dataclass
     before saving to file.
@@ -34,7 +31,9 @@ def convert_to_dict(obj: Any) -> Dict[str, Any]:
     # https://github.com/python/mypy/issues/6568
     # Unfortunately, since it's not currently supported I have an
     # assert check instead.
-    assert is_dataclass(obj), "This function is intended for dataclasses only"
+    assert is_dataclass(obj) and not isinstance(
+        obj, type
+    ), "This function is intended for dataclasses only"
     return asdict(obj, dict_factory=dict_filter_none)
 
 

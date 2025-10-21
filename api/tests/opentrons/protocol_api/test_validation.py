@@ -1,18 +1,31 @@
 """Tests for Protocol API input validation."""
-from typing import ContextManager, List, Type, Union, Optional, Dict, Any
+
+from typing import ContextManager, List, Type, Union, Optional, Dict, Sequence, Any
 from contextlib import nullcontext as do_not_raise
 
 from decoy import Decoy
 import pytest
+import re
 
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition2,
     LabwareRole,
-    Parameters as LabwareDefinitionParameters,
+    Parameters2 as LabwareDefinition2Parameters,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import Mount, DeckSlotName, Location, Point
+from opentrons.types import (
+    Mount,
+    DeckSlotName,
+    AxisType,
+    AxisMapType,
+    StringAxisMap,
+    StagingSlotName,
+    Location,
+    Point,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -21,26 +34,40 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api import validation as subject, Well, Labware
-from opentrons.protocol_api._types import StagingSlotName
+from opentrons.protocol_api import (
+    validation as subject,
+    Well,
+    Labware,
+    TrashBin,
+    WasteChute,
+)
 
 
 @pytest.mark.parametrize(
-    ["input_value", "expected"],
+    ["input_mount", "input_pipette", "expected"],
     [
-        ("left", Mount.LEFT),
-        ("right", Mount.RIGHT),
-        ("LeFt", Mount.LEFT),
-        (Mount.LEFT, Mount.LEFT),
-        (Mount.RIGHT, Mount.RIGHT),
+        # Different string capitalizations:
+        ("left", PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        ("right", PipetteNameType.P300_MULTI_GEN2, Mount.RIGHT),
+        ("LeFt", PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        # Passing in a Mount:
+        (Mount.LEFT, PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        (Mount.RIGHT, PipetteNameType.P300_MULTI_GEN2, Mount.RIGHT),
+        # Special handling for the 96-channel:
+        ("left", PipetteNameType.P1000_96, Mount.LEFT),
+        ("right", PipetteNameType.P1000_96, Mount.LEFT),
+        (None, PipetteNameType.P1000_96, Mount.LEFT),
     ],
 )
-def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:
+def test_ensure_mount(
+    input_mount: Union[str, Mount, None],
+    input_pipette: PipetteNameType,
+    expected: Mount,
+) -> None:
     """It should properly map strings and mounts."""
-    result = subject.ensure_mount(input_value)
+    result = subject.ensure_mount_for_pipette(input_mount, input_pipette)
     assert result == expected
 
 
@@ -49,18 +76,31 @@ def test_ensure_mount_input_invalid() -> None:
     with pytest.raises(
         subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
     ):
-        subject.ensure_mount("oh no")
+        subject.ensure_mount_for_pipette("oh no", PipetteNameType.P300_MULTI_GEN2)
+
+    # Any mount is valid for the 96-Channel, but it needs to be a valid mount.
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
+    ):
+        subject.ensure_mount_for_pipette("oh no", PipetteNameType.P1000_96)
 
     with pytest.raises(
         subject.PipetteMountTypeError,
         match="'left', 'right', or an opentrons.types.Mount",
     ):
-        subject.ensure_mount(42)  # type: ignore[arg-type]
+        subject.ensure_mount_for_pipette(42, PipetteNameType.P300_MULTI_GEN2)  # type: ignore[arg-type]
 
     with pytest.raises(
         subject.InvalidPipetteMountError, match="Use the left or right mounts instead"
     ):
-        subject.ensure_mount(Mount.EXTENSION)
+        subject.ensure_mount_for_pipette(
+            Mount.EXTENSION, PipetteNameType.P300_MULTI_GEN2
+        )
+
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="You must specify a left or right mount"
+    ):
+        subject.ensure_mount_for_pipette(None, PipetteNameType.P300_MULTI_GEN2)
 
 
 @pytest.mark.parametrize(
@@ -166,7 +206,9 @@ def test_ensure_and_convert_deck_slot(
             "A1",
             APIVersion(2, 0),
             APIVersionError,
-            '"A1" requires apiLevel 2.15. Increase your protocol\'s apiLevel, or use slot "10" instead.',
+            re.escape(
+                "Error 4011 INCORRECT_API_VERSION (APIVersionError): Specifying a deck slot like 'A1' is not available until API version 2.15. You are currently using API version 2.0. Increase your protocol's apiLevel, or use slot '10' instead."
+            ),
         ),
         ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],
@@ -182,7 +224,9 @@ def test_ensure_deck_slot_invalid(
     """It should raise an exception if given an invalid name."""
     with pytest.raises(expected_error_type, match=expected_error_match):
         subject.ensure_and_convert_deck_slot(
-            input_value, input_api_version, input_robot_type  # type: ignore[arg-type]
+            input_value,  # type: ignore[arg-type]
+            input_api_version,
+            input_robot_type,
         )
 
 
@@ -202,30 +246,30 @@ def test_ensure_lowercase_name_invalid() -> None:
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotLabwareError),
         ),
     ],
 )
 def test_ensure_definition_is_labware(
-    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+    definition: LabwareDefinition2, expected_raise: ContextManager[Any]
 ) -> None:
     """It should check if the Labware Definition is defined as a regular labware."""
     with expected_raise:
@@ -236,30 +280,30 @@ def test_ensure_definition_is_labware(
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinition2Parameters.model_construct(loadName="Foo"),  # type: ignore[call-arg]
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
     ],
 )
 def test_ensure_definition_is_adapter(
-    definition: LabwareDefinition, expected_raise: ContextManager[Any]
+    definition: LabwareDefinition2, expected_raise: ContextManager[Any]
 ) -> None:
     """It should check if the Labware Definition is defined as an adapter."""
     with expected_raise:
@@ -361,15 +405,15 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                     "hold_time_seconds": 45.6,
                 }
             ],
-            [{"temperature": 42.0, "hold_time_seconds": 783.6}],
+            [{"temperature": 42.0, "hold_time_seconds": 783.6, "ramp_rate": None}],
         ),
         (
-            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
-            [{"temperature": 42.0, "hold_time_seconds": 45.6}],
+            [{"temperature": 42.0, "hold_time_seconds": 45.6, "ramp_rate": 1.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 45.6, "ramp_rate": 1.0}],
         ),
         (
             [{"temperature": 42.0, "hold_time_minutes": 12.3}],
-            [{"temperature": 42.0, "hold_time_seconds": 738.0}],
+            [{"temperature": 42.0, "hold_time_seconds": 738.0, "ramp_rate": None}],
         ),
         (
             [
@@ -377,8 +421,8 @@ def test_ensure_thermocycler_repetition_count_raises(repetitions: int) -> None:
                 {"temperature": 52.0, "hold_time_minutes": 12.3},
             ],
             [
-                {"temperature": 42.0, "hold_time_seconds": 12.3},
-                {"temperature": 52.0, "hold_time_seconds": 738.0},
+                {"temperature": 42.0, "hold_time_seconds": 12.3, "ramp_rate": None},
+                {"temperature": 52.0, "hold_time_seconds": 738.0, "ramp_rate": None},
             ],
         ),
         ([], []),
@@ -431,7 +475,7 @@ def test_validate_well_no_location(decoy: Decoy) -> None:
     assert result == expected_result
 
 
-def test_validate_coordinates(decoy: Decoy) -> None:
+def test_validate_well_coordinates(decoy: Decoy) -> None:
     """Should return a WellTarget with no location."""
     input_location = Location(point=Point(x=1, y=1, z=2), labware=None)
     expected_result = subject.PointTarget(location=input_location, in_place=False)
@@ -506,7 +550,8 @@ def test_validate_with_wrong_location() -> None:
     """Should raise a LocationTypeError."""
     with pytest.raises(subject.LocationTypeError):
         subject.validate_location(
-            location=42, last_location=None  # type: ignore[arg-type]
+            location=42,  # type: ignore[arg-type]
+            last_location=None,
         )
 
 
@@ -534,3 +579,343 @@ def test_validate_last_location_with_labware(decoy: Decoy) -> None:
     result = subject.validate_location(location=None, last_location=input_last_location)
 
     assert result == subject.PointTarget(location=input_last_location, in_place=True)
+
+
+def test_validate_location_with_trash_bin(decoy: Decoy) -> None:
+    """Should return a Trash Bin object."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    result = subject.validate_location(location=None, last_location=mock_trash)
+    assert result.location is mock_trash
+    assert result.in_place
+
+    result = subject.validate_location(location=mock_trash, last_location=None)
+    assert result.location is mock_trash
+    assert not result.in_place
+
+    result = subject.validate_location(location=mock_trash, last_location=mock_trash)
+    assert result.location is mock_trash
+    assert result.in_place
+
+
+def test_validate_location_with_waste_chute(decoy: Decoy) -> None:
+    """Should return a waste chute object."""
+    mock_chute = decoy.mock(cls=WasteChute)
+
+    result = subject.validate_location(location=None, last_location=mock_chute)
+    assert result.location is mock_chute
+    assert result.in_place
+
+    result = subject.validate_location(location=mock_chute, last_location=None)
+    assert result.location is mock_chute
+    assert not result.in_place
+
+    result = subject.validate_location(location=mock_chute, last_location=mock_chute)
+    assert result.location is mock_chute
+    assert result.in_place
+
+
+def test_ensure_boolean() -> None:
+    """It should return a boolean value."""
+    assert subject.ensure_boolean(False) is False
+
+
+@pytest.mark.parametrize("value", [0, "False", "f", 0.0])
+def test_ensure_boolean_raises(value: Union[str, int, float]) -> None:
+    """It should raise if the value is not a boolean."""
+    with pytest.raises(ValueError, match="must be a boolean"):
+        subject.ensure_boolean(value)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("value", [-1.23, -1, 0, 0.0, 1, 1.23])
+def test_ensure_float(value: Union[int, float]) -> None:
+    """It should return a float value."""
+    assert subject.ensure_float(value) == float(value)
+
+
+def test_ensure_float_raises() -> None:
+    """It should raise if the value is not a float or an integer."""
+    with pytest.raises(ValueError, match="must be a floating point"):
+        subject.ensure_float("1.23")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("value", [0, 0.1, 1, 1.0])
+def test_ensure_positive_float(value: Union[int, float]) -> None:
+    """It should return a positive float."""
+    assert subject.ensure_positive_float(value) == float(value)
+
+
+@pytest.mark.parametrize("value", [-1, -1.0, float("inf"), float("-inf"), float("nan")])
+def test_ensure_positive_float_raises(value: Union[int, float]) -> None:
+    """It should raise if value is not a positive float."""
+    with pytest.raises(ValueError, match="(non-infinite|positive float)"):
+        subject.ensure_positive_float(value)
+
+
+def test_ensure_positive_int() -> None:
+    """It should return a positive int."""
+    assert subject.ensure_positive_int(42) == 42
+
+
+@pytest.mark.parametrize("value", [1.0, -1.0, -1])
+def test_ensure_positive_int_raises(value: Union[int, float]) -> None:
+    """It should raise if value is not a positive integer."""
+    with pytest.raises(ValueError, match="integer"):
+        subject.ensure_positive_int(value)  # type: ignore[arg-type]
+
+
+def test_validate_coordinates() -> None:
+    """It should validate the coordinates and return them as a tuple."""
+    assert subject.validate_coordinates([1, 2.0, 3.3]) == (1.0, 2.0, 3.3)
+
+
+@pytest.mark.parametrize("value", [[1, 2.0], [1, 2.0, 3.3, 4.2], ["1", 2, 3]])
+def test_validate_coordinates_raises(value: Sequence[Union[int, float, str]]) -> None:
+    """It should raise if value is not a valid sequence of three numbers."""
+    with pytest.raises(ValueError, match="(exactly three|must be floats)"):
+        subject.validate_coordinates(value)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    argnames=["axis_map", "robot_type", "is_96_channel", "expected_axis_map"],
+    argvalues=[
+        (
+            {"x": 100, "Y": 50, "z_g": 80},
+            "OT-3 Standard",
+            True,
+            {AxisType.X: 100, AxisType.Y: 50, AxisType.Z_G: 80},
+        ),
+        ({"z_r": 80}, "OT-2 Standard", False, {AxisType.Z_R: 80}),
+        (
+            {"Z_L": 19, "P_L": 20},
+            "OT-2 Standard",
+            False,
+            {AxisType.Z_L: 19, AxisType.P_L: 20},
+        ),
+        ({"Q": 5}, "OT-3 Standard", True, {AxisType.Q: 5}),
+    ],
+)
+def test_ensure_axis_map_type_success(
+    axis_map: Union[AxisMapType, StringAxisMap],
+    robot_type: RobotType,
+    is_96_channel: bool,
+    expected_axis_map: AxisMapType,
+) -> None:
+    """Check that axis map type validation returns the correct shape."""
+    res = subject.ensure_axis_map_type(axis_map, robot_type, is_96_channel)
+    assert res == expected_axis_map
+
+
+@pytest.mark.parametrize(
+    argnames=["axis_map", "robot_type", "is_96_channel", "error_message"],
+    argvalues=[
+        (
+            {AxisType.X: 100, "y": 50},
+            "OT-3 Standard",
+            True,
+            "Please provide an `axis_map` with only string or only AxisType keys",
+        ),
+        (
+            {AxisType.Z_R: 60},
+            "OT-3 Standard",
+            True,
+            "A 96 channel is attached. You cannot move the `Z_R` mount.",
+        ),
+        (
+            {"Z_G": 19, "P_L": 20},
+            "OT-2 Standard",
+            False,
+            "An OT-2 Robot only accepts the following axes ",
+        ),
+        (
+            {"Q": 5},
+            "OT-3 Standard",
+            False,
+            "A 96 channel is not attached. The clamp `Q` motor does not exist.",
+        ),
+    ],
+)
+def test_ensure_axis_map_type_failure(
+    axis_map: Union[AxisMapType, StringAxisMap],
+    robot_type: RobotType,
+    is_96_channel: bool,
+    error_message: str,
+) -> None:
+    """Check that axis_map validation occurs for the given scenarios."""
+    with pytest.raises(subject.IncorrectAxisError, match=error_message):
+        subject.ensure_axis_map_type(axis_map, robot_type, is_96_channel)
+
+
+@pytest.mark.parametrize(
+    argnames=["axis_map", "robot_type", "error_message"],
+    argvalues=[
+        (
+            {AxisType.X: 100, AxisType.P_L: 50},
+            "OT-3 Standard",
+            "A critical point only accepts Flex gantry axes which are ",
+        ),
+        (
+            {AxisType.Z_G: 60},
+            "OT-2 Standard",
+            "A critical point only accepts OT-2 gantry axes which are ",
+        ),
+    ],
+)
+def test_ensure_only_gantry_axis_map_type(
+    axis_map: AxisMapType, robot_type: RobotType, error_message: str
+) -> None:
+    """Check that gantry axis_map validation occurs for the given scenarios."""
+    with pytest.raises(subject.IncorrectAxisError, match=error_message):
+        subject.ensure_only_gantry_axis_map_type(axis_map, robot_type)
+
+
+@pytest.mark.parametrize(
+    ["value", "expected_result"],
+    [
+        ("once", TransferTipPolicyV2.ONCE),
+        ("NEVER", TransferTipPolicyV2.NEVER),
+        ("alWaYs", TransferTipPolicyV2.ALWAYS),
+        ("Per Source", TransferTipPolicyV2.PER_SOURCE),
+    ],
+)
+def test_ensure_new_tip_policy(
+    value: str, expected_result: TransferTipPolicyV2
+) -> None:
+    """It should return the expected tip policy."""
+    assert subject.ensure_new_tip_policy(value) == expected_result
+
+
+def test_ensure_new_tip_policy_raises() -> None:
+    """It should raise ValueError for invalid new_tip value."""
+    with pytest.raises(ValueError, match="is invalid value for 'new_tip'"):
+        subject.ensure_new_tip_policy("blah")
+
+
+@pytest.mark.parametrize(
+    ["target", "expected_raise"],
+    [
+        (
+            "a",
+            pytest.raises(
+                ValueError, match="'a' is not a valid location for transfer."
+            ),
+        ),
+        (
+            ["a"],
+            pytest.raises(
+                ValueError, match="'a' is not a valid location for transfer."
+            ),
+        ),
+        (
+            [("a",)],
+            pytest.raises(
+                ValueError, match="'a' is not a valid location for transfer."
+            ),
+        ),
+        (
+            [],
+            pytest.raises(
+                ValueError, match="No target well\\(s\\) specified for transfer."
+            ),
+        ),
+    ],
+)
+def test_ensure_valid_flat_wells_list_raises_for_invalid_targets(
+    target: Any,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error if target location is invalid."""
+    with expected_raise:
+        subject.ensure_valid_flat_wells_list_for_transfer_v2(target)
+
+
+def test_ensure_valid_flat_wells_list_raises_for_mixed_targets(decoy: Decoy) -> None:
+    """It should raise appropriate error if target has mixed valid and invalid wells."""
+    target1 = [decoy.mock(cls=Well), "a"]
+    with pytest.raises(ValueError, match="'a' is not a valid location for transfer."):
+        subject.ensure_valid_flat_wells_list_for_transfer_v2(target1)  # type: ignore[arg-type]
+
+    target2 = [[decoy.mock(cls=Well)], ["a"]]
+    with pytest.raises(ValueError, match="'a' is not a valid location for transfer."):
+        subject.ensure_valid_flat_wells_list_for_transfer_v2(target2)  # type: ignore[arg-type]
+
+
+def test_ensure_valid_flat_wells_list(decoy: Decoy) -> None:
+    """It should convert the locations to flat lists correctly."""
+    target1 = decoy.mock(cls=Well)
+    target2 = decoy.mock(cls=Well)
+
+    assert subject.ensure_valid_flat_wells_list_for_transfer_v2(target1) == [target1]
+    assert subject.ensure_valid_flat_wells_list_for_transfer_v2([target1, target2]) == [
+        target1,
+        target2,
+    ]
+    assert subject.ensure_valid_flat_wells_list_for_transfer_v2(
+        [
+            [target1, target1],
+            [target2, target2],
+        ]
+    ) == [target1, target1, target2, target2]
+    assert subject.ensure_valid_flat_wells_list_for_transfer_v2((target1, target2)) == [
+        target1,
+        target2,
+    ]
+    assert subject.ensure_valid_flat_wells_list_for_transfer_v2(
+        (
+            [target1, target1],
+            [target2, target2],
+        )
+    ) == [target1, target1, target2, target2]
+
+
+def test_ensure_valid_trash_location_for_transfer_v2(
+    decoy: Decoy,
+) -> None:
+    """It should check that the trash location is valid."""
+    mock_well = decoy.mock(cls=Well)
+    mock_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    mock_trash_bin = decoy.mock(cls=TrashBin)
+    mock_waste_chute = decoy.mock(cls=WasteChute)
+    decoy.when(mock_well.top()).then_return(Location(Point(1, 2, 3), labware=mock_well))
+    assert subject.ensure_valid_trash_location_for_transfer_v2(mock_well) == Location(
+        Point(1, 2, 3), labware=mock_well
+    )
+    assert (
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_location)
+        == mock_location
+    )
+    assert (
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_trash_bin)
+        == mock_trash_bin
+    )
+    assert (
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_waste_chute)
+        == mock_waste_chute
+    )
+
+
+def test_ensure_valid_trash_location_for_transfer_v2_raises(decoy: Decoy) -> None:
+    """It should raise an error for invalid trash locations."""
+    with pytest.raises(TypeError, match="However, it is '\\['a'\\]'"):
+        subject.ensure_valid_trash_location_for_transfer_v2(
+            ["a"]  # type: ignore[arg-type]
+        )
+
+    mock_labware = decoy.mock(cls=Labware)
+    with pytest.raises(TypeError, match=f"However, it is '{mock_labware}'"):
+        subject.ensure_valid_trash_location_for_transfer_v2(
+            mock_labware  # type: ignore[arg-type]
+        )
+
+    with pytest.raises(
+        TypeError, match="However, the given location doesn't refer to any well."
+    ):
+        subject.ensure_valid_trash_location_for_transfer_v2(
+            Location(point=Point(x=1, y=1, z=1), labware=None)
+        )
+
+
+def test_is_96_channel() -> None:
+    """Iterate through the pipette names and make sure that validation identifies 96 channels."""
+    for name in PipetteNameType:
+        assert subject.is_pipette_96_channel(name) == ("96" in name.value)

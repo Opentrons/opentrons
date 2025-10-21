@@ -13,8 +13,8 @@ from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandle
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
 )
-from opentrons.protocol_engine.state import (
-    StateStore,
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
 )

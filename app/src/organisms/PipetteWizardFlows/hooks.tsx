@@ -1,14 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import {
-  LEFT,
-  LoadedPipette,
-  PipetteMount,
-  RIGHT,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+
+import { LEFT, RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
 import { FLOWS } from './constants'
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+
+import type { LoadedPipette, PipetteMount } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteFlowWizardHeaderTextProps {
@@ -95,10 +93,14 @@ export function usePipetteFlowWizardHeaderText(
       )
     } else if (
       attachedPipettes[LEFT]?.data.channels === 96 &&
-      mountPipette?.pipetteName !== 'p1000_96'
+      mountPipette?.pipetteName !== 'p1000_96' &&
+      mountPipette?.pipetteName !== 'p200_96'
     ) {
       return t('detach_96_attach_mount', { mount: capitalizedMount })
-    } else if (leftPipette?.pipetteName === 'p1000_96') {
+    } else if (
+      leftPipette?.pipetteName === 'p1000_96' ||
+      leftPipette?.pipetteName === 'p200_96'
+    ) {
       if (isGantryEmpty) {
         return t('attach_96_channel')
       } else if (

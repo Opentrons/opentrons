@@ -1,27 +1,33 @@
-import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { EstopMissingModal } from '../EstopMissingModal'
-import { EstopPressedModal } from '../EstopPressedModal'
-import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
+import { getLocalRobot } from '/app/redux/discovery'
+import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../constants'
-import { getLocalRobot } from '../../../redux/discovery'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { EstopMissingModal } from '../EstopMissingModal'
+import { EstopPressedModal } from '../EstopPressedModal'
 import { EstopTakeover } from '../EstopTakeover'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../EstopMissingModal')
-jest.mock('../EstopPressedModal')
-jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
-jest.mock('../../../redux/discovery')
+import type { ComponentProps } from 'react'
+
+vi.mock('@opentrons/react-api-client')
+vi.mock('../EstopMissingModal')
+vi.mock('../EstopPressedModal')
+vi.mock('/app/redux-resources/config')
+vi.mock('/app/redux/discovery')
 
 const mockPressed = {
   data: {
@@ -31,83 +37,71 @@ const mockPressed = {
   },
 }
 
-const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
-  typeof useEstopQuery
->
-const mockEstopMissingModal = EstopMissingModal as jest.MockedFunction<
-  typeof EstopMissingModal
->
-const mockEstopPressedModal = EstopPressedModal as jest.MockedFunction<
-  typeof EstopPressedModal
->
-const mockUseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
-  typeof useIsUnboxingFlowOngoing
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-
-const render = (props: React.ComponentProps<typeof EstopTakeover>) => {
+const render = (props: ComponentProps<typeof EstopTakeover>) => {
   return renderWithProviders(<EstopTakeover {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('EstopTakeover', () => {
-  let props: React.ComponentProps<typeof EstopTakeover>
+  let props: ComponentProps<typeof EstopTakeover>
 
   beforeEach(() => {
     props = {
       robotName: 'Flex',
     }
-    mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
-    mockEstopMissingModal.mockReturnValue(<div>mock EstopMissingModal</div>)
-    mockEstopPressedModal.mockReturnValue(<div>mock EstopPressedModal</div>)
-    mockUseIsUnboxingFlowOngoing.mockReturnValue(false)
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockPressed } as any)
+    vi.mocked(EstopMissingModal).mockReturnValue(
+      <div>mock EstopMissingModal</div>
+    )
+    vi.mocked(EstopPressedModal).mockReturnValue(
+      <div>mock EstopPressedModal</div>
+    )
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
   })
 
   it('should render EstopPressedModal - PHYSICALLY_ENGAGED', () => {
-    const [{ getByText }] = render(props)
-    getByText('mock EstopPressedModal')
+    render(props)
+    screen.getByText('mock EstopPressedModal')
   })
 
   it('should render EstopPressedModal - LOGICALLY_ENGAGED', () => {
     mockPressed.data.status = LOGICALLY_ENGAGED
-    mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock EstopPressedModal')
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockPressed } as any)
+    render(props)
+    screen.getByText('mock EstopPressedModal')
   })
 
   it('should render EstopMissingModal on Desktop app - NOT_PRESENT', () => {
     mockPressed.data.status = NOT_PRESENT
     mockPressed.data.leftEstopPhysicalStatus = NOT_PRESENT
-    mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock EstopMissingModal')
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockPressed } as any)
+    render(props)
+    screen.getByText('mock EstopMissingModal')
   })
 
   it('should render EstopMissingModal on Touchscreen app - NOT_PRESENT', () => {
     mockPressed.data.status = NOT_PRESENT
     mockPressed.data.leftEstopPhysicalStatus = NOT_PRESENT
-    mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockPressed } as any)
     props = {
       robotName: undefined,
     }
-    const [{ getByText }] = render(props)
-    getByText('mock EstopMissingModal')
+    render(props)
+    screen.getByText('mock EstopMissingModal')
   })
 
   it('should not render EstopPressedModal if a user does not finish unboxing', () => {
-    mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
-    const [{ queryByText }] = render(props)
-    expect(queryByText('mock EstopPressedModal')).not.toBeInTheDocument()
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
+    render(props)
+    expect(screen.queryByText('mock EstopPressedModal')).not.toBeInTheDocument()
   })
 
   it('should not render EstopMissingModal if a user does not finish unboxing', () => {
-    mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
     mockPressed.data.status = NOT_PRESENT
-    const [{ queryByText }] = render(props)
-    expect(queryByText('mock EstopMissingModal')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('mock EstopMissingModal')).not.toBeInTheDocument()
   })
 })

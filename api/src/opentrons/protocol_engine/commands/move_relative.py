@@ -4,12 +4,24 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import MovementAxis, DeckPoint
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from .pipetting_common import DestinationPositionResult
+
+from ..types import MovementAxis
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+    DefinedErrorData,
+)
+from .movement_common import (
+    DestinationPositionResult,
+    move_relative,
+    StallOrCollisionError,
+)
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
+    from ..resources.model_utils import ModelUtils
 
 
 MoveRelativeCommandType = Literal["moveRelative"]
@@ -36,30 +48,47 @@ class MoveRelativeResult(DestinationPositionResult):
 
 
 class MoveRelativeImplementation(
-    AbstractCommandImpl[MoveRelativeParams, MoveRelativeResult]
+    AbstractCommandImpl[
+        MoveRelativeParams,
+        SuccessData[MoveRelativeResult] | DefinedErrorData[StallOrCollisionError],
+    ]
 ):
     """Move relative command implementation."""
 
-    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+    def __init__(
+        self, movement: MovementHandler, model_utils: ModelUtils, **kwargs: object
+    ) -> None:
         self._movement = movement
+        self._model_utils = model_utils
 
-    async def execute(self, params: MoveRelativeParams) -> MoveRelativeResult:
+    async def execute(
+        self, params: MoveRelativeParams
+    ) -> SuccessData[MoveRelativeResult] | DefinedErrorData[StallOrCollisionError]:
         """Move (jog) a given pipette a relative distance."""
-        x, y, z = await self._movement.move_relative(
+        result = await move_relative(
+            movement=self._movement,
+            model_utils=self._model_utils,
             pipette_id=params.pipetteId,
             axis=params.axis,
             distance=params.distance,
         )
+        if isinstance(result, DefinedErrorData):
+            return result
+        else:
+            return SuccessData(
+                public=MoveRelativeResult(position=result.public.position),
+                state_update=result.state_update,
+            )
 
-        return MoveRelativeResult(position=DeckPoint(x=x, y=y, z=z))
 
-
-class MoveRelative(BaseCommand[MoveRelativeParams, MoveRelativeResult]):
+class MoveRelative(
+    BaseCommand[MoveRelativeParams, MoveRelativeResult, StallOrCollisionError]
+):
     """Command to move (jog) a given pipette a relative distance."""
 
     commandType: MoveRelativeCommandType = "moveRelative"
     params: MoveRelativeParams
-    result: Optional[MoveRelativeResult]
+    result: Optional[MoveRelativeResult] = None
 
     _ImplementationCls: Type[MoveRelativeImplementation] = MoveRelativeImplementation
 

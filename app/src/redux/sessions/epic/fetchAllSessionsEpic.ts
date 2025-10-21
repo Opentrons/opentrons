@@ -2,17 +2,20 @@ import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
+  RobotApiV2ErrorResponseBody,
 } from '../../robot-api/types'
-import type { FetchAllSessionsAction, EnsureSessionAction } from '../types'
+import type { Action, Epic } from '../../types'
+import type {
+  EnsureSessionAction,
+  FetchAllSessionsAction,
+  MultiSessionResponse,
+} from '../types'
 
 export const mapActionToRequest = (): RobotApiRequestOptions => ({
   method: GET,
@@ -27,8 +30,16 @@ export const mapResponseToAction = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.fetchAllSessionsSuccess(host.name, body, meta)
-    : Actions.fetchAllSessionsFailure(host.name, body, meta)
+    ? Actions.fetchAllSessionsSuccess(
+        host.name,
+        body as MultiSessionResponse,
+        meta
+      )
+    : Actions.fetchAllSessionsFailure(
+        host.name,
+        body as RobotApiV2ErrorResponseBody,
+        meta
+      )
 }
 
 export const fetchAllSessionsEpic: Epic = (action$, state$) => {

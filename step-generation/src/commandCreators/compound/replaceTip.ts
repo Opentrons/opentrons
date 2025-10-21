@@ -1,0 +1,265 @@
+import {
+  ALL,
+  COLUMN,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  SINGLE,
+} from '@opentrons/shared-data'
+
+import * as errorCreators from '../../errorCreators'
+import { getNextTiprack } from '../../robotStateSelectors'
+import {
+  curryCommandCreator,
+  curryWithoutPython,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  PRIMARY_NOZZLE,
+  reduceCommandCreators,
+} from '../../utils'
+import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
+import { dropTip } from '../atomic/dropTip'
+import { pickUpTip } from '../atomic/pickUpTip'
+import { dropTipInTrash } from './dropTipInTrash'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
+
+import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { CommandCreator, CurriedCommandCreator } from '../../types'
+
+interface ReplaceTipArgs {
+  pipette: string
+  dropTipLocation: string
+  tipRack: string | null
+  nozzles?: NozzleConfigurationStyle
+  //  we need to emit atomic commands for python
+  //  if this replaceTip is for the mix compound command
+  isFromMixCommand?: boolean
+}
+
+/**
+  Pick up next available tip. Works differently for an 8-channel which needs a full row of tips.
+  Expects 96-well format tip naming system on the tiprack.
+  If there's already a tip on the pipette, this will drop it before getting a new one
+*/
+export const replaceTip: CommandCreator<ReplaceTipArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const {
+    pipette,
+    dropTipLocation,
+    nozzles,
+    tipRack,
+    isFromMixCommand = false,
+  } = args
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
+  const stateTiprack = prevRobotState.pipettes[pipette].tiprackId
+  if (tipRack == null) {
+    return {
+      errors: [errorCreators.noTipSelected()],
+    }
+  }
+  const { nextTiprack, tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    nozzles
+  )
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const channels = pipetteSpec?.channels
+
+  const excludedBy96Channel = tipracks?.excludedBy96Channel
+  const excludedByLid = tipracks?.excludedByLid
+
+  const is96ChannelTipracksAvailable =
+    nextTiprack == null && channels === 96 && excludedBy96Channel > 0
+  if (nozzles === ALL && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.missingAdapter()],
+    }
+  }
+
+  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.removeAdapter()],
+    }
+  }
+  if (excludedByLid > 0 && nextTiprack == null) {
+    return {
+      errors: [errorCreators.nextTiprackHasLid()],
+    }
+  }
+
+  if (nextTiprack == null) {
+    // no valid next tip / tiprack, bail out
+    return {
+      errors: [errorCreators.insufficientTips()],
+    }
+  }
+
+  const isFlexPipette =
+    (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
+
+  if (!pipetteSpec)
+    return {
+      errors: [
+        errorCreators.pipetteDoesNotExist({
+          pipette,
+        }),
+      ],
+    }
+  const labwareDef =
+    invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
+
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
+  if (!labwareDef) {
+    return {
+      errors: [
+        errorCreators.labwareDoesNotExist({
+          actionName: 'replaceTip',
+          labware: nextTiprack.tiprackId,
+        }),
+      ],
+    }
+  }
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin && hasTip)) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
+  if (
+    modulePipetteCollision({
+      pipette,
+      labware: nextTiprack.tiprackId,
+      invariantContext,
+      prevRobotState,
+    })
+  ) {
+    return {
+      errors: [errorCreators.modulePipetteCollisionDanger()],
+    }
+  }
+
+  const slotName = getLabwareSlot(nextTiprack.tiprackId, prevRobotState.labware)
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      slotName,
+      isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+    )
+  ) {
+    return {
+      errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()],
+    }
+  }
+  if (!isFlexPipette) {
+    if (
+      getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
+    ) {
+      return { errors: [errorCreators.heaterShakerEastWestWithLatchOpen()] }
+    }
+
+    if (
+      getIsHeaterShakerEastWestMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec
+      )
+    ) {
+      return {
+        errors: [errorCreators.heaterShakerEastWestOfMultiChannelPipette()],
+      }
+    }
+  }
+
+  let primaryNozzle
+  if (nozzles === COLUMN) {
+    primaryNozzle = PRIMARY_NOZZLE
+  } else if (nozzles === SINGLE && channels === 96) {
+    primaryNozzle = 'H12'
+  } else if (nozzles === SINGLE && channels === 8) {
+    primaryNozzle = 'H1'
+  }
+
+  const curryCommand = isFromMixCommand
+    ? curryCommandCreator
+    : curryWithoutPython
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+    //  only emit the command if previous nozzle state and tiprack state are different
+    //  only check for the 96-channel since we do not support 8-channel partial tip yet
+    channels === 96 &&
+    args.nozzles != null &&
+    (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
+      ? [
+          curryCommandCreator(configureNozzleLayout, {
+            configurationParams: {
+              primaryNozzle,
+              style: args.nozzles,
+            },
+            pipetteId: args.pipette,
+          }),
+        ]
+      : []
+
+  let commandCreators: CurriedCommandCreator[] = [
+    curryCommand(dropTip, {
+      pipette,
+      dropTipLocation,
+    }),
+    ...configureNozzleLayoutCommand,
+    curryCommand(pickUpTip, {
+      pipetteId: pipette,
+      labwareId: nextTiprack.tiprackId,
+      wellName: nextTiprack.well,
+      nozzles: args.nozzles,
+    }),
+  ]
+  if (isWasteChute) {
+    commandCreators = [
+      curryCommand(dropTipInWasteChute, {
+        pipetteId: args.pipette,
+        wasteChuteId:
+          invariantContext.wasteChuteEntities[args.dropTipLocation].id,
+      }),
+      ...configureNozzleLayoutCommand,
+      curryCommand(pickUpTip, {
+        pipetteId: pipette,
+        labwareId: nextTiprack.tiprackId,
+        wellName: nextTiprack.well,
+        nozzles: args.nozzles,
+      }),
+    ]
+  }
+  if (isTrashBin) {
+    commandCreators = [
+      curryCommand(dropTipInTrash, {
+        pipetteId: pipette,
+        trashLocation: invariantContext.trashBinEntities[args.dropTipLocation]
+          .location as CutoutId,
+      }),
+      ...configureNozzleLayoutCommand,
+      curryCommand(pickUpTip, {
+        pipetteId: pipette,
+        labwareId: nextTiprack.tiprackId,
+        wellName: nextTiprack.well,
+        nozzles: args.nozzles,
+      }),
+    ]
+  }
+
+  return reduceCommandCreators(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
+}

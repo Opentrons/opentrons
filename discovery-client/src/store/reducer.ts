@@ -1,33 +1,29 @@
-import { combineReducers } from 'redux'
 import isEqual from 'lodash/isEqual'
 import keyBy from 'lodash/keyBy'
 import omit from 'lodash/omit'
+import { combineReducers } from 'redux'
 
 import {
-  HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
 } from '../constants'
-
 import * as Actions from './actions'
 
-import type { Reducer } from 'redux'
-
 import type {
+  HealthErrorResponse,
   HealthResponse,
   ServerHealthResponse,
-  HealthErrorResponse,
 } from '../types'
-
 import type {
-  State,
   Action,
-  RobotState,
-  HostState,
-  RobotsByNameMap,
-  HostsByIpMap,
   Address,
   HealthStatus,
+  HostsByIpMap,
+  HostState,
+  RobotsByNameMap,
+  RobotState,
+  State,
 } from './types'
 
 const INITIAL_STATE: State = {
@@ -157,10 +153,10 @@ export const hostsByIpReducer = (
         port,
         robotName,
         seen: true,
-        healthStatus: newHost ? null : host?.healthStatus ?? null,
-        serverHealthStatus: newHost ? null : host?.serverHealthStatus ?? null,
-        healthError: newHost ? null : host?.healthError ?? null,
-        serverHealthError: newHost ? null : host?.serverHealthError ?? null,
+        healthStatus: newHost ? null : (host?.healthStatus ?? null),
+        serverHealthStatus: newHost ? null : (host?.serverHealthStatus ?? null),
+        healthError: newHost ? null : (host?.healthError ?? null),
+        serverHealthError: newHost ? null : (host?.serverHealthError ?? null),
         advertisedModel: robotModel,
       }
 
@@ -170,14 +166,8 @@ export const hostsByIpReducer = (
     }
 
     case Actions.HEALTH_POLLED: {
-      const {
-        ip,
-        port,
-        health,
-        serverHealth,
-        healthError,
-        serverHealthError,
-      } = action.payload
+      const { ip, port, health, serverHealth, healthError, serverHealthError } =
+        action.payload
       const host: HostState | undefined = state[ip]
       const robotName =
         serverHealth?.name ?? health?.name ?? host?.robotName ?? null
@@ -255,7 +245,7 @@ export const manualAddressesReducer = (
   return state
 }
 
-export const reducer: Reducer<State, Action> = combineReducers({
+export const reducer = combineReducers({
   robotsByName: robotsByNameReducer,
   hostsByIp: hostsByIpReducer,
   manualAddresses: manualAddressesReducer,

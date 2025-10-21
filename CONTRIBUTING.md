@@ -160,8 +160,8 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Python v3.7
-- Node.js v16
+- Python v3.10
+- Node.js v22.12.0+
 - [Yarn 1][yarn]
 
 See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
@@ -171,7 +171,7 @@ See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides 
 We use:
 
 - [pytest][] to test Python
-- [Jest][jest] to test JavaScript
+- [Vitest][vitest] to test JavaScript
   - To run tests in watch mode, you should also install [watchman][]
 - [Cypress.io][cypress] for end to end UI testing
 
@@ -199,7 +199,7 @@ make test-js watch=true
 make test-js cover=false
 
 # update snapshot tests
-# https://jestjs.io/docs/en/snapshot-testing
+# https://vitest.dev/guide/snapshot.html
 make test-js updateSnapshot=true
 ```
 
@@ -217,7 +217,7 @@ make check-js
 ```
 
 [pytest]: https://docs.pytest.org/en/latest/
-[jest]: https://jestjs.io/
+[vitest]: https://vitest.dev/
 [watchman]: https://facebook.github.io/watchman/
 [cypress]: https://www.cypress.io/
 
@@ -291,7 +291,7 @@ JavaScript dependencies are installed by [yarn][]. When calling yarn, you should
 A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
 
 - Build tools (webpack, babel)
-- Testing/linting/checking tools (jest, typescript, eslint)
+- Testing/linting/checking tools (vitest, typescript, eslint)
 - Libraries used only in support scripts (aws, express)
 
 To add a development dependency:

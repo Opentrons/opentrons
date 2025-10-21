@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -25,7 +27,7 @@ DEFAULT_INSTR_OFFSET = InstrumentOffset(single=(0, 0, 0), multi=(0, 0, 0))
     response_model=CalibrationStatus,
 )
 async def get_calibration_status(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> CalibrationStatus:
     # TODO: AA 12-01-2020 Instrument offset has been deprecated. We should
     # exclude instrument calibration in a future refactor

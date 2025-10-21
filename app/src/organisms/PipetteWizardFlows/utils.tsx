@@ -1,31 +1,42 @@
-import * as React from 'react'
 import { css } from 'styled-components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { SPACING } from '@opentrons/components'
+
+import { AnimationVideo, SPACING } from '@opentrons/components'
+import { LEFT, RIGHT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
+import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
+import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
+import attach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
+import attachPlate96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Plate_96.webm'
+import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import detachLeft1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
+import detachRight1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_1_R.webm'
+import detachLeft8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_8_L.webm'
+import detachRight8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_8_R.webm'
+import detach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_96.webm'
+import detachPlate96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Plate_96.webm'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
+import zAxisAttach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
+import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+
 import { FLOWS, SECTIONS } from './constants'
 
-import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
-import attachRight18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
-import detachLeft1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
-import detachRight1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_R.webm'
-import detachLeft8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_8_L.webm'
-import detachRight8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_8_R.webm'
-import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
-import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
-
-import attach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
-import attachPlate96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Plate_96.webm'
-import detach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_96.webm'
-import detachPlate96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Plate_96.webm'
-import zAxisAttach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
-import zAxisDetach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
-import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import detachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
-
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
-import type { PipetteWizardFlow, PipetteWizardStep } from './types'
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type {
+  CreateCommand,
+  DeckConfiguration,
+  MotorAxes,
+} from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
+import type {
+  PipetteWizardFlow,
+  PipetteWizardStep,
+  PipetteWizardStepProps,
+} from './types'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery
@@ -37,6 +48,85 @@ interface PipetteAnimationProps {
   pipetteWizardStep: PipetteWizardStep
   channel?: number
 }
+
+export function startCalibrationOnClick(
+  props: PipetteWizardStepProps,
+  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
+  pipetteId: string
+): () => void {
+  const { chainRunCommands, proceed, setShowErrorMessage, mount } = props
+  return () => {
+    const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
+    const verifyCommands: CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: {
+          pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
+      },
+    ]
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home',
+        params: { axes },
+      },
+      {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: mount },
+      },
+      {
+        commandType: 'calibration/calibratePipette',
+        params: { mount },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: { mount },
+      },
+    ]
+
+    chainRunCommands?.(verifyCommands, false)
+      .then(() => {
+        chainRunCommands?.(homeCommands, false)
+          .then(() => {
+            proceed()
+          })
+          .catch(error => {
+            setShowErrorMessage(error.message as string)
+          })
+      })
+      .catch(() => {
+        setShowUnableToDetect?.(true)
+      })
+  }
+}
+
+export function isWasteChuteOnDeck(
+  deckConfig?: UseQueryResult<DeckConfiguration>
+): boolean {
+  return !!deckConfig?.data?.find(
+    fixture =>
+      fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+      fixture.cutoutFixtureId?.includes('wasteChute')
+  )
+}
+
+export function is96Channel(
+  instrument: AttachedPipettesFromInstrumentsQuery
+): boolean {
+  const left_instrument = instrument[LEFT]
+  const right_instrument = instrument[RIGHT]
+  if (
+    left_instrument?.data?.channels === 96 ||
+    right_instrument?.data?.channels === 96
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function getPipetteAnimations(
   props: PipetteAnimationProps
 ): JSX.Element {
@@ -78,7 +168,7 @@ export function getPipetteAnimations(
   }
 
   return (
-    <video
+    <AnimationVideo
       css={css`
         padding-top: ${SPACING.spacing4};
         width: 100%;
@@ -87,9 +177,6 @@ export function getPipetteAnimations(
           ? `18rem`
           : `12rem`};
       `}
-      autoPlay={true}
-      loop={true}
-      controls={false}
       data-testid={
         section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE
           ? sourceProbe
@@ -103,7 +190,7 @@ export function getPipetteAnimations(
             : sourcePipette
         }
       />
-    </video>
+    </AnimationVideo>
   )
 }
 
@@ -127,18 +214,15 @@ export function getPipetteAnimations96(
     src = flowType === FLOWS.ATTACH ? zAxisAttach96 : zAxisDetach96
   }
   return (
-    <video
+    <AnimationVideo
       css={css`
         padding-top: ${SPACING.spacing4};
         max-width: 100%;
         max-height: 12rem;
       `}
-      autoPlay={true}
-      loop={true}
-      controls={false}
       data-testid={src}
     >
       <source src={src} />
-    </video>
+    </AnimationVideo>
   )
 }

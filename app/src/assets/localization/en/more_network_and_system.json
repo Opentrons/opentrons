@@ -1,9 +1,0 @@
-{
-  "description": "Description",
-  "driver_version": "Driver Version",
-  "launch_realtek_adapter_drivers_site": "Launch Realtek Adapter Drivers Site",
-  "manufacturer": "Manufacturer",
-  "network_and_system_title": "Network & System",
-  "u2e_adapter_information": "USB-to-Ethernet Adapter Information",
-  "u2e_driver_update_alert": "Update available for Realtek USB-to-Ethernet adapter driver"
-}

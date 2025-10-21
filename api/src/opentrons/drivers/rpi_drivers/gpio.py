@@ -7,7 +7,7 @@ from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
 from .types import gpio_group, PinDir, GPIOPin
 
-import gpiod  # type: ignore[import]
+import gpiod  # type: ignore[import-not-found]
 
 """
 Raspberry Pi GPIO control module

@@ -1,20 +1,21 @@
-import * as React from 'react'
-import { renderWithProviders } from '../../../testing/utils'
-import {
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
+import '@testing-library/jest-dom/vitest'
+
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
 
-const render = (props: React.ComponentProps<typeof AlertPrimaryButton>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof AlertPrimaryButton>) => {
   return renderWithProviders(<AlertPrimaryButton {...props} />)[0]
 }
 
 describe('AlertPrimaryButton', () => {
-  let props: React.ComponentProps<typeof AlertPrimaryButton>
+  let props: ComponentProps<typeof AlertPrimaryButton>
 
   beforeEach(() => {
     props = {
@@ -23,16 +24,16 @@ describe('AlertPrimaryButton', () => {
   })
 
   it('renders alert primary button with text', () => {
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
+    render(props)
+    const button = screen.getByText('alert primary button')
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
@@ -41,16 +42,8 @@ describe('AlertPrimaryButton', () => {
 
   it('renders alert primary button with text and disabled', () => {
     props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
+    render(props)
+    const button = screen.getByText('alert primary button')
     expect(button).toBeDisabled()
-  })
-
-  it('applies the correct states to the button - hover', () => {
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
-    expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
-      modifier: ':hover',
-    })
   })
 })

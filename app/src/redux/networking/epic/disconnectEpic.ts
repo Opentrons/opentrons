@@ -1,18 +1,21 @@
-import { ofType, combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
+
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
+import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
-import { PostWifiDisconnectAction } from '../types'
+import type { PostWifiDisconnectAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  PostWifiDisconnectAction
+> = action => ({
   method: POST,
   path: Constants.WIFI_DISCONNECT_PATH,
   body: { ssid: action.payload.ssid },
@@ -27,7 +30,11 @@ const mapResponseToAction: ResponseToActionMapper<PostWifiDisconnectAction> = (
 
   return response.ok
     ? Actions.postWifiDisconnectSuccess(host.name, meta)
-    : Actions.postWifiDisconnectFailure(host.name, body, meta)
+    : Actions.postWifiDisconnectFailure(
+        host.name,
+        body as RobotApiErrorResponse,
+        meta
+      )
 }
 
 const postDisconnectEpic: Epic = (action$, state$) =>

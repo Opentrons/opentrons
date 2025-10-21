@@ -1,29 +1,28 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
 import Store from 'electron-store'
-import get from 'lodash/get'
 import forEach from 'lodash/forEach'
+import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as Cfg from '@opentrons/app/src/redux/config'
-import systemd from '../systemd'
+import { configInitialized, configValueUpdated } from '../actions'
+import { UI_INITIALIZED } from '../constants'
+import * as Cfg from '../constants'
+import { setUserDataPath } from '../early'
 import { createLogger } from '../log'
+import systemd from '../systemd'
 import { DEFAULTS_V12, migrate } from './migrate'
-import { shouldUpdate, getNextValue } from './update'
+import { getNextValue, shouldUpdate } from './update'
 
 import type {
   ConfigV12,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
-
 import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
 export * from './types'
-
-export const ODD_DIR = '/data/ODD'
 
 // make sure all arguments are included in production
 const argv = process.argv0.endsWith('defaultApp')
@@ -45,12 +44,11 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({
+    _store = new Store({
       defaults: DEFAULTS_V12,
-      // dont overwrite config dir if in dev mode because it causes issues
-      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
-    }) as unknown) as Store<Config>
-    _store.store = migrate((_store.store as unknown) as ConfigV12)
+      cwd: setUserDataPath(),
+    }) as unknown as Store<Config>
+    _store.store = migrate(_store.store as unknown as ConfigV12)
   }
   return _store
 }
@@ -65,7 +63,14 @@ const log = (): Logger => _log ?? (_log = createLogger('config'))
 export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
-      dispatch(Cfg.configInitialized(getFullConfig()))
+      log().info('initializing configuration')
+      dispatch(configInitialized(getFullConfig()))
+      log().info(
+        `flow route: ${
+          getConfig('onDeviceDisplaySettings').unfinishedUnboxingFlowRoute
+        }`
+      )
+      log().info('configuration initialized')
     } else if (
       action.type === Cfg.UPDATE_VALUE ||
       action.type === Cfg.RESET_VALUE ||
@@ -82,28 +87,28 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
         )
 
         if (path === 'devtools') {
-          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err =>
+          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err => {
             log().debug('Something wrong when setting remote dev tools', {
               err,
             })
-          )
+          })
         }
 
         // Note (kj:08/03/2023) change touchscreen brightness
         if (path === 'onDeviceDisplaySettings.brightness') {
-          systemd.updateBrightness(String(nextValue)).catch(err =>
+          systemd.updateBrightness(String(nextValue)).catch(err => {
             log().debug(
               'Something wrong when updating the touchscreen brightness',
               {
                 err,
               }
             )
-          )
+          })
         }
 
         log().debug('Updating config', { path, nextValue })
         store().set(path, nextValue)
-        dispatch(Cfg.configValueUpdated(path, nextValue))
+        dispatch(configValueUpdated(path, nextValue))
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }
@@ -119,11 +124,11 @@ export function getOverrides(path?: string): unknown {
   return path != null ? get(overrides(), path) : overrides()
 }
 
-export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(): Config
+export function getConfig<P extends keyof Config>(path: P): Config[P]
 export function getConfig(path?: any): any {
   const result = store().get(path)
-  const over = getOverrides(path)
+  const over = getOverrides(path as string | undefined)
 
   if (over != null) {
     if (typeof result === 'object' && result != null) {

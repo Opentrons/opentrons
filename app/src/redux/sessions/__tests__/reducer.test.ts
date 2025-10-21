@@ -1,8 +1,10 @@
+import { describe, expect, it } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
+import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 import * as Actions from '../actions'
 import { sessionReducer } from '../reducer'
 
-import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
 
@@ -196,8 +198,7 @@ const SPECS: ReducerSpec[] = [
     },
   },
   {
-    name:
-      'handles sessions:FETCH_ALL_SESSIONS_SUCCESS overwriting existing sessions',
+    name: 'handles sessions:FETCH_ALL_SESSIONS_SUCCESS overwriting existing sessions',
     action: {
       type: 'sessions:FETCH_ALL_SESSIONS_SUCCESS',
       payload: {

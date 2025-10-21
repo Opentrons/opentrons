@@ -1,20 +1,29 @@
-import * as React from 'react'
-import {
-  renderWithProviders,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  BORDERS,
-} from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
+import { renderWithProviders } from '/app/__testing-utils__'
 
 import { QuaternaryButton } from '..'
 
-const render = (props: React.ComponentProps<typeof QuaternaryButton>) => {
+import type { ComponentProps } from 'react'
+
+vi.mock('styled-components', async () => {
+  const actual = await vi.importActual(
+    'styled-components/dist/styled-components.browser.esm.js'
+  )
+  return actual
+})
+
+const render = (props: ComponentProps<typeof QuaternaryButton>) => {
   return renderWithProviders(<QuaternaryButton {...props} />)[0]
 }
 
 describe('QuaternaryButton', () => {
-  let props: React.ComponentProps<typeof QuaternaryButton>
+  let props: ComponentProps<typeof QuaternaryButton>
 
   beforeEach(() => {
     props = {
@@ -22,67 +31,38 @@ describe('QuaternaryButton', () => {
     }
   })
 
-  it('renders secondary tertiary button with text', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(button).toHaveStyle(
-      `border-radius: ${String(BORDERS.radiusRoundEdge)}`
-    )
+  it('renders secondary tertiary button with text - active', () => {
+    render(props)
+    const button = screen.getByText('secondary tertiary button')
+    expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusFull}`)
     expect(button).toHaveStyle('box-shadow: none')
-    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(
-      `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
+      `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle('white-space: nowrap')
-    expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeLabel)}`)
-    expect(button).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
-    )
-    expect(button).toHaveStyle(
-      `line-height: ${String(TYPOGRAPHY.lineHeight12)}`
-    )
+    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeLabel}`)
+    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight12}`)
   })
 
   it('renders secondary tertiary button with text and disabled', () => {
     props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('secondary tertiary button')
+    render(props)
+    const button = screen.getByText('secondary tertiary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle('opacity: 50%')
   })
 
-  it('applies the correct states to the button - hover', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyleRule('opacity', '70%', {
-      modifier: ':hover',
-    })
-    expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
-      modifier: ':hover',
-    })
-  })
-
-  it('applies the correct states to the button - focus-visible', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
-  })
-
   it('renders secondary tertiary button with text and different background color', () => {
-    props.color = COLORS.errorEnabled
-    const { getByText } = render(props)
-    const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(button).toHaveStyle(`color: ${String(COLORS.errorEnabled)}`)
+    props.color = COLORS.red50
+    render(props)
+    const button = screen.getByText('secondary tertiary button')
+    expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(button).toHaveStyle(`color: ${COLORS.red50}`)
   })
 })

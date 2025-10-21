@@ -1,25 +1,30 @@
 import mapValues from 'lodash/mapValues'
-import { uuid } from '../../utils'
-import { getOnlyLatestDefs } from '../../labware-defs'
+
+import { getAllLabwareDefs } from '@opentrons/shared-data'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '../../utils'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
+
 import type {
+  LabwareDef2ByDefURI,
   LabwareDefinition2,
-  LabwareDefinitionsByUri,
+  LoadLiquidCreateCommand,
   ProtocolFileV6,
 } from '@opentrons/shared-data'
 import type {
-  LoadPipetteCreateCommand,
-  LoadModuleCreateCommand,
-  LoadLabwareCreateCommand,
+  LoadLabwareCreateCommand as LoadLabwareCommandV6,
+  LoadLiquidCreateCommand as LoadLiquidCommandV6,
+  LoadModuleCreateCommand as LoadModuleCommandV6,
+  LoadPipetteCreateCommand as LoadPipetteCommandV6,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
   LabwareLocation,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
-  LoadPipetteCreateCommand as LoadPipetteCommandV6,
-  LoadModuleCreateCommand as LoadModuleCommandV6,
-  LoadLabwareCreateCommand as LoadLabwareCommandV6,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration removes pipettes, labware, and modules as top level keys and adds necessary
@@ -60,7 +65,7 @@ export const migrateFile = (
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
-  const allLatestDefs = getOnlyLatestDefs()
+  const allLabwareDefs = getAllLabwareDefs()
 
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
@@ -79,7 +84,7 @@ export const migrateFile = (
     .filter(labwareId => getIsAdapter(labwareId))
     .reduce((acc: LabwareIdMapping, labwareId: string): LabwareIdMapping => {
       const { labwareUri, adapterUri } = getAdapterAndLabwareSplitInfo(
-        labwareId
+        labware[labwareId].definitionId
       )
       const newLabwareId = `${uuid()}:${labwareUri}`
       const newAdapterId = `${uuid()}:${adapterUri}`
@@ -127,12 +132,10 @@ export const migrateFile = (
         getIsAdapter(command.params.labwareId)
     )
     .flatMap(command => {
-      const {
-        adapterUri,
-        labwareUri,
-        adapterDisplayName,
-        labwareDisplayName,
-      } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
+      const { adapterUri, labwareUri, adapterDisplayName, labwareDisplayName } =
+        getAdapterAndLabwareSplitInfo(
+          labware[command.params.labwareId].definitionId
+        )
       const labwareLocation = command.params.location
       let adapterLocation: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -142,14 +145,10 @@ export const migrateFile = (
       } else if ('slotName' in labwareLocation) {
         adapterLocation = { slotName: labwareLocation.slotName }
       }
-      const {
-        parameters: adapterParameters,
-        version: adapterVersion,
-      } = allLatestDefs[adapterUri]
-      const {
-        parameters: labwareParameters,
-        version: labwareVersion,
-      } = allLatestDefs[labwareUri]
+      const { parameters: adapterParameters, version: adapterVersion } =
+        allLabwareDefs[adapterUri]
+      const { parameters: labwareParameters, version: labwareVersion } =
+        allLabwareDefs[labwareUri]
       const adapterId = mappedLabwareIds[command.params.labwareId].newAdapterId
 
       const loadAdapterCommand: LoadLabwareCreateCommand = {
@@ -180,9 +179,9 @@ export const migrateFile = (
 
       return [loadAdapterCommand, loadLabwareCommand]
     })
-  const newLabwareDefinitions: LabwareDefinitionsByUri = Object.keys(
+  const newLabwareDefinitions: LabwareDef2ByDefURI = Object.keys(
     labwareDefinitions
-  ).reduce((acc: LabwareDefinitionsByUri, defId: string) => {
+  ).reduce((acc: LabwareDef2ByDefURI, defId: string) => {
     const labwareDefinition = labwareDefinitions[defId]
     if (labwareDefinition == null) {
       console.error(
@@ -192,8 +191,8 @@ export const migrateFile = (
     const loadName = labwareDefinition.parameters.loadName
     if (ADAPTER_LABWARE_COMBO_LOAD_NAMES.includes(loadName)) {
       const { adapterUri, labwareUri } = getAdapterAndLabwareSplitInfo(defId)
-      const adapterLabwareDef = allLatestDefs[adapterUri]
-      const labwareDef = allLatestDefs[labwareUri]
+      const adapterLabwareDef = allLabwareDefs[adapterUri]
+      const labwareDef = allLabwareDefs[labwareUri]
       acc[adapterUri] = adapterLabwareDef
       acc[labwareUri] = labwareDef
     } else {
@@ -206,14 +205,13 @@ export const migrateFile = (
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
-        getIsAdapter(command.params.labwareId) === false
+        !getIsAdapter(command.params.labwareId)
     )
     .map(command => {
       const labwareId = command.params.labwareId
       const definitionId = labware[labwareId].definitionId
-      const { namespace, version, parameters } = labwareDefinitions[
-        definitionId
-      ]
+      const { namespace, version, parameters } =
+        labwareDefinitions[definitionId]
       const labwareLocation = command.params.location
       let location: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -228,6 +226,10 @@ export const migrateFile = (
         ...command,
         params: {
           ...command.params,
+          labwareId:
+            labwareId.includes(definitionId) || labwareId === 'fixedTrash'
+              ? labwareId
+              : `${labwareId}:${definitionId}`,
           loadName: parameters.loadName,
           namespace,
           version,
@@ -236,37 +238,61 @@ export const migrateFile = (
         },
       }
     })
+
+  const loadLiquidCommands: LoadLiquidCreateCommand[] = commands
+    .filter(
+      (command): command is LoadLiquidCommandV6 =>
+        command.commandType === 'loadLiquid'
+    )
+    .map(command => {
+      const labwareId = command.params.labwareId
+      const definitionId = labware[labwareId].definitionId
+      return {
+        ...command,
+        params: {
+          ...command.params,
+          labwareId: labwareId.includes(definitionId)
+            ? labwareId
+            : `${labwareId}:${definitionId}`,
+        },
+      }
+    })
+
   const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
     if (!getIsAdapter(labwareId)) {
-      acc[labwareId] = labwareLocationUpdate[labwareId]
+      const definitionId = labware[labwareId].definitionId
+      const labId =
+        labwareId.includes(definitionId) || labwareId === 'fixedTrash'
+          ? labwareId
+          : `${labwareId}:${definitionId}`
+      acc[labId] = labwareLocationUpdate[labwareId]
     } else {
-      const adapterAndLabwareLocationUpdate: LabwareLocationUpdate = Object.entries(
-        loadAdapterAndLabwareCommands
-      ).reduce(
-        (
-          adapterAndLabwareAcc: LabwareLocationUpdate,
-          [id, command]: [string, LoadLabwareCreateCommand]
-        ) => {
-          const { location, labwareId } = command.params
-          const labId = labwareId ?? ''
+      const adapterAndLabwareLocationUpdate: LabwareLocationUpdate =
+        Object.entries(loadAdapterAndLabwareCommands).reduce(
+          (
+            adapterAndLabwareAcc: LabwareLocationUpdate,
+            [id, command]: [string, LoadLabwareCreateCommand]
+          ) => {
+            const { location, labwareId } = command.params
+            const labId = labwareId ?? ''
 
-          let locationString = ''
-          if (location === 'offDeck') {
-            locationString = 'offDeck'
-          } else if ('moduleId' in location) {
-            locationString = location.moduleId
-          } else if ('slotName' in location) {
-            locationString = location.slotName
-          } else if ('labwareId' in location) {
-            locationString = location.labwareId
-          }
-          adapterAndLabwareAcc[labId] = locationString
-          return adapterAndLabwareAcc
-        },
-        {}
-      )
+            let locationString = ''
+            if (location === 'offDeck') {
+              locationString = 'offDeck'
+            } else if ('moduleId' in location) {
+              locationString = location.moduleId
+            } else if ('slotName' in location) {
+              locationString = location.slotName
+            } else if ('labwareId' in location) {
+              locationString = location.labwareId
+            }
+            adapterAndLabwareAcc[labId] = locationString
+            return adapterAndLabwareAcc
+          },
+          {}
+        )
       acc = { ...acc, ...adapterAndLabwareLocationUpdate }
     }
     return acc
@@ -275,20 +301,24 @@ export const migrateFile = (
   const getNewLabwareIngreds = (
     ingredLocations?: DesignerApplicationData['ingredLocations']
   ): DesignerApplicationData['ingredLocations'] => {
-    const updatedIngredLocations: DesignerApplicationData['ingredLocations'] = {}
+    const updatedIngredLocations: DesignerApplicationData['ingredLocations'] =
+      {}
     if (ingredLocations == null) return {}
     for (const [labwareId, wellData] of Object.entries(ingredLocations)) {
       if (getIsAdapter(labwareId)) {
         const newLabwareId = mappedLabwareIds[labwareId].newLabwareId
         updatedIngredLocations[newLabwareId] = wellData
       } else {
-        updatedIngredLocations[labwareId] = wellData
+        const definitionId = labware[labwareId].definitionId
+        const newLabwareId = labwareId.includes(definitionId)
+          ? labwareId
+          : `${labwareId}:${definitionId}`
+        updatedIngredLocations[newLabwareId] = wellData
       }
     }
     return updatedIngredLocations
   }
   const newLabwareIngreds = getNewLabwareIngreds(ingredLocations)
-
   const migrateSavedStepForms = (
     savedStepForms: Record<string, any>
   ): Record<string, any> => {
@@ -296,7 +326,7 @@ export const migrateFile = (
       if (stepForm.stepType === 'moveLiquid') {
         let newAspirateLabwareDefinition: LabwareDefinition2 | null = null
 
-        let aspirateLabware = stepForm.aspirate_labware
+        let aspirateLabware: string
         // aspirate labware is an adapter/labware split
         if (stepForm.aspirate_labware in mappedLabwareIds) {
           const newLabwareDefUri =
@@ -307,10 +337,15 @@ export const migrateFile = (
             mappedLabwareIds[stepForm.aspirate_labware].newLabwareId
           // aspirate labware is just a labware and doesn't need to be mapped
         } else {
+          const aspirateDefinitionId =
+            labware[stepForm.aspirate_labware].definitionId
           newAspirateLabwareDefinition =
-            newLabwareDefinitions[
-              labware[stepForm.aspirate_labware].definitionId
-            ]
+            newLabwareDefinitions[aspirateDefinitionId]
+          aspirateLabware =
+            stepForm.aspirate_labware.includes(aspirateDefinitionId) ||
+            stepForm.aspirate_labware === 'fixedTrash'
+              ? stepForm.aspirate_labware
+              : `${stepForm.aspirate_labware}:${aspirateDefinitionId}`
         }
         if (newAspirateLabwareDefinition == null) {
           console.error(
@@ -318,13 +353,14 @@ export const migrateFile = (
           )
         }
 
-        const aspirateTouchTipIncompatible = newAspirateLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const aspirateTouchTipIncompatible =
+          newAspirateLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
 
         let newDispenseLabwareDefinition: LabwareDefinition2 | null = null
 
-        let dispenseLabware = stepForm.dispense_labware
+        let dispenseLabware: string
         // dispense labware is an adapter/labware split
         if (stepForm.dispense_labware in mappedLabwareIds) {
           const labwareUri =
@@ -334,40 +370,47 @@ export const migrateFile = (
             mappedLabwareIds[stepForm.dispense_labware].newLabwareId
           // dispense labware is just a labware and doesn't need to be mapped
         } else {
+          const dispenseDefinitionId =
+            labware[stepForm.dispense_labware].definitionId
           newDispenseLabwareDefinition =
-            newLabwareDefinitions[
-              labware[stepForm.dispense_labware].definitionId
-            ]
+            newLabwareDefinitions[dispenseDefinitionId]
+          dispenseLabware =
+            stepForm.dispense_labware.includes(dispenseDefinitionId) ||
+            stepForm.dispense_labware === 'fixedTrash'
+              ? stepForm.dispense_labware
+              : `${stepForm.dispense_labware}:${dispenseDefinitionId}`
         }
+
         if (newDispenseLabwareDefinition == null) {
           console.error(
             `expected to find dispense labware definition with labwareId ${dispenseLabware} but could not`
           )
         }
-        const dispenseTouchTipIncompatible = newDispenseLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const dispenseTouchTipIncompatible =
+          newDispenseLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
         return {
           ...stepForm,
           dispense_labware: dispenseLabware,
           aspirate_labware: aspirateLabware,
           aspirate_touchTip_checkbox: aspirateTouchTipIncompatible
             ? false
-            : stepForm.aspirate_touchTip_checkbox ?? false,
+            : (stepForm.aspirate_touchTip_checkbox ?? false),
           aspirate_touchTip_mmFromBottom: aspirateTouchTipIncompatible
             ? null
-            : stepForm.aspirate_touchTip_mmFromBottom ?? null,
+            : (stepForm.aspirate_touchTip_mmFromBottom ?? null),
           dispense_touchTip_checkbox: dispenseTouchTipIncompatible
             ? false
-            : stepForm.dispense_touchTip_checkbox ?? false,
+            : (stepForm.dispense_touchTip_checkbox ?? false),
           dispense_touchTip_mmFromBottom: dispenseTouchTipIncompatible
             ? null
-            : stepForm.dispense_touchTip_mmFromBottom ?? null,
+            : (stepForm.dispense_touchTip_mmFromBottom ?? null),
         }
       } else if (stepForm.stepType === 'mix') {
         let newMixLabwareDefinition: LabwareDefinition2 | null = null
 
-        let mixLabware = stepForm.labware
+        let mixLabware: string
         // mix labware is an adapter/labware split
         if (stepForm.labware in mappedLabwareIds) {
           const labwareUri =
@@ -376,8 +419,13 @@ export const migrateFile = (
           mixLabware = mappedLabwareIds[stepForm.labware].newLabwareId
           // mix labware is just a labware and doesn't need to be mapped
         } else {
-          newMixLabwareDefinition =
-            newLabwareDefinitions[labware[stepForm.labware].definitionId]
+          const mixDefinitionId = labware[stepForm.labware].definitionId
+          newMixLabwareDefinition = newLabwareDefinitions[mixDefinitionId]
+          mixLabware =
+            stepForm.labware.includes(mixDefinitionId) ||
+            stepForm.labware === 'fixedTrash'
+              ? stepForm.labware
+              : `${stepForm.labware}:${mixDefinitionId}`
         }
 
         if (newMixLabwareDefinition == null) {
@@ -386,19 +434,20 @@ export const migrateFile = (
           )
         }
 
-        const mixTouchTipIncompatible = newMixLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const mixTouchTipIncompatible =
+          newMixLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
 
         return {
           ...stepForm,
           labware: mixLabware,
           mix_touchTip_checkbox: mixTouchTipIncompatible
             ? false
-            : stepForm.mix_touchTip_checkbox ?? false,
+            : (stepForm.mix_touchTip_checkbox ?? false),
           mix_touchTip_mmFromBottom: mixTouchTipIncompatible
             ? null
-            : stepForm.mix_touchTip_mmFromBottom ?? null,
+            : (stepForm.mix_touchTip_mmFromBottom ?? null),
         }
       }
 
@@ -445,6 +494,7 @@ export const migrateFile = (
       ...loadModuleCommands,
       ...loadAdapterAndLabwareCommands,
       ...loadLabwareCommands,
+      ...loadLiquidCommands,
     ],
   }
 }

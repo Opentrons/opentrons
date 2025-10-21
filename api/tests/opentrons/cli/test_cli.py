@@ -1,4 +1,6 @@
 """Test cli execution."""
+
+
 import json
 import tempfile
 import textwrap
@@ -9,8 +11,7 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-
-from opentrons.cli.analyze import analyze
+from opentrons.cli.analyze import analyze, AnalysisResult
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:
@@ -26,7 +27,13 @@ class _AnalysisCLIResult:
     stdout_stderr: str
 
 
-def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
+def _get_analysis_result(
+    protocol_files: List[Path],
+    output_type: str,
+    check: bool = False,
+    rtp_values: Optional[str] = None,
+    rtp_files: Optional[str] = None,
+) -> _AnalysisCLIResult:
     """Run `protocol_files` as a single protocol through the analysis CLI.
 
     Returns:
@@ -38,14 +45,20 @@ def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
         runner = CliRunner()
-        result = runner.invoke(
-            analyze,
-            [
-                "--json-output",
-                str(analysis_output_file),
-                *[str(p.resolve()) for p in protocol_files],
-            ],
-        )
+        args = [output_type, str(analysis_output_file)]
+
+        if rtp_values is not None:
+            args.extend(["--rtp-values", rtp_values])
+
+        if rtp_files is not None:
+            args.extend(["--rtp-files", rtp_files])
+
+        args.extend([str(p.resolve()) for p in protocol_files])
+
+        if check:
+            args.append("--check")
+
+        result = runner.invoke(analyze, args)
         if analysis_output_file.exists():
             json_output = json.loads(analysis_output_file.read_bytes())
         else:
@@ -57,12 +70,14 @@ def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
         )
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 @pytest.mark.parametrize("fixture_path", _list_fixtures(6))
 def test_analyze(
     fixture_path: Path,
+    output: str,
 ) -> None:
     """Should return with no errors and a non-empty output."""
-    result = _get_analysis_result([fixture_path])
+    result = _get_analysis_result([fixture_path], output)
 
     assert result.exit_code == 0
 
@@ -73,6 +88,7 @@ def test_analyze(
     assert "labware" in result.json_output
     assert "liquids" in result.json_output
     assert "modules" in result.json_output
+    assert "result" in result.json_output
 
 
 _DECK_DEFINITION_TEST_SLOT = 2
@@ -98,6 +114,7 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
     )
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 @pytest.mark.parametrize(
     ("api_level", "robot_type", "expected_point"),
     [
@@ -119,6 +136,7 @@ def test_analysis_deck_definition(
     robot_type: str,
     expected_point: str,
     tmp_path: Path,
+    output: str,
 ) -> None:
     """Test that the analysis uses the appropriate deck definition for the protocol's robot type.
 
@@ -135,7 +153,7 @@ def test_analysis_deck_definition(
         encoding="utf-8",
     )
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output)
 
     assert result.exit_code == 0
 
@@ -144,14 +162,13 @@ def test_analysis_deck_definition(
         "commands"
     ]
 
-    # todo(mm, 2023-05-12): When protocols emit true Protocol Engine comment commands instead
-    # of legacy commands, "legacyCommandText" should change to "message".
-    assert comment_command["params"]["legacyCommandText"] == expected_point
+    assert comment_command["params"]["message"] == expected_point
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
-def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) -> None:
     """It should apply strict validation to the metadata and requirements dicts.
 
     It should reject protocols with questionable metadata and requirements dicts,
@@ -172,7 +189,7 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(protocol_source, encoding="utf-8")
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output)
 
     assert result.exit_code != 0
 
@@ -182,6 +199,8 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     assert expected_message in result.stdout_stderr
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+@pytest.mark.parametrize("check", [True, False])
 @pytest.mark.parametrize(
     ("python_protocol_source", "expected_detail"),
     [
@@ -230,15 +249,324 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     ],
 )
 def test_python_error_line_numbers(
-    tmp_path: Path, python_protocol_source: str, expected_detail: str
+    tmp_path: Path,
+    python_protocol_source: str,
+    expected_detail: str,
+    output: str,
+    check: bool,
 ) -> None:
     """Test that error messages from Python protocols have line numbers."""
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output, check)
 
-    assert result.exit_code == 0
+    if check:
+        assert result.exit_code != 0
+    else:
+        assert result.exit_code == 0
     assert result.json_output is not None
+    assert result.json_output["result"] == AnalysisResult.NOT_OK.value
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_run_time_parameter_setting(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a RTP can be set to a non default value for analysis.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
+
+            def add_parameters(parameters):
+                parameters.add_bool(
+                    display_name="Dry Run",
+                    variable_name="dry_run",
+                    default=False,
+                )
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result(
+        [protocol_source_file], output, rtp_values=json.dumps({"dry_run": True})
+    )
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.OK
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["runTimeParameters"] == [
+        {
+            "displayName": "Dry Run",
+            "variableName": "dry_run",
+            "type": "bool",
+            "value": True,
+            "default": False,
+        }
+    ]
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_run_time_parameter_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that an RTP validation error is shown correctly in analysis result.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+                                                                      # line 2
+            def add_parameters(parameters):                           # line 3
+                # No default value specified                          # line 4
+                parameters.add_bool(                                  # line 5
+                    display_name="Dry Run",
+                    variable_name="dry_run",
+                )
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.NOT_OK.value
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"] == []
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    [error] = result.json_output["errors"]
+    assert error["detail"] == (
+        "TypeError [line 5]: ParameterContext.add_bool() missing 1"
+        " required positional argument: 'default'"
+    )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_rtp_csv_file_setting(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a CSV file can be set for analysis.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
+
+            def add_parameters(parameters):
+                parameters.add_csv_file(
+                    display_name="CSV File",
+                    variable_name="csv_file",
+                )
+            def run(protocol):
+                protocol.params.csv_file.contents
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    csv_source_file = tmp_path / "csv_file.csv"
+    csv_source_file.write_text("a,b,c", encoding="utf-8")
+
+    result = _get_analysis_result(
+        [protocol_source_file],
+        output,
+        rtp_files=json.dumps({"csv_file": str(csv_source_file.resolve())}),
+    )
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.OK
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 20],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["runTimeParameters"] == [
+        {
+            "displayName": "CSV File",
+            "variableName": "csv_file",
+            "type": "csv_file",
+            "file": {"id": "", "name": "csv_file.csv"},
+        }
+    ]
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_file_required_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a FileParameterRequired error gets caught and changes the result to FILE_REQUIRED.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.20"}
+
+            def add_parameters(parameters):
+                parameters.add_csv_file(
+                    display_name="CSV File",
+                    variable_name="csv_file",
+                )
+            def run(protocol):
+                protocol.params.csv_file.file
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["result"] == AnalysisResult.PARAMETER_VALUE_REQUIRED.value
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"]  # There should be a home command
+    assert result.json_output["labware"] == []
+    assert result.json_output["liquids"] == []
+    assert result.json_output["modules"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 20],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    assert result.json_output["errors"]
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_unexpected_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that an unexpected error raised from outside opentrons functions is handled correctly."""
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception before runner load.
+        """\
+            requirements = {"robotType": "OT-2", "apiLevel": "2.18"}  # line 1
+            x + 1 = 0                                                 # line 2
+            def add_parameters(parameters):
+                parameters.add_bool()
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code != 0
+    assert result.stdout_stderr == (
+        "Error: cannot assign to expression here."
+        " Maybe you meant '==' instead of '='? (protocol.py, line 2)\n"
+    )
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_unexpected_runner_load_error(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that an error raised during runner load is handled properly.
+
+    Also verify that analysis result contains all static data about the protocol.
+    """
+    python_protocol_source = textwrap.dedent(
+        # Raises an exception during runner load.
+        """\
+            requirements = {"apiLevel": "2.18"}     # line 1
+            call_a_non_existent_func()              # line 2
+
+            def add_parameters(parameters):         # line 4
+                parameters.add_bool()
+            def run(protocol):
+                pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
+    protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
+    result = _get_analysis_result([protocol_source_file], output)
+
+    assert result.exit_code == 0
+
+    assert result.json_output is not None
+    assert result.json_output["robotType"] == "OT-2 Standard"
+    assert result.json_output["pipettes"] == []
+    assert result.json_output["commands"] == []
+    assert result.json_output["config"] == {
+        "apiVersion": [2, 18],
+        "protocolType": "python",
+    }
+    assert result.json_output["files"] == [{"name": "protocol.py", "role": "main"}]
+    [error] = result.json_output["errors"]
+    assert error["detail"] == "name 'call_a_non_existent_func' is not defined"
+    assert error["errorCode"] == "4000"
+    assert error["errorType"] == "UnexpectedAnalysisError"
+
+
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_analyze_json_protocol(
+    tmp_path: Path,
+    output: str,
+) -> None:
+    """Test that a json protocol analyzes correctly."""
+    json_file = (
+        Path(__file__).parents[4]
+        / "shared-data"
+        / "protocol"
+        / "fixtures"
+        / "8"
+        / "simpleV8.json"
+    )
+    result = _get_analysis_result([json_file], output)
+
+    assert result.exit_code == 0
+    op = result.json_output
+    assert op is not None
+    assert len(op["commands"]) == 27
+    assert op["result"] == AnalysisResult.OK.value

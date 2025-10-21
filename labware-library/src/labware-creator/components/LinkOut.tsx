@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 // TODO make this a component library component?
 interface Props {

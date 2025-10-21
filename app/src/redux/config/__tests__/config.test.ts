@@ -1,10 +1,11 @@
-// config tests
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as Cfg from '..'
 import { configReducer } from '../reducer'
 
 import type { State } from '../../types'
 
-jest.mock('../../shell/remote', () => ({
+vi.mock('../../shell/remote', () => ({
   remote: { INITIAL_CONFIG: { isConfig: true } },
 }))
 
@@ -12,8 +13,6 @@ describe('config', () => {
   let state: State
 
   beforeEach(() => {
-    jest.clearAllMocks()
-
     state = {
       config: {
         devtools: true,
@@ -29,6 +28,7 @@ describe('config', () => {
       expect(Cfg.configInitialized(state.config as any)).toEqual({
         type: 'config:INITIALIZED',
         payload: { config: state.config },
+        meta: { shell: true },
       })
     })
 
@@ -36,6 +36,7 @@ describe('config', () => {
       expect(Cfg.configValueUpdated('foo.bar', false)).toEqual({
         type: 'config:VALUE_UPDATED',
         payload: { path: 'foo.bar', value: false },
+        meta: { shell: true },
       })
     })
 

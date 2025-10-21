@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -11,12 +10,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { HTMLProps } from 'react'
+
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({
   onClick,
   children,
-}: React.HTMLProps<HTMLButtonElement>): JSX.Element {
-  const history = useHistory()
+}: HTMLProps<HTMLButtonElement>): JSX.Element {
+  const navigate = useNavigate()
   const { t } = useTranslation('shared')
 
   return (
@@ -24,7 +25,13 @@ export function BackButton({
       marginBottom="1rem"
       maxWidth="fit-content"
       // go back in the history stack if no click handler specified
-      onClick={onClick != null ? onClick : () => history.goBack()}
+      onClick={
+        onClick != null
+          ? onClick
+          : () => {
+              navigate(-1)
+            }
+      }
     >
       <Flex alignItems={ALIGN_CENTER}>
         <Icon name="back" height="3rem" />

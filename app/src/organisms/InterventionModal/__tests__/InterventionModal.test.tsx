@@ -1,38 +1,109 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { RUN_STATUS_RUNNING, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
-  CompletedProtocolAnalysis,
   getLabwareDefURI,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
-import { i18n } from '../../../i18n'
-import { InterventionModal } from '..'
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useIsFlex } from '/app/redux-resources/robots'
+import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
+
+import { InterventionModal, useInterventionModal } from '..'
 import {
+  mockEmptyStackerCommand,
+  mockFillStackerCommand,
+  mockMoveLabwareCommandFromModule,
+  mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
-  mockMoveLabwareCommandFromSlot,
-  mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
 } from '../__fixtures__'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
-import { useIsFlex } from '../../Devices/hooks'
+
+import type { ComponentProps } from 'react'
+import type { RunData } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const ROBOT_NAME = 'Otie'
 
-const mockOnResumeHandler = jest.fn()
+const mockOnResumeHandler = vi.fn()
 
-jest.mock('../../Devices/hooks')
+vi.mock('/app/redux-resources/robots')
 
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+describe('useInterventionModal', () => {
+  const defaultProps = {
+    runData: { id: 'run1' } as RunData,
+    lastRunCommand: mockPauseCommandWithStartTime,
+    runStatus: RUN_STATUS_RUNNING,
+    robotName: 'TestRobot',
+    analysis: null,
+    doorIsOpen: false,
+  }
 
-const render = (props: React.ComponentProps<typeof InterventionModal>) => {
+  it('should return showModal true when conditions are met', () => {
+    const { result } = renderHook(() => useInterventionModal(defaultProps))
+
+    expect(result.current.showModal).toBe(true)
+    expect(result.current.modalProps).not.toBeNull()
+  })
+
+  it('should return showModal false when runStatus is terminal', () => {
+    const props = { ...defaultProps, runStatus: RUN_STATUS_STOPPED }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return showModal false when lastRunCommand is null', () => {
+    const props = { ...defaultProps, lastRunCommand: null }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return showModal false when robotName is null', () => {
+    const props = { ...defaultProps, robotName: null }
+
+    const { result } = renderHook(() => useInterventionModal(props))
+
+    expect(result.current.showModal).toBe(false)
+    expect(result.current.modalProps).toBeNull()
+  })
+
+  it('should return correct modalProps when showModal is true', () => {
+    const { result } = renderHook(() => useInterventionModal(defaultProps))
+
+    expect(result.current.modalProps).toEqual({
+      command: mockPauseCommandWithStartTime,
+      run: defaultProps.runData,
+      robotName: 'TestRobot',
+      analysis: null,
+    })
+  })
+  it('should return showModal true and an alternate footer when door is open', () => {
+    const { result } = renderHook(() =>
+      useInterventionModal({ ...defaultProps, doorIsOpen: true })
+    )
+    expect(result.current.showModal).toBe(true)
+    expect(result.current.modalProps?.alternateFooterContent).toBeTruthy()
+  })
+})
+
+const render = (props: ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('InterventionModal', () => {
-  let props: React.ComponentProps<typeof InterventionModal>
+  let props: ComponentProps<typeof InterventionModal>
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
@@ -48,33 +119,33 @@ describe('InterventionModal', () => {
         ],
       } as CompletedProtocolAnalysis,
     }
-    mockUseIsFlex.mockReturnValue(true)
+    vi.mocked(useIsFlex).mockReturnValue(true)
   })
 
   it('renders an InterventionModal with the robot name in the header and confirm button', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Pause on Otie')
+    render(props)
+    screen.getByText('Pause on Otie')
     // getByText('Learn more about manual steps')
-    getByRole('button', { name: 'Confirm and resume' })
+    screen.getByRole('button', { name: 'Confirm and resume' })
   })
 
   it('renders a pause intervention modal given a pause-type command', () => {
-    const { getByText } = render(props)
-    getByText(truncatedCommandMessage)
-    getByText('Paused for')
-    getByText(/[0-9]{2}:[0-9]{2}:[0-9]{2}/)
+    render(props)
+    screen.getByText(truncatedCommandMessage)
+    screen.getByText('Paused for')
+    screen.getByText(/[0-9]{2}:[0-9]{2}:[0-9]{2}/)
   })
 
   it('renders a pause intervention modal with an empty timestamp when no start time given', () => {
     props = { ...props, command: mockPauseCommandWithoutStartTime }
-    const { getByText } = render(props)
-    getByText('Paused for')
-    getByText('--:--:--')
+    render(props)
+    screen.getByText('Paused for')
+    screen.getByText('--:--:--')
   })
 
   it('clicking "Confirm and resume" triggers the resume handler', () => {
-    const { getByText } = render(props)
-    getByText('Confirm and resume').click()
+    render(props)
+    fireEvent.click(screen.getByText('Confirm and resume'))
     expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 
@@ -99,12 +170,49 @@ describe('InterventionModal', () => {
         modules: [],
       } as any,
     }
-    const { getByText, queryAllByText } = render(props)
-    getByText('Move labware on Otie')
-    getByText('Labware name')
-    getByText('mockLabware')
-    queryAllByText('A1')
-    queryAllByText('D3')
+    render(props)
+    screen.getByText('Move labware on Otie')
+    screen.getByText('mockLabware')
+    screen.queryAllByText('A1')
+    screen.queryAllByText('D3')
+  })
+
+  it('renders a move labware intervention modal given a move labware command - between staging area slots', () => {
+    props = {
+      ...props,
+      command: {
+        id: 'mockMoveLabwareCommandId',
+        key: 'mockMoveLabwareCommandKey',
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareId',
+          newLocation: {
+            addressableAreaName: 'C4',
+          },
+          strategy: 'manualMoveWithPause',
+        },
+        startedAt: 'fake_timestamp',
+        completedAt: 'fake_timestamp',
+        createdAt: 'fake_timestamp',
+        status: 'succeeded',
+      },
+      run: {
+        labware: [
+          {
+            id: 'mockLabwareId',
+            displayName: 'mockLabwareInStagingArea',
+            location: { slotName: 'B4' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+        ],
+        modules: [],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Move labware on Otie')
+    screen.getByText('mockLabwareInStagingArea')
+    screen.queryAllByText('B4')
+    screen.queryAllByText('C4')
   })
 
   it('renders a move labware intervention modal given a move labware command - module starting point', () => {
@@ -134,11 +242,87 @@ describe('InterventionModal', () => {
         ],
       } as any,
     }
-    const { getByText, queryAllByText } = render(props)
-    getByText('Move labware on Otie')
-    getByText('Labware name')
-    getByText('mockLabware')
-    queryAllByText('A1')
-    queryAllByText('C1')
+    render(props)
+    screen.getByText('Move labware on Otie')
+    screen.getByText('mockLabware')
+    screen.queryAllByText('A1')
+    screen.queryAllByText('C1')
+  })
+
+  it('renders a move labware intervention modal given a move labware command into waste chute', () => {
+    props = {
+      ...props,
+      command: {
+        id: 'mockMoveLabwareCommandId',
+        key: 'mockMoveLabwareCommandKey',
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareId',
+          newLocation: {
+            addressableAreaName: GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+          },
+          strategy: 'manualMoveWithPause',
+        },
+        startedAt: 'fake_timestamp',
+        completedAt: 'fake_timestamp',
+        createdAt: 'fake_timestamp',
+        status: 'succeeded',
+      },
+      run: {
+        labware: [
+          {
+            id: 'mockLabwareId',
+            displayName: 'mockLabwareInStagingArea',
+            location: { slotName: 'B4' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+        ],
+        modules: [],
+      } as any,
+    }
+    render(props)
+    screen.getByText('mockLabwareInStagingArea')
+    screen.queryAllByText('B4')
+    screen.queryAllByText('Waste Chute')
+  })
+
+  it('renders an empty stacker modal', () => {
+    props = {
+      ...props,
+      command: mockEmptyStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockEmptyStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Empty Stacker')
+    screen.queryAllByText('STACKER C3')
+  })
+
+  it('renders a fill stacker modal', () => {
+    props = {
+      ...props,
+      command: mockFillStackerCommand,
+      run: {
+        labware: [],
+        modules: [
+          {
+            id: mockFillStackerCommand.params.moduleId,
+            model: 'flexStackerModuleV1',
+            location: { slotName: 'C3' },
+          },
+        ],
+      } as any,
+    }
+    render(props)
+    screen.getByText('Refill Stacker')
+    screen.queryAllByText('STACKER C3')
   })
 })

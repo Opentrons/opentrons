@@ -1,6 +1,17 @@
-import takeWhile from 'lodash/takeWhile'
-import * as StepGeneration from '@opentrons/step-generation'
-import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
+import {
+  commandCreatorsTimeline,
+  curryCommandCreator,
+  dropTip,
+  dropTipInTrash,
+  dropTipInWasteChute,
+  getPipetteIdFromCCArgs,
+  reduceCommandCreators,
+} from '@opentrons/step-generation'
+
+import { commandCreatorFromStepArgs } from '../file-data/helpers'
+
+import type { CutoutId } from '@opentrons/shared-data'
+import type * as StepGeneration from '@opentrons/step-generation'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 
 export interface GenerateRobotStateTimelineArgs {
@@ -18,39 +29,33 @@ export const generateRobotStateTimeline = (
     initialRobotState,
     invariantContext,
   } = args
-  const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
-    stepId => {
-      return (
-        (allStepArgsAndErrors[stepId] &&
-          allStepArgsAndErrors[stepId].stepArgs) ||
-        null
-      )
-    }
-  )
-  // @ts-expect-error(sa, 2021-7-6): stepArgs might be null (see code above). this was incorrectly typed from before the TS migration and requires source code changes
-  const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
-    allStepArgs,
-    stepArgs => stepArgs
-  )
+  const continuousStepArgs = orderedStepIds.reduce<
+    StepGeneration.CommandCreatorArgs[]
+  >((acc, stepId) => {
+    const { stepArgs } = allStepArgsAndErrors?.[stepId]
+    return stepArgs != null ? [...acc, stepArgs] : acc
+  }, [])
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
       acc: StepGeneration.CurriedCommandCreator[],
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
     ): StepGeneration.CurriedCommandCreator[] => {
-      const curriedCommandCreator = commandCreatorFromStepArgs(args)
-
-      if (curriedCommandCreator === null) {
-        // unsupported command creator in args.commandCreatorFnName
+      const { stepNumber, name, description } = args
+      const baseCreator = commandCreatorFromStepArgs(args)
+      // unsupported command creator in args.commandCreatorFnName
+      if (baseCreator === null) {
         return acc
       }
+
+      let finalCreator: StepGeneration.CurriedCommandCreator = baseCreator
 
       // Drop tips eagerly, per pipette
       //
       // - If we don't have a 'changeTip: never' step for this pipette in the future,
       // we know the current tip(s) aren't going to be reused, so we can drop them
       // immediately after the current step is done.
-      const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
+      const pipetteId = getPipetteIdFromCCArgs(args)
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
@@ -58,79 +63,77 @@ export const generateRobotStateTimeline = (
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
-          .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
+          .find(
+            stepArgs => 'pipette' in stepArgs && stepArgs.pipette === pipetteId
+          )
         const willReuseTip =
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
-          nextStepArgsForPipette?.changeTip &&
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
+          nextStepArgsForPipette != null &&
+          'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
         const isWasteChute =
-          invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
-          invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'wasteChute'
+          invariantContext.wasteChuteEntities[dropTipLocation] != null
         const isTrashBin =
-          invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
-          invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'trashBin'
-
-        const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        const addressableAreaName =
-          pipetteSpec.channels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute'
-
-        let dropTipCommands = StepGeneration.curryCommandCreator(
-          StepGeneration.dropTip,
-          {
+          invariantContext.trashBinEntities[dropTipLocation] != null
+        let dropTipCommands = [
+          curryCommandCreator(dropTip, {
             pipette: pipetteId,
             dropTipLocation,
-          }
-        )
-
+          }),
+        ]
         if (isWasteChute) {
-          dropTipCommands = StepGeneration.curryCommandCreator(
-            StepGeneration.wasteChuteCommandsUtil,
-            {
-              type: 'dropTip',
-              pipetteId: pipetteId,
-              addressableAreaName,
-            }
-          )
-        }
-        if (isTrashBin) {
-          dropTipCommands = StepGeneration.curryCommandCreator(
-            StepGeneration.movableTrashCommandsUtil,
-            {
-              type: 'dropTip',
-              pipetteId: pipetteId,
-            }
-          )
-        }
-        if (!willReuseTip) {
-          return [
-            ...acc,
-            (_invariantContext, _prevRobotState) =>
-              StepGeneration.reduceCommandCreators(
-                [curriedCommandCreator, dropTipCommands],
-                _invariantContext,
-                _prevRobotState
-              ),
+          dropTipCommands = [
+            curryCommandCreator(dropTipInWasteChute, {
+              pipetteId,
+              wasteChuteId:
+                invariantContext.wasteChuteEntities[dropTipLocation].id,
+            }),
           ]
+        }
+
+        if (isTrashBin) {
+          const trashLocation =
+            invariantContext.trashBinEntities[dropTipLocation].location
+          dropTipCommands = [
+            curryCommandCreator(dropTipInTrash, {
+              pipetteId,
+              trashLocation: trashLocation as CutoutId,
+            }),
+          ]
+        }
+
+        if (!willReuseTip) {
+          finalCreator = (_invariantContext, _prevRobotState) =>
+            reduceCommandCreators(
+              [baseCreator, ...dropTipCommands],
+              _invariantContext,
+              _prevRobotState
+            )
         }
       }
 
-      return [...acc, curriedCommandCreator]
+      const wrappedWithStepInfo: StepGeneration.CurriedCommandCreator = (
+        _invariantContext,
+        _prevRobotState
+      ) => {
+        const result = finalCreator(_invariantContext, _prevRobotState)
+        return {
+          ...result,
+          stepNumber,
+          name,
+          description,
+        }
+      }
+
+      return [...acc, wrappedWithStepInfo]
     },
     []
   )
-  const timeline = StepGeneration.commandCreatorsTimeline(
+  const timeline = commandCreatorsTimeline(
     curriedCommandCreators,
     invariantContext,
     initialRobotState
   )
+
   return timeline
 }

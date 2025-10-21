@@ -3,7 +3,7 @@
 import logging
 import select
 from typing import Optional, List, Any
-import serial  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
 
 from . import usb_config, usb_monitor, tcp_conn
 

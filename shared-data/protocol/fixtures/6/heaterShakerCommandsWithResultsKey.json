@@ -2494,7 +2494,7 @@
   },
   "commands": [
     {
-      "id": "0",
+      "key": "0",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "3dff4f90-3412-11eb-ad93-ed232a2337cf",
@@ -2502,7 +2502,7 @@
       }
     },
     {
-      "id": "1",
+      "key": "1",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b",
@@ -2510,7 +2510,7 @@
       }
     },
     {
-      "id": "2",
+      "key": "2",
       "commandType": "loadModule",
       "params": {
         "moduleId": "3e012450-3412-11eb-ad93-ed232a2337cf:heaterShakerModuleType",
@@ -2523,7 +2523,7 @@
       }
     },
     {
-      "id": "5",
+      "key": "5",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "fixedTrash",
@@ -2590,7 +2590,7 @@
       }
     },
     {
-      "id": "6",
+      "key": "6",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "3e047fb0-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_tiprack_1000ul/1",
@@ -3622,7 +3622,7 @@
       }
     },
     {
-      "id": "7",
+      "key": "7",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
@@ -3691,7 +3691,7 @@
       }
     },
     {
-      "id": "8",
+      "key": "8",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "aac5d680-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",

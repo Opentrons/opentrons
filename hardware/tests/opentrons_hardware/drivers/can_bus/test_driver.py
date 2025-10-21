@@ -1,5 +1,5 @@
 """Can Driver tests."""
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Iterator, cast
 
 import pytest
 from can import Bus, Message
@@ -8,15 +8,17 @@ from opentrons_shared_data.errors.exceptions import CANBusBusError
 from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
 
 
+pytestmark = pytest.mark.slow
+
+
 @pytest.fixture
 def bus_channel() -> str:
     """The virtual can bus channel."""
     return "test_channel"
 
 
-@pytest.mark.slow
 @pytest.fixture
-def can_bus(bus_channel: str) -> Bus:
+def can_bus(bus_channel: str) -> Iterator[Bus]:
     """A virtual can bus fixture."""
     bus = Bus(bus_channel, interface="virtual")
     yield bus
@@ -38,7 +40,11 @@ async def test_send(subject: CanDriver, can_bus: Bus) -> None:
     )
     await subject.send(message)
 
-    recv = can_bus.recv()
+    # recv() returns an Optional where None indicates a timeout, but
+    # if you pass timeout=None (or don't specify, that's the default)
+    # then the bus will wait indefinitely so this isn't actually a
+    # possibility
+    recv = cast(Message, can_bus.recv())
     assert recv.data == bytearray([1, 2, 3, 4])
     assert recv.arbitration_id == 0x1FFFFFFF
 

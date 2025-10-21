@@ -1,32 +1,46 @@
-import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
-import { WellGroup } from '@opentrons/components'
+import { createSelector } from 'reselect'
+
+import { COLUMN, getWellNamePerMultiTip, SINGLE } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
-import { selectors as stepFormSelectors } from '../step-forms'
+
 import { selectors as fileDataSelectors } from '../file-data'
-import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
+import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  getHoveredStepId,
+  getHoveredSubstep,
+  getSelectedStepId,
+} from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../types'
+
+import type { WellGroup } from '@opentrons/components'
+import type {
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type { SubstepItemData } from '../steplist/types'
+import type { Selector } from '../types'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
-  wells: string[]
+  wells: string[],
+  nozzles: NozzleConfigurationStyle | null
 ): string[] {
-  const channels = pipetteEntity.spec.channels
-  // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (channels === 8 || channels === 96) {
+  const pipChannels = pipetteEntity.spec.channels
+  // `wells` is all the wells that pipette interacts with.
+  if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
+    let channels = pipChannels
+    if ((nozzles === COLUMN && pipChannels === 96) || pipChannels === 8) {
+      channels = 8
+    }
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
         labwareEntity.def,
         well,
         channels
       )
-
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
@@ -54,9 +68,10 @@ function _getSelectedWellsForStep(
   if (!pipetteEntity || !labwareEntity) {
     return []
   }
+  const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : null
 
   const getWells = (wells: string[]): string[] =>
-    _wellsForPipette(pipetteEntity, labwareEntity, wells)
+    _wellsForPipette(pipetteEntity, labwareEntity, wells, nozzles)
 
   const wells = []
 
@@ -94,25 +109,33 @@ function _getSelectedWellsForStep(
 
   frame.commands.forEach((c: CreateCommand) => {
     if (c.commandType === 'pickUpTip' && c.params.labwareId === labwareId) {
-      const commandWellName = c.params.wellName
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
+      let channels = pipetteSpec.channels
+      if ('nozzles' in stepArgs) {
+        if (stepArgs.nozzles === COLUMN) {
+          channels = 8
+        } else if (stepArgs.nozzles === SINGLE) {
+          channels = 1
+        }
+      }
+      const commandWellName = c.params.wellName
 
-      if (pipetteSpec.channels === 1) {
+      if (channels === 1) {
         wells.push(commandWellName)
-      } else if (pipetteSpec.channels === 8 || pipetteSpec.channels === 96) {
+      } else if (channels === 8 || channels === 96) {
         const wellSet =
-          getWellSetForMultichannel(
-            invariantContext.labwareEntities[labwareId].def,
-            commandWellName,
-            pipetteSpec.channels
-          ) || []
+          getWellSetForMultichannel({
+            labwareDef: invariantContext.labwareEntities[labwareId].def,
+            wellName: commandWellName,
+            channels,
+          }) || []
         wells.push(...wellSet)
       } else {
         console.error(
           `Unexpected number of channels: ${
-            pipetteSpec.channels || '?'
+            channels || '?'
           }. Could not get tip highlight state`
         )
       }
@@ -173,116 +196,145 @@ function _getSelectedWellsForSubstep(
 
   // source + dest steps
 
-  // @ts-expect-error(sa, 2021-6-22): `sourceLabware` is missing in `MixArgs`
-  if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
+  if (
+    'sourceLabware' in stepArgs &&
+    stepArgs.sourceLabware != null &&
+    stepArgs.sourceLabware === labwareId
+  ) {
     wells.push(...getWells('source'))
   }
 
-  // @ts-expect-error(sa, 2021-6-22): property `destLabware` is missing in `MixArgs`
-  if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
+  if (
+    'destLabware' in stepArgs &&
+    stepArgs.destLabware != null &&
+    stepArgs.destLabware === labwareId
+  ) {
     wells.push(...getWells('dest'))
   }
 
   if (substeps && substeps.substepType === 'sourceDest') {
     let tipWellSet: string[] = []
+    if ('pipette' in stepArgs) {
+      if (substeps.multichannel) {
+        if ('nozzles' in stepArgs && stepArgs.nozzles !== SINGLE) {
+          const { activeTips } = substeps.multiRows[substepIndex][0]
+          const pipChannels =
+            invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
+          let channels = pipChannels
 
-    if (substeps.multichannel) {
-      const { activeTips } = substeps.multiRows[substepIndex][0]
+          if (stepArgs.nozzles === COLUMN) {
+            channels = 8
+          }
 
-      // just use first multi row
-      if (activeTips && activeTips.labwareId === labwareId) {
-        const multiTipWellSet = getWellSetForMultichannel(
-          invariantContext.labwareEntities[labwareId].def,
-          activeTips.wellName,
-          8
+          // just use first multi row
+          if (
+            activeTips &&
+            activeTips.labwareId === labwareId &&
+            channels !== 1
+          ) {
+            const multiTipWellSet = getWellSetForMultichannel({
+              labwareDef: invariantContext.labwareEntities[labwareId].def,
+              wellName: activeTips.wellName,
+              channels,
+            })
+            if (multiTipWellSet) tipWellSet = multiTipWellSet
+          }
+        } else {
+          // single-nozzle pick up
+          const { activeTips } = substeps.multiRows[substepIndex][0]
+          if (
+            activeTips &&
+            activeTips.labwareId === labwareId &&
+            activeTips.wellName
+          )
+            tipWellSet = [activeTips.wellName]
+        }
+      } else {
+        // single-channel
+        const { activeTips } = substeps.rows[substepIndex]
+        if (
+          activeTips &&
+          activeTips.labwareId === labwareId &&
+          activeTips.wellName
         )
-        if (multiTipWellSet) tipWellSet = multiTipWellSet
+          tipWellSet = [activeTips.wellName]
       }
-    } else {
-      // single-channel
-      const { activeTips } = substeps.rows[substepIndex]
-      if (
-        activeTips &&
-        activeTips.labwareId === labwareId &&
-        activeTips.wellName
-      )
-        tipWellSet = [activeTips.wellName]
     }
-
     wells.push(...tipWellSet)
   }
 
   return wells
 }
 
-export const wellHighlightsByLabwareId: Selector<
-  Record<string, WellGroup>
-> = createSelector(
-  fileDataSelectors.getRobotStateTimeline,
-  stepFormSelectors.getInvariantContext,
-  stepFormSelectors.getArgsAndErrorsByStepId,
-  getHoveredStepId,
-  getHoveredSubstep,
-  fileDataSelectors.getSubsteps,
-  stepFormSelectors.getOrderedStepIds,
-  (
-    robotStateTimeline,
-    invariantContext,
-    allStepArgsAndErrors,
-    hoveredStepId,
-    hoveredSubstep,
-    substepsById,
-    orderedStepIds
-  ) => {
-    const timeline = robotStateTimeline.timeline
-    const stepId = hoveredStepId
-    const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
-    const frame = timeline[timelineIndex]
-    const robotState = frame && frame.robotState
-    const stepArgs =
-      stepId != null &&
-      allStepArgsAndErrors[stepId] &&
-      allStepArgsAndErrors[stepId].stepArgs
+export const wellHighlightsByLabwareId: Selector<Record<string, WellGroup>> =
+  createSelector(
+    fileDataSelectors.getRobotStateTimeline,
+    stepFormSelectors.getInvariantContext,
+    stepFormSelectors.getArgsAndErrorsByStepId,
+    getHoveredStepId,
+    getHoveredSubstep,
+    fileDataSelectors.getSubsteps,
+    stepFormSelectors.getOrderedStepIds,
+    getSelectedStepId,
+    (
+      robotStateTimeline,
+      invariantContext,
+      allStepArgsAndErrors,
+      hoveredStepId,
+      hoveredSubstep,
+      substepsById,
+      orderedStepIds,
+      selectedStepId
+    ) => {
+      const timeline = robotStateTimeline.timeline
+      const stepId = hoveredStepId || selectedStepId
+      const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
+      const frame = timeline[timelineIndex]
+      const robotState = frame && frame.robotState
+      const stepArgs =
+        stepId != null &&
+        allStepArgsAndErrors[stepId] &&
+        allStepArgsAndErrors[stepId].stepArgs
 
-    if (!robotState || stepId == null || !stepArgs) {
-      // nothing hovered, or no stepArgs for step
-      return {}
-    }
+      if (!robotState || stepId == null || !stepArgs) {
+        // nothing hovered, or no stepArgs for step
+        return {}
+      }
 
-    // replace value of each labware with highlighted wells info
-    return mapValues(
-      robotState.liquidState.labware,
-      (
-        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-        labwareId: string
-      ) => {
-        let selectedWells: string[] = []
+      // replace value of each labware with highlighted wells info
+      return mapValues(
+        robotState.liquidState.labware,
+        (
+          labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+          labwareId: string
+        ) => {
+          let selectedWells: string[] = []
 
-        if (hoveredSubstep != null) {
-          // wells for hovered substep
-          selectedWells = _getSelectedWellsForSubstep(
-            stepArgs,
-            labwareId,
-            substepsById[stepId],
-            hoveredSubstep.substepIndex,
-            invariantContext
-          )
-        } else {
-          // wells for step overall
-          selectedWells = _getSelectedWellsForStep(
-            stepArgs,
-            labwareId,
-            frame,
-            invariantContext
+          if (hoveredSubstep != null) {
+            // wells for hovered substep
+            selectedWells = _getSelectedWellsForSubstep(
+              stepArgs,
+              labwareId,
+              substepsById[stepId],
+              hoveredSubstep.substepIndex,
+              invariantContext
+            )
+          } else {
+            // wells for step overall
+            selectedWells = _getSelectedWellsForStep(
+              stepArgs,
+              labwareId,
+              frame,
+              invariantContext
+            )
+          }
+
+          // return selected wells eg {A1: null, B4: null}
+          return selectedWells.reduce(
+            (acc, well) => ({ ...acc, [well]: null }),
+            {}
           )
         }
-
-        // return selected wells eg {A1: null, B4: null}
-        return selectedWells.reduce(
-          (acc, well) => ({ ...acc, [well]: null }),
-          {}
-        )
-      }
-    )
-  }
-)
+      )
+    }
+  )

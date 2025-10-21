@@ -3,7 +3,7 @@ import asyncio
 from typing import Iterator
 
 import pytest
-from _pytest.fixtures import FixtureRequest
+from _pytest.fixtures import SubRequest
 
 from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
@@ -28,9 +28,9 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
         NodeId.pipette_left,
     ],
 )
-def eeprom_node_id(request: FixtureRequest) -> Iterator[NodeId]:
+def eeprom_node_id(request: SubRequest) -> Iterator[NodeId]:
     """Node with eeprom."""
-    yield request.param  # type: ignore[attr-defined]
+    yield request.param
 
 
 def filter_func(arb: ArbitrationId) -> bool:

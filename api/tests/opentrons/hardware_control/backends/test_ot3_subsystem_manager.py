@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Set, Optional, AsyncIterator, Tuple
+from typing import Dict, Set, Optional, AsyncIterator, Tuple, Callable, Any, cast
 from itertools import chain
 
 import pytest
@@ -13,9 +13,23 @@ from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     PipetteName,
 )
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.hardware_control import network, tools, types
 from opentrons_hardware.firmware_update import FirmwareUpdate, RunUpdate
 from opentrons_hardware.firmware_update.types import StatusElement, FirmwareUpdateStatus
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageRequest,
+    GetMotorUsageResponse,
+)
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    GetMotorUsageResponsePayload,
+)
+from opentrons_hardware.firmware_bindings import (
+    ArbitrationId,
+    ArbitrationIdParts,
+    MessageId,
+)
 from opentrons_hardware.drivers import can_bus, binary_usb
 
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
@@ -78,7 +92,7 @@ def default_fw_version() -> int:
 
 
 def default_revision() -> types.PCBARevision:
-    return types.PCBARevision("A1")
+    return types.PCBARevision("A1.0")
 
 
 def device_info_for(
@@ -109,9 +123,73 @@ def default_network_info_for(
 
 
 @pytest.fixture
-def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
+async def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
     """Build a decoyed can messenger."""
-    return decoy.mock(cls=can_bus.CanMessenger)
+    mock_messenger = decoy.mock(cls=can_bus.CanMessenger)
+    listeners: list[Callable[[MessageDefinition, ArbitrationId], None]] = []
+
+    def _add(
+        listener: Callable[[MessageDefinition, ArbitrationId], None], _: Any
+    ) -> None:
+        listeners.append(listener)
+
+    decoy.when(
+        mock_messenger.add_listener(
+            cast(Any, matchers.Anything()), cast(Any, matchers.Anything())
+        )
+    ).then_do(_add)
+
+    async def _send_response(node_id: NodeId, message: MessageDefinition) -> None:
+        for listener in listeners:
+            listener(
+                GetMotorUsageResponse(
+                    payload=GetMotorUsageResponsePayload(
+                        usage_elements=[], num_elements=UInt8Field(0)
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=MessageId.get_motor_usage_response,
+                        node_id=NodeId.host,
+                        originating_node_id=NodeId.pipette_left,
+                    )
+                ),
+            )
+            listener(
+                GetMotorUsageResponse(
+                    payload=GetMotorUsageResponsePayload(
+                        usage_elements=[], num_elements=UInt8Field(0)
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=MessageId.get_motor_usage_response,
+                        node_id=NodeId.host,
+                        originating_node_id=NodeId.pipette_right,
+                    )
+                ),
+            )
+            listener(
+                GetMotorUsageResponse(
+                    payload=GetMotorUsageResponsePayload(
+                        usage_elements=[], num_elements=UInt8Field(0)
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=MessageId.get_motor_usage_response,
+                        node_id=NodeId.host,
+                        originating_node_id=NodeId.gripper,
+                    )
+                ),
+            )
+
+    decoy.when(
+        await mock_messenger.send(
+            node_id=NodeId.broadcast, message=GetMotorUsageRequest()
+        )
+    ).then_do(_send_response)
+    return mock_messenger
 
 
 @pytest.fixture
@@ -227,10 +305,10 @@ class ToolDetectionController:
             else default_name
         )
         return tools.types.PipetteInformation(
-            pipette_name,
-            pipette_name.value,
-            pipette_name.name,
-            f"dummyserial{pipette_name.name}",
+            name=pipette_name,
+            name_int=pipette_name.value,
+            model=pipette_name.name,
+            serial=f"dummyserial{pipette_name.name}",
         )
 
     def _auto_tool_summary(
@@ -243,9 +321,11 @@ class ToolDetectionController:
             right=self._pipette_info_from_network(
                 devices.get(NodeId.pipette_right), PipetteName.p50_multi
             ),
-            gripper=tools.types.GripperInformation(model="1", serial="12131231")
-            if (NodeId.gripper in devices and devices[NodeId.gripper].ok)
-            else None,
+            gripper=(
+                tools.types.GripperInformation(model="1", serial="12131231")
+                if (NodeId.gripper in devices and devices[NodeId.gripper].ok)
+                else None
+            ),
         )
 
     async def add_resolution(
@@ -257,15 +337,23 @@ class ToolDetectionController:
         summary = specific or self._auto_tool_summary(devices)
 
         arg = tools.types.ToolDetectionResult(
-            left=on.left
-            if (NodeId.pipette_left in devices and devices[NodeId.pipette_left].ok)
-            else ToolType.nothing_attached,
-            right=on.right
-            if (NodeId.pipette_right in devices and devices[NodeId.pipette_right].ok)
-            else ToolType.nothing_attached,
-            gripper=on.gripper
-            if (NodeId.gripper in devices and devices[NodeId.gripper].ok)
-            else ToolType.nothing_attached,
+            left=(
+                on.left
+                if (NodeId.pipette_left in devices and devices[NodeId.pipette_left].ok)
+                else ToolType.nothing_attached
+            ),
+            right=(
+                on.right
+                if (
+                    NodeId.pipette_right in devices and devices[NodeId.pipette_right].ok
+                )
+                else ToolType.nothing_attached
+            ),
+            gripper=(
+                on.gripper
+                if (NodeId.gripper in devices and devices[NodeId.gripper].ok)
+                else ToolType.nothing_attached
+            ),
         )
 
         self._decoy.when(await self._tool_detector.resolve(arg, 10.0)).then_return(
@@ -896,8 +984,9 @@ async def test_update_process_fails_if_subsytem_does_not_appear_afterward(
     await tool_detection_controller.add_resolution(tool_struct, network_info_value)
 
     await subject.start()
+    subject._check_device_update_timeout = 0.5
     iteration = 0
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Device failed"):
         async for status in subject.update_firmware({SubSystem.gantry_x}):
             iteration += 1
             if iteration == 3:
@@ -944,8 +1033,9 @@ async def test_update_process_fails_if_subsytem_is_not_ok_afterward(
     await tool_detection_controller.add_resolution(tool_struct, network_info_value)
 
     await subject.start()
+    subject._check_device_update_timeout = 0.5
     iteration = 0
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="Device failed"):
         async for status in subject.update_firmware({SubSystem.gantry_x}):
             iteration += 1
             if iteration == 3:

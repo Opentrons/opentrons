@@ -1,44 +1,98 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+} from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { ModuleSetupModal } from '../ModuleSetupModal'
 
-const render = (props: React.ComponentProps<typeof ModuleSetupModal>) => {
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof ModuleSetupModal>) => {
   return renderWithProviders(<ModuleSetupModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('ModuleSetupModal', () => {
-  let props: React.ComponentProps<typeof ModuleSetupModal>
+  let props: ComponentProps<typeof ModuleSetupModal>
   beforeEach(() => {
-    props = { close: jest.fn(), moduleDisplayName: 'mockModuleDisplayName' }
+    props = {
+      close: vi.fn(),
+      moduleDisplayName: 'mockModuleDisplayName',
+      moduleModel: TEMPERATURE_MODULE_V2,
+    }
   })
 
   it('should render the correct header', () => {
-    const { getByRole } = render(props)
-    getByRole('heading', { name: 'mockModuleDisplayName Setup Instructions' })
+    render(props)
+    screen.getByRole('heading', {
+      name: 'mockModuleDisplayName Setup Instructions',
+    })
   })
   it('should render the correct body', () => {
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.'
     )
   })
   it('should render a link to the learn more page', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(
-      getByRole('link', {
-        name: 'mockModuleDisplayName setup instructions',
-      }).getAttribute('href')
+      screen
+        .getByRole('link', {
+          name: 'mockModuleDisplayName setup instructions',
+        })
+        .getAttribute('href')
     ).toBe('https://support.opentrons.com/s/modules')
   })
   it('should call close when the close button is pressed', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(props.close).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'Close' })
+    const closeButton = screen.getByRole('button', { name: 'Close' })
     fireEvent.click(closeButton)
     expect(props.close).toHaveBeenCalled()
+  })
+  it('should render variable copy and link if absorbance reader', () => {
+    props = {
+      ...props,
+      moduleModel: ABSORBANCE_READER_V1,
+    }
+    render(props)
+    screen.getByText(
+      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to read the module Instruction Manual.'
+    )
+    expect(
+      screen
+        .getByRole('link', {
+          name: 'mockModuleDisplayName setup instructions',
+        })
+        .getAttribute('href')
+    ).toBe(
+      'https://insights.opentrons.com/hubfs/Absorbance%20Plate%20Reader%20Instruction%20Manual.pdf'
+    )
+  })
+  it('should render variable copy and link if flex stacker', () => {
+    props = {
+      ...props,
+      moduleModel: FLEX_STACKER_MODULE_V1,
+    }
+    render(props)
+    screen.getByText(
+      'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to see the Stacker Quickstart guide.'
+    )
+    expect(
+      screen
+        .getByRole('link', {
+          name: 'mockModuleDisplayName setup instructions',
+        })
+        .getAttribute('href')
+    ).toBe('https://docs.opentrons.com/stacker/installation/')
   })
 })

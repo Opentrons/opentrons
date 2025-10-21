@@ -1,24 +1,42 @@
 from typing import Optional
 from typing_extensions import Protocol
 
-from opentrons.types import Mount
+from opentrons.types import Point
+from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
+from .types import MountArgType, CalibrationType, ConfigType
 
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
 from .configurable import Configurable
-from .calibratable import Calibratable, CalibrationType
+from .calibratable import Calibratable
 
 
 class LiquidHandler(
-    InstrumentConfigurer,
-    MotionController,
-    Configurable,
+    InstrumentConfigurer[MountArgType],
+    MotionController[MountArgType],
+    Configurable[ConfigType],
     Calibratable[CalibrationType],
-    Protocol[CalibrationType],
+    Protocol[CalibrationType, MountArgType, ConfigType],
 ):
+    def critical_point_for(
+        self,
+        mount: MountArgType,
+        cp_override: Optional[CriticalPoint] = None,
+    ) -> Point:
+        """
+        Determine the current critical point for the specified mount.
+
+        :param mount: A robot mount that the instrument is on.
+        :param cp_override: The critical point override to use.
+
+        If no critical point override is specified, the robot defaults to nozzle location `A1` or the mount critical point.
+        :return: Point.
+        """
+        ...
+
     async def update_nozzle_configuration_for_mount(
         self,
-        mount: Mount,
+        mount: MountArgType,
         back_left_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
         starting_nozzle: Optional[str] = None,
@@ -40,7 +58,7 @@ class LiquidHandler(
         """
         ...
 
-    async def configure_for_volume(self, mount: Mount, volume: float) -> None:
+    async def configure_for_volume(self, mount: MountArgType, volume: float) -> None:
         """
         Configure a pipette to handle the specified volume.
 
@@ -53,7 +71,9 @@ class LiquidHandler(
         """
         ...
 
-    async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
+    async def prepare_for_aspirate(
+        self, mount: MountArgType, rate: float = 1.0
+    ) -> None:
         """
         Prepare the pipette for aspiration.
 
@@ -75,9 +95,10 @@ class LiquidHandler(
 
     async def aspirate(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        correction_volume: float = 0.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -97,15 +118,35 @@ class LiquidHandler(
         volume : [float] The number of microliters to aspirate
         rate : [float] Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed
+        correction_volume : Correction volume in uL for the specified aspirate volume
+        """
+        ...
+
+    async def aspirate_while_tracking(
+        self,
+        mount: MountArgType,
+        end_point: Point,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
         """
         ...
 
     async def dispense(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette
@@ -116,19 +157,49 @@ class LiquidHandler(
         volume : [float] The number of microliters to dispense
         rate : [float] Set plunger speed for this dispense, where
             speed = rate * dispense_speed
+        correction_volume : Correction volume in uL for the specified dispense volume
         """
         ...
 
-    async def blow_out(self, mount: Mount, volume: Optional[float] = None) -> None:
+    async def dispense_while_tracking(
+        self,
+        mount: MountArgType,
+        end_point: Point,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
+        ...
+
+    async def blow_out(
+        self, mount: MountArgType, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         ...
 
+    async def tip_pickup_moves(
+        self,
+        mount: MountArgType,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> None:
+        ...
+
     async def pick_up_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -152,9 +223,18 @@ class LiquidHandler(
         """
         ...
 
+    async def tip_drop_moves(
+        self,
+        mount: MountArgType,
+        home_after: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
+    ) -> None:
+        ...
+
     async def drop_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         home_after: bool = True,
     ) -> None:
         """
@@ -166,4 +246,21 @@ class LiquidHandler(
                                 dropping the tip, and is also used to recover
                                 the ejector shroud after a drop.
         """
+        ...
+
+    async def liquid_probe(
+        self,
+        mount: MountArgType,
+        max_z_dist: float,
+    ) -> float:
+        """Search for and return liquid level height using this pipette
+        at the current location.
+
+        mount : Mount.LEFT or Mount.RIGHT
+        max_z_dist : maximum depth to probe for liquid
+        """
+        ...
+
+    async def increase_evo_disp_count(self, mount: MountArgType) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
         ...

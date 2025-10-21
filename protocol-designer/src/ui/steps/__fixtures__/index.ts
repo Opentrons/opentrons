@@ -1,4 +1,5 @@
-import { SavedStepFormState } from '../../../step-forms'
+import type { SavedStepFormState } from '../../../step-forms'
+
 export const getMockMoveLiquidStep = (): SavedStepFormState => ({
   move_liquid_step_id: {
     pipette: 'some_pipette_id',
@@ -16,7 +17,7 @@ export const getMockMoveLiquidStep = (): SavedStepFormState => ({
     aspirate_mix_volume: '5',
     aspirate_mmFromBottom: 1,
     aspirate_touchTip_checkbox: true,
-    aspirate_touchTip_mmFromBottom: 1,
+    aspirate_touchTip_mmFromTop: -1,
     dispense_flowRate: null,
     dispense_labware: 'dispense_labware_id',
     dispense_wells: ['A1'],
@@ -27,7 +28,7 @@ export const getMockMoveLiquidStep = (): SavedStepFormState => ({
     dispense_mix_volume: null,
     dispense_mmFromBottom: 0.5,
     dispense_touchTip_checkbox: true,
-    dispense_touchTip_mmFromBottom: 1,
+    dispense_touchTip_mmFromTop: -1,
     disposalVolume_checkbox: true,
     disposalVolume_volume: '20',
     blowout_checkbox: true,
@@ -74,7 +75,7 @@ export const getMockMixStep = (): SavedStepFormState => ({
     dispense_delay_checkbox: false,
     dispense_delay_seconds: '1',
     mix_touchTip_checkbox: false,
-    mix_touchTip_mmFromBottom: null,
+    mix_touchTip_mmFromTop: null,
     dropTip_location: 'fixedTrash',
   },
 })

@@ -1,38 +1,35 @@
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { deleteMultipleSteps } from '../actions/actions'
+import { legacy_configureStore } from 'redux-mock-store'
+import { thunk } from 'redux-thunk'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { getOrderedStepIds } from '../../step-forms/selectors'
+import { deleteMultipleSteps } from '../actions/actions'
 
-jest.mock('../../step-forms/selectors')
+vi.mock('../../step-forms/selectors')
 
-const getOrderedStepIdsMock = getOrderedStepIds as jest.MockedFunction<
-  typeof getOrderedStepIds
->
-
-const mockStore = configureMockStore([thunk])
+const mockStore = legacy_configureStore([thunk] as any)
 describe('step list actions', () => {
   describe('deleteMultipleSteps', () => {
     let store: any
     beforeEach(() => {
       store = mockStore()
-      when(getOrderedStepIdsMock)
+      when(vi.mocked(getOrderedStepIds))
         .calledWith(expect.anything())
-        .mockReturnValue([])
+        .thenReturn([])
     })
 
     afterEach(() => {
-      resetAllWhenMocks()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
     describe('when not deleting all steps', () => {
       it('should select the remaining steps', () => {
         const allSteps = ['1', '2', '3', '4', '5']
         const stepsToDelete = ['1', '2']
 
-        when(getOrderedStepIdsMock)
+        when(vi.mocked(getOrderedStepIds))
           .calledWith(expect.anything())
-          .mockReturnValue(allSteps)
+          .thenReturn(allSteps)
 
         store.dispatch(deleteMultipleSteps(stepsToDelete))
         const deleteMultipleStepsAction = {
@@ -54,9 +51,9 @@ describe('step list actions', () => {
         const allSteps = ['1', '2', '3', '4', '5']
         const stepsToDelete = ['4', '1']
 
-        when(getOrderedStepIdsMock)
+        when(vi.mocked(getOrderedStepIds))
           .calledWith(expect.anything())
-          .mockReturnValue(allSteps)
+          .thenReturn(allSteps)
 
         store.dispatch(deleteMultipleSteps(stepsToDelete))
         const deleteMultipleStepsAction = {
@@ -78,9 +75,9 @@ describe('step list actions', () => {
         const allSteps = ['1', '2', '3', '4', '5']
         const stepsToDelete = ['4', '5']
 
-        when(getOrderedStepIdsMock)
+        when(vi.mocked(getOrderedStepIds))
           .calledWith(expect.anything())
-          .mockReturnValue(allSteps)
+          .thenReturn(allSteps)
 
         store.dispatch(deleteMultipleSteps(stepsToDelete))
         const deleteMultipleStepsAction = {
@@ -102,9 +99,9 @@ describe('step list actions', () => {
         const allSteps = ['1', '2', '3', '4', '5']
         const stepsToDelete = ['5', '4', '1']
 
-        when(getOrderedStepIdsMock)
+        when(vi.mocked(getOrderedStepIds))
           .calledWith(expect.anything())
-          .mockReturnValue(allSteps)
+          .thenReturn(allSteps)
 
         store.dispatch(deleteMultipleSteps(stepsToDelete))
         const deleteMultipleStepsAction = {
@@ -128,9 +125,9 @@ describe('step list actions', () => {
         const allSteps = ['1', '2', '3', '4', '5']
         const stepsToDelete = [...allSteps]
 
-        when(getOrderedStepIdsMock)
+        when(vi.mocked(getOrderedStepIds))
           .calledWith(expect.anything())
-          .mockReturnValue(allSteps)
+          .thenReturn(allSteps)
 
         store.dispatch(deleteMultipleSteps(stepsToDelete))
         const deleteMultipleStepsAction = {

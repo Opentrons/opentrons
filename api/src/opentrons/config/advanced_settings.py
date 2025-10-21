@@ -16,9 +16,8 @@ from typing import (
     List,
 )
 
-from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
-from opentrons.system import log_control
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons.config import CONFIG
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -98,34 +97,6 @@ class SettingDefinition:
             set_restart_required()
 
 
-class DisableLogIntegrationSettingDefinition(SettingDefinition):
-    def __init__(self) -> None:
-        super().__init__(
-            _id="disableLogAggregation",
-            title="Disable Opentrons Log Collection",
-            description="Prevent the robot from sending its logs to Opentrons"
-            " for analysis. Opentrons uses these logs to"
-            " troubleshoot robot issues and spot error trends.",
-            robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-        )
-
-    async def on_change(self, value: Optional[bool]) -> None:
-        """Special side effect for this setting"""
-        if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-            code, stdout, stderr = await log_control.set_syslog_level(
-                "emerg" if value else "info"
-            )
-            if code != 0:
-                log.error(
-                    f"Could not set log control: {code}: stdout={stdout}"
-                    f" stderr={stderr}"
-                )
-                raise SettingException(
-                    f"Failed to set log upstreaming: {code}", "log-config-failure"
-                )
-        await super().on_change(value)
-
-
 class Setting(NamedTuple):
     value: Optional[bool]
     definition: SettingDefinition
@@ -177,19 +148,6 @@ settings = [
         default_true_on_robot_types=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
-        _id="disableFastProtocolUpload",
-        title="Use older protocol analysis method",
-        description=(
-            "Use an older, slower method of analyzing uploaded protocols. "
-            "This changes how the OT-2 validates your protocol during the upload "
-            "step, but does not affect how your protocol actually runs. "
-            "Opentrons Support might ask you to change this setting if you encounter "
-            "problems with the newer, faster protocol analysis method."
-        ),
-        restart_required=False,
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-    ),
-    SettingDefinition(
         _id="enableOT3HardwareController",
         title="Enable experimental OT-3 hardware controller",
         description=(
@@ -237,18 +195,42 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
-        _id="disableTipPresenceDetection",
-        title="Disable tip presence detection on pipettes.",
-        description="This setting disables tip presence detection on pipettes, do not turn this feature off unless recommended.",
+        _id="enableErrorRecoveryExperiments",
+        title="Enable error recovery experiments",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to enable additional,"
+            " in-development error recovery features."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="enableOEMMode",
+        title="Enable OEM Mode",
+        description="This setting anonymizes Opentrons branding in the ODD app.",
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
+    SettingDefinition(
+        _id="enablePerformanceMetrics",
+        title="Enable performance metrics",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to collect performance metrics."
+            " Do not turn this on unless you are playing with the performance metrics system."
+        ),
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="disableFlexStackerLabwareDetection",
+        title="Disable Flex Stacker's labware detection features",
+        description=(
+            "Flex Stackers will ignore labware's presence in the hopper and on the shuttle. Protocol runs will no longer raise the following recoverable errors: Hopper Empty, Shuttle Empty and Shuttle Occupied."
+        ),
         robot_type=[RobotTypeEnum.FLEX],
     ),
 ]
-
-if (
-    ARCHITECTURE == SystemArchitecture.BUILDROOT
-    or ARCHITECTURE == SystemArchitecture.YOCTO
-):
-    settings.append(DisableLogIntegrationSettingDefinition())
 
 
 settings_by_id: Dict[str, SettingDefinition] = {s.id: s for s in settings}
@@ -683,6 +665,92 @@ def _migrate28to29(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate29to30(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 30 of the feature flags file.
+
+    - Removes the disableTipPresenceDetection flag.
+    """
+    return {k: v for k, v in previous.items() if "disableTipPresenceDetection" != k}
+
+
+def _migrate30to31(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 31 of the feature flags file.
+
+    - Adds the enableErrorRecoveryExperiments config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableErrorRecoveryExperiments"] = None
+    return newmap
+
+
+def _migrate31to32(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 32 of the feature flags file.
+
+    - Adds the enableOEMMode config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableOEMMode"] = None
+    return newmap
+
+
+def _migrate32to33(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 33 of the feature flags file.
+
+    - Adds the enablePerformanceMetrics config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enablePerformanceMetrics"] = None
+    return newmap
+
+
+def _migrate33to34(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 34 of the feature flags file.
+
+    - Removes disableFastProtocolUpload
+    """
+    removals = ["disableFastProtocolUpload"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate34to35(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 35 of the feature flags file.
+
+    - Removes disableLogAggregation
+    """
+    removals = ["disableLogAggregation"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate35to36(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 36 of the feature flags file.
+
+    - Adds the allowLiquidClasses config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["allowLiquidClasses"] = None
+    return newmap
+
+
+def _migrate36to37(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 37 of the feature flags file.
+
+    - Removes the allowLiquidClasses flag.
+    """
+    return {k: v for k, v in previous.items() if "allowLiquidClasses" != k}
+
+
+def _migrate37to38(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 36 of the feature flags file.
+
+    -  Adds the disableFlexStackerLabwareDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableFlexStackerLabwareDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -713,6 +781,15 @@ _MIGRATIONS = [
     _migrate26to27,
     _migrate27to28,
     _migrate28to29,
+    _migrate29to30,
+    _migrate30to31,
+    _migrate31to32,
+    _migrate32to33,
+    _migrate33to34,
+    _migrate34to35,
+    _migrate35to36,
+    _migrate36to37,
+    _migrate37to38,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

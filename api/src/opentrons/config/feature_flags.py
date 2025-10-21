@@ -1,5 +1,5 @@
 from opentrons.config import advanced_settings as advs
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 
 def short_fixed_trash() -> bool:
@@ -22,12 +22,6 @@ def use_old_aspiration_functions() -> bool:
 
 def enable_door_safety_switch(robot_type: RobotTypeEnum) -> bool:
     return advs.get_setting_with_env_overload("enableDoorSafetySwitch", robot_type)
-
-
-def disable_fast_protocol_upload() -> bool:
-    return advs.get_setting_with_env_overload(
-        "disableFastProtocolUpload", RobotTypeEnum.FLEX
-    )
 
 
 def enable_ot3_hardware_controller() -> bool:
@@ -65,15 +59,28 @@ def status_bar_enabled() -> bool:
     )
 
 
-def tip_presence_detection_enabled() -> bool:
-    """Whether tip presence is enabled on the Flex"""
-    return not advs.get_setting_with_env_overload(
-        "disableTipPresenceDetection", RobotTypeEnum.FLEX
-    )
-
-
 def require_estop() -> bool:
     """Whether the OT3 should allow gantry movements with no Estop plugged in."""
     return not advs.get_setting_with_env_overload(
         "estopNotRequired", RobotTypeEnum.FLEX
+    )
+
+
+def enable_error_recovery_experiments() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableErrorRecoveryExperiments", RobotTypeEnum.FLEX
+    )
+
+
+def enable_performance_metrics(robot_type: RobotTypeEnum) -> bool:
+    return advs.get_setting_with_env_overload("enablePerformanceMetrics", robot_type)
+
+
+def oem_mode_enabled() -> bool:
+    return advs.get_setting_with_env_overload("enableOEMMode", RobotTypeEnum.FLEX)
+
+
+def flex_stacker_tof_sensors_disabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "disableFlexStackerLabwareDetection", RobotTypeEnum.FLEX
     )

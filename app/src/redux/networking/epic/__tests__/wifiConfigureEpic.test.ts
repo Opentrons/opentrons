@@ -1,9 +1,11 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { describe, expect, it } from 'vitest'
 
-import * as Discovery from '../../../discovery'
-import * as Fixtures from '../../__fixtures__'
-import * as Actions from '../../actions'
+import { runEpicTest, setupEpicTestMocks } from '/app/redux/robot-api/__utils__'
+
 import { networkingEpic } from '..'
+import * as Fixtures from '../../__fixtures__'
+import * as Discovery from '../../../discovery'
+import * as Actions from '../../actions'
 
 import type { Action } from '../../../types'
 
@@ -14,10 +16,6 @@ const makeTriggerAction = (robotName: string) =>
   })
 
 describe('networking wifiConfigureEpic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls POST /wifi/configure with options', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,

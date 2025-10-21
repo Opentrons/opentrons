@@ -1,11 +1,12 @@
 // hooks for components that depend on API state
-import { useReducer, useCallback, useRef, useState } from 'react'
+import { useCallback, useReducer, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
 
-import type { State, Action } from '../types'
 import { PENDING } from './constants'
 import { getRequestById } from './selectors'
+
+import type { Action, State } from '../types'
 import type { RequestState } from './types'
 
 type ActionWithRequestMeta = Action & {
@@ -38,6 +39,7 @@ export type DispatchRequestsType = (...actions: Action[]) => void
  * }
  */
 export function useDispatchApiRequest(): [DispatchApiRequestType, string[]] {
+  //  @ts-expect-error(BC, 2023-12-06): replace void with T
   const dispatch = useDispatch<(a: Action) => void>()
 
   // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref

@@ -1,4 +1,4 @@
-// system-info reducer tests
+import { describe, expect, it } from 'vitest'
 
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'

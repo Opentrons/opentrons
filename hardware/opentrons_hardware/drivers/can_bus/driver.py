@@ -2,7 +2,6 @@
 from __future__ import annotations
 import logging
 import asyncio
-import platform
 from typing import Optional, Union, Dict, Any
 import concurrent.futures
 
@@ -15,25 +14,6 @@ from .abstract_driver import AbstractCanDriver
 from .settings import calculate_fdcan_parameters, PCANParameters
 
 log = logging.getLogger(__name__)
-
-
-if platform.system() == "Darwin":
-    # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
-    #  need it anymore.
-    #  Super bad monkey patch to deal with MAC issue:
-    #  https://github.com/hardbyte/python-can/issues/1117
-    from can.interfaces.pcan import basic
-
-    basic.TPCANMsgMac = basic.TPCANMsg
-    basic.TPCANMsgFDMac = basic.TPCANMsgFD
-    basic.TPCANTimestampMac = basic.TPCANTimestamp
-
-    from can.interfaces.pcan import pcan
-
-    pcan.TPCANMsgMac = pcan.TPCANMsg
-    pcan.TPCANMsgFDMac = pcan.TPCANMsgFD
-    pcan.TPCANTimestampMac = pcan.TPCANTimestamp
-    # end super bad monkey patch
 
 
 class CanDriver(AbstractCanDriver):

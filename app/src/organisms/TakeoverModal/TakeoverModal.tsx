@@ -1,5 +1,6 @@
-import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,108 +8,117 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { OddModal } from '/app/molecules/OddModal'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
+  title: string
   showConfirmTerminateModal: boolean
-  setShowConfirmTerminateModal: React.Dispatch<React.SetStateAction<boolean>>
+  setShowConfirmTerminateModal: Dispatch<SetStateAction<boolean>>
   confirmTerminate: () => void
   terminateInProgress: boolean
 }
 
 export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const {
+    title,
     showConfirmTerminateModal,
     setShowConfirmTerminateModal,
     confirmTerminate,
     terminateInProgress,
   } = props
-  const { i18n, t } = useTranslation('shared')
+  const { t } = useTranslation(['shared', 'branded'])
 
-  const terminateHeader: ModalHeaderBaseProps = {
+  const terminateHeader: OddModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
-  return (
-    <Portal level="top">
-      {showConfirmTerminateModal ? (
-        //    confirm terminate modal
-        <Modal header={terminateHeader}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing32}>
-              {t('confirm_terminate')}
-            </StyledText>
-            <Flex flex="1" gridGap={SPACING.spacing8}>
-              <SmallButton
-                onClick={() => setShowConfirmTerminateModal(false)}
-                buttonText={t('continue_activity')}
-                width="50%"
-              />
-              <SmallButton
-                iconName={terminateInProgress ? 'ot-spinner' : undefined}
-                iconPlacement="startIcon"
-                buttonType="alert"
-                onClick={confirmTerminate}
-                buttonText={t('terminate_activity')}
-                width="50%"
-                disabled={terminateInProgress}
-              />
-            </Flex>
+  return createPortal(
+    showConfirmTerminateModal ? (
+      //    confirm terminate modal
+      <OddModal header={terminateHeader}>
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+          <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
+            {t('branded:confirm_terminate')}
+          </LegacyStyledText>
+          <Flex flex="1" gridGap={SPACING.spacing8}>
+            <SmallButton
+              onClick={() => {
+                setShowConfirmTerminateModal(false)
+              }}
+              buttonText={t('continue_activity')}
+              width="50%"
+            />
+            <SmallButton
+              iconName={terminateInProgress ? 'ot-spinner' : undefined}
+              iconPlacement="startIcon"
+              buttonType="alert"
+              onClick={confirmTerminate}
+              buttonText={t('terminate_activity')}
+              width="50%"
+              disabled={terminateInProgress}
+            />
           </Flex>
-        </Modal>
-      ) : (
-        <Modal>
+        </Flex>
+      </OddModal>
+    ) : (
+      <OddModal>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing40}
+          alignItems={ALIGN_CENTER}
+          justifyContent={ALIGN_CENTER}
+          width="100%"
+        >
           <Flex
+            height="12.5rem"
+            backgroundColor={COLORS.grey35}
+            borderRadius={BORDERS.borderRadius12}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing40}
+            color={COLORS.grey60}
+            padding={SPACING.spacing24}
             alignItems={ALIGN_CENTER}
-            justifyContent={ALIGN_CENTER}
+            width="100%"
           >
-            <Flex
-              height="12.5rem"
-              backgroundColor={COLORS.darkBlack20}
-              borderRadius={BORDERS.borderRadiusSize3}
-              flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
-              padding={SPACING.spacing24}
-              alignItems={ALIGN_CENTER}
+            <Icon
+              name="ot-alert"
+              size="2.5rem"
+              marginBottom={SPACING.spacing16}
+            />
+            <LegacyStyledText
+              as="h4"
+              marginBottom={SPACING.spacing4}
+              fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              <Icon
-                name="ot-alert"
-                size="2.5rem"
-                marginBottom={SPACING.spacing16}
-              />
-              <StyledText
-                as="h4"
-                marginBottom={SPACING.spacing4}
-                fontWeight={TYPOGRAPHY.fontWeightBold}
-              >
-                {i18n.format(t('robot_is_busy'), 'capitalize')}
-              </StyledText>
-              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
-                {t('computer_in_app_is_controlling_robot')}
-              </StyledText>
-            </Flex>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              onClick={() => setShowConfirmTerminateModal(true)}
-            >
-              {t('terminate')}
-            </StyledText>
+              {title}
+            </LegacyStyledText>
+            <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+              {t('branded:computer_in_app_is_controlling_robot')}
+            </LegacyStyledText>
           </Flex>
-        </Modal>
-      )}
-    </Portal>
+          <LegacyStyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            onClick={() => {
+              setShowConfirmTerminateModal(true)
+            }}
+          >
+            {t('terminate')}
+          </LegacyStyledText>
+        </Flex>
+      </OddModal>
+    ),
+    getTopPortalEl()
   )
 }

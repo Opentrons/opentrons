@@ -1,15 +1,16 @@
-import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '../icons'
 
-import styles from './forms.css'
+import { Icon } from '../icons'
+import styles from './forms.module.css'
+
+import type { ChangeEventHandler, ComponentProps } from 'react'
 
 /**
  * Checkbox Field Properties.
  */
 export interface DeprecatedCheckboxFieldProps {
   /** change handler */
-  onChange: React.ChangeEventHandler
+  onChange: ChangeEventHandler
   /** checkbox is checked if value is true */
   value?: boolean
   /** classes to apply */
@@ -27,7 +28,7 @@ export interface DeprecatedCheckboxFieldProps {
   /** html tabindex property */
   tabIndex?: number
   /** props passed into label div. TODO IMMEDIATELY what is the Flow type? */
-  labelProps?: React.ComponentProps<'div'>
+  labelProps?: ComponentProps<'div'>
   /** if true, render indeterminate icon */
   isIndeterminate?: boolean
 }
@@ -62,8 +63,8 @@ export function DeprecatedCheckboxField(
             props.isIndeterminate
               ? 'minus-box'
               : props.value
-              ? 'checkbox-marked'
-              : 'checkbox-blank-outline'
+                ? 'ot-checkbox'
+                : 'checkbox-blank-outline'
           }
           width="100%"
         />

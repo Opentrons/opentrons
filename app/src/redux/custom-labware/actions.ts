@@ -1,7 +1,7 @@
 import { resetConfigValue } from '../config'
-import * as Types from './types'
 
 import type { ResetConfigValueAction } from '../config/types'
+import type * as Types from './types'
 
 // action type literals
 
@@ -22,7 +22,8 @@ export const ADD_CUSTOM_LABWARE: 'labware:ADD_CUSTOM_LABWARE' =
 
 export const ADD_CUSTOM_LABWARE_FILE: 'labware:ADD_CUSTOM_LABWARE_FILE' =
   'labware:ADD_CUSTOM_LABWARE_FILE'
-
+export const ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR: 'labware:ADD_CUSTOM_LABWARE_FILE_BLOB' =
+  'labware:ADD_CUSTOM_LABWARE_FILE_BLOB'
 export const ADD_CUSTOM_LABWARE_FAILURE: 'labware:ADD_CUSTOM_LABWARE_FAILURE' =
   'labware:ADD_CUSTOM_LABWARE_FAILURE'
 
@@ -78,10 +79,11 @@ export const customLabwareListFailure = (
   meta: { source },
 })
 
-export const changeCustomLabwareDirectory = (): Types.ChangeCustomLabwareDirectoryAction => ({
-  type: CHANGE_CUSTOM_LABWARE_DIRECTORY,
-  meta: { shell: true },
-})
+export const changeCustomLabwareDirectory =
+  (): Types.ChangeCustomLabwareDirectoryAction => ({
+    type: CHANGE_CUSTOM_LABWARE_DIRECTORY,
+    meta: { shell: true },
+  })
 
 export const addCustomLabware = (
   overwrite: Types.DuplicateLabwareFile | null = null
@@ -96,6 +98,12 @@ export const addCustomLabwareFile = (
 ): Types.AddCustomLabwareFileAction => ({
   type: ADD_CUSTOM_LABWARE_FILE,
   payload: { filePath },
+  meta: { shell: true },
+})
+
+export const addCustomLabwareFileFromCreator = (file: string): any => ({
+  type: ADD_CUSTOM_LABWARE_FILE_FROM_CREATOR,
+  payload: { file },
   meta: { shell: true },
 })
 
@@ -115,9 +123,10 @@ export const addCustomLabwareFailure = (
   payload: { labware, message },
 })
 
-export const clearAddCustomLabwareFailure = (): Types.ClearAddCustomLabwareFailureAction => ({
-  type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
-})
+export const clearAddCustomLabwareFailure =
+  (): Types.ClearAddCustomLabwareFailureAction => ({
+    type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
+  })
 
 export const addNewLabwareName = (
   filename: string
@@ -130,10 +139,11 @@ export const clearNewLabwareName = (): Types.ClearNewLabwareNameAction => ({
   type: CLEAR_NEW_LABWARE_NAME,
 })
 
-export const openCustomLabwareDirectory = (): Types.OpenCustomLabwareDirectoryAction => ({
-  type: OPEN_CUSTOM_LABWARE_DIRECTORY,
-  meta: { shell: true },
-})
+export const openCustomLabwareDirectory =
+  (): Types.OpenCustomLabwareDirectoryAction => ({
+    type: OPEN_CUSTOM_LABWARE_DIRECTORY,
+    meta: { shell: true },
+  })
 
 export const resetCustomLabwareDirectory = (): ResetConfigValueAction => {
   return resetConfigValue(LABWARE_DIRECTORY_CONFIG_PATH)

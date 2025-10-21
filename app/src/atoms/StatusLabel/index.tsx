@@ -1,17 +1,16 @@
-import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
+  Icon,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
@@ -22,6 +21,7 @@ interface StatusLabelProps {
   iconSize?: string
   pulse?: boolean
   id?: string
+  capitalizeStatus?: boolean
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
@@ -35,13 +35,14 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     pulse,
     showIcon = true,
     id,
+    capitalizeStatus = true,
   } = props
 
   return (
     <Flex>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         gridGap={SPACING.spacing4}
         paddingX={SPACING.spacing6}
         paddingY={SPACING.spacing2}
@@ -71,13 +72,13 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
             ) : null}
           </Icon>
         ) : null}
-        <StyledText
+        <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
-          color={textColor ?? COLORS.bluePressed}
+          color={textColor ?? COLORS.blue60}
         >
-          {capitalize(status)}
-        </StyledText>
+          {capitalizeStatus ? capitalize(status) : status}
+        </LegacyStyledText>
       </Flex>
     </Flex>
   )

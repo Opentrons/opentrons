@@ -89,6 +89,7 @@ def get_pipette_offset(
         return None
     except (json.JSONDecodeError, ValidationError):
         log.warning(
-            f"Malformed calibrations for {pipette_id} on {mount}. Please factory reset your calibrations."
+            f"Malformed calibrations for {pipette_id} on {mount}. Please factory reset your calibrations.",
+            exc_info=True,
         )
         return None

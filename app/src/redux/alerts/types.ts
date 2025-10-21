@@ -1,8 +1,8 @@
-import {
-  ALERT_U2E_DRIVER_OUTDATED,
+import type {
   ALERT_APP_UPDATE_AVAILABLE,
-  ALERT_TRIGGERED,
   ALERT_DISMISSED,
+  ALERT_TRIGGERED,
+  ALERT_U2E_DRIVER_OUTDATED,
 } from './constants'
 
 export type AlertId =

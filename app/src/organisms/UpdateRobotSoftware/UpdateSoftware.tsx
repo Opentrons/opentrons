@@ -1,28 +1,23 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
+  LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { ProgressBar } from '../../atoms/ProgressBar'
-
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
-  processProgress: number
 }
 export function UpdateSoftware({
   updateType,
-  processProgress,
 }: UpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const renderText = (): string | null => {
@@ -43,34 +38,38 @@ export function UpdateSoftware({
 
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="33rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
+      <Icon
+        name="ot-spinner"
+        size="5rem"
+        spin={true}
+        color={COLORS.grey60}
+        data-testid="Icon_update"
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
       >
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
-        </StyledText>
-        <StyledText
+        </LegacyStyledText>
+        <LegacyStyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {renderText()}
-        </StyledText>
+        </LegacyStyledText>
       </Flex>
-      <Box width="47.5rem">
-        <ProgressBar percentComplete={processProgress} />
-      </Box>
     </Flex>
   )
 }

@@ -1,4 +1,10 @@
-import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type {
+  CommonCommandCreateInfo,
+  CommonCommandRunTimeInfo,
+  RunCommandFlexStackerError,
+} from '.'
+import type { LabwareDefinition } from '../../js'
+import type { LabwareLocationSequence } from './setup'
 
 export type ModuleRunTimeCommand =
   | MagneticModuleEngageMagnetRunTimeCommand
@@ -15,14 +21,27 @@ export type ModuleRunTimeCommand =
   | TCDeactivateBlockRunTimeCommand
   | TCDeactivateLidRunTimeCommand
   | TCRunProfileRunTimeCommand
+  | TCStartRunExtendedProfileRunTimeCommand
+  | TCRunExtendedProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
   | HeaterShakerWaitForTemperatureRunTimeCommand
   | HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
+  | HeaterShakerSetShakeSpeedRunTimeCommand
   | HeaterShakerOpenLatchRunTimeCommand
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
   | HeaterShakerDeactivateShakerRunTimeCommand
+  | AbsorbanceReaderOpenLidRunTimeCommand
+  | AbsorbanceReaderCloseLidRunTimeCommand
+  | AbsorbanceReaderInitializeRunTimeCommand
+  | AbsorbanceReaderReadRunTimeCommand
+  | FlexStackerSetStoredLabwareRunTimeCommand
+  | FlexStackerRetrieveRunTimeCommand
+  | FlexStackerStoreRunTimeCommand
+  | FlexStackerFillRunTimeCommand
+  | FlexStackerEmptyRunTimeCommand
+  | IdentifyModuleRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -39,14 +58,30 @@ export type ModuleCreateCommand =
   | TCDeactivateBlockCreateCommand
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
+  | TCRunExtendedProfileCreateCommand
+  | TCStartRunExtendedProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
   | HeaterShakerWaitForTemperatureCreateCommand
   | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
+  | HeaterShakerSetShakeSpeedCreateCommand
   | HeaterShakerOpenLatchCreateCommand
   | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerSetTargetTemperatureCreateCommand
+  | AbsorbanceReaderOpenLidCreateCommand
+  | AbsorbanceReaderCloseLidCreateCommand
+  | AbsorbanceReaderInitializeCreateCommand
+  | AbsorbanceReaderReadCreateCommand
+  | FlexStackerSetStoredLabwareCreateCommand
+  | FlexStackerRetrieveCreateCommand
+  | FlexStackerStoreCreateCommand
+  | FlexStackerFillCreateCommand
+  | FlexStackerEmptyCreateCommand
+  | FlexStackerPrepareShuttleCreateCommand
+  | FlexStackerOpenLatch
+  | FlexStackerCloseLatch
+  | IdentifyModuleCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -189,6 +224,26 @@ export interface TCRunProfileRunTimeCommand
     TCRunProfileCreateCommand {
   result?: any
 }
+export interface TCStartRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startRunExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCStartRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartRunExtendedProfileCreateCommand {
+  result?: any
+}
+export interface TCRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/runExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCRunExtendedProfileCreateCommand {
+  result?: any
+}
 export interface TCAwaitProfileCompleteCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/awaitProfileComplete'
@@ -227,6 +282,16 @@ export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
 export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
+  result?: any
+}
+export interface HeaterShakerSetShakeSpeedCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'heaterShaker/setShakeSpeed'
+  params: ShakeSpeedParams
+}
+export interface HeaterShakerSetShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerSetShakeSpeedCreateCommand {
   result?: any
 }
 export interface HeaterShakerDeactivateHeaterCreateCommand
@@ -269,12 +334,56 @@ export interface HeaterShakerDeactivateShakerRunTimeCommand
     HeaterShakerDeactivateShakerCreateCommand {
   result?: any
 }
-
+export interface AbsorbanceReaderOpenLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderOpenLidCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderCloseLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderCloseLidCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderInitializeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderInitializeCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderReadRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AbsorbanceReaderReadCreateCommand {
+  result?: any
+}
+export interface AbsorbanceReaderOpenLidCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/openLid'
+  params: ModuleOnlyParams
+}
+export interface AbsorbanceReaderCloseLidCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/closeLid'
+  params: ModuleOnlyParams
+}
+export interface AbsorbanceReaderInitializeCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/initialize'
+  params: AbsorbanceReaderInitializeParams
+}
+export interface AbsorbanceReaderReadCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'absorbanceReader/read'
+  params: { moduleId: string; fileName?: string | null }
+}
 export interface EngageMagnetParams {
   moduleId: string
   height: number
 }
-
+export interface AbsorbanceReaderInitializeParams {
+  moduleId: string
+  measureMode: 'single' | 'multi'
+  sampleWavelengths: number[]
+  referenceWavelength?: number
+}
 export interface TemperatureParams {
   moduleId: string
   celsius: number
@@ -304,4 +413,233 @@ export interface ThermocyclerSetTargetBlockTemperatureParams {
   celsius: number
   volume?: number
   holdTimeSeconds?: number
+}
+
+export interface TCProfileCycle {
+  steps: AtomicProfileStep[]
+  repetitions: number
+}
+
+export interface TCExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
+}
+
+export interface TCStartExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
+}
+
+export interface FlexStackerStoredLabwareDetails {
+  loadName: string
+  namespace: string
+  version: number
+}
+
+export interface FlexStackerStoredLabwareGroup {
+  primaryLabwareId: string
+  adapterLabwareId: string | null
+  lidLabwareId: string | null
+}
+
+interface StackerStoredLabwareLocationSequences {
+  originalPrimaryLabwareLocationSequences?: LabwareLocationSequence[] | null
+  originalAdapterLabwareLocationSequences?: LabwareLocationSequence[] | null
+  originalLidLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newPrimaryLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newAdapterLabwareLocationSequences?: LabwareLocationSequence[] | null
+  newLidLabwareLocationSequences?: LabwareLocationSequence[] | null
+}
+
+interface StackerStoredLabwareDefinitionURIs {
+  primaryLabwareURI: string
+  adapterLabwareURI?: string | null
+  lidLabwareURI?: string | null
+}
+
+export interface FlexStackerSetStoredLabwareCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/setStoredLabware'
+  params: {
+    moduleId: string
+    initialCount?: number | null
+    initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
+    primaryLabware: FlexStackerStoredLabwareDetails
+    lidLabware: FlexStackerStoredLabwareDetails | null
+    adapterLabware: FlexStackerStoredLabwareDetails | null
+  }
+}
+
+export interface FlexStackerSetStoredLabwareRunTimeCommand
+  extends FlexStackerSetStoredLabwareCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    primaryLabwareDefinition: LabwareDefinition
+    lidLabwareDefinition?: LabwareDefinition | null
+    adapterLabwareDefinition?: LabwareDefinition | null
+    count: number
+    storedLabware: FlexStackerStoredLabwareGroup[]
+  } & StackerStoredLabwareLocationSequences
+}
+
+export interface FlexStackerRetrieveCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/retrieve'
+  params: {
+    moduleId: string
+  }
+}
+
+export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/store'
+  params: {
+    moduleId: string
+    strategy: 'automatic' | 'manual'
+  }
+}
+
+export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/fill'
+  params: {
+    moduleId: string
+    strategy: 'manualWithPause' | 'logical'
+    message?: string
+    count?: number
+    labwareToStore?: FlexStackerStoredLabwareGroup[]
+  }
+}
+
+export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/empty'
+  params: {
+    moduleId: string
+    strategy: 'manualWithPause' | 'logical'
+    message?: string
+    count?: number
+  }
+}
+
+export interface FlexStackerPrepareShuttleCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/prepareShuttle'
+  params: {
+    moduleId: string
+    ignoreLatch?: boolean
+  }
+}
+
+// TODO(tz, 4-17-2025): move under unsafe domain when BE has moved as well
+export interface FlexStackerOpenLatch extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/openLatch'
+  params: {
+    moduleId: string
+  }
+}
+
+export interface FlexStackerCloseLatch extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/closeLatch'
+  params: {
+    moduleId: string
+  }
+}
+
+interface RetrieveResultPrimary {
+  labwareId: string
+  primaryLocationSequence: LabwareLocationSequence
+  originalPrimaryLocationSequence: LabwareLocationSequence
+  primaryLabwareURI: string
+}
+
+interface RetrieveResultNoLid {
+  lidId?: null
+  lidLocationSequence?: null
+  originalLidLocationSequence?: null
+  lidLabwareURI?: null
+}
+
+interface RetrieveResultLid {
+  lidId: string
+  lidLocationSequence: LabwareLocationSequence
+  originalLidLocationSequence: LabwareLocationSequence
+  lidLabwareURI: string
+}
+
+interface RetrieveResultAdapter {
+  adapterId: string
+  adapterLocationSequence: LabwareLocationSequence
+  originalAdapterLocationSequence: LabwareLocationSequence
+  adapterLabwareURI: string
+}
+
+interface RetrieveResultNoAdapter {
+  adapterId?: null
+  adapterLocationSequence?: null
+  originalAdapterLocationSequence?: null
+  adapterLabwareURI?: null
+}
+
+export interface FlexStackerRetrieveRunTimeCommand
+  extends FlexStackerRetrieveCreateCommand,
+    CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
+  result?:
+    | (RetrieveResultPrimary & RetrieveResultNoLid & RetrieveResultNoAdapter)
+    | (RetrieveResultPrimary & RetrieveResultLid & RetrieveResultNoAdapter)
+    | (RetrieveResultPrimary & RetrieveResultNoLid & RetrieveResultAdapter)
+    | (RetrieveResultPrimary & RetrieveResultAdapter & RetrieveResultLid)
+}
+
+export interface FlexStackerStoreRunTimeCommand
+  extends FlexStackerStoreCreateCommand,
+    CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
+  result?: {
+    eventualDestinationLocationSequence?: LabwareLocationSequence
+    primaryOriginLocationSequence?: LabwareLocationSequence
+    primaryLabwareId?: string
+    adapterOriginLocationSequence?: LabwareLocationSequence
+    adapterLabwareId?: string
+    lidOriginLocationSequence?: LabwareLocationSequence
+    lidLabwareId?: LabwareLocationSequence
+  } & StackerStoredLabwareDefinitionURIs
+}
+
+export interface FlexStackerFillRunTimeCommand
+  extends FlexStackerFillCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    addedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
+}
+
+export interface FlexStackerEmptyRunTimeCommand
+  extends FlexStackerEmptyCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    removedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
+}
+
+export type IdentifyColor = 'white' | 'red' | 'green' | 'blue' | 'yellow' | null
+
+export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'identifyModule'
+  params: {
+    model: string
+    moduleId: string
+    start: boolean
+    color?: IdentifyColor
+  }
+}
+
+export interface IdentifyModuleRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    IdentifyModuleCreateCommand {
+  result?: any
 }

@@ -1,15 +1,17 @@
-import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
-import * as Cfg from '@opentrons/app/src/redux/config'
-
-import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
-import { getValidLabwareFilePaths } from '../labware'
+import { updateConfigValue } from '../config/actions'
 import {
-  showOpenDirectoryDialog,
+  CHANGE_PYTHON_PATH_OVERRIDE,
+  OPEN_PYTHON_DIRECTORY,
+} from '../constants'
+import {
   openDirectoryInFileExplorer,
+  showOpenDirectoryDialog,
 } from '../dialogs'
-import { selectPythonPath, getPythonPath } from './getPythonPath'
+import { getValidLabwareFilePaths } from '../labware'
+import { createLogger } from '../log'
 import { executeAnalyzeCli } from './executeAnalyzeCli'
+import { getPythonPath, selectPythonPath } from './getPythonPath'
 import { writeFailedAnalysis } from './writeFailedAnalysis'
 
 import type { BrowserWindow } from 'electron'
@@ -28,25 +30,25 @@ export function registerProtocolAnalysis(
   selectPythonPath(pathToPythonOverride)
 
   handleConfigChange(CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE, newValue => {
-    selectPythonPath(newValue)
+    selectPythonPath(newValue as string | null)
   })
 
   return function handleIncomingAction(action: Action): void {
     switch (action.type) {
-      case ProtocolAnalysis.OPEN_PYTHON_DIRECTORY: {
+      case OPEN_PYTHON_DIRECTORY: {
         const dir = getConfig().python.pathToPythonOverride
         openDirectoryInFileExplorer(dir).catch(err => {
           log.debug('Error opening python directory', err.message)
         })
         break
       }
-      case ProtocolAnalysis.CHANGE_PYTHON_PATH_OVERRIDE: {
+      case CHANGE_PYTHON_PATH_OVERRIDE: {
         showOpenDirectoryDialog(mainWindow)
           .then(filePaths => {
             if (filePaths.length > 0) {
               const nextValue = filePaths[0]
               dispatch(
-                Cfg.updateConfigValue(
+                updateConfigValue(
                   CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
                   nextValue
                 )

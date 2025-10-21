@@ -30,11 +30,11 @@ You must specify the API version you are targeting in your Python protocol. In a
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '|apiLevel|',
-       'author': 'A. Biologist'}
+       "apiLevel": "|apiLevel|",
+       "author": "A. Biologist"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, world!')
+       protocol.comment("Hello, world!")
        
 From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` dictionary instead:
 
@@ -43,11 +43,11 @@ From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` d
 
    from opentrons import protocol_api
 
-   metadata = {'author': 'A. Biologist'}
-   requirements = {'apiLevel': '2.15', 'robotType': 'Flex'}
+   metadata = {"author": "A. Biologist"}
+   requirements = {"apiLevel": "|apiLevel|", "robotType": "Flex"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, Flex!')
+       protocol.comment("Hello, Flex!")
 
 Choose only one of these places to specify ``apiLevel``. If you put it in neither or both places, you will not be able to simulate or run your protocol.
 
@@ -59,6 +59,8 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
+.. _max-version:
+
 Maximum Supported Versions
 ==========================
 
@@ -66,9 +68,9 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.0.0) support the following version ranges: 
+Opentrons robots running the latest software (8.7.0) support the following version ranges: 
 
-    * **Flex:** version 2.15.
+    * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
 
 
@@ -82,6 +84,28 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.26    |          8.7.0               |
++-------------+------------------------------+
+|     2.25    |          8.6.0               |
++-------------+------------------------------+
+|     2.24    |          8.5.0               |
++-------------+------------------------------+
+|     2.23    |          8.4.0               |
++-------------+------------------------------+
+|     2.22    |          8.3.0               |
++-------------+------------------------------+
+|     2.21    |          8.2.0               |
++-------------+------------------------------+
+|     2.20    |          8.0.0               |
++-------------+------------------------------+
+|     2.19    |          7.3.1               |
++-------------+------------------------------+
+|     2.18    |          7.3.0               |
++-------------+------------------------------+
+|     2.17    |          7.2.0               |
++-------------+------------------------------+
+|     2.16    |          7.1.0               |
++-------------+------------------------------+
 |     2.15    |          7.0.0               |
 +-------------+------------------------------+
 |     2.14    |          6.3.0               |
@@ -122,6 +146,97 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.26
+-------------
+
+- Adds the ability to use the ``flex_96channel_200`` pipette to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`. 
+
+Version 2.25
+-------------
+
+- Adds :py:class:`.FlexStackerContext` to support the :ref:`Flex Stacker Module <stacker>`. Use the load name ``flexStackerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Flex Stacker and automate labware storage in a protocol.
+- Use the load name ``flex_96channel_200`` with :py:meth:`.load_instrument` to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. Note that this pipette does not work with liquid class commands in this API version. 
+
+Version 2.24
+-------------
+- Adds the ability to perform liquid handling actions using :ref:`liquid classes <liquid-classes>`.
+
+  - :py:meth:`.ProtocolContext.get_liquid_class` accesses :ref:`Opentrons-verified liquid class definitions <liquid-class-definitions>` for aqueous, volatile, and viscous liquids.
+  - :py:meth:`.ProtocolContext.define_liquid_class` lets you create your own liquid classes from verified classes or from scratch.
+  - New :py:class:`.InstrumentContext` methods — :py:meth:`.transfer_with_liquid_class`, :py:meth:`.distribute_with_liquid_class`, and :py:meth:`.consolidate_with_liquid_class` — move liquids according to their properties.
+- :py:meth:`.air_gap`, :py:meth:`.blow_out`, :py:meth:`.dispense`, :py:meth:`.mix`, and :py:meth:`.touch_tip` have new parameters for advanced settings that are also available in Protocol Designer.
+
+Version 2.23
+-------------
+- Wells now have a :py:meth:`~.Well.meniscus` location that corresponds to the top of the liquid, either as set in the protocol or measured by probing with a pipette tip. See :ref:`well-meniscus`.
+- Load and move labware lids with a new ``lid`` parameter of :py:meth:`~.ProtocolContext.load_labware` and standalone methods. See :ref:`loading-lids` and :ref:`moving-lids`.
+- Updated :py:meth:`.set_offset` to match new Labware Position Check behavior in Opentrons App v8.4.0.
+
+Version 2.22
+-------------
+- Improvements to loading liquids. Use the new :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, and :py:meth:`.Labware.load_empty` methods instead of ``Well.load_liquid()``, which is now deprecated.
+- Use new robot motor control methods to control individual robot motors. 
+    - The :py:meth:`.RobotContext.move_to`, :py:meth:`.RobotContext.move_axes_to`, and :py:meth:`.RobotContext.move_axes_relative` methods move robot motors to specific deck positions. 
+    - Calculate specific deck positions with the :py:meth:`.RobotContext.axis_coordinates_for` method, and pipette plunger positions with :py:meth:`.RobotContext.plunger_coordinates_for_volume` and :py:meth:`.RobotContext.plunger_coordinates_for_named_position`. 
+    - Control the Flex Gripper with the :py:meth:`.RobotContext.open_gripper_jaw` and :py:meth:`.RobotContext.close_gripper_jaw` methods. 
+- Beta features for our commercial partners.
+
+Version 2.21
+------------
+- Adds :py:class:`.AbsorbanceReaderContext` to support the :ref:`Absorbance Plate Reader Module <absorbance-plate-reader-module>`. Use the load name ``absorbanceReaderV1`` with :py:meth:`.ProtocolContext.load_module` to add an Absorbance Plate Reader to a protocol.
+- :ref:`Liquid presence detection <lpd>` now only checks on the first aspiration of the :py:meth:`.mix` cycle.
+- Improved the run log output of :py:meth:`.ThermocyclerContext.execute_profile`.
+
+Version 2.20
+------------
+
+- Detect liquid presence within a well. The :py:meth:`.InstrumentContext.detect_liquid_presence()` and :py:meth:`.InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also :ref:`enable liquid presence detection <lpd>` for all aspirations when loading a pipette, although this will add significant time to your protocol.
+- Define CSV runtime parameters and use their contents in a protocol with new :ref:`data manipulation methods <rtp-csv-data>`. See the :ref:`cherrypicking use case <use-case-cherrypicking>` for a full example.
+- :py:meth:`.configure_nozzle_layout` now accepts row, single, and partial column layout constants. See :ref:`partial-tip-pickup`.
+- You can now call :py:obj:`.ProtocolContext.define_liquid()` without supplying a ``description`` or ``display_color``.
+
+Version 2.19
+------------
+
+Opentrons recommends updating protocols from ``apiLevel`` 2.18 to 2.19 to take advantage of improved pipetting behavior.
+
+- This version uses new values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips. This can correct errors caused by the robot positioning the tip slightly lower than intended, potentially making contact with labware. See :py:meth:`.pick_up_tip` for additional details.
+
+Version 2.18
+------------
+
+- Define customizable parameters with the new ``add_parameters()`` function, and access their values on the :py:obj:`.ProtocolContext.params` object during a protocol run. See :ref:`runtime-parameters` and related pages for more information.
+- Move the pipette to positions relative to the top of a trash container. See :ref:`position-relative-trash`. The default behavior of :py:meth:`.drop_tip` also accounts for this new possibility.
+- :py:meth:`.set_offset` has been restored to the API with new behavior that applies to labware type–location pairs.
+- Automatic tip tracking is now available for all nozzle configurations.
+
+Version 2.17
+------------
+
+- :py:meth:`.dispense` now raises an error if you try to dispense more than :py:obj:`.InstrumentContext.current_volume`.
+
+Version 2.16
+------------
+
+This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you *must* load a trash container before dropping tips.
+
+- New features
+
+  - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See :ref:`Partial Tip Pickup <partial-tip-pickup>`.
+  - Specify the trash containers attached to your Flex with :py:meth:`.load_waste_chute` and :py:meth:`.load_trash_bin`.
+  - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling :py:meth:`.move_labware` with ``use_gripper=True``.
+  - Perform actions in staging area slots by referencing slots A4 through D4. See :ref:`deck-slots`.
+  - Explicitly command a pipette to :py:meth:`.prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
+
+- Improved features
+
+  - :py:meth:`.aspirate`, :py:meth:`.dispense`, and :py:meth:`.mix` will not move any liquid when called with ``volume=0``.
+
+- Other changes
+
+  - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
+  - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a :py:meth:`.drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
+
 Version 2.15
 ------------
 
@@ -149,13 +264,13 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
   - Use coordinates or numbers to specify :ref:`deck slots <deck-slots>`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
   
-  - The new :py:meth:`.load_adapter` method lets you load adapters and labware separately on modules, and lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
+  - The new module context ``load_adapter()`` methods let you load adapters and labware separately on modules, and :py:meth:`.ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
   
   - Move labware manually using :py:meth:`.move_labware`, without having to stop your protocol. 
   
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
-  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.  
+  - :py:meth:`.ProtocolContext.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
   
   - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
@@ -211,10 +326,10 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
     because the plunger's speed is a stepwise function of the volume.
     Use :py:attr:`.InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
 
-  - ``ModuleContext.load_labware_object`` was removed as an unnecessary internal method.
+  - ``load_labware_object()`` was removed from module contexts as an unnecessary internal method.
 
-  - ``ModuleContext.geometry`` was removed in favor of
-    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+  - ``geometry`` was removed from module contexts in favor of
+    ``model`` and ``type`` attributes.
 
   - ``Well.geometry`` was removed as unnecessary.
 
@@ -304,7 +419,7 @@ Version 2.8
 Version 2.7
 -----------
 
-- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
+- Added ``InstrumentContext.pair_with()``, an experimental feature for moving both pipettes simultaneously.
 
   .. note::
 

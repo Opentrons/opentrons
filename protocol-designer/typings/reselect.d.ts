@@ -1,4 +1,5 @@
-import { OutputSelector, Selector } from 'reselect'
+import type { OutputSelector, Selector } from 'reselect'
+
 declare module 'reselect' {
   // declaring type for createSelector with 15 selectors because the reselect types only support up to 12 selectors
   export function createSelector<
@@ -18,7 +19,7 @@ declare module 'reselect' {
     R13,
     R14,
     R15,
-    T
+    T,
   >(
     selector1: Selector<S, R1>,
     selector2: Selector<S, R2>,

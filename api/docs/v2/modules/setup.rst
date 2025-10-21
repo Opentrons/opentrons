@@ -22,16 +22,16 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Heater-Shaker Module GEN1 in deck slot D1.
                 heater_shaker = protocol.load_module(
-                  module_name='heaterShakerModuleV1', location='D1')
+                  module_name="heaterShakerModuleV1", location="D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module gen2', location='D3')
+                  module_name="temperature module gen2", location="D3")
 
         After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
@@ -42,16 +42,16 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
             
-            metadata = {'apiLevel': '2.14'}
+            metadata = {"apiLevel": "|apiLevel|"}
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.
                 magnetic_module = protocol.load_module(
-                  module_name='magnetic module gen2', location=1)
+                  module_name="magnetic module gen2", location=1)
          
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module', location=3)
+                  module_name="temperature module", location=3)
 
         After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
@@ -66,7 +66,7 @@ Available Modules
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
 .. table::
-   :widths: 4 5 2
+   :widths: 4 4 2
    
    +--------------------+-------------------------------+---------------------------+
    | Module             | API Load Name                 | Introduced in API Version |
@@ -94,6 +94,12 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    +--------------------+-------------------------------+---------------------------+
    | Magnetic Block     | ``magneticBlockV1``           | 2.15                      |
    | GEN1               |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Absorbance Plate   | ``absorbanceReaderV1``        | 2.21                      |
+   | Reader Module      |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Flex Stacker       | ``flexStackerModuleV1``       | 2.25                      |
+   | Module             |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies an :ref:`API version <v2-versioning>` high enough to support all the module generations you want to use.
@@ -124,7 +130,7 @@ Any :ref:`custom labware <v2-custom-labware>` added to your Opentrons App is als
 Module and Labware Compatibility
 --------------------------------
 
-It's your responsibility to ensure the labware and module combinations you load together work together. The Protocol API won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. See `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_ for more information about labware/module combinations.
+It's your responsibility to ensure the labware and module combinations you load together work together. The API generally won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. The API will raise an error if you try to load a labware on an unsupported adapter. When working with custom labware and module adapters, be sure to add stacking offsets for the adapter to your custom labware definition.
 
 
 Additional Labware Parameters

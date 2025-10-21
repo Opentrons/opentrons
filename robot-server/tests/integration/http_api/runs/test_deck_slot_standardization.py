@@ -1,9 +1,10 @@
 from typing import AsyncGenerator
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazy_fixtures import lf
 
 from ...robot_client import RobotClient
+from ...conftest import _OT3_SESSION_SERVER_PORT
 
 
 @pytest.fixture
@@ -21,10 +22,10 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
         "standardized_slot_2",
     ),
     [
-        (lazy_fixture("ot2_server_base_url"), "1", "2", "1", "2"),
-        (lazy_fixture("ot2_server_base_url"), "D1", "D2", "1", "2"),
+        (lf("ot2_server_base_url"), "1", "2", "1", "2"),
+        (lf("ot2_server_base_url"), "D1", "D2", "1", "2"),
         pytest.param(
-            lazy_fixture("ot3_server_base_url"),
+            lf("ot3_server_base_url"),
             "1",
             "2",
             "D1",
@@ -32,7 +33,7 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
             marks=pytest.mark.ot3_only,
         ),
         pytest.param(
-            lazy_fixture("ot3_server_base_url"),
+            lf("ot3_server_base_url"),
             "D1",
             "D2",
             "D1",
@@ -57,6 +58,29 @@ async def test_deck_slot_standardization(
     server types, and Tavern doesn't support parametrized fixtures.
     """
     module_model = "temperatureModuleV2"
+
+    deck_configuration_request = [
+        {"cutoutFixtureId": "singleLeftSlot", "cutoutId": "cutoutA1"},
+        {"cutoutFixtureId": "singleLeftSlot", "cutoutId": "cutoutB1"},
+        {"cutoutFixtureId": "singleLeftSlot", "cutoutId": "cutoutC1"},
+        {
+            "cutoutFixtureId": "temperatureModuleV2",
+            "cutoutId": "cutoutD1",
+            "opentronsModuleSerialNumber": "temp-1234",
+        },
+        {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutA2"},
+        {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutB2"},
+        {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutC2"},
+        {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutD2"},
+        {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutA3"},
+        {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutB3"},
+        {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutC3"},
+        {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutD3"},
+    ]
+    if _OT3_SESSION_SERVER_PORT in robot_client.base_url:
+        await robot_client.put_deck_configuration(
+            req_body={"data": {"cutoutFixtures": deck_configuration_request}}
+        )
 
     labware_load_name = "armadillo_96_wellplate_200ul_pcr_full_skirt"
     labware_namespace = "opentrons"

@@ -1,12 +1,14 @@
 // AlertModal with vertical scrolling
-import * as React from 'react'
 import omit from 'lodash/omit'
 
 import { AlertModal } from '@opentrons/components'
-import { BottomButtonBar } from './BottomButtonBar'
-import styles from './styles.css'
 
-type Props = React.ComponentProps<typeof AlertModal>
+import { BottomButtonBar } from './BottomButtonBar'
+import styles from './styles.module.css'
+
+import type { ComponentProps } from 'react'
+
+type Props = ComponentProps<typeof AlertModal>
 
 export function ScrollableAlertModal(props: Props): JSX.Element {
   return (

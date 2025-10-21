@@ -1,18 +1,29 @@
-import {
-  UseMutationResult,
-  UseMutationOptions,
-  useMutation,
-  UseMutateFunction,
-  useQueryClient,
-} from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
+
 import { createProtocol } from '@opentrons/api-client'
+
 import { useHost } from '../api'
+
 import type { AxiosError } from 'axios'
-import type { ErrorResponse, HostConfig, Protocol } from '@opentrons/api-client'
+import type {
+  UseMutateFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
+import type {
+  ErrorResponse,
+  HostConfig,
+  Protocol,
+  RunTimeParameterFilesCreateData,
+  RunTimeParameterValuesCreateData,
+} from '@opentrons/api-client'
 
 export interface CreateProtocolVariables {
   files: File[]
   protocolKey?: string
+  protocolKind?: string
+  runTimeParameterValues?: RunTimeParameterValuesCreateData
+  runTimeParameterFiles?: RunTimeParameterFilesCreateData
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
@@ -47,8 +58,21 @@ export function useCreateProtocolMutation(
     CreateProtocolVariables
   >(
     [host, 'protocols'],
-    ({ files: protocolFiles, protocolKey }) =>
-      createProtocol(host as HostConfig, protocolFiles, protocolKey)
+    ({
+      files: protocolFiles,
+      protocolKey,
+      protocolKind = 'standard',
+      runTimeParameterValues,
+      runTimeParameterFiles,
+    }) =>
+      createProtocol(
+        host as HostConfig,
+        protocolFiles,
+        protocolKey,
+        protocolKind,
+        runTimeParameterValues,
+        runTimeParameterFiles
+      )
         .then(response => {
           const protocolId = response.data.data.id
           queryClient

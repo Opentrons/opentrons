@@ -1,23 +1,23 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_FLEX_END,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Modal } from '../../molecules/Modal'
-import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrcode.png'
+import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { OddModal } from '/app/molecules/OddModal'
 
-import imgSrc from '../../assets/images/on-device-display/deck_fixture_setup_qrcode.png'
+import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 const SETUP_INSTRUCTION_URL =
   'https://support.opentrons.com/s/article/Deck-configuration-on-Opentrons-Flex'
@@ -32,18 +32,22 @@ export function DeckFixtureSetupInstructionsModal({
   setShowSetupInstructionsModal,
   isOnDevice = false,
 }: DeckFixtureSetupInstructionsModalProps): JSX.Element {
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
-  const modalHeader: ModalHeaderBaseProps = {
+  const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: COLORS.black90,
     hasExitIcon: true,
-    onClick: () => setShowSetupInstructionsModal(false),
+    onClick: () => {
+      setShowSetupInstructionsModal(false)
+    },
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     title: t('deck_fixture_setup_instructions'),
-    onClose: () => setShowSetupInstructionsModal(false),
+    onClose: () => {
+      setShowSetupInstructionsModal(false)
+    },
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '39.3125rem',
@@ -52,27 +56,29 @@ export function DeckFixtureSetupInstructionsModal({
   return (
     <>
       {isOnDevice ? (
-        <Modal
+        <OddModal
           header={modalHeader}
-          onOutsideClick={() => setShowSetupInstructionsModal(false)}
+          onOutsideClick={() => {
+            setShowSetupInstructionsModal(false)
+          }}
         >
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-              <StyledText as="p">
+              <LegacyStyledText as="p">
                 {t('deck_fixture_setup_modal_top_description')}
-              </StyledText>
-              <StyledText as="p">
-                {t('deck_fixture_setup_modal_bottom_description')}
-              </StyledText>
+              </LegacyStyledText>
+              <LegacyStyledText as="p">
+                {t('branded:deck_fixture_setup_modal_bottom_description')}
+              </LegacyStyledText>
             </Flex>
 
             <Flex>
               <img src={imgSrc} alt={IMG_ALT} width="178px" height="178px" />
             </Flex>
           </Flex>
-        </Modal>
+        </OddModal>
       ) : (
-        <LegacyModal {...modalProps}>
+        <Modal {...modalProps}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
               <Flex
@@ -83,12 +89,12 @@ export function DeckFixtureSetupInstructionsModal({
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing16}
                 >
-                  <StyledText as="p">
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_top_description')}
-                  </StyledText>
-                  <StyledText as="p">
+                  </LegacyStyledText>
+                  <LegacyStyledText as="p">
                     {t('deck_fixture_setup_modal_bottom_description_desktop')}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
                 <ExternalLink href={SETUP_INSTRUCTION_URL}>
                   {t('deck_fixture_setup_instructions')}
@@ -105,7 +111,7 @@ export function DeckFixtureSetupInstructionsModal({
               {i18n.format(t('shared:close'), 'capitalize')}
             </PrimaryButton>
           </Flex>
-        </LegacyModal>
+        </Modal>
       )}
     </>
   )

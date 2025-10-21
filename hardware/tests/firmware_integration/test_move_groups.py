@@ -4,7 +4,7 @@ import numpy as np
 from typing import Iterator, List, Dict
 
 import pytest
-from _pytest.fixtures import FixtureRequest
+from _pytest.fixtures import SubRequest
 from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
@@ -35,9 +35,9 @@ from opentrons_hardware.hardware_control.types import (
     scope="session",
     params=list(range(3)),
 )
-def group_id(request: FixtureRequest) -> Iterator[int]:
+def group_id(request: SubRequest) -> Iterator[int]:
     """A group id test fixture."""
-    yield request.param  # type: ignore[attr-defined]
+    yield request.param
 
 
 def filter_func(arb: ArbitrationId) -> bool:
@@ -193,7 +193,7 @@ async def test_move_integration(
     #  Also mypy doesn't like pytest.approx so we have to type ignore it
 
     # We now store the position as a tuple of assumed position + encoder value.
-    assert {k: v.motor_position for k, v in position.items()} == {  # type: ignore[comparison-overlap]
+    assert {k: v.motor_position for k, v in position.items()} == {
         motor_node: pytest.approx(
             motor_node.value, abs=all_motor_node_step_sizes[motor_node] * 3
         )

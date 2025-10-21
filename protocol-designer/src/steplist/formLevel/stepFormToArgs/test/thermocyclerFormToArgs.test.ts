@@ -1,40 +1,143 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
+import { describe, expect, it } from 'vitest'
+
+import {
+  THERMOCYCLER_PROFILE,
+  THERMOCYCLER_STATE,
+} from '/protocol-designer/constants'
+
 import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
-import { FormData } from '../../../../form-types'
+
 import type {
-  ThermocyclerStateStepArgs,
   ThermocyclerProfileStepArgs,
+  ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
+import type { HydratedThermocyclerFormData } from '/protocol-designer/form-types'
+import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
+
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {
   const testCases: Array<{
-    formData: FormData
+    formData: GetCastFormData<HydratedThermocyclerFormData>
     expected: ThermocyclerStateStepArgs | ThermocyclerProfileStepArgs
     testName: string
   }> = [
+    {
+      testName: 'all active temps - wrong (?) types',
+      // todo(mm, 2025-10-09): According to recently updated type hints, this input
+      // could not have been produced by earlier stages. Double-check that we don't
+      // actually need to handle this input shape, and delete this test if it's safe.
+      formData: {
+        ...getDefaultsForStepType('thermocycler'),
+        stepType: 'thermocycler',
+        id: 'testId',
+        moduleId: tcModuleId,
+        thermocyclerFormType: THERMOCYCLER_STATE,
+        blockIsActive: true,
+        // @ts-expect-error - See comment above.
+        blockTargetTemp: '45',
+        lidIsActive: true,
+        // @ts-expect-error - See comment above.
+        lidTargetTemp: '40',
+        lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        // @ts-expect-error - See comment above.
+        blockTargetTempHold: null,
+        // @ts-expect-error - See comment above.
+        lidTargetTempHold: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
+        stepNumber: 1,
+      },
+      expected: {
+        commandCreatorFnName: THERMOCYCLER_STATE,
+
+        moduleId: tcModuleId,
+        blockTargetTemp: 45,
+        lidTargetTemp: 40,
+        lidOpen: false,
+      },
+    },
     {
       testName: 'all active temps',
       formData: {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
-
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: true,
-        blockTargetTemp: '45',
+        blockTargetTemp: 45,
         lidIsActive: true,
-        lidTargetTemp: '40',
+        lidTargetTemp: 40,
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: 0,
+        lidTargetTempHold: 0,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
+        stepNumber: 1,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
 
-        module: tcModuleId,
+        moduleId: tcModuleId,
         blockTargetTemp: 45,
+        lidTargetTemp: 40,
+        lidOpen: false,
+      },
+    },
+    {
+      testName: 'inactive block - wrong (?) types',
+      // todo(mm, 2025-10-09): According to recently updated type hints, this input
+      // could not have been produced by earlier stages. Double-check that we don't
+      // actually need to handle this input shape, and delete this test if it's safe.
+      formData: {
+        ...getDefaultsForStepType('thermocycler'),
+        stepType: 'thermocycler',
+        id: 'testId',
+        stepNumber: 1,
+        moduleId: tcModuleId,
+        thermocyclerFormType: THERMOCYCLER_STATE,
+        blockIsActive: false,
+        // @ts-expect-error - See comment above.
+        blockTargetTemp: '9999',
+        lidIsActive: true,
+        // @ts-expect-error - See comment above.
+        lidTargetTemp: '40',
+        lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        // @ts-expect-error - See comment above.
+        blockTargetTempHold: null,
+        // @ts-expect-error - See comment above.
+        lidTargetTempHold: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
+      },
+      expected: {
+        commandCreatorFnName: THERMOCYCLER_STATE,
+
+        moduleId: tcModuleId,
+        blockTargetTemp: null,
         lidTargetTemp: 40,
         lidOpen: false,
       },
@@ -45,39 +148,58 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
-
+        stepNumber: 1,
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: false,
-        blockTargetTemp: '9999',
+        blockTargetTemp: 9999,
         lidIsActive: true,
-        lidTargetTemp: '40',
+        lidTargetTemp: 40,
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: 0,
+        lidTargetTempHold: 0,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
 
-        module: tcModuleId,
+        moduleId: tcModuleId,
         blockTargetTemp: null,
         lidTargetTemp: 40,
         lidOpen: false,
       },
     },
     {
-      testName: 'profile with cycles',
+      testName: 'profile with cycles - wrong (?) types',
+      // todo(mm, 2025-10-09): According to recently updated type hints, this input
+      // could not have been produced by earlier stages. Double-check that we don't
+      // actually need to handle this input shape, and delete this test if it's safe.
       formData: {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
-
+        stepName: 'mock name',
+        stepDetails: 'mock details',
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_PROFILE,
-
+        // @ts-expect-error - See comment above.
+        blockTargetTemp: '9999',
+        lidIsActive: true,
+        // @ts-expect-error - See comment above.
+        lidTargetTemp: '40',
+        lidOpen: false,
         profileVolume: '4',
         profileTargetLidTemp: '40',
         orderedProfileItems: ['profileItem1', 'profileItem2'],
+        stepNumber: 1,
         profileItemsById: {
           profileItem1: {
             type: 'profileStep',
@@ -112,16 +234,138 @@ describe('thermocyclerFormToArgs', () => {
           },
         },
         blockIsActiveHold: true,
+        // @ts-expect-error - See comment above.
+        // blockTargetTemp and blockTargetTempHold can never be null according to their castValue,
+        // but that might be unintentional. thermocyclerFormToArgs() does try to handle the null case
+        // and emit null blockTargetTempHold / blockTargetTemp. We need to clarify what's intended
+        // and possibly fix these fields' castValue.
         blockTargetTempHold: null,
         lidIsActiveHold: true,
+        // @ts-expect-error - See comment above.
         lidTargetTempHold: '5',
         lidOpenHold: true,
+        blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-        module: tcModuleId,
-
+        moduleId: tcModuleId,
+        description: 'mock details',
         blockTargetTempHold: null,
+        lidOpenHold: true,
+        lidTargetTempHold: 5,
+        profileSteps: [
+          // top-level step
+          { temperature: 5, holdTime: 50 },
+          // cycle rep 1
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
+          // cycle rep 2
+          { temperature: 12, holdTime: 62 },
+          { temperature: 99, holdTime: 45 },
+        ],
+        profileTargetLidTemp: 40,
+        profileVolume: 4,
+        meta: {
+          rawProfileItems: [
+            {
+              type: 'profileStep',
+              id: 'profileItem1',
+              title: 'Top level step',
+              temperature: '5',
+              durationMinutes: '',
+              durationSeconds: '50',
+            },
+            {
+              id: 'profileItem2',
+              type: 'profileCycle',
+              repetitions: '2',
+              steps: [
+                {
+                  type: 'profileStep',
+                  id: 'item2A',
+                  title: 'Step A in cycle',
+                  temperature: '12',
+                  durationMinutes: '1',
+                  durationSeconds: '2',
+                },
+                {
+                  type: 'profileStep',
+                  id: 'item2B',
+                  title: 'Step B in cycle',
+                  temperature: '99',
+                  durationMinutes: '',
+                  durationSeconds: '45',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    {
+      testName: 'profile with cycles',
+      formData: {
+        ...getDefaultsForStepType('thermocycler'),
+        stepType: 'thermocycler',
+        id: 'testId',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
+        moduleId: tcModuleId,
+        thermocyclerFormType: THERMOCYCLER_PROFILE,
+        blockTargetTemp: 9999,
+        lidIsActive: true,
+        lidTargetTemp: 40,
+        lidOpen: false,
+        profileVolume: '4',
+        profileTargetLidTemp: '40',
+        orderedProfileItems: ['profileItem1', 'profileItem2'],
+        stepNumber: 1,
+        profileItemsById: {
+          profileItem1: {
+            type: 'profileStep',
+            id: 'profileItem1',
+            title: 'Top level step',
+            temperature: '5',
+            durationMinutes: '',
+            durationSeconds: '50',
+          },
+          profileItem2: {
+            id: 'profileItem2',
+            type: 'profileCycle',
+            repetitions: '2',
+            steps: [
+              {
+                type: 'profileStep',
+                id: 'item2A',
+                title: 'Step A in cycle',
+                temperature: '12',
+                durationMinutes: '1',
+                durationSeconds: '2',
+              },
+              {
+                type: 'profileStep',
+                id: 'item2B',
+                title: 'Step B in cycle',
+                temperature: '99',
+                durationMinutes: '',
+                durationSeconds: '45',
+              },
+            ],
+          },
+        },
+        blockIsActiveHold: true,
+        blockTargetTempHold: 0,
+        lidIsActiveHold: true,
+        lidTargetTempHold: 5,
+        lidOpenHold: true,
+        blockIsActive: false,
+      },
+      expected: {
+        commandCreatorFnName: THERMOCYCLER_PROFILE,
+        moduleId: tcModuleId,
+        description: 'mock details',
+        // todo(mm, 2025-10-09): See comments above about blockTargetTemp and blockTargetTempHold nullability.
+        blockTargetTempHold: 0,
         lidOpenHold: true,
         lidTargetTempHold: 5,
         profileSteps: [

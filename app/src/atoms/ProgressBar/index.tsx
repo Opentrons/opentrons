@@ -1,8 +1,9 @@
-import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, Box } from '@opentrons/components'
+
+import { Box, COLORS } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 
 interface ProgressBarProps {
   /** the completed progress the range 0-100  */
@@ -12,7 +13,7 @@ interface ProgressBarProps {
   /** extra styles to be filled progress element */
   innerStyles?: FlattenSimpleInterpolation
   /** extra elements to be rendered within container */
-  children?: React.ReactNode
+  children?: ReactNode
 }
 
 export function ProgressBar({
@@ -38,7 +39,7 @@ export function ProgressBar({
   const LINER_PROGRESS_FILLER_STYLE = css`
     height: 0.5rem;
     width: ${progress};
-    background: ${COLORS.blueEnabled};
+    background: ${COLORS.blue50};
     transition: width 0.5s ease-in-out;
     webkit-transition: width 0.5s ease-in-out;
     moz-transition: width 0.5s ease-in-out;

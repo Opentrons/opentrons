@@ -1,14 +1,20 @@
-import * as React from 'react'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { COLORS, PrimaryButton } from '@opentrons/components'
-import { LegacyModalShell } from '../LegacyModal'
-import { WizardHeader } from '../WizardHeader'
-import { configReducer } from '../../redux/config/reducer'
+import { legacy_createStore } from 'redux'
+
+import {
+  COLORS,
+  ModalShell,
+  PrimaryButton,
+  WizardHeader,
+} from '@opentrons/components'
+
+import { configReducer } from '/app/redux/config/reducer'
+
 import { SimpleWizardBody } from './index'
 
-import type { Store } from 'redux'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
+import type { Store, StoreEnhancer } from 'redux'
+import type * as React from 'react'
 
 export default {
   title: 'App/Molecules/SimpleWizardBody',
@@ -21,20 +27,23 @@ const dummyConfig = {
   },
 } as any
 
-const store: Store<any> = createStore(configReducer, dummyConfig)
+const store: Store<any> = legacy_createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
 
 const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
   <Provider store={store}>
-    <LegacyModalShell>
+    <ModalShell>
       <WizardHeader currentStep={3} totalSteps={4} title="Attach a pipette" />
       <SimpleWizardBody {...args} />
-    </LegacyModalShell>
+    </ModalShell>
   </Provider>
 )
 
 export const AlertIcon = Template.bind({})
 AlertIcon.args = {
-  iconColor: COLORS.errorEnabled,
+  iconColor: COLORS.red50,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: false,
@@ -43,7 +52,7 @@ AlertIcon.args = {
 
 export const SuccessIcon = Template.bind({})
 SuccessIcon.args = {
-  iconColor: COLORS.successEnabled,
+  iconColor: COLORS.green50,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: true,

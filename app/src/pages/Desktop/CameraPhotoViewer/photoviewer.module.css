@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16);
+}
+
+.image {
+  /* Fill w/h minus padding. Updating the padding here
+   requires updating the padding sent to shell in GalleryItemCard, too. */
+  width: calc(100% - var(--spacing-16) * 2);
+  height: calc(100% - var(--spacing-16) * 2);
+  border-radius: var(--border-radius-4);
+  object-fit: contain;
+}

@@ -1,0 +1,131 @@
+import {
+  FLEX_96_CHANNEL_PIPETTES,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteSpecsV2,
+} from '@opentrons/shared-data'
+
+import type {
+  PipetteMount,
+  PipetteName,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type {
+  Gen,
+  PipetteType,
+} from '/protocol-designer/pages/Onboarding/types'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
+
+export interface PipetteSections {
+  type: PipetteType
+  gen: Gen | 'flex'
+  volume: string
+}
+
+export const getSectionsFromPipetteName = (
+  pipetteName: PipetteName,
+  specs: PipetteV2Specs
+): PipetteSections => {
+  const channels = specs.channels
+  let type: PipetteType = 'multi'
+  if (channels === 96) {
+    type = '96'
+  } else if (channels === 1) {
+    type = 'single'
+  }
+  const volume = pipetteName.split('_')[0]
+  return {
+    type,
+    gen: specs.displayCategory === 'FLEX' ? 'flex' : specs.displayCategory,
+    volume,
+  }
+}
+
+export const getShouldShowPipetteType = (
+  type: PipetteType,
+  leftPipette?: PipetteOnDeck | null,
+  rightPipette?: PipetteOnDeck | null,
+  currentEditingMount?: PipetteMount | null,
+  temporarilyDeletedPipettes?: string[] | null
+): boolean => {
+  if (type === '96') {
+    const effectiveLeftPipette =
+      leftPipette != null &&
+      !temporarilyDeletedPipettes?.includes(leftPipette.id)
+        ? leftPipette
+        : null
+    const effectiveRightPipette =
+      rightPipette != null &&
+      !temporarilyDeletedPipettes?.includes(rightPipette.id)
+        ? rightPipette
+        : null
+
+    // If no mount is being edited (adding a new pipette)
+    if (currentEditingMount == null) {
+      // Only show if both mounts are empty
+      return effectiveLeftPipette == null && effectiveRightPipette == null
+    }
+
+    // Only show if the opposite mount of the one being edited is empty
+    return currentEditingMount === 'left'
+      ? effectiveRightPipette == null
+      : effectiveLeftPipette == null
+  }
+
+  // Always show 1-Channel and Multi-Channel options
+  return true
+}
+
+export interface TiprackOption {
+  name: string
+  value: string
+}
+
+interface TiprackOptionsProps {
+  allLabware: LabwareDefByDefURI
+  allowAllTipracks: boolean
+  selectedPipetteName?: string | null
+}
+export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
+  const { allLabware, allowAllTipracks, selectedPipetteName } = props
+  const selectedPipetteDefaultTipracks =
+    selectedPipetteName != null
+      ? (getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? [])
+      : []
+  const selectedPipetteDisplayCategory =
+    selectedPipetteName != null
+      ? (getPipetteSpecsV2(selectedPipetteName as PipetteName)
+          ?.displayCategory ?? [])
+      : []
+
+  const isFlexPipette =
+    selectedPipetteDisplayCategory === 'FLEX' ||
+    (selectedPipetteName != null &&
+      FLEX_96_CHANNEL_PIPETTES.includes(selectedPipetteName))
+
+  const tiprackOptions = allLabware
+    ? Object.values(allLabware)
+        .filter(def => def.metadata.displayCategory === 'tipRack')
+        .filter(def => {
+          if (allowAllTipracks && !isFlexPipette) {
+            return !def.metadata.displayName.includes('Flex')
+          } else if (allowAllTipracks && isFlexPipette) {
+            return def.metadata.displayName.includes('Flex')
+          } else {
+            return (
+              selectedPipetteDefaultTipracks.includes(getLabwareDefURI(def)) ||
+              def.namespace === 'custom_beta'
+            )
+          }
+        })
+        .map(def => ({
+          name: getLabwareDisplayName(def),
+          value: getLabwareDefURI(def),
+        }))
+        .sort((a, b) => (a.name.includes('(Retired)') ? 1 : -1))
+    : []
+
+  return tiprackOptions
+}

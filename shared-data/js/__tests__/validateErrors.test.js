@@ -1,9 +1,9 @@
 // Tests for error data validation
-
 import Ajv from 'ajv'
+import { describe, expect, it } from 'vitest'
 
-import errorDefinitions from '@opentrons/shared-data/errors/definitions/1/errors.json'
-import errorSchema from '@opentrons/shared-data/errors/schemas/1.json'
+import errorDefinitions from '../../errors/definitions/1/errors.json'
+import errorSchema from '../../errors/schemas/1.json'
 
 describe('error data should match error schema', () => {
   it('error schema should match', () => {

@@ -1,6 +1,7 @@
 export const FLEX_NONE = 'none'
 export const FLEX_AUTO = 'auto'
 export const FLEX_MIN_CONTENT = 'min-content'
+export const FLEX_MAX_CONTENT = 'max-content'
 
 export const ALIGN_NORMAL = 'normal'
 export const ALIGN_START = 'start'
@@ -30,3 +31,9 @@ export const DIRECTION_COLUMN_REVERSE = 'column-reverse'
 export const WRAP = 'wrap'
 export const NO_WRAP = 'nowrap'
 export const WRAP_REVERSE = 'wrap-reverse'
+
+export const WHITE_SPACE_NORMAL = 'normal'
+export const WHITE_SPACE_PRE = 'pre'
+export const WHITE_SPACE_PRE_WRAP = 'pre-wrap'
+export const WHITE_SPACE_PRE_LINE = 'pre-line'
+export const WHITE_SPACE_BREAK_SPACES = 'break-spaces'

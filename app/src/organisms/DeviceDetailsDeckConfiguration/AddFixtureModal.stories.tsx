@@ -1,8 +1,32 @@
-import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { Provider } from 'react-redux'
+import { legacy_createStore } from 'redux'
+
+import { VIEWPORT } from '@opentrons/components'
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
+
+import { configReducer } from '/app/redux/config/reducer'
+
 import { AddFixtureModal } from './AddFixtureModal'
-import type { Story, Meta } from '@storybook/react'
+
+import type { Meta, Story } from '@storybook/react'
+import type { Store, StoreEnhancer } from 'redux'
+
+const dummyConfig = {
+  config: {
+    isOnDevice: true,
+  },
+} as any
+
+const store: Store<any> = legacy_createStore(
+  configReducer,
+  dummyConfig as StoreEnhancer
+)
+
+const queryClient = new QueryClient()
 
 export default {
   title: 'ODD/Organisms/AddFixtureModal',
@@ -13,19 +37,27 @@ export default {
     },
     onOutsideClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Story />
+        </QueryClientProvider>
+      </Provider>
+    ),
+  ],
 } as Meta
 
-const queryClient = new QueryClient()
 const Template: Story<React.ComponentProps<typeof AddFixtureModal>> = args => (
-  <QueryClientProvider client={queryClient}>
-    <AddFixtureModal {...args} />
-  </QueryClientProvider>
+  <AddFixtureModal {...args} />
 )
 
 export const Default = Template.bind({})
 Default.args = {
-  fixtureLocation: 'cutoutD3',
-  setShowAddFixtureModal: () => {},
+  cutoutId: 'cutoutD3',
+  addressableAreaId: 'D3',
+  closeModal: () => {},
   isOnDevice: true,
+  deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
 }

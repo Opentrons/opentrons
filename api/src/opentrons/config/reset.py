@@ -5,7 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
@@ -90,8 +90,13 @@ _settings_reset_options = {
     # This option is defined here only as a convenience for robot-server.
     # Find a way to split things up and define this in robot-server instead.
     ResetOptionId.runs_history: CommonResetOption(
-        name="Clear Runs History",
-        description="Erase this device's stored history of protocols and runs.",
+        name="Clear Robot Server Data",
+        description=(
+            "Erase everything stored by the robot server. This is *not* everything stored"
+            " on the robot. It currently includes runs, protocols, labware offsets, and more,"
+            " and the exact list may change over time. This is exposed for troubleshooting"
+            " and system recovery. The name `runsHistory` is a misnomer, for historical reasons."
+        ),
     ),
     ResetOptionId.on_device_display: CommonResetOption(
         name="On-Device Display Configuration",
@@ -170,6 +175,7 @@ def reset_pipette_offset(robot_type: RobotTypeEnum) -> None:
 
 def reset_gripper_offset() -> None:
     gripper_offset.clear_gripper_calibration_offsets()
+    gripper_offset.clear_gripper_jaw_width_data()
 
 
 def reset_tip_length_calibrations(robot_type: RobotTypeEnum) -> None:

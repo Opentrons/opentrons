@@ -1,18 +1,19 @@
 import type {
-  TemperatureModuleModel,
-  ThermocyclerModuleModel,
-  MagneticModuleModel,
-  HeaterShakerModuleModel,
-} from '@opentrons/shared-data'
-
-import {
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
+  AbsorbanceReaderModel,
+  FLEX_STACKER_MODULE_TYPE,
+  FlexStackerModuleModel,
   HEATERSHAKER_MODULE_TYPE,
+  HeaterShakerModuleModel,
+  MAGNETIC_MODULE_TYPE,
+  MagneticModuleModel,
+  TEMPERATURE_MODULE_TYPE,
+  TemperatureModuleModel,
+  THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
+import type * as ApiTypes from './api-types'
 
-import * as ApiTypes from './api-types'
 export * from './api-types'
 
 // common types
@@ -46,11 +47,24 @@ export interface HeaterShakerModule extends CommonModuleInfo {
   data: ApiTypes.HeaterShakerData
 }
 
+export interface AbsorbanceReaderModule extends CommonModuleInfo {
+  moduleType: typeof ABSORBANCE_READER_TYPE
+  moduleModel: AbsorbanceReaderModel
+  data: ApiTypes.AbsorbanceReaderData
+}
+export interface FlexStackerModule extends CommonModuleInfo {
+  moduleType: typeof FLEX_STACKER_MODULE_TYPE
+  moduleModel: FlexStackerModuleModel
+  data: ApiTypes.FlexStackerData
+  moduleOffset?: ApiTypes.ModuleOffset
+}
 export type AttachedModule =
   | TemperatureModule
   | MagneticModule
   | ThermocyclerModule
   | HeaterShakerModule
+  | AbsorbanceReaderModule
+  | FlexStackerModule
 
 export interface ModulesMeta {
   cursor: number

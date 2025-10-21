@@ -1,5 +1,8 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
 import { useDrag } from '../useDrag'
+
 import type { ElementPosition } from '../useDrag'
 
 const mockPosition: ElementPosition = {
@@ -29,13 +32,17 @@ describe('useDrag', () => {
 
   it('When calling enable, isEnabled true', () => {
     const { result } = renderHook(() => useDrag(mockPosition))
-    result.current.enable()
+    act(() => {
+      result.current.enable()
+    })
     expect(result.current.isEnabled).toBe(true)
   })
 
   it('When calling disable, isEnabled false', () => {
     const { result } = renderHook(() => useDrag(mockPosition))
-    result.current.disable()
+    act(() => {
+      result.current.disable()
+    })
     expect(result.current.isEnabled).toBe(false)
   })
 })

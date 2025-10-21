@@ -2,14 +2,13 @@ from mock import patch, MagicMock
 import logging
 import pytest
 from robot_server.service import logging as rs_logging
+from opentrons.config.types import RobotConfig
 
 
 @pytest.fixture
 def mock_robot_config():
-    with patch("robot_server.service.logging.robot_configs") as m:
-        mock = MagicMock(
-            spec=rs_logging.robot_configs.robot_config  # type: ignore[attr-defined]
-        )
+    with patch("robot_server.service.logging.robot_configs", autospec=True) as m:
+        mock = MagicMock(spec=RobotConfig)
         m.load.return_value = mock
         yield mock
 

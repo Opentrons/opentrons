@@ -1,12 +1,14 @@
 import { getOrderedStepIds } from '../../step-forms/selectors'
 import { getNextNonTerminalItemId } from '../utils'
-import { ThunkAction } from '../../types'
-import { StepIdType, FormData } from '../../form-types'
-import { ChangeFormPayload } from './types'
-import {
+
+import type { FormData, StepIdType } from '../../form-types'
+import type { ThunkAction } from '../../types'
+import type {
   ClearSelectedItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps'
+import type { ChangeFormPayload } from './types'
+
 export interface ChangeSavedStepFormAction {
   type: 'CHANGE_SAVED_STEP_FORM'
   payload: ChangeFormPayload
@@ -45,45 +47,47 @@ export interface DeleteMultipleStepsAction {
   type: 'DELETE_MULTIPLE_STEPS'
   payload: StepIdType[]
 }
-export const deleteMultipleSteps = (
-  stepIds: StepIdType[]
-): ThunkAction<
-  | DeleteMultipleStepsAction
-  | ClearSelectedItemAction
-  | SelectMultipleStepsAction
-> => (dispatch, getState) => {
-  const orderedStepIds = getOrderedStepIds(getState())
-  const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
-    type: 'DELETE_MULTIPLE_STEPS',
-    payload: stepIds,
-  }
-  dispatch(deleteMultipleStepsAction)
-
-  if (stepIds.length === orderedStepIds.length) {
-    // if we are deleting all the steps we need to clear out the selected item
-    const clearSelectedItemAction: ClearSelectedItemAction = {
-      type: 'CLEAR_SELECTED_ITEM',
+export const deleteMultipleSteps =
+  (
+    stepIds: StepIdType[]
+  ): ThunkAction<
+    | DeleteMultipleStepsAction
+    | ClearSelectedItemAction
+    | SelectMultipleStepsAction
+  > =>
+  (dispatch, getState) => {
+    const orderedStepIds = getOrderedStepIds(getState())
+    const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
+      type: 'DELETE_MULTIPLE_STEPS',
+      payload: stepIds,
     }
-    dispatch(clearSelectedItemAction)
-  } else {
-    const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
+    dispatch(deleteMultipleStepsAction)
 
-    if (nextStepId) {
-      const selectMultipleStepsAction: SelectMultipleStepsAction = {
-        type: 'SELECT_MULTIPLE_STEPS',
-        payload: {
-          stepIds: [nextStepId],
-          lastSelected: nextStepId,
-        },
+    if (stepIds.length === orderedStepIds.length) {
+      // if we are deleting all the steps we need to clear out the selected item
+      const clearSelectedItemAction: ClearSelectedItemAction = {
+        type: 'CLEAR_SELECTED_ITEM',
       }
-      dispatch(selectMultipleStepsAction)
+      dispatch(clearSelectedItemAction)
     } else {
-      console.warn(
-        'something went wrong, could not find the next non terminal item'
-      )
+      const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
+
+      if (nextStepId) {
+        const selectMultipleStepsAction: SelectMultipleStepsAction = {
+          type: 'SELECT_MULTIPLE_STEPS',
+          payload: {
+            stepIds: [nextStepId],
+            lastSelected: nextStepId,
+          },
+        }
+        dispatch(selectMultipleStepsAction)
+      } else {
+        console.warn(
+          'something went wrong, could not find the next non terminal item'
+        )
+      }
     }
   }
-}
 export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null
@@ -103,83 +107,4 @@ export const reorderSteps = (stepIds: StepIdType[]): ReorderStepsAction => ({
   payload: {
     stepIds,
   },
-})
-export interface AddProfileStepAction {
-  type: 'ADD_PROFILE_STEP'
-  payload: null | {
-    cycleId: string
-  }
-}
-export const addProfileStep = (
-  payload: AddProfileStepAction['payload']
-): AddProfileStepAction => ({
-  type: 'ADD_PROFILE_STEP',
-  payload,
-})
-export interface DeleteProfileCycleAction {
-  type: 'DELETE_PROFILE_CYCLE'
-  payload: {
-    id: string
-  }
-}
-export const deleteProfileCycle = (
-  payload: DeleteProfileCycleAction['payload']
-): DeleteProfileCycleAction => ({
-  type: 'DELETE_PROFILE_CYCLE',
-  payload,
-})
-export interface DeleteProfileStepAction {
-  type: 'DELETE_PROFILE_STEP'
-  payload: {
-    id: string
-  }
-}
-export const deleteProfileStep = (
-  payload: DeleteProfileStepAction['payload']
-): DeleteProfileStepAction => ({
-  type: 'DELETE_PROFILE_STEP',
-  payload,
-})
-export interface EditProfileCycleAction {
-  type: 'EDIT_PROFILE_CYCLE'
-  payload: {
-    id: string
-    fields: {
-      repetitions?: string
-    }
-  }
-}
-export const editProfileCycle = (
-  payload: EditProfileCycleAction['payload']
-): EditProfileCycleAction => ({
-  type: 'EDIT_PROFILE_CYCLE',
-  payload,
-})
-export interface EditProfileStepAction {
-  type: 'EDIT_PROFILE_STEP'
-  payload: {
-    id: string
-    fields: {
-      title?: string
-      temperature?: string
-      durationMinutes?: string
-      durationSeconds?: string
-    }
-  }
-}
-export const editProfileStep = (
-  payload: EditProfileStepAction['payload']
-): EditProfileStepAction => ({
-  type: 'EDIT_PROFILE_STEP',
-  payload,
-})
-export interface AddProfileCycleAction {
-  type: 'ADD_PROFILE_CYCLE'
-  payload: null
-}
-export const addProfileCycle = (
-  payload: AddProfileCycleAction['payload']
-): AddProfileCycleAction => ({
-  type: 'ADD_PROFILE_CYCLE',
-  payload,
 })

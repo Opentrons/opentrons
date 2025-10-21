@@ -1,0 +1,20 @@
+@import '../index.module.css';
+
+.name_overlay {
+  width: 100%;
+  padding: 0.25rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background-color: color-mod(var(--c-black) alpha(0.75));
+  color: var(--c-font-light);
+  font-size: 0.5rem;
+}
+
+.display_name {
+  color: var(--c-font-light);
+  font-weight: var(--fw-semibold);
+  overflow-wrap: break-word;
+}
+
+.deck_slot:active {
+  cursor: grabbing;
+}

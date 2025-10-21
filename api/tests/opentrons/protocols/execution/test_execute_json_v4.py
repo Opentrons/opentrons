@@ -1,6 +1,30 @@
-from unittest import mock
+from typing import Callable, Generator, List, Optional
 import pytest
+import typing
+from unittest import mock
+from opentrons.protocols.execution.dev_types import (
+    JsonV4MagneticModuleDispatch,
+    JsonV4TemperatureModuleDispatch,
+    JsonV4ThermocyclerDispatch,
+    PipetteDispatch,
+)
+from opentrons_shared_data.protocol.types import (
+    JsonProtocolV4,
+    MagneticModuleEngageParams,
+    ModuleIDParams,
+    TemperatureParams,
+    ThermocyclerAwaitBlockTemperatureCommand,
+    ThermocyclerAwaitLidTemperatureCommand,
+    ThermocyclerAwaitProfileCommand,
+    ThermocyclerCommand,
+    ThermocyclerRunProfileCommand,
+    ThermocyclerRunProfileParams,
+    ThermocyclerSetTargetBlockCommand,
+    ThermocyclerSetTargetBlockParams,
+    ThermocyclerSetTargetLidCommand,
+)
 from opentrons.protocols.parse import parse
+
 from opentrons.protocols.execution.execute_json_v4 import (
     dispatch_json,
     _engage_magnet,
@@ -38,15 +62,15 @@ from opentrons_shared_data.protocol.constants import (
 
 # autouse set to True to setup/teardown mock after each run
 @pytest.fixture(autouse=True)
-def mockObj():
+def mockObj() -> Generator[mock.Mock, None, None]:
     m = mock.Mock()
     yield m
     m.reset()
 
 
 @pytest.fixture
-def pipette_command_map(mockObj):
-    mock_pipette_command_map = {
+def pipette_command_map(mockObj: mock.Mock) -> "PipetteDispatch":
+    mock_pipette_command_map: "PipetteDispatch" = {
         JPC.blowout.value: mockObj._blowout,
         JPC.pickUpTip.value: mockObj._pick_up_tip,
         JPC.dropTip.value: mockObj._drop_tip,
@@ -58,8 +82,8 @@ def pipette_command_map(mockObj):
 
 
 @pytest.fixture
-def magnetic_module_command_map(mockObj):
-    mock_magnetic_module_command_map = {
+def magnetic_module_command_map(mockObj: mock.Mock) -> "JsonV4MagneticModuleDispatch":
+    mock_magnetic_module_command_map: "JsonV4MagneticModuleDispatch" = {
         JMMC.magneticModuleEngageMagnet.value: mockObj._engage_magnet,
         JMMC.magneticModuleDisengageMagnet.value: mockObj._disengage_magnet,
     }
@@ -68,8 +92,10 @@ def magnetic_module_command_map(mockObj):
 
 
 @pytest.fixture
-def temperature_module_command_map(mockObj):
-    mock_temperature_module_command_map = {
+def temperature_module_command_map(
+    mockObj: mock.Mock,
+) -> "JsonV4TemperatureModuleDispatch":
+    mock_temperature_module_command_map: "JsonV4TemperatureModuleDispatch" = {
         JTMC.temperatureModuleSetTargetTemperature.value: mockObj._temperature_module_set_temp,
         JTMC.temperatureModuleDeactivate.value: mockObj._temperature_module_deactivate,
         JTMC.temperatureModuleAwaitTemperature.value: mockObj._temperature_module_await_temp,
@@ -78,8 +104,8 @@ def temperature_module_command_map(mockObj):
 
 
 @pytest.fixture
-def thermocycler_module_command_map(mockObj):
-    mock_thermocycler_module_command_map = {
+def thermocycler_module_command_map(mockObj: mock.Mock) -> "JsonV4ThermocyclerDispatch":
+    mock_thermocycler_module_command_map: "JsonV4ThermocyclerDispatch" = {
         JTHC.thermocyclerCloseLid.value: mockObj._thermocycler_close_lid,
         JTHC.thermocyclerOpenLid.value: mockObj._thermocycler_open_lid,
         JTHC.thermocyclerDeactivateBlock.value: mockObj._thermocycler_deactivate_block,
@@ -97,13 +123,13 @@ def thermocycler_module_command_map(mockObj):
     return mock_thermocycler_module_command_map
 
 
-def test_load_modules_from_json():
-    def fake_module(model, slot=None):
+def test_load_modules_from_json() -> None:
+    def fake_module(model: str, slot: Optional[str] = None) -> str:
         return "mock_module_ctx_" + model
 
     ctx = mock.create_autospec(ProtocolContext)
     ctx.load_module.side_effect = fake_module
-    protocol = {
+    protocol: "JsonProtocolV4" = {
         "modules": {
             "aID": {"slot": "1", "model": "magneticModuleV1"},
             "bID": {"slot": "4", "model": "temperatureModuleV2"},
@@ -121,16 +147,16 @@ def test_load_modules_from_json():
 
     # resulting dict should have ModuleContext objects (from calling
     # load_module) as its values
-    assert result == {
+    assert result == {  # type: ignore[comparison-overlap]
         "aID": "mock_module_ctx_magneticModuleV1",
         "bID": "mock_module_ctx_temperatureModuleV2",
         "cID": "mock_module_ctx_thermocyclerModuleV1",
     }
 
 
-def test_engage_magnet():
+def test_engage_magnet() -> None:
     module_mock = mock.create_autospec(MagneticModuleContext)
-    params = {
+    params: "MagneticModuleEngageParams" = {
         "module": "someModuleId",
         "engageHeight": 4.2,
     }
@@ -139,83 +165,86 @@ def test_engage_magnet():
     assert module_mock.mock_calls == [mock.call.engage(height_from_base=4.2)]
 
 
-def test_disengage_magnet():
+def test_disengage_magnet() -> None:
     module_mock = mock.create_autospec(MagneticModuleContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _disengage_magnet(module_mock, params)
 
     assert module_mock.mock_calls == [mock.call.disengage()]
 
 
-def test_temperature_module_set_temp():
+def test_temperature_module_set_temp() -> None:
     module_mock = mock.create_autospec(TemperatureModuleContext)
-    params = {"module": "someModuleId", "temperature": 42.5}
+    params: "TemperatureParams" = {"module": "someModuleId", "temperature": 42.5}
     _temperature_module_set_temp(module_mock, params)
 
     assert module_mock.mock_calls == [mock.call.start_set_temperature(42.5)]
 
 
-def test_temperature_module_deactivate():
+def test_temperature_module_deactivate() -> None:
     module_mock = mock.create_autospec(TemperatureModuleContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _temperature_module_deactivate(module_mock, params)
 
     assert module_mock.mock_calls == [mock.call.deactivate()]
 
 
-def test_temperature_module_await_temp():
+def test_temperature_module_await_temp() -> None:
     module_mock = mock.create_autospec(TemperatureModuleContext)
-    params = {"module": "someModuleId", "temperature": 12.3}
+    params: "TemperatureParams" = {"module": "someModuleId", "temperature": 12.3}
     _temperature_module_await_temp(module_mock, params)
 
     assert module_mock.mock_calls == [mock.call.await_temperature(12.3)]
 
 
-def test_thermocycler_close_lid():
+def test_thermocycler_close_lid() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _thermocycler_close_lid(module_mock, params)
     assert module_mock.mock_calls == [mock.call.close_lid()]
 
 
-def test_thermocycler_open_lid():
+def test_thermocycler_open_lid() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _thermocycler_open_lid(module_mock, params)
     assert module_mock.mock_calls == [mock.call.open_lid()]
 
 
-def test_thermocycler_deactivate_block():
+def test_thermocycler_deactivate_block() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _thermocycler_deactivate_block(module_mock, params)
     assert module_mock.mock_calls == [mock.call.deactivate_block()]
 
 
-def test_thermocycler_deactivate_lid():
+def test_thermocycler_deactivate_lid() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"module": "someModuleId"}
+    params: "ModuleIDParams" = {"module": "someModuleId"}
     _thermocycler_deactivate_lid(module_mock, params)
     assert module_mock.mock_calls == [mock.call.deactivate_lid()]
 
 
-def test_thermocycler_set_block_temperature():
+def test_thermocycler_set_block_temperature() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"temperature": 42, "module": "someModuleId"}
+    params: "ThermocyclerSetTargetBlockParams" = {
+        "temperature": 42,
+        "module": "someModuleId",
+    }
     _thermocycler_set_block_temperature(module_mock, params)
     assert module_mock.mock_calls == [mock.call.set_block_temperature(42)]
 
 
-def test_thermocycler_set_lid_temperature():
+def test_thermocycler_set_lid_temperature() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {"module": "someModuleId", "temperature": 42}
+    params: "TemperatureParams" = {"module": "someModuleId", "temperature": 42}
     _thermocycler_set_lid_temperature(module_mock, params)
     assert module_mock.mock_calls == [mock.call.set_lid_temperature(42)]
 
 
-def test_thermocycler_run_profile():
+def test_thermocycler_run_profile() -> None:
     module_mock = mock.create_autospec(ThermocyclerContext)
-    params = {
+    params: "ThermocyclerRunProfileParams" = {
         "profile": [
             {"temperature": 55, "holdTime": 90},
             {"temperature": 65, "holdTime": 30},
@@ -235,13 +264,13 @@ def test_thermocycler_run_profile():
 
 
 def test_dispatch_json(
-    monkeypatch,
-    pipette_command_map,
-    magnetic_module_command_map,
-    temperature_module_command_map,
-    thermocycler_module_command_map,
-    mockObj,
-):
+    monkeypatch: pytest.MonkeyPatch,
+    pipette_command_map: "PipetteDispatch",
+    magnetic_module_command_map: "JsonV4MagneticModuleDispatch",
+    temperature_module_command_map: "JsonV4TemperatureModuleDispatch",
+    thermocycler_module_command_map: "JsonV4ThermocyclerDispatch",
+    mockObj: mock.Mock,
+) -> None:
 
     monkeypatch.setattr(v4, "_delay", mockObj)
     monkeypatch.setattr(v4, "_move_to_slot", mockObj)
@@ -356,7 +385,7 @@ def test_dispatch_json(
 
     dispatch_json(
         context,
-        protocol_data,
+        protocol_data,  # type: ignore[arg-type]
         instruments,
         loaded_labware,
         modules,
@@ -446,13 +475,14 @@ def test_dispatch_json(
     ]
 
 
+@typing.no_type_check
 def test_dispatch_json_invalid_command(
-    pipette_command_map,
-    magnetic_module_command_map,
-    temperature_module_command_map,
-    thermocycler_module_command_map,
-):
-    protocol_data = {
+    pipette_command_map: "PipetteDispatch",
+    magnetic_module_command_map: "JsonV4MagneticModuleDispatch",
+    temperature_module_command_map: "JsonV4TemperatureModuleDispatch",
+    thermocycler_module_command_map: "JsonV4ThermocyclerDispatch",
+) -> None:
+    protocol_data: "JsonProtocolV4" = {
         "commands": [
             {"command": "no_such_command", "params": "foo"},
         ]
@@ -472,7 +502,11 @@ def test_dispatch_json_invalid_command(
 
 
 @pytest.mark.ot2_only
-def test_papi_execute_json_v4(monkeypatch, ctx, get_json_protocol_fixture):
+def test_papi_execute_json_v4(
+    monkeypatch: pytest.MonkeyPatch,
+    ctx: ProtocolContext,
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
+) -> None:
     protocol_data = get_json_protocol_fixture("4", "testModulesProtocol", False)
     protocol = parse(protocol_data, None)
     ctx.home()
@@ -480,14 +514,46 @@ def test_papi_execute_json_v4(monkeypatch, ctx, get_json_protocol_fixture):
     execute.run_protocol(protocol, ctx)
 
 
-def test_assert_no_async_tc_behavior():
-    setBlock = {"command": "thermocycler/setTargetBlockTemperature"}
-    awaitBlock = {"command": "thermocycler/awaitBlockTemperature"}
-    setLid = {"command": "thermocycler/setTargetLidTemperature"}
-    awaitLid = {"command": "thermocycler/awaitLidTemperature"}
-    runProfile = {"command": "thermocycler/runProfile"}
-    awaitProfile = {"command": "thermocycler/awaitProfileComplete"}
-    anything = {"command": "foo"}  # stand-in for some other command
+def test_assert_no_async_tc_behavior() -> None:
+    temp_params: "TemperatureParams" = {
+        "temperature": 75,
+        "module": "thermocycler_module_id",
+    }
+    set_target_params: "ThermocyclerSetTargetBlockParams" = {
+        "volume": 100,
+        **temp_params,
+    }
+    run_profile_params: "ThermocyclerRunProfileParams" = {
+        "module": "thermocycler_module_id",
+        "volume": 100,
+        "profile": [],
+    }
+
+    setBlock: "ThermocyclerSetTargetBlockCommand" = {
+        "command": "thermocycler/setTargetBlockTemperature",
+        "params": set_target_params,
+    }
+    awaitBlock: "ThermocyclerAwaitBlockTemperatureCommand" = {
+        "command": "thermocycler/awaitBlockTemperature",
+        "params": temp_params,
+    }
+    setLid: "ThermocyclerSetTargetLidCommand" = {
+        "command": "thermocycler/setTargetLidTemperature",
+        "params": temp_params,
+    }
+    awaitLid: "ThermocyclerAwaitLidTemperatureCommand" = {
+        "command": "thermocycler/awaitLidTemperature",
+        "params": temp_params,
+    }
+    runProfile: "ThermocyclerRunProfileCommand" = {
+        "command": "thermocycler/runProfile",
+        "params": run_profile_params,
+    }
+    awaitProfile: "ThermocyclerAwaitProfileCommand" = {
+        "command": "thermocycler/awaitProfileComplete",
+        "params": run_profile_params,
+    }
+    anything: "ThermocyclerCommand" = {"command": "foo", "params": {}}  # type: ignore[assignment, misc]  # stand-in for some other command
 
     # no error
     assert_no_async_tc_behavior(
@@ -507,7 +573,7 @@ def test_assert_no_async_tc_behavior():
 
     assert_no_async_tc_behavior([anything, anything])
 
-    setters = [setBlock, setLid, runProfile]
+    setters: List[ThermocyclerCommand] = [setBlock, setLid, runProfile]
 
     for setter in setters:
         # Should raise if anything except the corresponding await
@@ -519,7 +585,7 @@ def test_assert_no_async_tc_behavior():
         with pytest.raises(RuntimeError):
             assert_no_async_tc_behavior([anything, setter])
 
-    awaiters = [awaitBlock, awaitLid, awaitProfile]
+    awaiters: List[ThermocyclerCommand] = [awaitBlock, awaitLid, awaitProfile]
 
     for awaiter in awaiters:
         # Should raise if anything except the corresponding set
@@ -532,15 +598,24 @@ def test_assert_no_async_tc_behavior():
             assert_no_async_tc_behavior([awaiter, anything])
 
 
-def test_assert_tc_commands_do_not_use_unimplemented_params():
+def test_assert_tc_commands_do_not_use_unimplemented_params() -> None:
     # should not throw for arbitrary commands
     assert_tc_commands_do_not_use_unimplemented_params(
-        [{"command": "foo", "params": {}}]
+        [{"command": "foo", "params": {}}]  # type: ignore[list-item, misc]
     )
 
-    fail_cases = [
-        [{"command": "thermocycler/setTargetBlockTemperature", "params": {"volume": 0}}]
+    fail_cases: List[List[ThermocyclerSetTargetBlockCommand]] = [
+        [
+            {
+                "command": "thermocycler/setTargetBlockTemperature",
+                "params": {
+                    "volume": 0,
+                    "temperature": 0,
+                    "module": "thermocycler_module_id",
+                },
+            }
+        ]
     ]
     for cmds in fail_cases:
         with pytest.raises(RuntimeError):
-            assert_tc_commands_do_not_use_unimplemented_params(cmds)
+            assert_tc_commands_do_not_use_unimplemented_params(cmds)  # type: ignore[arg-type]

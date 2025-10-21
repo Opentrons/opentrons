@@ -1,23 +1,23 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  LegacyStyledText,
+  Modal,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { Modal } from '../../molecules/Modal'
-import { getIsOnDevice } from '../../redux/config'
+import { getTopPortalEl } from '/app/App/portal'
+import { OddModal } from '/app/molecules/OddModal'
+import { getIsOnDevice } from '/app/redux/config'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { ModalProps } from '@opentrons/components'
+import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -37,22 +37,21 @@ export function EstopMissingModal({
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <TouchscreenModal robotName={robotName} closeModal={closeModal} />
-      ) : (
-        <>
-          {isDismissedModal === false ? (
-            <DesktopModal
-              robotName={robotName}
-              closeModal={closeModal}
-              setIsDismissedModal={setIsDismissedModal}
-            />
-          ) : null}
-        </>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <TouchscreenModal robotName={robotName} closeModal={closeModal} />
+    ) : (
+      <>
+        {!isDismissedModal ? (
+          <DesktopModal
+            robotName={robotName}
+            closeModal={closeModal}
+            setIsDismissedModal={setIsDismissedModal}
+          />
+        ) : null}
+      </>
+    ),
+    getTopPortalEl()
   )
 }
 
@@ -66,26 +65,26 @@ function TouchscreenModal({
   robotName,
 }: EstopMissingTouchscreenModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const modalHeader: ModalHeaderBaseProps = {
+  const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: COLORS.red50,
   }
   const modalProps = {
     header: { ...modalHeader },
   }
 
   return (
-    <Modal {...modalProps}>
+    <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
-        </StyledText>
-        <StyledText as="p">
-          {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText as="p">
+          {t('estop_missing_description', { robotName })}
+        </LegacyStyledText>
       </Flex>
-    </Modal>
+    </OddModal>
   )
 }
 
@@ -106,7 +105,7 @@ function DesktopModal({
     closeModal()
   }
 
-  const modalProps: LegacyModalProps = {
+  const modalProps: ModalProps = {
     type: 'error',
     title: t('estop_missing'),
     onClose: handleCloseModal,
@@ -116,13 +115,15 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal {...modalProps}>
+    <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <StyledText as="h1">{t('connect_the_estop_to_continue')}</StyledText>
-        <StyledText>
-          {t('estop_missing_description', { robotName: robotName })}
-        </StyledText>
+        <LegacyStyledText as="h1">
+          {t('connect_the_estop_to_continue')}
+        </LegacyStyledText>
+        <LegacyStyledText>
+          {t('estop_missing_description', { robotName })}
+        </LegacyStyledText>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

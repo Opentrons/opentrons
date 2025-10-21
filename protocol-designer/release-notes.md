@@ -1,0 +1,272 @@
+For more details about this release, please see the full [technical change
+log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
+
+[technical change log]: https://github.com/Opentrons/opentrons/releases
+[opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
+
+By using Opentrons Protocol Designer, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
+
+---
+
+## Opentrons Protocol Designer Changes in 8.6.0
+
+**Welcome to Protocol Designer 8.6.0!**
+
+This release adds support for new instruments, labware, and hardware,enables limited return tip support in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
+- Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
+- Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.
+- Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing. Return tip settings in version 8.6.0 are limited to a single return, and you won't be able to pick up these tips again in the same protocol.
+
+### Improved Features
+
+- Add a time in hours for the Heater-Shaker Module to heat or shake samples.
+- Exported protocols include step names and details added in Protocol Designer. Each appear as comments above individual steps in the Python protocol file.
+- Hover over wells in a labware to view final volumes on the ending deck.
+- Protocol Designer includes a warning when deleting a liquid added to labware in your protocol.
+
+### Bug Fixes
+
+- Protocol Designer now raises an error when moving labware to a deleted module.
+
+### Known Issues
+
+- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.
+
+## Opentrons Protocol Designer Changes in 8.5.6
+
+**Welcome to Protocol Designer 8.5.6!**
+
+This hotfix release addresses a bug when dispensing into a trash bin or waste chute.
+
+## Opentrons Protocol Designer Changes in 8.5.5
+
+**Welcome to Protocol Designer 8.5.5!**
+
+This hotfix release addresses a bug to allow full use of pipettes and tip racks during liquid class transfers.
+
+## Opentrons Protocol Designer Changes in 8.5.4
+
+**Welcome to Protocol Designer 8.5.4!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Set a custom aspirate tip position for any dispense location.
+- Protocol Designer correctly reassigns default tip settings when changing pipettes in your protocol.
+- Protocol Designer no longer crashes when encountering missing tip rack errors in imported protocols.
+- Aspirate and dispense tip positions default to 1 mm above the well bottom if unspecified in your protocols.
+
+## Opentrons Protocol Designer Changes in 8.5.3
+
+**Welcome to Protocol Designer 8.5.3!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Crashes and protocol loss no longer occur when:
+- Crashes and protocol loss no longer occur when:
+  - deleting a pipette involved in a mix step.
+  - deleting a Protocol Designer step title.
+  - checking labware details after deleting a liquid.
+  - deleting a pipette involved in a mix step.
+  - deleting a Protocol Designer step title.
+  - checking labware details after deleting a liquid.
+
+- All staging area slots remain when adding new staging areas after initial deck setup.
+
+## Opentrons Protocol Designer Changes in 8.5.2
+
+**Welcome to Protocol Designer 8.5.2!**
+
+This hotfix release addresses several bugs.
+
+### Bug Fixes
+
+- Protocol Designer no longer raises an error when checking your custom labware definitions for well ordering.
+- Transfer volumes as large as your tip limit without errors during a multi-dispense with liquid class settings applied.
+- Exported Python protocols include numbered commands, making it easier to identify errors.
+- Setting well volume over the limit results in a warning rather than a protocol error.
+- Crashes and protocol loss no longer occur when viewing liquids added to labware.
+- Additional refinement with assigning the correct tip rack to some liquid transfers.
+
+## Opentrons Protocol Designer Changes in 8.5.1
+
+**Welcome to Protocol Designer 8.5.1!**
+
+This hotfix release addresses a bug that caused the incorrect tip rack to be assigned to some liquid transfers.
+
+## Opentrons Protocol Designer Changes in 8.5.0
+
+**Welcome to Protocol Designer v8.5.0!**
+
+This release adds support for liquid classes in Flex protocols, exports Python protocols for Flex and OT-2, and includes feature improvements and bug fixes.
+
+Use Opentrons-verified liquid classes to automatically define transfer settings and optimize liquid handling behavior based on liquid properties like viscosity. When adding liquids to your protocol, select an Opentrons-verified liquid class from the dropdown menu. You can choose whether or not to apply liquid class settings to protocol steps that use compatible Opentrons labware and pipettes.
+
+### New Features
+
+- Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer.
+- Customize push out volume after a dispense to ensure all liquid leaves the pipette tip.
+- Add conditioning volumes to transfer steps. After aspirating liquid, the pipette will aspirate a smaller conditioning volume for a more accurate first dispense.
+
+### Improved Features
+
+- Protocol Designer includes a warning when you clear a labware, a module, or a fixture used in a protocol step.
+- Protocol Designer takes extra steps to validate any custom labware you upload.
+
+### Bug Fixes
+
+- Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).
+- During a mix, push out is set to 0 by default for all mixes except for the last, to avoid multiple push out actions. You can choose your own push out volume in a mix step menu.
+- Choose a new tip drop location from the dropdown menu when an uploaded protocol is missing a tip drop location.
+- Protocol Designer correctly updates adapter and labware combination definitions when you upload a protocol designed in Protocol Designer v7.0.0 or earlier.
+- When adding a disposal volume, a blowout location is now required. Older protocols that specified a blowout with no location selected will be updated to blowout in a loaded trash bin or waste chute.
+- No longer allow touch tip with incompatible labware. This changes the behavior of imported protocols that had touch tip on incompatible labware.
+- If multiple labware end up in the same slot at the same time due to deleting/rearranging steps, an error appears on the protocol timeline.
+- If a Heater-Shaker step is created with a a heater set and a timer, the protocol will now wait until the temperature is reached before counting down the timer.
+- If the timer of a Heater-Shaker step is toggled on and off, the timer input field no longer errors.
+- Successfully delete a defined liquid that has not been assigned to any location.
+- Display correct substep details for all transfer paths and pipettes.
+
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.5.1 or newer.
+
+## Opentrons Protocol Designer Changes in 8.4.4
+
+**Welcome to Protocol Designer 8.4.4!**
+
+Changes to file data support importing protocols generated by OpentronsAI.
+
+### Bug Fixes
+
+- When you export a protocol with an unused staging area, gripper, or trash bin, Protocol Designer will include the fixture when your protocol is imported again.
+- Fixed a crash when zooming into a slot that has an older version of a labware definition.
+
+### Improved Features
+
+- Increased responsiveness and alignment of the timeline toolbox, step form toolbox, and off-deck view of deck setup.
+
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.3.2 or newer.
+
+## Opentrons Protocol Designer Changes in 8.4.3
+
+**Welcome to Protocol Designer 8.4.3!**
+
+This release adds support for drag and drop labware in Protocol Designer, and includes feature improvements and bug fixes.
+
+When editing your protocol starting deck, click and drag to move any individual piece of labware to a new slot.
+
+### Improvements
+
+- To avoid deck conflicts with fixtures like the trash bin, add only one of each module in protocol setup. Click **Edit protocol** and **Protocol starting deck** to add and edit multiple modules as needed.
+- See your protocol starting deck edits more easily with module highlighting when moving labware or editing a module step.
+
+### Bug Fixes
+
+- Protocol Designer always redirects to the protocol overview when you import an existing protocol from the home or settings page.
+- When tip racks, labware, or modules aren't assigned to a transfer or module step, improved error recovery in Protocol Designer avoids a crash or unknown error.
+- Protocol Designer displays an error for transfer or Flex gripper move steps with off-deck labware, and when a transfer volume exceeds the well limit.
+- Touch tip is no longer available during a dispense into the trash bin.
+
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.3.0 or newer.
+
+## Opentrons Protocol Designer Changes in 8.4.2
+
+**Welcome to Protocol Designer 8.4.2!**
+
+This hotfix release addresses a bug during protocol analysis on the Opentrons App caused by an air gap after dispense.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.4.1
+
+Version 8.4.1 was not released due to internal branching issues.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.4.0
+
+**Welcome to Protocol Designer 8.4.0!**
+
+This release adds support for the Absorbance Plate Reader Module and includes feature improvements and bug fixes.
+
+### Bug Fixes
+
+- Move steps added to a Flex protocol now use the gripper by default.
+- Use matching X and Y offset values to aspirate and dispense during a Mix step.
+
+All protocols created in Protocol Designer now require version 8.2.0 or higher of the Opentrons App to run.
+
+### New Features
+
+**Absorbance Plate Reader Module GEN1**
+
+You can add an Absorbance Plate Reader Module GEN1 to deck slots A3-D3 on the Flex. You'll also need to use a gripper to safely move the lid on and off the module.
+
+To use the Absorbance Plate Reader Module in your Protocol Designer protocol, add the following steps:
+
+- an Absorbance Plate Reader step to close the lid using the gripper
+- an Absorbance Plate Reader step to initialize the module without labware inside. Choose from a single or multiple wavelengths.
+- an Absorbance Plate Reader step to open the lid using the gripper
+- a Move step to place a plate in the module. Using the gripper is optional.
+- an Absorbance Plate Reader step to read the plate using the same wavelength choices.
+
+Data from the Absorbance Plate Reader Module is exported as a .CSV file and can be found on your Flex's detail page in the Opentrons Desktop App. Repeat the steps shown above to open the lid and remove the plate.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.3.0
+
+Welcome to the v8.3.0 release of Opentrons Protocol Designer!
+
+### New Features
+
+- During step creation, labware and modules used are highlighted on the deck.
+
+### Bug Fixes
+
+- Custom labware can be added and moved onto its supported labware.
+
+### Improved Features
+
+- Touch tip and blow out copy is more precise.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.2.2
+
+Welcome to the v8.2.2 release of Opentrons Protocol Designer!
+
+### Bug Fixes
+
+- Fixed an error with the heater-shaker timer field where it would not save from an imported protocol.
+
+### Improved Features
+
+- The analytics modal is dismissible via the settings page for both previous and new users.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.2.1
+
+Welcome to the v8.2.1 release of Opentrons Protocol Designer!
+
+### Bug Fixes
+
+- Fixed blow out not saving when checking it in the form.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.2.0
+
+We’re excited to release the new Opentrons Protocol Designer, now with a fresh redesign! All protocols now require Opentrons App version 8.2.0+ to run. Enjoy the same functionality with the added ability to:
+
+### New Features
+
+- Add multiple Heater-Shaker Modules and Magnetic Blocks to the deck (Flex only).

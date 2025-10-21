@@ -1,58 +1,40 @@
-import { when } from 'jest-when'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
+import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { dispense } from '../commandCreators/atomic/dispense'
 import {
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
-import {
+  DEFAULT_PIPETTE,
+  getErrorResult,
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
-  makeContext,
-  getErrorResult,
   getSuccessResult,
-  DEFAULT_PIPETTE,
+  makeContext,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
-import { InvariantContext, RobotState } from '../types'
-import type {
-  AspDispAirgapParams as V3AspDispAirgapParams,
-  DispenseParams,
-} from '@opentrons/shared-data/protocol/types/schemaV3'
+import {
+  absorbanceReaderCollision,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  getSlotInLocationStack,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
 
-jest.mock('../utils/thermocyclerPipetteCollision')
-jest.mock('../utils/heaterShakerCollision')
+import type { DispenseAtomicCommandParams } from '../commandCreators/atomic/dispense'
+import type { InvariantContext, RobotState } from '../types'
 
-const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
-  typeof thermocyclerPipetteCollision
->
-const mockPipetteIntoHeaterShakerLatchOpen = pipetteIntoHeaterShakerLatchOpen as jest.MockedFunction<
-  typeof pipetteIntoHeaterShakerLatchOpen
->
-const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShaking as jest.MockedFunction<
-  typeof pipetteIntoHeaterShakerWhileShaking
->
-const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
-  typeof getIsHeaterShakerEastWestWithLatchOpen
->
-const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWestMultiChannelPipette as jest.MockedFunction<
-  typeof getIsHeaterShakerEastWestMultiChannelPipette
->
-const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
-  typeof pipetteAdjacentHeaterShakerWhileShaking
->
-const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
-  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
->
+vi.mock('../utils/absorbanceReaderCollision')
+vi.mock('../utils/thermocyclerPipetteCollision')
+vi.mock('../utils/heaterShakerCollision')
 
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -64,18 +46,22 @@ describe('dispense', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params: V3AspDispAirgapParams
+    let params: DispenseAtomicCommandParams
     beforeEach(() => {
       params = {
-        pipette: DEFAULT_PIPETTE,
+        pipetteId: DEFAULT_PIPETTE,
         volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 5,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'bottom',
+          offset: { z: 5, x: 0, y: 0 },
+        },
         flowRate: 6,
+        tipRack: 'tiprack1Id',
       }
     })
     it('dispense normally (with tip)', () => {
@@ -92,6 +78,8 @@ describe('dispense', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 5,
               },
             },
@@ -99,6 +87,14 @@ describe('dispense', () => {
           },
         },
       ])
+      expect(getSuccessResult(result).python).toBe(
+        `
+mock_pipette.dispense(
+    volume=50,
+    location=mock_source_plate["A1"].bottom(z=5),
+    flow_rate=6,
+)`.trimStart()
+      )
     })
     it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)
@@ -109,18 +105,21 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing from labware off deck', () => {
-      initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
-        invariantContext
-      )
+      initialRobotState =
+        getInitialRobotStateWithOffDeckLabwareStandard(invariantContext)
       const result = dispense(
         {
           flowRate: 10,
-          offsetFromBottomMm: 5,
-          pipette: DEFAULT_PIPETTE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: { z: 5, x: 0, y: 0 },
+          },
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
-        } as DispenseParams,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          tipRack: 'tiprack1Id',
+        },
         invariantContext,
         initialRobotState
       )
@@ -131,7 +130,7 @@ describe('dispense', () => {
     })
     it('dispense to nonexistent labware should throw error', () => {
       const result = dispense(
-        { ...params, labware: 'someBadLabwareId' },
+        { ...params, labwareId: 'someBadLabwareId' },
         invariantContext,
         robotStateWithTip
       )
@@ -145,7 +144,7 @@ describe('dispense', () => {
       robotStateWithTip = {
         ...robotStateWithTip,
         labware: {
-          [SOURCE_LABWARE]: { slot: 'A4' },
+          [SOURCE_LABWARE]: { stack: [SOURCE_LABWARE, 'A4'] },
         },
       }
       const result = dispense(params, invariantContext, robotStateWithTip)
@@ -155,7 +154,7 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing into thermocycler with pipette collision', () => {
-      mockThermocyclerPipetteCollision.mockImplementationOnce(
+      vi.mocked(thermocyclerPipetteCollision).mockImplementationOnce(
         (
           modules: RobotState['modules'],
           labware: RobotState['labware'],
@@ -174,8 +173,28 @@ describe('dispense', () => {
         type: 'THERMOCYCLER_LID_CLOSED',
       })
     })
+    it('should return an error when dispensing into absorbance reader with pipette collision', () => {
+      vi.mocked(absorbanceReaderCollision).mockImplementationOnce(
+        (
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'ABSORBANCE_READER_LID_CLOSED',
+      })
+    })
     it('should return an error when dispensing into heater shaker with latch open', () => {
-      mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      vi.mocked(pipetteIntoHeaterShakerLatchOpen).mockImplementationOnce(
         (
           modules: RobotState['modules'],
           labware: RobotState['labware'],
@@ -196,12 +215,11 @@ describe('dispense', () => {
     })
     it('should return an error when dispensing into heater shaker with latch open for flex', () => {
       if (FlexPipetteNameSpecs != null) {
-        invariantContext.pipetteEntities[
-          DEFAULT_PIPETTE
-        ].spec = FlexPipetteNameSpecs
+        invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+          FlexPipetteNameSpecs
       }
 
-      mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      vi.mocked(pipetteIntoHeaterShakerLatchOpen).mockImplementationOnce(
         (
           modules: RobotState['modules'],
           labware: RobotState['labware'],
@@ -221,7 +239,7 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing into heater-shaker when it is shaking', () => {
-      mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+      vi.mocked(pipetteIntoHeaterShakerWhileShaking).mockImplementationOnce(
         (
           modules: RobotState['modules'],
           labware: RobotState['labware'],
@@ -242,12 +260,11 @@ describe('dispense', () => {
     })
     it('should return an error when dispensing into heater-shaker when it is shaking for flex', () => {
       if (FlexPipetteNameSpecs != null) {
-        invariantContext.pipetteEntities[
-          DEFAULT_PIPETTE
-        ].spec = FlexPipetteNameSpecs
+        invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+          FlexPipetteNameSpecs
       }
 
-      mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+      vi.mocked(pipetteIntoHeaterShakerWhileShaking).mockImplementationOnce(
         (
           modules: RobotState['modules'],
           labware: RobotState['labware'],
@@ -267,12 +284,14 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing east/west of a heater shaker with its latch open', () => {
-      when(mockGetIsHeaterShakerEastWestWithLatchOpen)
+      when(getIsHeaterShakerEastWestWithLatchOpen)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          )
         )
-        .mockReturnValue(true)
+        .thenReturn(true)
 
       const result = dispense(params, invariantContext, robotStateWithTip)
       expect(getErrorResult(result).errors).toHaveLength(1)
@@ -281,13 +300,15 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing east/west of a heater shaker with a multi channel pipette', () => {
-      when(mockGetIsHeaterShakerEastWestMultiChannelPipette)
+      when(getIsHeaterShakerEastWestMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything()
         )
-        .mockReturnValue(true)
+        .thenReturn(true)
 
       const result = dispense(params, invariantContext, robotStateWithTip)
       expect(getErrorResult(result).errors).toHaveLength(1)
@@ -296,12 +317,15 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing north/south/east/west of a heater shaker while it is shaking', () => {
-      when(mockPipetteAdjacentHeaterShakerWhileShaking)
+      when(pipetteAdjacentHeaterShakerWhileShaking)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
+          OT2_ROBOT_TYPE
         )
-        .mockReturnValue(true)
+        .thenReturn(true)
 
       const result = dispense(params, invariantContext, robotStateWithTip)
       expect(getErrorResult(result).errors).toHaveLength(1)
@@ -310,14 +334,16 @@ describe('dispense', () => {
       })
     })
     it('should return an error when dispensing north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
-      when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+      when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
         .calledWith(
           robotStateWithTip.modules,
-          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          getSlotInLocationStack(
+            robotStateWithTip.labware[SOURCE_LABWARE].stack
+          ),
           expect.anything(),
           expect.anything()
         )
-        .mockReturnValue(true)
+        .thenReturn(true)
 
       const result = dispense(params, invariantContext, robotStateWithTip)
       expect(getErrorResult(result).errors).toHaveLength(1)

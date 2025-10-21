@@ -1,24 +1,26 @@
-import thunk from 'redux-thunk'
-import configureMockStore from 'redux-mock-store'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { legacy_configureStore } from 'redux-mock-store'
+import { thunk } from 'redux-thunk'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
+
 import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
-jest.mock('../selectors')
-const mockStore = configureMockStore([thunk])
-const mockGetBatchEditFieldChanges = getBatchEditFieldChanges as jest.MockedFunction<
-  typeof getBatchEditFieldChanges
->
+
+vi.mock('../selectors')
+
+const mockStore = legacy_configureStore([thunk] as any)
+
 describe('saveStepFormsMulti', () => {
   let store: any
   beforeEach(() => {
     store = mockStore()
-    when(mockGetBatchEditFieldChanges)
+    when(vi.mocked(getBatchEditFieldChanges))
       .calledWith(expect.anything())
-      .mockReturnValue({
-        someField: 'someVal',
-      })
+      .thenReturn({ someField: 'someVal' })
   })
-  afterEach(() => resetAllWhenMocks())
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
   it('should dispatch SAVE_STEP_FORMS_MULTI with edited fields and step ids', () => {
     const stepIds = ['1', '2']
     store.dispatch(saveStepFormsMulti(stepIds))

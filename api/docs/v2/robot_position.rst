@@ -16,10 +16,14 @@ Position Relative to Labware
 
 When the robot positions itself relative to a piece of labware, where it moves is determined by the labware definition, the actions you want it to perform, and the labware offsets for a specific deck slot. This section describes how these positional components are calculated and how to change them.
 
-Top, Bottom, and Center
------------------------
+Well Positions
+---------------------------------
 
-Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and what the labware is loaded on top of. You can use these positions as-is or calculate other positions relative to them.
+Every well on every piece of labware has four addressable positions: top, bottom, center, and meniscus. 
+
+The top, bottom, and center positions are determined by the labware definition and what the labware is loaded on top of. The meniscus position is determined by the height of the liquid inside a well. You can use these positions as-is or calculate other positions relative to them.
+
+.. _well-top:
 
 Top
 ^^^^
@@ -28,14 +32,14 @@ Let's look at the :py:meth:`.Well.top` method. It returns a position level with 
 
 .. code-block:: python
     
-    plate['A1'].top()  # the top center of the well
+    plate["A1"].top()  # the top center of the well
 
 This is a good position to use for a :ref:`blow out operation <new-blow-out>` or an activity where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z`` numbers move it down.
 
 .. code-block:: python
 
-   plate['A1'].top(z=1)  # 1 mm above the top center of the well
-   plate['A1'].top(z=-1) # 1 mm below the top center of the well
+   plate["A1"].top(z=1)  # 1 mm above the top center of the well
+   plate["A1"].top(z=-1) # 1 mm below the top center of the well
 
 .. versionadded:: 2.0
 
@@ -46,14 +50,14 @@ Let's look at the :py:meth:`.Well.bottom` method. It returns a position level wi
 
 .. code-block:: python
 
-   plate['A1'].bottom()  # the bottom center of the well
+   plate["A1"].bottom()  # the bottom center of the well
 
 This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activity where you want the tip to contact the liquid. Similar to the ``Well.top()`` method, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, negative ``z`` numbers move it down.
 
 .. code-block:: python
 
-   plate['A1'].bottom(z=1)  # 1 mm above the bottom center of the well
-   plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
+   plate["A1"].bottom(z=1)  # 1 mm above the bottom center of the well
+   plate["A1"].bottom(z=-1) # 1 mm below the bottom center of the well
                             # this may be dangerous!
 
 .. warning::
@@ -73,41 +77,68 @@ Let's look at the :py:meth:`.Well.center` method. It returns a position centered
 
 .. code-block:: python
 
-   plate['A1'].center() # the vertical and horizontal center of the well
+   plate["A1"].center() # the vertical and horizontal center of the well
 
 .. versionadded:: 2.0
 
+.. _well-meniscus:
+
+Meniscus
+^^^^^^^^
+
+Let's look at the :py:meth:`.Well.meniscus` method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the ``.Well.top`` and ``.Well.bottom`` methods, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` values move the position up, and negative ones move it down. 
+
+.. code-block:: python
+
+    plate["A1"].meniscus(
+        z=-1, target= "end"
+        ) 
+    # 1 mm below the meniscus of liquid inside the well
+
+
+The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a ``target`` position relative to the meniscus. Each position target is useful in different scenarios: 
+
+- Set ``target="start"`` to target the existing liquid meniscus in the destination well before a dispense. 
+- Set ``target="end"`` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
+
+.. note::
+    To use the :py:meth:`~.Well.meniscus` method, you'll first need to specify the starting liquid volume with :py:meth:`~.Labware.load_liquid` or probe for liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`.
+
+    Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
+
+.. versionadded:: 2.23
 
 .. _new-default-op-positions:
 
 Default Positions
 -----------------
 
-By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value by using the :py:meth:`.Well.bottom` method with the ``z`` argument, though it can be cumbersome to do so repeatedly.
+By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value based on your labware with the :py:meth:`.Well.bottom` method and the ``z`` argument, though it can be cumbersome to do so repeatedly.
 
 If you need to change the aspiration or dispensing height for multiple operations, specify the distance in mm from the well bottom with the :py:obj:`.InstrumentContext.well_bottom_clearance` object. It has two attributes: ``well_bottom_clearance.aspirate`` and ``well_bottom_clearance.dispense``. These change the aspiration height and dispense height, respectively.
 
 Modifying these attributes will affect all subsequent aspirate and dispense actions performed by the attached pipette, even those executed as part of a :py:meth:`.transfer` operation. This snippet from a sample protocol demonstrates how to work with and change the default clearance::
 
     # aspirate 1 mm above the bottom of the well (default)
-    pipette.aspirate(50, plate['A1'])
+    pipette.aspirate(50, plate["A1"])
     # dispense 1 mm above the bottom of the well (default)
-    pipette.dispense(50, plate['A1'])
+    pipette.dispense(50, plate["A1"])
 
     # change clearance for aspiration to 2 mm
     pipette.well_bottom_clearance.aspirate = 2
     # aspirate 2 mm above the bottom of the well
-    pipette.aspirate(50, plate['A1'])
+    pipette.aspirate(50, plate["A1"])
     # still dispensing 1 mm above the bottom
-    pipette.dispense(50, plate['A1'])
+    pipette.dispense(50, plate["A1"])
 
-    pipette.aspirate(50, plate['A1'])
+    pipette.aspirate(50, plate["A1"])
     # change clearance for dispensing to 10 mm      
     pipette.well_bottom_clearance.dispense = 10
     # dispense high above the well
-    pipette.dispense(50, plate['A1'])
+    pipette.dispense(50, plate["A1"])
 
 .. versionadded:: 2.0
+  
 
 Using Labware Position Check
 ============================
@@ -115,6 +146,33 @@ Using Labware Position Check
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
 You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See :ref:`using_lpc` in the Advanced Control article for information.
+
+.. _position-relative-trash:
+
+Position Relative to Trash Containers
+=====================================
+
+Movement to :py:class:`.TrashBin` or :py:class:`.WasteChute` objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
+
+.. note::
+    In API version 2.15 and earlier, trash containers are :py:class:`.Labware` objects that have a single well. See :py:obj:`.fixed_trash` and :ref:`position-relative-labware` above.
+
+You can adjust the position of the pipette center with the :py:meth:`.TrashBin.top` and :py:meth:`.WasteChute.top` methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, ``Well.top()``, :ref:`covered above <well-top>`, only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
+
+.. code-block:: python
+
+    trash = protocol.load_trash_bin("A3")
+
+    trash  # pipette center just below trash top center
+    trash.top()  # same position
+    trash.top(z=10)  # 10 mm higher
+    trash.top(y=10)  # 10 mm towards back, default height
+
+.. versionadded:: 2.18
+
+Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
+
+.. _protocol-api-deck-coords:
 
 Position Relative to the Deck
 =============================
@@ -140,21 +198,21 @@ Move To
 
 The :py:meth:`.InstrumentContext.move_to` method moves a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position.
 
-The :py:meth:`~.InstrumentContext.move_to` method requires the :py:class:`.Location` argument. The location can be automatically generated by methods like ``Well.top()`` and ``Well.bottom()`` or one you've created yourself, but you can't move a pipette to a well directly:
+The :py:meth:`~.InstrumentContext.move_to` method requires the :py:class:`.Location` argument. The location can be automatically generated by methods like ``Well.top()``, ``Well.bottom()``, and ``Well.mensicus()``, or one you've created yourself. However, you can't move a pipette to a well directly:
 
 .. code-block:: python
 
-    pipette.move_to(plate['A1'])              # error; can't move to a well itself
-    pipette.move_to(plate['A1'].bottom())     # move to the bottom of well A1
-    pipette.move_to(plate['A1'].top())        # move to the top of well A1
-    pipette.move_to(plate['A1'].bottom(z=2))  # move to 2 mm above the bottom of well A1
-    pipette.move_to(plate['A1'].top(z=-2))    # move to 2 mm below the top of well A1
+    pipette.move_to(plate["A1"])              # error; can't move to a well itself
+    pipette.move_to(plate["A1"].bottom())     # move to the bottom of well A1
+    pipette.move_to(plate["A1"].top())        # move to the top of well A1
+    pipette.move_to(plate["A1"].bottom(z=2))  # move to 2 mm above the bottom of well A1
+    pipette.move_to(plate["A1"].top(z=-2))    # move to 2 mm below the top of well A1
 
 When using ``move_to()``, by default the pipette will move in an arc: first upwards, then laterally to a position above the target location, and finally downwards to the target location. If you have a reason for doing so, you can force the pipette to move in a straight line to the target location:
 
 .. code-block:: python
 
-    pipette.move_to(plate['A1'].top(), force_direct=True)
+    pipette.move_to(plate["A1"].top(), force_direct=True)
 
 .. warning::
 
@@ -162,10 +220,10 @@ When using ``move_to()``, by default the pipette will move in an arc: first upwa
 
 Small, direct movements can be useful for working inside of a well, without having the tip exit and re-enter the well. This code sample demonstrates how to move the pipette to a well, make direct movements inside that well, and then move on to a different well::
 
-    pipette.move_to(plate['A1'].top())
-    pipette.move_to(plate['A1'].bottom(1), force_direct=True)
-    pipette.move_to(plate['A1'].top(-2), force_direct=True)
-    pipette.move_to(plate['A2'].top())
+    pipette.move_to(plate["A1"].top())
+    pipette.move_to(plate["A1"].bottom(1), force_direct=True)
+    pipette.move_to(plate["A1"].top(-2), force_direct=True)
+    pipette.move_to(plate["A2"].top())
 
 .. versionadded:: 2.0
 
@@ -185,7 +243,7 @@ When instructing the robot to move, it's important to consider the difference be
 This distinction is important for the :py:meth:`.Location.move` method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include ``from opentrons import types`` at the start of your protocol. The ``move()`` method does not mutate the location it is called on, so to perform an action at the updated location, use it as an argument of another method or save it to a variable. For example::
 
     # get the location at the center of well A1
-    center_location = plate['A1'].center()
+    center_location = plate["A1"].center()
 
     # get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1
     adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
@@ -203,11 +261,11 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
 	.. code-block:: python
 
 		# the following are equivalent
-		pipette.move_to(plate['A1'].bottom(z=2))
-		pipette.move_to(plate['A1'].bottom().move(types.Point(z=2)))
+		pipette.move_to(plate["A1"].bottom(z=2))
+		pipette.move_to(plate["A1"].bottom().move(types.Point(z=2)))
 
 		# adjust along the y-axis
-		pipette.move_to(plate['A1'].bottom().move(types.Point(y=2)))	
+		pipette.move_to(plate["A1"].bottom().move(types.Point(y=2)))	
 
 .. versionadded:: 2.0
 
@@ -217,6 +275,9 @@ Movement Speeds
 
 In addition to instructing the robot where to move a pipette, you can also control the speed at which it moves. Speed controls can be applied either to all pipette motions or to movement along a particular axis.
 
+.. note::
+    Like all mechanical systems, Opentrons robots have resonant frequencies that depend on their construction and current configuration. It's possible to set a speed that causes your robot to resonate, producing louder sounds than typical operation. This is safe, but if you find it annoying, increase or decrease the speed slightly.
+
 .. _gantry_speed: 
 
 Gantry Speed
@@ -225,9 +286,9 @@ Gantry Speed
 The robot's gantry usually moves as fast as it can given its construction. The default speed for Flex varies between 300 and 350 mm/s. The OT-2 default is 400 mm/s. However, some experiments or liquids may require slower movements. In this case, you can reduce the gantry speed for a specific pipette by setting :py:obj:`.InstrumentContext.default_speed` like this::
         
 	
-	pipette.move_to(plate['A1'].top())  # move to the first well at default speed
+	pipette.move_to(plate["A1"].top())  # move to the first well at default speed
 	pipette.default_speed = 100         # reduce pipette speed
-	pipette.move_to(plate['D6'].top())  # move to the last well at the slower speed
+	pipette.move_to(plate["D6"].top())  # move to the last well at the slower speed
 
 .. warning::
 
@@ -247,10 +308,10 @@ In addition to controlling the overall gantry speed, you can set speed limits fo
 .. code-block:: python
     :substitutions:
 
-	protocol.max_speeds['x'] = 50    # limit x-axis to 50 mm/s
-	del protocol.max_speeds['x']     # reset x-axis limit
-	protocol.max_speeds['a'] = 10    # limit a-axis to 10 mm/s
-	protocol.max_speeds['a'] = None  # reset a-axis limit
+	protocol.max_speeds["x"] = 50    # limit x-axis to 50 mm/s
+	del protocol.max_speeds["x"]     # reset x-axis limit
+	protocol.max_speeds["a"] = 10    # limit a-axis to 10 mm/s
+	protocol.max_speeds["a"] = None  # reset a-axis limit
 
 
 Note that ``max_speeds`` can't set limits for the pipette plunger axes (``b`` and ``c``); instead, set the flow rates or plunger speeds as described in :ref:`new-plunger-flow-rates`.

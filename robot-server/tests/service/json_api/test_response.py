@@ -12,6 +12,8 @@ from robot_server.service.json_api.response import (
     SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
+    NotifyRefetchBody,
+    NotifyUnsubscribeBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -23,7 +25,6 @@ class _Resource(ResourceModel):
 
 
 class _Links(BaseModel):
-
     sibling: ResourceLink
 
 
@@ -115,9 +116,14 @@ RESPONSE_SPECS = [
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
     ),
+    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetch": True}),
+    ResponseSpec(
+        subject=NotifyUnsubscribeBody(),
+        expected={"unsubscribe": True},
+    ),
 ]
 
 
 @pytest.mark.parametrize(ResponseSpec._fields, RESPONSE_SPECS)
 def test_response_to_dict(subject: BaseModel, expected: Dict[str, Any]) -> None:
-    assert subject.dict() == expected
+    assert subject.model_dump() == expected

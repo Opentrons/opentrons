@@ -1,0 +1,6 @@
+*.py[cod]
+*.egg
+build
+htmlcov
+
+src/performance_metrics/_version.py

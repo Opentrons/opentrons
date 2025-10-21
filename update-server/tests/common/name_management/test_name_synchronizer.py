@@ -165,7 +165,9 @@ async def test_advertises_initial_name(
     """
 
     decoy.when(await mock_get_pretty_hostname()).then_return("initial name")
-    mock_collision_subscription_context_manager = decoy.mock()
+    mock_collision_subscription_context_manager = decoy.mock(
+        name="mock_collision_subscription_context_manager"
+    )
     decoy.when(
         mock_avahi_client.listen_for_collisions(matchers.Anything())
     ).then_return(mock_collision_subscription_context_manager)
@@ -212,7 +214,7 @@ async def test_collision_handling(
     #
     # When it does, save the function that it provided as `some_callback_func`
     # into `collision_callback_captor.value`.
-    mock_listen_context_manager = decoy.mock()
+    mock_listen_context_manager = decoy.mock(name="mock_listen_context_manager")
     collision_callback_captor = matchers.Captor()
     decoy.when(
         mock_avahi_client.listen_for_collisions(collision_callback_captor)

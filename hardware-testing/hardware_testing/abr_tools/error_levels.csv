@@ -1,0 +1,52 @@
+Prefix,Error Code,Description,Categories,Level of Failure,
+1,1000,Communication Error,Hardware communication failed,2,
+1,1001,Canbus Communication Error,Hardware communication failed,2,
+1,1002,Internal USB Communication Error,Hardware communication failed,2,
+1,1003,Module Communication Error,Hardware communication failed,2,
+1,1004,Command Timed Out,Hardware communication failed,3,
+1,1005,Firmware Update Failed,Hardware communication failed,2,
+1,1006,Internal Message Format Error,Hardware communication failed,2,
+1,1007,Canbus Configuration Error,Hardware communication failed,2,
+1,1008,Canbus Bus Error,Hardware communication failed,2,
+2,2000,Robotics Control Error,A Robot Action Failed,3,
+2,2001,Motion Failed,A Robot Action Failed,4,
+2,2002,Homing Failed,A Robot Action Failed,4,
+2,2003,Stall or Collision Detected,A Robot Action Failed,3-4,
+2,2004,Motion Planning Failed,A Robot Action Failed,3,
+2,2005,Position Estimation Invalid,A Robot Action Failed,3,
+2,2006,Move Condition Not Met,A Robot Action Failed,3,
+2,2007,Calibration Structure Not Found,A Robot Action Failed,4,
+2,2008,Edge Not Found,A Robot Action Failed,3,
+2,2009,Early Capactivive Sense Trigger,A Robot Action Failed,4,
+2,2010,Innacrruate Non Contact Sweep,A Robot Action Failed,3,
+2,2011,Misaligned Gantry,A Robot Action Failed,3,
+2,2012,Unmatched Tip Presence States,A Robot Action Failed,3-4,
+2,2013,Position Unknown,A Robot Action Failed,4,
+2,2014,Execution Cancelled,A Robot Action Failed,3-4,
+2,2015,Failed Gripper Pickup Error,A Robot Action Failed,3-4,
+3,3000,Robotics Interaction Error,A Robot Interaction Failed,3,
+3,3001,Labware Dropped,A Robot Interaction Failed,3-4,
+3,3002,Labware Not Picked Up,A Robot Interaction Failed,3-4,
+3,3003,Tip Pickup Failed,A Robot Interaction Failed,4,
+3,3004,Tip Drop Failed,A Robot Interaction Failed,4,
+3,3005,Unexpeted Tip Removal,A Robot Interaction Failed,4,
+3,3006,Pipette Overpressure,A Robot Interaction Failed,3-4,
+3,3008,E-Stop Activated,A Robot Interaction Failed,Not an error,
+3,3009,E-Stop Not Present,A Robot Interaction Failed,5,
+3,3010,Pipette Not Present,A Robot Interaction Failed,5,
+3,3011,Gripper Not Present,A Robot Interaction Failed,5,
+3,3012,Unexpected Tip Attach,A Robot Interaction Failed,4,
+3,3013,Firmware Update Required,A Robot Interaction Failed,Not an error,
+3,3014,Invalid ID Actuator,A Robot Interaction Failed,3,
+3,3015,Module Not Pesent,A Robot Interaction Failed,5,Not an error
+3,3016,Invalid Instrument Data,A Robot Interaction Failed,3,
+3,3017,Invalid Liquid Class Name,A Robot Interaction Failed,5,Not an error
+3,3018,Tip Detector Not Found,A Robot Interaction Failed,3,
+4,4000,General Error,A Software Error Occured,2-4,How severe does a general error get
+4,4001,Robot In Use,A Software Error Occured,5,Not an error
+4,4002,API Removed,A Software Error Occured,5,used an old app on a new robot
+4,4003,Not Supported On Robot Type,A Software Error Occured,5,Not an error
+4,4004,Command Precondition Violated,A Software Error Occured,5,Not an error
+4,4005,Command Parameter Limit Violated,A Software Error Occured,5,Not an error
+4,4006,Invalid Protocol Data,A Software Error Occured,5,Not an error
+4,4007,API Misconfiguration,A Software Error Occured,5,Not an error

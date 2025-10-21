@@ -1,5 +1,13 @@
-import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
-import type { ModuleType } from './types'
+import type { WellLocation, WellOrigin } from '../command'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
+import type {
+  AddressableArea,
+  AreaType,
+  FakeAddressableArea,
+  ModuleModel,
+  ModuleType,
+  PositionReference,
+} from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -41,15 +49,25 @@ export const THERMOCYCLER_MODULE_V2: 'thermocyclerModuleV2' =
   'thermocyclerModuleV2'
 export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
+export const ABSORBANCE_READER_V1: 'absorbanceReaderV1' = 'absorbanceReaderV1'
+export const FLEX_STACKER_MODULE_V1: 'flexStackerModuleV1' =
+  'flexStackerModuleV1'
 
 export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
-export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
+export const GRIPPER_V1_3: 'gripperV1.3' = 'gripperV1.3'
+export const GRIPPER_MODELS = [
+  GRIPPER_V1,
+  GRIPPER_V1_1,
+  GRIPPER_V1_2,
+  GRIPPER_V1_3,
+]
 
 // robot display name
+export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
 // pipette display categories
@@ -74,6 +92,10 @@ export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
 export const HEATERSHAKER_MODULE_TYPE: 'heaterShakerModuleType' =
   'heaterShakerModuleType'
 export const MAGNETIC_BLOCK_TYPE: 'magneticBlockType' = 'magneticBlockType'
+export const ABSORBANCE_READER_TYPE: 'absorbanceReaderType' =
+  'absorbanceReaderType'
+export const FLEX_STACKER_MODULE_TYPE: 'flexStackerModuleType' =
+  'flexStackerModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -91,6 +113,10 @@ export const THERMOCYCLER_MODULE_MODELS = [
 
 export const HEATERSHAKER_MODULE_MODELS = [HEATERSHAKER_MODULE_V1]
 
+export const ABSORBANCE_READER_MODELS = [ABSORBANCE_READER_V1]
+
+export const FLEX_STACKER_MODULE_MODELS = [FLEX_STACKER_MODULE_V1]
+
 export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
 
 export const MODULE_MODELS = [
@@ -99,6 +125,14 @@ export const MODULE_MODELS = [
   ...THERMOCYCLER_MODULE_MODELS,
   ...HEATERSHAKER_MODULE_MODELS,
   ...MAGNETIC_BLOCK_MODELS,
+  ...ABSORBANCE_READER_MODELS,
+  ...FLEX_STACKER_MODULE_MODELS,
+]
+
+export const MODULE_MODELS_OT2_ONLY = [
+  ...MAGNETIC_MODULE_MODELS,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
 ]
 
 export const MODULE_TYPES = [
@@ -107,15 +141,17 @@ export const MODULE_TYPES = [
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
 
-export const IDENTITY_VECTOR = { x: 0, y: 0, z: 0 }
-
 export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
+
+export const FLEX_96_CHANNEL_PIPETTES = ['p1000_96', 'p200_96']
 
 //  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
@@ -125,7 +161,9 @@ export const OT3_PIPETTES = [
   'p50_single_flex',
   'p50_multi_flex',
   'p1000_multi_flex',
+  'p1000_multi_em_flex',
   'p1000_96',
+  'p200_96',
 ]
 export const OT2_PIPETTES = [
   'p300_single',
@@ -184,6 +222,17 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
 export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
   'cutoutA1',
   'cutoutB1',
@@ -198,6 +247,11 @@ export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
   'cutoutD2',
 ]
 
+export const LEFT_AND_CENTER_CUTOUTS = [
+  ...SINGLE_LEFT_CUTOUTS,
+  ...SINGLE_CENTER_CUTOUTS,
+]
+
 export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
@@ -206,6 +260,22 @@ export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
 ]
 
 export const STAGING_AREA_CUTOUTS: CutoutId[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
+export const TEMPERATURE_MODULE_CUTOUTS: CutoutId[] = [
+  ...SINGLE_RIGHT_CUTOUTS,
+  ...SINGLE_LEFT_CUTOUTS,
+]
+export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [
+  ...SINGLE_RIGHT_CUTOUTS,
+  ...SINGLE_LEFT_CUTOUTS,
+]
+export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
+export const ABSORBANCE_READER_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
   'cutoutC3',
@@ -231,6 +301,40 @@ export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
 export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
 export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
 
+// fake AA
+export const FAKE_D4_ADDRESSABLE_AREA: 'fakeD4' = 'fakeD4'
+export const FAKE_C4_ADDRESSABLE_AREA: 'fakeC4' = 'fakeC4'
+export const FAKE_B4_ADDRESSABLE_AREA: 'fakeB4' = 'fakeB4'
+export const FAKE_A4_ADDRESSABLE_AREA: 'fakeA4' = 'fakeA4'
+
+export const FAKE_AA = [
+  FAKE_A4_ADDRESSABLE_AREA,
+  FAKE_C4_ADDRESSABLE_AREA,
+  FAKE_B4_ADDRESSABLE_AREA,
+  FAKE_A4_ADDRESSABLE_AREA,
+]
+
+export type FlexFakeAddressableAreaName =
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
+
+export type FakeCutoutFixtureId =
+  | 'fakeStagingAreaRightSlot'
+  | 'fakeWasteChuteWithEmptySlot'
+  | 'fakeStagingSlotWithMagBlockV1'
+
+export type AddressableAreaNamesWithFakes =
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
+
+export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
+
+export type CutoutFixtureIdsWithFakes = CutoutFixtureId | FakeCutoutFixtureId
+
+export type AreaTypeWithFakes = AreaType | 'fakeStagingSlot'
+
 export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
   'movableTrashA1'
 export const MOVABLE_TRASH_A3_ADDRESSABLE_AREA: 'movableTrashA3' =
@@ -248,12 +352,220 @@ export const MOVABLE_TRASH_D1_ADDRESSABLE_AREA: 'movableTrashD1' =
 export const MOVABLE_TRASH_D3_ADDRESSABLE_AREA: 'movableTrashD3' =
   'movableTrashD3'
 
-export const ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1and8ChannelWasteChute' =
-  '1and8ChannelWasteChute'
+export const ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1ChannelWasteChute' =
+  '1ChannelWasteChute'
+export const EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '8ChannelWasteChute' =
+  '8ChannelWasteChute'
 export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChute' =
   '96ChannelWasteChute'
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
+
+export const THERMOCYCLER_ADDRESSABLE_AREA: 'thermocyclerModuleV2' =
+  'thermocyclerModuleV2'
+export const HEATERSHAKER_A1_ADDRESSABLE_AREA: 'heaterShakerV1A1' =
+  'heaterShakerV1A1'
+export const HEATERSHAKER_B1_ADDRESSABLE_AREA: 'heaterShakerV1B1' =
+  'heaterShakerV1B1'
+export const HEATERSHAKER_C1_ADDRESSABLE_AREA: 'heaterShakerV1C1' =
+  'heaterShakerV1C1'
+export const HEATERSHAKER_D1_ADDRESSABLE_AREA: 'heaterShakerV1D1' =
+  'heaterShakerV1D1'
+export const HEATERSHAKER_A3_ADDRESSABLE_AREA: 'heaterShakerV1A3' =
+  'heaterShakerV1A3'
+export const HEATERSHAKER_B3_ADDRESSABLE_AREA: 'heaterShakerV1B3' =
+  'heaterShakerV1B3'
+export const HEATERSHAKER_C3_ADDRESSABLE_AREA: 'heaterShakerV1C3' =
+  'heaterShakerV1C3'
+export const HEATERSHAKER_D3_ADDRESSABLE_AREA: 'heaterShakerV1D3' =
+  'heaterShakerV1D3'
+export const TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA: 'temperatureModuleV2A1' =
+  'temperatureModuleV2A1'
+export const TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA: 'temperatureModuleV2B1' =
+  'temperatureModuleV2B1'
+export const TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA: 'temperatureModuleV2C1' =
+  'temperatureModuleV2C1'
+export const TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA: 'temperatureModuleV2D1' =
+  'temperatureModuleV2D1'
+export const TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA: 'temperatureModuleV2A3' =
+  'temperatureModuleV2A3'
+export const TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA: 'temperatureModuleV2B3' =
+  'temperatureModuleV2B3'
+export const TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA: 'temperatureModuleV2C3' =
+  'temperatureModuleV2C3'
+export const TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA: 'temperatureModuleV2D3' =
+  'temperatureModuleV2D3'
+
+export const MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA: 'magneticBlockV1A1' =
+  'magneticBlockV1A1'
+export const MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA: 'magneticBlockV1B1' =
+  'magneticBlockV1B1'
+export const MAGNETIC_BLOCK_C1_ADDRESSABLE_AREA: 'magneticBlockV1C1' =
+  'magneticBlockV1C1'
+export const MAGNETIC_BLOCK_D1_ADDRESSABLE_AREA: 'magneticBlockV1D1' =
+  'magneticBlockV1D1'
+export const MAGNETIC_BLOCK_A2_ADDRESSABLE_AREA: 'magneticBlockV1A2' =
+  'magneticBlockV1A2'
+export const MAGNETIC_BLOCK_B2_ADDRESSABLE_AREA: 'magneticBlockV1B2' =
+  'magneticBlockV1B2'
+export const MAGNETIC_BLOCK_C2_ADDRESSABLE_AREA: 'magneticBlockV1C2' =
+  'magneticBlockV1C2'
+export const MAGNETIC_BLOCK_D2_ADDRESSABLE_AREA: 'magneticBlockV1D2' =
+  'magneticBlockV1D2'
+export const MAGNETIC_BLOCK_A3_ADDRESSABLE_AREA: 'magneticBlockV1A3' =
+  'magneticBlockV1A3'
+export const MAGNETIC_BLOCK_B3_ADDRESSABLE_AREA: 'magneticBlockV1B3' =
+  'magneticBlockV1B3'
+export const MAGNETIC_BLOCK_C3_ADDRESSABLE_AREA: 'magneticBlockV1C3' =
+  'magneticBlockV1C3'
+export const MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA: 'magneticBlockV1D3' =
+  'magneticBlockV1D3'
+export const ABSORBANCE_READER_D3_ADDRESSABLE_AREA: 'absorbanceReaderV1D3' =
+  'absorbanceReaderV1D3'
+export const ABSORBANCE_READER_C3_ADDRESSABLE_AREA: 'absorbanceReaderV1C3' =
+  'absorbanceReaderV1C3'
+export const ABSORBANCE_READER_B3_ADDRESSABLE_AREA: 'absorbanceReaderV1B3' =
+  'absorbanceReaderV1B3'
+export const ABSORBANCE_READER_A3_ADDRESSABLE_AREA: 'absorbanceReaderV1A3' =
+  'absorbanceReaderV1A3'
+export const ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockA4' =
+  'absorbanceReaderV1LidDockA4'
+export const ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockB4' =
+  'absorbanceReaderV1LidDockB4'
+export const ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockC4' =
+  'absorbanceReaderV1LidDockC4'
+export const ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA: 'absorbanceReaderV1LidDockD4' =
+  'absorbanceReaderV1LidDockD4'
+export const FLEX_STACKER_A4_ADDRESSABLE_AREA: 'flexStackerModuleV1A4' =
+  'flexStackerModuleV1A4'
+export const FLEX_STACKER_B4_ADDRESSABLE_AREA: 'flexStackerModuleV1B4' =
+  'flexStackerModuleV1B4'
+export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
+  'flexStackerModuleV1C4'
+export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
+  'flexStackerModuleV1D4'
+
+export const exactMatchOnlyLoadNames = new Set([
+  'milliplex_microtiter_plate',
+  'milliplex_microtiter_plate_lid',
+  'corning_falcon_384_wellplate_130ul_flat',
+  'corning_falcon_384_wellplate_130ul_flat_lid',
+  'ibidi_96_square_well_plate_300ul',
+  'ibidi_96_square_well_plate_300ul_lid',
+  'opentrons_96_deep_well_adapter',
+  'opentrons_96_filtertiprack_1000ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_universal_flat_adapter',
+  'opentrons_universal_flat_adapter_type_b',
+])
+
+export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_C1_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_D1_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_A2_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_B2_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_C2_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_D2_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_A3_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_B3_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_C3_ADDRESSABLE_AREA,
+  MAGNETIC_BLOCK_D3_ADDRESSABLE_AREA,
+]
+
+export const TEMPERATURE_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA,
+]
+
+export const HEATERSHAKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  HEATERSHAKER_A1_ADDRESSABLE_AREA,
+  HEATERSHAKER_B1_ADDRESSABLE_AREA,
+  HEATERSHAKER_C1_ADDRESSABLE_AREA,
+  HEATERSHAKER_D1_ADDRESSABLE_AREA,
+  HEATERSHAKER_A3_ADDRESSABLE_AREA,
+  HEATERSHAKER_B3_ADDRESSABLE_AREA,
+  HEATERSHAKER_C3_ADDRESSABLE_AREA,
+  HEATERSHAKER_D3_ADDRESSABLE_AREA,
+]
+
+export const ABSORBANCE_READER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ABSORBANCE_READER_A3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_B3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_C3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_D3_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
+export const FLEX_STACKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  FLEX_STACKER_A4_ADDRESSABLE_AREA,
+  FLEX_STACKER_B4_ADDRESSABLE_AREA,
+  FLEX_STACKER_C4_ADDRESSABLE_AREA,
+  FLEX_STACKER_D4_ADDRESSABLE_AREA,
+]
+
+export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  THERMOCYCLER_ADDRESSABLE_AREA,
+  ...ABSORBANCE_READER_ADDRESSABLE_AREAS,
+  ...HEATERSHAKER_ADDRESSABLE_AREAS,
+  ...TEMPERATURE_MODULE_ADDRESSABLE_AREAS,
+]
+
+export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ...FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  ...MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
+]
+
+export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ...FLEX_STACKER_ADDRESSABLE_AREAS,
+  A4_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_A4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_B4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_C4_ADDRESSABLE_AREA,
+  ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
+]
+
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] =
+  [...FLEX_STAGING_ADDRESSABLE_AREAS, ...FAKE_AA]
+
+export const ADDRESSABLE_AREA_1: '1' = '1'
+export const ADDRESSABLE_AREA_2: '2' = '2'
+export const ADDRESSABLE_AREA_3: '3' = '3'
+export const ADDRESSABLE_AREA_4: '4' = '4'
+export const ADDRESSABLE_AREA_5: '5' = '5'
+export const ADDRESSABLE_AREA_6: '6' = '6'
+export const ADDRESSABLE_AREA_7: '7' = '7'
+export const ADDRESSABLE_AREA_8: '8' = '8'
+export const ADDRESSABLE_AREA_9: '9' = '9'
+export const ADDRESSABLE_AREA_10: '10' = '10'
+export const ADDRESSABLE_AREA_11: '11' = '11'
+
+export const OT2_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+]
 
 export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
@@ -289,7 +601,8 @@ export const MOVABLE_TRASH_ADDRESSABLE_AREAS: AddressableAreaName[] = [
 ]
 
 export const WASTE_CHUTE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
-  ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 ]
@@ -301,6 +614,16 @@ export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
 export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
   'stagingAreaRightSlot'
 
+export const FAKE_STAGING_AREA_RIGHT_SLOT: 'fakeStagingAreaRightSlot' =
+  'fakeStagingAreaRightSlot'
+
+export const FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE: 'fakeWasteChuteWithEmptySlot' =
+  'fakeWasteChuteWithEmptySlot'
+
+export const FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE: 'fakeStagingSlotWithMagBlockV1' =
+  'fakeStagingSlotWithMagBlockV1'
+
+export const TRASH_BIN_FIXTURE: 'trashBin' = 'trashBin'
 export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
 
 export const WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: 'wasteChuteRightAdapterCovered' =
@@ -312,7 +635,56 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: '
 export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
   'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
-export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
+export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1' =
+  'heaterShakerModuleV1'
+export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModuleV2' =
+  'temperatureModuleV2'
+export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockV1' = 'magneticBlockV1'
+export const STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE: 'stagingAreaSlotWithMagneticBlockV1' =
+  'stagingAreaSlotWithMagneticBlockV1'
+export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' =
+  'thermocyclerModuleV2Rear'
+export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' =
+  'thermocyclerModuleV2Front'
+export const ABSORBANCE_READER_V1_FIXTURE: 'absorbanceReaderV1' =
+  'absorbanceReaderV1'
+export const FLEX_STACKER_V1_FIXTURE: 'flexStackerModuleV1' =
+  'flexStackerModuleV1'
+export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterCovered' =
+  'flexStackerModuleV1WithWasteChuteRightAdapterCovered'
+export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStackerModuleV1WithWasteChuteRightAdapterNoCover' =
+  'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
+export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
+  'flexStackerModuleV1WithMagneticBlockV1'
+
+export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
+  [moduleModel in ModuleModel]?: AreaType
+} = {
+  [HEATERSHAKER_MODULE_V1]: 'heaterShaker',
+  [TEMPERATURE_MODULE_V2]: 'temperatureModule',
+  [MAGNETIC_BLOCK_V1]: 'magneticBlock',
+  [THERMOCYCLER_MODULE_V2]: 'thermocycler',
+  [ABSORBANCE_READER_V1]: 'absorbanceReader',
+  [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+}
+
+export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  ABSORBANCE_READER_V1_FIXTURE,
+  FLEX_STACKER_V1_FIXTURE,
+]
+
+export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
+]
+
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -323,6 +695,18 @@ export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+]
+
+export const WASTE_CHUTE_WITH_FAKE_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
 ]
 
 export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
@@ -330,7 +714,118 @@ export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
 
+export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] =
+  [...WASTE_CHUTE_ONLY_FIXTURES, FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE]
+
 export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_FLEX_STACKER_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+]
+
+export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
+  FLEX_STACKER_V1_FIXTURE,
+  FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const MODULE_FIXTURES_BY_MODEL: {
+  [moduleModel in ModuleModel]?: CutoutFixtureId[]
+} = {
+  [HEATERSHAKER_MODULE_V1]: [HEATERSHAKER_MODULE_V1_FIXTURE],
+  [TEMPERATURE_MODULE_V2]: [TEMPERATURE_MODULE_V2_FIXTURE],
+  [MAGNETIC_BLOCK_V1]: [MAGNETIC_BLOCK_V1_FIXTURE],
+  [THERMOCYCLER_MODULE_V2]: [
+    THERMOCYCLER_V2_REAR_FIXTURE,
+    THERMOCYCLER_V2_FRONT_FIXTURE,
+  ],
+  [ABSORBANCE_READER_V1]: [ABSORBANCE_READER_V1_FIXTURE],
+  [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
+}
+
+export const DEFAULT_AA_FOR_WASTE_CHUTE =
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+
+export const STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+]
+
+export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
+
+// default hex values for liquid colors
+const electricPurple = '#b925ff'
+const goldenYellow = '#ffd600'
+const aquamarine = '#9dffd8'
+const orangePeel = '#ff9900'
+const skyBlue = '#50d5ff'
+const popPink = '#ff80f5'
+const springGreen = '#7eff42'
+const tartRed = '#ff4f4f'
+export const DEFAULT_LIQUID_COLORS = [
+  electricPurple,
+  goldenYellow,
+  aquamarine,
+  orangePeel,
+  skyBlue,
+  popPink,
+  springGreen,
+  tartRed,
+]
+export const DEPRECATED_WHALE_GREY = '#9395a0'
+
+// this can't go in @opentrons/components because its used in a utility
+// method in PD (not react code) and we do not want non react code loading
+// react code because the web worker context does not play nicely with react
+export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
+
+export const POSITION_REFERENCE_TOP: 'well-top' = 'well-top'
+export const POSITION_REFERENCE_BOTTOM: 'well-bottom' = 'well-bottom'
+export const POSITION_REFERENCE_CENTER: 'well-center' = 'well-center'
+export const POSITION_REFERENCE_LIQUID_MENISCUS: 'liquid-meniscus' =
+  'liquid-meniscus'
+
+export const WELL_ORIGIN_TOP: 'top' = 'top'
+export const WELL_ORIGIN_BOTTOM: 'bottom' = 'bottom'
+export const WELL_ORIGIN_CENTER: 'center' = 'center'
+export const WELL_ORIGIN_MENISCUS: 'meniscus' = 'meniscus'
+
+export const POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN: Record<
+  PositionReference,
+  WellOrigin
+> = {
+  [POSITION_REFERENCE_TOP]: WELL_ORIGIN_TOP,
+  [POSITION_REFERENCE_BOTTOM]: WELL_ORIGIN_BOTTOM,
+  [POSITION_REFERENCE_CENTER]: WELL_ORIGIN_CENTER,
+  [POSITION_REFERENCE_LIQUID_MENISCUS]: WELL_ORIGIN_MENISCUS,
+}
+
+export const SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM = 2
+
+export const SAFE_MOVE_TO_WELL_LOCATION: WellLocation = {
+  origin: WELL_ORIGIN_TOP,
+  offset: {
+    x: 0,
+    y: 0,
+    z: SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  },
+}
+
+export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  FAKE_STAGING_AREA_RIGHT_SLOT,
+  FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
+  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+]
+
+export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
+  ...FLEX_STACKER_FIXTURES,
+  ...MAGNETIC_BLOCK_FIXTURES,
+  ...WASTE_CHUTE_FIXTURES,
+  ...FAKE_FIXTURE_IDS,
+  ...STAGING_AREA_FIXTURES,
 ]

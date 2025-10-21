@@ -1,18 +1,25 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { Slideout } from '..'
-import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const render = (props: React.ComponentProps<typeof Slideout>) => {
+import '@testing-library/jest-dom/vitest'
+
+import { fireEvent, screen } from '@testing-library/react'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
+import { Slideout } from '..'
+
+import type { ComponentProps } from 'react'
+
+const render = (props: ComponentProps<typeof Slideout>) => {
   return renderWithProviders(<Slideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('Slideout', () => {
-  let props: React.ComponentProps<typeof Slideout>
-  const mockOnClick = jest.fn()
+  let props: ComponentProps<typeof Slideout>
+  const mockOnClick = vi.fn()
   beforeEach(() => {
     props = {
       title: 'Set Engage Height for Magnetic Module GEN1',
@@ -21,30 +28,27 @@ describe('Slideout', () => {
       onCloseClick: mockOnClick,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders correct title and body for a gen1 magnetic module', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Engage Height for Magnetic Module GEN1')
-    getByText('Mock Children')
+    screen.getByText('Set Engage Height for Magnetic Module GEN1')
+    screen.getByText('Mock Children')
   })
 
   it('renders the exit button and it is clickable', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /exit/i })
+    render(props)
+    const button = screen.getByRole('button', { name: /exit/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
 
   it('clicking overlay triggers close', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /exit/i })
+    render(props)
+    const button = screen.getByRole('button', { name: /exit/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
-    expect(mockOnClick).toHaveBeenCalledTimes(1)
+    expect(mockOnClick).toHaveBeenCalled()
   })
 })

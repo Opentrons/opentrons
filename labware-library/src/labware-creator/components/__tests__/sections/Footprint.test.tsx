@@ -1,38 +1,38 @@
-import React from 'react'
-import '@testing-library/jest-dom'
-import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { nestedTextMatcher } from '@opentrons/components'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
+
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { when } from 'vitest-when'
+
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
+import { getDefaultFormState } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { isEveryFieldHidden } from '../../../utils'
 
-jest.mock('../../../utils')
+import type { FormikConfig } from 'formik'
+import type { LabwareFields } from '../../../fields'
 
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils')
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
+  onSubmit: vi.fn(),
 }
 
 describe('Footprint', () => {
   beforeEach(() => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['footprintXDimension', 'footprintYDimension'],
         formikConfig.initialValues
       )
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
   it('should render alerts and text fields when fields are visible', () => {
     render(wrapInFormik(<Footprint />, formikConfig))
@@ -82,20 +82,22 @@ describe('Footprint', () => {
   it('should render xydimension alert when error is present', () => {
     formikConfig.initialValues.footprintXDimension = '130'
     formikConfig.initialTouched = { footprintXDimension: true }
-    const { container } = render(wrapInFormik(<Footprint />, formikConfig))
-    const error = container.querySelector('[class="alert info"]')
-    expect(error?.textContent).toBe(
-      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please request custom labware via this form.'
+    render(wrapInFormik(<Footprint />, formikConfig))
+    const warning = screen.getByText('Our recommended footprint for labware', {
+      exact: false,
+    })
+    expect(warning.textContent).toEqual(
+      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please contact Opentrons Support.'
     )
   })
 
   it('should not render when all fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['footprintXDimension', 'footprintYDimension'],
         formikConfig.initialValues
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Footprint />, formikConfig))
     expect(container.firstChild).toBe(null)

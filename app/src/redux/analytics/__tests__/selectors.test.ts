@@ -1,10 +1,12 @@
-import * as Selectors from '../selectors'
+import { describe, expect, it, vi } from 'vitest'
+
 import * as SessionsSelectors from '../../sessions/selectors'
+import * as Selectors from '../selectors'
 
-import type { State } from '../../types'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
+import type { State } from '../../types'
 
-jest.mock('../../sessions/selectors')
+vi.mock('../../sessions/selectors')
 
 describe('analytics selectors', () => {
   describe('analytics config selectors', () => {
@@ -39,30 +41,13 @@ describe('analytics selectors', () => {
       } as any
       expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
     })
-
-    it('should return true for getAnalyticsOptInSeen if no config', () => {
-      const mockState = { config: null } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(true)
-    })
-
-    it('should return config.analytics.seenOptIn with getAnalyticsOptInSeen', () => {
-      const mockState = {
-        config: {
-          analytics: { appId: 'foobar', optedIn: false, seenOptIn: false },
-        },
-      } as any
-      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(false)
-    })
   })
 
   describe('analytics calibration selectors', () => {
     describe('getAnalyticsSessionExitDetails', () => {
-      const mockGetRobotSessionById = SessionsSelectors.getRobotSessionById as jest.MockedFunction<
-        typeof SessionsSelectors.getRobotSessionById
-      >
       it('returns data if the session exists', () => {
         const mockState: State = {} as any
-        mockGetRobotSessionById.mockReturnValue({
+        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue({
           sessionType: 'deckCalibration',
           details: {
             currentStep: 'inspectingTip',
@@ -84,7 +69,7 @@ describe('analytics selectors', () => {
         )
       })
       it('returns null if the session cannot be found', () => {
-        mockGetRobotSessionById.mockReturnValue(null)
+        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue(null)
         const mockState: State = {} as any
         expect(
           Selectors.getAnalyticsSessionExitDetails(

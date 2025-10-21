@@ -1,16 +1,35 @@
+import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
-import type { CommandCreator } from '../../types'
-export interface BlowOutInPlaceArgs {
-  pipetteId: string
-  flowRate: number
-}
 
-export const blowOutInPlace: CommandCreator<BlowOutInPlaceArgs> = (
+import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
+import type { CommandCreator, CommandCreatorError } from '../../types'
+
+export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   const { pipetteId, flowRate } = args
+
+  const errors: CommandCreatorError[] = []
+
+  if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {
+    errors.push(
+      errorCreators.noTipOnPipette({
+        actionName: 'blowout',
+        pipette: pipetteId,
+      })
+    )
+  }
+
+  if (errors.length > 0) {
+    return {
+      errors,
+    }
+  }
+
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
 
   const commands = [
     {
@@ -24,5 +43,9 @@ export const blowOutInPlace: CommandCreator<BlowOutInPlaceArgs> = (
   ]
   return {
     commands,
+    python:
+      // blow_out() blows out in place if no location= is specified
+      `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
+      `${pipettePythonName}.blow_out()`,
   }
 }

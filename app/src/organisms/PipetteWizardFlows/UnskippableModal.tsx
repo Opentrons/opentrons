@@ -1,14 +1,15 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import {
+  AlertPrimaryButton,
   COLORS,
+  SecondaryButton,
   SPACING,
   TYPOGRAPHY,
-  SecondaryButton,
-  AlertPrimaryButton,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+
+import { SmallButton } from '/app/atoms/buttons'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 interface UnskippableModalProps {
   goBack: () => void
@@ -22,7 +23,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   return (
     <SimpleWizardBody
-      iconColor={COLORS.warningEnabled}
+      iconColor={COLORS.yellow50}
       header={i18n.format(t('critical_unskippable_step'), 'capitalize')}
       subHeader={t('must_detach_mounting_plate')}
       isSuccess={false}
@@ -32,7 +33,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
           <SmallButton
             marginRight={SPACING.spacing8}
             onClick={proceed}
-            buttonText={t('shared:exit')}
+            buttonText={i18n.format(t('shared:exit'), 'capitalize')}
             buttonType="alert"
             disabled={isRobotMoving}
           />

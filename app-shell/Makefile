@@ -9,7 +9,7 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 3000
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -31,7 +31,7 @@ publish_dir := dist/publish
 # make test tests=src/__tests__/http.test.ts would run only the
 # specified test
 tests ?= $(SRC_PATH)/src
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app-shell/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # Other SSH args for robot
@@ -59,7 +59,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
+	--config.electronVersion=33.2.1 \
 	--publish never
 
 
@@ -70,6 +70,15 @@ electron := yarn electron . \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
 	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
+
+electron-dist := yarn electron . \
+	--devtools \
+	--log.level.console="debug" \
+	--disable_ui.webPreferences.webSecurity \
+	--ui.url.protocol="file:" \
+	--ui.url.path="$(ui_dir)/dist/index.html"
+	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
+
 
 # standard targets
 #####################################################################
@@ -89,7 +98,11 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist python
+	yarn shx rm -rf lib dist python/install
+
+.PHONY: cleanall
+cleanall: clean
+	yarn shx rm -rf python
 
 # artifacts
 #####################################################################
@@ -97,7 +110,8 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	webpack --profile
+	echo "Building app shell JS bundle (electron layer)"
+	vite build
 
 .PHONY: deps
 deps:
@@ -109,33 +123,36 @@ package-deps: clean lib deps
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
 package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
+package dist-posix dist-osx dist-linux dist-win: export USE_HARD_LINKS := false
 
+# Note: these depend on make -C app dist having been run; do not do this automatically because we separate these
+# tasks in CI and even if you have a file dep it's easy to accidentally make the dist run.
 .PHONY: package
-package: package-deps
+package:
 	$(builder) --dir
 
 .PHONY: dist-posix
-dist-posix: package-deps
+dist-posix: clean lib
 	$(builder) --linux --mac
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-osx
-dist-osx: package-deps
-	$(builder) --mac
+dist-osx: clean lib
+	$(builder) --mac --universal
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-linux
-dist-linux: package-deps
+dist-linux:  clean lib
 	$(builder) --linux
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-win
-dist-win: package-deps
+dist-win: clean lib
 	$(builder) --win --x64
 	$(MAKE) _dist-collect-artifacts
 
 .PHONY: dist-ot3
-dist-ot3: package-deps
+dist-ot3: clean lib
 	NO_PYTHON=true $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
@@ -144,14 +161,11 @@ dist-ot3: package-deps
 .PHONY: dist-macos-latest
 dist-macos-latest: dist-osx
 
-.PHONY: dist-macos-11
-dist-macos-11: dist-osx
-
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
-.PHONY: dist-ubuntu-22.04
-dist-ubuntu-22.04: dist-linux
+.PHONY: dist-ubuntu-24.04
+dist-ubuntu-24.04: dist-linux
 
 .PHONY: dist-windows-2019
 dist-windows-2019: dist-win
@@ -170,20 +184,25 @@ _dist-collect-artifacts:
 # development
 #####################################################################
 
-.PHONY: clean-dev-autoupdate
-clean-dev-autoupdate:
-	rm -f ./dev-app-update.yml
 
-dev-app-update.yml:
+.PHONY: dev-app-update-file
+dev-app-update-file:
 	cp ./dev-app-update-$(OPENTRONS_PROJECT).yml ./dev-app-update.yml
 
 
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev: clean-dev-autoupdate ./dev-app-update.yml
-	webpack
+dev: dev-app-update-file
+	vite build
 	$(electron)
+
+.PHONY: dev-dist
+dev: export NODE_ENV := development
+dev-dist: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev-dist: package-deps
+	vite build
+	$(electron-dist)
 
 .PHONY: test
 test:

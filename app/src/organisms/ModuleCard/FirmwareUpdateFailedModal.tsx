@@ -1,21 +1,21 @@
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+
 import {
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  DIRECTION_COLUMN,
   Icon,
-  COLORS,
-  TYPOGRAPHY,
+  JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  Modal,
   PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { LegacyModal } from '../../molecules/LegacyModal'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type { AttachedModule } from '/app/redux/modules/types'
 
 interface FirmwareUpdateFailedModalProps {
   onCloseClick: () => void
@@ -32,28 +32,28 @@ export const FirmwareUpdateFailedModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         width={SPACING.spacing20}
-        color={COLORS.errorEnabled}
+        color={COLORS.red50}
         name="information"
         aria-label="information"
       />
-      <StyledText marginLeft={SPACING.spacing8}>
+      <LegacyStyledText marginLeft={SPACING.spacing8}>
         {t('firmware_update_failed')}
-      </StyledText>
+      </LegacyStyledText>
     </Flex>
   )
 
   return (
-    <LegacyModal title={title} onClose={onCloseClick}>
+    <Modal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
-        <StyledText paddingBottom={SPACING.spacing4}>
+        <LegacyStyledText paddingBottom={SPACING.spacing4}>
           {t('an_error_occurred_while_updating_module', {
             moduleName: getModuleDisplayName(module.moduleModel),
           })}
-        </StyledText>
-        <StyledText>{errorMessage}</StyledText>
+        </LegacyStyledText>
+        <LegacyStyledText>{errorMessage}</LegacyStyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -68,6 +68,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </LegacyModal>
+    </Modal>
   )
 }

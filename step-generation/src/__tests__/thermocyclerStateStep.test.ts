@@ -1,18 +1,18 @@
-import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
+import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../types'
+import type { Diff } from '../utils/thermocyclerStateDiff'
 
-jest.mock('../utils/thermocyclerStateDiff')
-
-const mockThermocyclerStateDiff = thermocyclerStateDiff as jest.MockedFunction<
-  typeof thermocyclerStateDiff
->
+vi.mock('../utils/thermocyclerStateDiff')
 
 const getInitialDiff = (): Diff => ({
   lidOpen: false,
@@ -27,7 +27,7 @@ const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 describe('thermocyclerStateStep', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   const testCases: Array<{
     expected: CreateCommand[]
@@ -36,11 +36,12 @@ describe('thermocyclerStateStep', () => {
     testMsg: string
     thermocyclerStateArgs: ThermocyclerStateStepArgs
     thermocyclerStateDiff: Diff
+    expectedPython: string
   }> = [
     {
       testMsg: 'should open the lid when diff includes lidOpen',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -60,11 +61,12 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.open_lid()',
     },
     {
       testMsg: 'should close the lid when diff includes lidClosed',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -84,12 +86,13 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.close_lid()',
     },
     {
       testMsg:
         'should set the block temperature when diff includes setBlockTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 10,
         lidTargetTemp: null,
@@ -109,20 +112,14 @@ describe('thermocyclerStateStep', () => {
             celsius: 10,
           },
         },
-        {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
+      expectedPython: 'mock_thermocycler.set_block_temperature(10)',
     },
     {
       testMsg:
         'should decativate the block when diff includes deactivateBlockTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -145,12 +142,13 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_block()',
     },
     {
       testMsg:
         'should set the lid temperature when diff includes setLidTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 10,
@@ -170,20 +168,14 @@ describe('thermocyclerStateStep', () => {
             celsius: 10,
           },
         },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
+      expectedPython: 'mock_thermocycler.set_lid_temperature(10)',
     },
     {
       testMsg:
         'should decativate the block when diff includes deactivateBlockTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -206,12 +198,13 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_block()',
     },
     {
       testMsg:
         'should set the lid temperature when diff includes setLidTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: 10,
@@ -231,20 +224,14 @@ describe('thermocyclerStateStep', () => {
             celsius: 10,
           },
         },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
+      expectedPython: 'mock_thermocycler.set_lid_temperature(10)',
     },
     {
       testMsg:
         'should deactivate the lid when diff includes deactivateLidTemperature',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: null,
         lidTargetTemp: null,
@@ -267,11 +254,12 @@ describe('thermocyclerStateStep', () => {
           },
         },
       ],
+      expectedPython: 'mock_thermocycler.deactivate_lid()',
     },
     {
       testMsg: 'should issue commands in the correct order',
       thermocyclerStateArgs: {
-        module: thermocyclerId,
+        moduleId: thermocyclerId,
         commandCreatorFnName: 'thermocyclerState',
         blockTargetTemp: 10,
         lidTargetTemp: 20,
@@ -320,13 +308,6 @@ describe('thermocyclerStateStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/waitForBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
-        {
           commandType: 'thermocycler/deactivateLid',
           key: expect.any(String),
           params: {
@@ -341,14 +322,14 @@ describe('thermocyclerStateStep', () => {
             celsius: 20,
           },
         },
-        {
-          commandType: 'thermocycler/waitForLidTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: thermocyclerId,
-          },
-        },
       ],
+      expectedPython: `
+mock_thermocycler.open_lid()
+mock_thermocycler.close_lid()
+mock_thermocycler.deactivate_block()
+mock_thermocycler.set_block_temperature(10)
+mock_thermocycler.deactivate_lid()
+mock_thermocycler.set_lid_temperature(20)`.trimStart(),
     },
   ]
   testCases.forEach(
@@ -359,20 +340,26 @@ describe('thermocyclerStateStep', () => {
       invariantContext,
       thermocyclerStateDiff,
       expected,
+      expectedPython,
     }) => {
       it(testMsg, () => {
-        mockThermocyclerStateDiff.mockImplementationOnce((state, args) => {
-          expect(state).toEqual(robotState.modules[thermocyclerId].moduleState)
-          expect(args).toEqual(thermocyclerStateArgs)
-          return thermocyclerStateDiff
-        })
+        vi.mocked(actualThermocyclerStateDiff).mockImplementationOnce(
+          (state: any, args: any) => {
+            expect(state).toEqual(
+              robotState.modules[thermocyclerId].moduleState
+            )
+            expect(args).toEqual(thermocyclerStateArgs)
+            return thermocyclerStateDiff
+          }
+        )
         const result = thermocyclerStateStep(
           thermocyclerStateArgs,
           invariantContext,
           robotState
         )
-        const { commands } = getSuccessResult(result)
+        const { commands, python } = getSuccessResult(result)
         expect(commands).toEqual(expected)
+        expect(python).toEqual(expectedPython)
       })
     }
   )

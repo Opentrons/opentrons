@@ -1,19 +1,22 @@
-import assert from 'assert'
-import {
-  SetTemperatureArgs,
+import type {
   DeactivateTemperatureArgs,
+  SetTemperatureArgs,
 } from '@opentrons/step-generation'
-import { HydratedTemperatureFormData } from '../../../form-types'
+import type { HydratedTemperatureFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
+
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
-  hydratedFormData: HydratedTemperatureFormData
+  castFormData: GetCastFormData<HydratedTemperatureFormData>
 ): TemperatureArgs => {
-  const { moduleId } = hydratedFormData
+  const { moduleId, stepName, stepDetails } = castFormData
   // cast values
-  const setTemperature = hydratedFormData.setTemperature === 'true'
+  const setTemperature = castFormData.setTemperature === 'true'
   // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
-  const targetTemperature = parseFloat(hydratedFormData.targetTemperature)
-  assert(
+  // todo(mm, 2025-10-09): Pretty sure targetTemperature is actually non-nullable now,
+  // though it is a number, not a string, and so there is still a type error here.
+  const targetTemperature = parseFloat(castFormData.targetTemperature)
+  console.assert(
     setTemperature ? !Number.isNaN(targetTemperature) : true,
     'temperatureFormToArgs expected (hydrated) targetTemperature to be a number when setTemperature is "true"'
   )
@@ -21,13 +24,17 @@ export const temperatureFormToArgs = (
   if (setTemperature && !Number.isNaN(targetTemperature)) {
     return {
       commandCreatorFnName: 'setTemperature',
-      module: moduleId,
-      targetTemperature,
+      moduleId: moduleId ?? '',
+      celsius: targetTemperature,
+      name: stepName,
+      description: stepDetails,
     }
   } else {
     return {
       commandCreatorFnName: 'deactivateTemperature',
-      module: moduleId,
+      moduleId: moduleId ?? '',
+      name: stepName,
+      description: stepDetails,
     }
   }
 }

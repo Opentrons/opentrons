@@ -1,13 +1,14 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazy_fixtures import lf as lazy_fixture
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 29
+    return 38
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -19,16 +20,17 @@ def default_file_settings() -> Dict[str, Any]:
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
-        "disableLogAggregation": None,
         "enableDoorSafetySwitch": None,
-        "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
         "disableStallDetection": None,
         "disableStatusBar": None,
         "disableOverpressureDetection": None,
-        "disableTipPresenceDetection": None,
         "estopNotRequired": None,
+        "enableErrorRecoveryExperiments": None,
+        "enableOEMMode": None,
+        "enablePerformanceMetrics": None,
+        "disableFlexStackerLabwareDetection": None,
     }
 
 
@@ -67,7 +69,7 @@ def v2_config(v1_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 2,
-            "disableLogAggregation": True,
+            "disableLogAggregation": None,
         }
     )
     return r
@@ -359,8 +361,97 @@ def v29_config(v28_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v30_config(v29_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = {k: v for k, v in v29_config.items() if k != "disableTipPresenceDetection"}
+    r["_version"] = 30
+    return r
+
+
+@pytest.fixture
+def v31_config(v30_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v30_config.copy()
+    r.update(
+        {
+            "_version": 31,
+            "enableErrorRecoveryExperiments": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v32_config(v31_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v31_config.copy()
+    r.update(
+        {
+            "_version": 32,
+            "enableOEMMode": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v33_config(v32_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v32_config.copy()
+    r.update(
+        {
+            "_version": 33,
+            "enablePerformanceMetrics": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v34_config(v33_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v33_config.copy()
+    r.pop("disableFastProtocolUpload")
+    r["_version"] = 34
+    return r
+
+
+@pytest.fixture
+def v35_config(v34_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v34_config.copy()
+    r.pop("disableLogAggregation")
+    r["_version"] = 35
+    return r
+
+
+@pytest.fixture
+def v36_config(v35_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v35_config.copy()
+    r.update(
+        {
+            "_version": 36,
+            "allowLiquidClasses": None,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v37_config(v36_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = {k: v for k, v in v36_config.items() if k != "allowLiquidClasses"}
+    r["_version"] = 37
+    return r
+
+
+@pytest.fixture
+def v38_config(v37_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v37_config.copy()
+    r.update(
+        {
+            "_version": 38,
+            "disableFlexStackerLabwareDetection": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
-    scope="session",
     params=[
         lazy_fixture("empty_settings"),
         lazy_fixture("version_less"),
@@ -393,10 +484,19 @@ def v29_config(v28_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v27_config"),
         lazy_fixture("v28_config"),
         lazy_fixture("v29_config"),
+        lazy_fixture("v30_config"),
+        lazy_fixture("v31_config"),
+        lazy_fixture("v32_config"),
+        lazy_fixture("v33_config"),
+        lazy_fixture("v34_config"),
+        lazy_fixture("v35_config"),
+        lazy_fixture("v36_config"),
+        lazy_fixture("v37_config"),
+        lazy_fixture("v38_config"),
     ],
 )
-def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def old_settings(request: SubRequest) -> Dict[str, Any]:
+    return cast(Dict[str, Any], request.param)
 
 
 def test_migrations(
@@ -467,22 +567,21 @@ def test_ignores_invalid_keys(
 
 
 def test_ensures_config() -> None:
-    assert _ensure(
-        {"_version": 3, "shortFixedTrash": False, "disableLogAggregation": True}
-    ) == {
+    assert _ensure({"_version": 3, "shortFixedTrash": False}) == {
         "_version": 3,
         "shortFixedTrash": False,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
-        "disableLogAggregation": True,
         "enableDoorSafetySwitch": None,
-        "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,
         "disableStallDetection": None,
         "disableStatusBar": None,
         "estopNotRequired": None,
-        "disableTipPresenceDetection": None,
         "disableOverpressureDetection": None,
+        "enableErrorRecoveryExperiments": None,
+        "enableOEMMode": None,
+        "enablePerformanceMetrics": None,
+        "disableFlexStackerLabwareDetection": None,
     }

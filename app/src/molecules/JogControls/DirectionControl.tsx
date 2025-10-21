@@ -1,38 +1,41 @@
 // jog controls component
-import * as React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  Icon,
-  HandleKeypress,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_ROW,
-  ALIGN_FLEX_START,
   ALIGN_FLEX_END,
-  PrimaryButton,
-  TEXT_ALIGN_LEFT,
-  JUSTIFY_FLEX_START,
+  ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_GRID,
+  Flex,
+  HandleKeypress,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  LegacyStyledText,
+  PrimaryButton,
   RESPONSIVENESS,
+  SPACING,
+  TEXT_ALIGN_LEFT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { ControlContainer } from './ControlContainer'
-import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
-import type { IconName } from '@opentrons/components'
-import type { CSSProperties } from 'styled-components'
-import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import { ControlContainer } from './ControlContainer'
 import { TouchControlButton } from './TouchControlButton'
+
+import type { CSSProperties } from 'styled-components'
+import type { MouseEvent } from 'react'
+import type { IconName } from '@opentrons/components'
+import type { Axis, Bearing, Jog, Plane, Sign, StepSize } from './types'
 
 interface Control {
   bearing: Bearing
@@ -174,7 +177,7 @@ const DEFAULT_BUTTON_STYLE = css`
   justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
-  color: ${COLORS.black};
+  color: ${COLORS.black90};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 
@@ -184,31 +187,31 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.white};
-    color: ${COLORS.black};
+    color: ${COLORS.black90};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${COLORS.blueEnabled};
-    border: 1px ${COLORS.blueEnabled} solid;
+    color: ${COLORS.blue50};
+    border: 1px ${COLORS.blue50} solid;
   }
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-  color: ${COLORS.blueEnabled};
-  border: 1px ${COLORS.blueEnabled} solid;
+  color: ${COLORS.blue50};
+  border: 1px ${COLORS.blue50} solid;
 
   &:hover {
-    color: ${COLORS.bluePressed};
-    border: 1px ${COLORS.bluePressed} solid;
+    color: ${COLORS.blue60};
+    border: 1px ${COLORS.blue60} solid;
   }
 `
 
@@ -222,12 +225,12 @@ interface DirectionControlProps {
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {
   const { planes, jog, stepSize, initialPlane } = props
-  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+  const [currentPlane, setCurrentPlane] = useState<Plane>(
     initialPlane ?? planes[0]
   )
   const { t } = useTranslation(['robot_calibration'])
 
-  const handlePlane = (event: React.MouseEvent<HTMLButtonElement>): void => {
+  const handlePlane = (event: MouseEvent<HTMLButtonElement>): void => {
     setCurrentPlane(event.currentTarget.value as Plane)
     event.currentTarget.blur()
   }
@@ -263,14 +266,14 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   flex="1 1 auto"
                 >
                   {title}
-                  <StyledText
+                  <LegacyStyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </PrimaryButton>
             )
@@ -302,7 +305,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
 }
 
 const ARROW_GRID_STYLES = css`
-  display: grid;
+  display: ${DISPLAY_GRID};
   max-width: 8.75rem;
   grid-template-columns: repeat(6, 1fr);
   grid-template-areas:
@@ -330,7 +333,7 @@ const ARROW_GRID_STYLES = css`
   }
 `
 const ARROW_BUTTON_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};
@@ -342,15 +345,15 @@ const ARROW_BUTTON_STYLES = css`
   justify-content: ${JUSTIFY_CENTER};
   &:hover {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyPressed};
-    border: 1px ${COLORS.lightGreyHover} solid;
+    color: ${COLORS.grey60};
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:focus {
@@ -359,7 +362,7 @@ const ARROW_BUTTON_STYLES = css`
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey30};
   }
 
   @media (max-width: 750px) {
@@ -369,33 +372,34 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlackEnabled};
-    border-radius: ${BORDERS.borderRadiusSize4};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.black90};
+    border-radius: ${BORDERS.borderRadius16};
 
     &:hover {
-      background-color: ${COLORS.light1Pressed};
-      color: ${COLORS.darkBlackHover};
+      background-color: ${COLORS.grey40};
+      color: ${COLORS.black80};
       border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
-      background-color: ${COLORS.light1Pressed};
-      color: ${COLORS.darkGreyPressed};
+      background-color: ${COLORS.grey40};
+      color: ${COLORS.grey60};
     }
 
     &:focus {
-      background-color: ${COLORS.light1Pressed};
+      background-color: ${COLORS.grey40};
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack40};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
       border: 1px ${COLORS.transparent} solid;
     }
   }
 `
-const ARROW_ICON_STYLES = css`
+
+const StyledIcon = styled(Icon)`
   height: 1.125rem;
   width: 1.125rem;
 
@@ -425,21 +429,19 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
 
   return (
     <Box css={ARROW_GRID_STYLES}>
-      {controls.map(
-        ({ bearing, iconName, axis, sign, gridColumn, keyName, disabled }) => (
-          <PrimaryButton
-            key={bearing}
-            onClick={() => jog(axis, sign, stepSize)}
-            css={ARROW_BUTTON_STYLES}
-            title={bearing}
-            gridArea={keyName}
-            alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
-            disabled={disabled}
-          >
-            <Icon css={ARROW_ICON_STYLES} name={iconName} />
-          </PrimaryButton>
-        )
-      )}
+      {controls.map(({ bearing, iconName, axis, sign, keyName, disabled }) => (
+        <PrimaryButton
+          key={bearing}
+          onClick={() => jog(axis, sign, stepSize)}
+          css={ARROW_BUTTON_STYLES}
+          title={bearing}
+          gridArea={keyName}
+          alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
+          disabled={disabled}
+        >
+          <StyledIcon name={iconName} />
+        </PrimaryButton>
+      ))}
     </Box>
   )
 }
@@ -448,7 +450,7 @@ export function TouchDirectionControl(
   props: DirectionControlProps
 ): JSX.Element {
   const { planes, jog, stepSize, initialPlane } = props
-  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+  const [currentPlane, setCurrentPlane] = useState<Plane>(
     initialPlane ?? planes[0]
   )
   const { i18n, t } = useTranslation(['robot_calibration'])
@@ -457,8 +459,8 @@ export function TouchDirectionControl(
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack40}`}
-      borderRadius={BORDERS.borderRadiusSize4}
+      border={`1px solid ${COLORS.grey50}`}
+      borderRadius={BORDERS.borderRadius16}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
@@ -483,13 +485,13 @@ export function TouchDirectionControl(
                   justifyContent={JUSTIFY_CENTER}
                   height="74px"
                 >
-                  <StyledText
+                  <LegacyStyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+                    color={selected ? COLORS.white : COLORS.black90}
                   >
                     {CONTROLS_CONTENTS_BY_PLANE[plane].title}
-                  </StyledText>
+                  </LegacyStyledText>
                 </Flex>
               </TouchControlButton>
             )

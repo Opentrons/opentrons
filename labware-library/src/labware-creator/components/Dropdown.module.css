@@ -1,0 +1,17 @@
+@import '@opentrons/components/styles';
+
+.option_row {
+  display: flex;
+  height: 2rem;
+  align-items: center;
+}
+
+.option_image {
+  flex: 1;
+  padding-right: 1rem;
+  object-fit: contain;
+}
+
+.option_label {
+  flex: 2;
+}

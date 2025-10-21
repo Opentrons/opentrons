@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+
 // NOTE: unlike other major bump (schema change) migrations, the only change
 // from v3 to v4 protocol schema is adding additional commands.
 // In designerApplication.data, there's a "minor bump" migration for changes
@@ -36,7 +37,10 @@ export const migrateFile = (fileData: any): any => {
       data: {
         ...fileData.designerApplication.data,
         savedStepForms: migrateSavedStepForms(
-          fileData.designerApplication.data.savedStepForms
+          fileData.designerApplication.data.savedStepForms as Record<
+            string,
+            any
+          >
         ),
       },
     },

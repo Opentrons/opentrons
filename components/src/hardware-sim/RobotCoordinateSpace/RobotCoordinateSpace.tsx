@@ -1,27 +1,31 @@
-import styled from 'styled-components'
 import { animated } from '@react-spring/web'
-import * as React from 'react'
-import { Svg } from '../../primitives'
 
-interface RobotCoordinateSpaceProps extends React.ComponentProps<typeof Svg> {
+import styles from './robotcoordinatespace.module.css'
+
+import type { ComponentType, ReactNode, SVGProps } from 'react'
+
+interface RobotCoordinateSpaceProps {
   animated?: boolean
+  children?: ReactNode
+  height?: string
+  viewBox?: string
 }
+
+const AnimatedSvg = animated.svg as ComponentType<SVGProps<SVGSVGElement>>
+
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps
 ): JSX.Element {
-  const { animated = false, children, ...restProps } = props
+  const { animated: isAnimated = false, children, ...restProps } = props
+
   const allPassThroughProps = {
-    transform: 'scale(1, -1)',
+    className: styles.svg,
     ...restProps,
   }
-  return animated ? (
+
+  return isAnimated ? (
     <AnimatedSvg {...allPassThroughProps}>{children}</AnimatedSvg>
   ) : (
-    <Svg {...allPassThroughProps}>{children}</Svg>
+    <svg {...allPassThroughProps}>{children}</svg>
   )
 }
-
-/**
- * These animated components needs to be split out because react-spring and styled-components don't play nice
- * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedSvg = styled(animated.svg)<any>``
