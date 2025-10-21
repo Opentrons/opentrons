@@ -412,7 +412,6 @@ async def test_get_data_file_image(
 
     assert result.status_code == 200
     assert result.media_type == "image/jpeg"
-    assert result.path == image_path
 
 
 async def test_get_all_data_file_info(

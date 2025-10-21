@@ -23,7 +23,6 @@ from .dependencies import (
     get_data_file_auto_deleter,
 )
 from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
-from robot_server.persistence.fastapi_dependencies import get_images_directory
 from .data_files_store import DataFilesStore
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from .file_auto_deleter import DataFileAutoDeleter
