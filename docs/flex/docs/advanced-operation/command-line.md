@@ -11,7 +11,7 @@ Opentrons Flex gives you command-line access to its operating system through a S
 An SSH key is required to perform these tasks and to issue commands from the terminal. Follow these instructions to create an SSH key and use it for terminal authentication and access.
 
 !!!note
-    If you're unable to use a Wi-Fi network for SSH, see [Hardwired SSH Connections][hardwired-ssh-connections] below.
+    If you're unable to use a Wi-Fi network for SSH, see [Making a hardwired SSH connection][making-a-hardwired-ssh-connection] below.
 
 ## Creating an SSH key
 
