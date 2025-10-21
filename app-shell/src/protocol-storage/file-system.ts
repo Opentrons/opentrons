@@ -52,12 +52,18 @@ export function readDirectoriesWithinDirectory(dir: string): Promise<string[]> {
   })
 }
 
+const VALID_PROTOCOL_FILE_EXTENSIONS = ['.py', '.json']
 export function readFilesWithinDirectory(dir: string): Promise<string[]> {
   const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
 
+  const isValidProtocolFile = (e: Dirent): boolean => {
+    const extension = path.extname(e.name).toLowerCase()
+    return e.isFile() && VALID_PROTOCOL_FILE_EXTENSIONS.includes(extension)
+  }
+
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
     const protocolDirPaths = entries
-      .filter(e => e.isFile())
+      .filter(isValidProtocolFile)
       .map(getAbsolutePath)
 
     return protocolDirPaths
@@ -159,7 +165,12 @@ export function analyzeProtocolByKey(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
-  return analyzeProtocolSource(srcDirPath, destFilePath)
+  return readFilesWithinDirectory(srcDirPath).then(protocolFiles => {
+    if (protocolFiles.length === 0) {
+      throw new Error('No valid protocol files found')
+    }
+    return analyzeProtocolSource(protocolFiles[0], destFilePath)
+  })
 }
 
 export function viewProtocolSourceFolder(
