@@ -1,4 +1,4 @@
-import { getModuleDef } from '@opentrons/shared-data'
+import { getModuleDef, locationIsOnDeck } from '@opentrons/shared-data'
 
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
@@ -58,10 +58,7 @@ export function getResultingTimelineFrameFromRunCommands(
     (acc, command) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
         const stack = [command.result.labwareId]
-        if (
-          command.params.location === 'offDeck' ||
-          command.params.location === 'systemLocation'
-        ) {
+        if (!locationIsOnDeck(command.params.location)) {
           stack.push(command.params.location)
         } else if ('slotName' in command.params.location) {
           stack.push(command.params.location.slotName)
