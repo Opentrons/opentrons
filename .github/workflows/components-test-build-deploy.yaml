@@ -34,6 +34,7 @@ defaults:
 
 env:
   CI: true
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
   determine-deploy-config:

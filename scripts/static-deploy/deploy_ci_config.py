@@ -36,25 +36,25 @@ class CIConfig:
 def _determine_application_from_tag(ref_name: str) -> str | None:
     """Determine application from tag name patterns."""
     ref_name_lower = ref_name.lower()
-    
+
     tag_patterns = {
         "labware_library": ["staging-labware-library", "labware-library"],
         "mkdocs": ["staging-mkdocs", "mkdocs"],
         "docs": ["staging-docs", "docs"],
         "protocol_designer": ["staging-protocol-designer", "protocol-designer"],
     }
-    
+
     for app_name, prefixes in tag_patterns.items():
         if any(ref_name_lower.startswith(prefix) for prefix in prefixes):
             return app_name
-    
+
     return None
 
 
 def _determine_application_from_workflow() -> str | None:
     """Determine application from workflow name."""
     workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
-    
+
     workflow_patterns = {
         "mkdocs": "Docs build and deploy",
         "protocol_designer": "PD test, build, and deploy",
@@ -62,11 +62,11 @@ def _determine_application_from_workflow() -> str | None:
         "components": "Components test, build, and deploy",
         "docs": "API docs build",
     }
-    
+
     for app_name, pattern in workflow_patterns.items():
         if pattern in workflow_name:
             return app_name
-    
+
     return None
 
 
@@ -77,12 +77,12 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
         app_from_tag = _determine_application_from_tag(ref_name)
         if app_from_tag:
             return app_from_tag
-    
+
     # Fall back to workflow-based detection
     app_from_workflow = _determine_application_from_workflow()
     if app_from_workflow:
         return app_from_workflow
-    
+
     # No application could be determined - exit with error
     raise ValueError(
         f"Could not determine application from ref_type='{ref_type}', ref_name='{ref_name}', "
