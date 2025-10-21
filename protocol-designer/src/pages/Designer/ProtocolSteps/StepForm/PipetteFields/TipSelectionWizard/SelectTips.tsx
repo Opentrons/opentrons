@@ -97,36 +97,50 @@ export function SelectTips(
   }
 
   const robotState = useSelector(getRobotStateAtActiveItem)
+  const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
+
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
+  const { channels } = pipetteSpecs
+
   const primaryNozzle = getDefaultPrimaryNozzle({
     nozzles,
-    channels: pipetteSpecs.channels,
+    channels,
   })
 
-  const tipAccessibileStatusByWellName =
-    useMemoizedTipAccessibileStatusByWellName({
+  const tipAccessibileStatusByWellName = useMemoizedTipAccessibileStatusByWellName(
+    {
       selectedTiprackId: selectedTiprackId ?? '',
       nozzles,
       pipetteSpecs,
       selectedTips,
       primaryNozzle,
       pipetteId,
-    })
+    }
+  )
+
+  const allWellsAffectedByHover = getAffectedWells({
+    wellName: hoveredWell,
+    labwareDef,
+    channels,
+    nozzles,
+  })
+
+  const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
+    well => tipAccessibileStatusByWellName[well] && tipState?.[well] !== EMPTY
+  )
+
   const numPickupsRemaining = numTotalPickups - selectedTips.length
-
-  const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
-
-  const { channels } = pipetteSpecs
 
   const handleUnselectWell = (unselectIndex: number): void => {
     setSelectedTips(selectedTips.slice(0, unselectIndex))
   }
 
-  // TODO: handle partial configurations for 8 and 96 channel pipettes
   const handleClickWell = (wellName: string): void => {
     if (
       tipState?.[wellName] === 'EMPTY' ||
-      !tipAccessibileStatusByWellName[wellName]
+      !tipAccessibileStatusByWellName[wellName] ||
+      (allWellsAffectedByHover.includes(wellName) &&
+        !areAllHoveredWellsAccessibleAndOccupied)
     ) {
       return
     }
@@ -172,18 +186,8 @@ export function SelectTips(
     }
   }
 
-  const allWellsAffectedByHover = getAffectedWells({
-    wellName: hoveredWell,
-    labwareDef,
-    channels,
-    nozzles,
-  })
-
   const handleHoverWell = (e: WellMouseEvent): void => {
     const { wellName } = e
-    if (tipState?.[wellName] === EMPTY) {
-      return
-    }
     let transformedWellName = wellName
     if (
       (channels === 8 && nozzles === ALL) ||
@@ -234,32 +238,21 @@ export function SelectTips(
       },
       {}
     )
+
     const tipStatusByWellName =
       tipState != null
         ? Object.entries(tipState).reduce<Record<string, TipType>>(
             (acc, [wellName, state]) => {
-              let status = TIP_STATE_TO_TIP_TYPE[state]
-              if (state === EMPTY) {
-                status = NO
-              }
-              if (
-                wellName in tipAccessibileStatusByWellName &&
-                !tipAccessibileStatusByWellName[wellName]
-              ) {
-                status = INACCESSIBLE
-              } else if (
-                wellName in selectedWellsByIndex ||
-                allWellsAffectedByHover.includes(wellName)
-              ) {
-                status = status === USED ? SELECTED_USED : SELECTED
-              }
-              if (allWellsAffectedByHover.includes(wellName)) {
-                if (
-                  wellName in tipAccessibileStatusByWellName &&
-                  !tipAccessibileStatusByWellName[wellName]
-                ) {
-                  status = SELECTED_ERROR
-                }
+              const rawState = TIP_STATE_TO_TIP_TYPE[state]
+              let status = rawState
+              if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
+                status = rawState === USED ? SELECTED_USED : SELECTED
+              } else if (allWellsAffectedByHover.includes(wellName)) {
+                status = areAllHoveredWellsAccessibleAndOccupied
+                  ? rawState === USED
+                    ? SELECTED_USED
+                    : SELECTED
+                  : SELECTED_ERROR
               }
               return { ...acc, [wellName]: status }
             },
