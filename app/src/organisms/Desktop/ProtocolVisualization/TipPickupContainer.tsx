@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   LabwareRender,
-  NEW,
   NO,
   RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
   Tag,
-  USED,
+  tipStateToTipType,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -18,11 +17,7 @@ import styles from './tippickupcontainer.module.css'
 import { getMissingTips } from './utils'
 
 import type { TipType } from '@opentrons/components'
-import type {
-  LabwareEntity,
-  RobotState,
-  TipState,
-} from '@opentrons/step-generation'
+import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
 
 interface TipPickupContainerProps {
   tiprackEntity: LabwareEntity
@@ -93,9 +88,4 @@ export function TipPickupContainer(
       </div>
     </div>
   )
-}
-const tipStateToTipType: Record<TipState, TipType> = {
-  CLEAN: NEW,
-  DIRTY: USED,
-  EMPTY: NO,
 }

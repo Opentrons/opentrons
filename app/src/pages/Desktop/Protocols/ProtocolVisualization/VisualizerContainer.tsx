@@ -144,7 +144,6 @@ export function VisualizerContainer(
       }
     }
   }, [isThermocyclerAttached, selectedSlot])
-  console.log('selectedCommandId', selectedCommandId, selectedRunTimeCommand)
 
   const handleMouseDown = (
     e: MouseEvent<HTMLDivElement>,

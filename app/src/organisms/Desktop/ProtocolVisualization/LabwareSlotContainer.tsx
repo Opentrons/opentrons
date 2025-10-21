@@ -65,7 +65,7 @@ export function LabwareSlotContainer(
   const slot = getSlotInLocationStack(labware[topLabwareOnSlotId].stack)
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
-  const labwareNickname =
+  const labwareNickname: string | null =
     labwareLoadCommandParams != null &&
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
@@ -164,7 +164,7 @@ export function LabwareSlotContainer(
         </div>
         <div className={styles.subheader}>
           <StyledText desktopStyle="captionSemiBold">
-            {labwareNickname != null ? labwareNickname : labwareDisplayName}
+            {labwareNickname ?? labwareDisplayName}
           </StyledText>
         </div>
         <div className={styles.main_content}>

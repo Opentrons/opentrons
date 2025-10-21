@@ -65,25 +65,20 @@ export function StepDetailContainer({
     rightMountPipetteName == null &&
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
 
-  const leftPipetteId =
-    Object.entries(pipettes ?? {}).find(
-      ([_, pipette]) => pipette.mount === 'left'
-    )?.[0] ?? null
-  const rightPipetteId =
-    Object.entries(pipettes ?? {}).find(
-      ([_, pipette]) => pipette.mount === 'right'
-    )?.[0] ?? null
-
-  const isLeftPipetteActive =
-    'pipetteId' in currentCommand.params &&
-    currentCommand.params.pipetteId === leftPipetteId &&
-    leftPipetteId != null &&
-    pipettes[leftPipetteId].entityId != null
-  const isRightPipetteActive =
-    'pipetteId' in currentCommand.params &&
-    currentCommand.params.pipetteId === rightPipetteId &&
-    rightPipetteId != null &&
-    pipettes[rightPipetteId].entityId != null
+  const getIsPipetteActive = (side: 'left' | 'right'): boolean => {
+    const pipetteId =
+      Object.entries(pipettes ?? {}).find(
+        ([_, pipette]) => pipette.mount === side
+      )?.[0] ?? null
+    return (
+      'pipetteId' in currentCommand.params &&
+      currentCommand.params.pipetteId === pipetteId &&
+      pipetteId != null &&
+      pipettes[pipetteId].entityId != null
+    )
+  }
+  const isLeftPipetteActive = getIsPipetteActive('left')
+  const isRightPipetteActive = getIsPipetteActive('right')
 
   return (
     <div className={styles.container}>

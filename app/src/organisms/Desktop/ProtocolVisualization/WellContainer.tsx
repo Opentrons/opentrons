@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 
 import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
-import { getMmFromBottom } from '@opentrons/shared-data'
+import {
+  getMmFromBottom,
+  POSITION_REFERENCE_BOTTOM,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 
 import { TipSvg } from './TipSvg'
 import { getTipSvgInfo, getWellVolume } from './utils'
@@ -55,9 +59,9 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const reference =
     'wellLocation' in params
       ? params.wellLocation.origin === 'top'
-        ? 'well-top'
-        : 'well-bottom'
-      : 'well-bottom'
+        ? POSITION_REFERENCE_TOP
+        : POSITION_REFERENCE_BOTTOM
+      : POSITION_REFERENCE_BOTTOM
   const mmFromBottom =
     getMmFromBottom(Number(zValue), reference, labwareDepth) ?? 1
 

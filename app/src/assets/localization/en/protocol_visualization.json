@@ -21,8 +21,8 @@
   "tips_in_trash": "Tips in trash",
   "tips_remaining": "Tips remaining",
   "trash": "TRASH",
+  "well_dimension": "{{number}} mm",
   "well_name": "Well {{wellName}}",
   "well_view": "Well view",
-  "well_volume": "{{volume}} µl",
-  "well_dimension": "{{number}} mm"
+  "well_volume": "{{volume}} µl"
 }

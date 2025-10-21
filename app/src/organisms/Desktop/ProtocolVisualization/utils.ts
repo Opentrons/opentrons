@@ -165,9 +165,11 @@ export const getTipSvgInfo = (
   liquids: Liquid[]
 ): TipSvgInfo => {
   const ingredIds = Object.keys(pipetteLocationLiquidState)
-  const colorsInTip = liquids
-    .filter(liquid => ingredIds.includes(liquid.id))
-    ?.map(liquid => liquid.displayColor)
+  const colorsInTip = liquids.reduce<string[]>(
+    (acc, { id, displayColor }) =>
+      ingredIds.includes(id) && displayColor ? [...acc, displayColor] : acc,
+    []
+  )
   const tipColor =
     colorsInTip.length > 1 ? COLORS.grey40 : (colorsInTip[0] ?? COLORS.grey40)
   const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
@@ -179,8 +181,8 @@ export const getTipSvgInfo = (
 
 export const getWellVolume = (
   labwareLocationLiquidState: LocationLiquidState
-): number => {
-  return Object.entries(labwareLocationLiquidState)
-    .filter(([id, _]) => id !== AIR) // filter out air gap volume
-    .reduce((sum, [_, volume]) => sum + volume.volume, 0)
-}
+): number =>
+  Object.entries(labwareLocationLiquidState).reduce(
+    (sum, [id, volume]) => (id !== AIR ? sum + volume.volume : sum),
+    0
+  )

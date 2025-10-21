@@ -2,7 +2,8 @@ import { Divider, RobotInfoLabel, StyledText } from '@opentrons/components'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareSlotContainer } from '../../../../organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
+import { LabwareSlotContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
+
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
 import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'

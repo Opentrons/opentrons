@@ -7,10 +7,8 @@ import {
   Chip,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  NEW,
-  NO,
   StyledText,
-  USED,
+  tipStateToTipType,
 } from '@opentrons/components'
 import {
   ALL,
@@ -37,7 +35,6 @@ import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { TipState } from '@opentrons/step-generation'
 import type { TipSelectionBaseProps } from './types'
 
 const NINETY_SIX_ALL_TARGET_WELL = 'A1'
@@ -262,10 +259,4 @@ export function SelectTips(
       </div>
     </div>
   )
-}
-
-const tipStateToTipType: Record<TipState, TipType> = {
-  CLEAN: NEW,
-  DIRTY: USED,
-  EMPTY: NO,
 }

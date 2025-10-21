@@ -1,4 +1,8 @@
-import { COLORS, POSITION_ABSOLUTE } from '@opentrons/components'
+import {
+  COLORS,
+  CURSOR_POINTER,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
 
 import type { Dispatch, SetStateAction } from 'react'
 
@@ -55,7 +59,7 @@ export const TipSvg = ({
           onMouseLeave={() => {
             setIsHovered(false)
           }}
-          cursor="pointer"
+          cursor={CURSOR_POINTER}
         />
 
         <path

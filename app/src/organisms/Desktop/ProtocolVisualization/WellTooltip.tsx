@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 
@@ -50,6 +51,7 @@ export const WellTooltip = ({
   children,
   ingredNames,
 }: WellTooltipProps): JSX.Element => {
+  const { t } = useTranslation('protocol_visualization')
   const [tooltipState, setTooltipState] =
     useState<TooltipState>(initialTooltipState)
 
@@ -57,8 +59,9 @@ export const WellTooltip = ({
     (wellName: string, wellIngreds: LocationLiquidState) =>
     (e: MouseEvent): void => {
       const target = e.target as HTMLElement
-      if (!target) return
-
+      if (!target) {
+        return
+      }
       const { left, top, height, width } = target.getBoundingClientRect()
       if (Object.keys(wellIngreds).length > 0 && left && top) {
         setTooltipState({
@@ -128,16 +131,18 @@ export const WellTooltip = ({
                           {ingredNames[groupId]}
                         </StyledText>
                       </td>
-                      {hasMultipleIngreds && (
+                      {hasMultipleIngreds ? (
                         <td>
                           <StyledText desktopStyle="captionRegular">
                             {formatPercentage(ingred.volume, totalLiquidVolume)}
                           </StyledText>
                         </td>
-                      )}
+                      ) : null}
                       <td>
                         <StyledText desktopStyle="captionRegular">
-                          {formatVolume(ingred.volume, 2)}µl
+                          {t('well_volume', {
+                            volume: formatVolume(ingred.volume, 2),
+                          })}
                         </StyledText>
                       </td>
                     </tr>
@@ -145,17 +150,19 @@ export const WellTooltip = ({
                 </tbody>
               </table>
 
-              {hasMultipleIngreds && (
+              {hasMultipleIngreds ? (
                 <>
                   <div className={styles.divider} />
                   <div className={styles.footer}>
                     <StyledText desktopStyle="captionRegular">{`${tooltipWellName} Total Volume`}</StyledText>
                     <StyledText desktopStyle="captionRegular">
-                      {formatVolume(totalLiquidVolume, 2)}µl
+                      {t('well_volume', {
+                        volume: formatVolume(totalLiquidVolume, 2),
+                      })}
                     </StyledText>
                   </div>
                 </>
-              )}
+              ) : null}
             </div>,
             getModalPortalEl()
           )

@@ -83,13 +83,14 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background: linear-gradient(
-    to right,
-    var(--blue-50) 0%,
-    var(--blue-50) var(--progress, 0%),
-    #ccc var(--progress, 0%),
-    #ccc 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
 }
 
 /* Hide thumb initially */
@@ -154,9 +155,9 @@
 }
 
 .command_step_groups {
+  height: 39rem;
   min-height: 0;
   flex: 1;
-  height: 39rem;
   overflow-y: auto;
 }
 
@@ -386,7 +387,7 @@
 .info_label_container {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--spacing-4);
 }
 
 .labware_render_container {
