@@ -12,6 +12,7 @@ import { getLabwareDefinitionsByURIForProtocol } from './getLabwareDefinitionsBy
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getLiquidsByIdForLabware } from './getLiquidsByIdForLabware'
 import { getSlotFromAddressableAreaName } from './parseAddressableArea'
+import { locationIsOnLabware } from './symbolicPositionHelpers'
 
 import type { CutoutId } from '../../deck'
 import type {
@@ -90,9 +91,7 @@ export function getStackedItemsOnStartingDeck(
   const loadLidCommands = commands.filter(
     (command): command is LoadLidOnLabwareCommad =>
       command.commandType === 'loadLid' &&
-      command.params.location !== 'offDeck' &&
-      command.params.location !== 'systemLocation' &&
-      'labwareId' in command.params.location
+      locationIsOnLabware(command.params.location)
   )
   const labwareAndLidOnDeck = commands
     .filter(
