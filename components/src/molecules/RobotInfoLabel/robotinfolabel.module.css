@@ -10,7 +10,6 @@
   border-radius: var(--border-radius-8);
   background-color: inherit;
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 .robot_info_label_highlight {
