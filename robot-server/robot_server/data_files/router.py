@@ -1,16 +1,21 @@
 """Router for /dataFiles endpoints."""
+import zipfile
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Annotated, Optional, Literal, Union, Final
 
 from fastapi import UploadFile, File, Form, Depends, Response, status, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
-from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.runs.dependencies import get_run_data_manager, get_run_store
 from robot_server.runs.router.base_router import RunNotFound
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import RunStore
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.service.json_api import (
@@ -36,8 +41,13 @@ from .models import (
     FileIdNotFound,
     FileInUseError,
     ImageFileMetadata,
+    NoImagesFound,
 )
-from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
+from ..protocols.dependencies import (
+    get_file_hasher,
+    get_file_reader_writer,
+    get_protocol_store,
+)
 from ..service.dependencies import get_current_time, get_unique_id
 
 datafiles_router = LightRouter()
@@ -460,3 +470,98 @@ async def delete_run_images(
         content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
     )
+
+
+@datafiles_router.get(
+    path="/dataFiles/{runId}/images/download",
+    summary="Download all camera images for a run as a zip file",
+    description=dedent(
+        """
+        Download all camera image files associated with a run as a single zip archive.
+
+        The zip file will contain all JPEG images captured during the protocol run.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {
+            "content": {"application/zip": {}},
+            "description": "A zip file containing all camera images for the run",
+        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoImagesFound]},
+    },
+)
+async def download_run_images(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+) -> StreamingResponse:
+    """Download all camera images for a run as a zip file.
+
+    Arguments:
+        runId: The run ID associated with the camera image files.
+        data_files_store: Store for data files database access.
+        run_store: Store for run data management.
+        protocol_store: Store for protocol storage access.
+    """
+    info_slice = data_files_store.get_files_info_by_run_mime_type(
+        run_id=runId,
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=None,
+    )
+
+    if not info_slice.file_info:
+        raise NoImagesFound(detail=f"No images found for run '{runId}'").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for file_info in info_slice.file_info:
+            image_path = Path(file_info.path)
+
+            if not image_path.exists() or not image_path.is_file():
+                continue
+
+            zip_file.write(image_path, arcname=file_info.name)
+
+    zip_buffer.seek(0)
+    zip_filename = _build_zip_filename(
+        run_id=runId, run_store=run_store, protocol_store=protocol_store
+    )
+
+    return StreamingResponse(
+        zip_buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
+    )
+
+
+def _build_zip_filename(
+    run_id: str, run_store: RunStore, protocol_store: ProtocolStore
+) -> str:
+    run_info = run_store.get(run_id)
+    protocol_id = run_info.protocol_id if run_info else None
+
+    if protocol_id is not None:
+        protocol = protocol_store.get(protocol_id)
+        protocol_name = (
+            protocol.source.metadata.get(
+                "protocolName", protocol.source.files[0].path.name
+            )
+            if protocol is not None
+            else None
+        )
+        robot_name = config.name()
+        timestamp = run_info.created_at.strftime("%Y%m%d_%H%M%S")
+        final_str = f"{robot_name}_{_sanitize_str(protocol_name)}_{timestamp}.zip"
+
+        return final_str
+
+    return f"{run_id}_images.zip"
+
+
+def _sanitize_str(input_str: str) -> str:
+    """Ensure that the input string contains only alphanumeric characters."""
+    return "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in input_str)

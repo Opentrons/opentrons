@@ -70,6 +70,13 @@ class FileIdNotFound(ErrorDetails):
     title: str = "Specified file id not found on the robot"
 
 
+class NoImagesFound(ErrorDetails):
+    """An error returned when no images are found for the specified run."""
+
+    id: Literal["NoImagesFound"] = "NoImagesFound"
+    title: str = "No images found for run"
+
+
 class ImageFileMetadata(BaseModel):
     """Metadata associated with a particular image file captured by a camera during a run."""
 

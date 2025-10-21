@@ -34,6 +34,9 @@ from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
+from robot_server.data_files.router import download_run_images
+from robot_server.runs.run_store import RunStore
+from robot_server.protocols.protocol_store import ProtocolStore
 
 
 @pytest.fixture
@@ -64,6 +67,18 @@ def file_auto_deleter(decoy: Decoy) -> DataFileAutoDeleter:
 def run_data_manager(decoy: Decoy) -> RunDataManager:
     """Get a mocked out RunDataManager."""
     return decoy.mock(cls=RunDataManager)
+
+
+@pytest.fixture
+def run_store(decoy: Decoy) -> RunStore:
+    """Get a mocked out RunStore."""
+    return decoy.mock(cls=RunStore)
+
+
+@pytest.fixture
+def protocol_store(decoy: Decoy) -> ProtocolStore:
+    """Get a mocked out ProtocolStore."""
+    return decoy.mock(cls=ProtocolStore)
 
 
 async def test_upload_new_data_file(
@@ -661,3 +676,118 @@ async def test_delete_run_images_run_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_download_run_images_success(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_store: RunStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should return a zip file with all images for a run."""
+    file_info_1 = DataFileInfoWithCommands(
+        id="file-id-1",
+        name="image1.jpeg",
+        file_hash="hash1",
+        created_at=datetime(year=2024, month=6, day=20),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="/tmp/test/run-id-1/image1.jpeg",
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-1",
+            prev_command_id="prev-1",
+        ),
+    )
+
+    file_info_2 = DataFileInfoWithCommands(
+        id="file-id-2",
+        name="image2.jpeg",
+        file_hash="hash2",
+        created_at=datetime(year=2024, month=6, day=21),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="/tmp/test/run-id-2/image2.jpeg",
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-2",
+            prev_command_id="prev-2",
+        ),
+    )
+
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            offset=0,
+            limit=None,
+        )
+    ).then_return(
+        DataFileWithCommandsInfoSlice(
+            file_info=[file_info_1, file_info_2], total_length=2
+        )
+    )
+
+    mock_run = decoy.mock(name="run_data")
+    decoy.when(mock_run.protocol_id).then_return("protocol-id")
+    decoy.when(mock_run.created_at).then_return(
+        datetime(year=2024, month=6, day=20, hour=10, minute=30, second=15)
+    )
+    decoy.when(run_store.get("run-id")).then_return(mock_run)
+
+    mock_protocol = decoy.mock(name="protocol")
+    mock_source = decoy.mock(name="source")
+    mock_files = [decoy.mock(name="file")]
+    mock_path = decoy.mock(name="path")
+    decoy.when(mock_path.name).then_return("my_protocol.py")
+    decoy.when(mock_files[0].path).then_return(mock_path)
+    decoy.when(mock_source.files).then_return(mock_files)
+    decoy.when(mock_source.metadata).then_return({"protocolName": "Test Protocol"})
+    decoy.when(mock_protocol.source).then_return(mock_source)
+    decoy.when(protocol_store.get("protocol-id")).then_return(mock_protocol)
+
+    Path(file_info_1.path).parent.mkdir(parents=True, exist_ok=True)
+    Path(file_info_2.path).parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        result = await download_run_images(
+            runId="run-id",
+            data_files_store=data_files_store,
+            run_store=run_store,
+            protocol_store=protocol_store,
+        )
+
+        assert result.media_type == "application/zip"
+        assert "attachment" in result.headers["Content-Disposition"]
+        assert ".zip" in result.headers["Content-Disposition"]
+    finally:
+        Path(file_info_1.path).unlink(missing_ok=True)
+        Path(file_info_2.path).unlink(missing_ok=True)
+
+
+async def test_download_run_images_no_images_found(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_store: RunStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should raise an error when no images are found for the run."""
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            offset=0,
+            limit=None,
+        )
+    ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
+
+    with pytest.raises(ApiError) as exc_info:
+        await download_run_images(
+            runId="run-id",
+            data_files_store=data_files_store,
+            run_store=run_store,
+            protocol_store=protocol_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "NoImagesFound"

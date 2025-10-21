@@ -606,3 +606,53 @@ async def test_get_files_info_by_run_mime_type(
     assert result.total_length == 1
     assert result.file_info[0].id == "jpeg-run1"
     assert result.file_info[0].command_info.command_id == "command-1"
+
+
+async def test_get_files_info_by_run_mime_type_no_limit(
+    subject: DataFilesStore,
+) -> None:
+    """It should retrieve all files when limit is None."""
+    _create_run_in_db(subject._sql_engine, "run-id-1")
+
+    for i in range(5):
+        jpeg = DataFileInfo(
+            id=f"jpeg-{i}",
+            name=f"image{i}.jpeg",
+            file_hash=f"hash{i}",
+            created_at=datetime(year=2024, month=6, day=20 + i, tzinfo=timezone.utc),
+            mime_type=MimeType.IMAGE_JPEG,
+            path=f"data_files/jpeg-{i}/image{i}.jpeg",
+            generated=True,
+            stored=True,
+        )
+        await subject.insert(jpeg)
+        await subject.insert_output_file(
+            OutputDataFileInfo(
+                file_id=f"jpeg-{i}",
+                run_id="run-id-1",
+                command_info=CmdDataFileInfo(
+                    command_id=f"command-{i}",
+                    prev_command_id=f"prev-{i}",
+                ),
+            )
+        )
+
+    result = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=None,
+    )
+
+    assert len(result.file_info) == 5
+    assert result.total_length == 5
+
+    result_with_limit = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=2,
+    )
+
+    assert len(result_with_limit.file_info) == 2
+    assert result_with_limit.total_length == 5
