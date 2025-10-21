@@ -2,6 +2,7 @@
 from typing import Annotated
 
 from fastapi import Depends, status
+
 from robot_server.error_recovery.settings.store import (
     ErrorRecoverySettingStore,
     get_error_recovery_setting_store,
@@ -13,6 +14,8 @@ from robot_server.camera.settings.store import (
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
+from robot_server.data_files.dependencies import get_data_file_auto_deleter
 from robot_server.file_provider.fastapi_dependencies import get_file_provider_executor
 from robot_server.file_provider.provider import FileProviderExecutor
 from sqlalchemy.engine import Engine as SQLEngine
@@ -199,6 +202,9 @@ async def get_run_data_manager(
 async def get_run_auto_deleter(
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    data_file_auto_deleter: Annotated[
+        DataFileAutoDeleter, Depends(get_data_file_auto_deleter)
+    ],
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
@@ -206,12 +212,16 @@ async def get_run_auto_deleter(
         protocol_store=protocol_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
         protocol_kind=ProtocolKind.STANDARD,
+        data_file_auto_deleter=data_file_auto_deleter,
     )
 
 
 async def get_quick_transfer_run_auto_deleter(
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    data_file_auto_deleter: Annotated[
+        DataFileAutoDeleter, Depends(get_data_file_auto_deleter)
+    ],
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs for quick transfer prorotocols."""
     return RunAutoDeleter(
@@ -221,4 +231,5 @@ async def get_quick_transfer_run_auto_deleter(
         # run slot so we can clone an active run.
         deletion_planner=RunDeletionPlanner(maximum_runs=2),
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
+        data_file_auto_deleter=data_file_auto_deleter,
     )
