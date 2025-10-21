@@ -5,6 +5,7 @@ from textwrap import dedent
 from typing import Annotated, Optional, Literal, Union, Final
 
 from fastapi import UploadFile, File, Form, Depends, Response, status, Query
+from fastapi.responses import FileResponse
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from server_utils.fastapi_utils.light_router import LightRouter
 
@@ -22,6 +23,7 @@ from .dependencies import (
     get_data_file_auto_deleter,
 )
 from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from .data_files_store import DataFilesStore
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from .file_auto_deleter import DataFileAutoDeleter
@@ -233,7 +235,6 @@ async def get_data_file_info_by_id(
 )
 async def get_data_file(
     dataFileId: str,
-    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
 ) -> Response:
@@ -243,17 +244,28 @@ async def get_data_file(
     except FileIdNotFoundError as e:
         raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    try:
-        [buffered_file] = await file_reader_writer.read(
-            files=[data_files_directory / dataFileId / data_file_info.name]
-        )
-    except FileNotFoundError as e:
-        raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    file_path = Path(data_file_info.path)
+    if data_file_info.mime_type == MimeType.IMAGE_JPEG:
+        if not file_path.exists():
+            raise FileNotFound(
+                detail=f"Image file '{data_file_info.name}' not found"
+            ).as_error(status.HTTP_404_NOT_FOUND)
 
-    return Response(
-        content=buffered_file.contents.decode("utf-8"),
-        media_type="text/plain",
-    )
+        return FileResponse(
+            path=file_path,
+            media_type="image/jpeg",
+            filename=data_file_info.name,
+        )
+    else:
+        try:
+            [buffered_file] = await file_reader_writer.read(files=[file_path])
+        except FileNotFoundError as e:
+            raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+        return Response(
+            content=buffered_file.contents.decode("utf-8"),
+            media_type="text/plain",
+        )
 
 
 @PydanticResponse.wrap_route(
