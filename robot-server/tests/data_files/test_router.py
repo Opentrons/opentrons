@@ -338,30 +338,30 @@ async def test_get_data_file(
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
 ) -> None:
-    """It should return the existing file."""
+    """It should return the existing CSV file."""
     data_files_directory = Path("/dev/null")
 
     decoy.when(data_files_store.get("data-file-id")).then_return(
         DataFileInfo(
             id="qwerty",
-            name="abc.xyz",
+            name="abc.csv",
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
             mime_type=MimeType.TEXT_CSV,
             generated=False,
             stored=True,
-            path=f"{data_files_directory}/qwerty/abc.xyz",
+            path=f"{data_files_directory}/qwerty/abc.csv",
         )
     )
 
     decoy.when(
         await file_reader_writer.read(
-            files=[data_files_directory / "data-file-id" / "abc.xyz"]
+            files=[Path(f"{data_files_directory}/qwerty/abc.csv")]
         )
     ).then_return(
         [
             BufferedFile(
-                name="123.456",
+                name="abc.csv",
                 contents=bytes("some_content", encoding="utf-8"),
                 path=None,
             )
@@ -370,7 +370,6 @@ async def test_get_data_file(
 
     result = await get_data_file(
         "data-file-id",
-        data_files_directory=data_files_directory,
         data_files_store=data_files_store,
         file_reader_writer=file_reader_writer,
     )
@@ -378,6 +377,41 @@ async def test_get_data_file(
     assert result.status_code == 200
     assert result.body == b"some_content"
     assert result.media_type == "text/plain"
+
+
+async def test_get_data_file_image(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    file_reader_writer: FileReaderWriter,
+    tmp_path: Path,
+) -> None:
+    """It should return an existing image file."""
+    image_path = tmp_path / "test-run-id" / "image.jpeg"
+    image_path.parent.mkdir(parents=True)
+    image_content = b"fake_image_content"
+    image_path.write_bytes(image_content)
+
+    decoy.when(data_files_store.get("image-file-id")).then_return(
+        DataFileInfo(
+            id="image-file-id",
+            name="image.jpeg",
+            file_hash="abc123",
+            created_at=datetime(year=2024, month=7, day=15),
+            mime_type=MimeType.IMAGE_JPEG,
+            generated=True,
+            stored=True,
+            path=str(image_path),
+        )
+    )
+
+    result = await get_data_file(
+        "image-file-id",
+        data_files_store=data_files_store,
+        file_reader_writer=file_reader_writer,
+    )
+
+    assert result.status_code == 200
+    assert result.media_type == "image/jpeg"
 
 
 async def test_get_all_data_file_info(
