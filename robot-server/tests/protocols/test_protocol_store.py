@@ -596,12 +596,11 @@ async def test_get_referenced_data_files(
             id="data-file-id-1",
             name="file-name",
             file_hash="abc123",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/data-file-id-1/file-name",
+            generated=False,
+            stored=True,
         )
     )
     await data_files_store.insert(
@@ -609,12 +608,11 @@ async def test_get_referenced_data_files(
             id="data-file-id-2",
             name="file-name",
             file_hash="abc123",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/data-file-id-2/file-name",
+            generated=False,
+            stored=True,
         )
     )
     await data_files_store.insert(
@@ -622,12 +620,11 @@ async def test_get_referenced_data_files(
             id="data-file-id-3",
             name="file-name",
             file_hash="abc123",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/data-file-id-3/file-name",
+            generated=False,
+            stored=True,
         )
     )
 

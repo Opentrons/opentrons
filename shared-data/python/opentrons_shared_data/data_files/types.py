@@ -13,6 +13,13 @@ class MimeType(str, Enum):
     IMAGE_JPEG = "image/jpeg"
 
 
+class DataFileSource(Enum):
+    """The source this data file is from."""
+
+    UPLOADED = "uploaded"
+    GENERATED = "generated"
+
+
 @dataclass(frozen=True)
 class DataFileInfo:
     """Metadata about a data file."""

@@ -731,12 +731,11 @@ async def test_create_new_protocol_with_run_time_params(
             id="123",
             name="file.abc",
             file_hash="xyz",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2022, month=2, day=2),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/123/file.abc",
+            generated=False,
+            stored=True,
         )
     )
 
@@ -1001,12 +1000,11 @@ async def test_create_existing_protocol_with_different_run_time_params(
             id="123",
             name="file.abc",
             file_hash="xyz",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2022, month=2, day=2),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/123/file.abc",
+            generated=False,
+            stored=True,
         )
     )
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
@@ -1827,12 +1825,11 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             id="123",
             name="foo.csv",
             file_hash="xyz",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2022, month=2, day=2),
             mime_type=MimeType.TEXT_CSV,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
+            path="data_files/123/foo.csv",
+            generated=False,
+            stored=True,
         )
     )
     decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)

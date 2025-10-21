@@ -146,13 +146,8 @@ analysis_csv_rtp_table = sqlalchemy.Table(
         nullable=False,
     ),
     sqlalchemy.Column(
-        "input_file_id",
-        sqlalchemy.String,
-        nullable=True,
-    ),
-    sqlalchemy.Column(
-        "input_run_id",
-        sqlalchemy.String,
+        "file_id",
+        sqlalchemy.ForeignKey("data_files.id"),
         nullable=True,
     ),
 )
@@ -335,7 +330,6 @@ data_files_table = sqlalchemy.Table(
 input_data_files_table = sqlalchemy.Table(
     "input_data_files",
     metadata,
-    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
     sqlalchemy.Column(
         "file_id",
         sqlalchemy.String,
@@ -350,6 +344,7 @@ input_data_files_table = sqlalchemy.Table(
         nullable=False,
         index=True,
     ),
+    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
 )
 
 
@@ -357,7 +352,6 @@ input_data_files_table = sqlalchemy.Table(
 output_data_files_table = sqlalchemy.Table(
     "output_data_files",
     metadata,
-    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
     sqlalchemy.Column(
         "run_id",
         sqlalchemy.String,
@@ -382,6 +376,7 @@ output_data_files_table = sqlalchemy.Table(
         nullable=False,
         index=True,
     ),
+    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
 )
 
 
@@ -404,13 +399,8 @@ run_csv_rtp_table = sqlalchemy.Table(
         nullable=False,
     ),
     sqlalchemy.Column(
-        "input_file_id",
-        sqlalchemy.String,
-        nullable=True,
-    ),
-    sqlalchemy.Column(
-        "input_run_id",
-        sqlalchemy.String,
+        "file_id",
+        sqlalchemy.ForeignKey("data_files.id"),
         nullable=True,
     ),
 )

@@ -144,7 +144,7 @@ async def upload_data_file(
                     id=existing_file_info.id,
                     name=existing_file_info.name,
                     createdAt=existing_file_info.created_at,
-                    source=existing_file_info.source,
+                    source=DataFileSource.UPLOADED,
                 )
             ),
             status_code=status.HTTP_200_OK,
@@ -159,11 +159,10 @@ async def upload_data_file(
         name=buffered_file.name,
         file_hash=file_hash,
         created_at=created_at,
-        source=DataFileSource.UPLOADED,
         mime_type=MimeType.TEXT_CSV,
-        run_id=None,
-        command_id=None,
-        prev_command_id=None,
+        path=f"{data_files_directory}/{file_id}/{buffered_file.name}",
+        generated=False,
+        stored=True,
     )
     await data_files_store.insert(file_info)
     return await PydanticResponse.create(
@@ -203,13 +202,15 @@ async def get_data_file_info_by_id(
     except FileIdNotFoundError as e:
         raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
+    source = DataFileSource.GENERATED if resource.generated else DataFileSource.UPLOADED
+
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(
             data=DataFile.model_construct(
                 id=resource.id,
                 name=resource.name,
                 createdAt=resource.created_at,
-                source=resource.source,
+                source=source,
             )
         ),
         status_code=status.HTTP_200_OK,
@@ -275,7 +276,9 @@ async def get_all_data_files(
                     id=data_file_info.id,
                     name=data_file_info.name,
                     createdAt=data_file_info.created_at,
-                    source=data_file_info.source,
+                    source=DataFileSource.GENERATED
+                    if data_file_info.generated
+                    else DataFileSource.UPLOADED,
                 )
                 for data_file_info in data_files
             ],
@@ -305,7 +308,7 @@ async def delete_file_by_id(
         data_files_store: Store for data files database access.
     """
     try:
-        data_files_store.remove(file_id=dataFileId)
+        data_files_store.remove_stored(file_id=dataFileId)
     except FileIdNotFoundError as e:
         raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     except FileInUseError as e:

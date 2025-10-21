@@ -176,12 +176,12 @@ class DataFilesStore:
             )
 
         select_ids_used_in_analyses = sqlalchemy.select(
-            analysis_csv_rtp_table.c.input_file_id
-        ).where(analysis_csv_rtp_table.c.input_file_id.is_not(None))
+            analysis_csv_rtp_table.c.file_id
+        ).where(analysis_csv_rtp_table.c.file_id.is_not(None))
 
-        select_ids_used_in_runs = sqlalchemy.select(
-            run_csv_rtp_table.c.input_file_id
-        ).where(run_csv_rtp_table.c.input_file_id.is_not(None))
+        select_ids_used_in_runs = sqlalchemy.select(run_csv_rtp_table.c.file_id).where(
+            run_csv_rtp_table.c.file_id.is_not(None)
+        )
 
         with self._sql_engine.begin() as transaction:
             all_file_ids: List[str] = (
@@ -206,10 +206,16 @@ class DataFilesStore:
         return usage_info
 
     def remove_stored(self, file_id: str) -> None:
-        """Mark a data file as not stored and remove physical files.
+        """Remove the persisted data file and clean up associated records.
+
+        Strategy:
+        - Always remove physical file from disk
+        - If file only exists in input_data_files table: fully delete from input_data_files and data_files
+        - If file exists in output_data_files table: mark as not stored in data_files, preserve output_data_files
+        records, and delete any input_data_files records.
 
         This should only be called when the specified file has no references
-        in the database.
+        in analysis_csv_rtp_table or run_csv_rtp_table.
 
         Raises:
             FileIdNotFoundError: the given file ID was not found in the store.
@@ -219,21 +225,33 @@ class DataFilesStore:
         # Check if file is used in analyses
         select_ids_used_in_analyses = sqlalchemy.select(
             analysis_csv_rtp_table.c.analysis_id
-        ).where(analysis_csv_rtp_table.c.input_file_id == file_id)
+        ).where(analysis_csv_rtp_table.c.file_id == file_id)
 
         # Check if file is used in runs
         select_ids_used_in_runs = sqlalchemy.select(run_csv_rtp_table.c.run_id).where(
-            run_csv_rtp_table.c.input_file_id == file_id
+            run_csv_rtp_table.c.file_id == file_id
         )
 
-        # Update statement to set stored to False
-        update_statement = (
-            sqlalchemy.update(data_files_table)
-            .where(data_files_table.c.id == file_id)
-            .values(stored=False)
-        )
+        # Check if file exists in output_data_files table
+        select_output_file_entries = sqlalchemy.select(
+            output_data_files_table.c.file_id
+        ).where(output_data_files_table.c.file_id == file_id)
+
+        # Check if file exists in input_data_files table
+        select_input_file_entries = sqlalchemy.select(
+            input_data_files_table.c.file_id
+        ).where(input_data_files_table.c.file_id == file_id)
 
         with self._sql_engine.begin() as transaction:
+            file_exists = transaction.execute(
+                sqlalchemy.select(data_files_table).where(
+                    data_files_table.c.id == file_id
+                )
+            ).first()
+
+            if not file_exists:
+                raise FileIdNotFoundError(file_id)
+
             files_used_in_analyses: Set[str] = set(
                 transaction.execute(select_ids_used_in_analyses).scalars().all()
             )
@@ -248,12 +266,45 @@ class DataFilesStore:
                     ids_used_in_analyses=files_used_in_analyses,
                 )
 
-            result = transaction.execute(update_statement)
+            output_entries = list(
+                transaction.execute(select_output_file_entries).scalars().all()
+            )
+            has_output_entries = len(output_entries) > 0
 
-        if result.rowcount < 1:
-            raise FileIdNotFoundError(file_id)
+            input_entries = list(
+                transaction.execute(select_input_file_entries).scalars().all()
+            )
+            has_input_entries = len(input_entries) > 0
 
-        # Remove physical files
+            if has_output_entries:
+                # File is generated output - preserve it for history
+                # Delete all input file entries (if any)
+                if has_input_entries:
+                    transaction.execute(
+                        input_data_files_table.delete().where(
+                            input_data_files_table.c.file_id == file_id
+                        )
+                    )
+
+                # Mark as not stored in data_files table instead of deleting from data_files table
+                transaction.execute(
+                    sqlalchemy.update(data_files_table)
+                    .where(data_files_table.c.id == file_id)
+                    .values(stored=False)
+                )
+            else:
+                if has_input_entries:
+                    transaction.execute(
+                        input_data_files_table.delete().where(
+                            input_data_files_table.c.file_id == file_id
+                        )
+                    )
+
+                # Delete from data_files table
+                transaction.execute(
+                    data_files_table.delete().where(data_files_table.c.id == file_id)
+                )
+
         file_dir = self._data_files_directory.joinpath(file_id)
         if file_dir.exists():
             for file in file_dir.glob("*"):

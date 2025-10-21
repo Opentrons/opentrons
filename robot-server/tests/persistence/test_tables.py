@@ -92,6 +92,8 @@ EXPECTED_STATEMENTS_LATEST = [
         engine_status VARCHAR,
         _updated_at DATETIME,
         run_time_parameters VARCHAR,
+        input_file_ids VARCHAR,
+        output_file_ids VARCHAR,
         PRIMARY KEY (id),
         FOREIGN KEY(protocol_id) REFERENCES protocol (id)
     )
@@ -136,22 +138,52 @@ EXPECTED_STATEMENTS_LATEST = [
     CREATE TABLE data_files (
         id VARCHAR NOT NULL,
         name VARCHAR NOT NULL,
+        path VARCHAR NOT NULL,
+        stored BOOLEAN NOT NULL,
+        generated BOOLEAN NOT NULL,
+        mime_type VARCHAR NOT NULL,
         file_hash VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,
-        source VARCHAR(9),
-        mime_type VARCHAR NOT NULL,
-        run_id VARCHAR,
-        command_id VARCHAR,
-        prev_command_id VARCHAR,
-        PRIMARY KEY (id),
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_data_files_generated ON data_files (generated)
+    """,
+    """
+    CREATE INDEX ix_data_files_mime_type ON data_files (mime_type)
+    """,
+    """
+    CREATE TABLE input_data_files (
+        file_id VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )
     """,
     """
-    CREATE INDEX ix_data_files_run_id ON data_files (run_id)
+    CREATE INDEX ix_input_data_files_file_id ON input_data_files (file_id)
     """,
     """
-    CREATE INDEX ix_data_files_run_id_mime_type_created_at ON data_files (run_id, mime_type, created_at)
+    CREATE INDEX ix_input_data_files_run_id ON input_data_files (run_id)
+    """,
+    """
+    CREATE TABLE output_data_files (
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        prev_command_id VARCHAR NOT NULL,
+        file_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_output_data_files_run_id ON output_data_files (run_id)
+    """,
+    """
+    CREATE INDEX ix_output_data_files_file_id ON output_data_files (file_id)
     """,
     """
     CREATE TABLE run_csv_rtp_table (

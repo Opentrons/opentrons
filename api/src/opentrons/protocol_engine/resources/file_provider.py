@@ -5,7 +5,7 @@ import csv
 from typing import List, Optional, Callable, Awaitable, Dict
 from dataclasses import dataclass
 from pydantic import BaseModel
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 
 from ..errors import StorageLimitReachedError
 
@@ -194,9 +194,8 @@ class FileProvider:
             name="",
             file_hash="",
             created_at=datetime.now(),
-            source=DataFileSource.GENERATED,
+            generated=True,
+            stored=False,
+            path="",
             mime_type=mime_type,
-            run_id=None,
-            command_id=None,
-            prev_command_id=None,
         )

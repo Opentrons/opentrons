@@ -5,15 +5,16 @@ Summary of changes from schema 13:
 - This compatibility change adds additional camera related fields to the BooleanSettingKey table.
 - Refactors data_files table into separate input/output tables with unified storage metadata.
 - Adds input_data_files table for what are currently uploaded files.
-- Adds output_data_files table for what are currently generated files with run/command associations.
 - Updates run table to include input_file_ids and output_file_ids JSON arrays.
-- Updates foreign key references in analysis_csv_rtp_table and run_csv_rtp_table to use composite keys.
+- NOTE: We can't accurately relate absorbance reader data files (the only data files in
+  output_data_files_table) to commands, so existing files are not included in the migration.
 """
 
 from pathlib import Path
 import json
+from typing import Dict, List
 
-from ._util import copy_contents
+from ._util import copy_contents, add_column
 from .._folder_migrator import Migration
 import sqlalchemy
 from ..database import sql_engine_ctx
@@ -28,17 +29,39 @@ class Migration12to13(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 12 to 13."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
+        dest_db_file = dest_dir / DB_FILE
+
+        with sql_engine_ctx(dest_db_file) as engine:
             assert (
                 schema_11.boolean_setting_table.name
                 != schema_13.boolean_setting_table.name
             )
-            _migrate_boolean_settings_table(transaction)
-            _migrate_data_files_tables(transaction)
-            _migrate_run_table(transaction)
-            _update_foreign_key_references(transaction)
+
+            add_column(
+                engine, schema_13.run_table.name, schema_13.run_table.c.input_file_ids
+            )
+            add_column(
+                engine, schema_13.run_table.name, schema_13.run_table.c.output_file_ids
+            )
+
+            with engine.begin() as transaction:
+                old_data_files = transaction.execute(
+                    sqlalchemy.select(schema_11.data_files_table)
+                ).fetchall()
+
+                old_analysis_csv = transaction.execute(
+                    sqlalchemy.select(schema_11.analysis_csv_rtp_table)
+                ).fetchall()
+
+                old_run_csv = transaction.execute(
+                    sqlalchemy.select(schema_11.run_csv_rtp_table)
+                ).fetchall()
+
+                _migrate_boolean_settings_table(transaction)
+                _migrate_data_files_tables(transaction, old_data_files)
+                _update_foreign_key_references(
+                    transaction, old_analysis_csv, old_run_csv
+                )
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
@@ -73,12 +96,11 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
     schema_11.boolean_setting_table.drop(connection)
 
 
-def _migrate_data_files_tables(connection: sqlalchemy.engine.Connection) -> None:
+def _migrate_data_files_tables(
+    connection: sqlalchemy.engine.Connection,
+    old_data_files: List[sqlalchemy.engine.Row],
+) -> None:
     """Migrate data_files table to new schema with separate input/output tables."""
-    old_data_files = connection.execute(
-        sqlalchemy.select(schema_11.data_files_table)
-    ).fetchall()
-
     schema_11.data_files_table.drop(connection)
 
     schema_13.data_files_table.create(connection)
@@ -131,49 +153,19 @@ def _migrate_data_files_tables(connection: sqlalchemy.engine.Connection) -> None
             )
 
 
-def _migrate_run_table(connection: sqlalchemy.engine.Connection) -> None:
-    """Add input_file_ids and output_file_ids columns to run table."""
-    old_runs = connection.execute(sqlalchemy.select(schema_11.run_table)).fetchall()
-
-    schema_11.run_table.drop(connection)
-
-    schema_13.run_table.create(connection)
-
-    # Migrate run data
-    for old_run in old_runs:
-        connection.execute(
-            sqlalchemy.insert(schema_13.run_table).values(
-                id=old_run.id,
-                created_at=old_run.created_at,
-                protocol_id=old_run.protocol_id,
-                state_summary=old_run.state_summary,
-                engine_status=old_run.engine_status,
-                _updated_at=old_run._updated_at,
-                run_time_parameters=old_run.run_time_parameters,
-                input_file_ids=None,  # Will be populated later
-                output_file_ids=None,
-            )
-        )
-
-
-def _update_foreign_key_references(connection: sqlalchemy.engine.Connection) -> None:
+def _update_foreign_key_references(
+    connection: sqlalchemy.engine.Connection,
+    old_analysis_csv: List[sqlalchemy.engine.Row],
+    old_run_csv: List[sqlalchemy.engine.Row],
+) -> None:
     """Update foreign key references in related tables and populate run file associations."""
-
-    old_analysis_csv = connection.execute(
-        sqlalchemy.select(schema_11.analysis_csv_rtp_table)
-    ).fetchall()
-
-    old_run_csv = connection.execute(
-        sqlalchemy.select(schema_11.run_csv_rtp_table)
-    ).fetchall()
-
     schema_11.analysis_csv_rtp_table.drop(connection)
     schema_11.run_csv_rtp_table.drop(connection)
 
     schema_13.analysis_csv_rtp_table.create(connection)
     schema_13.run_csv_rtp_table.create(connection)
 
-    run_input_files = {}
+    run_input_files: Dict[str, List[str]] = {}
 
     # First pass: Update input_data_files with actual run_ids from run_csv_rtp_table
     # and track which files belong to which runs
@@ -204,46 +196,25 @@ def _update_foreign_key_references(connection: sqlalchemy.engine.Connection) -> 
         )
     )
 
-    # Migrate analysis_csv_rtp_table data with composite foreign key
+    # Migrate analysis_csv_rtp_table data
     for old_row in old_analysis_csv:
-        # We need to find a run_id for this file. Since analysis doesn't have direct run association,
-        # we'll use the first run that uses this file, or skip if no run uses it
-        input_file = connection.execute(
-            sqlalchemy.select(schema_13.input_data_files_table).where(
-                schema_13.input_data_files_table.c.file_id == old_row.file_id
+        connection.execute(
+            sqlalchemy.insert(schema_13.analysis_csv_rtp_table).values(
+                analysis_id=old_row.analysis_id,
+                parameter_variable_name=old_row.parameter_variable_name,
+                file_id=old_row.file_id,  # Direct reference to data_files.id
             )
-        ).first()
+        )
 
-        if input_file:
-            connection.execute(
-                sqlalchemy.insert(schema_13.analysis_csv_rtp_table).values(
-                    analysis_id=old_row.analysis_id,
-                    parameter_variable_name=old_row.parameter_variable_name,
-                    input_file_id=input_file.file_id,
-                    input_run_id=input_file.run_id,
-                )
-            )
-
-    # Migrate run_csv_rtp_table data with composite foreign key
+    # Migrate run_csv_rtp_table data
     for old_row in old_run_csv:
-        input_file = connection.execute(
-            sqlalchemy.select(schema_13.input_data_files_table).where(
-                sqlalchemy.and_(
-                    schema_13.input_data_files_table.c.file_id == old_row.file_id,
-                    schema_13.input_data_files_table.c.run_id == old_row.run_id,
-                )
+        connection.execute(
+            sqlalchemy.insert(schema_13.run_csv_rtp_table).values(
+                run_id=old_row.run_id,
+                parameter_variable_name=old_row.parameter_variable_name,
+                file_id=old_row.file_id,
             )
-        ).first()
-
-        if input_file:
-            connection.execute(
-                sqlalchemy.insert(schema_13.run_csv_rtp_table).values(
-                    run_id=old_row.run_id,
-                    parameter_variable_name=old_row.parameter_variable_name,
-                    input_file_id=input_file.file_id,
-                    input_run_id=input_file.run_id,
-                )
-            )
+        )
 
     # Update run table with input file associations
     all_runs = connection.execute(

@@ -7,6 +7,7 @@ from .types import (
     CmdDataFileInfo,
     MimeType,
     IODataFileInfo,
+    DataFileSource,
 )
 
 
@@ -17,4 +18,5 @@ __all__ = [
     "IODataFileInfo",
     "CmdDataFileInfo",
     "MimeType",
+    "DataFileSource",
 ]
