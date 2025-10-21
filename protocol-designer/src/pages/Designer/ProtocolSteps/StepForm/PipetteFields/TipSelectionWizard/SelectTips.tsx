@@ -105,16 +105,15 @@ export function SelectTips(
     channels,
   })
 
-  const tipAccessibileStatusByWellName = useMemoizedTipAccessibileStatusByWellName(
-    {
+  const tipAccessibileStatusByWellName =
+    useMemoizedTipAccessibileStatusByWellName({
       selectedTiprackId: selectedTiprackId ?? '',
       nozzles,
       pipetteSpecs,
       selectedTips,
       primaryNozzle,
       pipetteId,
-    }
-  )
+    })
 
   const allWellsAffectedByHover = getAffectedWells({
     wellName: hoveredWell,
@@ -287,6 +286,7 @@ export function SelectTips(
             labwareState={activeDeckSetup.labware}
             isAccessible={areAllHoveredWellsAccessibleAndOccupied}
             primaryNozzle={primaryNozzle}
+            text={'test'}
           />
         ) : null}
       </>
