@@ -30,7 +30,6 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import {
-  LabwareButtonBasket,
   LiquidButton,
 } from '/protocol-designer/components/molecules'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
@@ -45,11 +44,11 @@ import {
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { SelectableLabware } from '../Labware/SelectableLabware'
+import { LabwareStackToolboxContainer } from './LabwareToolbox'
 import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import { LabwareStackToolboxContainer } from './LabwareToolbox'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -125,9 +124,18 @@ export function AssignLiquidsModal(
     >
       <Flex
         width="100%"
-        flexDirection={DIRECTION_COLUMN}
+        flexDirection={DIRECTION_ROW}
         overflow={OVERFLOW_AUTO}
+        padding={SPACING.spacing16}
       >
+        {labwareStack.length > 1 ? (
+          <LabwareStackToolboxContainer
+            selectedLabwareIds={selectedLabwareArray}
+            showBadFormState={showBadFormState}
+            setShowBadFormState={setShowBadFormState}
+            setDefineLiquidModal={setDefineLiquidModal}
+          />
+        ) : null}
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gap={SPACING.spacing24}
@@ -165,17 +173,6 @@ export function AssignLiquidsModal(
               </StyledText>
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
-              {labwareStack.length > 1 ? (
-                <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-                  <LabwareButtonBasket
-                    stackOfLabware={labwareStack}
-                    labware={labware}
-                    setSelectedLabware={handleAssignToLabware}
-                    selectedLabware={selectedLabwareArray}
-                  />
-                </Flex>
-              ) : null}
-              <LabwareStackToolboxContainer selectedLabwareIds={selectedLabwareArray} showBadFormState={showBadFormState} setShowBadFormState={setShowBadFormState} setDefineLiquidModal={setDefineLiquidModal} />
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
@@ -273,8 +270,7 @@ export function AssignLiquidsModalContainer(
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-  console.log('allWellContents', allWellContents)
-  console.log('allWellContents[]:', allWellContents[labwareId])
+
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 

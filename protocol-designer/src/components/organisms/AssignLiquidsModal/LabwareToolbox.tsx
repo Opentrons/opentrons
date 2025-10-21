@@ -1,48 +1,28 @@
-import { Controller, useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Banner,
-  Btn,
-  COLORS,
   DIRECTION_COLUMN,
-  DropdownMenu,
   Flex,
   InfoScreen,
-  InputField,
-  JUSTIFY_SPACE_BETWEEN,
-  ListItem,
-  SPACING,
   StyledText,
-  TertiaryButton,
   Toolbox,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { LabwareEntities, LiquidEntities } from '@opentrons/step-generation'
+import { LabwareEntities } from '@opentrons/step-generation'
 
-import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
-import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
-import {
-  removeWellsContents,
-  setWellContents,
-} from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
-import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
-import { getInitialDeckSetup, getLabwareEntities, getLiquidEntities } from '/protocol-designer/step-forms/selectors'
-import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
+import {
+  getInitialDeckSetup,
+  getLabwareEntities,
+} from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import { deselectAllWells } from '/protocol-designer/well-selection/actions'
-import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
-import { LiquidCard } from './LiquidCard'
-
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
-import type { DropdownOption } from '@opentrons/components'
-import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 import { LabwareButtonBasket } from '../../molecules'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 export interface LiquidInfo {
   name: string
@@ -51,21 +31,12 @@ export interface LiquidInfo {
   liquidClassDisplayName: string | null
 }
 
-interface ValidFormValues {
-  selectedLabwareId: string
-  volume: string
-}
-
-interface ToolboxFormValues {
-  selectedLiquidId?: string | null
-  volume?: string | null
-}
 
 interface LabwareStackToolboxData {
   labwareEntities: LabwareEntities
   labware: Record<string, any>
   labwareId: string | null
-  selectedWellGroups: any
+  allWellContents: Record<string, any>
 }
 
 interface LabwareStackToolboxProps {
@@ -85,9 +56,7 @@ export function LabwareStackToolbox({
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const {
-      labwareEntities,
-  } = data
+  const { labwareEntities, labware, labwareId, allWellContents } = data
 
   const handleCancelForm = (): void => {
     dispatch(deselectAllWells())
@@ -95,8 +64,7 @@ export function LabwareStackToolbox({
     reset()
   }
 
-  const labwareStack = labware[labwareId].stack
-
+  const labwareStack = labwareId != null ? labware[labwareId].stack : []
 
   const handleSaveSubmit: (values: ToolboxFormValues) => void = values => {
     handleSaveForm(values)
@@ -107,35 +75,47 @@ export function LabwareStackToolbox({
     navigate('/designer')
   }
 
+  const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
+    labwareId ?? '',
+  ])
+
+  useEffect(() => {
+    setSelectedLabware([labwareId ?? ''])
+  }, [labwareId])
+
+  const handleAssignToLabware = (newItem: string) => {
+    if (labwareId && allWellContents[newItem] == allWellContents[labwareId]) {
+      alert('You cannot assign to the same labware')
+    }
+    setSelectedLabware(prevItems => [...prevItems, newItem])
+  }
+
   return (
     <>
       <Toolbox
+        width="235px"
         title={
           <StyledText desktopStyle="bodyLargeSemiBold">
-            'Stacker Labware'
+            Stacker Labware
           </StyledText>
         }
         onCloseClick={() => {}}
         height="100%"
-        width="21.875rem"
-        confirmButtonText={t('shared:done')}
+        confirmButtonText="Add another labware"
         onConfirmClick={handleConfirmClick}
         closeButton={
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('clear_wells')}
-          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">Select all</StyledText>
         }
       >
         {labwareStack.length > 0 ? (
-            <Flex flexDirection={DIRECTION_COLUMN} width="224px">
-              <LabwareButtonBasket
-                  stackOfLabware={labwareStack}
-                  labware={labware}
-                  setSelectedLabware={handleAssignToLabware}
-                  selectedLabware={selectedLabwareArray}
-              />
-            </Flex>
-
+          <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+            <LabwareButtonBasket
+              stackOfLabware={labwareStack}
+              labware={labware}
+              setSelectedLabware={handleAssignToLabware}
+              selectedLabware={selectedLabwareArray}
+            />
+          </Flex>
         ) : (
           <InfoScreen
             content={t('no_liquids_defined')}
@@ -163,34 +143,18 @@ export function LabwareStackToolboxContainer({
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const selectedWellGroups = useSelector(getSelectedWells)
-  const nickNames = useSelector(getLabwareNicknamesById)
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
   const { labware } = useSelector(getInitialDeckSetup)
-
-  const commonSelectedLiquidId = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonIngredId
+  const allWellContents = useSelector(
+    wellContentsSelectors.getWellContentsForLabwareStack
   )
-  const commonSelectedVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsCommonVolume
-  )
-  const selectedWellsMaxVolume = useSelector(
-    wellContentsSelectors.getSelectedWellsMaxVolume
-  )
-  const liquidSelectionOptions = useSelector(
-    labwareIngredSelectors.getLiquidSelectionOptions
-  )
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
+  console.log('labwareId', labwareId)
+  console.log('labware', labware)
 
   const data: LabwareStackToolboxData = {
     labwareEntities,
-    labwareId,
+    labwareId: labwareId ?? null,
     labware,
-    selectedWellGroups,
+    allWellContents,
   }
 
   return (
