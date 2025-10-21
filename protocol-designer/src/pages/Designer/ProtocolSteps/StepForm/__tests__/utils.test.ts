@@ -1,9 +1,11 @@
 import round from 'lodash/round'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
+  getPipetteWithTipMaxVol,
+  makeContext,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
@@ -13,14 +15,14 @@ import {
   OT2_PLUNGER_MAX_SPEED,
 } from '/protocol-designer/constants'
 
-import { getMaxUiFlowRate } from '../PipetteFields/utils'
+import { getMaxUiFlowRate, getNumPickups } from '../PipetteFields/utils'
 import {
   capitalizeFirstLetter,
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
 } from '../utils'
 
-import type { PipetteChannels } from '@opentrons/shared-data'
+import type * as SharedData from '@opentrons/shared-data'
 import type { FormErrorLocationType } from '/protocol-designer/steplist/formLevel/errors'
 
 const BASE_VISIBLE_FORM_ERROR = {
@@ -29,6 +31,15 @@ const BASE_VISIBLE_FORM_ERROR = {
   location: 'form' as FormErrorLocationType,
 }
 
+const MOCK_INVARIANT_CONTEXT = makeContext()
+
+vi.mock('@opentrons/step-generation', async importOriginal => {
+  const actual = await importOriginal<typeof SharedData>()
+  return {
+    ...actual,
+    getPipetteWithTipMaxVol: vi.fn(),
+  }
+})
 describe('getBlowoutLocationOptionsForForm', () => {
   const destOption = {
     name: 'Destination well',
@@ -234,7 +245,7 @@ describe('getMaxUiFlowRate', () => {
   it('should use the last entry in flowRateFunction if targetVolume is larger than all defined points', () => {
     const largeVolumeArgs = {
       targetVolume: 150,
-      channels: 1 as PipetteChannels,
+      channels: 1,
       robotType: FLEX_ROBOT_TYPE,
       tipLiquidSpecs: mockTipLiquidSpecs,
       flowRateType: 'aspirate',
@@ -246,5 +257,96 @@ describe('getMaxUiFlowRate', () => {
     const expectedMaxFlowRate =
       150 / (expectedTravelMm / FLEX_LOW_THROUGHPUT_PLUNGER_MAX_SPEED)
     expect(getMaxUiFlowRate(largeVolumeArgs)).toEqual(expectedMaxFlowRate)
+  })
+})
+
+describe('getNumPickups', () => {
+  let args: any
+
+  beforeEach(() => {
+    args = {
+      formData: {
+        stepType: 'moveLiquid',
+        changeTip: 'once',
+      },
+      invariantContext: MOCK_INVARIANT_CONTEXT,
+    }
+  })
+
+  it('should return 1 for changeTip once', () => {
+    const result = getNumPickups(args)
+    expect(result).toEqual(1)
+  })
+
+  it('should return 0 for changeTip never', () => {
+    const result = getNumPickups({ ...args, formData: { changeTip: 'never' } })
+    expect(result).toEqual(0)
+  })
+
+  it('should return 0 for step type other than moveLiquid or mix', () => {
+    const result = getNumPickups({ ...args, formData: { stepType: 'comment' } })
+    expect(result).toEqual(0)
+  })
+
+  it('should return 1 for changeTip perSource', () => {
+    const result = getNumPickups({
+      ...args,
+      formData: {
+        ...args.formData,
+        changeTip: 'perSource',
+        aspirate_wells: ['A1', 'A2'],
+      },
+    })
+    expect(result).toEqual(2)
+  })
+
+  it('should return the number of dispense wells for changeTip perDest', () => {
+    const result = getNumPickups({
+      ...args,
+      formData: {
+        ...args.formData,
+        changeTip: 'perDest',
+        dispense_wells: ['B1', 'B2', 'B3'],
+      },
+    })
+    expect(result).toEqual(3)
+  })
+
+  it('should return the number of wells to consider for changeTip perSource with multiWellHandling', () => {
+    vi.mocked(getPipetteWithTipMaxVol).mockReturnValue(100)
+    const result = getNumPickups({
+      ...args,
+      formData: {
+        ...args.formData,
+        changeTip: 'always',
+        path: 'multiDispense',
+        dispense_wells: ['B1', 'B2', 'B3'],
+        volume: 50,
+      },
+      multiWellHandling: {
+        isSupported: true,
+        numWellsToFitInTip: 2,
+      },
+    })
+    expect(result).toEqual(2)
+  })
+
+  it('should return the number of wells to consider for changeTip always with multiWellHandling, multiDispense', () => {
+    vi.mocked(getPipetteWithTipMaxVol).mockReturnValue(100)
+    const result = getNumPickups({
+      ...args,
+      formData: {
+        ...args.formData,
+        changeTip: 'always',
+        path: 'multiAspirate',
+        aspirate_wells: ['A1', 'A2'],
+        volume: 50,
+      },
+      multiWellHandling: {
+        isSupported: true,
+        numWellsToFitInTip: 2,
+      },
+    })
+    expect(result).toEqual(1)
   })
 })

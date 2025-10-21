@@ -109,7 +109,7 @@
   "unsafe/updatePositionEstimators": "Unsafe",
   "unsealPipetteFromTip": "Unseal pipette",
   "verifyTipPresence": "Tip presence",
-  "waitForDuration": "WaitForDuration",
+  "waitForDuration": "Wait",
   "waitForResume": "Wait",
   "waitForTasks": "Wait"
 }

@@ -92,8 +92,17 @@ export function Chip(props: ChipProps): JSX.Element {
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
   const iconColor = CHIP_PROPS_BY_TYPE[type].iconColor
-
-  const smallSize = iconName === 'connection-status' ? '0.5rem' : '0.75rem'
+  const getIconSize = (iconName: string | undefined): string => {
+    switch (iconName) {
+      case 'connection-status':
+        return '0.5rem'
+      case 'circle':
+        return '0.375rem'
+      default:
+        return '0.75rem'
+    }
+  }
+  const smallSize = getIconSize(iconName)
 
   return (
     <Flex

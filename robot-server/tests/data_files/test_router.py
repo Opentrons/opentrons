@@ -18,7 +18,7 @@ from robot_server.data_files.models import (
     FileIdNotFoundError,
     FileInUseError,
 )
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileSource, DataFileInfo, MimeType
 from robot_server.data_files.router import (
     upload_data_file,
     get_data_file_info_by_id,
@@ -105,7 +105,10 @@ async def test_upload_new_data_file(
                 name="abc.csv",
                 file_hash="abc123",
                 created_at=datetime(year=2024, month=6, day=18),
-                source=DataFileSource.UPLOADED,
+                mime_type=MimeType.TEXT_CSV,
+                generated=False,
+                stored=True,
+                path=f"{data_files_directory}/data-file-id/abc.csv",
             )
         ),
     )
@@ -136,7 +139,10 @@ async def test_upload_existing_data_file(
             name="abc.csv",
             file_hash="abc123",
             created_at=datetime(year=2023, month=6, day=18),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            path=f"{data_files_directory}/existing-file-id/abc.csv",
+            stored=True,
+            generated=False,
         )
     )
 
@@ -206,7 +212,10 @@ async def test_upload_new_data_file_path(
                 name="abc.csv",
                 file_hash="abc123",
                 created_at=datetime(year=2024, month=6, day=18),
-                source=DataFileSource.UPLOADED,
+                mime_type=MimeType.TEXT_CSV,
+                path=f"{data_files_directory}/data-file-id/abc.csv",
+                stored=True,
+                generated=False,
             )
         ),
     )
@@ -283,7 +292,10 @@ async def test_get_data_file_info(
             name="abc.xyz",
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path="data_files/qwerty/abc.xyz",
         )
     )
 
@@ -332,7 +344,10 @@ async def test_get_data_file(
             name="abc.xyz",
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path=f"{data_files_directory}/qwerty/abc.xyz",
         )
     )
 
@@ -374,14 +389,20 @@ async def test_get_all_data_file_info(
                 name="abc.xyz",
                 file_hash="123",
                 created_at=datetime(year=2024, month=7, day=15),
-                source=DataFileSource.UPLOADED,
+                mime_type=MimeType.TEXT_CSV,
+                generated=False,
+                stored=True,
+                path="data_files/qwerty/abc.xyz",
             ),
             DataFileInfo(
                 id="hfhcjdeowjfie",
                 name="mcd.kfc",
                 file_hash="124",
                 created_at=datetime(year=2024, month=7, day=22),
-                source=DataFileSource.UPLOADED,
+                mime_type=MimeType.TEXT_CSV,
+                generated=False,
+                stored=True,
+                path="data_files/hfhcjdeowjfie/mcd.kfc",
             ),
         ]
     )
@@ -414,7 +435,7 @@ async def test_delete_by_file_id(
     result = await delete_file_by_id(
         dataFileId="file-id", data_files_store=data_files_store
     )
-    decoy.verify(data_files_store.remove(file_id="file-id"))
+    decoy.verify(data_files_store.remove_stored(file_id="file-id"))
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -425,7 +446,7 @@ async def test_delete_non_existent_file(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file ID doesn't exist."""
-    decoy.when(data_files_store.remove("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
         FileIdNotFoundError(data_file_id="file-id")
     )
 
@@ -440,7 +461,7 @@ async def test_delete_file_in_use(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file to be deleted is in use."""
-    decoy.when(data_files_store.remove("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
         FileInUseError(
             data_file_id="file-id", ids_used_in_runs=set(), ids_used_in_analyses=set()
         )

@@ -1,12 +1,23 @@
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { SlotDetails } from '../Protocols/ProtocolVisualization/SlotDetails'
 
+import type {
+  Liquid,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+
+interface StepDetailData {
+  analysis: ProtocolAnalysisOutput
+  robotState: RobotState
+  invariantContext: InvariantContext
+  command: RunTimeCommand
+  slot: string
+  liquids: Liquid[]
+}
 interface StepDetailViewerParams {
   protocolKey: string
 }
@@ -16,14 +27,69 @@ export function StepDetailViewer(): JSX.Element {
     keyof StepDetailViewerParams
   >() as StepDetailViewerParams
 
+  const [data, setData] = useState<StepDetailData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchData = async (): Promise<void> => {
+      try {
+        const result: StepDetailData =
+          await global.APP_SHELL_REMOTE.ipcRenderer.invoke(
+            'get-step-detail-data',
+            protocolKey
+          )
+        if (isMounted) {
+          setData(result)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error(error)
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    // initial fetch
+    fetchData()
+
+    // listen for updates
+    const listener = (_event: unknown, updatedKey: string): void => {
+      if (updatedKey === protocolKey) {
+        fetchData()
+      }
+    }
+
+    global.APP_SHELL_REMOTE.ipcRenderer.on('step-detail-data-updated', listener)
+
+    return () => {
+      isMounted = false
+      global.APP_SHELL_REMOTE.ipcRenderer.removeListener(
+        'step-detail-data-updated',
+        listener
+      )
+    }
+  }, [protocolKey])
+
+  if (loading) {
+    return <div>loading</div>
+  }
+  if (!data) {
+    return <div>no data found</div>
+  }
+  const { slot, command, robotState, invariantContext, analysis, liquids } =
+    data
+
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
-      padding={SPACING.spacing16}
-    >
-      <StyledText as="h1">Step Detail Viewer</StyledText>
-      <StyledText as="p">Protocol Key: {protocolKey}</StyledText>
-    </Flex>
+    <SlotDetails
+      slotId={slot}
+      command={command}
+      robotState={robotState}
+      invariantContext={invariantContext}
+      analysis={analysis}
+      liquids={liquids}
+    />
   )
 }
