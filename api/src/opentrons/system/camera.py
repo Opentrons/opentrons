@@ -121,6 +121,10 @@ async def update_live_stream_status(
     stream_status: bool, camera_provider: CameraProvider
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
+    if not IS_ROBOT:
+        # If we are not on a robot we simply no-op updating the stream
+        return None
+
     contents = load_stream_configuration_file_data()
     if contents is None:
         log.error("Opentrons Live Stream Configuraiton file cannot be updated.")
