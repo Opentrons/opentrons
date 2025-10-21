@@ -49,10 +49,22 @@ def data_files_directory(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def subject(sql_engine: SQLEngine, data_files_directory: Path) -> DataFilesStore:
+def images_directory(tmp_path: Path) -> Path:
+    """Return a directory for storing camera capture files."""
+    subdirectory = tmp_path / "images"
+    subdirectory.mkdir()
+    return subdirectory
+
+
+@pytest.fixture
+def subject(
+    sql_engine: SQLEngine, data_files_directory: Path, images_directory: Path
+) -> DataFilesStore:
     """Get a DataFilesStore test subject."""
     return DataFilesStore(
-        sql_engine=sql_engine, data_files_directory=data_files_directory
+        sql_engine=sql_engine,
+        data_files_directory=data_files_directory,
+        images_directory=images_directory,
     )
 
 

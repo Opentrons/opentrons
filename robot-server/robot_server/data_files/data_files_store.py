@@ -44,10 +44,12 @@ class DataFilesStore:
         self,
         sql_engine: sqlalchemy.engine.Engine,
         data_files_directory: Path,
+        images_directory: Path,
     ) -> None:
         """Create a new DataFilesStore."""
         self._sql_engine = sql_engine
         self._data_files_directory = data_files_directory
+        self._images_directory = images_directory
 
     def get_file_info_by_hash(self, file_hash: str) -> Optional[DataFileInfo]:
         """Get the data file info having the provided hash."""
@@ -357,11 +359,72 @@ class DataFilesStore:
                     data_files_table.delete().where(data_files_table.c.id == file_id)
                 )
 
-        file_dir = self._data_files_directory.joinpath(file_id)
-        if file_dir.exists():
-            for file in file_dir.glob("*"):
+        file_path = Path(file_exists.path)
+        self._remove_directory_and_contents(file_path.parent)
+
+    def remove_all_by_run_id(self, run_id: str) -> None:
+        """Remove all data files associated with a specific run.
+
+        Strategy:
+        - Always delete all entries from output_data_files table for this run
+        - Always delete all physical files in the images directory for this run
+        - For each output file: if it has no entries in input_data_files table,
+          fully remove from data_files table and delete the physical file
+        - If a file has entries in input_data_files table, preserve the physical file
+          and entries in the input_data_files table and the data_files table
+        """
+        run_image_dir = self._images_directory / run_id
+        self._remove_directory_and_contents(run_image_dir)
+
+        select_output_files_for_run = sqlalchemy.select(
+            output_data_files_table.c.file_id
+        ).where(output_data_files_table.c.run_id == run_id)
+
+        with self._sql_engine.begin() as transaction:
+            output_file_ids = list(
+                transaction.execute(select_output_files_for_run).scalars().all()
+            )
+
+            if output_file_ids:
+                transaction.execute(
+                    output_data_files_table.delete().where(
+                        output_data_files_table.c.run_id == run_id
+                    )
+                )
+
+                files_to_fully_remove = []
+                for file_id in output_file_ids:
+                    select_input_entries = sqlalchemy.select(
+                        input_data_files_table.c.file_id
+                    ).where(input_data_files_table.c.file_id == file_id)
+
+                    input_entries = transaction.execute(select_input_entries).first()
+
+                    if input_entries is None:
+                        files_to_fully_remove.append(file_id)
+
+                if files_to_fully_remove:
+                    select_files = sqlalchemy.select(data_files_table).where(
+                        data_files_table.c.id.in_(files_to_fully_remove)
+                    )
+                    file_rows = transaction.execute(select_files).all()
+
+                    transaction.execute(
+                        data_files_table.delete().where(
+                            data_files_table.c.id.in_(files_to_fully_remove)
+                        )
+                    )
+
+                    for file_row in file_rows:
+                        file_path = Path(file_row.path)
+                        self._remove_directory_and_contents(file_path.parent)
+
+    def _remove_directory_and_contents(self, directory: Path) -> None:
+        """Remove a directory and all its contents."""
+        if directory.exists():
+            for file in directory.glob("*"):
                 file.unlink()
-            file_dir.rmdir()
+            directory.rmdir()
 
 
 def _convert_row_to_data_file_info(row: sqlalchemy.engine.Row) -> DataFileInfo:

@@ -1,5 +1,6 @@
 """Auto-delete old user data files to make room for new ones."""
 from logging import getLogger
+from typing import Set
 
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.deletion_planner import DataFileDeletionPlanner
@@ -36,3 +37,20 @@ class DataFileAutoDeleter:
             )
             for file_id in file_ids_to_delete:
                 self._data_files_store.remove_stored(file_id)
+
+    def make_room_for_new_generated_files(self, run_ids_to_delete: Set[str]) -> None:
+        """Delete generated data files associated with runs being deleted."""
+        if not run_ids_to_delete:
+            return
+
+        _log.info(
+            f"Auto-deleting generated files associated with runs: {run_ids_to_delete}"
+        )
+
+        for run_id in run_ids_to_delete:
+            try:
+                self._data_files_store.remove_all_by_run_id(run_id)
+            except Exception as e:
+                _log.warning(
+                    f"Failed to delete files for run {run_id}: {e}", exc_info=True
+                )
