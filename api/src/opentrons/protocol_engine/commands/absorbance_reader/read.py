@@ -17,6 +17,7 @@ from ...resources.file_provider import (
     ReadData,
     MAXIMUM_FILE_LIMIT,
     ReadCmdFileNameMetadata,
+    FileNameCmdMetadata,
 )
 from ...resources import FileProvider
 from ...state import update_types
@@ -174,6 +175,12 @@ class ReadAbsorbanceImpl(
             )
 
             if isinstance(plate_read_result, PlateReaderData):
+                this_cmd_id = self._state_view.commands.get_running_command_id()
+                prev_cmd = (
+                    self._state_view.commands.get_most_recently_finalized_command()
+                )
+                prev_cmd_id = prev_cmd.command.id if prev_cmd is not None else None
+
                 # Write a CSV file for each of the measurements taken
                 for measurement in plate_read_result.read_results:
                     csv_bytes = plate_read_result.build_csv_bytes(
@@ -185,6 +192,9 @@ class ReadAbsorbanceImpl(
                         command_metadata=ReadCmdFileNameMetadata(
                             base_filename=params.fileName,
                             wavelength=measurement.wavelength,
+                            command_id_info=FileNameCmdMetadata(
+                                command_id=this_cmd_id, prev_command_id=prev_cmd_id
+                            ),
                         ),
                     )
                     file_ids.append(file_info.id)

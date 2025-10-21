@@ -26,7 +26,7 @@ class ReadCmdFileNameMetadata:
 
     base_filename: str
     wavelength: int
-    command_id_info = None
+    command_id_info: FileNameCmdMetadata
 
 
 @dataclass(frozen=True)
