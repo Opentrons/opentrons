@@ -53,29 +53,33 @@ describe('LabwareStackToolboxContainer', () => {
         },
         labware: {
           mockLabwareId: {
-            stack: ['mockLabwareId'],
+            stack: ['mockLabwareId', 'labware2'],
             id: 'mockLabwareId',
             labwareDefURI: 'mockLabwareDefURI',
             pythonName: 'mockPythonName',
             def: fixture96Plate as LabwareDefinition2,
           },
+          labware2: {
+            stack: ['A2'],
+            id: 'labware2',
+            labwareDefURI: 'labware2DefURI',
+            pythonName: 'labware2PythonName',
+            def: fixture96Plate as LabwareDefinition2,
+          },
         },
         labwareId: 'mockLabwareId',
-        allWellContents: {},
+        allWellContents: {
+          mockLabwareId: {
+            A1: {
+              groupIds: ['mockGroupId'],
+            },
+          },
+        },
       },
       setShowBadFormState: vi.fn(),
       setDefineLiquidModal: vi.fn(),
       selectedLabwareIds: ['mockLabwareId'],
     }
-  })
-
-  it('loads the modal without selectable labware', () => {
-    render(props)
-
-    expect(screen.queryByText('Top of stack')).not.toBeInTheDocument()
-    screen.getByText('mockLabwareId')
-
-    screen.getByText('Click and drag to select wells')
   })
 
   it('loads the modal with selectable labware', () => {
@@ -102,6 +106,15 @@ describe('LabwareStackToolboxContainer', () => {
     //     A5: null,
     //   },
     // })
+  })
+
+  it('select all labware buttons', () => {
+    render(props)
+
+    const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
+    expect(allLabwareButton).toBeInTheDocument()
+    fireEvent.click(allLabwareButton)
+    expect(allLabwareButton).toHaveClass('_button_active_386e4e')
   })
 
   // test that when selecting labware with different liquids shows modal

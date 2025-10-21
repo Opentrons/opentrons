@@ -57,13 +57,16 @@ export function LabwareStackToolbox({
 
   const { labware, labwareId, allWellContents } = data
 
+  console.log('labwareId', labwareId)
+  console.log('labware', labware)
+  console.log('allWellContents', allWellContents)
   const handleCancelForm = (): void => {
     dispatch(deselectAllWells())
     setShowBadFormState(false)
     reset()
   }
 
-  const labwareStack = labwareId != null ? labware[labwareId].stack : []
+  const labwareStack = labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
   const handleSaveSubmit: (values: ToolboxFormValues) => void = values => {
     handleSaveForm(values)
@@ -82,9 +85,15 @@ export function LabwareStackToolbox({
     setSelectedLabware([labwareId ?? ''])
   }, [labwareId])
 
+  const handleSelectAllLabware = (): void => {
+    setSelectedLabware(labwareStack)
+  }
+
   const handleAssignToLabware = (newItem: string): void => {
-    if (labwareId && allWellContents[newItem] === allWellContents[labwareId]) {
-      alert('You cannot assign to the same labware')
+    if (labwareId && allWellContents[newItem] !== allWellContents[labwareId]) {
+      console.error(
+        'You cannot assign to the labware with the different liquid'
+      )
     }
     setSelectedLabware(prevItems => [...prevItems, newItem])
   }
@@ -98,12 +107,17 @@ export function LabwareStackToolbox({
             Stacker Labware
           </StyledText>
         }
-        onCloseClick={() => {}}
+        onCloseClick={handleSelectAllLabware}
         height="100%"
         confirmButtonText="Add another labware"
         onConfirmClick={handleConfirmClick}
         closeButton={
-          <StyledText desktopStyle="bodyDefaultRegular">Select all</StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            onClick={handleSelectAllLabware}
+          >
+            Select all
+          </StyledText>
         }
       >
         {labwareStack.length > 0 ? (
@@ -142,12 +156,10 @@ export function LabwareStackToolboxContainer({
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const labware = useSelector(getInitialDeckSetup)
+  const { labware } = useSelector(getInitialDeckSetup)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-  console.log('labwareId', labwareId)
-  console.log('labware', labware)
 
   const data: LabwareStackToolboxData = {
     labwareEntities,
