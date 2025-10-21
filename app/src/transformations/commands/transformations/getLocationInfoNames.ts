@@ -1,6 +1,10 @@
 import {
   getLabwareDisplayName,
   getLabwareStackCountAndLocation,
+  locationIsOnAddressableArea,
+  locationIsOnDeck,
+  locationIsOnModule,
+  locationIsOnSlot,
 } from '@opentrons/shared-data'
 
 import type {
@@ -53,7 +57,7 @@ export function getLocationInfoNames(
     loadLabwareCommands
   )
 
-  if (labwareLocation === 'offDeck' || labwareLocation === 'systemLocation') {
+  if (!locationIsOnDeck(labwareLocation)) {
     return { slotName: 'Off deck', labwareName, labwareQuantity }
   } else if ('slotName' in labwareLocation) {
     return { slotName: labwareLocation.slotName, labwareName, labwareQuantity }
@@ -89,11 +93,7 @@ export function getLocationInfoNames(
         `expected to find an adapter under the labware but could not with labwareId ${labwareLocation.labwareId}`
       )
       return { slotName: '', labwareName: labwareName, labwareQuantity }
-    } else if (
-      loadedAdapterCommand?.params.location !== 'offDeck' &&
-      loadedAdapterCommand?.params.location !== 'systemLocation' &&
-      'slotName' in loadedAdapterCommand?.params.location
-    ) {
+    } else if (locationIsOnSlot(loadedAdapterCommand?.params.location)) {
       return {
         slotName: loadedAdapterCommand?.params.location.slotName,
         labwareName,
@@ -104,9 +104,7 @@ export function getLocationInfoNames(
         labwareQuantity,
       }
     } else if (
-      loadedAdapterCommand?.params.location !== 'offDeck' &&
-      loadedAdapterCommand?.params.location !== 'systemLocation' &&
-      'addressableAreaName' in loadedAdapterCommand?.params.location
+      locationIsOnAddressableArea(loadedAdapterCommand?.params.location)
     ) {
       return {
         slotName: loadedAdapterCommand?.params.location.addressableAreaName,
@@ -117,11 +115,7 @@ export function getLocationInfoNames(
         adapterId: loadedAdapterCommand?.result?.labwareId,
         labwareQuantity,
       }
-    } else if (
-      loadedAdapterCommand?.params.location !== 'offDeck' &&
-      loadedAdapterCommand?.params.location !== 'systemLocation' &&
-      'moduleId' in loadedAdapterCommand?.params.location
-    ) {
+    } else if (locationIsOnModule(loadedAdapterCommand?.params.location)) {
       const moduleId = loadedAdapterCommand?.params.location.moduleId
       const loadModuleCommandUnderAdapter = loadModuleCommands?.find(
         command => command.result?.moduleId === moduleId

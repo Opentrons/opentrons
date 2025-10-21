@@ -1,3 +1,5 @@
+import { locationIsOnDeck } from '@opentrons/shared-data'
+
 import {
   getLabwareLocation,
   getModuleInitialLoadInfo,
@@ -22,7 +24,7 @@ export const getLegacyLabwareOffsetLocation = (
 ): LegacyLabwareOffsetLocation | null => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
 
-  if (labwareLocation === 'offDeck' || labwareLocation === 'systemLocation') {
+  if (!locationIsOnDeck(labwareLocation)) {
     return null
   } else if ('moduleId' in labwareLocation) {
     const module = modules.find(
@@ -36,11 +38,7 @@ export const getLegacyLabwareOffsetLocation = (
     return { slotName, moduleModel }
   } else if ('labwareId' in labwareLocation) {
     const adapter = labware.find(lw => lw.id === labwareLocation.labwareId)
-    if (
-      adapter == null ||
-      adapter.location === 'offDeck' ||
-      adapter.location === 'systemLocation'
-    ) {
+    if (adapter == null || !locationIsOnDeck(adapter.location)) {
       return null
     } else if ('slotName' in adapter.location) {
       return {
