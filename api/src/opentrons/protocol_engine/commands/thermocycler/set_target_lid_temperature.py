@@ -97,7 +97,7 @@ class SetTargetLidTemperatureImpl(
         )
 
 
-class SetTargetLidTemperature( 
+class SetTargetLidTemperature(
     BaseCommand[
         SetTargetLidTemperatureParams,
         SetTargetLidTemperatureResult,
