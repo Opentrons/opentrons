@@ -55,6 +55,8 @@ def _determine_application(ref_type: str, ref_name: str) -> str:
         return "protocol_designer"
     elif "Labware Library test, build, and deploy" in workflow_name:
         return "labware_library"
+    elif "Components test, build, and deploy" in workflow_name:
+        return "components"
     elif "API docs build" in workflow_name:
         return "docs"
 

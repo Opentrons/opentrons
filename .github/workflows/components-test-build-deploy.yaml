@@ -36,6 +36,30 @@ env:
   CI: true
 
 jobs:
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
@@ -54,7 +78,7 @@ jobs:
   build-components-storybook:
     name: 'build components artifact'
     runs-on: 'ubuntu-24.04'
-    needs: ['js-unit-test']
+    needs: ['determine-deploy-config', 'js-unit-test']
     steps:
       - uses: 'actions/checkout@v4'
       - uses: ./.github/actions/js/setup
@@ -70,8 +94,8 @@ jobs:
   deploy-components:
     name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-24.04'
-    needs: ['js-unit-test', 'build-components-storybook']
-    if: always() && needs.build-components-storybook.result == 'success'
+    needs: ['determine-deploy-config', 'js-unit-test', 'build-components-storybook']
+    if: always() && needs.build-components-storybook.result == 'success' && needs.determine-deploy-config.result == 'success'
     permissions:
       id-token: write
       contents: read
@@ -103,10 +127,10 @@ jobs:
       - name: Deploy to S3
         working-directory: scripts/static-deploy
         run: make deploy \
-          APPLICATION=components \
-          ENVIRONMENT=sandbox \
-          SANDBOX_PREFIX=components \
-          RELATIVE_ARTIFACT_DIR=../../dist
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
 
   publish-components:
     name: 'publish components package to npm'
