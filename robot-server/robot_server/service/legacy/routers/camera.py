@@ -2,7 +2,6 @@ import logging
 import os
 import io
 import tempfile
-from functools import lru_cache
 from typing import Annotated
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends
@@ -383,7 +382,7 @@ def _live_stream_settings_to_configuration_file(
     settings: LiveStreamSettings, stream_status: StreamStatusType
 ) -> None:
     contents: dict[str, str] = {
-        StreamConfigurationKeys.BOOT_ID: _get_boot_id(),
+        StreamConfigurationKeys.BOOT_ID: camera.get_boot_id(),
         StreamConfigurationKeys.STATUS: stream_status,
         StreamConfigurationKeys.SOURCE: settings.source,
         StreamConfigurationKeys.RESOLUTION: f"{settings.resolution.width}x{settings.resolution.height}",
@@ -401,11 +400,3 @@ def _validate_camera_present() -> None:
             message=f"No video device found with device path: {DEFAULT_CAMERA_PATH}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
-
-
-@lru_cache(maxsize=1)
-def _get_boot_id() -> str:
-    if IS_ROBOT:
-        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    else:
-        return "SIMULATED_BOOT_ID"
