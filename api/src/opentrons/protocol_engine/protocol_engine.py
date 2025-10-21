@@ -13,6 +13,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
+from opentrons.system import camera
 
 from .actions.actions import (
     ResumeFromRecoveryAction,
@@ -480,7 +481,7 @@ class ProtocolEngine:
         )
         self._state_store.commands.raise_fatal_command_error()
 
-    async def finish(
+    async def finish(  # noqa: C901
         self,
         error: Optional[Exception] = None,
         drop_tips_after_run: bool = True,
@@ -593,6 +594,11 @@ class ProtocolEngine:
             )
         else:
             finish_error_details = None
+
+        try:
+            await camera.update_live_stream_status(False, self._camera_provider)
+        except Exception as e:
+            _log.exception(f"Exception during live stream post-run cleanup: {e}")
 
         self._action_dispatcher.dispatch(
             HardwareStoppedAction(
