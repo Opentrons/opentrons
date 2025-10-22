@@ -62,18 +62,8 @@ export function LabwareStackToolbox({
   console.log('labwareId', labwareId)
   console.log('labware', labware)
   console.log('allWellContents', allWellContents)
-  const handleCancelForm = (): void => {
-    dispatch(deselectAllWells())
-    setShowBadFormState(false)
-    reset()
-  }
 
   const labwareStack = labwareId != null ? labware[labwareId]?.stack ?? [] : []
-
-  const handleSaveSubmit: (values: ToolboxFormValues) => void = values => {
-    handleSaveForm(values)
-    reset()
-  }
 
   const handleConfirmClick = (): void => {
     navigate('/designer')
@@ -91,16 +81,22 @@ export function LabwareStackToolbox({
     setSelectedLabware(labwareStack)
   }
 
-  const handleAssignToLabware = (newItem: string): void => {
+  const handleAssignToLabware = (
+    newItem: string,
+    event: React.MouseEvent<HTMLButtonElement>
+  ): void => {
     if (
       labwareId &&
+      (event.metaKey || event.ctrlKey) &&
       JSON.stringify(allWellContents[newItem]) !==
         JSON.stringify(allWellContents[labwareId])
     ) {
       console.error('selected labware have different liquid layouts')
       setShowLiquidLayoutOverlay(true)
-    } else {
+    } else if (event.metaKey || event.ctrlKey) {
       setSelectedLabware(prevItems => [...prevItems, newItem])
+    } else {
+      setSelectedLabware([newItem])
     }
   }
 

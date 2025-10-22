@@ -9,7 +9,10 @@ interface LabwareButtonProps {
   numberInStack: number
   displayName: string
   isSelected: boolean
-  onClick: (labwareId: string) => void
+  onClick: (
+    labwareId: string,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => void
   id: string
 }
 export function LabwareButton(props: LabwareButtonProps): JSX.Element {
@@ -21,8 +24,8 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   return (
     <button
       data-testid={`LabwareButton-${numberInStack}`}
-      onClick={() => {
-        onClick(id)
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+        onClick(id, event)
       }}
       className={clsx(styles.button, { [styles.button_active]: isSelected })}
     >

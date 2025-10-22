@@ -134,8 +134,28 @@ describe('LabwareStackToolboxContainer', () => {
       name: '0 ANSI 96 Standard Microplate',
     })
     expect(labwareButton).toBeInTheDocument()
-    fireEvent.click(labwareButton)
+    fireEvent.click(labwareButton, { ctrlKey: true })
     expect(setShowLiquidLayoutOverlay).toHaveBeenCalledWith(true)
     expect(labwareButton).not.toHaveClass('_button_active_386e4e')
+  })
+
+  it('selects a single labware when ctrl key is not pressed', () => {
+    render(props)
+    const labwareButton = screen.getByRole('button', {
+      name: '0 ANSI 96 Standard Microplate',
+    })
+    expect(labwareButton).toBeInTheDocument()
+    fireEvent.click(labwareButton)
+    expect(props.selectedLabwareIds).toEqual(['mockLabwareId'])
+  })
+
+  it('selects multiple labware when ctrl key is pressed with different liquids', () => {
+    render(props)
+    const labwareButton = screen.getByRole('button', {
+      name: '0 ANSI 96 Standard Microplate',
+    })
+    expect(labwareButton).toBeInTheDocument()
+    fireEvent.click(labwareButton, { ctrlKey: true })
+    expect(props.selectedLabwareIds).toEqual(['mockLabwareId'])
   })
 })

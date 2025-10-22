@@ -10,7 +10,10 @@ import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/s
 interface LabwareButtonBasketProps {
   stackOfLabware: string[]
   labware: AllTemporalPropertiesForTimelineFrame['labware']
-  setSelectedLabware: (selectedLabwareId: string) => void
+  setSelectedLabware: (
+    selectedLabwareId: string,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => void
   selectedLabware: string[]
 }
 export function LabwareButtonBasket(
@@ -30,8 +33,8 @@ export function LabwareButtonBasket(
               numberInStack={stackOfLabware.length - 1 - index}
               displayName={labware[item].def.metadata.displayName}
               isSelected={selectedLabware.includes(item)}
-              onClick={id => {
-                setSelectedLabware(id)
+              onClick={(id, event) => {
+                setSelectedLabware(id, event)
               }}
               id={item}
             />
