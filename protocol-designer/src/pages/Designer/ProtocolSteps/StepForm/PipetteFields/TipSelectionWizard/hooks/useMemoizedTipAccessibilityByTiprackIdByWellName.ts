@@ -85,7 +85,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
               getIsSafePipetteMovement({
                 robotState,
                 invariantContext,
-                pipetteId: pipetteId,
+                pipetteId,
                 labwareId: id,
                 wellLocationOffset: { x: 0, y: 0 },
                 wellTargetName: wellName,
