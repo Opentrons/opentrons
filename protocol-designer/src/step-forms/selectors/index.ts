@@ -452,15 +452,16 @@ export const getOrderedStepIds: Selector<BaseState, StepIdType[]> =
   createSelector(rootSelector, state => state.orderedStepIds)
 export const getSavedStepForms: Selector<BaseState, SavedStepFormState> =
   createSelector(rootSelector, state => state.savedStepForms)
-const getOrderedSavedForms: Selector<BaseState, FormData[]> = createSelector(
-  getOrderedStepIds,
-  getSavedStepForms,
-  (orderedStepIds, savedStepForms) => {
-    return orderedStepIds
-      .map(stepId => savedStepForms[stepId])
-      .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
-  }
-)
+export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
+  createSelector(
+    getOrderedStepIds,
+    getSavedStepForms,
+    (orderedStepIds, savedStepForms) => {
+      return orderedStepIds
+        .map(stepId => savedStepForms[stepId])
+        .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
+    }
+  )
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
     getUnsavedForm,
