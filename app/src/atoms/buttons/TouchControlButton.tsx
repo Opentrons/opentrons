@@ -8,7 +8,6 @@ import {
   CURSOR_DEFAULT,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
@@ -79,13 +78,8 @@ export function TouchControlButton(props: TouchControlProps): JSX.Element {
   return (
     <StyledTouchButton isActive={isActive} onClick={onClick} isOnOdd={isOnOdd}>
       <StyledText
-        oddStyle={'level4HeaderSemiBold'}
+        oddStyle={'bodyTextSemiBold'}
         desktopStyle={'bodyDefaultSemiBold'}
-        fontWeight={
-          isOnOdd
-            ? TYPOGRAPHY.level4HeaderSemiBold
-            : TYPOGRAPHY.fontWeightSemiBold
-        }
         color={
           isActive && !isOnOdd
             ? COLORS.blue50
@@ -97,7 +91,7 @@ export function TouchControlButton(props: TouchControlProps): JSX.Element {
         {text1}
       </StyledText>
       <StyledText
-        oddStyle={'level4HeaderRegular'}
+        oddStyle={'bodyTextRegular'}
         desktopStyle={'captionRegular'}
         color={isActive && isOnOdd ? COLORS.white : COLORS.grey60}
       >
