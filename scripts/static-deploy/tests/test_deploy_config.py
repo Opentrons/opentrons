@@ -107,6 +107,19 @@ def test_get_deploy_config_with_env_vars():
     assert sandbox_designer.s3_bucket == "opentrons.sandbox.designer"
     assert staging_designer.s3_bucket == "opentrons.staging.designer"
 
+    # Test components configuration
+    sandbox_components = get_config("sandbox", "components")
+    staging_components = get_config("staging", "components")
+    production_components = get_config("production", "components")
+
+    assert sandbox_components.s3_bucket == "opentrons.sandbox.components"
+    assert sandbox_components.url == "http://sandbox.components.opentrons.com/"
+    assert sandbox_components.cloudfront_id is None
+
+    # Components only available in sandbox, so staging and production point to sandbox
+    assert staging_components.s3_bucket == "opentrons.sandbox.components"
+    assert production_components.s3_bucket == "opentrons.sandbox.components"
+
 
 def test_get_deploy_config_with_defaults():
     """Test that get_deploy_config returns static configuration values."""
