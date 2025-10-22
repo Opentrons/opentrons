@@ -114,12 +114,21 @@ describe('LabwareStackToolboxContainer', () => {
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
     fireEvent.click(allLabwareButton)
-    expect(allLabwareButton).toHaveClass('_button_active_386e4e')
+    const firstlabwareButton = screen.getByRole('button', {
+      name: '0 ANSI 96 Standard Microplate',
+    })
+    const secondlabwareButton = screen.getByRole('button', {
+      name: '1 ANSI 96 Standard Microplate',
+    })
+    expect(firstlabwareButton).toHaveClass('_button_active_386e4e')
+    expect(secondlabwareButton).toHaveClass('_button_active_386e4e')
   })
 
   it('select shows an overlay when liquids dont match', () => {
     render(props)
-    const labwareButton = screen.getByRole('button', { name: 'Labware2' })
+    const labwareButton = screen.getByRole('button', {
+      name: '0 ANSI 96 Standard Microplate',
+    })
     expect(labwareButton).toBeInTheDocument()
     fireEvent.click(labwareButton)
     expect(labwareButton).toHaveClass('_button_active_386e4e')
