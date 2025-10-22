@@ -457,6 +457,7 @@ const getSubmergeRetractFields = (args: {
   additionalEquipmentEntities?: AdditionalEquipmentEntities
   isDisposalVolumeEnabled?: boolean
   isConditioningVolumeEnabled?: boolean
+  blowoutMaxUiFlowRate?: number | null
 }): Record<string, any> => {
   const {
     submergeRetractLookup,
@@ -466,6 +467,7 @@ const getSubmergeRetractFields = (args: {
     additionalEquipmentEntities,
     isDisposalVolumeEnabled = false,
     isConditioningVolumeEnabled = false,
+    blowoutMaxUiFlowRate = null,
   } = args
 
   // all common submerge and retract fields
@@ -507,6 +509,9 @@ const getSubmergeRetractFields = (args: {
           blowout: submergeRetractLookup.blowout,
           additionalEquipmentEntities,
           disable: isDisposalVolumeEnabled,
+          ...(blowoutMaxUiFlowRate != null
+            ? { hardwareMaximumFlowRate: blowoutMaxUiFlowRate }
+            : {}),
         })
       : {}
 
@@ -719,6 +724,15 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
           correctionVolume: dispenseCorrectionVolume,
         })
       : null
+  const blowoutMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'blowout',
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+        })
+      : null
 
   const aspirateFlowRateFields = getFlowRateFields(
     volume,
@@ -806,9 +820,11 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     dispense_retract_delay_seconds: 0,
     dispense_submerge_delay_seconds: 0,
     blowout_flowRate:
-      dispense.retract.blowout.params?.flowRate ??
-      matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default ??
-      null,
+      min([
+        dispense.retract.blowout.params?.flowRate ??
+          matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default,
+        blowoutMaxUiFlowRate,
+      ]) ?? null,
   }
   return {
     ...getDefaultsForStepType(stepType),
@@ -906,6 +922,7 @@ const getNoLiquidClassValuesMix = (args: {
           correctionVolume: dispenseCorrectionVolume,
         })
       : null
+
   if (robotType === OT2_ROBOT_TYPE || liquidClassValuesForTip == null) {
     return {
       aspirate_flowRate:
@@ -933,6 +950,16 @@ const getNoLiquidClassValuesMix = (args: {
     dispenseMaxUiFlowRate
   )
 
+  const blowoutMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'blowout',
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+        })
+      : null
+
   const pushOutVolume =
     linearInterpolate(
       volume,
@@ -950,6 +977,10 @@ const getNoLiquidClassValuesMix = (args: {
     mix_touchTip_speed: singleDispense.retract.touchTip.params?.speed,
     mix_touchTip_mmFromEdge: singleDispense.retract.touchTip.params?.mmFromEdge,
     mix_touchTip_mmFromTop: singleDispense.retract.touchTip.params?.zOffset,
+    blowout_flowRate: min([
+      singleDispense.retract.blowout.params?.flowRate,
+      blowoutMaxUiFlowRate,
+    ]),
   }
 
   return {
@@ -1101,6 +1132,16 @@ const getLiquidClassValuesMoveLiquid = (args: {
         })
       : null
 
+  const blowoutMaxUiFlowRate =
+    matchingTipLiquidSpecs != null
+      ? getMaxUiFlowRate({
+          channels: pipetteSpecs.channels,
+          robotType,
+          flowRateType: 'blowout',
+          shaftULperMM: pipetteSpecs.shaftULperMM,
+        })
+      : null
+
   const aspirateFlowRateFields = getFlowRateFields(
     byVolumeLookup.flowRate.aspirate,
     aspirateFlowRateByVolume,
@@ -1195,6 +1236,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
     tipMovement: 'retract',
     additionalEquipmentEntities,
     isDisposalVolumeEnabled,
+    blowoutMaxUiFlowRate,
   })
 
   const aspirateFields = {

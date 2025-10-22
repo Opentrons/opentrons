@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  locationIsOnAddressableArea,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
@@ -17,6 +18,7 @@ import { getUnoccupiedSlotForTrash } from '../../../step-forms'
 import type {
   AddressableAreaName,
   CreateCommand,
+  LabwareLocation,
   LoadLabwareCreateCommand,
   MoveLabwareCreateCommand,
   MoveToAddressableAreaCreateCommand,
@@ -75,12 +77,10 @@ const getStagingAreaSlotNames = (
           command
         ): command is MoveLabwareCreateCommand | LoadLabwareCreateCommand =>
           command.commandType === commandType &&
-          //  @ts-expect-error: ts doesn't trust that locationkey is actually found in the command params
-          command.params[locationKey] !== 'offDeck' &&
-          //  @ts-expect-error
-          command.params[locationKey] !== 'systemLocation' &&
-          //  @ts-expect-error
-          'addressableAreaName' in command.params[locationKey] &&
+          locationIsOnAddressableArea(
+            //  @ts-expect-error: ts doesn't trust that locationkey is actually found in the command params
+            command.params[locationKey] as any as LabwareLocation
+          ) &&
           COLUMN_4_SLOTS.includes(
             //  @ts-expect-error
             command.params[locationKey]
@@ -113,9 +113,7 @@ export const getAdditionalEquipmentLocationUpdate = (
           command.params.addressableAreaName as AddressableAreaName
         )) ||
       (command.commandType === 'moveLabware' &&
-        command.params.newLocation !== 'offDeck' &&
-        command.params.newLocation !== 'systemLocation' &&
-        'addressableAreaName' in command.params.newLocation &&
+        locationIsOnAddressableArea(command.params.newLocation) &&
         WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
           command.params.newLocation.addressableAreaName as AddressableAreaName
         ))

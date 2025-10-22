@@ -656,3 +656,105 @@ async def test_get_files_info_by_run_mime_type_no_limit(
 
     assert len(result_with_limit.file_info) == 2
     assert result_with_limit.total_length == 5
+
+
+async def test_get_data_files_by_run_id(
+    subject: DataFilesStore,
+) -> None:
+    """It should retrieve all input and output files for a run, ordered by creation time."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+
+    input_file_1 = DataFileInfo(
+        id="input-file-1",
+        name="input1.csv",
+        file_hash="hash-input-1",
+        created_at=datetime(year=2025, month=10, day=21, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/input-file-1/input1.csv",
+        generated=False,
+        stored=True,
+    )
+
+    input_file_2 = DataFileInfo(
+        id="input-file-2",
+        name="input2.csv",
+        file_hash="hash-input-2",
+        created_at=datetime(year=2025, month=10, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/input-file-2/input2.csv",
+        generated=False,
+        stored=True,
+    )
+
+    output_file_1 = DataFileInfo(
+        id="output-file-1",
+        name="output1.csv",
+        file_hash="hash-output-1",
+        created_at=datetime(year=2025, month=10, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/output-file-1/output1.csv",
+        generated=True,
+        stored=True,
+    )
+
+    output_file_2 = DataFileInfo(
+        id="output-file-2",
+        name="output2.csv",
+        file_hash="hash-output-2",
+        created_at=datetime(year=2025, month=10, day=23, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/output-file-2/output2.csv",
+        generated=True,
+        stored=True,
+    )
+
+    await subject.insert(input_file_1)
+    await subject.insert(input_file_2)
+    await subject.insert(output_file_1)
+    await subject.insert(output_file_2)
+
+    await subject.insert_input_file(
+        InputDataFileInfo(
+            file_id="input-file-1",
+            run_id="run-id",
+            command_info=None,
+        )
+    )
+    await subject.insert_input_file(
+        InputDataFileInfo(
+            file_id="input-file-2",
+            run_id="run-id",
+            command_info=None,
+        )
+    )
+
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="output-file-1",
+            run_id="run-id",
+            command_info=CmdDataFileInfo(
+                command_id="command-1",
+                prev_command_id="prev-1",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="output-file-2",
+            run_id="run-id",
+            command_info=CmdDataFileInfo(
+                command_id="command-2",
+                prev_command_id="prev-2",
+            ),
+        )
+    )
+
+    result = subject.get_data_files_by_run_id("run-id")
+
+    assert len(result.input_files) == 2
+    assert result.input_files[0] == input_file_2
+    assert result.input_files[1] == input_file_1
+
+    assert len(result.output_files) == 2
+    assert result.output_files[0] == output_file_2
+    assert result.output_files[1] == output_file_1

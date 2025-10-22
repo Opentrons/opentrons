@@ -69,7 +69,7 @@ export interface FormError {
   title: string
   dependentFields: StepFieldName[]
   //  location the error appears in the form
-  location: FormErrorLocationType
+  location: FormErrorLocationType[]
   //  used for top-level form warnings see formLevel/warnings.tsx
   body?: ReactNode
   //  for multi-step forms
@@ -85,156 +85,156 @@ const TIME_TITLE = 'Enter a value that uses the specified format'
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
   dependentFields: ['aspirate_labware', 'pipette'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 }
 const INCOMPATIBLE_DISPENSE_LABWARE: FormError = {
   title: 'Selected dispense labware is incompatible with pipette',
   dependentFields: ['dispense_labware', 'pipette'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 }
 const INCOMPATIBLE_LABWARE: FormError = {
   title: 'Selected labware is incompatible with pipette',
   dependentFields: ['labware', 'pipette'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 }
 const PAUSE_TYPE_REQUIRED: FormError = {
   title:
     'Must either pause for amount of time, until told to resume, or until temperature reached',
   dependentFields: ['pauseAction'],
-  location: 'form',
+  location: ['form'],
 }
 const TIME_PARAM_REQUIRED: FormError = {
   title: 'Must include hours, minutes, or seconds',
   dependentFields: ['pauseAction', 'pauseTime'],
-  location: 'form',
+  location: ['form'],
 }
 const PAUSE_TEMP_PARAM_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['pauseAction', 'pauseTemperature'],
-  location: 'form',
+  location: ['form'],
 }
 
 const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
   title: `Volume is greater than maximum pipette/tip volume (${pipetteCapacity} ul)`,
   dependentFields: ['pipette', 'volume'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 })
 
 const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
   dependentFields: ['aspirate_wells', 'dispense_wells'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 }
 const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
   title: 'Well selection must be many to 1, or 1 to 1',
   dependentFields: ['aspirate_wells'],
-  location: 'form',
+  location: ['form'],
   showOnReopen: true,
 }
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
   title: 'Action type must be either engage or disengage',
   dependentFields: ['magnetAction'],
-  location: 'form',
+  location: ['form'],
 }
 const ENGAGE_HEIGHT_REQUIRED: FormError = {
   title: 'Engage height required',
   dependentFields: ['magnetAction', 'engageHeight'],
-  location: 'field',
+  location: ['field'],
 }
 const ENGAGE_HEIGHT_MIN_EXCEEDED: FormError = {
   title: 'Specified distance is below module minimum',
   dependentFields: ['magnetAction', 'engageHeight'],
-  location: 'field',
+  location: ['field'],
 }
 const ENGAGE_HEIGHT_MAX_EXCEEDED: FormError = {
   title: 'Specified distance is above module maximum',
   dependentFields: ['magnetAction', 'engageHeight'],
-  location: 'field',
+  location: ['field'],
 }
 const MODULE_ID_REQUIRED: FormError = {
   title:
     'Module is required. Ensure the appropriate module is present on the deck and selected for this step',
   dependentFields: ['moduleId'],
-  location: 'field',
+  location: ['field'],
   showOnReopen: true,
 }
 const TARGET_TEMPERATURE_REQUIRED: FormError = {
   title: 'Temperature required',
   dependentFields: ['setTemperature', 'targetTemperature'],
-  location: 'field',
+  location: ['field'],
 }
 const PROFILE_VOLUME_REQUIRED: FormError = {
   title: 'Well volume required',
   dependentFields: ['thermocyclerFormType', 'profileVolume'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const PROFILE_LID_TEMPERATURE_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const LID_TEMPERATURE_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['lidIsActive', 'lidTargetTemp'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const BLOCK_TEMPERATURE_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['blockIsActive', 'blockTargetTemp'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const BLOCK_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const SHAKE_SPEED_REQUIRED: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['setShake', 'targetSpeed'],
-  location: 'field',
+  location: ['field'],
 }
 const SHAKE_TIME_REQUIRED: FormError = {
   title: TIME_TITLE,
   dependentFields: ['heaterShakerSetTimer', 'heaterShakerTimer'],
-  location: 'field',
+  location: ['field'],
 }
 const SHAKER_TIME_FORMAT: FormError = {
   title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['heaterShakerTimer'],
-  location: 'field',
+  location: ['field'],
 }
 
 const PAUSE_ACTION_REQUIRED: FormError = {
   title: 'Pause type required',
   dependentFields: [],
-  location: 'field',
+  location: ['field'],
 }
 const PAUSE_MODULE_REQUIRED: FormError = {
   title: 'Select a module',
   dependentFields: ['moduleId', 'pauseAction'],
-  location: 'field',
+  location: ['field'],
   showOnReopen: true,
 }
 const PAUSE_TEMP_REQUIRED: FormError = {
   title: 'Pause temperature required',
   dependentFields: ['pauseTemperature', 'pauseAction'],
-  location: 'field',
+  location: ['field'],
 }
 const HS_TEMPERATURE_REQUIRED: FormError = {
   title: RANGE_TITLE,
@@ -242,347 +242,347 @@ const HS_TEMPERATURE_REQUIRED: FormError = {
     'targetHeaterShakerTemperature',
     'setHeaterShakerTemperature',
   ],
-  location: 'field',
+  location: ['field'],
 }
 const LABWARE_TO_MOVE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['labware'],
-  location: 'field',
+  location: ['field'],
   showOnReopen: true,
 }
 const NEW_LABWARE_LOCATION_REQUIRED: FormError = {
   title: 'New location required',
   dependentFields: ['newLocation'],
-  location: 'field',
+  location: ['field'],
   showOnReopen: true,
 }
 const ASPIRATE_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['aspirate_wells'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const DISPENSE_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['dispense_wells'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const MIX_WELLS_REQUIRED: FormError = {
   title: 'Choose wells',
   dependentFields: ['wells'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['volume'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const TIMES_REQUIRED: FormError = {
   title: 'Enter an integer value greater than 0',
   dependentFields: ['times'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const ASPIRATE_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['aspirate_labware'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const DISPENSE_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['dispense_labware'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const MIX_LABWARE_REQUIRED: FormError = {
   title: 'Labware required',
   dependentFields: ['labware'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
   title: 'Enter an integer value greater than 0',
   dependentFields: ['aspirate_mix_times'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_MIX_VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['aspirate_mix_checkbox', 'aspirate_mix_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_DELAY_DURATION_REQUIRED: FormError = {
   title: 'Duration required',
   dependentFields: ['aspirate_delay_checkbox', 'aspirate_delay_seconds'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['aspirate_airGap_checkbox', 'aspirate_airGap_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
   title: 'Enter an integer value greater than 0',
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_times'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const DISPENSE_MIX_VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const DISPENSE_DELAY_DURATION_REQUIRED: FormError = {
   title: 'Duration required',
   dependentFields: ['dispense_delay_checkbox', 'dispense_delay_seconds'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   title: 'Volume required',
   dependentFields: ['dispense_airGap_checkbox', 'dispense_airGap_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
   title: 'Blowout location required',
   dependentFields: ['blowout_checkbox', 'blowout_location'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const BLOWOUT_FLOW_RATE_REQUIRED: FormError = {
   title: 'Flow rate required',
   dependentFields: ['blowout_flowRate'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const WAVELENGTH_REQUIRED: FormError = {
   title: 'Custom wavelength required',
   dependentFields: ['wavelengths'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const WAVELENGTH_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
   dependentFields: ['wavelengths'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const REFERENCE_WAVELENGTH_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
   dependentFields: ['referenceWavelength'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const REFERENCE_WAVELENGTH_REQUIRED: FormError = {
   title: 'Custom wavelength required',
   dependentFields: ['referenceWavelength'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const FILENAME_REQUIRED: FormError = {
   title: 'File name required',
   dependentFields: ['fileName'],
-  location: 'field',
+  location: ['field'],
   page: 1,
 }
 const ABSORBANCE_READER_MODULE_ID_REQUIRED: FormError = {
   title: 'Module required',
   dependentFields: ['moduleId'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const MAGNETIC_MODULE_ID_REQUIRED: FormError = {
   title: 'Module required',
   dependentFields: ['moduleId'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
   dependentFields: ['aspirate_touchTip_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
   dependentFields: ['dispense_touchTip_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
   dependentFields: ['aspirate_touchTip_mmFromEdge'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
   dependentFields: ['dispense_touchTip_mmFromEdge'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
   dependentFields: ['aspirate_touchTip_mmFromEdge'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
   dependentFields: ['dispense_touchTip_mmFromEdge'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const PUSH_OUT_VOLUME_REQUIRED: FormError = {
   title: 'Push out volume required',
   dependentFields: ['pushOut_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const PUSH_OUT_VOLUME_OUT_OF_RANGE: FormError = {
   title: 'Push out volume out of range',
   dependentFields: ['pushOut_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'dispense',
 }
 const CONDITIONING_VOLUME_REQUIRED: FormError = {
   title: 'Conditioning volume required',
   dependentFields: ['conditioning_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
   title: 'Conditioning volume out of range',
   dependentFields: ['conditioning_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   tab: 'aspirate',
 }
 const VOLUME_UNDER_MINIMUM: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['volume'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const MESSAGE_REQUIRED: FormError = {
   title: 'Message required',
   dependentFields: ['message'],
-  location: 'field',
+  location: ['field'],
   showOnReopen: true,
 }
 const PIPETTE_REQUIRED: FormError = {
   title: 'Pipette required',
   dependentFields: ['pipette'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const TIPRACK_REQUIRED: FormError = {
   title: 'Tiprack required',
   dependentFields: ['tipRack'],
-  location: 'field',
+  location: ['field'],
   page: 0,
   showOnReopen: true,
 }
 const TARGET_TEMPERATURE_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['targetTemperature'],
-  location: 'field',
+  location: ['field'],
 }
 const TARGET_HEATER_SHAKER_TEMPERATURE_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['targetHeaterShakerTemperature'],
-  location: 'field',
+  location: ['field'],
 }
 
 const TARGET_HEATER_SHAKER_SPEED_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['targetSpeed'],
-  location: 'field',
+  location: ['field'],
 }
 const PAUSE_TIME_FORMAT: FormError = {
   title: 'Must be a valid time (hh:mm:ss)',
   dependentFields: ['pauseTime'],
-  location: 'form',
+  location: ['form'],
 }
 const PAUSE_TEMP_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['pauseTemperature'],
-  location: 'field',
+  location: ['field'],
 }
 const BLOCK_TARGET_TEMP_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['blockTargetTemp'],
-  location: 'field',
+  location: ['field'],
 }
 const LID_TARGET_TEMP_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['lidTargetTemp'],
-  location: 'field',
+  location: ['field'],
 }
 const PROFILE_TARGET_LID_TEMP_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['profileTargetLidTemp'],
-  location: 'field',
+  location: ['field'],
 }
 const PROFILE_VOLUME_RANGE: FormError = {
   title: `Enter a value between ${MIN_TC_PROFILE_VOLUME} and ${MAX_TC_PROFILE_VOLUME}`,
   dependentFields: ['profileVolume'],
-  location: 'field',
+  location: ['field'],
 }
 const BLOCK_TARGET_TEMP_HOLD_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['blockTargetTempHold'],
-  location: 'field',
+  location: ['field'],
 }
 const LID_TARGET_TEMP_HOLD_RANGE: FormError = {
   title: RANGE_TITLE,
   dependentFields: ['lidTargetTempHold'],
-  location: 'field',
+  location: ['field'],
 }
 const ASPIRATE_SUBMERGE_SPEED_REQUIRED: FormError = {
   title: 'Submerge speed required',
   dependentFields: ['aspirate_submerge_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   showOnReopen: true,
   tab: 'aspirate',
@@ -590,7 +590,7 @@ const ASPIRATE_SUBMERGE_SPEED_REQUIRED: FormError = {
 const ASPIRATE_RETRACT_SPEED_REQUIRED: FormError = {
   title: 'Retract speed required',
   dependentFields: ['aspirate_retract_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   showOnReopen: true,
   tab: 'aspirate',
@@ -598,7 +598,7 @@ const ASPIRATE_RETRACT_SPEED_REQUIRED: FormError = {
 const DISPENSE_SUBMERGE_SPEED_REQUIRED: FormError = {
   title: 'Submerge speed required',
   dependentFields: ['dispense_submerge_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   showOnReopen: true,
   tab: 'dispense',
@@ -606,7 +606,7 @@ const DISPENSE_SUBMERGE_SPEED_REQUIRED: FormError = {
 const DISPENSE_RETRACT_SPEED_REQUIRED: FormError = {
   title: 'Retract speed required',
   dependentFields: ['dispense_retract_speed'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   showOnReopen: true,
   tab: 'dispense',
@@ -614,15 +614,15 @@ const DISPENSE_RETRACT_SPEED_REQUIRED: FormError = {
 const DISPOSAL_VOLUME_REQUIRED: FormError = {
   title: 'Disposal volume required',
   dependentFields: ['disposalVolume_checkbox', 'disposalVolume_volume'],
-  location: 'field',
+  location: ['field'],
   page: 2,
   showOnReopen: true,
   tab: 'dispense',
 }
 const TIPS_SELECTED_REQUIRED: FormError = {
-  title: 'Tips selected required',
+  title: 'Not enough tips selected for manual tip tracking.',
   dependentFields: ['tips_selected', 'tip_tracking'],
-  location: 'field',
+  location: ['form', 'field'],
   page: 3,
 }
 export type FormErrorChecker = (

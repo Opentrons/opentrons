@@ -37,6 +37,14 @@ class DataFileWithCommandsInfoSlice:
     total_length: int
 
 
+@dataclass(frozen=True)
+class DataFilesByRunInfo:
+    """Container for input and output data file metadata for a run."""
+
+    input_files: List[DataFileInfo]
+    output_files: List[DataFileInfo]
+
+
 class DataFilesStore:
     """Store and retrieve info about uploaded data files."""
 
@@ -210,6 +218,37 @@ class DataFilesStore:
         with self._sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_row_to_data_file_info(sql_row) for sql_row in all_rows]
+
+    def get_data_files_by_run_id(self, run_id: str) -> DataFilesByRunInfo:
+        """Get all input and output data files associated with a run."""
+        input_statement = (
+            sqlalchemy.select(data_files_table)
+            .join(
+                input_data_files_table,
+                data_files_table.c.id == input_data_files_table.c.file_id,
+            )
+            .where(input_data_files_table.c.run_id == run_id)
+            .order_by(data_files_table.c.created_at.desc())
+        )
+
+        output_statement = (
+            sqlalchemy.select(data_files_table)
+            .join(
+                output_data_files_table,
+                data_files_table.c.id == output_data_files_table.c.file_id,
+            )
+            .where(output_data_files_table.c.run_id == run_id)
+            .order_by(data_files_table.c.created_at.desc())
+        )
+
+        with self._sql_engine.begin() as transaction:
+            input_rows = transaction.execute(input_statement).all()
+            input_files = [_convert_row_to_data_file_info(row) for row in input_rows]
+
+            output_rows = transaction.execute(output_statement).all()
+            output_files = [_convert_row_to_data_file_info(row) for row in output_rows]
+
+        return DataFilesByRunInfo(input_files=input_files, output_files=output_files)
 
     def get_usage_info(self, generated: Optional[bool] = None) -> List[FileUsageInfo]:
         """Return information about usage of all the existing data files in runs & analyses.

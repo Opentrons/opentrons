@@ -241,9 +241,16 @@ export function getMatchingTipLiquidSpecs(
   volume: number,
   tiprack: string
 ): SupportedTip {
-  const matchingLabwareDef = Object.values(
-    pipetteEntity.tiprackLabwareDef
-  ).find(def => tiprack.includes(def.parameters.loadName))
+  const matchingLabwareDef =
+    Object.values(pipetteEntity.tiprackLabwareDef).find(def =>
+      tiprack.includes(def.parameters.loadName)
+    ) ||
+    // The `tiprack` from a step might not be in `pipetteEntity.tiprackLabwareDef`
+    // anymore because the user removed the tiprack from the pipette. So we can try
+    // looking up the `tiprack` in getAllLabwareDefs() as well.
+    // TODO: But getAllLabwareDefs() only contains standard labware, so this would still
+    // fail if `tiprack` is a custom tiprack.
+    getAllLabwareDefs()[tiprack]
 
   console.assert(
     matchingLabwareDef,

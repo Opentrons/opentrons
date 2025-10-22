@@ -141,6 +141,7 @@ class DispenseWhileTrackingImplementation(
             },
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            movement_delay=params.movement_delay,
         )
         position_after_dispense = await self._gantry_mover.get_position(
             params.pipetteId
