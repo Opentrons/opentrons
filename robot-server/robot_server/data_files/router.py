@@ -2,10 +2,15 @@
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Optional, Literal, Union
+from typing import Annotated, Optional, Literal, Union, Final
 
-from fastapi import UploadFile, File, Form, Depends, Response, status
+from fastapi import UploadFile, File, Form, Depends, Response, status, Query
+from fastapi.responses import FileResponse
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.router.base_router import RunNotFound
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunNotFoundError
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.service.json_api import (
@@ -21,6 +26,7 @@ from .dependencies import (
     get_data_files_store,
     get_data_file_auto_deleter,
 )
+from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
 from .data_files_store import DataFilesStore
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from .file_auto_deleter import DataFileAutoDeleter
@@ -29,11 +35,15 @@ from .models import (
     FileIdNotFoundError,
     FileIdNotFound,
     FileInUseError,
+    ImageFileMetadata,
 )
 from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
 from ..service.dependencies import get_current_time, get_unique_id
 
 datafiles_router = LightRouter()
+
+_DEFAULT_IMAGE_METADATA_LIST_LENGTH: Final = 99
+_DEFAULT_IMAGE_METADATA_CURSOR: Final = 0
 
 
 class MultipleDataFileSources(ErrorDetails):
@@ -181,7 +191,7 @@ async def upload_data_file(
 @PydanticResponse.wrap_route(
     datafiles_router.get,
     path="/dataFiles/{dataFileId}",
-    summary="Get information about an uploaded data file",
+    summary="Get information about a data file",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
@@ -219,7 +229,7 @@ async def get_data_file_info_by_id(
 
 @datafiles_router.get(
     path="/dataFiles/{dataFileId}/download",
-    summary="Get an uploaded data file",
+    summary="Get a data file",
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorBody[Union[FileIdNotFound, FileNotFound]]
@@ -228,7 +238,6 @@ async def get_data_file_info_by_id(
 )
 async def get_data_file(
     dataFileId: str,
-    data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     file_reader_writer: Annotated[FileReaderWriter, Depends(get_file_reader_writer)],
 ) -> Response:
@@ -238,17 +247,28 @@ async def get_data_file(
     except FileIdNotFoundError as e:
         raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    try:
-        [buffered_file] = await file_reader_writer.read(
-            files=[data_files_directory / dataFileId / data_file_info.name]
-        )
-    except FileNotFoundError as e:
-        raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    file_path = Path(data_file_info.path)
+    if data_file_info.mime_type == MimeType.IMAGE_JPEG:
+        if not file_path.exists():
+            raise FileNotFound(
+                detail=f"Image file '{data_file_info.name}' not found"
+            ).as_error(status.HTTP_404_NOT_FOUND)
 
-    return Response(
-        content=buffered_file.contents.decode("utf-8"),
-        media_type="text/plain",
-    )
+        return FileResponse(
+            path=file_path,
+            media_type="image/jpeg",
+            filename=data_file_info.name,
+        )
+    else:
+        try:
+            [buffered_file] = await file_reader_writer.read(files=[file_path])
+        except FileNotFoundError as e:
+            raise FileNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+        return Response(
+            content=buffered_file.contents.decode("utf-8"),
+            media_type="text/plain",
+        )
 
 
 @PydanticResponse.wrap_route(
@@ -313,6 +333,128 @@ async def delete_file_by_id(
         raise FileIdNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     except FileInUseError as e:
         raise DataFileInUse(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.model_construct(),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.get,
+    path="/dataFiles/{runId}/images",
+    summary="Get a list of metadata for all camera image files associated with a given run.",
+    description=dedent(
+        """
+        Get a list of metadata for camera image files associated with a given run.
+        "\n\n"
+        The camera image file metadata are returned in order from newest to oldest.
+        "\n\n"
+        If the run contains no camera image file metadata or the run does not exist, an empty
+        list is returned.
+        "\n\n"
+        This endpoint returns camera image file metadata. Use `GET /runs/{runId}/images/{fileName}`
+         to get a specific camera image file.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[ImageFileMetadata]},
+    },
+)
+async def get_run_image_metadata(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    pageLength: Annotated[
+        int,
+        Query(
+            description="The maximum number of camera image file metadata in the list to return.",
+        ),
+    ] = _DEFAULT_IMAGE_METADATA_LIST_LENGTH,
+    cursor: Annotated[
+        Optional[int],
+        Query(
+            description=(
+                "The starting index of the desired first image metadata in the list."
+                " If unspecified, starts from the most recent camera image file metadata."
+            ),
+        ),
+    ] = _DEFAULT_IMAGE_METADATA_CURSOR,
+) -> PydanticResponse[SimpleMultiBody[ImageFileMetadata]]:
+    """Get paginated metadata for camera-captured images associated with a run.
+
+    Returns metadata for image files captured during a protocol run, ordered from
+    newest to oldest. Supports pagination through cursor-based navigation.
+
+    Args:
+        runId: The unique identifier of the run to query for images.
+        data_files_store: Store for accessing data file information from the database.
+        pageLength: Maximum number of image metadata entries to return (default: 99).
+        cursor: Starting index for pagination; 0-based offset into the result set.
+                Defaults to 0 (most recent images first).
+    """
+    offset = max(0, cursor) if cursor else 0
+
+    info_slice = data_files_store.get_files_info_by_run_mime_type(
+        run_id=runId, mime_type=MimeType.IMAGE_JPEG, limit=pageLength, offset=offset
+    )
+
+    data = [
+        ImageFileMetadata.model_construct(
+            id=file.id,
+            cameraId=DEFAULT_CAMERA_ID,
+            commandId=file.command_info.command_id,
+            prevCommandId=file.command_info.prev_command_id,
+            createdAt=file.created_at,
+        )
+        for file in info_slice.file_info
+    ]
+
+    effective_cursor = cursor if cursor is not None else 0
+    effective_cursor = min(effective_cursor, max(0, info_slice.total_length))
+
+    meta = MultiBodyMeta(totalLength=info_slice.total_length, cursor=effective_cursor)
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.model_construct(data=data, meta=meta),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.delete,
+    path="/dataFiles/{runId}/images",
+    summary="Delete all camera images for a run",
+    description=dedent(
+        """
+        Delete all camera image files associated with a run from both the database
+        and filesystem storage.
+
+        This operation cannot be undone.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def delete_run_images(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleEmptyBody]:
+    """Delete all camera images for a run.
+
+    Arguments:
+        runId: The run ID whose images should be deleted.
+        data_files_store: Store for data files database access.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        run_data_manager.get(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    data_files_store.remove_all_by_run_id(runId)
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),

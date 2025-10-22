@@ -78,7 +78,13 @@ def data_files_store(sql_engine: SQLEngine, tmp_path: Path) -> DataFilesStore:
     """Get a mocked out DataFilesStore."""
     data_files_dir = tmp_path / "data_files"
     data_files_dir.mkdir()
-    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    return DataFilesStore(
+        sql_engine=sql_engine,
+        data_files_directory=data_files_dir,
+        images_directory=images_dir,
+    )
 
 
 @pytest.fixture
