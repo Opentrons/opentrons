@@ -1,5 +1,5 @@
 ---
-title: "Opentrons Flex: Flex Log Files"
+title: "Opentrons Flex: Log Files"
 ---
 
 All Flex robots keep records of their movements and system processes. During normal operation, there's no need to download or examine these files. However, if a failure or malfunction occurs, Opentrons Support may request these files, as they provide detailed information that helps identify and resolve problems with the robot. This article summarizes each log file and explains how to download them using the Opentrons App.
