@@ -149,7 +149,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       pipetteSpecs,
       selectedTips,
       primaryNozzle: formData.primaryNozzle,
-      pipetteId: formData.pipetteId,
+      pipetteId: formData.pipette,
       tiprackUri: formData.tipRack,
     })
   const validTiprackIds = Object.entries(tipAccessibilityStatus).reduce<
