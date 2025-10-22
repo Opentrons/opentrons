@@ -799,6 +799,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self._api_version}",
             )
 
+        if end_location is not None and isinstance(location, labware.Well):
+            raise ValueError(
+                "When using end_location, location can not be of type Well"
+            )
+
         def delay_with_publish(seconds: float) -> None:
             # We don't have access to ProtocolContext.delay() which would automatically
             # publish a message to the broker, so we have to do it manually:
@@ -821,13 +826,23 @@ class InstrumentContext(publisher.CommandPublisher):
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
+            # dispense has to move in the opposite direction when an end_location is given
+            # but must continue at location if none is specified
+            if end_location is None:
+                location_1 = location
+                location_2: Optional[types.Location] = None
+            else:
+                location_1 = end_location
+                # this is checked above but needs it for lint
+                assert isinstance(location, types.Location)
+                location_2 = location
             self.dispense(
                 volume=volume,
-                location=location,
+                location=location_1,
                 rate=rate,
                 flow_rate=dispense_flow_rate,
                 push_out=push_out,
-                end_location=end_location,
+                end_location=location_2,
                 movement_delay=movement_delay,
             )
             if dispense_delay:
