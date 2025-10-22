@@ -668,7 +668,7 @@ async def test_delete_run_images_run_not_found(
 
 
 @pytest.mark.parametrize(
-    argnames=["input_files", "output_files"],
+    argnames=["input_files", "output_files", "expected_length"],
     argvalues=[
         pytest.param(
             [
@@ -715,11 +715,13 @@ async def test_delete_run_images_run_not_found(
                     stored=True,
                 ),
             ],
+            4,
             id="multiple_input_and_output_files",
         ),
         pytest.param(
             [],
             [],
+            0,
             id="empty_result",
         ),
         pytest.param(
@@ -736,6 +738,7 @@ async def test_delete_run_images_run_not_found(
                 ),
             ],
             [],
+            1,
             id="only_input_files",
         ),
         pytest.param(
@@ -752,6 +755,7 @@ async def test_delete_run_images_run_not_found(
                     stored=True,
                 ),
             ],
+            1,
             id="only_output_files",
         ),
     ],
@@ -762,6 +766,7 @@ async def test_get_data_files_by_run_id(
     run_data_manager: RunDataManager,
     input_files: List[DataFileInfo],
     output_files: List[DataFileInfo],
+    expected_length: int,
 ) -> None:
     """It should return metadata for all data files associated with a run."""
     decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
@@ -779,12 +784,15 @@ async def test_get_data_files_by_run_id(
         run_data_manager=run_data_manager,
     )
 
-    all_files = input_files + output_files
-    for i, file_info in enumerate(all_files):
-        assert result.content.data[i].id == file_info.id
-        assert result.content.data[i].stored == file_info.stored
-        assert result.content.data[i].generated == file_info.generated
-        assert result.content.data[i].mimeType == file_info.mime_type
+    assert len(result.content.data) == expected_length
+    if expected_length > 0:
+        all_files = input_files + output_files
+
+        for response_file, expected_file in zip(result.content.data, all_files):
+            assert response_file.id == expected_file.id
+            assert response_file.stored == expected_file.stored
+            assert response_file.generated == expected_file.generated
+            assert response_file.mimeType == expected_file.mime_type
 
 
 async def test_get_data_files_by_run_id_run_not_found(

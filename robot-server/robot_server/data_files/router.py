@@ -359,7 +359,7 @@ async def get_data_files_by_run_id(
     runId: str,
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
-) -> PydanticResponse[SimpleBody[DataFileMetadataResponse]]:
+) -> PydanticResponse[SimpleMultiBody[DataFileMetadataResponse]]:
     """Get all data files associated with a run.
 
     Args:
@@ -396,7 +396,10 @@ async def get_data_files_by_run_id(
         )
 
     return await PydanticResponse.create(
-        content=SimpleBody.model_construct(data=response_data),
+        content=SimpleMultiBody.model_construct(
+            data=response_data,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
+        ),
         status_code=status.HTTP_200_OK,
     )
 
