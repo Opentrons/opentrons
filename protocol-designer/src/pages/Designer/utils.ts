@@ -400,8 +400,9 @@ export const getUnoccupiedStackOptions = (args: {
       const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
       const isUniversalLid =
         def.parameters.loadName === 'opentrons_tough_universal_lid'
-      const isLabwareOnSlotTubeOrBlock =
-        labwareOnDeckDef.metadata.displayCategory === 'tubeRack' ||
+      const isLabwareOnSlotTuberack =
+        labwareOnDeckDef.metadata.displayCategory === 'tubeRack'
+      const isLabwareOnSlotAluminumBlock =
         labwareOnDeckDef.metadata.displayCategory === 'aluminumBlock'
       const isLabwareOnSlotTiprack = labwareOnDeckDef.parameters.isTiprack
 
@@ -410,7 +411,8 @@ export const getUnoccupiedStackOptions = (args: {
         // allow universal lid can go anywhere except for tubeRacks, aluminum blocks, and tipracks and other lids
         // since it doesn't have a labwareCompatibleLabware array, we need to special-case it, huhu
         (isUniversalLid &&
-          !isLabwareOnSlotTubeOrBlock &&
+          !isLabwareOnSlotTuberack &&
+          !isLabwareOnSlotAluminumBlock &&
           !isLabwareOnSlotTiprack &&
           labwareOnDeckDef.allowedRoles?.includes('lid'))
 
