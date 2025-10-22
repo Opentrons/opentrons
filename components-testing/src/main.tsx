@@ -43,6 +43,7 @@ function App(): JSX.Element {
           protocolAnalysis={analysis as any}
           baseDeckProps={{
             showSlotLabels: true,
+            showExpansion: true,
           }}
         />
       </div>

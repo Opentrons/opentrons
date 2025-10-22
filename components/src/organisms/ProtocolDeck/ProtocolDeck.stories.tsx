@@ -41,49 +41,19 @@ export const Default: Story = {
   },
 }
 
-export const WithCustomStyling: Story = {
+export const WithLabelsAndExpansion: Story = {
   args: {
     protocolAnalysis: StackerAnalysis as any,
     baseDeckProps: {
       showSlotLabels: true,
+      showExpansion: true,
     },
   },
   parameters: {
     docs: {
       description: {
         story:
-          'ProtocolDeck with slot labels shown for easier identification of deck positions.',
-      },
-    },
-  },
-}
-
-export const NullAnalysis: Story = {
-  args: {
-    protocolAnalysis: null,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'ProtocolDeck with null analysis - should render nothing gracefully.',
-      },
-    },
-  },
-}
-
-export const ErrorAnalysis: Story = {
-  args: {
-    protocolAnalysis: {
-      ...StackerAnalysis,
-      errors: [{ id: 'test-error', detail: 'Test error message' }],
-    } as any,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'ProtocolDeck with analysis containing errors - should render nothing when errors are present.',
+          'ProtocolDeck with both slot labels and expansion visualization enabled, providing complete deck position identification and extended deck area display.',
       },
     },
   },
