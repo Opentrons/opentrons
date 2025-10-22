@@ -53,13 +53,13 @@ export function LabwareSlotContainer(
     moduleEntities,
   } = props
   const { t } = useTranslation('protocol_visualization')
-  const { labware } = robotState
+  const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = Object.values(commands).find(
     command =>
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
   )
-  const pipetteTemporalProperties = Object.entries(robotState.pipettes).find(
+  const pipetteTemporalProperties = Object.entries(pipettes).find(
     ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
   )
   const slot = getSlotInLocationStack(labware[topLabwareOnSlotId].stack)
@@ -78,7 +78,7 @@ export function LabwareSlotContainer(
     liquids.map(liquid => [liquid.id, liquid.displayColor ?? COLORS.grey40])
   )
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
-    robotState.liquidState,
+    liquidState,
     labwareDef
   )
   const wellContents =
@@ -101,11 +101,11 @@ export function LabwareSlotContainer(
 
   const pipetteLocationLiquidState =
     pipetteTemporalProperties != null
-      ? robotState.liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
+      ? liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
       : null
   const labwareLocationLiquidState =
     activeWellName != null
-      ? robotState.liquidState.labware[topLabwareOnSlotId]?.[activeWellName]
+      ? liquidState.labware[topLabwareOnSlotId]?.[activeWellName]
       : null
 
   const tipMaxVolume =
@@ -173,7 +173,6 @@ export function LabwareSlotContainer(
               <div className={styles.labware_render_container}>
                 <RobotWorkSpace
                   key={topLabwareOnSlotId}
-                  width="14rem"
                   viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
                 >
                   {() => (

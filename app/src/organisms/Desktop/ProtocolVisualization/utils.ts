@@ -79,15 +79,14 @@ const getSlotFromPipetteLocation = (
 }
 
 export const getActiveSlotForLabwareDetails = (
-  pipettes: PipetteTemporalProperties[],
   robotState: RobotState,
   invariantContext: InvariantContext,
   currentCommand: RunTimeCommand
 ): DeckSlot | null => {
-  const { labware } = robotState
+  const { labware, pipettes } = robotState
   const { trashBinEntities, wasteChuteEntities, labwareEntities } =
     invariantContext
-  const entityUnderPipette = pipettes.find(
+  const entityUnderPipette = Object.values(pipettes).find(
     pipette => pipette.entityId != null
   )?.entityId
   let slot = null
@@ -186,3 +185,20 @@ export const getWellVolume = (
     (sum, [id, volume]) => (id !== AIR ? sum + volume.volume : sum),
     0
   )
+
+export const getIsPipetteActive = (
+  side: 'left' | 'right',
+  pipettes: RobotState['pipettes'],
+  currentCommand: RunTimeCommand
+): boolean => {
+  const pipetteId =
+    Object.entries(pipettes ?? {}).find(
+      ([_, pipette]) => pipette.mount === side
+    )?.[0] ?? null
+  return (
+    'pipetteId' in currentCommand.params &&
+    currentCommand.params.pipetteId === pipetteId &&
+    pipetteId != null &&
+    pipettes[pipetteId].entityId != null
+  )
+}

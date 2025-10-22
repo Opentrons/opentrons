@@ -63,7 +63,6 @@ export function TipPickupContainer(
       <div className={styles.main_content}>
         <RobotWorkSpace
           key={id}
-          width="14rem"
           viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
         >
           {() => (

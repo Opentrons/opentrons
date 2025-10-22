@@ -9,6 +9,7 @@ import { TipPickupContainer } from './TipPickupContainer'
 import {
   getActiveSlotForLabwareDetails,
   getActiveSlotForTiprackDetails,
+  getIsPipetteActive,
 } from './utils'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -43,7 +44,6 @@ export function StepDetailContainer({
       ? getFullStackFromLabwares(labware, tiprackActiveSlot)
       : []
   const labwareActiveSlot = getActiveSlotForLabwareDetails(
-    Object.values(pipettes),
     robotState,
     invariantContext,
     currentCommand
@@ -65,20 +65,16 @@ export function StepDetailContainer({
     rightMountPipetteName == null &&
     (leftMountPipetteName === 'p1000_96' || leftMountPipetteName === 'p200_96')
 
-  const getIsPipetteActive = (side: 'left' | 'right'): boolean => {
-    const pipetteId =
-      Object.entries(pipettes ?? {}).find(
-        ([_, pipette]) => pipette.mount === side
-      )?.[0] ?? null
-    return (
-      'pipetteId' in currentCommand.params &&
-      currentCommand.params.pipetteId === pipetteId &&
-      pipetteId != null &&
-      pipettes[pipetteId].entityId != null
-    )
-  }
-  const isLeftPipetteActive = getIsPipetteActive('left')
-  const isRightPipetteActive = getIsPipetteActive('right')
+  const isLeftPipetteActive = getIsPipetteActive(
+    'left',
+    pipettes,
+    currentCommand
+  )
+  const isRightPipetteActive = getIsPipetteActive(
+    'right',
+    pipettes,
+    currentCommand
+  )
 
   return (
     <div className={styles.container}>
