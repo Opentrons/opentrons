@@ -93,7 +93,9 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
       <StyledText desktopStyle="headingSmallBold">
         {t('select_tiprack')}
       </StyledText>
-      <BaseDeckTipSelection hoveredId={hoveredId} controls={controls} />
+      <div className={styles.select_tips_deck_container}>
+        <BaseDeckTipSelection hoveredId={hoveredId} controls={controls} />
+      </div>
     </div>
   )
 }

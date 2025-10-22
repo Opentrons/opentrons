@@ -411,7 +411,12 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
     // Handle multi-step toolbox with more pages
     if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
-      setToolboxStep(currentStep => currentStep + strideForContinueOrBack)
+      // need to skip past liquid clas page on OT-2
+      const increment =
+        isLiquidHandlingStepType && toolboxStep === 0
+          ? strideForContinueOrBack
+          : 1
+      setToolboxStep(currentStep => currentStep + increment)
       setShowFormErrors(false)
       handleScrollToTop()
       return
@@ -422,13 +427,20 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
 
   const handleBack = (): void => {
-    setToolboxStep(currStep => currStep - strideForContinueOrBack)
+    // need to skip past liquid clas page on OT-2
+    const increment =
+      isLiquidHandlingStepType && toolboxStep === 2
+        ? strideForContinueOrBack
+        : 1
+    setToolboxStep(currStep => currStep - increment)
     setShowFormErrors(false)
     handleScrollToTop()
   }
 
   const transformedStepIndexForDisplay =
-    isToolboxIndexTransformNeeded && toolboxStep === 2 ? 1 : toolboxStep
+    isToolboxIndexTransformNeeded && toolboxStep >= 2
+      ? toolboxStep - 1
+      : toolboxStep
   const transformedStepTotalForDisplay = isToolboxIndexTransformNeeded
     ? numStepFormPages - 1
     : numStepFormPages
