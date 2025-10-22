@@ -1927,7 +1927,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[List[labware.Well]] = None,
+        selected_tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -2080,7 +2082,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[List[labware.Well]] = None,
+        selected_tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -2238,7 +2242,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[List[labware.Well]] = None,
+        selected_tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.

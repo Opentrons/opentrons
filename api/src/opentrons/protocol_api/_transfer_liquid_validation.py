@@ -38,7 +38,7 @@ def verify_and_normalize_transfer_args(  # noqa: C901
     group_wells_for_multi_channel: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
-    selected_tips: Optional[List[Well]],
+    selected_tips: Optional[Union[Sequence[Well], Sequence[Sequence[Well]]]],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     if not isinstance(dest, (TrashBin, WasteChute)):
@@ -61,12 +61,18 @@ def verify_and_normalize_transfer_args(  # noqa: C901
         )
 
     valid_selected_tips: Optional[List[Well]] = None
-    if selected_tips and group_wells_for_multi_channel and nozzle_map.tip_count > 1:
-        valid_selected_tips = tx_liquid_utils.group_wells_for_multi_channel_transfer(
-            selected_tips, nozzle_map, "tip"
+    if selected_tips:
+        flat_tips_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            selected_tips
         )
-    elif selected_tips:
-        valid_selected_tips = copy.copy(selected_tips)
+        if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
+            valid_selected_tips = (
+                tx_liquid_utils.group_wells_for_multi_channel_transfer(
+                    flat_tips_list, nozzle_map, "tip"
+                )
+            )
+        else:
+            valid_selected_tips = copy.copy(flat_tips_list)
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
     if valid_selected_tips is not None:
