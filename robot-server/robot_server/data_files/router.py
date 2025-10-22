@@ -36,6 +36,7 @@ from .models import (
     FileIdNotFound,
     FileInUseError,
     ImageFileMetadata,
+    DataFileMetadataResponse,
 )
 from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
 from ..service.dependencies import get_current_time, get_unique_id
@@ -342,11 +343,71 @@ async def delete_file_by_id(
 
 @PydanticResponse.wrap_route(
     datafiles_router.get,
+    path="/dataFiles/{runId}/all",
+    summary="Get metadata for all data files associated with a run",
+    description="""
+        Get metadata for all data files associated with a specific run.
+
+        Metadata includes the related command id when applicable.
+    """,
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[DataFileMetadataResponse]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def get_data_files_by_run_id(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleBody[DataFileMetadataResponse]]:
+    """Get all data files associated with a run.
+
+    Args:
+        runId: The unique identifier of the run to query for data files.
+        data_files_store: Store for accessing data file information from the database.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        run_data_manager.get(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    data_files_info = data_files_store.get_data_files_by_run_id(runId)
+    response_data = []
+
+    for file_info in data_files_info.input_files:
+        response_data.append(
+            DataFileMetadataResponse(
+                id=file_info.id,
+                stored=file_info.stored,
+                generated=file_info.generated,
+                mimeType=file_info.mime_type,
+            )
+        )
+
+    for file_info in data_files_info.output_files:
+        response_data.append(
+            DataFileMetadataResponse(
+                id=file_info.id,
+                stored=file_info.stored,
+                generated=file_info.generated,
+                mimeType=file_info.mime_type,
+            )
+        )
+
+    return await PydanticResponse.create(
+        content=SimpleBody.model_construct(data=response_data),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.get,
     path="/dataFiles/{runId}/images",
-    summary="Get a list of metadata for all camera image files associated with a given run.",
+    summary="Get a list of image-specific metadata for all camera image files associated with a given run.",
     description=dedent(
         """
-        Get a list of metadata for camera image files associated with a given run.
+        Get a list of image-specific metadata for camera image files associated with a given run.
         "\n\n"
         The camera image file metadata are returned in order from newest to oldest.
         "\n\n"
