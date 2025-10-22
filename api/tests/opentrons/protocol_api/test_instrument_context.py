@@ -2121,6 +2121,87 @@ def test_mix_with_delay_and_final_push_out(
         mock_protocol_core.delay(4, msg=None),  # dispense delay
     )
 
+def test_mix_with_end_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    end_location = Location(point=Point(2, 2, 4), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location,
+        end_location,
+        input_location,
+        end_location,
+        input_location,
+        end_location,
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate()).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.mix(
+        repetitions=3,
+        volume=10.0,
+        location=input_location,
+        aspirate_flow_rate=300.0,
+        dispense_flow_rate=400.0,
+        end_location=end_location,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=3.0,  # requested aspirate_flow_rate is 3x default flow rate of 100
+            flow_rate=300.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=end_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        times=3
+    )
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=end_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=4.0,  # requested dispense_flow_rate is 4x default flow rate of 100
+            flow_rate=400.0,
+            in_place=False,
+            push_out=0.0,
+            meniscus_tracking=None,
+            end_location=input_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        times=2
+    )
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=end_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=4.0,  # requested dispense_flow_rate is 4x default flow rate of 100
+            flow_rate=400.0,
+            in_place=False,
+            push_out=None,
+            meniscus_tracking=None,
+            end_location=input_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        times=1
+    )
+
+
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
