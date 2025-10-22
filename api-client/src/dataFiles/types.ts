@@ -13,6 +13,15 @@ export interface CsvFileData {
   name: string
 }
 
+export interface ImageFileData {
+  id: string
+  createdAt: string
+  cameraId: string
+  commandId?: string
+  prevCommandId?: string
+  name?: string
+}
+
 export interface DataFileDataResponse {
   data: CsvFileData
 }
@@ -24,3 +33,9 @@ export interface UploadedCsvFilesResponse {
 }
 
 export type DownloadedDataFileResponse = string
+
+export type ImageFileDataResponse = DataFileDataResponse
+
+export interface ImageFilesDataResponse {
+  data: ImageFileData[]
+}
