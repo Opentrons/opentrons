@@ -65,7 +65,9 @@ function StepSizeButtons({
         <TouchControlButton
           key={stepSize}
           isActive={currentStepSize === stepSize}
-          onClick={() => setCurrentStepSize(stepSize)}
+          onClick={() => {
+            setCurrentStepSize(stepSize)
+          }}
           text1={t(stepSizeTranslationKeyByStep[stepSize])}
           text2={`${stepSize} mm`}
         />
