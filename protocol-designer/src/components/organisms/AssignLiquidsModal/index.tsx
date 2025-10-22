@@ -91,6 +91,8 @@ export function AssignLiquidsModal(
     labwareId ?? '',
   ])
 
+  const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
+
   useEffect(() => {
     setSelectedLabware([labwareId ?? ''])
   }, [labwareId])
@@ -122,6 +124,7 @@ export function AssignLiquidsModal(
       >
         {labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
+            setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareArray}
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
@@ -169,7 +172,7 @@ export function AssignLiquidsModal(
               gap={SPACING.spacing24}
               position={POSITION_RELATIVE}
             >
-              <LiquidLayoutOverlayModalContainer />
+              {showLiquidLayoutOverlay && <LiquidLayoutOverlayModalContainer />}
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}

@@ -42,6 +42,7 @@ interface LabwareStackToolboxProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
 }
@@ -49,6 +50,7 @@ export function LabwareStackToolbox({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
+  setShowLiquidLayoutOverlay,
   data,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
@@ -90,12 +92,16 @@ export function LabwareStackToolbox({
   }
 
   const handleAssignToLabware = (newItem: string): void => {
-    if (labwareId && allWellContents[newItem] !== allWellContents[labwareId]) {
-      console.error(
-        'You cannot assign to the labware with the different liquid'
-      )
+    if (
+      labwareId &&
+      JSON.stringify(allWellContents[newItem]) !==
+        JSON.stringify(allWellContents[labwareId])
+    ) {
+      console.error('selected labware have different liquid layouts')
+      setShowLiquidLayoutOverlay(true)
+    } else {
+      setSelectedLabware(prevItems => [...prevItems, newItem])
     }
-    setSelectedLabware(prevItems => [...prevItems, newItem])
   }
 
   return (
@@ -144,6 +150,7 @@ interface LiquidToolboxContainerProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   selectedLabwareIds: string[]
 }
 
@@ -152,6 +159,7 @@ export function LabwareStackToolboxContainer({
   setShowBadFormState,
   setDefineLiquidModal,
   selectedLabwareIds,
+  setShowLiquidLayoutOverlay,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
@@ -170,6 +178,7 @@ export function LabwareStackToolboxContainer({
 
   return (
     <LabwareStackToolbox
+      setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
       showBadFormState={showBadFormState}
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}

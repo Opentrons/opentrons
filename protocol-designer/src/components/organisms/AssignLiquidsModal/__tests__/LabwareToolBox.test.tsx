@@ -1,6 +1,6 @@
 import { NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
@@ -38,10 +38,12 @@ const render = (props: ComponentProps<typeof LabwareStackToolbox>) => {
 
 describe('LabwareStackToolboxContainer', () => {
   let props: ComponentProps<typeof LabwareStackToolbox>
-
+  let setShowLiquidLayoutOverlay: Mock
   beforeEach(() => {
+    setShowLiquidLayoutOverlay = vi.fn()
     props = {
       showBadFormState: false,
+      setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
       data: {
         labwareEntities: {
           mockLabwareId: {
@@ -87,7 +89,19 @@ describe('LabwareStackToolboxContainer', () => {
     props.data.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
-    render(props)
+    ;(props.data.allWellContents = {
+      mockLabwareId: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+      labware2: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+    }),
+      render(props)
 
     expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
     const firstButton = screen.getByTestId('LabwareButton-1')
@@ -96,16 +110,6 @@ describe('LabwareStackToolboxContainer', () => {
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton)
     expect(scondButton).toHaveClass('_button_active_386e4e')
-    // expect(mockDispatch).toHaveBeenCalledWith({
-    //   type: 'SELECT_WELLS',
-    //   payload: {
-    //     A1: null,
-    //     A2: null,
-    //     A3: null,
-    //     A4: null,
-    //     A5: null,
-    //   },
-    // })
   })
 
   it('select all labware buttons', () => {
@@ -131,9 +135,7 @@ describe('LabwareStackToolboxContainer', () => {
     })
     expect(labwareButton).toBeInTheDocument()
     fireEvent.click(labwareButton)
-    expect(labwareButton).toHaveClass('_button_active_386e4e')
+    expect(setShowLiquidLayoutOverlay).toHaveBeenCalledWith(true)
+    expect(labwareButton).not.toHaveClass('_button_active_386e4e')
   })
-
-  // test that when selecting labware with different liquids shows modal
-  // test that different labware does not render the left side of the modal
 })

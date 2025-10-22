@@ -106,25 +106,5 @@ describe('AssignLiquidsModal', () => {
     render(props)
 
     screen.getByText('mock LabwareStackToolbox')
-    // expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
-    // const firstButton = screen.getByTestId('LabwareButton-1')
-    // expect(firstButton).toHaveClass('_button_active_386e4e')
-
-    // const scondButton = screen.getByTestId('LabwareButton-0')
-    // fireEvent.click(scondButton)
-    // expect(scondButton).toHaveClass('_button_active_386e4e')
-    // expect(mockDispatch).toHaveBeenCalledWith({
-    //   type: 'SELECT_WELLS',
-    //   payload: {
-    //     A1: null,
-    //     A2: null,
-    //     A3: null,
-    //     A4: null,
-    //     A5: null,
-    //   },
-    // })
   })
-
-  // test that when selecting labware with different liquids shows modal
-  // test that different labware does not render the left side of the modal
 })
