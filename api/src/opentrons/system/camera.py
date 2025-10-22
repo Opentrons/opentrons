@@ -2,16 +2,30 @@ import asyncio
 import os
 from pathlib import Path
 import logging
+from functools import lru_cache
 from enum import Enum
 from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-
+from opentrons.config import IS_ROBOT
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    ImageParameters,
+    CameraError,
+)
+from opentrons.system import ffmpeg
 
 log = logging.getLogger(__name__)
-STREAM_CONF_FILE = "opentrons-live-stream.conf"
+
+# Default System Cameras
+FLEX_EMBEDDED_CAMERA = "/dev/video2"
+OT2_CAMERA = "/dev/video0"
+
+# Stream Globals
+DEFAULT_CONF_FILE = (
+    "/lib/systemd/system/opentrons-live-stream/opentrons-live-stream.env"
+)
 STREAM_CONF_FILE_KEYS = [
     "BOOT_ID",
     "STATUS",
@@ -20,6 +34,20 @@ STREAM_CONF_FILE_KEYS = [
     "FRAMERATE",
     "BITRATE",
 ]
+
+# Camera Parameter Globals
+ZOOM_MIN = 1.0
+ZOOM_MAX = 2.0
+ZOOM_DEFAULT = 1.0
+CONTRAST_MIN = 0.0
+CONTRAST_MAX = 2.0
+CONTRAST_DEFAULT = 1.0
+BRIGHTNESS_MIN = -128
+BRIGHTNESS_MAX = 128
+BRIGHTNESS_DEFAULT = 0
+SATURATION_MIN = 0.0
+SATURATION_MAX = 2.0
+SATURATION_DEFAULT = 1.0
 
 
 class StreamConfigurationKeys(str, Enum):
@@ -43,7 +71,7 @@ class CameraException(CommunicationError):
 
 
 async def take_picture(filename: Path) -> None:
-    """Take a picture and save it to filename
+    """Legacy method to take a picture and save it to filename
 
     :param filename: Name of file to save picture to
     :param loop: optional loop to use
@@ -79,16 +107,27 @@ async def take_picture(filename: Path) -> None:
 
 def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
-    return get_opentrons_path("live_stream_configuration_file")
+    filepath = get_opentrons_path("live_stream_environment_file")
+    if IS_ROBOT and not os.path.exists(filepath):
+        # If the dynamic configuration file doesn't exist make it using our defaults file
+        with open(DEFAULT_CONF_FILE, "r") as default_config:
+            content = default_config.read()
+        with open(filepath, "w") as new_config_file:
+            new_config_file.write(content)
+    return filepath
 
 
 async def update_live_stream_status(
     stream_status: bool, camera_provider: CameraProvider
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
+    if not IS_ROBOT:
+        # If we are not on a robot we simply no-op updating the stream
+        return None
+
     contents = load_stream_configuration_file_data()
     if contents is None:
-        log.error("Opentrons Live Stream Configuraiton file cannot be updated.")
+        log.error("Opentrons Live Stream Configuration file cannot be updated.")
         return None
 
     # Validate the stream status
@@ -108,9 +147,27 @@ async def update_live_stream_status(
         # Enable the stream
         status = "ON"
     # Overwrite the contents
+    contents["BOOT_ID"] = get_boot_id()
     contents["STATUS"] = status
     write_stream_configuration_file_data(contents)
     await restart_live_stream()
+
+
+async def stop_live_stream() -> None:
+    """Attempt to stop the Opentrons Live Stream service."""
+    command = ["systemctl", "stop", "opentrons-live-stream"]
+    subprocess = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await subprocess.communicate()
+    if subprocess.returncode == 0:
+        log.info("Stopped the opentrons-live-stream service.")
+    else:
+        log.error(
+            f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+        )
 
 
 async def restart_live_stream() -> None:
@@ -159,7 +216,7 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(contents.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+            "Opentrons Live Stream Configuration file data is incorrect or missing."
         )
         # We don't want to write bad or incomplete data to the file
         return None
@@ -175,7 +232,7 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(data.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Data provided to write is not compatible with Opentrons Live Stream Configuraiton file."
+            "Data provided to write is not compatible with Opentrons Live Stream Configuration file."
         )
         return None
 
@@ -189,3 +246,88 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
             f"{StreamConfigurationKeys.BITRATE}={data[StreamConfigurationKeys.BITRATE]}\n",
         ]
         fd.writelines(file_lines)
+
+
+async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
+    """Process an Image Capture request with a Camera utilizing a given set of parameters."""
+    camera = (
+        FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA
+    )
+
+    # We must always validate the camera exists
+    if not os.path.exists(camera):
+        return CameraError(
+            message=f"No video device found with device path {camera}", code=None
+        )
+
+    if parameters.zoom is not None and (
+        parameters.zoom < ZOOM_MIN or parameters.zoom > ZOOM_MAX
+    ):
+        potential_invalid_param = "Zoom"
+    elif parameters.contrast is not None and (
+        parameters.contrast < CONTRAST_MIN or parameters.contrast > CONTRAST_MAX
+    ):
+        potential_invalid_param = "Contrast"
+    elif parameters.brightness is not None and (
+        parameters.brightness < BRIGHTNESS_MIN or parameters.brightness > BRIGHTNESS_MAX
+    ):
+        potential_invalid_param = "Brightness"
+    elif parameters.saturation is not None and (
+        parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX
+    ):
+        potential_invalid_param = "Saturation"
+    else:
+        potential_invalid_param = None
+    if potential_invalid_param is not None:
+        return CameraError(
+            message=f"{potential_invalid_param} parameter is outside the boundaries allowed for image capture.",
+            code="IMAGE_SETTINGS",
+        )
+    try:
+        # Always stop the live stream service to ensure the Camera is always free when attempting an image capture
+        await stop_live_stream()
+
+        zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
+        contrast = (
+            parameters.contrast if parameters.contrast is not None else CONTRAST_DEFAULT
+        )
+        brightness = (
+            parameters.brightness
+            if parameters.brightness is not None
+            else BRIGHTNESS_DEFAULT
+        )
+        saturation = (
+            parameters.saturation
+            if parameters.saturation is not None
+            else SATURATION_DEFAULT
+        )
+        resolution = (
+            parameters.resolution if parameters.resolution is not None else (1920, 1080)
+        )
+
+        result = await ffmpeg.ffmpeg_capture_image_bytes(
+            resolution=resolution,
+            camera=camera,
+            zoom=zoom,
+            pan=parameters.pan if parameters.pan is not None else (0, 0),
+            contrast=contrast,
+            brightness=brightness,
+            saturation=saturation,
+        )
+    except Exception:
+        result = CameraError(
+            message="Exception occured during execution of system image capture.",
+            code=None,
+        )
+    finally:
+        # Restart the live stream service
+        await restart_live_stream()
+    return result
+
+
+@lru_cache(maxsize=1)
+def get_boot_id() -> str:
+    if IS_ROBOT:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    else:
+        return "SIMULATED_BOOT_ID"

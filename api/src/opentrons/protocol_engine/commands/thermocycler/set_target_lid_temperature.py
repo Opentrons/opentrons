@@ -1,4 +1,4 @@
-"""Command models to start heating a Thermocycler's lid."""
+"""Command models for heating a Thermocycler's lid."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 
-
 SetTargetLidTemperatureCommandType = Literal["thermocycler/setTargetLidTemperature"]
 
 
@@ -22,7 +21,7 @@ def _remove_default(s: dict[str, Any]) -> None:
 
 
 class SetTargetLidTemperatureParams(BaseModel):
-    """Input parameters to set a Thermocycler's target lid temperature."""
+    """Input parameters to  to set a Thermocycler's target lid temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
@@ -49,10 +48,11 @@ class SetTargetLidTemperatureResult(BaseModel):
 
 class SetTargetLidTemperatureImpl(
     AbstractCommandImpl[
-        SetTargetLidTemperatureParams, SuccessData[SetTargetLidTemperatureResult]
+        SetTargetLidTemperatureParams,
+        SuccessData[SetTargetLidTemperatureResult],
     ]
 ):
-    """Execution implementation of a Thermocycler's set lid temperature command."""
+    """Execution implementation of a Thermocycler's  to set lid temperature command."""
 
     def __init__(
         self,
@@ -69,7 +69,7 @@ class SetTargetLidTemperatureImpl(
         self,
         params: SetTargetLidTemperatureParams,
     ) -> SuccessData[SetTargetLidTemperatureResult]:
-        """Set a Thermocycler's target lid temperature."""
+        """To set a Thermocycler's target lid temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
         )
@@ -99,10 +99,12 @@ class SetTargetLidTemperatureImpl(
 
 class SetTargetLidTemperature(
     BaseCommand[
-        SetTargetLidTemperatureParams, SetTargetLidTemperatureResult, ErrorOccurrence
+        SetTargetLidTemperatureParams,
+        SetTargetLidTemperatureResult,
+        ErrorOccurrence,
     ]
 ):
-    """A command to set a Thermocycler's target lid temperature."""
+    """A command to  to set a Thermocycler's target lid temperature."""
 
     commandType: SetTargetLidTemperatureCommandType = (
         "thermocycler/setTargetLidTemperature"

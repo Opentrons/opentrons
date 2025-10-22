@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Banner,
-  Modal,
+  Box,
+  ModalShell,
   PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms/Portal'
@@ -27,6 +29,7 @@ interface TipSelectionModalProps {
   continueText?: string
   showPickupsRequiredBanner: boolean
   numPickupsRemaining: number
+  showReusingTipsBanner: boolean
 }
 
 export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
@@ -41,18 +44,17 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     totalSteps,
     showPickupsRequiredBanner,
     numPickupsRemaining,
+    showReusingTipsBanner,
   } = props
   const { t } = useTranslation('tip_selection')
 
-  const titleElement = (
-    <div className={styles.modal_header}>
-      <StyledText desktopStyle="bodyLargeSemiBold">
-        {t('select_tips_for_tracking')}
-      </StyledText>
-      <StyledText desktopStyle="bodyDefaultRegular">{`Step ${
-        currentStepIndex + 1
-      }/${totalSteps}`}</StyledText>
-    </div>
+  const header = (
+    <WizardHeader
+      title={t('select_tips_for_tracking')}
+      currentStep={currentStepIndex}
+      totalSteps={totalSteps}
+      onExit={onClose}
+    />
   )
 
   const footerElement = (
@@ -60,7 +62,15 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
       {showPickupsRequiredBanner ? (
         <Banner type="error">
           <StyledText desktopStyle="bodyDefaultRegular">
-            Not enough tips selected ({numPickupsRemaining} pickups remaining)
+            {t('not_enough_tips_selected', { count: numPickupsRemaining })}
+          </StyledText>
+        </Banner>
+      ) : null}
+      {/* pickups required error takes precedence over reusing tips warning */}
+      {showReusingTipsBanner && !showPickupsRequiredBanner ? (
+        <Banner type="warning">
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('reusing_tips_banner')}
           </StyledText>
         </Banner>
       ) : null}
@@ -72,16 +82,9 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
   )
 
   return createPortal(
-    <Modal
-      title={titleElement}
-      onClose={onClose}
-      closeOnOutsideClick
-      width="56.25rem"
-      childrenPadding={SPACING.spacing24}
-      footer={footerElement}
-    >
-      {children}
-    </Modal>,
+    <ModalShell header={header} width="56.25rem" footer={footerElement}>
+      <Box padding={SPACING.spacing24}>{children}</Box>
+    </ModalShell>,
     getMainPagePortalEl()
   )
 }

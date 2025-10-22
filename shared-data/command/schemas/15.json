@@ -422,6 +422,11 @@
           "title": "Labwareid",
           "type": "string"
         },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
+        },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
           "title": "Pipetteid",
@@ -744,6 +749,143 @@
       },
       "required": ["mount"],
       "title": "CalibratePipetteParams",
+      "type": "object"
+    },
+    "CaptureImageCreate": {
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "properties": {
+        "commandType": {
+          "const": "captureImage",
+          "default": "captureImage",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CaptureImageParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CaptureImageCreate",
+      "type": "object"
+    },
+    "CaptureImageParams": {
+      "description": "Input parameters for an image capture.",
+      "properties": {
+        "brightness": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The brightness to use when processing an image. Scale is 0% to 100%.",
+          "title": "Brightness"
+        },
+        "contrast": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The contrast to use when processing an image. Scale is 0% to 100%.",
+          "title": "Contrast"
+        },
+        "fileName": {
+          "description": "Optional file name to use when storing the results of an Image Capture.",
+          "title": "Filename",
+          "type": "string"
+        },
+        "pan": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.",
+          "title": "Pan"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Width by height resolution in pixels for the image to be captured with.",
+          "title": "Resolution"
+        },
+        "saturation": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The saturation to use when processing an image. Scale is 0% to 100%.",
+          "title": "Saturation"
+        },
+        "zoom": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.",
+          "title": "Zoom"
+        }
+      },
+      "title": "CaptureImageParams",
       "type": "object"
     },
     "CloseGripperJawCreate": {
@@ -1682,6 +1824,11 @@
           "description": "Identifier of labware to use.",
           "title": "Labwareid",
           "type": "string"
+        },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
         },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
@@ -3409,7 +3556,7 @@
           "type": "boolean"
         },
         "ignoreTipConfiguration": {
-          "description": "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
+          "description": "Whether to utilize the critical point of the tip configuration when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
           "title": "Ignoretipconfiguration",
           "type": "boolean"
         },
@@ -5271,7 +5418,7 @@
       "type": "object"
     },
     "SetTargetLidTemperatureParams": {
-      "description": "Input parameters to set a Thermocycler's target lid temperature.",
+      "description": "Input parameters to  to set a Thermocycler's target lid temperature.",
       "properties": {
         "celsius": {
           "description": "Target temperature in \u00b0C.",
@@ -7118,6 +7265,7 @@
       "calibration/calibrateModule": "#/$defs/CalibrateModuleCreate",
       "calibration/calibratePipette": "#/$defs/CalibratePipetteCreate",
       "calibration/moveToMaintenancePosition": "#/$defs/MoveToMaintenancePositionCreate",
+      "captureImage": "#/$defs/CaptureImageCreate",
       "comment": "#/$defs/CommentCreate",
       "configureForVolume": "#/$defs/ConfigureForVolumeCreate",
       "configureNozzleLayout": "#/$defs/ConfigureNozzleLayoutCreate",
@@ -7364,6 +7512,9 @@
     },
     {
       "$ref": "#/$defs/UnsealPipetteFromTipCreate"
+    },
+    {
+      "$ref": "#/$defs/CaptureImageCreate"
     },
     {
       "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"

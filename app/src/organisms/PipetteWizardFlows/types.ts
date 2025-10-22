@@ -6,6 +6,7 @@ import type { FLOWS, SECTIONS } from './constants'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
+  | RemoveWasteChuteStep
   | DetachProbeStep
   | AttachProbeStep
   | ResultsStep
@@ -14,6 +15,7 @@ export type PipetteWizardStep =
   | MountingPlateStep
   | CarriageStep
   | FirmwareUpdateStep
+  | AttachWasteChuteStep
 
 export type PipetteWizardFlow =
   | typeof FLOWS.ATTACH
@@ -27,7 +29,9 @@ export interface BaseStep {
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
 }
-
+export interface RemoveWasteChuteStep extends BaseStep {
+  section: typeof SECTIONS.REMOVE_WASTE_CHUTE
+}
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
 }
@@ -55,6 +59,9 @@ export interface MountingPlateStep extends BaseStep {
 
 export interface FirmwareUpdateStep extends BaseStep {
   section: typeof SECTIONS.FIRMWARE_UPDATE
+}
+export interface AttachWasteChuteStep extends BaseStep {
+  section: typeof SECTIONS.ATTACH_WASTE_CHUTE
 }
 
 type CreateCommandMutate = ReturnType<

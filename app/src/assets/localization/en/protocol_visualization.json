@@ -1,5 +1,6 @@
 {
   "active": "Active",
+  "deck_view": "Deck view",
   "destination_labware": "Destination labware",
   "destination_tips": "Destination tips",
   "destination_well_view": "Destination well view",
@@ -14,11 +15,13 @@
   "step": "Step {{number}}",
   "quantity": "Quantity: {{quantity}}",
   "tipPickup": "Tip pickup",
+  "percent_complete": "{{percent}}% complete",
   "tip_disposal": "Tip disposal",
   "remaining_tips": "{{remaining}} tips",
   "tips_remaining": "Tips remaining",
   "tips_in_trash": "Tips in trash",
   "lids_in_trash": "Lids in trash",
   "trash_bin": "TRASH BIN",
+  "timeline": "Timeline",
   "well_name": "Well {{wellName}}"
 }

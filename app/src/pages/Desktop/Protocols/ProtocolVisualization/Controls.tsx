@@ -1,4 +1,8 @@
+import { useDispatch } from 'react-redux'
+
 import { Chip, COLORS, NewIconButton } from '@opentrons/components'
+
+import { stepDetailViewerUpdateAction } from '/app/redux/shell'
 
 import styles from './preview.module.css'
 
@@ -8,7 +12,12 @@ import styles from './preview.module.css'
 // } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  Liquid,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface ControlsProps {
@@ -21,6 +30,15 @@ interface ControlsProps {
   isPlaying: boolean
   commands: RunTimeCommand[]
   groupedCommands: GroupedCommands | null
+  spotlightWindowData: {
+    protocolKey: string
+    robotState: RobotState
+    invariantContext: InvariantContext
+    analysis: ProtocolAnalysisOutput
+    liquids: Liquid[]
+    slot: string | null
+    command?: RunTimeCommand
+  }
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -33,7 +51,9 @@ export function Controls(props: ControlsProps): JSX.Element {
     isPlaying,
     commands,
     // groupedCommands,
+    spotlightWindowData,
   } = props
+  const dispatch = useDispatch()
 
   // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
   // const currentCommandId = commands[currentCommandIndex].id
@@ -60,7 +80,6 @@ export function Controls(props: ControlsProps): JSX.Element {
   //     setSelectedCommand(commands[commands.length - 1].id)
   //   }
   // }
-
   return (
     <>
       <div className={styles.container}>
@@ -104,6 +123,22 @@ export function Controls(props: ControlsProps): JSX.Element {
           onChange={e => {
             const nextIndex = Number(e.target.value) - 1
             setSelectedCommand(commands[nextIndex].id)
+            if (
+              spotlightWindowData.slot != null &&
+              spotlightWindowData.command != null
+            ) {
+              dispatch(
+                stepDetailViewerUpdateAction({
+                  protocolKey: spotlightWindowData.protocolKey,
+                  slot: spotlightWindowData.slot,
+                  command: spotlightWindowData.command,
+                  robotState: spotlightWindowData.robotState,
+                  invariantContext: spotlightWindowData.invariantContext,
+                  analysis: spotlightWindowData.analysis,
+                  liquids: spotlightWindowData.liquids,
+                })
+              )
+            }
           }}
         />
       </div>

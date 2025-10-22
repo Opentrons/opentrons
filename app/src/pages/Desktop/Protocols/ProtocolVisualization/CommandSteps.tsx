@@ -1,4 +1,6 @@
-import { COLORS, Divider, StyledText } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
+import { COLORS, StyledText } from '@opentrons/components'
 
 import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/AnnotatedSteps'
 
@@ -25,17 +27,18 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     handlePause,
     percentComplete,
   } = props
+  const { t } = useTranslation('protocol_visualization')
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>
         <div className={styles.command_step_header}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">Timeline</StyledText>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-          >{`${percentComplete.toFixed(0)}% complete`}</StyledText>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('timeline')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {t('percent_complete', { percent: percentComplete.toFixed(0) })}
+          </StyledText>
         </div>
-        <Divider />
         <div className={styles.command_step_groups}>
           <AnnotatedSteps
             currentCommandIndex={currentCommandIndex}

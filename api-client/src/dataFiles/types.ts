@@ -13,14 +13,14 @@ export interface CsvFileData {
   name: string
 }
 
-export interface CsvFileDataResponse {
+export interface DataFileDataResponse {
   data: CsvFileData
 }
 
-export type UploadedCsvFileResponse = CsvFileDataResponse
+export type UploadedCsvFileResponse = DataFileDataResponse
 
 export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
 }
 
-export type DownloadedCsvFileResponse = string
+export type DownloadedDataFileResponse = string

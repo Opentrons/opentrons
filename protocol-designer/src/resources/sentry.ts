@@ -49,7 +49,13 @@ export const initializeSentry = (state: BaseState): void => {
         ],
         replaysSessionSampleRate: 0.0, // No Session Replay
         replaysOnErrorSampleRate: 0.0, // No Session Replay
-        ignoreErrors: [/Failed to fetch/i], // Ignore the fetch since PD doesn't use fetch
+        ignoreErrors: [
+          // Ignore the fetch since PD doesn't use fetch
+          /Failed to fetch/i,
+          // Most likely triggered by MS Defender trying to run PD. Nothing we can do but ignore it:
+          // https://github.com/getsentry/sentry-javascript/issues/3440
+          'Non-Error promise rejection captured with value: Object Not Found Matching Id:',
+        ],
       })
       isSentryInitialized = true
       console.log('Sentry.init done')

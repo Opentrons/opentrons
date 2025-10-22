@@ -20,7 +20,7 @@ from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
-from opentrons.protocol_engine.resources import ModelUtils, FileProvider
+from opentrons.protocol_engine.resources import ModelUtils, FileProvider, CameraProvider
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -184,6 +184,7 @@ def subject(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
     movement: MovementHandler,
     mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
@@ -200,6 +201,7 @@ def subject(
     return CommandExecutor(
         hardware_api=hardware_api,
         file_provider=file_provider,
+        camera_provider=camera_provider,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment,
@@ -248,6 +250,7 @@ async def test_execute(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
     movement: MovementHandler,
     mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
@@ -352,6 +355,7 @@ async def test_execute(
             state_view=state_store,
             hardware_api=hardware_api,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             equipment=equipment,
             movement=movement,
             gantry_mover=mock_gantry_mover,
@@ -419,6 +423,7 @@ async def test_execute_undefined_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
     movement: MovementHandler,
     mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
@@ -505,6 +510,7 @@ async def test_execute_undefined_error(
             state_view=state_store,
             hardware_api=hardware_api,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             equipment=equipment,
             movement=movement,
             gantry_mover=mock_gantry_mover,
@@ -561,6 +567,7 @@ async def test_execute_defined_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
     movement: MovementHandler,
     mock_gantry_mover: GantryMover,
     labware_movement: LabwareMovementHandler,
@@ -647,6 +654,7 @@ async def test_execute_defined_error(
             state_view=state_store,
             hardware_api=hardware_api,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             equipment=equipment,
             movement=movement,
             gantry_mover=mock_gantry_mover,

@@ -26032,11 +26032,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0e4831bfe31b9357e5ca7d4c85e512f2",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7b91a0ee389e1df8939bf67848b68789",
+      "key": "ae96f9899fa5c2422e20c00875e54b7b",
       "notes": [],
       "params": {
         "celsius": 80.0,
@@ -26050,11 +26064,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d69689b43dd6c6ff79035b3d227a9438",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5455346c26e38b0e8401c1476ee4fb30",
+      "key": "4578a04ded849eae1bc8d2b6525b157a",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26068,7 +26096,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a27e3df16423194ab4ad2811a7ce4682",
+      "key": "2316e2efcd766498881595b8e3913af6",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26082,7 +26110,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f08dfceb1db2b5b3f2016a595f00d380",
+      "key": "9c7de6b9ac49af937f72dc79abc69faf",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26098,7 +26126,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c6a2575de2ae32e69c30f387895f04a5",
+      "key": "057f3104223639880c74bd00c0ccaad8",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26112,7 +26140,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0bcb0c85335c1c4b98b375fcbf639184",
+      "key": "bf2953551e47414a5b32cd2c71dea8f3",
       "notes": [],
       "params": {
         "celsius": 75.0,
@@ -26129,7 +26157,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "eb506b96a8c5aae317add1cfc9216361",
+      "key": "1f649356493f4ac0fa207f19fb1a8f18",
       "notes": [],
       "params": {
         "moduleId": "UUID",
@@ -26146,7 +26174,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cfd16a38ef21913ef86474a657fd7f89",
+      "key": "927ee45785f946b672b20a79a64a41f0",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26160,7 +26188,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e3c106195f83a740bae01787f27c55f3",
+      "key": "f4fbb33f92abe137e8478c850056300b",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26174,7 +26202,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b9cd44d6ba940ade5cd2f34d496f5cc7",
+      "key": "88129ab3c17aa663b937f0142374832c",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26188,7 +26216,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3437fe92cd81d7205b5bc5e0ce7486f1",
+      "key": "3367350d31707fbfd159905a579a4efc",
       "notes": [],
       "params": {
         "celsius": 80.0,
@@ -26206,7 +26234,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2ff1fb1879dbf296a181fc0cd940731c",
+      "key": "d3971afd739164014ce2aabd522b7005",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26220,7 +26248,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "94fd9003a884b4acb8cf41f8cd51398e",
+      "key": "67d04eb04b7bfdac7b7627ea010058db",
       "notes": [],
       "params": {
         "celsius": 10.0,
@@ -26238,7 +26266,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6bf6fa9fd0adb9b636e920ece2959761",
+      "key": "d9effe3b03f2099fcbd9cba8be9f5c92",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26252,7 +26280,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c2cb746e6d61d834a6bcdf7100dcf14a",
+      "key": "c8670c4948ba02946ca2976dbb047096",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -26266,7 +26294,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "fa306d16ad8e5b259fb1cb44f6843cc5",
+      "key": "55234200c05450b2f9bd643b0fdaae22",
       "notes": [],
       "params": {
         "labwareId": "UUID",

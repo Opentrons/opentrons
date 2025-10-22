@@ -50,6 +50,7 @@ from opentrons.protocol_engine.execution import (
 )
 from opentrons.protocol_engine.resources import (
     FileProvider,
+    CameraProvider,
     ModelUtils,
     ModuleDataProvider,
 )
@@ -137,6 +138,12 @@ def file_provider(decoy: Decoy) -> FileProvider:
     return decoy.mock(cls=FileProvider)
 
 
+@pytest.fixture
+def camera_provider(decoy: Decoy) -> CameraProvider:
+    """Get a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
 @pytest.fixture(autouse=True)
 def _mock_slot_standardization_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
@@ -179,6 +186,7 @@ def subject(
     door_watcher: DoorWatcher,
     module_data_provider: ModuleDataProvider,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -192,6 +200,7 @@ def subject(
         door_watcher=door_watcher,
         module_data_provider=module_data_provider,
         file_provider=file_provider,
+        camera_provider=camera_provider,
     )
 
 

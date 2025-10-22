@@ -223,9 +223,6 @@ class RunOrchestrator:
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
-        # Shut down the live stream, if there is one
-        if self._camera_provider:
-            await camera.update_live_stream_status(False, self._camera_provider)
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""

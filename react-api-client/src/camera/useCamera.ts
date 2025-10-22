@@ -13,7 +13,7 @@ export function useCamera(
 ): UseQueryResult<CameraResponse> {
   const host = useHost()
   const query = useQuery<CameraResponse>(
-    [useHost, 'camera'],
+    [host, 'camera'],
     () =>
       getCamera(host as HostConfig)
         .then(response => response.data)

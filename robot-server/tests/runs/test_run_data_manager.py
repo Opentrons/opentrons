@@ -7,6 +7,7 @@ from unittest.mock import sentinel, Mock
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -58,7 +59,6 @@ from robot_server.service.task_runner import TaskRunner
 from opentrons.protocol_engine.resources import FileProvider
 from robot_server.file_provider.provider import (
     FileProviderExecutor,
-    RunFileNameMetadata,
 )
 from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_engine.resources import CameraProvider
@@ -183,7 +183,7 @@ def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
 
 @pytest.fixture()
 def mock_file_provider(
-    decoy: Decoy, mock_file_provider_wrapper: FileProviderExecutor
+    decoy: Decoy, mock_file_provider_wrapper: FileProvider
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
@@ -235,7 +235,7 @@ def subject(
     mock_camera_setting_store: CameraSettingStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
-    mock_file_provider_wrapper: FileProviderExecutor,
+    mock_file_provider: FileProvider,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
@@ -245,7 +245,7 @@ def subject(
         camera_setting_store=mock_camera_setting_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
-        file_provider_executor=mock_file_provider_wrapper,
+        file_provider=mock_file_provider,
     )
 
 
@@ -254,7 +254,7 @@ async def test_create(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
-    mock_file_provider_wrapper: FileProviderExecutor,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -286,7 +286,7 @@ async def test_create(
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
-            file_provider=sentinel.file_provider,
+            file_provider=mock_file_provider,
             camera_provider=sentinel.camera_provider,
             run_time_param_values=sentinel.run_time_param_values,
             run_time_param_paths=sentinel.run_time_param_paths,
@@ -329,7 +329,6 @@ async def test_create(
         labware_offsets=sentinel.labware_offsets,
         protocol=protocol,
         deck_configuration=sentinel.deck_configuration,
-        file_provider=sentinel.file_provider,
         camera_provider=sentinel.camera_provider,
         run_time_param_values=sentinel.run_time_param_values,
         run_time_param_paths=sentinel.run_time_param_paths,
@@ -355,9 +354,10 @@ async def test_create(
         outputFileIds=engine_state_summary.files,
     )
     decoy.verify(
-        mock_file_provider_wrapper.set_run_metadata(
-            RunFileNameMetadata.model_construct(
+        mock_file_provider.set_run_metadata(
+            RunFileNameMetadata(
                 robot_name=config.name(),
+                run_id=run_id,
                 run_created_at=created_at,
                 protocol_name="test_protocol",
             )
@@ -416,7 +416,6 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -737,7 +736,7 @@ async def test_update_current(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_runs_publisher: RunsPublisher,
-    mock_file_provider_wrapper: FileProviderExecutor,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
@@ -776,7 +775,7 @@ async def test_update_current(
         times=1,
     )
     decoy.verify(
-        mock_file_provider_wrapper.clear_run_metadata(),
+        mock_file_provider.clear_run_metadata(),
         times=1,
     )
     assert result == Run(
@@ -942,7 +941,6 @@ async def test_create_archives_existing(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
-        file_provider=mock_file_provider,
         camera_provider=mock_camera_provider,
         run_time_param_values=None,
         run_time_param_paths=None,

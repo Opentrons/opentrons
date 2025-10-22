@@ -33,6 +33,10 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
 
+### Known Issues
+
+- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.
+
 ## Opentrons Protocol Designer Changes in 8.5.6
 
 **Welcome to Protocol Designer 8.5.6!**

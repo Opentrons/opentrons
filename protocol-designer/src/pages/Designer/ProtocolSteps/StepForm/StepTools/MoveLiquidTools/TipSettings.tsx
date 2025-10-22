@@ -83,6 +83,7 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
         <TipTrackingField
           propsForFields={propsForFields}
           padding={`0 ${SPACING.spacing16}`}
+          formData={formData}
         />
       ) : null}
     </Flex>
