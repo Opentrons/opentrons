@@ -365,7 +365,7 @@ function PrepareToRun({
     !isAnyNecessaryDefaultOffsetMissing &&
     // TODO(jh, 10-01-25): Eventually, only block the run if the camera is used in the protocol
     //  AND the camera is not in an enabled state (unconfirmed enabled is ok).
-    cameraSettingsConfirmed
+    (cameraSettingsConfirmed || !isCameraEnabled)
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
