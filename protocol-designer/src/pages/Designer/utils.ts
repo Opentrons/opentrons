@@ -407,6 +407,8 @@ export const getUnoccupiedStackOptions = (args: {
 
       const isCompatible =
         labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
+        // allow universal lid can go anywhere except for tubeRacks, aluminum blocks, and tipracks and other lids
+        // since it doesn't have a labwareCompatibleLabware array, we need to special-case it, huhu
         (isUniversalLid &&
           !isLabwareOnSlotTubeOrBlock &&
           !isLabwareOnSlotTiprack &&
