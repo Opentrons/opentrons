@@ -693,6 +693,8 @@ class InstrumentContext(publisher.CommandPublisher):
         aspirate_delay: Optional[float] = None,
         dispense_delay: Optional[float] = None,
         final_push_out: Optional[float] = None,
+        end_location: Optional[types.Location] = None,
+        movement_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
@@ -806,16 +808,27 @@ class InstrumentContext(publisher.CommandPublisher):
             ):
                 self._protocol_core.delay(seconds=seconds, msg=None)
 
-        def aspirate_with_delay(
-            location: Optional[types.Location | labware.Well],
-        ) -> None:
-            self.aspirate(volume, location, rate, flow_rate=aspirate_flow_rate)
+        def aspirate_with_delay() -> None:
+            self.aspirate(
+                volume,
+                location,
+                rate,
+                flow_rate=aspirate_flow_rate,
+                end_location=end_location,
+                movement_delay=movement_delay,
+            )
             if aspirate_delay:
                 delay_with_publish(aspirate_delay)
 
         def dispense_with_delay(push_out: Optional[float]) -> None:
             self.dispense(
-                volume, None, rate, flow_rate=dispense_flow_rate, push_out=push_out
+                volume=volume,
+                location=location,
+                rate=rate,
+                flow_rate=dispense_flow_rate,
+                push_out=push_out,
+                end_location=end_location,
+                movement_delay=movement_delay,
             )
             if dispense_delay:
                 delay_with_publish(dispense_delay)
@@ -829,7 +842,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 location=location,
             ),
         ):
-            aspirate_with_delay(location=location)
+            aspirate_with_delay()
             with AutoProbeDisable(self):
                 while repetitions - 1 > 0:
                     # starting in 2.16, we disable push_out on all but the last
@@ -838,8 +851,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     dispense_with_delay(
                         push_out=0 if self.api_version >= APIVersion(2, 16) else None
                     )
-                    # aspirate location was set above, do subsequent aspirates in-place:
-                    aspirate_with_delay(location=None)
+                    aspirate_with_delay()
                     repetitions -= 1
                 if final_push_out is not None:
                     dispense_with_delay(push_out=final_push_out)
