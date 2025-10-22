@@ -127,7 +127,7 @@ async def update_live_stream_status(
 
     contents = load_stream_configuration_file_data()
     if contents is None:
-        log.error("Opentrons Live Stream Configuraiton file cannot be updated.")
+        log.error("Opentrons Live Stream Configuration file cannot be updated.")
         return None
 
     # Validate the stream status
@@ -216,7 +216,7 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(contents.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+            "Opentrons Live Stream Configuration file data is incorrect or missing."
         )
         # We don't want to write bad or incomplete data to the file
         return None
@@ -232,7 +232,7 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(data.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Data provided to write is not compatible with Opentrons Live Stream Configuraiton file."
+            "Data provided to write is not compatible with Opentrons Live Stream Configuration file."
         )
         return None
 
