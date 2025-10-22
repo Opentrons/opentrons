@@ -26,11 +26,14 @@ from robot_server.data_files.router import (
     get_all_data_files,
     delete_file_by_id,
     get_run_image_metadata,
+    delete_run_images,
 )
 from robot_server.data_files.data_files_store import DataFileWithCommandsInfoSlice
 from opentrons_shared_data.data_files import DataFileInfoWithCommands, CmdDataFileInfo
 from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.errors.error_responses import ApiError
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunNotFoundError
 
 
 @pytest.fixture
@@ -55,6 +58,12 @@ def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
 def file_auto_deleter(decoy: Decoy) -> DataFileAutoDeleter:
     """Get a mocked out DataFileAutoDeleter."""
     return decoy.mock(cls=DataFileAutoDeleter)
+
+
+@pytest.fixture
+def run_data_manager(decoy: Decoy) -> RunDataManager:
+    """Get a mocked out RunDataManager."""
+    return decoy.mock(cls=RunDataManager)
 
 
 async def test_upload_new_data_file(
@@ -338,30 +347,30 @@ async def test_get_data_file(
     data_files_store: DataFilesStore,
     file_reader_writer: FileReaderWriter,
 ) -> None:
-    """It should return the existing file."""
+    """It should return the existing CSV file."""
     data_files_directory = Path("/dev/null")
 
     decoy.when(data_files_store.get("data-file-id")).then_return(
         DataFileInfo(
             id="qwerty",
-            name="abc.xyz",
+            name="abc.csv",
             file_hash="123",
             created_at=datetime(year=2024, month=7, day=15),
             mime_type=MimeType.TEXT_CSV,
             generated=False,
             stored=True,
-            path=f"{data_files_directory}/qwerty/abc.xyz",
+            path=f"{data_files_directory}/qwerty/abc.csv",
         )
     )
 
     decoy.when(
         await file_reader_writer.read(
-            files=[data_files_directory / "data-file-id" / "abc.xyz"]
+            files=[Path(f"{data_files_directory}/qwerty/abc.csv")]
         )
     ).then_return(
         [
             BufferedFile(
-                name="123.456",
+                name="abc.csv",
                 contents=bytes("some_content", encoding="utf-8"),
                 path=None,
             )
@@ -370,7 +379,6 @@ async def test_get_data_file(
 
     result = await get_data_file(
         "data-file-id",
-        data_files_directory=data_files_directory,
         data_files_store=data_files_store,
         file_reader_writer=file_reader_writer,
     )
@@ -378,6 +386,41 @@ async def test_get_data_file(
     assert result.status_code == 200
     assert result.body == b"some_content"
     assert result.media_type == "text/plain"
+
+
+async def test_get_data_file_image(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    file_reader_writer: FileReaderWriter,
+    tmp_path: Path,
+) -> None:
+    """It should return an existing image file."""
+    image_path = tmp_path / "test-run-id" / "image.jpeg"
+    image_path.parent.mkdir(parents=True)
+    image_content = b"fake_image_content"
+    image_path.write_bytes(image_content)
+
+    decoy.when(data_files_store.get("image-file-id")).then_return(
+        DataFileInfo(
+            id="image-file-id",
+            name="image.jpeg",
+            file_hash="abc123",
+            created_at=datetime(year=2024, month=7, day=15),
+            mime_type=MimeType.IMAGE_JPEG,
+            generated=True,
+            stored=True,
+            path=str(image_path),
+        )
+    )
+
+    result = await get_data_file(
+        "image-file-id",
+        data_files_store=data_files_store,
+        file_reader_writer=file_reader_writer,
+    )
+
+    assert result.status_code == 200
+    assert result.media_type == "image/jpeg"
 
 
 async def test_get_all_data_file_info(
@@ -577,3 +620,44 @@ async def test_get_run_image_metadata_with_pagination(
     assert len(result.content.data) == 1
     assert result.content.data[0].id == "file-id-3"
     assert result.content.meta == MultiBodyMeta(totalLength=5, cursor=2)
+
+
+async def test_delete_run_images(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+) -> None:
+    """It should delete all images for a run."""
+    decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
+    decoy.when(run_data_manager.current_run_id).then_return(None)
+
+    result = await delete_run_images(
+        runId="run-id",
+        data_files_store=data_files_store,
+        run_data_manager=run_data_manager,
+    )
+
+    decoy.verify(data_files_store.remove_all_by_run_id("run-id"))
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
+
+
+async def test_delete_run_images_run_not_found(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+) -> None:
+    """It should raise an error if the run doesn't exist."""
+    decoy.when(run_data_manager.get("run-id")).then_raise(
+        RunNotFoundError(run_id="run-id")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await delete_run_images(
+            runId="run-id",
+            data_files_store=data_files_store,
+            run_data_manager=run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"

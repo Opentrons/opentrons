@@ -21,7 +21,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useCsvFileQuery } from '@opentrons/react-api-client'
+import { useDataFileQuery } from '@opentrons/react-api-client'
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -316,7 +316,7 @@ interface CsvFileDataRowProps {
 function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
   const { fileId } = props
 
-  const { data: fileData } = useCsvFileQuery(fileId)
+  const { data: fileData } = useDataFileQuery(fileId)
   if (fileData == null) {
     return null
   }

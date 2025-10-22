@@ -2,15 +2,15 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getCsvFile } from '@opentrons/api-client'
+import { getDataFile } from '@opentrons/api-client'
 
-import { useCsvFileQuery } from '..'
+import { useDataFileQuery } from '..'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
 import type {
   CsvFileData,
-  CsvFileDataResponse,
+  DataFileDataResponse,
   HostConfig,
   Response,
 } from '@opentrons/api-client'
@@ -27,9 +27,9 @@ const FILE_CONTENT_RESPONSE = {
     id: FILE_ID,
     createdAt: '2024-06-07T19:19:56.268029+00:00',
   } as CsvFileData,
-} as CsvFileDataResponse
+} as DataFileDataResponse
 
-describe('useCsvFileQuery hook', () => {
+describe('useDataFileQuery hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('useCsvFileQuery hook', () => {
   it('should return no data if no host', () => {
     vi.mocked(useHost).mockReturnValue(null)
 
-    const { result } = renderHook(() => useCsvFileQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileQuery(FILE_ID), {
       wrapper,
     })
 
@@ -55,9 +55,9 @@ describe('useCsvFileQuery hook', () => {
 
   it('should return no data if the get file request fails', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCsvFile).mockRejectedValue('oh no')
+    vi.mocked(getDataFile).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCsvFileQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileQuery(FILE_ID), {
       wrapper,
     })
     expect(result.current.data).toBeUndefined()
@@ -65,11 +65,11 @@ describe('useCsvFileQuery hook', () => {
 
   it('should return file data if successful request', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCsvFile).mockResolvedValue({
+    vi.mocked(getDataFile).mockResolvedValue({
       data: FILE_CONTENT_RESPONSE,
-    } as Response<CsvFileDataResponse>)
+    } as Response<DataFileDataResponse>)
 
-    const { result } = renderHook(() => useCsvFileQuery(FILE_ID), {
+    const { result } = renderHook(() => useDataFileQuery(FILE_ID), {
       wrapper,
     })
 
