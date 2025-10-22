@@ -19,9 +19,11 @@ import { getIsTiprackSelectable } from './utils'
 
 import type { TipSelectionBaseProps } from './types'
 
-export function SelectTiprack(
-  props: TipSelectionBaseProps & { validTiprackIds: string[] }
-): JSX.Element {
+interface SelectTiprackProps extends TipSelectionBaseProps {
+  validTiprackIds: string[]
+}
+
+export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
   const {
     selectedTiprackId,
     setSelectedTiprackId,

@@ -62,7 +62,10 @@ export function TipSelectionWizard(
   const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] =
     useState(false)
   const robotState = useSelector(getRobotStateAtActiveItem)
-  const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
+  const tipState =
+    selectedTiprackId != null
+      ? robotState?.tipState.tipracks[selectedTiprackId]
+      : null
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { pipetteEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]

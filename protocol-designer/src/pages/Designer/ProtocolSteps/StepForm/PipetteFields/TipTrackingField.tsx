@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Banner,
   COLORS,
-  DIRECTION_COLUMN,
   Flex,
+  InlineNotification,
   ListButton,
   RadioButton,
   SPACING,
@@ -223,16 +222,11 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       ) : null}
       {propsForFields.tip_tracking.value === MANUAL &&
       !hasValidTiprackForPickup ? (
-        <Banner type="error">
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {t('tip_selection:no_valid_tips_available.title')}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('tip_selection:no_valid_tips_available.body')}
-            </StyledText>
-          </Flex>
-        </Banner>
+        <InlineNotification
+          type="error"
+          heading={t('tip_selection:no_valid_tips_available.title')}
+          message={t('tip_selection:no_valid_tips_available.body')}
+        />
       ) : null}
       {showTipSelectionModal && (
         <TipSelectionWizard

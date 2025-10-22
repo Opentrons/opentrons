@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Banner,
+  InlineNotification,
   Modal,
   PrimaryButton,
   SecondaryButton,
@@ -59,19 +59,21 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
   const footerElement = (
     <div className={styles.modal_footer}>
       {showPickupsRequiredBanner ? (
-        <Banner type="error">
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('not_enough_tips_selected', { count: numPickupsRemaining })}
-          </StyledText>
-        </Banner>
+        <InlineNotification
+          type="error"
+          message={t('not_enough_tips_selected', {
+            count: numPickupsRemaining,
+          })}
+          hug
+        />
       ) : null}
       {/* pickups required error takes precedence over reusing tips warning */}
       {showReusingTipsBanner && !showPickupsRequiredBanner ? (
-        <Banner type="warning">
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('reusing_tips_banner')}
-          </StyledText>
-        </Banner>
+        <InlineNotification
+          type="alert"
+          message={t('reusing_tips_banner')}
+          hug
+        />
       ) : null}
       {showBackButton ? (
         <SecondaryButton onClick={onBack}>{t('go_back')}</SecondaryButton>

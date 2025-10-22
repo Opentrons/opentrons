@@ -16,7 +16,7 @@
   },
   "not_enough_tips_selected": "Not enough tips selected ({{count}} pickups remaining)",
   "pickups_remaining": "{{count}} pickups remaining",
-  "reusing_tips_banner": "Selected tips have been reused. Pipetting accuracy may be reduced.",
+  "reusing_tips_banner": "Selected tips have been reused. Pipetting accuracy may be reduced",
   "select": "Select",
   "selected": "Selected",
   "select_tiprack": "Select a tip rack to pick up tips from",
