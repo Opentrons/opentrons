@@ -8,7 +8,7 @@ Opentrons Flex gives you command-line access to its operating system through a S
 - Perform advanced tasks like customizing the robot's Python environment.
 - Execute protocols that reference external files on disk (apart from custom labware definition files).
 
-An SSH key is required to perform these tasks and to issue commands from the terminal. Follow these instructions to create an SSH key and use it for terminal authentication and access.
+An SSH key is required to perform these tasks and to issue commands from the terminal. The instructions below will show you how to create an SSH key and use it for terminal authentication and access.
 
 !!!note
     If you're unable to use a Wi-Fi network for SSH, see [Making a hardwired SSH connection][making-a-hardwired-ssh-connection] below.

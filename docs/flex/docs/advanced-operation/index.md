@@ -2,6 +2,8 @@
 title: "Opentrons Flex: Advanced Operations"
 ---
 
-Intro summary text here. 
+This chapter describes selected features and techniques you might use only under unusual circumstances or for non-standard interactions, such as diagnostics or specialized control that requires knowledge of terminal commands.
 
-Suspendisse non est vulputate, pretium ante vitae, congue lacus. Nunc turpis urna, aliquam quis mauris in, cursus congue justo. Maecenas et enim eget justo sodales feugiat eget at lacus. In id dui nunc. Cras mollis tellus ut felis tempor eleifend. Maecenas a ipsum placerat, posuere ligula non, imperdiet elit. Donec facilisis imperdiet massa, quis tempus velit.
+- [Command Line Operation Over SSH](command-line.md) explains how to get access to the robot's operating system through terminal shell commands.
+- [Flex Log Files](log-files.md) summarizes the log files produced by the robot and how to download them.
+- [Jupyter Notebook](jupyter-notebook.md) explains how to interact with the robot through the built-in Jupyter server.

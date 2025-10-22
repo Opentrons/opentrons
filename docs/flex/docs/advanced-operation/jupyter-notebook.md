@@ -11,4 +11,4 @@ Access your robot's Jupyter Notebook either:
 - In your web browser. Navigate directly to `http://<robot-ip>:48888`, replacing `<robot-ip>` with the local IP address of your Flex.
 
 For more details on using Jupyter, including preparing executable cells
-of code and running them on a robot, see the [Jupyter Notebook section](https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook) of the Python Protocol API documentation.
+of code and running them on a robot, see the [Jupyter Notebook section](https://docs.opentrons.com/v2/advanced_control/jupyter.html#jupyter-notebook) of the Python Protocol API documentation.
