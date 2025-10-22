@@ -35,6 +35,11 @@ from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
 from .tasks import TaskState, TaskView, TaskStore
+from .preconditions import (
+    CommandPreconditionState,
+    CommandPreconditionStore,
+    CommandPreconditionView,
+)
 
 
 _ParamsT = ParamSpec("_ParamsT")
@@ -56,6 +61,7 @@ class State:
     wells: WellState
     files: FileState
     tasks: TaskState
+    preconditions: CommandPreconditionState
 
 
 class StateView(HasState[State]):
@@ -76,6 +82,7 @@ class StateView(HasState[State]):
     _files: FileView
     _config: Config
     _tasks: TaskView
+    _preconditions: CommandPreconditionView
 
     @property
     def commands(self) -> CommandView:
@@ -141,6 +148,11 @@ class StateView(HasState[State]):
     def config(self) -> Config:
         """Get ProtocolEngine configuration."""
         return self._config
+
+    @property
+    def preconditions(self) -> CommandPreconditionView:
+        """Get state view selectors for command preconditions."""
+        return self._preconditions
 
     @property
     def tasks(self) -> TaskView:
@@ -241,6 +253,7 @@ class StateStore(StateView, ActionHandler):
         self._well_store = WellStore()
         self._file_store = FileStore()
         self._task_store = TaskStore()
+        self._precondition_store = CommandPreconditionStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -378,6 +391,7 @@ class StateStore(StateView, ActionHandler):
             wells=self._well_store.state,
             files=self._file_store.state,
             tasks=self._task_store.state,
+            preconditions=self._precondition_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -397,6 +411,7 @@ class StateStore(StateView, ActionHandler):
         self._wells = WellView(state.wells)
         self._files = FileView(state.files)
         self._tasks = TaskView(state.tasks)
+        self._preconditions = CommandPreconditionView(state.preconditions)
 
         # Derived states
         self._geometry = GeometryView(
