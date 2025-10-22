@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 
-import { StyledText } from '../atoms'
+import { StepMeter, StyledText } from '../atoms'
 import { COLORS } from '../helix-design-system'
 import { Icon } from '../icons'
 import { Box, Btn, Flex } from '../primitives'
@@ -12,7 +12,7 @@ import {
 } from '../styles'
 import { SPACING } from '../ui-style-constants'
 
-import type { MouseEventHandler, ReactNode } from 'react'
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../icons'
 
 export interface ModalHeaderProps {
@@ -25,6 +25,7 @@ export interface ModalHeaderProps {
   color?: string
   icon?: IconProps
   closeButton?: ReactNode
+  stepMeterProps?: ComponentProps<typeof StepMeter>
 }
 
 export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
@@ -38,6 +39,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
     tagElement,
     color = COLORS.black90,
     closeButton,
+    stepMeterProps,
   } = props
   return (
     <>
@@ -75,7 +77,11 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
             ))}
         </Flex>
       </StyledModalHeader>
-      <StyledDivider data-testid="divider" />
+      {stepMeterProps == null ? (
+        <StyledDivider data-testid="divider" />
+      ) : (
+        <StepMeter {...stepMeterProps} />
+      )}
     </>
   )
 }

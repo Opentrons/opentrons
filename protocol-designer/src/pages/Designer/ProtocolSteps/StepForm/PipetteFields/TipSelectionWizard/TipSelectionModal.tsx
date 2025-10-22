@@ -50,9 +50,9 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('select_tips_for_tracking')}
       </StyledText>
-      <StyledText desktopStyle="bodyDefaultRegular">{`Step ${
-        currentStepIndex + 1
-      }/${totalSteps}`}</StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('step_counter', { currentStep: currentStepIndex + 1, totalSteps })}
+      </StyledText>
     </div>
   )
 
@@ -87,6 +87,7 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
       width="56.25rem"
       childrenPadding={SPACING.spacing24}
       footer={footerElement}
+      stepMeterProps={{ totalSteps, currentStep: currentStepIndex }}
     >
       {children}
     </Modal>,
