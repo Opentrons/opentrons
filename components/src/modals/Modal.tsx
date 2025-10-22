@@ -1,11 +1,10 @@
-import { StepMeter } from '../atoms'
 import { COLORS } from '../helix-design-system'
 import { Box } from '../primitives'
 import { SPACING } from '../ui-style-constants'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
 
-import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../icons'
 import type { StyleProps } from '../primitives'
 import type { Position } from './ModalShell'
@@ -28,7 +27,6 @@ export interface ModalProps extends StyleProps {
   showOverlay?: boolean
   position?: Position
   hasHeader?: boolean
-  stepMeterProps?: ComponentProps<typeof StepMeter>
 }
 
 /**
@@ -50,7 +48,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
     position,
     showOverlay,
     hasHeader = true,
-    stepMeterProps,
     ...styleProps
   } = props
 
@@ -83,7 +80,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
       color={COLORS.black90}
       backgroundColor={COLORS.white}
-      stepMeterProps={stepMeterProps}
     />
   )
   return (

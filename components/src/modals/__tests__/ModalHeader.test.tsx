@@ -68,14 +68,4 @@ describe('ModalHeader', () => {
     fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })
-
-  it('should render StepMeter correctly', () => {
-    props.stepMeterProps = {
-      totalSteps: 5,
-      currentStep: 1,
-    }
-    render(props)
-    screen.getByTestId('StepMeter_StepMeterContainer')
-    screen.getByTestId('StepMeter_StepMeterBar')
-  })
 })
