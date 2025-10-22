@@ -2056,8 +2056,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in selected_tips]
-                if selected_tips is not None
+                selected_tips=[tip._core for tip in transfer_args.selected_tips]
+                if transfer_args.selected_tips is not None
                 else None,
             )
 
@@ -2214,8 +2214,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in selected_tips]
-                if selected_tips is not None
+                selected_tips=[tip._core for tip in transfer_args.selected_tips]
+                if transfer_args.selected_tips is not None
                 else None,
             )
 
@@ -2372,8 +2372,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in selected_tips]
-                if selected_tips is not None
+                selected_tips=[tip._core for tip in transfer_args.selected_tips]
+                if transfer_args.selected_tips is not None
                 else None,
             )
 

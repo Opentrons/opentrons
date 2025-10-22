@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from itertools import dropwhile
-from copy import copy, deepcopy
+from copy import deepcopy
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -1367,9 +1367,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         transfer_props = self._get_transfer_properties_for_tip_rack(
             liquid_class, tiprack_uri_for_transfer_props
         )
-        prioritized_tips_to_pick_up = (
-            None if selected_tips is None else copy(selected_tips)
-        )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1406,10 +1403,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip == TransferTipPolicyV2.ONCE:
             self._pick_up_tip_for_liquid_class(
-                tip_racks,
-                starting_tip,
-                tiprack_uri_for_transfer_props,
-                prioritized_tips_to_pick_up,
+                tip_racks, starting_tip, tiprack_uri_for_transfer_props, selected_tips
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
@@ -1452,7 +1446,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    prioritized_tips_to_pick_up,
+                    selected_tips,
                 )
                 post_disp_tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1595,10 +1589,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 selected_tips=selected_tips,
             )
 
-        prioritized_tips_to_pick_up = (
-            None if selected_tips is None else copy(selected_tips)
-        )
-
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
             name=liquid_class.name,
@@ -1630,7 +1620,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_racks,
                 starting_tip,
                 tiprack_uri_for_transfer_props,
-                prioritized_tips_to_pick_up,
+                selected_tips,
             )
 
         tip_contents = [
@@ -1701,7 +1691,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    prioritized_tips_to_pick_up,
+                    selected_tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1858,9 +1848,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 'Blowout location "source" incompatible with consolidate liquid.'
                 ' Please choose "destination" or "trash".'
             )
-        prioritized_tips_to_pick_up = (
-            None if selected_tips is None else copy(selected_tips)
-        )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
@@ -1892,7 +1879,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_racks,
                 starting_tip,
                 tiprack_uri_for_transfer_props,
-                prioritized_tips_to_pick_up,
+                selected_tips,
             )
 
         aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
@@ -1928,7 +1915,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    prioritized_tips_to_pick_up,
+                    selected_tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(

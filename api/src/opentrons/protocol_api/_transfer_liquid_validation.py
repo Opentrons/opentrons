@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from typing import List, Union, Sequence, Optional
 
@@ -24,9 +25,10 @@ class TransferInfo:
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
+    selected_tips: Optional[List[Well]]
 
 
-def verify_and_normalize_transfer_args(
+def verify_and_normalize_transfer_args(  # noqa: C901
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute],
     tip_policy: TransferTipPolicyV2Type,
@@ -58,9 +60,17 @@ def verify_and_normalize_transfer_args(
             reject_adapter=True,
         )
 
+    valid_selected_tips: Optional[List[Well]] = None
+    if selected_tips and group_wells_for_multi_channel and nozzle_map.tip_count > 1:
+        valid_selected_tips = tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            selected_tips, nozzle_map, "tip"
+        )
+    elif selected_tips:
+        valid_selected_tips = copy.copy(selected_tips)
+
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
-    if selected_tips is not None:
-        valid_tip_racks = [tip.parent for tip in selected_tips]
+    if valid_selected_tips is not None:
+        valid_tip_racks = [tip.parent for tip in valid_selected_tips]
     elif valid_new_tip == TransferTipPolicyV2.NEVER:
         if last_tip_well is None:
             raise RuntimeError(
@@ -95,6 +105,7 @@ def verify_and_normalize_transfer_args(
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
+        selected_tips=valid_selected_tips,
     )
 
 
