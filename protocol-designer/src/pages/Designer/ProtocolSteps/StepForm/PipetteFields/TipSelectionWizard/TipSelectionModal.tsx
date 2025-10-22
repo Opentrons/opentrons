@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Banner,
-  Modal,
+  Box,
+  ModalShell,
   PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms/Portal'
@@ -45,15 +47,14 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     showReusingTipsBanner,
   } = props
   const { t } = useTranslation('tip_selection')
-  const titleElement = (
-    <div className={styles.modal_header}>
-      <StyledText desktopStyle="bodyLargeSemiBold">
-        {t('select_tips_for_tracking')}
-      </StyledText>
-      <StyledText desktopStyle="bodyDefaultRegular">{`Step ${
-        currentStepIndex + 1
-      }/${totalSteps}`}</StyledText>
-    </div>
+
+  const header = (
+    <WizardHeader
+      title={t('select_tips_for_tracking')}
+      currentStep={currentStepIndex}
+      totalSteps={totalSteps}
+      onExit={onClose}
+    />
   )
 
   const footerElement = (
@@ -81,15 +82,9 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
   )
 
   return createPortal(
-    <Modal
-      title={titleElement}
-      onClose={onClose}
-      width="56.25rem"
-      childrenPadding={SPACING.spacing24}
-      footer={footerElement}
-    >
-      {children}
-    </Modal>,
+    <ModalShell header={header} width="56.25rem" footer={footerElement}>
+      <Box padding={SPACING.spacing24}>{children}</Box>
+    </ModalShell>,
     getMainPagePortalEl()
   )
 }
