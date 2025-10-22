@@ -1,6 +1,6 @@
 import {
   getLabwareDefIsStandard,
-  locationIsOnDeck,
+  locationIsOffDeck,
 } from '@opentrons/shared-data'
 
 import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
@@ -22,7 +22,7 @@ const getMoveLabwareError = (
   if (
     labware == null ||
     newLocation == null ||
-    !locationIsOnDeck(newLocation) ||
+    locationIsOffDeck(newLocation) ||
     !getLabwareDefIsStandard(labware?.def)
   )
     return null

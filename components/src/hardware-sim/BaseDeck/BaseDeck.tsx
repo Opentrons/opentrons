@@ -9,7 +9,7 @@ import {
   getPositionFromSlotId,
   HEATERSHAKER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
-  locationIsOnDeck,
+  locationIsOffDeck,
   locationIsOnSlot,
   MODULE_FIXTURES_BY_MODEL,
   MOVABLE_TRASH_CUTOUTS,
@@ -484,7 +484,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             highlightShadow,
           }) => {
             if (
-              !locationIsOnDeck(labwareLocation) ||
+              locationIsOffDeck(labwareLocation) ||
               !locationIsOnSlot(labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
@@ -561,7 +561,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         {labwareOnDeck.map(
           ({ labwareLocation, definition, stacked = false }) => {
             if (
-              !locationIsOnDeck(labwareLocation) ||
+              locationIsOffDeck(labwareLocation) ||
               !locationIsOnSlot(labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===

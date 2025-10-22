@@ -10,12 +10,17 @@ export const changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotN
       quoteUnquoteSlotName
     )
 
+export const locationIsOffDeck = (
+  labwareLocation: LabwareLocation
+): labwareLocation is 'offDeck' | 'systemLocation' | 'wasteChuteLocation' =>
+  labwareLocation === 'offDeck' ||
+  labwareLocation === 'systemLocation' ||
+  labwareLocation === 'wasteChuteLocation'
+
 export const locationIsOnDeck = (
   labwareLocation: LabwareLocation
 ): labwareLocation is OnDeckLabwareLocation =>
-  labwareLocation !== 'offDeck' &&
-  labwareLocation !== 'systemLocation' &&
-  labwareLocation !== 'wasteChuteLocation'
+  !locationIsOffDeck(labwareLocation)
 
 export const locationIsOnLabware = (
   labwareLocation: LabwareLocation

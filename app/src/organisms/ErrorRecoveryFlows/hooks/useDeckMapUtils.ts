@@ -10,7 +10,7 @@ import {
   getModuleType,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
-  locationIsOnDeck,
+  locationIsOffDeck,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -446,7 +446,7 @@ export function getSlotNameAndLwLocFrom(
     getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
       ? (labwareLocationObject?.slotName.charAt(0) ?? null)
       : (labwareLocationObject?.slotName ?? null)
-  if (location == null || !locationIsOnDeck(location)) {
+  if (location == null || locationIsOffDeck(location)) {
     return [null, null]
   } else if (excludeModules && onModuleModel != null) {
     return [null, null]

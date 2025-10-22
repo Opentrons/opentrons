@@ -7,7 +7,7 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
-  locationIsOnDeck,
+  locationIsOffDeck,
   locationIsOnLabware,
 } from '@opentrons/shared-data'
 
@@ -74,7 +74,7 @@ export const getLoadCommandText = ({
 
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
-      if (!locationIsOnDeck(command.params.location)) {
+      if (locationIsOffDeck(command.params.location)) {
         displayLocation = location
       } else if ('labwareId' in command.params.location) {
         displayLocation = t('on_location', { location })

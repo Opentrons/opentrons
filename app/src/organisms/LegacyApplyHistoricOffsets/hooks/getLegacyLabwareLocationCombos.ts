@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual'
 import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getLabwareDefURI,
-  locationIsOnDeck,
+  locationIsOffDeck,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -38,7 +38,7 @@ export function getLegacyLabwareLocationCombos(
         )
           return acc
         const definitionUri = getLabwareDefURI(command.result.definition)
-        if (!locationIsOnDeck(command.params.location)) {
+        if (locationIsOffDeck(command.params.location)) {
           return acc
         } else if ('moduleId' in command.params.location) {
           const { moduleId } = command.params.location
@@ -89,7 +89,7 @@ export function getLegacyLabwareLocationCombos(
           )
           return acc
         }
-        if (!locationIsOnDeck(command.params.newLocation)) {
+        if (locationIsOffDeck(command.params.newLocation)) {
           return acc
         } else if ('moduleId' in command.params.newLocation) {
           const modLocation = resolveModuleLocation(
@@ -228,7 +228,7 @@ function resolveAdapterLocation(
 
   let moduleIdUnderAdapter
   let adapterOffsetLocation: LegacyLabwareOffsetLocation | null = null
-  if (!locationIsOnDeck(labwareEntity.location)) {
+  if (locationIsOffDeck(labwareEntity.location)) {
     return { adapterOffsetLocation: null }
     // can't have adapter on top of an adapter
   } else if ('labwareId' in labwareEntity.location) {

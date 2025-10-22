@@ -5,7 +5,7 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getTiprackVolume,
-  locationIsOnDeck,
+  locationIsOffDeck,
   locationIsOnSlot,
 } from '@opentrons/shared-data'
 
@@ -170,7 +170,7 @@ export const getLabwareIdsInOrder = (
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
           let slot = ''
-          if (!locationIsOnDeck(loc)) {
+          if (locationIsOffDeck(loc)) {
             slot = 'offDeck'
           } else if ('moduleId' in loc) {
             slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
@@ -182,7 +182,7 @@ export const getLabwareIdsInOrder = (
                 command.result?.labwareId === loc.labwareId
             )
             const adapterLocation = matchingAdapter?.params.location
-            if (adapterLocation == null || !locationIsOnDeck(adapterLocation)) {
+            if (adapterLocation == null || locationIsOffDeck(adapterLocation)) {
               slot = 'offDeck'
             } else if (
               adapterLocation != null &&

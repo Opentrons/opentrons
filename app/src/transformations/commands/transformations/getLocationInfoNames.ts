@@ -1,6 +1,7 @@
 import {
   getLabwareDisplayName,
   getLabwareStackCountAndLocation,
+  locationIsOffDeck,
   locationIsOnAddressableArea,
   locationIsOnDeck,
   locationIsOnModule,
@@ -56,8 +57,7 @@ export function getLocationInfoNames(
     labwareId,
     loadLabwareCommands
   )
-
-  if (!locationIsOnDeck(labwareLocation)) {
+  if (locationIsOffDeck(labwareLocation)) {
     return { slotName: 'Off deck', labwareName, labwareQuantity }
   } else if ('slotName' in labwareLocation) {
     return { slotName: labwareLocation.slotName, labwareName, labwareQuantity }
@@ -90,7 +90,8 @@ export function getLocationInfoNames(
     )
     if (loadedAdapterCommand?.params == null) {
       console.warn(
-        `expected to find an adapter under the labware but could not with labwareId ${labwareLocation.labwareId}`
+        'getLocationInfoNames: expected to find an adapter under the labware but could not with labwareId',
+        labwareLocation.labwareId
       )
       return { slotName: '', labwareName: labwareName, labwareQuantity }
     } else if (locationIsOnSlot(loadedAdapterCommand?.params.location)) {
@@ -135,6 +136,10 @@ export function getLocationInfoNames(
           }
         : { slotName: '', labwareName, labwareQuantity }
     } else {
+      console.warn(
+        'getLocationInfoNames: unhandled adapter location',
+        loadedAdapterCommand?.params.location
+      )
       //  shouldn't hit this
       return { slotName: '', labwareName, labwareQuantity }
     }

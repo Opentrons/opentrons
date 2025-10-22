@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 
 import {
   getLoadedLabwareDefinitionsByUri,
-  locationIsOnDeck,
+  locationIsOffDeck,
 } from '@opentrons/shared-data'
 
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
@@ -147,7 +147,7 @@ function buildLoadCopy(
 ): string {
   const location = command.params.location
 
-  if (!locationIsOnDeck(location)) {
+  if (locationIsOffDeck(location)) {
     return `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
   } else if ('slotName' in location) {
     const { slotName } = location

@@ -1,7 +1,7 @@
 import {
   getIsLid,
   getIsPipettableLabware,
-  locationIsOnDeck,
+  locationIsOffDeck,
 } from '@opentrons/shared-data'
 
 import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
@@ -32,7 +32,7 @@ export function forMoveLabware(
   let isParentPipettableLabware: boolean = false
 
   const newLocationStack: string[] = []
-  if (!locationIsOnDeck(newLocation)) {
+  if (locationIsOffDeck(newLocation)) {
     newLocationStack.push(newLocation)
   } else if ('moduleId' in newLocation) {
     newLocationStack.push(

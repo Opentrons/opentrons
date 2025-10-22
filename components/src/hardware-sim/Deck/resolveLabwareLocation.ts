@@ -1,7 +1,7 @@
 import {
   getLabwareDefURI,
   getModuleDef,
-  locationIsOnDeck,
+  locationIsOffDeck,
 } from '@opentrons/shared-data'
 
 import type {
@@ -53,7 +53,7 @@ export function resolveLabwareLocation({
   const bottomLabwareLocation =
     labwareTopToBottom[labwareTopToBottom.length - 1].location
 
-  if (!locationIsOnDeck(bottomLabwareLocation)) {
+  if (locationIsOffDeck(bottomLabwareLocation)) {
     return 'offDeck'
   }
 
