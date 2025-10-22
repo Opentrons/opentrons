@@ -1524,6 +1524,7 @@ class OT3API(
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
         expect_stalls: bool = False,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -1557,6 +1558,7 @@ class OT3API(
                     machine_pos,
                     speed or 400.0,
                     HWStopCondition.stall if expect_stalls else HWStopCondition.none,
+                    delay=delay,
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -3085,6 +3087,7 @@ class OT3API(
         end_point: top_types.Point,
         volume: float,
         flow_rate: float = 1.0,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3093,6 +3096,7 @@ class OT3API(
         :param z_distance: The distance the z axis will move during apsiration.
         :param volume: The volume of liquid to be aspirated.
         :param flow_rate: The flow rate to aspirate with.
+        :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
@@ -3115,6 +3119,9 @@ class OT3API(
             end_position,
         )
 
+        delay: Optional[Tuple[List[Axis], float]] = None
+        if movement_delay is not None:
+            delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -3127,6 +3134,7 @@ class OT3API(
                     target_pos,
                     speed=aspirate_spec.speed,
                     home_flagged_axes=False,
+                    delay=delay,
                 )
         except Exception:
             self._log.exception("Aspirate failed")
@@ -3143,6 +3151,7 @@ class OT3API(
         push_out: Optional[float],
         flow_rate: float = 1.0,
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3151,6 +3160,7 @@ class OT3API(
         :param z_distance: The distance the z axis will move during dispensing.
         :param volume: The volume of liquid to be dispensed.
         :param flow_rate: The flow rate to dispense with.
+        :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
@@ -3173,6 +3183,10 @@ class OT3API(
             end_position,
         )
 
+        delay: Optional[Tuple[List[Axis], float]] = None
+        if movement_delay is not None:
+            delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
+
         try:
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}
@@ -3185,6 +3199,7 @@ class OT3API(
                     target_pos,
                     speed=dispense_spec.speed,
                     home_flagged_axes=False,
+                    delay=delay,
                 )
         except Exception:
             self._log.exception("dispense failed")

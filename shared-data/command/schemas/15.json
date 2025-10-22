@@ -422,6 +422,11 @@
           "title": "Labwareid",
           "type": "string"
         },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
+        },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
           "title": "Pipetteid",
@@ -1819,6 +1824,11 @@
           "description": "Identifier of labware to use.",
           "title": "Labwareid",
           "type": "string"
+        },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
         },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
