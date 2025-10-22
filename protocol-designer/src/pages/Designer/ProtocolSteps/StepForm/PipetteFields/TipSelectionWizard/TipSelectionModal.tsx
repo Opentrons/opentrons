@@ -8,7 +8,6 @@ import {
   PrimaryButton,
   SecondaryButton,
   SPACING,
-  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 
