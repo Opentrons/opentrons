@@ -51,7 +51,7 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
   const header = (
     <WizardHeader
       title={t('select_tips_for_tracking')}
-      currentStep={currentStepIndex + 1}
+      currentStep={currentStepIndex}
       totalSteps={totalSteps}
       onExit={onClose}
     />
