@@ -31,6 +31,12 @@ export interface CloseLabwareSelectorAction {
 export const closeLabwareSelector: () => CloseLabwareSelectorAction = createAction(
   'CLOSE_LABWARE_SELECTOR'
 )
+// ===== Open and close multiple Ingredient Selector modal ====
+export interface OpenIngredientsSelectorAction {
+  type: 'OPEN_INGREDIENTS_SELECTOR'
+  payload: string[]
+}
+
 // ===== Open and close Ingredient Selector modal ====
 export interface OpenIngredientSelectorAction {
   type: 'OPEN_INGREDIENT_SELECTOR'
@@ -40,6 +46,13 @@ export interface OpenIngredientSelectorAction {
 export const openIngredientSelector: (
   payload: string
 ) => OpenIngredientSelectorAction = createAction('OPEN_INGREDIENT_SELECTOR')
+export interface CloseIngredientSelectorAction {
+  type: 'CLOSE_INGREDIENT_SELECTOR'
+}
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
+export const openIngredientsSelector: (
+  payload: string[]
+) => OpenIngredientsSelectorAction = createAction('OPEN_INGREDIENTS_SELECTOR')
 export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
 }

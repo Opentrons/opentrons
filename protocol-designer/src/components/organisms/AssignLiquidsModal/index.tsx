@@ -37,6 +37,7 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
   deselectWells,
+  deselectAllWells,
   selectWells,
 } from '/protocol-designer/well-selection/actions'
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
@@ -93,10 +94,6 @@ export function AssignLiquidsModal(
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 
-  useEffect(() => {
-    setSelectedLabware([labwareId ?? ''])
-  }, [labwareId])
-
   if (labwareId === null) {
     console.assert(
       false,
@@ -129,6 +126,7 @@ export function AssignLiquidsModal(
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
             setDefineLiquidModal={setDefineLiquidModal}
+            setSelectedLabware={setSelectedLabware}
           />
         ) : null}
         <Flex
@@ -256,6 +254,9 @@ interface AssignLiquidsModalContainerProps {
 }
 
 export function LiquidLayoutOverlayModalContainer(): JSX.Element | null {
+  const dispatch = useDispatch()
+  const selectedWells = useSelector(getSelectedWells)
+  console.log('selectedWells', selectedWells)
   return (
     <OverlayModal
       header="Selected labware have different liquid layouts"
@@ -263,7 +264,7 @@ export function LiquidLayoutOverlayModalContainer(): JSX.Element | null {
       primaryButtonProps={{
         text: 'Clear liquids',
         onClick: () => {
-          console.log('clear liquids')
+          dispatch(deselectWells(selectedWells))
         },
       }}
       secondaryButtonProps={{

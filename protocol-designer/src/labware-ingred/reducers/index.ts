@@ -34,6 +34,7 @@ import type {
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
+  OpenIngredientsSelectorAction,
   RemoveWellsContentsAction,
   RenameLabwareAction,
   SelectAdapterAction,
@@ -84,6 +85,22 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   },
   null
 )
+export type SelectedContainerIds = string[] | null | undefined
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+const selectedContainerIds: Reducer<SelectedContainerIds, any> = handleActions(
+  {
+    OPEN_INGREDIENT_SELECTOR: (
+      state,
+      action: OpenIngredientsSelectorAction
+    ): SelectedContainerIds => action.payload,
+    CLOSE_INGREDIENT_SELECTOR: (
+      state,
+      action: CloseIngredientSelectorAction
+    ): SelectedContainerIds => null,
+  },
+  null
+)
+
 export type DrillDownLabwareId = string | null | undefined
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -468,6 +485,7 @@ export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
+  selectedContainerIds: SelectedContainerIds
   drillDownLabwareId: DrillDownLabwareId
   containers: ContainersState
   selectedLiquidGroup: SelectedLiquidGroupState
@@ -482,6 +500,7 @@ export const rootReducer = combineReducers({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,
+  selectedContainerIds,
   drillDownLabwareId,
   containers,
   ingredients,

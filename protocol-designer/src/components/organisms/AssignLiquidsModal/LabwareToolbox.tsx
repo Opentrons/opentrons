@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom'
 import {
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   InfoScreen,
+  SecondaryButton,
   StyledText,
   Toolbox,
 } from '@opentrons/components'
@@ -17,8 +19,7 @@ import {
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { deselectAllWells } from '/protocol-designer/well-selection/actions'
-
+import { openIngredientsSelector } from '/protocol-designer/labware-ingred/actions'
 import { LabwareButtonBasket } from '../../molecules'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -45,23 +46,19 @@ interface LabwareStackToolboxProps {
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
+  setSelectedLabware: Dispatch<SetStateAction<string[]>>
 }
 export function LabwareStackToolbox({
-  showBadFormState,
-  setShowBadFormState,
-  setDefineLiquidModal,
   setShowLiquidLayoutOverlay,
   data,
+  selectedLabwareIds,
+  setSelectedLabware,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
-  const dispatch = useDispatch()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const { labware, labwareId, allWellContents } = data
-
-  console.log('labwareId', labwareId)
-  console.log('labware', labware)
-  console.log('allWellContents', allWellContents)
 
   const labwareStack = labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
@@ -69,15 +66,14 @@ export function LabwareStackToolbox({
     navigate('/designer')
   }
 
-  const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
-    labwareId ?? '',
-  ])
-
-  useEffect(() => {
-    setSelectedLabware([labwareId ?? ''])
-  }, [labwareId])
-
   const handleSelectAllLabware = (): void => {
+    const allEqual = labwareId && allWellContents[labwareId] && allWellContents.every(item => item === allWellContents[labwareId]);
+
+    if (!allEqual) {
+      setShowLiquidLayoutOverlay(true)
+      return
+    }
+    dispatch(openIngredientsSelector(labwareStack))
     setSelectedLabware(labwareStack)
   }
 
@@ -111,14 +107,25 @@ export function LabwareStackToolbox({
         }
         onCloseClick={handleSelectAllLabware}
         height="100%"
-        confirmButtonText="Add another labware"
-        onConfirmClick={handleConfirmClick}
+        confirmButton={
+          <SecondaryButton
+            width="100%"
+            data-testid="Toolbox_confirmButton"
+            onClick={handleConfirmClick}
+          >
+          <Icon
+            size="1.5rem"
+            name='plus'
+          />
+             Add another labware
+          </SecondaryButton>
+        }
         closeButton={
           <StyledText
             desktopStyle="bodyDefaultRegular"
             onClick={handleSelectAllLabware}
           >
-            Select all
+          Select all
           </StyledText>
         }
       >
@@ -128,7 +135,7 @@ export function LabwareStackToolbox({
               stackOfLabware={labwareStack}
               labware={labware}
               setSelectedLabware={handleAssignToLabware}
-              selectedLabware={selectedLabwareArray}
+              selectedLabware={selectedLabwareIds}
             />
           </Flex>
         ) : (
@@ -148,6 +155,7 @@ interface LiquidToolboxContainerProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   selectedLabwareIds: string[]
+  setSelectedLabware: Dispatch<SetStateAction<string[]>>
 }
 
 export function LabwareStackToolboxContainer({
@@ -156,10 +164,13 @@ export function LabwareStackToolboxContainer({
   setDefineLiquidModal,
   selectedLabwareIds,
   setShowLiquidLayoutOverlay,
+  setSelectedLabware,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const labwareIds =
+    useSelector(labwareIngredSelectors.getSelectedLabwareIds) ?? []
   const { labware } = useSelector(getInitialDeckSetup)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
@@ -179,6 +190,7 @@ export function LabwareStackToolboxContainer({
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}
       selectedLabwareIds={selectedLabwareIds}
+      setSelectedLabware={setSelectedLabware}
       data={data}
     />
   )

@@ -515,8 +515,9 @@ export function LiquidToolboxContainer({
   selectedLabwareIds,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
+  console.log('selectedLabwareIds', selectedLabwareIds)
   const liquids = useSelector(getLiquidEntities)
-  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const labwareId = selectedLabwareIds[0] //useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
   const liquidLocations = useSelector(
