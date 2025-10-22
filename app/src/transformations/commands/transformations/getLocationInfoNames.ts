@@ -3,7 +3,6 @@ import {
   getLabwareStackCountAndLocation,
   locationIsOffDeck,
   locationIsOnAddressableArea,
-  locationIsOnDeck,
   locationIsOnModule,
   locationIsOnSlot,
 } from '@opentrons/shared-data'

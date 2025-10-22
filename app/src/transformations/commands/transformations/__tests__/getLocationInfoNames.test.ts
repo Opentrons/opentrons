@@ -156,8 +156,8 @@ const MOCK_ADAPTER_EXTENSION_COMMANDS = [
 ]
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const original =
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     await importOriginal<typeof import('@opentrons/shared-data')>()
   return {
     ...original,
