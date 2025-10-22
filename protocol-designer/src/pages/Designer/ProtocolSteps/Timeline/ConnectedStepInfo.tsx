@@ -48,7 +48,6 @@ import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
   stepNumber: number
-  dragHovered?: boolean
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
@@ -63,7 +62,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
     stepNumber,
-    dragHovered = false,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -252,7 +250,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         stepNumber={stepNumber}
         text={text}
         subtext={subtext}
-        dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}
       />
     </>

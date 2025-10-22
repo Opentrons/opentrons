@@ -2,7 +2,14 @@ import { useRef, useState } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { useTranslation } from 'react-i18next'
 
-import { Box, DIRECTION_COLUMN, Flex } from '@opentrons/components'
+import {
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Divider,
+  Flex,
+  SPACING,
+} from '@opentrons/components'
 
 import { DND_TYPES } from '/protocol-designer/constants'
 
@@ -81,6 +88,7 @@ interface ConnectedStepItemProps {
 interface DragDropStepProps extends ConnectedStepItemProps {
   stepId: StepIdType
   moveStep: (stepId: StepIdType, value: number) => void
+
   findStepIndex: (stepId: StepIdType) => number
   orderedStepIds: string[]
   openedOverflowMenuId?: string | null
@@ -137,18 +145,35 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 
   drag(drop(stepRef))
   return (
-    <Box
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      opacity={isDragging ? 0.3 : 1}
       ref={stepRef}
-      style={{ opacity: isDragging ? 0.3 : 1 }}
       data-handler-id={handlerId}
     >
+      {hovered && <DragDropPreviewBar />}
       <ConnectedStepInfo
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         stepNumber={stepNumber}
         stepId={stepId}
-        dragHovered={hovered}
         sidebarWidth={sidebarWidth}
+      />
+    </Flex>
+  )
+}
+
+/** A horizontal divider indicating where the step will be placed. */
+function DragDropPreviewBar(): JSX.Element {
+  return (
+    <Box paddingY={SPACING.spacing2}>
+      <Divider
+        marginY="0"
+        borderBottom="none"
+        height="0.25rem" // 4px
+        width="100%"
+        backgroundColor={COLORS.blue50}
+        borderRadius="0.125rem" // half of height
       />
     </Box>
   )
