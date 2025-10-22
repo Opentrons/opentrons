@@ -11,7 +11,7 @@ import StackerAnalysis from './StackerAnalysis.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-const analysis = (StackerAnalysis as unknown) as ProtocolAnalysisOutput
+const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
 
 function App(): JSX.Element {
   return (

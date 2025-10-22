@@ -4,14 +4,14 @@
   "description": "React components library for Opentrons' projects",
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
-  "style": "src/index.module.css",
+  "style": "lib/style.css",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "exports": {
     ".": {
+      "types": "./lib/index.d.ts",
       "import": "./lib/index.mjs",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "require": "./lib/index.js"
     },
     "./styles": "./lib/style.css",
     "./styles/global": "./src/styles/global.css",

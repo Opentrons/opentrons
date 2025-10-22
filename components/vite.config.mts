@@ -35,8 +35,13 @@ export default defineConfig({
         'react-dom/client'
       ],
       output: {
-        // Ensure CSS is bundled
-        assetFileNames: '[name].[ext]'
+  // Ensure CSS is bundled and exported with stable names for consumers
+        assetFileNames: assetInfo => {
+          const assetNames = assetInfo.names ?? []
+          const representativeName = assetNames[0] ?? ''
+
+          return representativeName.endsWith('.css') ? 'style.css' : '[name].[ext]'
+        }
       }
     },
   },
@@ -59,8 +64,8 @@ export default defineConfig({
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),
-        // Apply plugin should come early to transform custom property blocks
-        postCssApply(),
+        // Remove legacy custom property set blocks so downstream plugins cannot emit invalid CSS
+        postCssApply({ preserve: false }),
         // Process colors and other functions after apply
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
