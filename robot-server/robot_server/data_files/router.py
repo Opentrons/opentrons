@@ -1,10 +1,10 @@
 """Router for /dataFiles endpoints."""
-import zipfile
+import asyncio
 from datetime import datetime
-from io import BytesIO
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from textwrap import dedent
-from typing import Annotated, Optional, Literal, Union, Final
+from typing import Annotated, Optional, Literal, Union, Final, AsyncIterator
 
 from fastapi import UploadFile, File, Form, Depends, Response, status, Query
 from fastapi.responses import FileResponse, StreamingResponse
@@ -42,6 +42,7 @@ from .models import (
     FileInUseError,
     ImageFileMetadata,
     NoImagesFound,
+    ZipCreationFailed,
 )
 from ..protocols.dependencies import (
     get_file_hasher,
@@ -488,6 +489,7 @@ async def delete_run_images(
             "description": "A zip file containing all camera images for the run",
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoImagesFound]},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[ZipCreationFailed]},
     },
 )
 async def download_run_images(
@@ -497,6 +499,8 @@ async def download_run_images(
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
 ) -> StreamingResponse:
     """Download all camera images for a run as a zip file.
+
+    Streams the resultant zip file via a spawned subprocess.
 
     Arguments:
         runId: The run ID associated with the camera image files.
@@ -516,26 +520,82 @@ async def download_run_images(
             status.HTTP_404_NOT_FOUND
         )
 
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for file_info in info_slice.file_info:
-            image_path = Path(file_info.path)
+    existing_files = []
+    for file_info in info_slice.file_info:
+        image_path = Path(file_info.path)
+        if image_path.exists() and image_path.is_file():
+            existing_files.append((image_path, file_info.name))
 
-            if not image_path.exists() or not image_path.is_file():
-                continue
+    if not existing_files:
+        raise NoImagesFound(
+            detail=f"No accessible images found for run '{runId}'"
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
-            zip_file.write(image_path, arcname=file_info.name)
-
-    zip_buffer.seek(0)
     zip_filename = _build_zip_filename(
         run_id=runId, run_store=run_store, protocol_store=protocol_store
     )
 
     return StreamingResponse(
-        zip_buffer,
+        _stream_zip_from_subprocess(existing_files),
         media_type="application/zip",
         headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
     )
+
+
+async def _stream_zip_from_subprocess(
+    files: list[tuple[Path, str]],
+    chunk_size: int = 65536,
+) -> AsyncIterator[bytes]:
+    """Offload zipping to a subprocess, yielding the final zip file chunks, `chunk_size` bytes in size."""
+    process = None
+    tmp_dir_obj = None
+
+    try:
+        tmp_dir_obj = TemporaryDirectory()
+        tmp_path = Path(tmp_dir_obj.name)
+
+        files_dir = tmp_path / "images"
+        files_dir.mkdir()
+
+        for file_path, file_name in files:
+            dest_path = files_dir / file_name
+            dest_path.symlink_to(file_path)
+
+        zip_file_path = tmp_path / "images.zip"
+
+        file_paths = [str(files_dir / file_name) for _, file_name in files]
+        cmd = ["python3", "-m", "zipfile", "-c", str(zip_file_path)] + file_paths
+
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        _, stderr_output = await process.communicate()
+
+        if process.returncode != 0:
+            error_msg = stderr_output.decode() if stderr_output else "Unknown error"
+            raise Exception(f"Failed to create zip file: {error_msg}")
+
+        with open(zip_file_path, "rb") as zip_file:
+            while True:
+                chunk = zip_file.read(chunk_size)
+                if not chunk:
+                    break
+                yield chunk
+
+    except Exception as e:
+        if process is not None and process.returncode is None:
+            process.kill()
+            await process.wait()
+
+        raise ZipCreationFailed(
+            detail=f"Unexpected error during zip creation: {str(e)}"
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
+    finally:
+        if tmp_dir_obj is not None:
+            tmp_dir_obj.cleanup()
 
 
 def _build_zip_filename(

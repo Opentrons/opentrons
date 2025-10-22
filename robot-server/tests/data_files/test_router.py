@@ -683,15 +683,21 @@ async def test_download_run_images_success(
     data_files_store: DataFilesStore,
     run_store: RunStore,
     protocol_store: ProtocolStore,
+    tmp_path: Path,
 ) -> None:
     """It should return a zip file with all images for a run."""
+    image1_path = tmp_path / "image1.jpeg"
+    image2_path = tmp_path / "image2.jpeg"
+    image1_path.write_bytes(b"fake image data 1")
+    image2_path.write_bytes(b"fake image data 2")
+
     file_info_1 = DataFileInfoWithCommands(
         id="file-id-1",
         name="image1.jpeg",
         file_hash="hash1",
         created_at=datetime(year=2024, month=6, day=20),
         mime_type=MimeType.IMAGE_JPEG,
-        path="/tmp/test/run-id-1/image1.jpeg",
+        path=str(image1_path),
         generated=True,
         stored=True,
         command_info=CmdDataFileInfo(
@@ -706,7 +712,7 @@ async def test_download_run_images_success(
         file_hash="hash2",
         created_at=datetime(year=2024, month=6, day=21),
         mime_type=MimeType.IMAGE_JPEG,
-        path="/tmp/test/run-id-2/image2.jpeg",
+        path=str(image2_path),
         generated=True,
         stored=True,
         command_info=CmdDataFileInfo(
@@ -746,23 +752,24 @@ async def test_download_run_images_success(
     decoy.when(mock_protocol.source).then_return(mock_source)
     decoy.when(protocol_store.get("protocol-id")).then_return(mock_protocol)
 
-    Path(file_info_1.path).parent.mkdir(parents=True, exist_ok=True)
-    Path(file_info_2.path).parent.mkdir(parents=True, exist_ok=True)
+    result = await download_run_images(
+        runId="run-id",
+        data_files_store=data_files_store,
+        run_store=run_store,
+        protocol_store=protocol_store,
+    )
 
-    try:
-        result = await download_run_images(
-            runId="run-id",
-            data_files_store=data_files_store,
-            run_store=run_store,
-            protocol_store=protocol_store,
-        )
+    assert result.media_type == "application/zip"
+    assert "attachment" in result.headers["Content-Disposition"]
+    assert ".zip" in result.headers["Content-Disposition"]
 
-        assert result.media_type == "application/zip"
-        assert "attachment" in result.headers["Content-Disposition"]
-        assert ".zip" in result.headers["Content-Disposition"]
-    finally:
-        Path(file_info_1.path).unlink(missing_ok=True)
-        Path(file_info_2.path).unlink(missing_ok=True)
+    chunks = []
+    async for chunk in result.body_iterator:
+        chunks.append(chunk)
+
+    assert len(chunks) > 0
+    total_size = sum(len(chunk) for chunk in chunks)
+    assert total_size > 0
 
 
 async def test_download_run_images_no_images_found(

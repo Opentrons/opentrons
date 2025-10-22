@@ -77,6 +77,13 @@ class NoImagesFound(ErrorDetails):
     title: str = "No images found for run"
 
 
+class ZipCreationFailed(ErrorDetails):
+    """An error returned when zip file creation fails during image download."""
+
+    id: Literal["ZipCreationFailed"] = "ZipCreationFailed"
+    title: str = "Failed to create zip file"
+
+
 class ImageFileMetadata(BaseModel):
     """Metadata associated with a particular image file captured by a camera during a run."""
 
