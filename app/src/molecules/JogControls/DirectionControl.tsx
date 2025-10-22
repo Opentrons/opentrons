@@ -479,8 +479,8 @@ export function TouchDirectionControl(
                 onClick={() => {
                   setCurrentPlane(plane)
                 }}
-                text1={CONTROLS_CONTENTS_BY_PLANE[plane].title}
-              ></TouchControlButton>
+                title={CONTROLS_CONTENTS_BY_PLANE[plane].title}
+              />
             )
           })}
         </Flex>

@@ -72,8 +72,8 @@ function ZoomBtn({
   return (
     <TouchControlButton
       onClick={onClick}
-      text1={btnZoomValue}
-      text2={buildBtnCopy()}
+      title={btnZoomValue}
+      subText={buildBtnCopy()}
       isActive={isActive}
     />
   )

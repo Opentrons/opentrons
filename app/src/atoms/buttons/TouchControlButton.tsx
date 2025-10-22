@@ -12,13 +12,11 @@ import {
 
 import { getIsOnDevice } from '/app/redux/config'
 
-import type { MouseEventHandler } from 'react'
-
 interface TouchControlProps {
-  text1: string
+  title: string
   isActive: boolean
-  onClick?: MouseEventHandler
-  text2?: string
+  onClick: () => void
+  subText?: string
 }
 
 const StyledTouchButton = styled(Btn)<{ isActive: boolean; isOnOdd: boolean }>`
@@ -73,7 +71,7 @@ const StyledTouchButton = styled(Btn)<{ isActive: boolean; isOnOdd: boolean }>`
 `
 
 export function TouchControlButton(props: TouchControlProps): JSX.Element {
-  const { text1, text2, isActive, onClick } = props
+  const { title, subText, isActive, onClick } = props
   const isOnOdd = useSelector(getIsOnDevice)
   return (
     <StyledTouchButton isActive={isActive} onClick={onClick} isOnOdd={isOnOdd}>
@@ -88,14 +86,14 @@ export function TouchControlButton(props: TouchControlProps): JSX.Element {
               : COLORS.black90
         }
       >
-        {text1}
+        {title}
       </StyledText>
       <StyledText
         oddStyle={'bodyTextRegular'}
         desktopStyle={'captionRegular'}
         color={isActive && isOnOdd ? COLORS.white : COLORS.grey60}
       >
-        {text2}
+        {subText}
       </StyledText>
     </StyledTouchButton>
   )

@@ -68,8 +68,8 @@ function StepSizeButtons({
           onClick={() => {
             setCurrentStepSize(stepSize)
           }}
-          text1={t(stepSizeTranslationKeyByStep[stepSize])}
-          text2={`${stepSize} mm`}
+          title={t(stepSizeTranslationKeyByStep[stepSize])}
+          subText={`${stepSize} mm`}
         />
       ))}
     </>
