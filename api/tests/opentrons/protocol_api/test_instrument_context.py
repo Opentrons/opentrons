@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import ContextManager, Optional, Any
 from unittest.mock import sentinel
 
-from decoy import Decoy, matchers
+from decoy import Decoy
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
@@ -2121,6 +2121,7 @@ def test_mix_with_delay_and_final_push_out(
         mock_protocol_core.delay(4, msg=None),  # dispense delay
     )
 
+
 def test_mix_with_end_location(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -2166,7 +2167,7 @@ def test_mix_with_end_location(
             end_meniscus_tracking=None,
             movement_delay=None,
         ),
-        times=3
+        times=3,
     )
     decoy.verify(
         mock_instrument_core.dispense(
@@ -2182,7 +2183,7 @@ def test_mix_with_end_location(
             end_meniscus_tracking=None,
             movement_delay=None,
         ),
-        times=2
+        times=2,
     )
     decoy.verify(
         mock_instrument_core.dispense(
@@ -2198,9 +2199,8 @@ def test_mix_with_end_location(
             end_meniscus_tracking=None,
             movement_delay=None,
         ),
-        times=1
+        times=1,
     )
-
 
 
 @pytest.mark.ot3_only
