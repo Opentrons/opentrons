@@ -729,6 +729,18 @@ class InstrumentContext(publisher.CommandPublisher):
                                pipette will not push out after earlier repetitions. If
                                not specified or ``None``, the pipette will push out the
                                default non-zero amount. See :ref:`push-out-dispense`.
+        :param end_location: Tells the robot to move between location and end_location
+            while mixing liquid liquid. When this argument is provided the pipette will aspirate
+            while simultaneously moving from location to end_location and dispense while
+            simultaneously moving from end_location to location. When this argument is used
+            the location and end_location must both be :py:class:`.Location`.
+        :type end_location: :py:class:`.Location`
+        :param movement_delay: Delay the x/y/z movement during a dynamic mix.
+            This option is only valid when using end_location. When this argument
+            is used, the x/y/z movement will wait movement_delay seconds after the pipette
+            starts to aspirate/dispense before moving. This may help when mixing very viscous
+            liquids that need to build up some pressure before liquid starts to flow.
+        :type movement_delay: float
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :returns: This instance.
 
