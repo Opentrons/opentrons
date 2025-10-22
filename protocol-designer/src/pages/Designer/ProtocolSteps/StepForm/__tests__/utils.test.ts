@@ -28,7 +28,7 @@ import type { FormErrorLocationType } from '/protocol-designer/steplist/formLeve
 const BASE_VISIBLE_FORM_ERROR = {
   title: 'form level error title',
   dependentFields: ['field1', 'field2'],
-  location: 'form' as FormErrorLocationType,
+  location: ['form'] as FormErrorLocationType[],
 }
 
 const MOCK_INVARIANT_CONTEXT = makeContext()
@@ -114,19 +114,19 @@ describe('getFormErrorsMappedToField', () => {
   })
   it('should render errors for field level', () => {
     const result = getFormErrorsMappedToField([
-      { ...BASE_VISIBLE_FORM_ERROR, location: 'field' },
+      { ...BASE_VISIBLE_FORM_ERROR, location: ['field'] },
     ])
     expect(result).toEqual({
       field1: [
         {
           ...BASE_VISIBLE_FORM_ERROR,
-          location: 'field',
+          location: ['field'],
         },
       ],
       field2: [
         {
           ...BASE_VISIBLE_FORM_ERROR,
-          location: 'field',
+          location: ['field'],
         },
       ],
     })

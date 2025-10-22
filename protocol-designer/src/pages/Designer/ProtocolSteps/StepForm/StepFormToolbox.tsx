@@ -533,7 +533,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           <FormAlerts
             focusedField={focusedField}
             dirtyFields={dirtyFields}
-            showFormErrors={!currentFormIsPresaved || showFormErrors}
+            showFormErrors={showFormErrors}
             page={toolboxStep}
           />
           <ToolsComponent

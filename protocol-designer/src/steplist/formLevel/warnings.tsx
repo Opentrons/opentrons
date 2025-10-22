@@ -41,14 +41,14 @@ const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   title: `Disposal volume is below recommended minimum (${min} uL)`,
   body: 'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum.',
   dependentFields: ['pipette', 'volume'],
-  location: 'form',
+  location: ['form'],
 })
 
 const overMaxWellVolumeWarning = (): FormWarning => ({
   type: 'OVER_MAX_WELL_VOLUME',
   title: 'Dispense volume will overflow a destination well',
   dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
-  location: 'form',
+  location: ['form'],
 })
 
 const tipPositionedLowInTube = (): FormWarning => ({
@@ -56,7 +56,7 @@ const tipPositionedLowInTube = (): FormWarning => ({
   title:
     'A tuberack has an aspirate and dispense default height at 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['aspirate_labware', 'dispense_labware'],
-  location: 'form',
+  location: ['form'],
 })
 
 const mixTipPositionedLowInTube = (): FormWarning => ({
@@ -64,14 +64,14 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   title:
     'The default mix height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['labware'],
-  location: 'form',
+  location: ['form'],
 })
 
 const volumeTooHighInWell = (): FormWarning => ({
   type: 'VOLUME_OUT_OF_RANGE',
   title: 'Well volume is out of range',
   dependentFields: ['volume'],
-  location: 'form',
+  location: ['form'],
 })
 
 /*******************
@@ -194,42 +194,42 @@ export const _lowVolumeTransferWarning = (): FormWarning => ({
   type: 'LOW_VOLUME_TRANSFER',
   title: `Transfer volumes of ${MINIMUM_LIQUID_CLASS_VOLUME} µL or less are incompatible with liquid classes.`,
   dependentFields: ['volume'],
-  location: 'form',
+  location: ['form'],
 })
 
 export const _incompatiblePipettePathWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_PIPETTE_PATH',
   title: 'The selected pipette path is incompatible with some liquid classes.',
   dependentFields: ['path', 'pipette', 'tipRack'],
-  location: 'form',
+  location: ['form'],
 })
 
 export const _incompatibleAllPipetteWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_ALL_PIPETTE',
   title: `The selected pipette is incompatible with liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
-  location: 'form',
+  location: ['form'],
 })
 
 export const _incompatibleSomePipetteWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_SOME_PIPETTE',
   title: `The selected pipette is incompatible with some liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
-  location: 'form',
+  location: ['form'],
 })
 
 export const _incompatibleAllTipRackWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_TIP_RACK_ALL',
   title: `The selected tiprack is incompatible with all liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
-  location: 'form',
+  location: ['form'],
 })
 
 export const _incompatibleSomeTipRackWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_TIP_RACK_SOME',
   title: `The selected tiprack is incompatible with some liquid classes.`,
   dependentFields: ['pipette', 'tipRack'],
-  location: 'form',
+  location: ['form'],
 })
 
 enum ReasonForWarning {
