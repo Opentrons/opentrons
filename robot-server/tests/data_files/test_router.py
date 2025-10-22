@@ -1,5 +1,7 @@
 """Tests for data_files router."""
 import io
+from typing import List
+
 import pytest
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +14,7 @@ from robot_server.service.json_api import MultiBodyMeta, SimpleEmptyBody
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
+    DataFilesByRunInfo,
 )
 from robot_server.data_files.models import (
     DataFile,
@@ -27,6 +30,7 @@ from robot_server.data_files.router import (
     delete_file_by_id,
     get_run_image_metadata,
     delete_run_images,
+    get_data_files_by_run_id,
 )
 from robot_server.data_files.data_files_store import DataFileWithCommandsInfoSlice
 from opentrons_shared_data.data_files import DataFileInfoWithCommands, CmdDataFileInfo
@@ -654,6 +658,155 @@ async def test_delete_run_images_run_not_found(
 
     with pytest.raises(ApiError) as exc_info:
         await delete_run_images(
+            runId="run-id",
+            data_files_store=data_files_store,
+            run_data_manager=run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+@pytest.mark.parametrize(
+    argnames=["input_files", "output_files", "expected_length"],
+    argvalues=[
+        pytest.param(
+            [
+                DataFileInfo(
+                    id="input-file-1",
+                    name="input1.csv",
+                    file_hash="hash-input-1",
+                    created_at=datetime(year=2024, month=6, day=20),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/input-file-1/input1.csv",
+                    generated=False,
+                    stored=True,
+                ),
+                DataFileInfo(
+                    id="input-file-2",
+                    name="input2.csv",
+                    file_hash="hash-input-2",
+                    created_at=datetime(year=2024, month=6, day=21),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/input-file-2/input2.csv",
+                    generated=False,
+                    stored=True,
+                ),
+            ],
+            [
+                DataFileInfo(
+                    id="output-file-1",
+                    name="output1.csv",
+                    file_hash="hash-output-1",
+                    created_at=datetime(year=2024, month=6, day=22),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/output-file-1/output1.csv",
+                    generated=True,
+                    stored=True,
+                ),
+                DataFileInfo(
+                    id="output-file-2",
+                    name="output2.csv",
+                    file_hash="hash-output-2",
+                    created_at=datetime(year=2024, month=6, day=23),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/output-file-2/output2.csv",
+                    generated=True,
+                    stored=True,
+                ),
+            ],
+            4,
+            id="multiple_input_and_output_files",
+        ),
+        pytest.param(
+            [],
+            [],
+            0,
+            id="empty_result",
+        ),
+        pytest.param(
+            [
+                DataFileInfo(
+                    id="input-file-1",
+                    name="input1.csv",
+                    file_hash="hash-input-1",
+                    created_at=datetime(year=2024, month=6, day=20),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/input-file-1/input1.csv",
+                    generated=False,
+                    stored=True,
+                ),
+            ],
+            [],
+            1,
+            id="only_input_files",
+        ),
+        pytest.param(
+            [],
+            [
+                DataFileInfo(
+                    id="output-file-1",
+                    name="output1.csv",
+                    file_hash="hash-output-1",
+                    created_at=datetime(year=2024, month=6, day=22),
+                    mime_type=MimeType.TEXT_CSV,
+                    path="data_files/output-file-1/output1.csv",
+                    generated=True,
+                    stored=True,
+                ),
+            ],
+            1,
+            id="only_output_files",
+        ),
+    ],
+)
+async def test_get_data_files_by_run_id(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+    input_files: List[DataFileInfo],
+    output_files: List[DataFileInfo],
+    expected_length: int,
+) -> None:
+    """It should return metadata for all data files associated with a run."""
+    decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
+
+    decoy.when(data_files_store.get_data_files_by_run_id("run-id")).then_return(
+        DataFilesByRunInfo(
+            input_files=input_files,
+            output_files=output_files,
+        )
+    )
+
+    result = await get_data_files_by_run_id(
+        runId="run-id",
+        data_files_store=data_files_store,
+        run_data_manager=run_data_manager,
+    )
+
+    assert len(result.content.data) == expected_length
+    if expected_length > 0:
+        all_files = input_files + output_files
+
+        for response_file, expected_file in zip(result.content.data, all_files):
+            assert response_file.id == expected_file.id
+            assert response_file.stored == expected_file.stored
+            assert response_file.generated == expected_file.generated
+            assert response_file.mimeType == expected_file.mime_type
+
+
+async def test_get_data_files_by_run_id_run_not_found(
+    decoy: Decoy,
+    data_files_store: DataFilesStore,
+    run_data_manager: RunDataManager,
+) -> None:
+    """It should raise an error if the run doesn't exist."""
+    decoy.when(run_data_manager.get("run-id")).then_raise(
+        RunNotFoundError(run_id="run-id")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_data_files_by_run_id(
             runId="run-id",
             data_files_store=data_files_store,
             run_data_manager=run_data_manager,

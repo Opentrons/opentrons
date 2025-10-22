@@ -109,6 +109,7 @@ class LegacyInstrumentCoreSimulator(
         end_location: Optional[types.Location] = None,
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -154,6 +155,7 @@ class LegacyInstrumentCoreSimulator(
         end_location: Optional[types.Location] = None,
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(

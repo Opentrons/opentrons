@@ -13348,11 +13348,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "38abc67ca848dce21580fcb2a4c91a4a",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c1e0ffb3c32b723f773cf1e59fa8d90d",
+      "key": "cdbdfdb23c503134e067a4027082fa1d",
       "notes": [],
       "params": {
         "celsius": 38.0,
@@ -13366,11 +13380,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2723cde615c6e0734ade8f275e779fe0",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9be83425c9bed4cb4b132c78b53fa483",
+      "key": "f408af8544c27e73dad57b2c82111dd9",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13384,7 +13412,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "840e33f499a2b8131535f9a43ec4d01a",
+      "key": "7be936ae8289a4ce569f91a548f7364f",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -13444,7 +13472,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "afca8d6da175c2411b4e22a13689b800",
+      "key": "93d55882e8dc2ee82e04632fcad24bdf",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13458,7 +13486,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c4ed65b17434c3470c807ff392ea5663",
+      "key": "9ed4f76ebc9695a9d035855b36115a22",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13472,7 +13500,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6e3ebd40f7f67296625c792f5d4ba075",
+      "key": "9ae6574f7724b6253706f93b1e00fb13",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13488,7 +13516,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ebddc8ff34953b3b033ea0569fa2b7ee",
+      "key": "bf034101c050142f107e4707febd354b",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -13566,7 +13594,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "89bc437612d29a16b70aec9ae8b9f020",
+      "key": "e30e2dece987637c21648ba6d85b0cdf",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13580,7 +13608,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6afb80b103a39fb45a12bb3c813ad72f",
+      "key": "69a2a8602c1660ef08a2f2ba92b2ad20",
       "notes": [],
       "params": {
         "celsius": 38.0,
@@ -13597,7 +13625,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e25b8090c82031b7e1b9bf0d9a369d90",
+      "key": "152eedca888a97121f36a3c46ef2a371",
       "notes": [],
       "params": {
         "moduleId": "UUID",
@@ -13614,7 +13642,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4cfd76f407857c7f73e3a687a722d25c",
+      "key": "b9d6c7022e3942a17551b1b839998506",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13628,7 +13656,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6f95864498ac79674e47c36fbc947296",
+      "key": "21c180ae2288a0ab0d3de167688806e0",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13642,7 +13670,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7dd308793968350cffebb7ec8e27753c",
+      "key": "e039843ed7ad670c188214c760c53f2e",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13656,7 +13684,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9525bf19b69da3ffd2381d5bb4ac1980",
+      "key": "1f256b95b5a787511f076c129885363c",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13672,7 +13700,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7260807d874f460913ceec15288e647f",
+      "key": "91c9f46b7646567f1fb944124f297ca8",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -13754,7 +13782,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "caab1457b631989ad8e0bad1485d54af",
+      "key": "9d275ff542b16ab2bb87784916bab630",
       "notes": [],
       "params": {
         "celsius": 38.0,
@@ -13772,7 +13800,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5101ed5af20e301b09eaa243b8da4a3f",
+      "key": "15165e83e748536f4285d9854e493f7a",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13786,7 +13814,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "70b7f8bd6beb5874ebe5cc8b9de3ea14",
+      "key": "a913a5fc591976f20b260a69eca2e5d2",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13800,7 +13828,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5708db88203bfd4675e47ec0eec892a6",
+      "key": "94b7690362cd09648a30901a9662e855",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -13874,7 +13902,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cf85834d6eb050191590e5006b0b960b",
+      "key": "a7f24faca51c9fec8ad352b303567090",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -13888,7 +13916,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5e6dd0de2462b55f5297342d3f965244",
+      "key": "16680d14e68fb37857861b36030d406c",
       "notes": [],
       "params": {
         "fileName": "smoke_APR_data.csv",
@@ -14007,7 +14035,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e25cd8845e3a3a98856d70220061a0dd",
+      "key": "1cd3d8461c2f207df3301d15fc53a704",
       "notes": [],
       "params": {
         "message": "single: {600: {'A1': 0.0, 'A2': 0.0, 'A3': 0.0, 'A4': 0.0, 'A5': 0.0, 'A6': 0.0, 'A7': 0.0, 'A8': 0.0, 'A9': 0.0, 'A10': 0.0, 'A11': 0.0, 'A12': 0.0, 'B1': 0.0, 'B2': 0.0, 'B3': 0.0, 'B4': 0.0, 'B5': 0.0, 'B6': 0.0, 'B7': 0.0, 'B8': 0.0, 'B9': 0.0, 'B10': 0.0, 'B11': 0.0, 'B12': 0.0, 'C1': 0.0, 'C2': 0.0, 'C3': 0.0, 'C4': 0.0, 'C5': 0.0, 'C6': 0.0, 'C7': 0.0, 'C8': 0.0, 'C9': 0.0, 'C10': 0.0, 'C11': 0.0, 'C12': 0.0, 'D1': 0.0, 'D2': 0.0, 'D3': 0.0, 'D4': 0.0, 'D5': 0.0, 'D6': 0.0, 'D7': 0.0, 'D8': 0.0, 'D9': 0.0, 'D10': 0.0, 'D11': 0.0, 'D12': 0.0, 'E1': 0.0, 'E2': 0.0, 'E3': 0.0, 'E4': 0.0, 'E5': 0.0, 'E6': 0.0, 'E7': 0.0, 'E8': 0.0, 'E9': 0.0, 'E10': 0.0, 'E11': 0.0, 'E12': 0.0, 'F1': 0.0, 'F2': 0.0, 'F3': 0.0, 'F4': 0.0, 'F5': 0.0, 'F6': 0.0, 'F7': 0.0, 'F8': 0.0, 'F9': 0.0, 'F10': 0.0, 'F11': 0.0, 'F12': 0.0, 'G1': 0.0, 'G2': 0.0, 'G3': 0.0, 'G4': 0.0, 'G5': 0.0, 'G6': 0.0, 'G7': 0.0, 'G8': 0.0, 'G9': 0.0, 'G10': 0.0, 'G11': 0.0, 'G12': 0.0, 'H1': 0.0, 'H2': 0.0, 'H3': 0.0, 'H4': 0.0, 'H5': 0.0, 'H6': 0.0, 'H7': 0.0, 'H8': 0.0, 'H9': 0.0, 'H10': 0.0, 'H11': 0.0, 'H12': 0.0}}"
@@ -14021,7 +14049,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4bcf2e841495e69faee0e94e0982e839",
+      "key": "a89b363a404d46dea229575ec6e858e3",
       "notes": [],
       "params": {
         "message": "single: {600: {'A1': 0.0, 'A2': 0.0, 'A3': 0.0, 'A4': 0.0, 'A5': 0.0, 'A6': 0.0, 'A7': 0.0, 'A8': 0.0, 'A9': 0.0, 'A10': 0.0, 'A11': 0.0, 'A12': 0.0, 'B1': 0.0, 'B2': 0.0, 'B3': 0.0, 'B4': 0.0, 'B5': 0.0, 'B6': 0.0, 'B7': 0.0, 'B8': 0.0, 'B9': 0.0, 'B10': 0.0, 'B11': 0.0, 'B12': 0.0, 'C1': 0.0, 'C2': 0.0, 'C3': 0.0, 'C4': 0.0, 'C5': 0.0, 'C6': 0.0, 'C7': 0.0, 'C8': 0.0, 'C9': 0.0, 'C10': 0.0, 'C11': 0.0, 'C12': 0.0, 'D1': 0.0, 'D2': 0.0, 'D3': 0.0, 'D4': 0.0, 'D5': 0.0, 'D6': 0.0, 'D7': 0.0, 'D8': 0.0, 'D9': 0.0, 'D10': 0.0, 'D11': 0.0, 'D12': 0.0, 'E1': 0.0, 'E2': 0.0, 'E3': 0.0, 'E4': 0.0, 'E5': 0.0, 'E6': 0.0, 'E7': 0.0, 'E8': 0.0, 'E9': 0.0, 'E10': 0.0, 'E11': 0.0, 'E12': 0.0, 'F1': 0.0, 'F2': 0.0, 'F3': 0.0, 'F4': 0.0, 'F5': 0.0, 'F6': 0.0, 'F7': 0.0, 'F8': 0.0, 'F9': 0.0, 'F10': 0.0, 'F11': 0.0, 'F12': 0.0, 'G1': 0.0, 'G2': 0.0, 'G3': 0.0, 'G4': 0.0, 'G5': 0.0, 'G6': 0.0, 'G7': 0.0, 'G8': 0.0, 'G9': 0.0, 'G10': 0.0, 'G11': 0.0, 'G12': 0.0, 'H1': 0.0, 'H2': 0.0, 'H3': 0.0, 'H4': 0.0, 'H5': 0.0, 'H6': 0.0, 'H7': 0.0, 'H8': 0.0, 'H9': 0.0, 'H10': 0.0, 'H11': 0.0, 'H12': 0.0}}"
@@ -14035,7 +14063,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "eaf9467d6960139f76c520100ddba65b",
+      "key": "e7d18ca6b1a3903ad9ec60161f9fb8ba",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -14049,7 +14077,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d525d3ec8fb0e05157485e048cf3e087",
+      "key": "52730941aa839dfa28418c7b5b4f24b5",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14111,7 +14139,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "35faac5c7a8a95f06ccd8fadf74a9058",
+      "key": "ea78e104df91152ad14143bb67e98bd7",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14153,7 +14181,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c4e7b279c73e81094eaa1b36d9c471cb",
+      "key": "93b54213d765ba3b83a1d34fd27c2161",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14186,7 +14214,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "610a312aef5d01161759ff745bf55ae1",
+      "key": "14370ac4ec3eef47f51e253380335b4e",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14218,7 +14246,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f21c62e25ce8836efc67abb3d0722fb6",
+      "key": "a431ade7442c4b1be1fda0ea5191ceba",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be at the LPC calibrated height."
@@ -14232,7 +14260,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0e10bdb369fd70271a015e931bda22fe",
+      "key": "5003a25f60bb352e910adef1098587fa",
       "notes": [],
       "params": {
         "labwareId": "UUID"
@@ -14262,7 +14290,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a22eb6f857b4d93fd54d55e6882f0747",
+      "key": "348a8acd40e73b2723a0ca8b09a2e7f5",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14294,7 +14322,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a6b843c353d81bfeb1a17e19c66bb958",
+      "key": "982a94fd7303e66aa6259b6eb805e808",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be 10mm higher than the LPC calibrated height."
@@ -14308,7 +14336,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "82b680ede46da709bf1e9ed2bd0a6c34",
+      "key": "acb7feb8e883d58e6bd169f14da2ca06",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14366,7 +14394,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f8dd21c4850124f4558b796e20fb4ecc",
+      "key": "d06fd1079071892d4f896f9daa10ff89",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14398,7 +14426,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b01a42db87e67862babd1c8c149dad07",
+      "key": "424db1d1c50dbde8014cd2ef2238ded6",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot D2? It should be at the LPC calibrated height."
@@ -14412,7 +14440,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9611499355bade5f36961f160fda71c0",
+      "key": "8d6373ee9287e77e4b6719910cb8228d",
       "notes": [],
       "params": {
         "labwareId": "UUID"
@@ -14442,7 +14470,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "55ab759efc37d843ffc3b9eac2323e60",
+      "key": "43e853d8b631492d257678cefe8026dd",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14474,7 +14502,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e50333c328d44021be35960561c46847",
+      "key": "d0a7deeda4ca5e597a812635602650a2",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot D2? It should be 10mm higher than the LPC calibrated height."
@@ -14488,7 +14516,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f9cbbb380f4f1542c6a6d54d47067b9e",
+      "key": "66d67195eeaae2f0a92958350b3fb939",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14547,7 +14575,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "da53f2380203c8811f81696b269e12d5",
+      "key": "7a606d5788955882027e428a14aaeb1e",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14579,7 +14607,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1191731c533868a6ae1691005190505b",
+      "key": "781168bd5a7e02b46a55f37231802add",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be 10mm higher than the LPC calibrated height."
@@ -14593,7 +14621,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "65c5fb8dbb357149567f9db58a011290",
+      "key": "cd444e409d19cc34ae13c57c78bb086e",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14644,7 +14672,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "09d8497de1de5ac1900be3c9642d6a09",
+      "key": "c5d7971ec2f6b522614c2d2f88094e1d",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -14676,7 +14704,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "781b949e789c686350c0f5fe6161f43a",
+      "key": "1d59eda3d33ebec0f868e8338bbddfba",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the reservoir , well A1, in slot D2? It should be at the LPC calibrated height."
@@ -14690,7 +14718,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7a8c7f28deb911975561bb142a06a195",
+      "key": "29d9d636fc2e8788aca7a2ab3bf1ff42",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
@@ -14722,7 +14750,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "343be7cd07211cdbe2b0ce8c7f09eb10",
+      "key": "4635c8bdd0af988291bd7ac6b20f5a3f",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -14773,7 +14801,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7631735c846c8a32e2fb1c2bc3357cda",
+      "key": "cb0da417e9dda17600e8bb3b689581ba",
       "notes": [],
       "params": {
         "message": "!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!"
