@@ -398,14 +398,19 @@ export const getUnoccupiedStackOptions = (args: {
       const { def: labwareOnDeckDef } = labwareOnDeck
       const { displayName } = labwareOnDeckDef.metadata
       const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
+      const isUniversalLid =
+        def.parameters.loadName === 'opentrons_tough_universal_lid'
+      const isLabwareOnSlotTubeOrBlock =
+        labwareOnDeckDef.metadata.displayCategory === 'tubeRack' ||
+        labwareOnDeckDef.metadata.displayCategory === 'aluminumBlock'
+      const isLabwareOnSlotTiprack = labwareOnDeckDef.parameters.isTiprack
 
       const isCompatible =
-        labwareCompatibleParentLabware?.includes(
-          labwareOnDeckLoadName
-          //  allow universal lid to go on itself, special-case since it doesn't have a compatibleParentLabware array
-        ) ||
-        (def.parameters.loadName === 'opentrons_tough_universal_lid' &&
-          labwareOnDeckLoadName === 'opentrons_tough_universal_lid')
+        labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
+        (isUniversalLid &&
+          !isLabwareOnSlotTubeOrBlock &&
+          !isLabwareOnSlotTiprack &&
+          labwareOnDeckDef.allowedRoles?.includes('lid'))
 
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
