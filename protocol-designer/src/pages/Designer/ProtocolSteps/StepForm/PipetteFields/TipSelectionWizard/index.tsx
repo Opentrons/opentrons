@@ -84,8 +84,6 @@ export function TipSelectionWizard(
       tiprackUri: formTiprackUri,
     })
 
-  console.log({ tipAccessibilityStatus })
-
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const isAnySelectedWellUsed =
