@@ -5418,7 +5418,7 @@
       "type": "object"
     },
     "SetTargetLidTemperatureParams": {
-      "description": "Input parameters to set a Thermocycler's target lid temperature.",
+      "description": "Input parameters to  to set a Thermocycler's target lid temperature.",
       "properties": {
         "celsius": {
           "description": "Target temperature in \u00b0C.",

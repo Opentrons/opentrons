@@ -81,6 +81,7 @@ TEMPDECK_AWAIT_TEMP: Final = "command.TEMPDECK_AWAIT_TEMP"
 THERMOCYCLER_OPEN: Final = "command.THERMOCYCLER_OPEN"
 THERMOCYCLER_CLOSE: Final = "command.THERMOCYCLER_CLOSE"
 THERMOCYCLER_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_SET_BLOCK_TEMP"
+THERMOCYCLER_START_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_START_SET_BLOCK_TEMP"
 THERMOCYCLER_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_EXECUTE_PROFILE"
 THERMOCYCLER_START_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_START_EXECUTE_PROFILE"
 THERMOCYCLER_DEACTIVATE: Final = "command.THERMOCYCLER_DEACTIVATE"
@@ -88,6 +89,7 @@ THERMOCYCLER_WAIT_FOR_HOLD: Final = "command.THERMOCYCLER_WAIT_FOR_HOLD"
 THERMOCYCLER_WAIT_FOR_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_TEMP"
 THERMOCYCLER_WAIT_FOR_LID_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_LID_TEMP"
 THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
+THERMOCYCLER_START_SET_LID_TEMP: Final = "command.THERMOCYCLER_START_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
@@ -314,6 +316,15 @@ class ThermocyclerSetBlockTempCommand(TypedDict):
     payload: ThermocyclerSetBlockTempCommandPayload
 
 
+class ThermocyclerStartSetBlockTempCommandPayload(TextOnlyPayload):
+    temperature: float
+
+
+class ThermocyclerStartSetBlockTempCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_SET_BLOCK_TEMP"]
+    payload: ThermocyclerStartSetBlockTempCommandPayload
+
+
 class ThermocyclerExecuteProfileCommandPayload(TextOnlyPayload):
     steps: List[ThermocyclerStep]
 
@@ -357,6 +368,15 @@ class ThermocyclerSetLidTempCommandPayload(TextOnlyPayload):
 class ThermocyclerSetLidTempCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_SET_LID_TEMP"]
     payload: ThermocyclerSetLidTempCommandPayload
+
+
+class ThermocyclerStartSetLidTempCommandPayload(TextOnlyPayload):
+    pass
+
+
+class ThermocyclerStartSetLidTempCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_SET_LID_TEMP"]
+    payload: ThermocyclerStartSetLidTempCommandPayload
 
 
 class ThermocyclerDeactivateLidCommandPayload(TextOnlyPayload):
@@ -791,11 +811,13 @@ Command = Union[
     ThermocyclerDeactivateBlockCommand,
     ThermocyclerDeactivateLidCommand,
     ThermocyclerSetLidTempCommand,
+    ThermocyclerStartSetLidTempCommand,
     ThermocyclerWaitForTempCommand,
     ThermocyclerWaitForHoldCommand,
     ThermocyclerExecuteProfileCommand,
     ThermocyclerStartExecuteProfileCommand,
     ThermocyclerSetBlockTempCommand,
+    ThermocyclerStartSetBlockTempCommand,
     ThermocyclerOpenCommand,
     TempdeckDeactivateCommand,
     TempdeckAwaitTempCommand,
@@ -854,6 +876,7 @@ CommandPayload = Union[
     ThermocyclerWaitForHoldCommandPayload,
     ThermocyclerWaitForTempCommandPayload,
     ThermocyclerSetLidTempCommandPayload,
+    ThermocyclerStartSetLidTempCommandPayload,
     ThermocyclerDeactivateLidCommandPayload,
     ThermocyclerDeactivateBlockCommandPayload,
     ThermocyclerDeactivateCommandPayload,
@@ -877,6 +900,7 @@ CommandPayload = Union[
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerStartExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
+    ThermocyclerStartSetBlockTempCommandPayload,
     TempdeckAwaitTempCommandPayload,
     TempdeckSetTempCommandPayload,
     PauseCommandPayload,
@@ -1068,6 +1092,18 @@ class ThermocyclerDeactivateLidMessage(
 
 class ThermocyclerSetLidTempMessage(
     CommandMessageFields, ThermocyclerSetLidTempCommand
+):
+    pass
+
+
+class ThermocyclerStartSetLidTempMessage(
+    CommandMessageFields, ThermocyclerStartSetLidTempCommand
+):
+    pass
+
+
+class ThermocyclerStartSetBlockTempMessage(
+    CommandMessageFields, ThermocyclerStartSetBlockTempCommand
 ):
     pass
 
