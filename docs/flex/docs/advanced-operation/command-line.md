@@ -25,12 +25,12 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 2. Create a passphrase when prompted. This process generates a file, `robot_key.pub`. A passphrase is not required, but you should create one.
 
-2. Copy the `robot_key.pub` file to the root of a USB-A flash drive. You will use this USB drive (and the saved key) for SSH authentication to the robot.
+3. Copy the `robot_key.pub` file to the root of a USB-A flash drive. You will use this USB drive (and the saved key) for SSH authentication to the robot.
 
     !!!note
         The flash drive must have a single partition formatted with a file system readable by the embedded Linux system on Flex. FAT32, NTFS, and ext4 file systems are supported. The macOS HFS+ and APFS file systems are not. macOS can read and write to FAT-formatted drives.
 
-3. Eject the USB drive.
+4. Eject the USB drive.
 
 ## Making a wireless SSH connection
 
