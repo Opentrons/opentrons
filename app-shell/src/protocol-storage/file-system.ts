@@ -1,7 +1,7 @@
 import path from 'path'
 import { app, shell } from 'electron'
 import fs from 'fs-extra'
-import uuid from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import { analyzeProtocolSource } from '../protocol-analysis'
 
@@ -114,7 +114,7 @@ export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
 ): Promise<string> {
-  const protocolKey = uuid()
+  const protocolKey = uuidv4()
   const protocolDirPath = path.join(protocolsDirPath, protocolKey as string)
 
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
@@ -167,7 +167,9 @@ export function analyzeProtocolByKey(
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
   return readFilesWithinDirectory(srcDirPath).then(protocolFiles => {
     if (protocolFiles.length === 0) {
-      throw new Error('No valid protocol files found')
+      throw new Error(
+        `No valid protocol files (.py, .json) found in directory: ${srcDirPath}`
+      )
     }
     return analyzeProtocolSource(protocolFiles[0], destFilePath)
   })
