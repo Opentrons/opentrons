@@ -145,6 +145,7 @@ class AspirateWhileTrackingImplementation(
             command_note_adder=self._command_note_adder,
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            movement_delay=params.movement_delay,
         )
         position_after_aspirate = await self._gantry_mover.get_position(
             params.pipetteId

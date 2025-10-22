@@ -25,7 +25,7 @@ const getOnlyLatestDefs = (
   })
 }
 
-export function getAllDefinitions(): LabwareDefinition[] {
+export function getAllLatestDefs(): LabwareDefinition[] {
   const allDefs = getAllDefs().filter(
     (d: LabwareDefinition) =>
       // eslint-disable-next-line @typescript-eslint/prefer-includes

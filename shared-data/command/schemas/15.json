@@ -422,6 +422,11 @@
           "title": "Labwareid",
           "type": "string"
         },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
+        },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
           "title": "Pipetteid",
@@ -1819,6 +1824,11 @@
           "description": "Identifier of labware to use.",
           "title": "Labwareid",
           "type": "string"
+        },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
         },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
@@ -3546,7 +3556,7 @@
           "type": "boolean"
         },
         "ignoreTipConfiguration": {
-          "description": "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
+          "description": "Whether to utilize the critical point of the tip configuration when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
           "title": "Ignoretipconfiguration",
           "type": "boolean"
         },
