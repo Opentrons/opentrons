@@ -1969,9 +1969,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
+            than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``selected_tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2121,9 +2126,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
+            than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``selected_tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2282,9 +2292,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
+            than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``selected_tips`` parameter.
 
         """
         if volume == 0.0:
