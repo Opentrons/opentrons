@@ -65,6 +65,9 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
         return acc
       }
       const tipState = robotState?.tipState.tipracks[id] ?? null
+      if (tipState == null) {
+        return acc
+      }
       return {
         ...acc,
         [id]: Object.keys(def.wells).reduce(
