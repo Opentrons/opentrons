@@ -2859,7 +2859,7 @@ def test_return_tip_fails_after_new_tip_never_keep_last_tip_false(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "simulated_protocol_context", [("2.24", "Flex")], indirect=True
+    "simulated_protocol_context", [("2.27", "Flex")], indirect=True
 )
 def test_water_transfer_with_selected_tips(
     simulated_protocol_context: ProtocolContext,

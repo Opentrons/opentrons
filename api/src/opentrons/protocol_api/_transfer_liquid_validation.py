@@ -1,4 +1,3 @@
-import copy
 from dataclasses import dataclass
 from typing import List, Union, Sequence, Optional
 
@@ -72,7 +71,7 @@ def verify_and_normalize_transfer_args(  # noqa: C901
                 )
             )
         else:
-            valid_selected_tips = copy.copy(flat_tips_list)
+            valid_selected_tips = flat_tips_list
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
     if valid_selected_tips is not None:
