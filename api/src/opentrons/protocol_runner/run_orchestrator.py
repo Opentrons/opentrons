@@ -44,6 +44,7 @@ from ..protocol_engine.types import (
     CSVRuntimeParamPaths,
     CommandAnnotation,
     ModuleModel,
+    CommandPreconditions,
 )
 from ..protocol_engine.resources.camera_provider import CameraProvider
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
@@ -249,6 +250,10 @@ class RunOrchestrator:
     def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
+
+    def get_preconditions(self) -> CommandPreconditions:
+        """Get the preconditions of a protocol run."""
+        return self._protocol_engine.state_view.preconditions.get_precondition()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""

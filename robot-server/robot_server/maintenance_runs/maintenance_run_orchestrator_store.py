@@ -215,6 +215,7 @@ class MaintenanceRunOrchestratorStore:
 
         run_data = self.run_orchestrator.get_state_summary()
         commands = self.run_orchestrator.get_all_commands()
+        preconditions = self.run_orchestrator.get_preconditions()
         self._run_orchestrator = None
         self._created_at = None
 
@@ -223,6 +224,7 @@ class MaintenanceRunOrchestratorStore:
             commands=commands,
             parameters=[],
             command_annotations=[],
+            command_preconditions=preconditions,
         )
 
     def get_command_slice(
