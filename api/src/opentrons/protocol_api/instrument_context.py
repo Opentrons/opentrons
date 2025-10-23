@@ -1971,9 +1971,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
-            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
-            than the transfer requires.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
@@ -2137,9 +2136,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
-            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
-            than the transfer requires.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
@@ -2312,9 +2310,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
-            :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
-            than the transfer requires.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.

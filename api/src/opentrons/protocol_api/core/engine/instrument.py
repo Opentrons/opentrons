@@ -1359,7 +1359,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the transfer.
             tips: If provided, transfer will pick up the tips in the order given. If this
-                           is less than the amount of tips needed, an error will be raised.
+                  is less than the amount of tips needed, an error will be raised.
         """
         if not tip_racks and not tips:
             raise RuntimeError(
@@ -1530,7 +1530,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the distribute.
             tips: If provided, transfer will pick up the tips in the order given. If this
-                           is less than the amount of tips needed, an error will be raised.
+                  is less than the amount of tips needed, an error will be raised.
 
         This method distributes the liquid in the source well into multiple destinations.
         It can accomplish this by either doing a multi-dispense (aspirate once and then
@@ -1827,7 +1827,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the consolidate.
             tips: If provided, transfer will pick up the tips in the order given. If this
-                           is less than the amount of tips needed, an error will be raised.
+                  is less than the amount of tips needed, an error will be raised.
         """
         if not tip_racks:
             raise RuntimeError(
