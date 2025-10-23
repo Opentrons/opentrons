@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "statement": [
+    {
+      "effect": "Allow",
+      "principal": {
+        "Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "action": "sts:AssumeRoleWithWebIdentity",
+      "condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:Opentrons/opentrons:ref:refs/tags/*"
+        }
+      }
+    }
+  ]
+}

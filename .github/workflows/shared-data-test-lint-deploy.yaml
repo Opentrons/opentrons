@@ -151,6 +151,9 @@ jobs:
     needs: [python-test]
     runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required for checkout
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -184,18 +187,18 @@ jobs:
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
-        uses: './.github/actions/python/pypi-deploy'
+        uses: './.github/actions/python/pypi-deploy-oidc'
         with:
           project: 'shared-data'
           repository_url: 'https://test.pypi.org/legacy/'
-          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
+          pypi_trusted_publisher: 'pypi:opentrons-shared-data'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
-        uses: './.github/actions/python/pypi-deploy'
+        uses: './.github/actions/python/pypi-deploy-oidc'
         with:
           project: 'shared-data'
           repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
+          pypi_trusted_publisher: 'pypi:opentrons-shared-data'
 
   publish-switch:
     runs-on: 'ubuntu-latest'

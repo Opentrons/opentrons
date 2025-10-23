@@ -1,0 +1,251 @@
+name: 'Test OIDC PyPI Publishing'
+
+on:
+  push:
+    branches: [ 'feature/components-sandbox' ]  # Test on current branch
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read   # Required for checkout
+
+jobs:
+  test-oidc-token-generation:
+    name: 'Test OIDC Token Generation'
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v4'
+      
+      - name: 'Test OIDC token generation'
+        run: |
+          echo "🔍 Testing OIDC token generation..."
+          
+          # Check if we can generate an OIDC token
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "✅ OIDC environment variables are available"
+            
+            # Request OIDC token
+            TOKEN_RESPONSE=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                                 "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=pypi")
+            
+            if echo "$TOKEN_RESPONSE" | jq -e '.value' > /dev/null 2>&1; then
+              TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r .value)
+              echo "✅ OIDC token generated successfully"
+              echo "Token length: ${#TOKEN} characters"
+              echo "Token preview: ${TOKEN:0:50}..."
+            else
+              echo "❌ Failed to generate OIDC token"
+              echo "Response: $TOKEN_RESPONSE"
+              exit 1
+            fi
+          else
+            echo "❌ OIDC environment variables not available"
+            echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+SET}"
+            echo "ACTIONS_ID_TOKEN_REQUEST_URL: ${ACTIONS_ID_TOKEN_REQUEST_URL:+SET}"
+            exit 1
+          fi
+
+  test-pypi-deploy-action:
+    name: 'Test PyPI Deploy Action (Dry Run)'
+    runs-on: 'ubuntu-24.04'
+    needs: test-oidc-token-generation
+    steps:
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v4'
+      
+      - name: 'Setup Python'
+        uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.10'
+      
+      - name: 'Test OIDC action syntax'
+        run: |
+          echo "🔍 Testing OIDC action syntax and configuration..."
+          
+          # Check if the OIDC action file exists and is valid
+          if [ -f ".github/actions/python/pypi-deploy-oidc/action.yaml" ]; then
+            echo "✅ OIDC action file exists"
+            
+            # Basic YAML syntax check
+            if command -v yq > /dev/null 2>&1; then
+              yq eval '.name' .github/actions/python/pypi-deploy-oidc/action.yaml
+              echo "✅ OIDC action YAML syntax is valid"
+            else
+              echo "⚠️  yq not available, skipping YAML validation"
+            fi
+          else
+            echo "❌ OIDC action file not found"
+            exit 1
+          fi
+          
+          # Check if required inputs are defined
+          echo "📋 Checking action inputs..."
+          if grep -q "pypi_trusted_publisher:" .github/actions/python/pypi-deploy-oidc/action.yaml; then
+            echo "✅ pypi_trusted_publisher input found"
+          else
+            echo "❌ pypi_trusted_publisher input missing"
+            exit 1
+          fi
+
+  test-workflow-permissions:
+    name: 'Test Workflow Permissions'
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v4'
+      
+      - name: 'Verify workflow permissions'
+        run: |
+          echo "🔍 Checking workflow permission configurations..."
+          
+          # Check API workflow permissions
+          if grep -A 5 "permissions:" .github/workflows/api-test-lint-deploy.yaml | grep -q "id-token: write"; then
+            echo "✅ API workflow has OIDC permissions"
+          else
+            echo "❌ API workflow missing OIDC permissions"
+            exit 1
+          fi
+          
+          # Check shared-data workflow permissions
+          if grep -A 5 "permissions:" .github/workflows/shared-data-test-lint-deploy.yaml | grep -q "id-token: write"; then
+            echo "✅ Shared-data workflow has OIDC permissions"
+          else
+            echo "❌ Shared-data workflow missing OIDC permissions"
+            exit 1
+          fi
+          
+          # Check if OIDC action is being used
+          if grep -q "pypi-deploy-oidc" .github/workflows/api-test-lint-deploy.yaml; then
+            echo "✅ API workflow uses OIDC action"
+          else
+            echo "❌ API workflow not using OIDC action"
+            exit 1
+          fi
+          
+          if grep -q "pypi-deploy-oidc" .github/workflows/shared-data-test-lint-deploy.yaml; then
+            echo "✅ Shared-data workflow uses OIDC action"
+          else
+            echo "❌ Shared-data workflow not using OIDC action"
+            exit 1
+          fi
+
+  test-pypi-configuration:
+    name: 'Test PyPI Configuration'
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v4'
+      
+      - name: 'Validate PyPI configuration'
+        run: |
+          echo "🔍 Validating PyPI configuration..."
+          
+          # Check for trusted publisher configurations
+          echo "📋 Checking trusted publisher configurations..."
+          
+          # API workflow
+          if grep -q "pypi_trusted_publisher: 'pypi:opentrons'" .github/workflows/api-test-lint-deploy.yaml; then
+            echo "✅ API workflow has correct trusted publisher config"
+          else
+            echo "❌ API workflow missing trusted publisher config"
+            exit 1
+          fi
+          
+          # Shared-data workflow
+          if grep -q "pypi_trusted_publisher: 'pypi:opentrons-shared-data'" .github/workflows/shared-data-test-lint-deploy.yaml; then
+            echo "✅ Shared-data workflow has correct trusted publisher config"
+          else
+            echo "❌ Shared-data workflow missing trusted publisher config"
+            exit 1
+          fi
+          
+          # Check repository URLs
+          if grep -q "https://test.pypi.org/legacy/" .github/workflows/api-test-lint-deploy.yaml; then
+            echo "✅ Test PyPI URL configured"
+          else
+            echo "❌ Test PyPI URL missing"
+            exit 1
+          fi
+          
+          if grep -q "https://upload.pypi.org/legacy/" .github/workflows/api-test-lint-deploy.yaml; then
+            echo "✅ Production PyPI URL configured"
+          else
+            echo "❌ Production PyPI URL missing"
+            exit 1
+          fi
+
+  test-documentation:
+    name: 'Test Documentation'
+    runs-on: 'ubuntu-24.04'
+    steps:
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v4'
+      
+      - name: 'Validate documentation'
+        run: |
+          echo "🔍 Validating OIDC documentation..."
+          
+          if [ -f ".github/PYPI_OIDC_SETUP.md" ]; then
+            echo "✅ OIDC setup documentation exists"
+            
+            # Check for key sections
+            if grep -q "## Setup Steps" .github/PYPI_OIDC_SETUP.md; then
+              echo "✅ Setup steps documented"
+            else
+              echo "❌ Setup steps missing from documentation"
+              exit 1
+            fi
+            
+            if grep -q "## Migration Checklist" .github/PYPI_OIDC_SETUP.md; then
+              echo "✅ Migration checklist documented"
+            else
+              echo "❌ Migration checklist missing from documentation"
+              exit 1
+            fi
+            
+            if grep -q "## Troubleshooting" .github/PYPI_OIDC_SETUP.md; then
+              echo "✅ Troubleshooting section documented"
+            else
+              echo "❌ Troubleshooting section missing from documentation"
+              exit 1
+            fi
+          else
+            echo "❌ OIDC setup documentation not found"
+            exit 1
+          fi
+
+  summary:
+    name: 'Test Summary'
+    runs-on: 'ubuntu-24.04'
+    needs: [test-oidc-token-generation, test-pypi-deploy-action, test-workflow-permissions, test-pypi-configuration, test-documentation]
+    if: always()
+    steps:
+      - name: 'Generate test summary'
+        run: |
+          echo "## 🧪 OIDC PyPI Publishing Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| OIDC Token Generation | ${{ needs.test-oidc-token-generation.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| PyPI Deploy Action | ${{ needs.test-pypi-deploy-action.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Workflow Permissions | ${{ needs.test-workflow-permissions.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| PyPI Configuration | ${{ needs.test-pypi-configuration.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation | ${{ needs.test-documentation.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.test-oidc-token-generation.result }}" == "success" && 
+                "${{ needs.test-pypi-deploy-action.result }}" == "success" && 
+                "${{ needs.test-workflow-permissions.result }}" == "success" && 
+                "${{ needs.test-pypi-configuration.result }}" == "success" && 
+                "${{ needs.test-documentation.result }}" == "success" ]]; then
+            echo "🎉 **All tests passed!** OIDC PyPI publishing setup is ready for testing with actual PyPI trusted publishing configuration." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some tests failed.** Please review the failed tests and fix any issues before proceeding with PyPI trusted publishing setup." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Set up trusted publishing on PyPI (see \`.github/PYPI_OIDC_SETUP.md\`)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test with a real release tag" >> $GITHUB_STEP_SUMMARY
+          echo "3. Monitor workflow logs for authentication success" >> $GITHUB_STEP_SUMMARY
