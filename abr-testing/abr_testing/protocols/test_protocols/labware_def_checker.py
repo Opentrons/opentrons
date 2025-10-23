@@ -59,16 +59,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.load_lid_stack(labware_type, "C3", 1)
     labware = protocol.load_labware("corning_falcon_384_wellplate_130ul_flat", "D3")
 
-    # Lid loading
-    # if labware_type == "corning_falcon_384_wellplate_130ul_flat_lid":
-    #    for _ in range(2):
-    #        protocol.move_lid("C3", labware, use_gripper=True)
-    #        protocol.move_lid(labware, deck_riser, use_gripper=True)
-    #        protocol.move_lid(deck_riser, "C3", use_gripper=True)
-    # else:
-    #    labware = protocol.load_labware(labware_type, "D3")
 
-    # pick up tip
     pipette.pick_up_tip()
 
     # move tip to positions

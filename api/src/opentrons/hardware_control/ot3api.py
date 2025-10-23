@@ -3253,5 +3253,26 @@ class OT3API(
         s_data = await self._backend.read_capacitive_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def touch_probe(self, axis: Axis, speed: float, distance: float) -> float:
-        return await self._backend.touch_probe(axis, speed, distance)
+    async def touch_probe(
+            self,
+            mount: Union[top_types.Mount, OT3Mount],
+            axis: Axis,
+            speed: float,
+            distance: float,
+        ) -> top_types.Point:
+            await self._backend.touch_probe(axis, speed, distance)
+            realmount = OT3Mount.from_mount(mount)
+            machine_pos = await self._backend.update_position()
+            end_pos = self.get_deck_from_machine(machine_pos)
+            end_point = top_types.Point(
+                end_pos[Axis.X], end_pos[Axis.Y], end_pos[Axis.by_mount(realmount)]
+            )
+            offset = offset_for_mount(
+                realmount,
+                top_types.Point(*self._config.left_mount_offset),
+                top_types.Point(*self._config.right_mount_offset),
+                top_types.Point(*self._config.gripper_mount_offset),
+            )
+            cp = self.critical_point_for(realmount, None)
+            return end_point + offset + cp
+
