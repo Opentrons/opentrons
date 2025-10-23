@@ -83,4 +83,4 @@ At this point you should have an assembled robot, but it isn't time to power it 
 
 </div>
 
-At this point your OT-2 is ready for use. You can attach pipettes to the gantry, add modules to the deck, and create protocols in for the robot using the Opentrons App.
+At this point your OT-2 is ready for use. You can attach pipettes to the gantry, add modules to the deck, and upload protocols to the robot using the Opentrons App.
