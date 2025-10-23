@@ -109,6 +109,7 @@ class ProtocolAnalyzer:
             liquids=result.state_summary.liquids,
             liquidClasses=result.state_summary.liquidClasses,
             command_annotations=result.command_annotations,
+            command_preconditions=result.command_preconditions,
         )
 
     async def update_to_failed_analysis(
