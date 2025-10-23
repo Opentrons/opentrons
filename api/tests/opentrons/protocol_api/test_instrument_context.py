@@ -2571,7 +2571,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -2633,7 +2633,7 @@ def test_transfer_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -2683,7 +2683,7 @@ def test_transfer_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -2736,7 +2736,7 @@ def test_transfer_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -2771,7 +2771,7 @@ def test_transfer_liquid_uses_selected_tips(
         dest=[mock_well],
         new_tip="always",
         trash_location=trash_location,
-        selected_tips=[mock_selected_tip],
+        tips=[mock_selected_tip],
     )
     decoy.verify(
         mock_instrument_core.transfer_with_liquid_class(
@@ -2790,7 +2790,7 @@ def test_transfer_liquid_uses_selected_tips(
             trash_location=trash_location,
             return_tip=False,
             keep_last_tip=False,
-            selected_tips=[mock_selected_tip._core],
+            tips=[mock_selected_tip._core],
         )
     )
 
@@ -3014,7 +3014,7 @@ def test_distribute_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3079,7 +3079,7 @@ def test_distribute_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3148,7 +3148,7 @@ def test_distribute_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3202,7 +3202,7 @@ def test_distribute_liquid_uses_selected_tips(
         dest=[[mock_well, mock_well]],
         new_tip="always",
         trash_location=trash_location,
-        selected_tips=[[mock_selected_tip, mock_selected_tip]],
+        tips=[[mock_selected_tip, mock_selected_tip]],
     )
     decoy.verify(
         mock_instrument_core.distribute_with_liquid_class(
@@ -3224,7 +3224,7 @@ def test_distribute_liquid_uses_selected_tips(
             trash_location=trash_location,
             return_tip=False,
             keep_last_tip=False,
-            selected_tips=[mock_selected_tip._core],
+            tips=[mock_selected_tip._core],
         )
     )
 
@@ -3442,7 +3442,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3508,7 +3508,7 @@ def test_consolidate_liquid_multi_channel_delegates_to_engine_core(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3559,7 +3559,7 @@ def test_consolidate_liquid_delegates_to_engine_core_with_trash_destination(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3613,7 +3613,7 @@ def test_consolidate_liquid_uses_provided_tip_racks(
             trash_location=trash_location,
             return_tip=True,
             keep_last_tip=False,
-            selected_tips=None,
+            tips=None,
         )
     )
 
@@ -3649,7 +3649,7 @@ def test_consolidate_liquid_uses_selected_tips(
         dest=mock_well,
         new_tip="once",
         trash_location=trash_location,
-        selected_tips=[mock_selected_tip],
+        tips=[mock_selected_tip],
     )
     decoy.verify(
         mock_instrument_core.consolidate_with_liquid_class(
@@ -3668,6 +3668,6 @@ def test_consolidate_liquid_uses_selected_tips(
             trash_location=trash_location,
             return_tip=False,
             keep_last_tip=False,
-            selected_tips=[mock_selected_tip._core],
+            tips=[mock_selected_tip._core],
         )
     )

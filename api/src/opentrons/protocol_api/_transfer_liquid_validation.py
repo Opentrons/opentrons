@@ -24,7 +24,7 @@ class TransferInfo:
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
-    selected_tips: Optional[List[Well]]
+    tips: Optional[List[Well]]
 
 
 def verify_and_normalize_transfer_args(  # noqa: C901
@@ -37,7 +37,7 @@ def verify_and_normalize_transfer_args(  # noqa: C901
     group_wells_for_multi_channel: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
-    selected_tips: Optional[Union[Sequence[Well], Sequence[Sequence[Well]]]],
+    tips: Optional[Union[Sequence[Well], Sequence[Sequence[Well]]]],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     if not isinstance(dest, (TrashBin, WasteChute)):
@@ -59,23 +59,19 @@ def verify_and_normalize_transfer_args(  # noqa: C901
             reject_adapter=True,
         )
 
-    valid_selected_tips: Optional[List[Well]] = None
-    if selected_tips:
-        flat_tips_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(
-            selected_tips
-        )
+    valid_tips: Optional[List[Well]] = None
+    if tips:
+        flat_tips_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(tips)
         if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
-            valid_selected_tips = (
-                tx_liquid_utils.group_wells_for_multi_channel_transfer(
-                    flat_tips_list, nozzle_map, "tip"
-                )
+            valid_tips = tx_liquid_utils.group_wells_for_multi_channel_transfer(
+                flat_tips_list, nozzle_map, "tip"
             )
         else:
-            valid_selected_tips = flat_tips_list
+            valid_tips = flat_tips_list
 
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
-    if valid_selected_tips is not None:
-        valid_tip_racks = [tip.parent for tip in valid_selected_tips]
+    if valid_tips is not None:
+        valid_tip_racks = [tip.parent for tip in valid_tips]
     elif valid_new_tip == TransferTipPolicyV2.NEVER:
         if last_tip_well is None:
             raise RuntimeError(
@@ -110,7 +106,7 @@ def verify_and_normalize_transfer_args(  # noqa: C901
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
-        selected_tips=valid_selected_tips,
+        tips=valid_tips,
     )
 
 

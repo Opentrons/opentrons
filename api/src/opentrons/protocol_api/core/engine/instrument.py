@@ -1335,7 +1335,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        selected_tips: Optional[List[WellCore]],
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute transfer using liquid class properties.
 
@@ -1358,10 +1358,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the transfer.
-            selected_tips: If provided, transfer will pick up the tips in the order given. If this
+            tips: If provided, transfer will pick up the tips in the order given. If this
                            is less than the amount of tips needed, an error will be raised.
         """
-        if not tip_racks and not selected_tips:
+        if not tip_racks and not tips:
             raise RuntimeError(
                 "No tipracks or tips found for pipette in order to perform transfer"
             )
@@ -1405,7 +1405,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip == TransferTipPolicyV2.ONCE:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props, selected_tips
+                tip_racks, starting_tip, tiprack_uri_for_transfer_props, tips
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
@@ -1448,7 +1448,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    selected_tips,
+                    tips,
                 )
                 post_disp_tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1505,7 +1505,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        selected_tips: Optional[List[WellCore]],
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute a distribution using liquid class properties.
 
@@ -1529,7 +1529,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the distribute.
-            selected_tips: If provided, transfer will pick up the tips in the order given. If this
+            tips: If provided, transfer will pick up the tips in the order given. If this
                            is less than the amount of tips needed, an error will be raised.
 
         This method distributes the liquid in the source well into multiple destinations.
@@ -1590,7 +1590,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 trash_location=trash_location,
                 return_tip=return_tip,
                 keep_last_tip=keep_last_tip,
-                selected_tips=selected_tips,
+                tips=tips,
             )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
@@ -1624,7 +1624,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_racks,
                 starting_tip,
                 tiprack_uri_for_transfer_props,
-                selected_tips,
+                tips,
             )
 
         tip_contents = [
@@ -1695,7 +1695,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    selected_tips,
+                    tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1801,7 +1801,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
-        selected_tips: Optional[List[WellCore]],
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute consolidate using liquid class properties.
 
@@ -1826,7 +1826,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the consolidate.
-            selected_tips: If provided, transfer will pick up the tips in the order given. If this
+            tips: If provided, transfer will pick up the tips in the order given. If this
                            is less than the amount of tips needed, an error will be raised.
         """
         if not tip_racks:
@@ -1885,7 +1885,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 tip_racks,
                 starting_tip,
                 tiprack_uri_for_transfer_props,
-                selected_tips,
+                tips,
             )
 
         aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
@@ -1921,7 +1921,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     tip_racks,
                     starting_tip,
                     tiprack_uri_for_transfer_props,
-                    selected_tips,
+                    tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(

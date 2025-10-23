@@ -1929,7 +1929,7 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[
+        tips: Optional[
             Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
         ] = None,
     ) -> InstrumentContext:
@@ -1971,14 +1971,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
             :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
             than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
             .. versionchanged:: 2.27
-                Added the ``selected_tips`` parameter.
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -1998,7 +1998,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self.api_version}",
             )
         if (
-            selected_tips is not None
+            tips is not None
             and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
@@ -2019,7 +2019,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
-            selected_tips=selected_tips,
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2074,8 +2074,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in transfer_args.selected_tips]
-                if transfer_args.selected_tips is not None
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
                 else None,
             )
 
@@ -2098,7 +2098,7 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[
+        tips: Optional[
             Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
         ] = None,
     ) -> InstrumentContext:
@@ -2137,14 +2137,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
             :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
             than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
             .. versionchanged:: 2.27
-                Added the ``selected_tips`` parameter.
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2164,7 +2164,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self.api_version}",
             )
         if (
-            selected_tips is not None
+            tips is not None
             and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
@@ -2185,7 +2185,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
-            selected_tips=selected_tips,
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2248,8 +2248,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in transfer_args.selected_tips]
-                if transfer_args.selected_tips is not None
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
                 else None,
             )
 
@@ -2272,7 +2272,7 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
-        selected_tips: Optional[
+        tips: Optional[
             Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
         ] = None,
     ) -> InstrumentContext:
@@ -2312,14 +2312,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
-        :param selected_tips: An optional list of tips to pick up in the order provided. This will take precedent over
+        :param tips: An optional list of tips to pick up in the order provided. This will take precedent over
             :py:obj:`.InstrumentContext.tip_racks` and the ``tip_racks`` argument. It is an error to provide less tips
             than the transfer requires.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
             .. versionchanged:: 2.27
-                Added the ``selected_tips`` parameter.
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2339,7 +2339,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 current_version=f"{self.api_version}",
             )
         if (
-            selected_tips is not None
+            tips is not None
             and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
@@ -2360,7 +2360,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
-            selected_tips=selected_tips,
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2422,8 +2422,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                selected_tips=[tip._core for tip in transfer_args.selected_tips]
-                if transfer_args.selected_tips is not None
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
                 else None,
             )
 

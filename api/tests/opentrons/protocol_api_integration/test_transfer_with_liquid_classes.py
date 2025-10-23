@@ -2926,7 +2926,7 @@ def test_water_transfer_with_selected_tips(
             dest=arma_plate.rows()[0][:2],
             new_tip="always",
             trash_location=trash,
-            selected_tips=[tiprack["D10"], tiprack["B3"]],
+            tips=[tiprack["D10"], tiprack["B3"]],
         )
         expected_calls = [
             mock.call.load_liquid_class(
