@@ -1,38 +1,12 @@
-import { ALL, getPipetteSpecsV2, SINGLE } from '@opentrons/shared-data'
 import { AUTOMATIC } from '@opentrons/step-generation'
+
+import { getDefaultNozzleConfiguration } from './utils/__tests__/getDefaultNozzleConfiguration'
 
 import type {
   NozzleConfigurationStyle,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { PDMetadata, Pipettes } from '/protocol-designer/file-types'
-
-const getDefaultNozzleConfiguration = (
-  rawNozzles: NozzleConfigurationStyle | null,
-  pipettes: Pipettes,
-  pipetteId: string
-): NozzleConfigurationStyle => {
-  if (rawNozzles != null) {
-    return rawNozzles
-  }
-  const pipetteName = pipettes?.[pipetteId]?.pipetteName ?? null
-  const pipetteSpecs =
-    pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
-  const pipetteChannels = pipetteSpecs?.channels
-
-  switch (pipetteChannels) {
-    case 1:
-      return SINGLE
-    case 8:
-    case 96:
-      return ALL
-
-    // should not hit
-    default:
-      console.warn('Unknown pipette channels:', pipetteChannels)
-      return ALL
-  }
-}
+import type { PDMetadata } from '/protocol-designer/file-types'
 
 export const migrateFile = (
   appData: ProtocolFile<PDMetadata>
