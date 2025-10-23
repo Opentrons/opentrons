@@ -179,6 +179,8 @@ export function SummaryAndSettings(
     })
   }
 
+  console.log('obj', JSON.stringify(state.dropTipLocation, null, 4))
+
   return showSaveOrRunModal ? (
     <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
   ) : (

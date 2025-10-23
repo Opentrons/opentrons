@@ -66,11 +66,13 @@ export function quickTransferStepCommands(
 
   let finalDropTipCommand = ''
 
-  if (Object.values(trashBinEntities).length > 0) {
-    finalDropTipCommand = `${pipettePythonName}.drop_tip()`
-  } else if (Object.values(wasteChuteEntities).length > 0) {
-    const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
-    finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+  if (stepArgs?.isReturnTip === false) {
+    if (Object.values(trashBinEntities).length > 0) {
+      finalDropTipCommand = `${pipettePythonName}.drop_tip()`
+    } else if (Object.values(wasteChuteEntities).length > 0) {
+      const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
+      finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+    }
   }
 
   return (

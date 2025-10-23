@@ -1,5 +1,6 @@
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
+import type { CutoutConfig, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
@@ -105,7 +106,7 @@ export function quickTransferWizardReducer(
     case 'SET_DROP_TIP_LOCATION': {
       return {
         ...state,
-        dropTipLocation: action.location,
+        dropTipLocation: action.location as CutoutConfig | LabwareDefinition2,
       }
     }
     case 'SET_LIQUID_CLASS': {
@@ -260,7 +261,7 @@ export function quickTransferSummaryReducer(
     case 'SET_DROP_TIP_LOCATION': {
       return {
         ...state,
-        dropTipLocation: action.location,
+        dropTipLocation: action.location as CutoutConfig | LabwareDefinition2,
       }
     }
     case 'SET_PUSH_OUT': {

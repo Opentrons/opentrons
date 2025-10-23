@@ -8,20 +8,18 @@ import {
   NONE_LIQUID_CLASS_NAME,
   POSITION_REFERENCE_TOP,
   SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM,
+  TRASH_BIN_ADAPTER_FIXTURE,
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  getTransferPlanAndReferenceVolumes,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
+import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { calculateAdjustWells } from './calculateAdjustWells'
+import { convertBlowoutLocation } from './convertBlowoutLocation'
 import { getFlowRateFields } from './getFlowRaiteFields'
 import { getMatchingTipLiquidSpecsFromSpec } from './getMatchingTipLiquidSpecsFromSpec'
 import { getMaxUiFlowRate } from './getMaxUiFlowRate'
 
-import type { BlowOutLocation, QuickTransferSummaryState } from '../types'
+import type { QuickTransferSummaryState } from '../types'
 
 const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 
@@ -44,24 +42,6 @@ export const retrieveLiquidClassValues = (
       convertedPipetteName,
       liquidHandlingAction
     )
-  }
-}
-
-const convertBlowoutLocation = (
-  location: string | undefined,
-  state: QuickTransferSummaryState
-): BlowOutLocation | undefined => {
-  if (location == null) return undefined
-
-  switch (location) {
-    case 'source':
-      return SOURCE_WELL_BLOWOUT_DESTINATION
-    case 'destination':
-      return DEST_WELL_BLOWOUT_DESTINATION
-    case 'trash':
-      return state.dropTipLocation
-    default:
-      return undefined
   }
 }
 
@@ -244,8 +224,14 @@ const getNoLiquidClassValues = (
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
-          state
-        ) ?? state.dropTipLocation,
+          state.dropTipLocation
+        ) ??
+        ('cutoutFixtureId' in state.dropTipLocation
+          ? state.dropTipLocation
+          : {
+              cutoutId: 'cutoutA3',
+              cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+            }),
       flowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     },
   }
@@ -497,7 +483,7 @@ const getLiquidClassValues = (
         : {
             location: convertBlowoutLocation(
               dispense?.retract.blowout?.params?.location,
-              state
+              state.dropTipLocation
             ),
             flowRate: dispense?.retract.blowout?.params?.flowRate ?? 0,
           },
@@ -515,9 +501,14 @@ const getLiquidClassValues = (
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
-          state
-        ) ?? state.dropTipLocation,
-
+          state.dropTipLocation
+        ) ??
+        ('cutoutFixtureId' in state.dropTipLocation
+          ? state.dropTipLocation
+          : {
+              cutoutId: 'cutoutA3',
+              cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+            }),
       flowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     },
   }

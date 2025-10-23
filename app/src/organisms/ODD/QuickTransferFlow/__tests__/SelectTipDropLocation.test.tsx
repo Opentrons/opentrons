@@ -7,9 +7,11 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
+import mockQuickTransferState from '../QuickTransferAdvancedSettings/__fixtures__/QuickTransferState.json'
 import { SelectTipDropLocation } from '../SelectTipDropLocation'
 
 import type { ComponentProps } from 'react'
+import type { QuickTransferWizardState } from '../types'
 
 vi.mock('/app/resources/deck_configuration')
 
@@ -42,7 +44,7 @@ describe('SelectTipDropLocation', () => {
         buttonText: 'Exit',
         onClick: vi.fn(),
       },
-      state: {},
+      state: mockQuickTransferState as QuickTransferWizardState,
       dispatch: vi.fn(),
     }
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
@@ -57,6 +59,7 @@ describe('SelectTipDropLocation', () => {
     screen.getByText('Continue')
     screen.getByText('Trash bin in A3')
     screen.getByText('Waste chute in C3')
+    screen.getByText('Tip rack')
   })
 
   it('should call mock function when tappin exit button', () => {
@@ -65,7 +68,7 @@ describe('SelectTipDropLocation', () => {
     expect(props.exitButtonProps.onClick).toHaveBeenCalled()
   })
 
-  it('should call mock function when tappin continue button', () => {
+  it('should call mock function when tapping trash bin option and continue button', () => {
     render(props)
     fireEvent.click(screen.getByText('Trash bin in A3'))
     fireEvent.click(screen.getByText('Continue'))
@@ -76,6 +79,17 @@ describe('SelectTipDropLocation', () => {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
       },
+    })
+  })
+
+  it('should call mock function when tapping tip rack option and continue button', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Tip rack'))
+    fireEvent.click(screen.getByText('Continue'))
+    expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_DROP_TIP_LOCATION',
+      location: mockQuickTransferState.tipRack,
     })
   })
 })

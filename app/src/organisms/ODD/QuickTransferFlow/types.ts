@@ -27,7 +27,7 @@ export interface QuickTransferWizardState {
   // Note added for liquid classes in Quick Transfer
   path?: PathOption
   changeTip?: ChangeTipOptions
-  dropTipLocation?: CutoutConfig
+  dropTipLocation?: CutoutConfig | LabwareDefinition2
   liquidClassName?: string
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
@@ -120,7 +120,7 @@ export interface QuickTransferSummaryState {
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
-  dropTipLocation: CutoutConfig
+  dropTipLocation: CutoutConfig | LabwareDefinition2
   liquidClassName: string
   conditionAspirate?: number
   disposalVolumeDispenseSettings?: {
@@ -290,7 +290,7 @@ interface SetChangeTip {
 }
 interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
-  location: CutoutConfig
+  location: CutoutConfig | LabwareDefinition2
 }
 
 interface SetLiquidClassAction {

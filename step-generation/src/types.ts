@@ -282,6 +282,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   volume: number
   /** drop tip location entity id */
   dropTipLocation: string
+  /** return tip support */
+  isReturnTip: boolean
   // ===== ASPIRATE SETTINGS =====
   /** Pre-wet tip with ??? uL liquid from the first source well. */
   preWetTip: boolean
