@@ -2,7 +2,6 @@
 import asyncio
 from datetime import datetime
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from textwrap import dedent
 from typing import Annotated, Optional, Literal, Union, Final, AsyncIterator
 
@@ -612,44 +611,42 @@ async def _stream_zip_from_subprocess(
 ) -> AsyncIterator[bytes]:
     """Offload zipping to a subprocess, yielding the final zip file chunks, `chunk_size` bytes in size."""
     process = None
-    tmp_dir_obj = None
 
     try:
-        tmp_dir_obj = TemporaryDirectory()
-        tmp_path = Path(tmp_dir_obj.name)
-
-        files_dir = tmp_path / "images"
-        files_dir.mkdir()
-
-        for file_path, file_name in files:
-            dest_path = files_dir / file_name
-            dest_path.symlink_to(file_path)
-
-        zip_file_path = tmp_path / "images.zip"
-
-        file_paths = [str(files_dir / file_name) for _, file_name in files]
-        cmd = ["python3", "-m", "zipfile", "-c", str(zip_file_path)] + file_paths
+        file_paths = [str(file_path) for file_path, _ in files]
 
         process = await asyncio.create_subprocess_exec(
-            *cmd,
+            "zip",
+            "-q",  # quiet
+            "-j",  # junk paths (store only filenames)
+            "-",  # write zip output to stdout
+            *file_paths,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
 
-        _, stderr_output = await process.communicate()
+        if process.stdout is None:
+            raise RuntimeError("stdout was not captured")
+        if process.stderr is None:
+            raise RuntimeError("stderr was not captured")
+
+        while True:
+            chunk = await process.stdout.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk
+
+        await process.wait()
 
         if process.returncode != 0:
+            stderr_output = await process.stderr.read()
             error_msg = stderr_output.decode() if stderr_output else "Unknown error"
-            raise Exception(f"Failed to create zip file: {error_msg}")
-
-        with open(zip_file_path, "rb") as zip_file:
-            while True:
-                chunk = zip_file.read(chunk_size)
-                if not chunk:
-                    break
-                yield chunk
+            raise Exception(
+                f"zip command failed with code {process.returncode}: {error_msg}"
+            )
 
     except Exception as e:
+        # Clean up process if still running
         if process is not None and process.returncode is None:
             process.kill()
             await process.wait()
@@ -657,9 +654,6 @@ async def _stream_zip_from_subprocess(
         raise ZipCreationFailed(
             detail=f"Unexpected error during zip creation: {str(e)}"
         ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
-    finally:
-        if tmp_dir_obj is not None:
-            tmp_dir_obj.cleanup()
 
 
 def _build_zip_filename(
