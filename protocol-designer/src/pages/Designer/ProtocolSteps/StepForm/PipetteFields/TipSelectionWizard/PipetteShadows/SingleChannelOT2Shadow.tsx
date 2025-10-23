@@ -24,9 +24,8 @@ export function SingleChannelOT2Shadow(props: PipetteShadowProps): JSX.Element {
         width="95.6715"
         height="134.133"
         rx="10.9127"
-        fill="#16212D"
-        fillOpacity="0.2"
-        stroke="#006CFA"
+        fill={fill}
+        stroke={stroke}
         strokeWidth="2.79"
       />
     </svg>

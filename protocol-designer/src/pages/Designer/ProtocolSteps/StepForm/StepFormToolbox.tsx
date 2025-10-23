@@ -411,7 +411,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
 
     // Handle multi-step toolbox with more pages
     if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
-      // need to skip past liquid clas page on OT-2
+      // need to skip past liquid class page on OT-2
       const increment =
         isLiquidHandlingStepType && toolboxStep === 0
           ? strideForContinueOrBack
@@ -427,7 +427,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
 
   const handleBack = (): void => {
-    // need to skip past liquid clas page on OT-2
+    // need to skip past liquid class page on OT-2
     const increment =
       isLiquidHandlingStepType && toolboxStep === 2
         ? strideForContinueOrBack
