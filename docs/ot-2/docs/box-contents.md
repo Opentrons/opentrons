@@ -64,7 +64,8 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 
 <figure markdown>
 ![Hex L-key set](images/hex-key-set.png "Multiple size hex L-keys")
-<figcaption>(4) Hex Keys (1.5 mm, 2 mm, 2.5 mm, 3 mm)</figcaption>
+<figcaption>(4) Hex Keys
+<p class="part-info">(1.5 mm, 2 mm, 2.5 mm, 3 mm)</p></figcaption>
 </figure>
 
 <figure markdown>
