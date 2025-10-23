@@ -54,6 +54,7 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
         "payload": {"text": text},
     }
 
+
 def capture_Image(
     resolution: Optional[Tuple[int, int]],
     zoom: Optional[float],

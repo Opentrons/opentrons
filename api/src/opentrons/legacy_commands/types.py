@@ -636,12 +636,14 @@ class MoveToDisposalLocationCommand(TypedDict):
 class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
 
+
 class CaptureImageCommandPayload(TextOnlyPayload):
     resolution: Optional[Tuple[int, int]]
     zoom: Optional[float]
     contrast: Optional[float]
     brightness: Optional[float]
     saturation: Optional[float]
+
 
 class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     liquid_class: LiquidClass
@@ -697,9 +699,11 @@ class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
 
+
 class CaptureImageCommand(TypedDict):
     name: Literal["command.CAPTURE_IMAGE"]
     payload: CaptureImageCommandPayload
+
 
 class SealCommand(TypedDict):
     name: Literal["command.SEAL"]

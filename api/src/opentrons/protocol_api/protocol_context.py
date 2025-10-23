@@ -1821,7 +1821,7 @@ class ProtocolContext(CommandPublisher):
                 core_map=self._core_map,
             )
         return None
-    
+
     @requires_version(2, 28)
     def capture_image(
         self,
@@ -1834,7 +1834,7 @@ class ProtocolContext(CommandPublisher):
         saturation: Optional[float] = None,
     ) -> None:
         """Capture an image using the camera. Captured images get saved as a result of the protocol run.
-        
+
         :param home_before: Boolean to home the pipette before capturing an image.
         :param filename: Filename to use when saving the captured image as a file.
         :param resolution: Width/height tuple to determine the resolution to use when capturing an image.
