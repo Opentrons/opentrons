@@ -176,7 +176,13 @@ class FileProvider:
         mime_type: MimeType,
         command_metadata: CommandFileNameMetadata,
     ) -> DataFileInfo:
-        """Writes arbitrary data to a file in the Data Files directory. Returns the `DataFileInfo` of the file created."""
+        """Writes arbitrary data to a file in the Data Files directory.
+
+        Returns the `DataFileInfo` of the file created.
+
+        Raises:
+            Note that the callback may raise a StorageLimitReachedError.
+        """
         if self._data_files_write_file_cb is not None:
             assert self._run_metadata is not None
             file_data = FileData.build(

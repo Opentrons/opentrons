@@ -62,7 +62,11 @@ class FileProviderExecutor:
         self,
         file_data: FileData,
     ) -> DataFileInfo:
-        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
+        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file.
+
+        Raises:
+            A StorageLimitReachedError on disk space limit violations.
+        """
         if (
             isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata)
             and self._disk_monitor.is_images_directory_over_limit()
