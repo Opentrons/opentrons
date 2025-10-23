@@ -206,6 +206,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         end_location: Optional[Location] = None,
         end_meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -290,6 +291,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         volume=volume,
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
+                        movement_delay=movement_delay,
                     )
                 )
             else:
@@ -320,6 +322,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         end_location: Optional[Location] = None,
         end_meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -421,6 +424,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         flowRate=flow_rate,
                         pushOut=push_out,
                         correctionVolume=correction_volume,
+                        movement_delay=movement_delay,
                     )
                 )
             else:

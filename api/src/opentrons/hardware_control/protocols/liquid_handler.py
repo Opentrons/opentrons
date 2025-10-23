@@ -128,6 +128,7 @@ class LiquidHandler(
         end_point: Point,
         volume: float,
         flow_rate: float = 1.0,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -136,6 +137,7 @@ class LiquidHandler(
         :param z_distance: The distance the z axis will move during apsiration.
         :param volume: The volume of liquid to be aspirated.
         :param flow_rate: The flow rate to aspirate with.
+        :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
         """
         ...
 
@@ -169,6 +171,7 @@ class LiquidHandler(
         push_out: Optional[float],
         flow_rate: float = 1.0,
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -177,6 +180,7 @@ class LiquidHandler(
         :param z_distance: The distance the z axis will move during dispensing.
         :param volume: The volume of liquid to be dispensed.
         :param flow_rate: The flow rate to dispense with.
+        :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
         """
         ...
 

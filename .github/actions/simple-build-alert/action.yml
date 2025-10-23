@@ -78,4 +78,4 @@ runs:
             ]
           }
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets[steps.channel-config.outputs.webhook_secret] }}
+        SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

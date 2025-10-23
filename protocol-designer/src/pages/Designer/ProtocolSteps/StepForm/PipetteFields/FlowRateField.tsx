@@ -134,13 +134,21 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           referenceVolumesForByVolumeInterpolation?.flowRate.dispense,
           referenceVolumesForByVolumeInterpolation?.correction.dispense,
         ]
+  const dispenseKeyForCorrectionVolumeInterpolation =
+    formData?.path === 'multiDispense' &&
+    liquidClassValuesForTip != null &&
+    'multiDispense' in liquidClassValuesForTip
+      ? 'multiDispense'
+      : 'singleDispense'
   const correctionVolume =
     referenceVolumeCorrection != null && liquidClassValuesForTip != null
       ? linearInterpolate(
           referenceVolumeCorrection,
           liquidClassValuesForTip[
-            flowRateType === 'aspirate' ? 'aspirate' : 'singleDispense'
-          ].correctionByVolume as Array<[number, number]>
+            flowRateType === 'aspirate'
+              ? 'aspirate'
+              : dispenseKeyForCorrectionVolumeInterpolation
+          ]?.correctionByVolume as Array<[number, number]>
         )
       : 0
 

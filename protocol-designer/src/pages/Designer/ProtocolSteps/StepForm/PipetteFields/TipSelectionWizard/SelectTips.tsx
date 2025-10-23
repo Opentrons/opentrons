@@ -20,11 +20,7 @@ import {
   getPositionFromSlotId,
   SINGLE,
 } from '@opentrons/shared-data'
-import {
-  EMPTY,
-  getDefaultPrimaryNozzle,
-  getSlotInLocationStack,
-} from '@opentrons/step-generation'
+import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -34,7 +30,6 @@ import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TIP_STATE_TO_TIP_TYPE } from './constants'
 import { DeckOverlay } from './DeckOverlay'
-import { useMemoizedTipAccessibileStatusByWellName } from './hooks'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
 import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
@@ -62,10 +57,10 @@ export function SelectTips(
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
+    primaryNozzle: string
+    tipAccessibilityStatus: Record<string, Record<string, boolean>>
   }
 ): JSX.Element {
-  const { pipetteSpecs, nozzles, pipetteId } = props
-
   const { t } = useTranslation('tip_selection')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
@@ -74,6 +69,7 @@ export function SelectTips(
   const currentHoveredWellRef = useRef<string | null>(null)
 
   const {
+    pipetteSpecs,
     selectedTiprackId,
     activeDeckSetup,
     deckDef,
@@ -81,6 +77,9 @@ export function SelectTips(
     setSelectedTips,
     numTotalPickups,
     setShowPickupsRequiredBanner,
+    tipAccessibilityStatus,
+    nozzles,
+    primaryNozzle,
   } = props
   const labwareName = labwareNicknamesById[selectedTiprackId ?? '']
   const viewBox =
@@ -102,20 +101,10 @@ export function SelectTips(
   const labwareDef = activeDeckSetup.labware[selectedTiprackId ?? '']?.def
   const { channels } = pipetteSpecs
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels,
-  })
-
   const tipAccessibileStatusByWellName =
-    useMemoizedTipAccessibileStatusByWellName({
-      selectedTiprackId: selectedTiprackId ?? '',
-      nozzles,
-      pipetteSpecs,
-      selectedTips,
-      primaryNozzle,
-      pipetteId,
-    })
+    selectedTiprackId != null
+      ? (tipAccessibilityStatus[selectedTiprackId] ?? {})
+      : {}
 
   const allWellsAffectedByHover = getAffectedWells({
     wellName: hoveredWell,
@@ -127,7 +116,6 @@ export function SelectTips(
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
     well => tipAccessibileStatusByWellName[well] && tipState?.[well] !== EMPTY
   )
-
   const numPickupsRemaining = numTotalPickups - selectedTips.length
 
   const handleUnselectWell = (unselectIndex: number): void => {
