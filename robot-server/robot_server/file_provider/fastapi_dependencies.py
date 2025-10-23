@@ -44,7 +44,6 @@ async def get_file_provider(
     """Return the engine `FileProvider` which accepts callbacks from FileProviderWrapper."""
     file_provider = FileProvider(
         data_files_write_file_cb=file_provider_executor.write_file_cb,
-        data_files_filecount=file_provider_executor.filecount_cb,
     )
 
     return file_provider

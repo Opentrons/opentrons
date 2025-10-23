@@ -116,11 +116,6 @@ class FileProviderExecutor:
             await self._data_files_store.insert_output_file(output_file_info)
             return file_info
 
-    async def filecount_cb(self) -> int:
-        """Return the current count of generated files stored within the data files directory."""
-        data_file_usage_info = self._data_files_store.get_usage_info(generated=True)
-        return len(data_file_usage_info)
-
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
         """Build the finalized filename."""
         if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):

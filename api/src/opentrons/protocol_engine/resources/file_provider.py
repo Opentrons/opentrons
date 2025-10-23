@@ -13,8 +13,6 @@ from opentrons_shared_data.data_files import (
 
 from ..errors import StorageLimitReachedError
 
-MAXIMUM_FILE_LIMIT = 400
-
 
 @dataclass(frozen=True)
 class FileNameCmdMetadata:
@@ -162,7 +160,6 @@ class FileProvider:
         data_files_write_file_cb: Optional[
             Callable[[FileData], Awaitable[DataFileInfo]]
         ] = None,
-        data_files_filecount: Optional[Callable[[], Awaitable[int]]] = None,
     ) -> None:
         """Initialize the interface callbacks of the File Provider for data file handling within the Protocol Engine.
 
@@ -171,7 +168,6 @@ class FileProvider:
             data_files_filecount: Callback to check the amount of data files already present in the data files directory.
         """
         self._data_files_write_file_cb = data_files_write_file_cb
-        self._data_files_filecount = data_files_filecount
         self._run_metadata: RunFileNameMetadata | None = None
 
     async def write_file(
@@ -181,21 +177,16 @@ class FileProvider:
         command_metadata: CommandFileNameMetadata,
     ) -> DataFileInfo:
         """Writes arbitrary data to a file in the Data Files directory. Returns the `DataFileInfo` of the file created."""
-        if self._data_files_filecount is not None:
-            file_count = await self._data_files_filecount()
-            if file_count >= MAXIMUM_FILE_LIMIT:
-                raise StorageLimitReachedError(
-                    f"Not enough space to store file. Maximum file limit of {MAXIMUM_FILE_LIMIT} reached."
-                )
-            if self._data_files_write_file_cb is not None:
-                assert self._run_metadata is not None
-                file_data = FileData.build(
-                    data=data,
-                    mime_type=mime_type,
-                    command_metadata=command_metadata,
-                    run_metadata=self._run_metadata,
-                )
-                return await self._data_files_write_file_cb(file_data)
+        if self._data_files_write_file_cb is not None:
+            assert self._run_metadata is not None
+            file_data = FileData.build(
+                data=data,
+                mime_type=mime_type,
+                command_metadata=command_metadata,
+                run_metadata=self._run_metadata,
+            )
+
+            return await self._data_files_write_file_cb(file_data)
         # If we are in an analysis or simulation state, return an empty `DataFileInfo`
         return DataFileInfo(
             id="",
