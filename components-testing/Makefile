@@ -17,7 +17,7 @@ teardown: clean-local-packages
 
 install-local-packages:
 	@echo "Building shared-data package..."
-	cd ../shared-data && make pack
+	make -C ../shared-data pack
 	@echo "Building components package..."
 	cd ../components && make pack
 	@echo "Installing local packages..."
