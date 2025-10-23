@@ -22,6 +22,10 @@ from rich.console import Console
 
 console = Console()
 
+PR_SPECIAL_BRANCH_PREFIXES: tuple[str, ...] = ("chore_release",)
+PR_SPECIAL_BRANCH_NAMES: tuple[str, ...] = ("edge", "release")
+PR_SANDBOX_SUFFIX = "-pr"
+
 
 @dataclass(frozen=True)
 class CIConfig:
@@ -98,6 +102,8 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
         # Handle empty or null head_ref values
         if head_ref and head_ref.lower() not in ["", "null", "none"]:
             sandbox_prefix = head_ref
+            if _is_special_pr_branch(head_ref):
+                sandbox_prefix = _alternate_pr_sandbox_prefix(head_ref)
         else:
             sandbox_prefix = "unknown"
         return environment, sandbox_prefix
@@ -118,6 +124,23 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
             return "sandbox", ref_name
 
     raise ValueError(f"No deployment configuration found for event: {event_name}, ref_type: {ref_type}")
+
+
+def _is_special_pr_branch(branch_name: str) -> bool:
+    """Return True if the PR branch should use an alternate sandbox prefix."""
+    normalized = branch_name.lower()
+    if normalized in PR_SPECIAL_BRANCH_NAMES:
+        return True
+
+    return any(normalized.startswith(prefix) for prefix in PR_SPECIAL_BRANCH_PREFIXES)
+
+
+def _alternate_pr_sandbox_prefix(branch_name: str) -> str:
+    """Build the alternate sandbox prefix for special PR branches."""
+    if branch_name.endswith(PR_SANDBOX_SUFFIX):
+        return branch_name
+
+    return f"{branch_name}{PR_SANDBOX_SUFFIX}"
 
 
 def parse_github_event_context(
