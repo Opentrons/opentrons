@@ -11,7 +11,7 @@ Contact us if you have any questions about the OT-2. Opentrons teams are here to
 
 ## Support
 
-Answers to many common questions are available on the Opentrons Help Center at <https://support.opentrons.com/>. Contact Opentrons Support at <support@opentrons.com> if you can't find an answer to your question. We can also help you with warranty issues, parts, repairs, supplies, and other support-related problems or concerns.
+Opentrons Support can help you with warranty issues, parts, repairs, supplies, and other support-related problems or concerns.
 
 Online chat is available from the [Opentrons website](https://opentrons.com/). Click on the live chat popup on the lower right corner of the page.
 
