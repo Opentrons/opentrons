@@ -64,7 +64,8 @@ _log = getLogger(__name__)
 #
 # Version History
 #     * Changed to "2" for version 7.0 from "initial"
-_CURRENT_ANALYZER_VERSION: Final = "2"
+#     * Changed to "3" for the implementation of Command Preconditions
+_CURRENT_ANALYZER_VERSION: Final = "3"
 # We have a reasonable limit for a memory cache of analyses.
 _CACHE_MAX_SIZE: Final = 32
 
