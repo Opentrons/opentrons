@@ -220,6 +220,7 @@ async def test_analyze(
             liquids=[],
             liquidClasses=[],
             command_annotations=[command_annotation],
+            command_preconditions=command_preconditions,
         )
     )
 
