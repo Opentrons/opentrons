@@ -1363,7 +1363,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """
         if not tip_racks and not tips:
             raise RuntimeError(
-                "No tipracks or tips found for pipette in order to perform transfer"
+                "No tip racks or tips found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         transfer_props = self._get_transfer_properties_for_tip_rack(
@@ -1542,7 +1542,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """
         if not tip_racks:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tip racks found for pipette in order to perform transfer"
             )
         assert new_tip in [
             TransferTipPolicyV2.NEVER,
@@ -1831,7 +1831,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """
         if not tip_racks:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tip racks found for pipette in order to perform transfer"
             )
         # NOTE: Tip option of "always" in consolidate is equivalent to "after every dispense",
         #       or more specifically, "before the next chunk of aspirates".
