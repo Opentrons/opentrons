@@ -96,9 +96,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
-  const selected: boolean = multiSelectItemIds?.length
-    ? multiSelectItemIds.includes(stepId)
-    : selectedStepId === stepId
+  const selected: boolean =
+    multiSelectItemIds != null && multiSelectItemIds.length > 0
+      ? multiSelectItemIds.includes(stepId)
+      : selectedStepId === stepId
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
