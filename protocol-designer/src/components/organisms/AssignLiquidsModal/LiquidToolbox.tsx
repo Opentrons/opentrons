@@ -77,6 +77,7 @@ interface LiquidToolboxProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
+  showLiquidLayoutOverlay: boolean
   data: LiquidToolboxData
   selectedLabwareIds: string[]
 }
@@ -85,6 +86,7 @@ export function LiquidToolbox({
   setShowBadFormState,
   setDefineLiquidModal,
   selectedLabwareIds,
+  showLiquidLayoutOverlay,
   data,
 }: LiquidToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
@@ -296,7 +298,8 @@ export function LiquidToolbox({
         }
       >
         {(liquidsInLabware != null && liquidsInLabware.length > 0) ||
-        selectedWells.length > 0 ? (
+        selectedWells.length > 0 &&
+        !showLiquidLayoutOverlay ? (
           <form onSubmit={handleSubmit(handleSaveSubmit)}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {selectedWells.length > 0 ? (
@@ -506,6 +509,7 @@ interface LiquidToolboxContainerProps {
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   selectedLabwareIds: string[]
+  showLiquidLayoutOverlay: boolean
 }
 
 export function LiquidToolboxContainer({
@@ -513,8 +517,10 @@ export function LiquidToolboxContainer({
   setShowBadFormState,
   setDefineLiquidModal,
   selectedLabwareIds,
+  showLiquidLayoutOverlay,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
+  console.log('showLiquidLayoutOverlay', showLiquidLayoutOverlay)
   console.log('selectedLabwareIds', selectedLabwareIds)
   const liquids = useSelector(getLiquidEntities)
   const labwareId = selectedLabwareIds[0] //useSelector(labwareIngredSelectors.getSelectedLabwareId)
@@ -558,6 +564,7 @@ export function LiquidToolboxContainer({
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}
       selectedLabwareIds={selectedLabwareIds}
+      showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
     />
   )

@@ -3,11 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   InfoScreen,
+  JUSTIFY_CENTER,
   SecondaryButton,
+  SPACING,
   StyledText,
   Toolbox,
 } from '@opentrons/components'
@@ -125,6 +129,10 @@ export function LabwareStackToolbox({
         height="100%"
         confirmButton={
           <SecondaryButton
+            display={DISPLAY_FLEX}
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing8}
             width="100%"
             data-testid="Toolbox_confirmButton"
             onClick={handleConfirmClick}

@@ -247,6 +247,7 @@ export function AssignLiquidsModal(
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
           setDefineLiquidModal={setDefineLiquidModal}
+          showLiquidLayoutOverlay={showLiquidLayoutOverlay}
         />
       </Flex>
     </Flex>
