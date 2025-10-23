@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
@@ -329,7 +329,7 @@ function useTipSelectionUtils(
   // Use this labware to represent all tip racks for manual tip selection.
   const tipSelectorDef = useMemo(
     () =>
-      getAllLabwareDefs()[
+      getAllDefinitions()[
         'opentrons/thermoscientificnunc_96_wellplate_1300ul/1'
       ],
     []

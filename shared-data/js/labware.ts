@@ -70,25 +70,17 @@ const schema3DefinitionsByURI = Object.fromEntries(
 
 // todo(mm, 2025-02-27): When calling code is ready, this should probably include
 // schema 3 definitions, not just schema 2 definitions.
-//
-// todo(mm, 2025-02-27): The only remaining difference between this and
-// getAllDefinitions() is that getAllDefinitions() has potentially dangerous caching
-// behavior (see the todo comment there). Delete this in favor of getAllDefinitions()
-// when that's resolved.
-export const getAllLabwareDefs = (): Record<string, LabwareDefinition2> =>
-  schema2DefinitionsByURI
-
 export function getAllDefinitions(
   blockList?: Set<string>
 ): LabwareDef2ByDefURI {
   if (blockList) {
     return Object.fromEntries(
-      Object.entries(getAllLabwareDefs()).filter(
+      Object.entries(schema2DefinitionsByURI).filter(
         ([, labwareDef]) => !blockList.has(labwareDef.parameters.loadName)
       )
     )
   } else {
-    return getAllLabwareDefs()
+    return schema2DefinitionsByURI
   }
 }
 
