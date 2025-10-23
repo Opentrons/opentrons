@@ -1,5 +1,5 @@
 ---
-title: "Opentrons OT-2 Liquid Handler Instruction Manual"
+title: "Opentrons OT-2 Instruction Manual"
 ---
 
 <style>
@@ -8,7 +8,7 @@ title: "Opentrons OT-2 Liquid Handler Instruction Manual"
 }
 </style>
 
-<strong style="color: red;">PLACEHOLDER FOR COVER IMAGE</strong>
+![OT-2 rendered cover image](images/OT2-render-HERO.png)
 
 **Opentrons Labworks Inc.**<br>
 Month Year
