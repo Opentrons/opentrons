@@ -33,7 +33,7 @@ runs:
         fi
 
     - name: 'Send Slack Alert'
-      uses: slackapi/slack-github-action@v1.14.0
+      uses: slackapi/slack-github-action@v2.1.1
       with:
         payload: |
           {
