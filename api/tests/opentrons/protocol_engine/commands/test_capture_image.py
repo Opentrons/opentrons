@@ -8,6 +8,7 @@ from opentrons.system import camera
 from opentrons.system import ffmpeg
 from opentrons.protocol_engine.resources import FileProvider, CameraProvider
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import PreconditionTypes
 from opentrons.protocol_engine.commands.command import SuccessData
@@ -216,6 +217,9 @@ async def test_ensure_camera_used_precondition_set(
     with mock.patch("os.path.exists", mock.Mock(return_value=True)):
         result = await subject.execute(params=params)
         assert isinstance(result, SuccessData)
+        assert isinstance(
+            result.state_update.precondition_update, update_types.PreconditionUpdate
+        )
         assert result.state_update.precondition_update.preconditions == {
             PreconditionTypes.IS_CAMERA_USED: True
         }
