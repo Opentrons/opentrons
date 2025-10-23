@@ -2380,6 +2380,50 @@ def test_dynamic_mix_with_delay(
     )
 
 
+def test_dynamic_mix_arg_checking(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    mock_well_2 = decoy.mock(cls=Well)
+    aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_location = Location(point=Point(2, 2, 3), labware=mock_well_2)
+
+    # Raises error when aspirate and dispense are in different wells
+    with pytest.raises(ValueError):
+        subject.dynamic_mix(
+            repetitions=2,
+            volume=10.0,
+            aspirate_start_location=aspirate_location,
+            dispense_start_location=dispense_location,
+        )
+    aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    aspirate_end_location = Location(point=Point(2, 2, 1), labware=mock_well_2)
+    dispense_end_location = Location(point=Point(2, 2, 3), labware=mock_well_2)
+    # Raises error when aspirate start and end are in different wells
+    with pytest.raises(ValueError):
+        subject.dynamic_mix(
+            repetitions=2,
+            volume=10.0,
+            aspirate_start_location=aspirate_location,
+            dispense_start_location=dispense_location,
+            aspirate_end_location=aspirate_end_location,
+        )
+    # Raises error when dispense start and end are in different wells
+    with pytest.raises(ValueError):
+        subject.dynamic_mix(
+            repetitions=2,
+            volume=10.0,
+            aspirate_start_location=aspirate_location,
+            dispense_start_location=dispense_location,
+            dispense_end_location=dispense_end_location,
+        )
+
+
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
 def test_aspirate_with_lpd(
