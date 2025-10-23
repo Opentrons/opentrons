@@ -174,11 +174,9 @@ export const getAffectedWells = (args: {
   if (channels === 1 || nozzles === SINGLE) {
     return [wellName]
   } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
-    const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
-    return allWellsInColumn
+    return getAllWellsInColumn(wellName, labwareDef)
   } else if (channels === 96) {
-    const allWells = Object.keys(labwareDef.wells)
-    return allWells
+    return Object.keys(labwareDef.wells)
   }
   return []
 }

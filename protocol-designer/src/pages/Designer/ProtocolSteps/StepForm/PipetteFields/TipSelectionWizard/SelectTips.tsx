@@ -7,7 +7,9 @@ import {
   Chip,
   COLORS,
   Flex,
+  INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
+  NO,
   SELECTED,
   SELECTED_ERROR,
   SELECTED_USED,
@@ -216,9 +218,10 @@ export function SelectTips(
     const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
     const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
       (acc, tipList, index) => {
-        const innerAcc = tipList.reduce<Record<string, number>>((acc, tip) => {
-          return { ...acc, [tip]: index }
-        }, {})
+        const innerAcc = tipList.reduce<Record<string, number>>(
+          (acc, tip) => ({ ...acc, [tip]: index }),
+          {}
+        )
         return { ...acc, ...innerAcc }
       },
       {}
@@ -230,6 +233,9 @@ export function SelectTips(
             (acc, [wellName, state]) => {
               const rawState = TIP_STATE_TO_TIP_TYPE[state]
               let status = rawState
+              if (!tipAccessibileStatusByWellName[wellName]) {
+                status = rawState === NO ? NO : INACCESSIBLE
+              }
               if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
                 status = rawState === USED ? SELECTED_USED : SELECTED
               } else if (allWellsAffectedByHover.includes(wellName)) {

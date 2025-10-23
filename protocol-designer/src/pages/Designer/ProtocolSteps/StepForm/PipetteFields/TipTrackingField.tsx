@@ -19,6 +19,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -143,12 +144,17 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: formData.nozzles,
+    channels: pipetteSpecs.channels,
+  })
+
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({
       nozzles: formData.nozzles,
       pipetteSpecs,
       selectedTips,
-      primaryNozzle: formData.primaryNozzle,
+      primaryNozzle,
       pipetteId: formData.pipette,
       tiprackUri: formData.tipRack,
     })
@@ -181,14 +187,13 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
               onChange={() => {
                 propsForFields.tip_tracking.updateValue(value)
               }}
-              isSelected={propsForFields.tip_tracking.value === value}
+              isSelected={formData.tip_tracking === value}
               largeDesktopBorderRadius
             />
           ))}
         </Flex>
       </Flex>
-      {propsForFields.tip_tracking.value === MANUAL &&
-      hasValidTiprackForPickup ? (
+      {formData.tip_tracking === MANUAL && hasValidTiprackForPickup ? (
         <Flex className={styles.manual_container}>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('step_edit_form.field.tip_tracking.manual.title')}
@@ -220,8 +225,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           </ListButton>
         </Flex>
       ) : null}
-      {propsForFields.tip_tracking.value === MANUAL &&
-      !hasValidTiprackForPickup ? (
+      {formData.tip_tracking === MANUAL && !hasValidTiprackForPickup ? (
         <InlineNotification
           type="error"
           heading={t('tip_selection:no_valid_tips_available.title')}
@@ -231,9 +235,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       {showTipSelectionModal && (
         <TipSelectionWizard
           setShowTipSelectionModal={setShowTipSelectionModal}
-          formTiprackUri={propsForFields.tipRack.value as string}
-          pipetteId={propsForFields.pipette.value as string}
-          nozzles={propsForFields.nozzles.value as NozzleConfigurationStyle}
+          formTiprackUri={formData.tipRack as string}
+          pipetteId={formData.pipette as string}
+          nozzles={formData.nozzles as NozzleConfigurationStyle}
           numPickups={numPickups}
           tiprackSelected={formData.tiprack_selected}
           updateFormTiprackSelected={
@@ -243,6 +247,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           selectedTips={selectedTips}
           setSelectedTips={setSelectedTips}
           validTiprackIds={validTiprackIds}
+          tipAccessibilityStatus={tipAccessibilityStatus}
         />
       )}
     </Flex>

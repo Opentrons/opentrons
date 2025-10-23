@@ -11,6 +11,8 @@ import { OFFDECK } from '/protocol-designer/constants'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
+import { getAffectedWells } from '../utils'
+
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
@@ -95,8 +97,13 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
                 primaryNozzle,
                 nozzleConfiguration: nozzles,
               }) &&
-              // check if tip is not empty
-              tipState[wellName] !== EMPTY,
+              // check if tip(s) is/are not empty
+              getAffectedWells({
+                wellName,
+                labwareDef: def,
+                channels: pipetteSpecs.channels,
+                nozzles,
+              }).every(well => tipState[well] !== EMPTY),
           }),
           {}
         ),
