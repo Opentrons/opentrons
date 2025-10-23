@@ -2,7 +2,7 @@ name: 'Test OIDC PyPI Publishing'
 
 on:
   push:
-    branches: [ 'feature/components-sandbox' ]  # Test on current branch
+    branches: [ 'pypi-publish', 'feature/components-sandbox', 'main' ]  # Test on multiple branches
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
