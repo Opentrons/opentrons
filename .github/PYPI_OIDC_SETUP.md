@@ -1,6 +1,6 @@
 # PyPI OIDC Trusted Publishing Setup
 
-This document explains how to migrate from PyPI API tokens to OIDC trusted publishing for secure, tokenless deployments.
+This document explains how to migrate from PyPI API tokens to OIDC trusted publishing using the official `pypa/gh-action-pypi-publish` GitHub Action.
 
 ## Overview
 
@@ -22,33 +22,32 @@ For each project that needs to publish to PyPI:
    - **Environment name**: Leave empty (or specify if using environments)
    - **Branch/tag**: `refs/tags/*` (for tagged releases)
 
-### 2. Update Workflow Files
+### 2. Workflow Configuration
 
-Replace the token-based authentication with OIDC trusted publishing:
+The workflows are already configured to use the official `pypa/gh-action-pypi-publish` action:
 
-**Before (token-based):**
+**Production PyPI (for tagged releases):**
 ```yaml
-- name: 'upload to pypi'
+- name: 'upload to real pypi'
+  uses: pypa/gh-action-pypi-publish@release/v1
+  with:
+    packages-dir: api/dist/
+    repository-url: https://upload.pypi.org/legacy/
+```
+
+**Test PyPI (for non-tagged pushes):**
+```yaml
+- name: 'upload to test pypi'
   uses: './.github/actions/python/pypi-deploy'
   with:
     project: 'api'
-    repository_url: 'https://upload.pypi.org/legacy/'
-    password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS }}'
-```
-
-**After (OIDC-based):**
-```yaml
-- name: 'upload to pypi'
-  uses: './.github/actions/python/pypi-deploy-oidc'
-  with:
-    project: 'api'
-    repository_url: 'https://upload.pypi.org/legacy/'
-    pypi_trusted_publisher: 'pypi:opentrons'
+    repository_url: 'https://test.pypi.org/legacy/'
+    password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
 ```
 
 ### 3. Required Workflow Permissions
 
-Add these permissions to your workflow:
+The workflows already have the required permissions:
 
 ```yaml
 permissions:
@@ -58,28 +57,32 @@ permissions:
 
 ### 4. Environment Variables
 
-The OIDC action will automatically handle authentication using the trusted publisher configuration.
+The official action automatically handles OIDC authentication using the trusted publisher configuration.
 
 ## Benefits
 
-- **No long-lived secrets**: Eliminates the need to store PyPI API tokens
+- **No long-lived secrets**: Eliminates the need to store PyPI API tokens for production releases
 - **Enhanced security**: Tokens can't be leaked or compromised
 - **Automatic rotation**: No need to manually rotate tokens
 - **Audit trail**: Better tracking of publishing activities
+- **Official support**: Maintained by the PyPI team
 
 ## Migration Checklist
 
+- [x] Updated workflows to use `pypa/gh-action-pypi-publish@release/v1`
+- [x] Added required OIDC permissions to workflows
+- [x] Kept token-based publishing for Test PyPI (for development/testing)
 - [ ] Set up trusted publishing on PyPI for each project
-- [ ] Update workflow files to use OIDC action
-- [ ] Add required permissions to workflows
-- [ ] Test with a test release
+- [ ] Test with a real release tag
 - [ ] Remove old API token secrets (after confirming OIDC works)
 
-## Projects to Migrate
+## Projects to Configure
 
 Based on current setup:
-- `opentrons` (main API package)
-- `opentrons-shared-data` (shared data package)
+- `opentrons` (main API package) - **Production PyPI only**
+- `opentrons-shared-data` (shared data package) - **Production PyPI only**
+
+**Note**: Test PyPI uploads still use tokens for development/testing purposes.
 
 ## Troubleshooting
 
@@ -87,3 +90,10 @@ Based on current setup:
 - Check that the workflow filename is correct
 - Verify the repository owner and name match
 - Make sure the branch/tag pattern includes your release tags
+- For Test PyPI, ensure the API token secrets are still available
+
+## Official Documentation
+
+- [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishing/)
+- [pypa/gh-action-pypi-publish](https://github.com/pypa/gh-action-pypi-publish)
+- [Publishing with GitHub Actions](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/)

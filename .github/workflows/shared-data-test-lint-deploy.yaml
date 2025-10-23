@@ -187,18 +187,17 @@ jobs:
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
-        uses: './.github/actions/python/pypi-deploy-oidc'
+        uses: './.github/actions/python/pypi-deploy'
         with:
           project: 'shared-data'
           repository_url: 'https://test.pypi.org/legacy/'
-          pypi_trusted_publisher: 'pypi:opentrons-shared-data'
+          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
-        uses: './.github/actions/python/pypi-deploy-oidc'
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          project: 'shared-data'
-          repository_url: 'https://upload.pypi.org/legacy/'
-          pypi_trusted_publisher: 'pypi:opentrons-shared-data'
+          packages-dir: shared-data/dist/
+          repository-url: https://upload.pypi.org/legacy/
 
   publish-switch:
     runs-on: 'ubuntu-latest'
