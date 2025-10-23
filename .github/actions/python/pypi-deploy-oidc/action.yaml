@@ -31,15 +31,13 @@ runs:
         echo "Configuring OIDC trusted publishing for PyPI"
         
         # Create .pypirc with OIDC trusted publisher configuration
-        cat > ~/.pypirc << EOF
-[distutils]
-index-servers = pypi
-
-[pypi]
-repository = ${{ inputs.repository_url }}
-username = __token__
-password = ${{ inputs.pypi_trusted_publisher }}
-EOF
+        echo "[distutils]" > ~/.pypirc
+        echo "index-servers = pypi" >> ~/.pypirc
+        echo "" >> ~/.pypirc
+        echo "[pypi]" >> ~/.pypirc
+        echo "repository = ${{ inputs.repository_url }}" >> ~/.pypirc
+        echo "username = __token__" >> ~/.pypirc
+        echo "password = ${{ inputs.pypi_trusted_publisher }}" >> ~/.pypirc
         
         status=0
         CI=1 QUIET=1 BUILD_NUMBER=${OT_BUILD} make -C ${{ inputs.project }} clean deploy twine_repository_url=${{ inputs.repository_url }} pypi_username=__token__ pypi_password=${{ inputs.pypi_trusted_publisher }} || status=$?
