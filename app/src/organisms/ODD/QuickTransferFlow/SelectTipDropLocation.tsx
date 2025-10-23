@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { drop } from 'lodash'
 
 import {
   DIRECTION_COLUMN,
@@ -10,7 +9,6 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
-  getIsTiprack,
   getLabwareDefURI,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,

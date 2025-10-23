@@ -14,6 +14,7 @@ import mockQuickTransferState from '../QuickTransferAdvancedSettings/__fixtures_
 import { SelectTipDropLocation } from '../SelectTipDropLocation'
 
 import type { ComponentProps } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { QuickTransferWizardState } from '../types'
 
 vi.mock('/app/resources/deck_configuration')
@@ -85,16 +86,16 @@ describe('SelectTipDropLocation', () => {
     })
   })
 
-  // it('should call mock function when tapping tip rack option and continue button', () => {
-  //   render(props)
-  //   fireEvent.click(screen.getByText('Tip rack'))
-  //   fireEvent.click(screen.getByText('Continue'))
-  //   expect(props.onNext).toHaveBeenCalled()
-  //   expect(props.dispatch).toHaveBeenCalledWith({
-  //     type: 'SET_DROP_TIP_LOCATION',
-  //     location: getLabwareDefURI(
-  //       mockQuickTransferState.tipRack as LabwareDefinition2
-  //     ),
-  //   })
-  // })
+  it('should call mock function when tapping tip rack option and continue button', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Tip rack'))
+    fireEvent.click(screen.getByText('Continue'))
+    expect(props.onNext).toHaveBeenCalled()
+    expect(props.dispatch).toHaveBeenCalledWith({
+      type: 'SET_DROP_TIP_LOCATION',
+      location: getLabwareDefURI(
+        mockQuickTransferState.tipRack as LabwareDefinition2
+      ),
+    })
+  })
 })

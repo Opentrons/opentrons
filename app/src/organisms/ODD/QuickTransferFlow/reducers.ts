@@ -1,6 +1,6 @@
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
-import type { CutoutConfig, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type {
   QuickTransferSummaryAction,
   QuickTransferSummaryState,
