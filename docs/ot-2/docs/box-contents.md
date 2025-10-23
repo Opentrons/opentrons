@@ -58,7 +58,7 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 </figure>
 
 <figure markdown>
-![T10 Torx](images/torx-t10.png "T10 Torx")
+![T10 Torx](images/torx-t10.png "T10 Torx Key")
 <figcaption>(1) T10 Torx</figcaption>
 </figure>
 
