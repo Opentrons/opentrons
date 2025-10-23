@@ -31,19 +31,21 @@ make teardown setup dev
 
 #### `make setup`
 
-Complete setup - builds packages and links them locally.
+Complete setup - installs dependencies, then builds and links packages locally.
 
 This command:
 
-1. Builds the `@opentrons/shared-data` package using `make pack`
-2. Builds the `@opentrons/components` package using `make pack`
-3. Moves the built `.tgz` packages to a local `pack/` directory
-4. Links the packages using `pnpm link` (does NOT modify package.json or pnpm-lock.yaml)
-5. Installs all other dependencies with `pnpm install`
+1. Runs `pnpm install` to create `node_modules` and install dependencies
+2. Builds the `@opentrons/shared-data` package using `make pack`
+3. Moves the built `.tgz` to `pack/opentrons-shared-data-v0.0.0-dev.tgz`
+4. Builds the `@opentrons/components` package using `make pack`
+5. Moves the built `.tgz` to `pack/opentrons-components-v0.0.0-dev.tgz`
+6. Extracts both packages to `pack/` directory
+7. Links the packages using `pnpm link` (does NOT modify package.json or pnpm-lock.yaml)
 
 #### `make install-local-packages`
 
-Install only the local packages (assumes they're already built). Use this when you've made changes to the source packages.
+Rebuild and link local packages only (requires `node_modules` to exist). Use this when you've made changes to the source packages and want to test them.
 
 ### Development Commands
 
@@ -89,9 +91,8 @@ Remove linked packages and clean up completely.
 
 This command:
 
-1. Unlinks `@opentrons/shared-data` and `@opentrons/components`
-2. Removes the `pack/` directory with `.tgz` files
-3. Removes `node_modules` directory
+1. Removes the `pack/` directory with `.tgz` files and extracted packages
+2. Removes `node_modules` directory
 
 #### `make clean-local-packages`
 
@@ -126,13 +127,20 @@ When you make **intentional** style or layout changes to ProtocolDeck:
 
 ## Package Linking Approach
 
-This project uses `pnpm link` instead of `pnpm add` to avoid:
+This project uses `pnpm link` with extracted package directories instead of `pnpm add` to avoid:
 
 - Modifying package.json with file: dependencies
 - Causing unnecessary pnpm-lock.yaml relocks
 - Potential side effects on other dependencies during lock updates
 
-The `.tgz` packages are stored in a local `pack/` directory that is gitignored, keeping the repository clean.
+The workflow:
+
+1. Install regular dependencies with `pnpm install` to create `node_modules`
+2. Build packages as `.tgz` files
+3. Extract `.tgz` files to `pack/opentrons-shared-data/` and `pack/opentrons-components/`
+4. Use `pnpm link` with absolute paths to symlink extracted packages into `node_modules/@opentrons/`
+
+The `pack/` directory is gitignored, keeping the repository clean.
 
 ## Project Structure
 
@@ -168,5 +176,7 @@ This project uses exact versions matching the monorepo's root package.json:
 
 The following packages are linked at build time via `pnpm link`:
 
-- `@opentrons/shared-data`: Built from `../shared-data/pack/opentrons-shared-data-v0.0.0-dev.tgz`
-- `@opentrons/components`: Built from `../components/pack/opentrons-components-v0.0.0-dev.tgz`
+- `@opentrons/shared-data`: Extracted to `pack/opentrons-shared-data/`
+- `@opentrons/components`: Extracted to `pack/opentrons-components/`
+
+These are symlinked into `node_modules/@opentrons/` without appearing in `package.json`.

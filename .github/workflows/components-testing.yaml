@@ -40,14 +40,9 @@ jobs:
         run: |
           corepack enable
           corepack prepare pnpm@9.0.0 --activate
-      - name: 'setup components-testing'
-        working-directory: components-testing
-        run: |
-          make setup test-setup
       - name: 'run components-testing tests'
         working-directory: components-testing
-        run: |
-          make test
+        run: make test
       - name: 'upload playwright report'
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

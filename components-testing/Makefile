@@ -12,23 +12,14 @@ COMPONENTS_DIR := $(PACK_DIR)/opentrons-components
 
 # Development server
 .PHONY: dev
-dev:
+dev: setup
 	pnpm run dev
 
-# Build production bundle
-.PHONY: build
-build:
-	pnpm build
-
-# Preview production build
-.PHONY: preview
-preview:
-	pnpm preview
-
-# Complete setup: build packages, install them, and install dependencies
+# Complete setup: install dependencies, then build and link packages
 .PHONY: setup
-setup: install-local-packages
+setup:
 	pnpm install
+	$(MAKE) install-local-packages
 
 # Complete teardown: remove packages and node_modules
 .PHONY: teardown
@@ -52,27 +43,20 @@ install-local-packages:
 	@mkdir -p $(SHARED_DATA_DIR) $(COMPONENTS_DIR)
 	@tar -xzf $(SHARED_DATA_PACK) --strip-components=1 -C $(SHARED_DATA_DIR)
 	@tar -xzf $(COMPONENTS_PACK) --strip-components=1 -C $(COMPONENTS_DIR)
-	@echo "Linking packages via pnpm link..."
-	cd $(SHARED_DATA_DIR) && pnpm link --global
-	cd $(COMPONENTS_DIR) && pnpm link --global
-	pnpm link --global @opentrons/shared-data @opentrons/components
+	@echo "Linking packages directly..."
+	@pnpm link $(PWD)/$(SHARED_DATA_DIR) $(PWD)/$(COMPONENTS_DIR)
 	@echo "Local packages linked successfully!"
 
 # Unlink local packages and clean up pack directory
 .PHONY: clean-local-packages
 clean-local-packages:
-	@echo "Unlinking local packages..."
-	-@pnpm unlink --global @opentrons/shared-data 2>/dev/null || true
-	-@pnpm unlink --global @opentrons/components 2>/dev/null || true
-	-@cd $(SHARED_DATA_DIR) && pnpm unlink --global 2>/dev/null || true
-	-@cd $(COMPONENTS_DIR) && pnpm unlink --global 2>/dev/null || true
 	@echo "Cleaning up pack directory..."
 	@rm -rf $(PACK_DIR)
 	@echo "Local packages cleaned!"
 
 # Run Playwright tests
 .PHONY: test
-test: setup test-setup
+test: test-setup
 	pnpm playwright test --config=playwright.config.ts
 
 # Install Playwright browser dependencies
@@ -82,5 +66,5 @@ test-setup: setup
 
 # Update Playwright snapshots (use after intentional style changes)
 .PHONY: test-update-snapshots
-test-update-snapshots: setup test-setup
+test-update-snapshots: test-setup
 	pnpm playwright test --config=playwright.config.ts --update-snapshots

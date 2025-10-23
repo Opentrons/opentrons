@@ -26,12 +26,20 @@ The testing environment simulates a real-world scenario where these packages wou
 
 ## Package Linking Strategy
 
-This project uses **`pnpm link`** instead of `pnpm add` to install local packages. This approach:
+This project uses **`pnpm link`** with extracted package directories to install local packages. This approach:
 
 - **Does NOT modify** `package.json` or `pnpm-lock.yaml`
 - Avoids unnecessary lock file churn
 - Prevents side effects on other dependencies during relocks
 - Stores `.tgz` packages in a gitignored `pack/` directory
+- Extracts packages to `pack/` subdirectories for linking
+
+The workflow:
+
+1. Run `pnpm install` first to create `node_modules`
+2. Build packages as `.tgz` files
+3. Extract to `pack/opentrons-shared-data/` and `pack/opentrons-components/`
+4. Use `pnpm link <absolute-path>` to symlink into `node_modules/@opentrons/`
 
 Local packages are linked at runtime, not declared as dependencies.
 
@@ -65,13 +73,14 @@ The Makefile provides automated commands for package building and testing. All c
 
 This command:
 
-1. Creates a `pack/` directory for `.tgz` files
+1. Runs `pnpm install` to create `node_modules` and install dependencies
 2. Builds the `@opentrons/shared-data` package using `make pack`
 3. Moves the built `.tgz` to `pack/opentrons-shared-data-v0.0.0-dev.tgz`
-4. Builds the `@opentrons/components` package using `make pack`
-5. Moves the built `.tgz` to `pack/opentrons-components-v0.0.0-dev.tgz`
-6. Links packages using `pnpm link` (no package.json changes)
-7. Installs all other dependencies with `pnpm install`
+4. Extracts the tarball to `pack/opentrons-shared-data/`
+5. Builds the `@opentrons/components` package using `make pack`
+6. Moves the built `.tgz` to `pack/opentrons-components-v0.0.0-dev.tgz`
+7. Extracts the tarball to `pack/opentrons-components/`
+8. Links packages using `pnpm link <absolute-path>` (no package.json changes)
 
 **`make install-local-packages`** - Rebuild and link local packages only
 
@@ -107,13 +116,12 @@ pnpm test:update-snapshots
 
 ### Cleanup Commands
 
-**`make teardown`** - Complete teardown: unlink packages and remove node_modules
+**`make teardown`** - Complete teardown: remove pack directory and node_modules
 
 This command:
 
-1. Unlinks `@opentrons/shared-data` and `@opentrons/components` (using `pnpm unlink`)
-2. Removes the `pack/` directory with `.tgz` files
-3. Removes `node_modules` directory
+1. Removes the `pack/` directory with `.tgz` files and extracted packages
+2. Removes `node_modules` directory
 
 **`make clean-local-packages`** - Remove local packages only (keeps node_modules)
 
@@ -221,10 +229,12 @@ The test environment includes all necessary providers:
 
 The local packages are built with version `v0.0.0-dev` and stored in:
 
-- `pack/opentrons-shared-data-v0.0.0-dev.tgz`
-- `pack/opentrons-components-v0.0.0-dev.tgz`
+- `pack/opentrons-shared-data-v0.0.0-dev.tgz` (tarball)
+- `pack/opentrons-shared-data/` (extracted, linked via pnpm)
+- `pack/opentrons-components-v0.0.0-dev.tgz` (tarball)
+- `pack/opentrons-components/` (extracted, linked via pnpm)
 
-These are linked using `pnpm link` and do NOT appear in `package.json`.
+These are linked using `pnpm link` with absolute paths and do NOT appear in `package.json`.
 
 ## Development Notes
 
