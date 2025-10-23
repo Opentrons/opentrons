@@ -71,3 +71,56 @@ packages = ['opentrons_hardware']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
+
+[tool.ruff]
+# Like Black
+line-length = 140
+# Like Black
+indent-width = 4
+target-version = "py310"
+exclude = ["venv", ".venv", "build", "dist", "*.egg-info"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "D",  # flake8-docstrings
+    "ANN", # flake8-annotations
+]
+ignore = [
+    # defer formatting concerns to ruff format
+    "E203",  # space around `:` operator
+    "E501",  # maximum line length
+    # do not require type annotations for self nor cls
+    "ANN101",
+    "ANN102",
+    # do not grammar pedant me any more
+    "D400",
+    "D401",
+    "D403",
+    "D404",
+    "D415",
+    # there's no need to mandate docstrings in like __add__ (note that __init__
+    # is covered separately by D107)
+    "D105",
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.docstring-convention] = "google"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

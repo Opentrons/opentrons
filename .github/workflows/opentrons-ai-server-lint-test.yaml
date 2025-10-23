@@ -34,11 +34,7 @@ jobs:
         id: install
         working-directory: ./opentrons-ai-server
         run: make setup
-      - name: black-check
-        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
-        working-directory: ./opentrons-ai-server
-        run: make black-check
-      - name: ruff
+      - name: ruff-check
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./opentrons-ai-server
         run: make ruff-check

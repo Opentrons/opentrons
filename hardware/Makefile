@@ -113,12 +113,12 @@ test-with-opentrons-sock-emulator: test-with-emulator
 .PHONY: lint
 lint:
 	$(python) -m mypy opentrons_hardware tests
-	$(python) -m black --check opentrons_hardware tests
-	$(python) -m flake8 opentrons_hardware tests
+	$(python) -m ruff check opentrons_hardware tests
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_hardware tests
+	$(python) -m ruff format opentrons_hardware tests
+	$(python) -m ruff check --fix --unsafe-fixes opentrons_hardware tests
 
 # launch hardware controller in dev mode
 .PHONY: dev
