@@ -379,6 +379,17 @@ class OT3Controller(FlexBackend):
                 self._configuration.motion_settings, GantryLoad.LOW_THROUGHPUT
             )
         )
+        # Set motion profile preference for motion planning if provided in config
+        try:
+            from opentrons_hardware.hardware_control.motion_planning import move_utils as _mu
+
+            if hasattr(self._configuration, "motion_profile"):
+                _mu.set_motion_profile(getattr(self._configuration, "motion_profile"))
+            if hasattr(self._configuration, "scurve_segments"):
+                _mu.set_scurve_segments(int(getattr(self._configuration, "scurve_segments")))
+        except Exception:
+            # Don't fail controller init if optional profile wiring fails
+            pass
         self._pressure_sensor_available: Dict[NodeId, bool] = {}
 
     @asynccontextmanager
@@ -793,11 +804,21 @@ class OT3Controller(FlexBackend):
             self._handle_motor_status_response(positions, handle_gear_move)
 
     def _get_axis_home_distance(self, axis: Axis) -> float:
-        if self.check_motor_status([axis]):
-            return -1 * (
+        # Prefer encoder status (which indicates the axis has been homed since power-up)
+        # when deciding if we can trust the cached position to compute a short homing move.
+        if self.check_encoder_status([axis]):
+            # Distance to travel towards the limit switch plus a small overtravel.
+            distance = -1 * (
                 self._position[axis_to_node(axis)] + LIMIT_SWITCH_OVERTRAVEL_DISTANCE
             )
+            # Ensure we always travel at least a safe minimum to actually hit the switch
+            # even if cached position is slightly wrong.
+            min_travel = -abs(self._configuration.safe_home_distance)
+            if abs(distance) < abs(min_travel):
+                distance = min_travel
+            return distance
         else:
+            # Unknown position: move the full axis span towards the limit.
             return -1 * self.axis_bounds[axis][1] - self.axis_bounds[axis][0]
 
     def _build_axes_home_groups(
@@ -1381,8 +1402,11 @@ class OT3Controller(FlexBackend):
 
     async def halt(self) -> None:
         """Halt the motors."""
+        # Provide explicit expected nodes to avoid defaulting to all known nodes
+        # and to improve ack handling during an emergency stop.
+        expected = list(self._motor_nodes())
         error = await self._messenger.ensure_send(
-            NodeId.broadcast, StopRequest(payload=EmptyPayload())
+            NodeId.broadcast, StopRequest(payload=EmptyPayload()), expected_nodes=expected
         )
         if error != ErrorCode.ok:
             log.warning(f"Halt stop request failed: {error}")

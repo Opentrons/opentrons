@@ -384,6 +384,8 @@ def create_move_group(
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
+    min_step_time = None
+    max_step_time = None
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
@@ -407,6 +409,17 @@ def create_move_group(
             for ax in pos.keys():
                 pos[ax] += node_id_distances.get(ax, 0)
             move_group.append(step)
+            # Track min/max step time for diagnostics
+            t = float(block.time)
+            min_step_time = t if min_step_time is None else min(min_step_time, t)
+            max_step_time = t if max_step_time is None else max(max_step_time, t)
+    LOG.debug(
+        "Built move group: sequences=%d, min_step_time=%.6fs, max_step_time=%.6fs, nodes=%s",
+        len(move_group),
+        (min_step_time if min_step_time is not None else -1.0),
+        (max_step_time if max_step_time is not None else -1.0),
+        [n.name for n in present_nodes],
+    )
     return move_group, {k: float(v) for k, v in pos.items()}
 
 

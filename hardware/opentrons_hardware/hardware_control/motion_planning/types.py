@@ -91,7 +91,10 @@ class Move(Generic[AxisKey]):
     unit_vector: Coordinates[AxisKey, np.float64]
     distance: np.float64
     max_speed: np.float64
-    blocks: Tuple[Block, Block, Block]
+    # NOTE: historically this was exactly 3 blocks (accel/coast/decel). To support
+    # alternative profiles like S-curve or multi-segment approximations, allow a
+    # variable-length tuple of blocks.
+    blocks: Tuple[Block, ...]
     initial_speed: np.float64 = dataclasses.field(init=False)
     final_speed: np.float64 = dataclasses.field(init=False)
     nonzero_blocks: int = dataclasses.field(init=False)
@@ -101,7 +104,7 @@ class Move(Generic[AxisKey]):
         unit_vector: Coordinates[AxisKey, np.float64],
         distance: np.float64,
         max_speed: np.float64,
-        blocks: Tuple[Block, Block, Block],
+    blocks: Tuple[Block, ...],
     ) -> None:
         """Constructor."""
         # verify unit vector before creating Move
@@ -186,7 +189,7 @@ class Move(Generic[AxisKey]):
         unit_vector: Coordinates[AxisKey, CoordinateValue],
         distance: CoordinateValue,
         max_speed: CoordinateValue,
-        blocks: Tuple[Block, Block, Block],
+        blocks: Tuple[Block, ...],
     ) -> Move[AxisKey]:
         """Build function for Move."""
         return cls(

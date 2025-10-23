@@ -181,3 +181,7 @@ class OT3Config:
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
     liquid_sense: LiquidProbeSettings
+    # Motion profile selection for motion planning (e.g., "trapezoid" or "s-curve")
+    motion_profile: Literal["trapezoid", "s-curve"] = "trapezoid"
+    # Number of segments used to approximate S-curve accel/decel (odd >= 3)
+    scurve_segments: int = 9

@@ -9,16 +9,18 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=45, z=pos_max.z - 200)  # stay above deck to be safe
+    pos_min = types.Point(x=0, y=45, z=pos_max.z)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right-up
-        pos_min._replace(z=pos_max.z),  # front-left-up
-        pos_min,  # front-left-down
-        pos_min._replace(y=pos_max.y),  # back-left-down
+        # pos_min._replace(z=pos_max.z),  # front-left-up 
+        # pos_min,  # front-left-down
+        # pos_min._replace(y=pos_max.y),  # back-left-down
         pos_max._replace(x=pos_min.x),  # back-left-up
-        pos_max._replace(y=pos_min.y),  # front-right-up
+        # pos_max._replace(y=pos_min.y),  # front-right-up
+        pos_min._replace(z=pos_max.z),  # front-left-up 
+
         pos_min._replace(x=pos_max.x),  # front-right-down
-        pos_max._replace(z=pos_min.z),  # back-right-down
+        # pos_max._replace(z=pos_min.z),  # back-right-down
     ]
     return bowtie_points
 

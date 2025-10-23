@@ -104,7 +104,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput_1000={
-        OT3AxisKind.X: 700,
+        OT3AxisKind.X: 400,
         OT3AxisKind.Y: 600,
         OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
@@ -236,6 +236,15 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.Z_G: 0.67,
     },
 )
+
+# Default motion profile for motion planning. Options: "trapezoid", "s-curve"
+DEFAULT_MOTION_PROFILE: Final[str] = "s-curve"
+# Default number of segments for S-curve approximation (odd >= 3)
+# Note: The planner will automatically cap the effective segments based on
+# per-segment time and a firmware-safe sequence budget. Values of 5 are a
+# good reliability/smoothness balance across gantry and Z moves; higher values
+# may be used for longer moves but can be capped by runtime constraints.
+DEFAULT_SCURVE_SEGMENTS: Final[int] = 5
 
 
 def _build_log_files_with_default(
@@ -476,6 +485,8 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         liquid_sense=_build_default_liquid_probe(
             robot_settings.get("liquid_sense", {}), DEFAULT_LIQUID_PROBE_SETTINGS
         ),
+        motion_profile=robot_settings.get("motion_profile", DEFAULT_MOTION_PROFILE),
+        scurve_segments=int(robot_settings.get("scurve_segments", DEFAULT_SCURVE_SEGMENTS)),
     )
 
 
