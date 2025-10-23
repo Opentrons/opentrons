@@ -33,9 +33,9 @@
 
 .select_tips_deck_container {
   display: flex;
-  align-self: center;
   width: 714px;
   height: 536px;
+  align-self: center;
 }
 
 .slot_fill {
