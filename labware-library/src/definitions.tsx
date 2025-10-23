@@ -57,11 +57,7 @@ let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
   if (!definitions) {
-    const allDefs = _getAllDefs().filter(
-      (d: LabwareDefinition2) =>
-        // eslint-disable-next-line @typescript-eslint/prefer-includes
-        LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
-    )
+    const allDefs = Object.values(_getAllDefinitions(LABWAREV2_DO_NOT_LIST))
     definitions = getOnlyLatestDefs(allDefs)
   }
 

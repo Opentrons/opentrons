@@ -78,24 +78,18 @@ const schema3DefinitionsByURI = Object.fromEntries(
 export const getAllLabwareDefs = (): Record<string, LabwareDefinition2> =>
   schema2DefinitionsByURI
 
-let _definitions: LabwareDef2ByDefURI | null = null
 export function getAllDefinitions(
-  blockList: string[] = []
+  blockList?: Set<string>
 ): LabwareDef2ByDefURI {
-  // todo(mm, 2025-02-27): This looks suspicious: if we're called twice with two
-  // different blockList values, we'll return the same results for both.
-  if (_definitions == null) {
-    _definitions = Object.values(
-      getAllLabwareDefs()
-    ).reduce<LabwareDef2ByDefURI>((acc, labwareDef: LabwareDefinition2) => {
-      const labwareDefURI = getLabwareDefURI(labwareDef)
-      return blockList.includes(labwareDef.parameters.loadName)
-        ? acc
-        : { ...acc, [labwareDefURI]: labwareDef }
-    }, {})
+  if (blockList) {
+    return Object.fromEntries(
+      Object.entries(getAllLabwareDefs()).filter(
+        ([, labwareDef]) => !blockList.has(labwareDef.parameters.loadName)
+      )
+    )
+  } else {
+    return getAllLabwareDefs()
   }
-
-  return _definitions
 }
 
 export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
