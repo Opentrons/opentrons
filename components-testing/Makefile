@@ -41,11 +41,9 @@ install-local-packages:
 	@echo "Creating pack directory..."
 	@mkdir -p $(PACK_DIR)
 	@echo "Building shared-data package..."
-	cd ../shared-data && $(MAKE) pack
-	@echo "Moving shared-data package to pack directory..."
-	@mv ../shared-data/opentrons-shared-data-v0.0.0-dev.tgz $(SHARED_DATA_PACK)
+	make -C ../shared-data pack
 	@echo "Building components package..."
-	cd ../components && $(MAKE) pack
+	make -C ../components pack
 	@echo "Moving components package to pack directory..."
 	@mv ../components/opentrons-components-v0.0.0-dev.tgz $(COMPONENTS_PACK)
 	@echo "Extracting packages..."
