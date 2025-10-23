@@ -14,6 +14,7 @@ import {
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getAllLiquidClassDefs,
+  TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -52,10 +53,21 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   const dropTipLocationCopy = (
     location: CutoutConfig | LabwareDefinition2
   ): string => {
-    if ('cutoutFixtureId' in location) {
-      return t(`${location.cutoutFixtureId}_location`, {
-        slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[location.cutoutId],
-      })
+    if (
+      location != null &&
+      'cutoutFixtureId' in location &&
+      'cutoutId' in location
+    ) {
+      return t(
+        `${
+          location.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+            ? 'trashBin'
+            : 'wasteChute'
+        }_location`,
+        {
+          slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[location.cutoutId],
+        }
+      )
     }
     return t('tip_rack')
   }
