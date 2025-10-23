@@ -13,7 +13,6 @@ import {
   getRobotStateAtActiveItem,
 } from '/protocol-designer/top-selectors/labware-locations'
 
-import { useMemoizedTipAccessibilityByTiprackIdByWellName } from './hooks'
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
@@ -36,6 +35,7 @@ interface TipSelectionWizardProps {
   selectedTips: string[][]
   setSelectedTips: Dispatch<SetStateAction<string[][]>>
   validTiprackIds: string[]
+  tipAccessibilityStatus: Record<string, Record<string, boolean>>
 }
 
 export function TipSelectionWizard(
@@ -53,6 +53,7 @@ export function TipSelectionWizard(
     selectedTips,
     setSelectedTips,
     validTiprackIds,
+    tipAccessibilityStatus,
   } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
@@ -76,16 +77,6 @@ export function TipSelectionWizard(
     nozzles,
     channels: pipetteSpecs.channels,
   })
-
-  const tipAccessibilityStatus =
-    useMemoizedTipAccessibilityByTiprackIdByWellName({
-      nozzles,
-      pipetteSpecs,
-      selectedTips,
-      primaryNozzle,
-      pipetteId,
-      tiprackUri: formTiprackUri,
-    })
 
   const deckDef = getDeckDefFromRobotType(robotType)
 

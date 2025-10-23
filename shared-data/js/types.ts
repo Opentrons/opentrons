@@ -1033,6 +1033,10 @@ export type RunTimeParameter =
   | NumberParameter
   | CsvFileParameter
 
+export interface CommandPreconditions {
+  isCameraUsed: boolean
+}
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -1047,6 +1051,7 @@ export interface CompletedProtocolAnalysis {
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
 }
 
 export interface ResourceFile {

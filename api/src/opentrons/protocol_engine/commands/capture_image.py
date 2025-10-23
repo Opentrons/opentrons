@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.data_files import MimeType
+from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     StorageLimitReachedError,
@@ -118,6 +119,9 @@ class CaptureImageImpl(
     ) -> SuccessData[CaptureImageResult]:
         """Initiate an image capture with a camera."""
         state_update = update_types.StateUpdate()
+        state_update.precondition_update = update_types.PreconditionUpdate(
+            {PreconditionTypes.IS_CAMERA_USED: True}
+        )
 
         # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
 
