@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   COLORS,
   Flex,
+  InlineNotification,
   ListButton,
   RadioButton,
   SPACING,
@@ -30,6 +31,7 @@ import {
 } from '/protocol-designer/step-forms/selectors'
 
 import { TipSelectionWizard } from './TipSelectionWizard'
+import { useMemoizedTipAccessibilityByTiprackIdByWellName } from './TipSelectionWizard/hooks'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
@@ -46,14 +48,18 @@ interface TipTrackingFieldProps {
 
 export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const { propsForFields, formData } = props
-  const { t } = useTranslation('form')
+  const { t } = useTranslation(['form', 'tip_selection'])
   const [showTipSelectionModal, setShowTipSelectionModal] =
     useState<boolean>(false)
+  const [selectedTips, setSelectedTips] = useState<string[][]>(
+    formData.tips_selected as string[][]
+  )
   const pipetteEntities = useSelector(getPipetteEntities)
   const robotType = useSelector(getRobotType)
   const invariantContext = useSelector(getInvariantContext)
   const tiprackEntities = useSelector(getLabwareEntities)
   const pipette = pipetteEntities[formData.pipette]
+  const { spec: pipetteSpecs } = pipette
   const tiprackDefinition = Object.values(tiprackEntities).find(
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
@@ -137,6 +143,25 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
+  const tipAccessibilityStatus =
+    useMemoizedTipAccessibilityByTiprackIdByWellName({
+      nozzles: formData.nozzles,
+      pipetteSpecs,
+      selectedTips,
+      primaryNozzle: formData.primaryNozzle,
+      pipetteId: formData.pipette,
+      tiprackUri: formData.tipRack,
+    })
+  const validTiprackIds = Object.entries(tipAccessibilityStatus).reduce<
+    string[]
+  >((acc, [id, tiprackState]) => {
+    return Object.values(tiprackState).filter(state => state).length >=
+      numPickups
+      ? [...acc, id]
+      : acc
+  }, [])
+  const hasValidTiprackForPickup = validTiprackIds.length > 0
+
   return (
     <Flex className={styles.container}>
       <Flex className={styles.options_container}>
@@ -162,7 +187,8 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           ))}
         </Flex>
       </Flex>
-      {propsForFields.tip_tracking.value === MANUAL && (
+      {propsForFields.tip_tracking.value === MANUAL &&
+      hasValidTiprackForPickup ? (
         <Flex className={styles.manual_container}>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('step_edit_form.field.tip_tracking.manual.title')}
@@ -193,7 +219,15 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
             </StyledText>
           </ListButton>
         </Flex>
-      )}
+      ) : null}
+      {propsForFields.tip_tracking.value === MANUAL &&
+      !hasValidTiprackForPickup ? (
+        <InlineNotification
+          type="error"
+          heading={t('tip_selection:no_valid_tips_available.title')}
+          message={t('tip_selection:no_valid_tips_available.body')}
+        />
+      ) : null}
       {showTipSelectionModal && (
         <TipSelectionWizard
           setShowTipSelectionModal={setShowTipSelectionModal}
@@ -202,9 +236,13 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           nozzles={propsForFields.nozzles.value as NozzleConfigurationStyle}
           numPickups={numPickups}
           tiprackSelected={formData.tiprack_selected}
-          updateTiprackSelected={propsForFields.tiprack_selected.updateValue}
-          tipsSelected={formData.tips_selected}
-          updateTipsSelected={propsForFields.tips_selected.updateValue}
+          updateFormTiprackSelected={
+            propsForFields.tiprack_selected.updateValue
+          }
+          updateFormTipsSelected={propsForFields.tips_selected.updateValue}
+          selectedTips={selectedTips}
+          setSelectedTips={setSelectedTips}
+          validTiprackIds={validTiprackIds}
         />
       )}
     </Flex>
