@@ -414,7 +414,7 @@ export const getUnoccupiedStackOptions = (args: {
           !isLabwareOnSlotTuberack &&
           !isLabwareOnSlotAluminumBlock &&
           !isLabwareOnSlotTiprack &&
-          labwareOnDeckDef.allowedRoles?.includes('lid'))
+          !labwareOnDeckDef.allowedRoles?.includes('lid'))
 
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown

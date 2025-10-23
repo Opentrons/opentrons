@@ -940,6 +940,21 @@ export const getIsLabwareCompatibleWithStack = (
     )?.length
     isAboveStackLimit =
       isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+
+    // This is an exception to allow universal lids to be placed on any labware except
+    // tube racks, aluminum blocks, tip racks, or other lids.
+    // --- PATCH START ---
+    const isUniversalLid =
+      movingLabwareEntity.def.parameters.loadName ===
+      'opentrons_tough_universal_lid'
+    const isLabwareOnSlotTuberack =
+      topLabwareEntity.def.metadata.displayCategory === 'tubeRack'
+    const isLabwareOnSlotAluminumBlock =
+      topLabwareEntity.def.metadata.displayCategory === 'aluminumBlock'
+    const isLabwareOnSlotTiprack = topLabwareEntity.def.parameters.isTiprack
+    const isDestLid = topLabwareEntity.def.allowedRoles?.includes('lid')
+    // --- PATCH END ---
+
     isCompatible =
       // check compatible labware key
       movingLabwareEntity.def.compatibleParentLabware?.some(
@@ -948,7 +963,15 @@ export const getIsLabwareCompatibleWithStack = (
       // check stacking offset map for legacy compatibility
       Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
-      )
+      ) ||
+      // --- PATCH START ---
+      (isUniversalLid &&
+        !isLabwareOnSlotTuberack &&
+        !isLabwareOnSlotAluminumBlock &&
+        !isLabwareOnSlotTiprack &&
+        !isDestLid)
+    // --- PATCH END ---
+
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {
     const topModuleEntity = moduleEntities[topIdInStack]
