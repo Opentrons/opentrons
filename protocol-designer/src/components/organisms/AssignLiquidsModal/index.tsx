@@ -30,6 +30,7 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
+import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -170,7 +171,11 @@ export function AssignLiquidsModal(
               gap={SPACING.spacing24}
               position={POSITION_RELATIVE}
             >
-              {showLiquidLayoutOverlay && <LiquidLayoutOverlayModalContainer />}
+              {showLiquidLayoutOverlay && (
+                <LiquidLayoutOverlayModalContainer
+                  showLiquidOverflowMenu={setShowLiquidLayoutOverlay}
+                />
+              )}
               <Box
                 width="100%"
                 padding={`${SPACING.spacing32} ${SPACING.spacing48}`}
@@ -253,9 +258,18 @@ interface AssignLiquidsModalContainerProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
 }
 
-export function LiquidLayoutOverlayModalContainer(): JSX.Element | null {
+export function LiquidLayoutOverlayModalContainer({
+  showLiquidOverflowMenu,
+}: {
+  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+}): JSX.Element | null {
   const dispatch = useDispatch()
   const selectedWells = useSelector(getSelectedWells)
+  const allWellContents = useSelector(
+    wellContentsSelectors.getWellContentsForLabwareStack
+  )
+  const labwareId = useSelector(selectors.getSelectedLabwareId)
+  console.log('allWellContents: ', allWellContents)
   console.log('selectedWells', selectedWells)
   return (
     <OverlayModal
@@ -264,13 +278,18 @@ export function LiquidLayoutOverlayModalContainer(): JSX.Element | null {
       primaryButtonProps={{
         text: 'Clear liquids',
         onClick: () => {
-          dispatch(deselectWells(selectedWells))
+          dispatch(
+            removeWellsContents({
+              labwareId: labwareId,
+              wells: allWellContents[labwareId].groupIds[0],
+            })
+          )
         },
       }}
       secondaryButtonProps={{
         text: 'Cancel',
         onClick: () => {
-          console.log('cancel')
+          showLiquidOverflowMenu(false)
         },
       }}
     />

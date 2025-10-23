@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -131,7 +130,12 @@ export function LabwareStackToolbox({
             onClick={handleConfirmClick}
           >
             <Icon size="1.5rem" name="plus" />
-            Add another labware
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              display="inline-block"
+            >
+              Add another labware
+            </StyledText>
           </SecondaryButton>
         }
         closeButton={
