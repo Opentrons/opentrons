@@ -11,6 +11,7 @@ from typing import (
     Union,
     Mapping,
     cast,
+    Tuple,
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -1818,6 +1819,53 @@ class ProtocolContext(CommandPublisher):
                 api_version=self._api_version,
                 protocol_core=self._core,
                 core_map=self._core_map,
+            )
+        return None
+    
+    @requires_version(2, 28)
+    def capture_image(
+        self,
+        home_before: Optional[bool] = False,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using the camera. Captured images get saved as a result of the protocol run.
+        
+        :param home_before: Boolean to home the pipette before capturing an image.
+        :param filename: Filename to use when saving the captured image as a file.
+        :param resolution: Width/height tuple to determine the resolution to use when capturing an image.
+        :param zoom: Optional zoom level, with minimum/default of 1x zoom and maximum of 2x zoom.
+        :param contrast: Contrast level to be applied to an image, range is 0% to 100%.
+        :param brightness: Brightness level to be applied to an image, range is 0% to 100%.
+        :param saturation: Saturation level to be applied to an image, range is 0% to 100%.
+
+        .. versionadded:: 2.28
+
+        """
+        if home_before is True:
+            self._core.home()
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.capture_Image(
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
+            ),
+        ):
+            self._core.capture_image(
+                filename=filename,
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
             )
         return None
 
