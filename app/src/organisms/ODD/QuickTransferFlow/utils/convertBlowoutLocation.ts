@@ -4,12 +4,12 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 
-import type { CutoutConfig, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { BlowOutLocation } from '../types'
 
 export const convertBlowoutLocation = (
   location: string | undefined,
-  dropTipLocation: CutoutConfig | LabwareDefinition2
+  dropTipLocation: CutoutConfig | string
 ): BlowOutLocation | undefined => {
   if (location == null) return undefined
 
@@ -19,8 +19,9 @@ export const convertBlowoutLocation = (
     case 'destination':
       return DEST_WELL_BLOWOUT_DESTINATION
     case 'trash':
-      return 'cutoutId' in dropTipLocation
-        ? (dropTipLocation as CutoutConfig)
+      return typeof dropTipLocation !== 'string' &&
+        'cutoutId' in dropTipLocation
+        ? dropTipLocation
         : {
             cutoutId: 'cutoutA3',
             cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,

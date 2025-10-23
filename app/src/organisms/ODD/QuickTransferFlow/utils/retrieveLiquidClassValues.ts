@@ -224,9 +224,15 @@ const getNoLiquidClassValues = (
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
-          state.dropTipLocation
+          typeof state.dropTipLocation !== 'string'
+            ? state.dropTipLocation
+            : {
+                cutoutId: 'cutoutA3',
+                cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+              }
         ) ??
-        ('cutoutFixtureId' in state.dropTipLocation
+        (typeof state.dropTipLocation !== 'string' &&
+        'cutoutFixtureId' in state.dropTipLocation
           ? state.dropTipLocation
           : {
               cutoutId: 'cutoutA3',
@@ -501,9 +507,15 @@ const getLiquidClassValues = (
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,
-          state.dropTipLocation
+          typeof state.dropTipLocation !== 'string'
+            ? state.dropTipLocation
+            : {
+                cutoutId: 'cutoutA3',
+                cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+              }
         ) ??
-        ('cutoutFixtureId' in state.dropTipLocation
+        (typeof state.dropTipLocation !== 'string' &&
+        'cutoutFixtureId' in state.dropTipLocation
           ? state.dropTipLocation
           : {
               cutoutId: 'cutoutA3',

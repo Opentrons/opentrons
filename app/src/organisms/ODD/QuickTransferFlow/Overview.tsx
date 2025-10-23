@@ -21,7 +21,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
-import type { CutoutConfig, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from './types'
 
 interface OverviewProps {
@@ -50,14 +50,8 @@ export function Overview(props: OverviewProps): JSX.Element | null {
   }
   const pathCopy = pathCopyMap[state.path]
 
-  const dropTipLocationCopy = (
-    location: CutoutConfig | LabwareDefinition2
-  ): string => {
-    if (
-      location != null &&
-      'cutoutFixtureId' in location &&
-      'cutoutId' in location
-    ) {
+  const dropTipLocationCopy = (location: CutoutConfig | string): string => {
+    if (location != null && typeof location !== 'string') {
       return t(
         `${
           location.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE

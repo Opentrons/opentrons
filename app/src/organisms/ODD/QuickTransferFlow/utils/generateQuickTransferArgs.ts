@@ -18,7 +18,6 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../constants'
-import { isTipRackDropLocation } from './isTipRackDropLocation'
 
 import type {
   CutoutConfig,
@@ -176,7 +175,7 @@ export function getInvariantContextAndRobotState(
   let wasteChuteEntities: WasteChuteEntities = {}
 
   if (
-    'cutoutFixtureId' in quickTransferState.dropTipLocation &&
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     quickTransferState.dropTipLocation.cutoutFixtureId ===
       TRASH_BIN_ADAPTER_FIXTURE
   ) {
@@ -215,7 +214,7 @@ export function getInvariantContextAndRobotState(
   }
 
   if (
-    'cutoutFixtureId' in quickTransferState.dropTipLocation &&
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
     )
@@ -342,27 +341,20 @@ export function generateQuickTransferArgs(
     invariantContext.trashBinEntities
   ).find(
     entity =>
-      'cutoutId' in quickTransferState.dropTipLocation &&
+      typeof quickTransferState.dropTipLocation !== 'string' &&
       entity.location === quickTransferState.dropTipLocation.cutoutId
   )
   const dropTipWasteChuteLocationEntity = Object.values(
     invariantContext.wasteChuteEntities
   ).find(
     entity =>
-      'cutoutId' in quickTransferState.dropTipLocation &&
+      typeof quickTransferState.dropTipLocation !== 'string' &&
       entity.location === quickTransferState.dropTipLocation.cutoutId
   )
-  const isReturnTip = isTipRackDropLocation(quickTransferState.dropTipLocation)
-
-  const dropTipLocation = isReturnTip
-    ? (Object.keys(robotState.labware).find(
-        labwareId =>
-          invariantContext.labwareEntities[labwareId].def ===
-          quickTransferState.dropTipLocation
-      ) ?? '')
-    : (dropTipTrashBinLocationEntity?.id ??
-      dropTipWasteChuteLocationEntity?.id ??
-      '')
+  const dropTipLocation =
+    dropTipTrashBinLocationEntity?.id ??
+    dropTipWasteChuteLocationEntity?.id ??
+    ''
 
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
 
@@ -435,7 +427,6 @@ export function generateQuickTransferArgs(
     touchTipAfterDispenseSpeed:
       quickTransferState.touchTipDispenseSpeed ?? null,
     dropTipLocation,
-    isReturnTip,
     aspirateXOffset: 0,
     aspirateYOffset: 0,
     dispenseXOffset: 0,

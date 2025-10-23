@@ -106,7 +106,7 @@ export function quickTransferWizardReducer(
     case 'SET_DROP_TIP_LOCATION': {
       return {
         ...state,
-        dropTipLocation: action.location as CutoutConfig | LabwareDefinition2,
+        dropTipLocation: action.location as CutoutConfig | string,
       }
     }
     case 'SET_LIQUID_CLASS': {
@@ -261,7 +261,7 @@ export function quickTransferSummaryReducer(
     case 'SET_DROP_TIP_LOCATION': {
       return {
         ...state,
-        dropTipLocation: action.location as CutoutConfig | LabwareDefinition2,
+        dropTipLocation: action.location as CutoutConfig | string,
       }
     }
     case 'SET_PUSH_OUT': {

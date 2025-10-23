@@ -347,7 +347,6 @@ export const moveLiquidFormToArgs = (
     name: castFormData.stepName,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation,
-    isReturnTip: false,
     nozzles,
     aspirateXOffset: aspirate_x_position ?? 0,
     aspirateYOffset: aspirate_y_position ?? 0,

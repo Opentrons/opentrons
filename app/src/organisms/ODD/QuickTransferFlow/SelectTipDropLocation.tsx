@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { drop } from 'lodash'
 
 import {
   DIRECTION_COLUMN,
@@ -9,6 +10,8 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getIsTiprack,
+  getLabwareDefURI,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -17,7 +20,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { ComponentProps, Dispatch } from 'react'
-import type { CutoutConfig, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
@@ -41,7 +44,7 @@ export function SelectTipDropLocation({
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const [selectedTipDropLocation, setSelectedTipDropLocation] = useState<
-    CutoutConfig | LabwareDefinition2 | undefined
+    CutoutConfig | string | undefined
   >(undefined)
 
   const isTipRackReturnEnabled = state.tipRack != null && state.pipette != null
@@ -58,14 +61,10 @@ export function SelectTipDropLocation({
     })
   }
 
-  const isTipRackSelected = (): boolean => {
-    if (selectedTipDropLocation == null || state.tipRack == null) {
-      return false
+  const handleSelectTipRack = (): void => {
+    if (state.tipRack != null) {
+      setSelectedTipDropLocation(getLabwareDefURI(state.tipRack))
     }
-    return (
-      'ordering' in selectedTipDropLocation &&
-      selectedTipDropLocation === state.tipRack
-    )
   }
 
   const handleClickNext = (): void => {
@@ -102,7 +101,7 @@ export function SelectTipDropLocation({
             key={option.cutoutId}
             isSelected={
               selectedTipDropLocation != null &&
-              'cutoutId' in selectedTipDropLocation &&
+              typeof selectedTipDropLocation !== 'string' &&
               selectedTipDropLocation?.cutoutId === option.cutoutId
             }
             onChange={() => {
@@ -124,12 +123,14 @@ export function SelectTipDropLocation({
         {isTipRackReturnEnabled && state.tipRack != null ? (
           <RadioButton
             key="tiprack"
-            isSelected={isTipRackSelected()}
+            isSelected={
+              selectedTipDropLocation != null &&
+              typeof selectedTipDropLocation === 'string' &&
+              selectedTipDropLocation === getLabwareDefURI(state.tipRack)
+            }
             buttonLabel={t('tip_rack')}
-            buttonValue="tiprack"
-            onChange={() => {
-              setSelectedTipDropLocation(state.tipRack)
-            }}
+            buttonValue={getLabwareDefURI(state.tipRack)}
+            onChange={handleSelectTipRack}
           />
         ) : null}
       </Flex>

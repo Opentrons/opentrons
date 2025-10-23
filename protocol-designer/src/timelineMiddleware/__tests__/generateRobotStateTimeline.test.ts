@@ -30,7 +30,6 @@ describe('generateRobotStateTimeline', () => {
         stepArgs: {
           stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
-          isReturnTip: false,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
@@ -105,7 +104,6 @@ describe('generateRobotStateTimeline', () => {
         stepArgs: {
           stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
-          isReturnTip: false,
           pipette: MULTI_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
