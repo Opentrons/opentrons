@@ -2122,6 +2122,263 @@ def test_mix_with_delay_and_final_push_out(
     )
 
 
+def test_dynamic_mix_without_endpoints(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    start_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        start_location,
+        aspirate_location,
+        dispense_location,
+        aspirate_location,
+        dispense_location,
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.dynamic_mix(
+        repetitions=2,
+        volume=10.0,
+        aspirate_start_location=aspirate_location,
+        dispense_start_location=dispense_location,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=0.0,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=None,
+            meniscus_tracking=None,
+            end_location=None,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+    )
+
+
+def test_dynamic_mix_with_endpoints(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    start_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    aspirate_end_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_end_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        start_location,
+        aspirate_end_location,
+        dispense_end_location,
+        aspirate_end_location,
+        dispense_end_location,
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.dynamic_mix(
+        repetitions=2,
+        volume=10.0,
+        aspirate_start_location=aspirate_location,
+        dispense_start_location=dispense_location,
+        aspirate_end_location=aspirate_end_location,
+        dispense_end_location=dispense_end_location,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=aspirate_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=0.0,
+            meniscus_tracking=None,
+            end_location=dispense_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=aspirate_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=None,
+            meniscus_tracking=None,
+            end_location=dispense_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=None,
+        ),
+    )
+
+
+def test_dynamic_mix_with_delay(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should mix with aspirate_flow_rate and dispense_flow_rate."""
+    mock_well = decoy.mock(cls=Well)
+    start_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    aspirate_end_location = Location(point=Point(2, 2, 1), labware=mock_well)
+    dispense_end_location = Location(point=Point(2, 2, 3), labware=mock_well)
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        start_location,
+        aspirate_end_location,
+        dispense_end_location,
+        aspirate_end_location,
+        dispense_end_location,
+    )
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+
+    subject.dynamic_mix(
+        repetitions=2,
+        volume=10.0,
+        aspirate_start_location=aspirate_location,
+        dispense_start_location=dispense_location,
+        aspirate_end_location=aspirate_end_location,
+        dispense_end_location=dispense_end_location,
+        movement_delay=3.14,
+    )
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=aspirate_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=3.14,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=0.0,
+            meniscus_tracking=None,
+            end_location=dispense_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=3.14,
+        ),
+        mock_instrument_core.aspirate(
+            location=aspirate_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            meniscus_tracking=None,
+            end_location=aspirate_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=3.14,
+        ),
+        mock_instrument_core.dispense(
+            location=dispense_location,
+            well_core=mock_well._core,
+            volume=10.0,
+            rate=1.0,
+            flow_rate=100.0,
+            in_place=False,
+            push_out=None,
+            meniscus_tracking=None,
+            end_location=dispense_end_location,
+            end_meniscus_tracking=None,
+            movement_delay=3.14,
+        ),
+    )
+
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
 def test_aspirate_with_lpd(
