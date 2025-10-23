@@ -1,10 +1,8 @@
 ---
-title: "Opentrons OT-2: Unboxing and Assembly"
+title: "Opentrons OT-2: Unboxing"
 ---
 
 Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides instructions that walk you through the steps required to get the OT-2 unboxed, assembled, and ready for use.
-
-## Effort and time required
 
 You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before you begin, ask a lab partner to assist with the unboxing, lifting, moving, and assembly process.
 
@@ -12,12 +10,10 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 
 <div class="instruction-list" markdown>
 
-<!-- Remove padding/whitespace around images or good enough? -->
-
-1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present. <!-- too much border or padding around these images -->
+1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present. 
     ![image shows padding removal](../images/remove-padding.png)
 
-2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any machine components inside.
+2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any robot components inside.
     ![cutting the shipping bag](../images/cut-shipping-bag.png)
 
 3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 42 kg (93 lbs). Get help from a lab partner to remove the robot from the box.
@@ -63,15 +59,15 @@ At this point you should have an assembled robot, but it isn't time to power it 
 
 14. Perform the following assembly check:
     - Confirm that 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
-    - Confirm that you are not missing any required cables or parts. If you are missing components, contact Customer Support.
-    - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Customer Support.
-    - Visually check the gantry; if it is uneven or slanted, contact Customer Support.
-    - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Customer Support.
+    - Confirm that you are not missing any required cables or parts. If you are missing components, contact [Opentrons Support](https://opentrons.com/opentrons-support).
+    - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
+    - Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
+    - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact .
 
 15. Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
 
     !!!note
-        When during cleaning or other maintenance, be sure to turn off the machine and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
+        During during cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
 
 ## Final steps and power on
 
@@ -80,7 +76,7 @@ At this point you should have an assembled robot, but it isn't time to power it 
 17. Connect the Ethernet cable to the OT-2 and laptop. If your computer does not have an Ethernet port, use the provided Ethernet-to-USB dongle.
     ![laptop USB-Ethernet connection](../images/computer-connection.png)
 
-18. Connect the external power supply to the OT-2 and then connect the main power cable to a wall outlet.
+18. Connect the external power supply to the OT-2 and then connect the power cable to a wall outlet.
     ![external power supply connection](../images/OT2-power.png)
 
 19. Turn on the power by pressing the power button on the OT-2. It may take up to 45 seconds before the OT-2 starts running. After starting up, the robot will move the gantry to its home position.
