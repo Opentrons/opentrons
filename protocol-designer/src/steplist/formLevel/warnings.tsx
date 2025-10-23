@@ -299,7 +299,7 @@ export const incompatibleLiquidClass: (
     }
 
     const tipRackObject = pipetteObject.byTipType.find(
-      ({ tiprack }) => tiprack === tipRack
+      ({ tiprack }) => tiprack === tipRack.labwareDefURI
     )
 
     if (tipRackObject == null) {

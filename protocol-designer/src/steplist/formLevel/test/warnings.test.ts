@@ -185,7 +185,9 @@ describe('liquid class compatibility', () => {
       pipette: {
         spec: { channels: 1, liquids: { default: { maxVolume: 1000 } } },
       },
-      tipRack: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      tipRack: {
+        labwareDefURI: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      },
       liquidClass: 'glycerol_50',
       path: 'singleDispense',
     }

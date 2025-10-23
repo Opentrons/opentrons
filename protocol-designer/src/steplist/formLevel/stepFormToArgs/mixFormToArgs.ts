@@ -36,10 +36,11 @@ export const mixFormToArgs = (
     pushOut_checkbox,
     pushOut_volume,
   } = hydratedFormData
+  // TODO: refactor getMatchingTipLiquidSpecs() to use tiprack def directly instead of tiprackDefURI
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
     hydratedFormData.volume,
-    hydratedFormData.tipRack
+    hydratedFormData.tipRack.labwareDefURI
   )
   const unorderedWells = hydratedFormData.wells || []
   const orderedWells = getOrderedWells(
@@ -110,7 +111,7 @@ export const mixFormToArgs = (
     offsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
-    tipRack: hydratedFormData.tipRack,
+    tipRack: hydratedFormData.tipRack.labwareDefURI,
     dispenseDelaySeconds,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,

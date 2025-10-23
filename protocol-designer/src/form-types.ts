@@ -281,7 +281,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   nozzles: NozzleConfigurationStyle | null
   path: PathOption
   pipette: PipetteEntity
-  tipRack: string
+  tipRack: LabwareEntity
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
@@ -375,7 +375,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
-  tipRack: string
+  tipRack: LabwareEntity
   volume: number
   wells: string[]
   aspirate_delay_seconds?: number | null

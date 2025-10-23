@@ -74,11 +74,8 @@ const getCheckedPath = (
   contextualState: InvariantContext,
   path: PathOption
 ): PathOption => {
-  const { pipette, tipRack, volume } = hydratedFormData
+  const { pipette, tipRack: tiprackEntity, volume } = hydratedFormData
   const { spec: pipetteSpecs } = pipette
-  const tiprackEntity = Object.values(contextualState.labwareEntities).find(
-    lw => lw.labwareDefURI === tipRack
-  )
   // should not hit
   if (tiprackEntity == null) {
     console.error('Tiprack for transfer has no associated labware entity.')
@@ -297,10 +294,11 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
+  // TODO: refactor getMatchingTipLiquidSpecs() to use tiprack def directly instead of tiprackDefURI
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     hydratedFormData.pipette,
     hydratedFormData.volume,
-    tipRack
+    tipRack.labwareDefURI
   )
   const conditioningVolume =
     hydratedFormData.conditioning_checkbox === true &&
@@ -314,7 +312,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack: tipRack,
+    tipRack: tipRack.labwareDefURI,
     aspirateFlowRateUlSec:
       hydratedFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,

@@ -72,7 +72,7 @@ describe('move liquid step form -> command creator args', () => {
         type: sourceLabwareType,
         def: sourceLabwareDef,
       },
-      tipRack: 'tiprack1Id',
+      tipRack: { labwareDefURI: 'tiprack1Id' } as any,
       aspirate_wells: [ASPIRATE_WELL],
       aspirate_wellOrder_first: 'l2r',
       aspirate_wellOrder_second: 't2b',

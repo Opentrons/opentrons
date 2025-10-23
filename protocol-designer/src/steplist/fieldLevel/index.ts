@@ -20,6 +20,7 @@ import type {
 import type {
   InvariantContext,
   LabwareEntities,
+  LabwareEntity,
   PipetteEntity,
   StagingAreaEntities,
   TrashBinEntities,
@@ -59,6 +60,15 @@ const getLabwareOrAdditionalEquipmentEntity = (
       name: 'trashBin',
     }
   } else return null
+}
+
+const getTipRackEntityByURI = (
+  state: InvariantContext,
+  tiprackDefURI: string
+): LabwareEntity | undefined => {
+  return Object.values(state.labwareEntities).find(
+    lw => lw.labwareDefURI == tiprackDefURI
+  )
 }
 
 const getIsStackingLocation = (
@@ -286,6 +296,9 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   pipette: {
     hydrate: getPipetteEntity,
+  },
+  tipRack: {
+    hydrate: getTipRackEntityByURI,
   },
   times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),

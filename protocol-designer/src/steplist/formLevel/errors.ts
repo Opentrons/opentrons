@@ -768,7 +768,8 @@ export const volumeTooHigh = (
   }
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
+  // TODO: refactor getPipetteCapacity() to use tiprack def directly instead of tiprackDefURI
+  const pipetteCapacity = getPipetteCapacity(pipette, tipRack.labwareDefURI)
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&
@@ -1418,13 +1419,14 @@ export const conditioningVolumeOutOfRange = (
   ) {
     return null
   }
+  // TODO: refactor getMaxConditioningVolume() to use tiprack def directly instead of tiprackDefUri
   const maxConditioningVolume = getMaxConditioningVolume({
     transferVolume: Number(volume),
     disposalVolume:
       disposalVolume_checkbox === true ? Number(disposalVolume_volume) : 0,
     pipetteSpecs: pipette.spec,
     labwareEntities: labwareEntities ?? {},
-    tiprackDefUri: tipRack,
+    tiprackDefUri: tipRack.labwareDefURI,
   })
   return conditioning_checkbox && conditioning_volume > maxConditioningVolume
     ? CONDITIONING_VOLUME_OUT_OF_RANGE

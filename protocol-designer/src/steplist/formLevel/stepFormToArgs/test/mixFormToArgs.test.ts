@@ -40,7 +40,7 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
-    tipRack: 'mockTiprack',
+    tipRack: { labwareDefURI: 'mockTiprack' } as any,
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10SingleV2Specs,
