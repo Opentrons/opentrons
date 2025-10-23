@@ -13,7 +13,7 @@ tipracks_200ul,D2,D3,C2,C3,B1,B2,B3,A1,A2
 tipracks_1000ul,D2,D3,C2,C3,B1,B2,B3,A1,A2
 labware_on_scale,nest_1_reservoir_195ml,A1,,,,,,,
 slot_scale,C1,,,,,,,,
-volumes_to_test_20ul,5,,,,,,,,
+volumes_to_test_20ul,,,,,,,,,
 volumes_to_test_50ul,5,,,,,,,,
 volumes_to_test_200ul,200,,,,,,,,
 volumes_to_test_1000ul,1000,,,,,,,,
