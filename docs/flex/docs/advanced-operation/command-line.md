@@ -4,14 +4,11 @@ title: "Opentrons Flex: Command Line Operation Over SSH"
 
 Opentrons Flex gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
 
-- Run protocols directly via the [Python API and command line](https://docs.opentrons.com/v2/new_advanced_running.html#command-line).
+- Run protocols directly via the [Python API and command line](https://docs.opentrons.com/v2/advanced_control/command_line.html#command-line).
 - Perform advanced tasks like customizing the robot's Python environment.
 - Execute protocols that reference external files on disk (apart from custom labware definition files).
 
 An SSH key is required to perform these tasks and to issue commands from the terminal. The instructions below will show you how to create an SSH key and use it for terminal authentication and access.
-
-!!!note
-    If you're unable to use a Wi-Fi network for SSH, see [Making a hardwired SSH connection][making-a-hardwired-ssh-connection] below.
 
 ## Creating an SSH key
 
@@ -33,6 +30,9 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 4. Eject the USB drive.
 
 ## Making a wireless SSH connection
+
+!!!note
+    If you're unable to use a Wi-Fi network for SSH, see [Making a hardwired SSH connection][making-a-hardwired-ssh-connection] below.
 
 To make an SSH connection:
 
