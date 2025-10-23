@@ -854,6 +854,7 @@ Command = Union[
     PressurizeCommand,
     ConfigureForVolumeCommand,
     ConfigureNozzleLayoutCommand,
+    CaptureImageCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
@@ -928,6 +929,7 @@ CommandPayload = Union[
     PressurizeCommandPayload,
     ConfigureForVolumePayload,
     ConfigureNozzleLayoutPayload,
+    CaptureImageCommandPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,

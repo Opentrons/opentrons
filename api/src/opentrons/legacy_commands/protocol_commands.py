@@ -75,7 +75,7 @@ def capture_Image(
         text += f" saturation of {saturation}%"
     text += "."
     return {
-        "name": command_types.CaptureImageCommand,
+        "name": command_types.CAPTURE_IMAGE,
         "payload": {
             "text": text,
             "resolution": resolution,
