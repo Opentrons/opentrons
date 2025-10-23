@@ -39,11 +39,14 @@ const render = (props: ComponentProps<typeof LabwareStackToolbox>) => {
 describe('LabwareStackToolboxContainer', () => {
   let props: ComponentProps<typeof LabwareStackToolbox>
   let setShowLiquidLayoutOverlay: Mock
+  let setSelectedLabware: Mock
   beforeEach(() => {
     setShowLiquidLayoutOverlay = vi.fn()
+    setSelectedLabware = vi.fn()
     props = {
       showBadFormState: false,
       setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
+      setSelectedLabware: setSelectedLabware,
       data: {
         labwareEntities: {
           mockLabwareId: {
@@ -109,23 +112,63 @@ describe('LabwareStackToolboxContainer', () => {
 
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton)
-    expect(scondButton).toHaveClass('_button_active_386e4e')
+    expect(setSelectedLabware).toHaveBeenCalledWith(['labware2'])
+  })
+
+  it.only('loads the modal with multiple selectable labware', () => {
+    props.data.labware.mockLabwareId.stack = ['mockLabwareId', 'labware2']
+    props.data.labware.labware2 = {
+      def: fixture96Plate as LabwareDefinition2,
+    }
+    ;(props.data.allWellContents = {
+      mockLabwareId: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+      labware2: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+    }),
+      render(props)
+
+    expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
+    const firstButton = screen.getByTestId('LabwareButton-1')
+    expect(firstButton).toHaveClass('_button_active_386e4e')
+
+    const scondButton = screen.getByTestId('LabwareButton-0')
+    fireEvent.click(scondButton, { ctrlKey: true })
+    expect(setSelectedLabware).toHaveBeenCalledWith([
+      'mockLabwareId',
+      'labware2',
+    ])
   })
 
   it('select all labware buttons', () => {
-    render(props)
+    props.data.labware.mockLabwareId.stack = ['mockLabwareId', 'labware2']
+    props.data.labware.labware2 = {
+      def: fixture96Plate as LabwareDefinition2,
+    }
+    ;(props.data.allWellContents = {
+      mockLabwareId: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+      labware2: {
+        A1: {
+          groupIds: ['mockGroupId'],
+        },
+      },
+    }),
+      render(props)
 
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
     fireEvent.click(allLabwareButton)
-    const firstlabwareButton = screen.getByRole('button', {
-      name: '0 ANSI 96 Standard Microplate',
-    })
-    const secondlabwareButton = screen.getByRole('button', {
-      name: '1 ANSI 96 Standard Microplate',
-    })
-    expect(firstlabwareButton).toHaveClass('_button_active_386e4e')
-    expect(secondlabwareButton).toHaveClass('_button_active_386e4e')
+    expect(setSelectedLabware).toBeCalledWith(['mockLabwareId', 'labware2'])
   })
 
   it('select shows an overlay when liquids dont match', () => {

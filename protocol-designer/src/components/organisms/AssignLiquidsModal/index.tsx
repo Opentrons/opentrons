@@ -36,8 +36,8 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
-  deselectWells,
   deselectAllWells,
+  deselectWells,
   selectWells,
 } from '/protocol-designer/well-selection/actions'
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'

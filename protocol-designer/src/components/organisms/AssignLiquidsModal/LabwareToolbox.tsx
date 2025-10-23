@@ -13,13 +13,14 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
+import { openIngredientsSelector } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   getInitialDeckSetup,
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { openIngredientsSelector } from '/protocol-designer/labware-ingred/actions'
+
 import { LabwareButtonBasket } from '../../molecules'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -60,15 +61,22 @@ export function LabwareStackToolbox({
 
   const { labware, labwareId, allWellContents } = data
 
-  const labwareStack = labwareId != null ? labware[labwareId]?.stack ?? [] : []
+  const labwareStack: string[] =
+    labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
   const handleConfirmClick = (): void => {
     navigate('/designer')
   }
 
   const handleSelectAllLabware = (): void => {
-    const allEqual = labwareId && allWellContents[labwareId] && allWellContents.every(item => item === allWellContents[labwareId]);
+    const currentLiquidContents = labwareId && allWellContents[labwareId]
+    const allEqual = labwareStack.every(
+      item =>
+        JSON.stringify(allWellContents[item]) ===
+        JSON.stringify(currentLiquidContents)
+    )
 
+    console.log('allEqual', allEqual)
     if (!allEqual) {
       setShowLiquidLayoutOverlay(true)
       return
@@ -81,6 +89,11 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
+    console.log('newItem', newItem)
+    console.log('labwareId', labwareId)
+    console.log('allWellContents[newItem]', allWellContents[newItem])
+    console.log('allWellContents[labwareId]', allWellContents[labwareId])
+    console.log('selectedLabwareIds', selectedLabwareIds)
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
@@ -90,8 +103,12 @@ export function LabwareStackToolbox({
       console.error('selected labware have different liquid layouts')
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
+      console.log('newItem with ctrl key')
       setSelectedLabware(prevItems => [...prevItems, newItem])
+      dispatch(openIngredientsSelector([...selectedLabwareIds, newItem]))
+      console.log('selectedLabwareIds', selectedLabwareIds)
     } else {
+      console.log('newItem')
       setSelectedLabware([newItem])
     }
   }
@@ -113,11 +130,8 @@ export function LabwareStackToolbox({
             data-testid="Toolbox_confirmButton"
             onClick={handleConfirmClick}
           >
-          <Icon
-            size="1.5rem"
-            name='plus'
-          />
-             Add another labware
+            <Icon size="1.5rem" name="plus" />
+            Add another labware
           </SecondaryButton>
         }
         closeButton={
@@ -125,7 +139,7 @@ export function LabwareStackToolbox({
             desktopStyle="bodyDefaultRegular"
             onClick={handleSelectAllLabware}
           >
-          Select all
+            Select all
           </StyledText>
         }
       >
