@@ -457,7 +457,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         ) {
           return null
         }
-        console.log(labware.stack)
         const slot = getSlotInLocationStack(labware.stack)
         const labwareAmount = labware.stack.reduce(
           (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
