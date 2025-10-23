@@ -5,7 +5,7 @@ import round from 'lodash/round'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getPipetteSpecsV2,
@@ -87,7 +87,7 @@ const getClippedFlowRateForMoveLiquid = (args: {
   const tipLiquidSpecs = liquidClass?.byPipette
     .find(byPipette => byPipette.pipetteModel === pipetteName)
     ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
-  const tiprackDef = getAllLabwareDefs()[tiprack]
+  const tiprackDef = getAllDefinitions()[tiprack]
   let correctionVolume: number = 0
   if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
     const liquidClassLookup =
@@ -184,7 +184,7 @@ export const migrateFile = (
     //  for OpentronsAI
     Object.values(labwareDefinitions).length > 0
       ? labwareDefinitions
-      : getAllLabwareDefs()
+      : getAllDefinitions()
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
