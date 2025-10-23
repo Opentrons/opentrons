@@ -5,8 +5,10 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   DEST_WELL_BLOWOUT_DESTINATION,
   getTransferPlanAndReferenceVolumes,
+  MANUAL,
 } from '@opentrons/step-generation'
 
 import {
@@ -177,6 +179,9 @@ export const moveLiquidFormToArgs = (
     dispense_y_position,
     pushOut_checkbox,
     pushOut_volume,
+    tip_tracking,
+    tips_selected,
+    tiprack_selected,
   } = castFormData
   let sourceWells = getOrderedWells(
     castFormData.aspirate_wells,
@@ -387,6 +392,9 @@ export const moveLiquidFormToArgs = (
       castFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
         ? null
         : (castFormData.liquidClass ?? null),
+    tip_tracking: tip_tracking ?? AUTOMATIC,
+    tips_selected: tips_selected ?? [],
+    tiprack_selected: tiprack_selected ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -407,6 +415,19 @@ export const moveLiquidFormToArgs = (
   console.assert(
     !(path === 'multiDispense' && destWells == null),
     'cannot distribute when destWells is null'
+  )
+
+  console.assert(
+    !(tiprack_selected != null && tip_tracking === MANUAL),
+    'expected tiprack_selected to be set when tip_tracking is manual'
+  )
+
+  console.assert(
+    !(
+      (tips_selected == null || tips_selected.length === 0) &&
+      tip_tracking === MANUAL
+    ),
+    'expected tips_selected to be set when tip_tracking is manual'
   )
 
   const checkedPath = getCheckedPath(castFormData, contextualState, path)
