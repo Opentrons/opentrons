@@ -358,3 +358,4 @@ def test_resolve_ci_config_lowercase_tag():
     assert config.environment == "production"
     assert config.sandbox_prefix == "docs-v3.0.0"  # Preserves original case
     assert config.relative_artifact_dir == "/dist/docs"
+    
