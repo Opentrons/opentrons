@@ -466,7 +466,7 @@ async def _analyze(  # noqa: C901
         liquids=analysis.state_summary.liquids,
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
-        commandPreconditions=analysis.command_preconditions
+        commandPreconditions=analysis.command_preconditions,
     )
 
     _call_for_output_of_kind(
@@ -557,4 +557,4 @@ class AnalyzeResults(BaseModel):
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
-    commandPreconditions: CommandPreconditions
+    commandPreconditions: Optional[CommandPreconditions]

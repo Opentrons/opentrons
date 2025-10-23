@@ -267,6 +267,7 @@ class StateStore(StateView, ActionHandler):
             self._well_store,
             self._file_store,
             self._task_store,
+            self._precondition_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
