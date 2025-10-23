@@ -242,7 +242,7 @@ def dynamic_mix(
     dispense_end_location: Union[Location, None],
     movement_delay: float,
 ) -> command_types.DynamicMixCommand:
-    text = "Mixing {repetitions} times with a volume of {volume} ul".format(
+    text = "Dynamically mixing {repetitions} times with a volume of {volume} ul".format(
         repetitions=repetitions, volume=float(volume)
     )
     return {
