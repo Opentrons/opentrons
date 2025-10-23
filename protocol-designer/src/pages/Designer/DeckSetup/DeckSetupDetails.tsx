@@ -472,7 +472,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         }
         const labwareIsAdapter =
           labware.def.metadata.displayCategory === 'adapter'
-        console.log(' labware', labware)
 
         return (
           <Fragment key={labware.id}>
