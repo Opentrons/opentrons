@@ -21,7 +21,7 @@ The Python API documentation covers writing Python code to:
 
 - Load and work with labware.
 - Load and work with Opentrons modules.
-- Load and work with pipettes and the gripper.
+- Load and work with pipettes.
 - Perform discrete liquid-handling actions, such as aspirating and dispensing.
 - Perform complex liquid-handling actions, such as transfers between wells.
 - Move instruments to exact locations in the working area.
@@ -42,7 +42,4 @@ The API reference is defined by and generated from an [OpenAPI](https://www.open
 
 ## Developer documentation
 
-For users who want to work directly with Opentrons source code, documentation is available alongside the corresponding code on GitHub. Notable documentation pages include:
-
-- [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md): Opinionated instructions for setting up your computer to work on the software in the `Opentrons/opentrons` repository. These setup steps are required for running the Opentrons App or a simulated robot server from source.
-- [Opentrons Emulation Wiki](https://github.com/Opentrons/opentrons-emulation/wiki): Explanation and instructions for using our software that emulates Opentrons robots at the firmware or hardware level.
+For users who want to work directly with Opentrons source code, documentation is available alongside the corresponding code on GitHub. For example, the [Development Environment Setup](https://github.com/Opentrons/opentrons/blob/edge/DEV_SETUP.md) page provides a guide with opinionated instructions for setting up your computer. Working through these steps is required to run the Opentrons App or a simulated robot server from source.

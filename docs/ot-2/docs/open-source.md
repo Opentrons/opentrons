@@ -12,9 +12,6 @@ The Opentrons GitHub organization can be found at <https://github.com/Opentrons>
 
 Our GitHub site has several useful resources for OT-2 users, and you can participate in our community even if you're not a coder.
 
-!!!note
-    As you browse our GitHub repositories, you may encounter references to `ot3`, which is a model identifier for the [Opentrons Flex](https://opentrons.com/robots/flex). This manual is for the OT-2.
-
 ### Releases
 
 Whenever we create a new version of the robot software and Opentrons App, we publish it on GitHub as a release. Past releases of Opentrons software are kept at <https://github.com/Opentrons/opentrons/releases>.
@@ -43,8 +40,6 @@ The following (non-exhaustive) list of directories, subdirectories, and files ca
 
 | Directory | Description |
 |----|----|
-| [`/ot2/`](https://github.com/Opentrons/ot2) | Open source hardware documentation for the OT-2. |
-| [`/protocols/`](https://github.com/Opentrons/Protocols) | A repository for open-source robot protocols, which are also available online in the [Opentrons Protocol Library](https://protocols.opentrons.com). |
 | [`/api/`](https://github.com/Opentrons/opentrons/tree/edge/api) | Source for the Python Protocol API, written in Python and distributed as the `opentrons` PyPI package. |
 | [`/api/docs/`](https://github.com/Opentrons/opentrons/tree/edge/api/docs) | Documentation for the Python Protocol API, written in ReStructuredText. |
 | [`/api/release-notes.md`](https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md) | Release notes for the robot system software (as a whole, including changes outside of the `/api/` directory). |
@@ -56,6 +51,6 @@ repositories include:
 
 | Repository | Description |
 | ---- | ---- |
-| [`oe-core`](https://github.com/Opentrons/oe-core) | The heart of Opentrons' [OpenEmbedded](https://www.openembedded.org/wiki/Main_Page) system definitions. |
+| [`buildroot`](https://github.com/Opentrons/buildroot) | The Opentrons fork of buildroot for building the OT2 system. |
 | [`opentrons-emulation`](https://github.com/Opentrons/opentrons-emulation) | Emulation of Opentrons robots and modules at either the hardware or firmware level. Uses [Docker](https://www.docker.com/), configuration files, and a simple command-line interface. |
 | [`opentrons-modules`](https://github.com/Opentrons/opentrons-modules) | Firmware for all Opentrons modules. |

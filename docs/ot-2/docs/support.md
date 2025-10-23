@@ -4,10 +4,10 @@ title: "Opentrons OT-2: Product Support and Company Information"
 
 Contact us if you have any questions about the OT-2. Opentrons teams are here to help you with:
 
-- Technical support
 - Sales
-- Warranty information
-- Business information
+- Technical support
+- Applications support
+- Warranty service
 
 ## Support
 
@@ -48,9 +48,3 @@ Opentrons is closed for the following US holidays:
 - Veteran's Day
 - Thanksgiving Day (Thursday and Friday)
 - Christmas Day through New Year's Eve
-
-***
-
-Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.
-
-MONTH YEAR © OPENTRONS YEAR. ALL RIGHTS RESERVED
