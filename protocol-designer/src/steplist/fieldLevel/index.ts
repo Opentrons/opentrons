@@ -67,7 +67,7 @@ const getTipRackEntityByURI = (
   tiprackDefURI: string
 ): LabwareEntity | undefined => {
   return Object.values(state.labwareEntities).find(
-    lw => lw.labwareDefURI == tiprackDefURI
+    lw => lw.labwareDefURI === tiprackDefURI
   )
 }
 
