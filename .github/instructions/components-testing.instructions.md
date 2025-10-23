@@ -22,98 +22,130 @@ The testing environment simulates a real-world scenario where these packages wou
 - Component exports are properly accessible
 - All dependencies are correctly packaged and resolved
 - The ProtocolDeck component renders correctly with real protocol analysis data
+- Visual changes are caught through Playwright snapshot testing
+
+## Package Linking Strategy
+
+This project uses **`pnpm link`** instead of `pnpm add` to install local packages. This approach:
+
+- **Does NOT modify** `package.json` or `pnpm-lock.yaml`
+- Avoids unnecessary lock file churn
+- Prevents side effects on other dependencies during relocks
+- Stores `.tgz` packages in a gitignored `pack/` directory
+
+Local packages are linked at runtime, not declared as dependencies.
 
 ## Project Structure
 
 ```shell
 components-testing/
-├── Makefile                # Build and setup automation
-├── package.json            # Dependencies and scripts
-├── vite.config.mts         # Vite configuration
-├── index.html             # HTML entry point
-└── src/
-    ├── main.tsx           # Main application with ProtocolDeck test
-    ├── styles.css         # Base styles
-    └── StackerAnalysis.json # Protocol analysis test data
+├── Makefile                    # Build and setup automation
+├── package.json               # Dependencies (local packages NOT listed)
+├── pnpm-lock.yaml            # Lock file (unaffected by local links)
+├── playwright.config.ts      # Playwright test configuration
+├── vite.config.mts           # Vite configuration
+├── index.html                # HTML entry point
+├── pack/                     # Gitignored .tgz packages (created by make)
+├── src/
+│   ├── main.tsx             # Main application with ProtocolDeck test
+│   ├── styles.css           # Base styles
+│   └── StackerAnalysis.json # Protocol analysis test data
+└── tests/
+    ├── protocolDeck.spec.ts     # Playwright visual tests
+    └── __screenshots__/         # Baseline screenshots (committed)
 ```
 
 ## Available Make Commands
 
-The Makefile provides automated commands for package building and testing. All commands should be run from the `components-testing` directory:
+The Makefile provides automated commands for package building and testing. All commands should be run from the `components-testing` directory.
 
 ### Setup Commands
 
-```bash
-# Complete setup - builds packages and installs dependencies
-make setup
-```
+**`make setup`** - Complete setup: builds packages and links them
 
 This command:
 
-1. Builds the `@opentrons/shared-data` package using `make pack`
-2. Builds the `@opentrons/components` package using `make pack`
-3. Installs the local `.tgz` packages into this project
-4. Installs all other dependencies with `pnpm install`
+1. Creates a `pack/` directory for `.tgz` files
+2. Builds the `@opentrons/shared-data` package using `make pack`
+3. Moves the built `.tgz` to `pack/opentrons-shared-data-v0.0.0-dev.tgz`
+4. Builds the `@opentrons/components` package using `make pack`
+5. Moves the built `.tgz` to `pack/opentrons-components-v0.0.0-dev.tgz`
+6. Links packages using `pnpm link` (no package.json changes)
+7. Installs all other dependencies with `pnpm install`
 
-```bash
-# Install only the local packages (assumes they're already built)
-make install-local-packages
-```
+**`make install-local-packages`** - Rebuild and link local packages only
+
+Use this when you've made changes to source packages and want to test them.
 
 ### Development Commands
 
-Use these during normal development (for a full clean cycle use the Quick Start command):
+**`make dev`** - Start Vite development server
+
+Typically runs on <http://localhost:5173>
+
+**`make build`** - Build for production
+
+**`make preview`** - Preview production build
+
+### Testing Commands
+
+**`make test`** - Run Playwright tests with current snapshots
+
+**`make test-setup`** - Install Playwright browsers (one-time setup)
+
+Installs Chromium with dependencies for running visual tests.
+
+**`make test-update-snapshots`** - Update visual snapshots after intentional style changes
+
+Use this when you've made **purposeful** changes to ProtocolDeck styling or layout and need to update the baseline screenshots. The updated snapshots will be committed to the repository as the new expected output.
+
+You can also use the npm script:
 
 ```bash
-# Start the development server
-make dev
-```
-
-Starts Vite development server (typically on <http://localhost:5173>)
-
-```bash
-# Build for production
-make build
-```
-
-```bash
-# Preview production build
-make preview
+pnpm test:update-snapshots
 ```
 
 ### Cleanup Commands
 
-```bash
-# Remove local packages and clean up
-make teardown
-```
+**`make teardown`** - Complete teardown: unlink packages and remove node_modules
 
 This command:
 
-1. Removes `@opentrons/shared-data` and `@opentrons/components` from dependencies
-2. Cleans up the `.tgz` package files
+1. Unlinks `@opentrons/shared-data` and `@opentrons/components` (using `pnpm unlink`)
+2. Removes the `pack/` directory with `.tgz` files
 3. Removes `node_modules` directory
 
-```bash
-# Remove only local packages (keeps node_modules)
-make clean-local-packages
-```
+**`make clean-local-packages`** - Remove local packages only (keeps node_modules)
+
+Useful when you want to refresh just the linked packages without reinstalling everything.
 
 ## Testing Workflow
 
 ### Initial Setup
 
-1. Run `make setup` to build packages and install dependencies
-2. Run `make dev` to start the development server
-3. Open your browser to the displayed URL (typically <http://localhost:5173>)
+1. Run `make setup` to build packages and link dependencies
+2. Run `make test-setup` to install Playwright browsers (one-time)
+3. Run `make test` to verify visual tests pass
+4. Run `make dev` to start the development server
 
-### Testing Changes
+### Development Workflow
 
-When you make changes to the source components or shared-data packages:
+When you make changes to the source `components` or `shared-data` packages:
 
-1. Run `make clean-local-packages` to remove old packages
-2. Run `make install-local-packages` to rebuild and reinstall
-3. Refresh your browser to see changes
+1. Run `make clean-local-packages` to unlink old packages
+2. Run `make install-local-packages` to rebuild and relink
+3. Run `make test` to verify visual tests still pass
+4. Run `make dev` to see changes in the browser
+
+### Updating Visual Snapshots
+
+When you make **intentional** style or layout changes to ProtocolDeck:
+
+1. Make your changes in the source `components` package
+2. Run `make clean-local-packages && make install-local-packages` to rebuild
+3. Run `make test-update-snapshots` to update the baseline screenshots
+4. Review the updated snapshots in `tests/__screenshots__/`
+5. Commit the updated snapshots if they look correct
 
 ### Complete Reset
 
@@ -132,6 +164,7 @@ The main focus is testing the `ProtocolDeck` component with:
 - Proper context providers (Redux, React Query, i18next)
 - CSS styling from bundled packages
 - Component props and rendering
+- Visual regression testing with Playwright snapshots
 
 ### Package Integration
 
@@ -156,7 +189,7 @@ The test environment includes all necessary providers:
 **"Module not found" errors:**
 
 - Run `make clean-local-packages` then `make install-local-packages`
-- Ensure packages built successfully (check for `.tgz` files in parent directories)
+- Ensure packages built successfully (check for `.tgz` files in `pack/` directory)
 
 **CSS not loading:**
 
@@ -166,23 +199,32 @@ The test environment includes all necessary providers:
 
 **React hooks errors (e.g. dispatcher null / useMemo undefined):**
 
-- Often caused by multiple React copies (library bundling React instead of externalizing it).
-- Verify `components/vite.config.mts` has React entries in `rollupOptions.external`.
-- Rebuild packages and reinstall local tarballs (`make clean-local-packages` then `make install-local-packages`).
-- Clear browser cache and refresh.
-- Ensure only one React version is installed (check `pnpm why react`).
+- Often caused by multiple React copies (library bundling React instead of externalizing it)
+- Verify `components/vite.config.mts` has React entries in `rollupOptions.external`
+- Rebuild packages and reinstall local tarballs (`make clean-local-packages` then `make install-local-packages`)
+- Clear browser cache and refresh
+- Ensure only one React version is installed (check `pnpm why react`)
 
 **Build failures:**
 
 - Run `make teardown` then `make setup` for complete reset
 - Check parent package build logs for errors
 
-### Package Versions
+**Playwright test failures:**
 
-The local packages are built with version `v0.0.0-dev` and installed as:
+- Run `make test-setup` to ensure browsers are installed
+- Check that dev server is not running when running tests
+- Review test output for specific failures
+- Use `make test-update-snapshots` if changes are intentional
 
-- `@opentrons/shared-data` from `../shared-data/opentrons-shared-data-v0.0.0-dev.tgz`
-- `@opentrons/components` from `../components/opentrons-components-v0.0.0-dev.tgz`
+### Package Locations
+
+The local packages are built with version `v0.0.0-dev` and stored in:
+
+- `pack/opentrons-shared-data-v0.0.0-dev.tgz`
+- `pack/opentrons-components-v0.0.0-dev.tgz`
+
+These are linked using `pnpm link` and do NOT appear in `package.json`.
 
 ## Development Notes
 
@@ -190,3 +232,5 @@ The local packages are built with version `v0.0.0-dev` and installed as:
 - Changes to source components require rebuilding packages to test
 - The setup mimics how external consumers would use these packages
 - Focus is specifically on ProtocolDeck component functionality and styling
+- **`package.json` and `pnpm-lock.yaml` remain stable** - they are not modified by the linking process
+- The `pack/` directory is gitignored and can be safely deleted

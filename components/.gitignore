@@ -1,5 +1,2 @@
 # type caches
 lib/
-
-# npm pack tarballs
-*.tgz

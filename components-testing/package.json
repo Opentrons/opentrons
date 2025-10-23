@@ -6,11 +6,11 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:update-snapshots": "playwright test --update-snapshots"
   },
   "dependencies": {
-    "@opentrons/components": "file:../components/opentrons-components-v0.0.0-dev.tgz",
-    "@opentrons/shared-data": "file:../shared-data/opentrons-shared-data-v0.0.0-dev.tgz",
     "@playwright/test": "^1.55.1",
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
