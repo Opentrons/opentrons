@@ -42,6 +42,8 @@ install-local-packages:
 	@mkdir -p $(PACK_DIR)
 	@echo "Building shared-data package..."
 	make -C ../shared-data pack
+	@echo "Moving shared-data package to pack directory..."
+	@mv ../shared-data/opentrons-shared-data-v0.0.0-dev.tgz $(SHARED_DATA_PACK)
 	@echo "Building components package..."
 	make -C ../components pack
 	@echo "Moving components package to pack directory..."
@@ -70,15 +72,15 @@ clean-local-packages:
 
 # Run Playwright tests
 .PHONY: test
-test:
+test: setup test-setup
 	pnpm playwright test --config=playwright.config.ts
 
 # Install Playwright browser dependencies
 .PHONY: test-setup
-test-setup:
+test-setup: setup
 	npx playwright install --with-deps chromium
 
 # Update Playwright snapshots (use after intentional style changes)
 .PHONY: test-update-snapshots
-test-update-snapshots:
+test-update-snapshots: setup test-setup
 	pnpm playwright test --config=playwright.config.ts --update-snapshots
