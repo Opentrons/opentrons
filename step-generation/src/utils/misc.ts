@@ -969,7 +969,9 @@ export const getIsLabwareCompatibleWithStack = (
         !isLabwareOnSlotTuberack &&
         !isLabwareOnSlotAluminumBlock &&
         !isLabwareOnSlotTiprack &&
-        !isDestLid)
+        (topLabwareEntity.def.parameters.loadName ===
+          'opentrons_tough_universal_lid' ||
+          !isLidRole))
     // --- PATCH END ---
 
     // check compatibility with module
