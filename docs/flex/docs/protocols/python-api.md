@@ -21,7 +21,7 @@ Python protocols generally follow the same basic structure:
 
     - Locations of [modules](https://docs.opentrons.com/v2/new_modules.html), [labware](https://docs.opentrons.com/v2/new_labware.html), and [deck fixtures](https://docs.opentrons.com/v2/deck_slots.html#deck-configuration).
 
-    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells) (optional).
+    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-labware) (optional).
 
     - Commands the system will physically execute (e.g., [simple](https://docs.opentrons.com/v2/new_atomic_commands.html) or [complex](https://docs.opentrons.com/v2/new_complex_commands.html) liquid
       handling commands, [module](https://docs.opentrons.com/v2/new_modules.html) commands, or [movement](https://docs.opentrons.com/v2/robot_position.html) commands).
