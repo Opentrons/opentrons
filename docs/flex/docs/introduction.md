@@ -8,20 +8,24 @@ Flex workstations come with all of the equipment — robot, hardware, and labwar
 
 ## Flex-exclusive features
 
-Opentrons Flex is part of the Opentrons liquid handler series of robots. Flex goes beyond the capabilities of the Opentrons OT-2, our personal pipetting robot, in several key areas, delivering higher throughput and walkaway time. This section details hardware and open-source features to help you automate any workflow, available only on the Flex. 
+Opentrons Flex includes advanced features to help you automate any workflow, available only on the Flex. 
 
 | Feature | Description |
 | --- | --- |
-| **Pipette throughput** | <ul><li>Flex pipettes have 1, 8, or 96 channels. The 96-channel pipette is available only for Flex.</li><li> Flex pipettes have large volume ranges. The 5--1000 µL pipettes work wtih any volume of Opentrons Flex tips, making it easy to automate a wide range of pipetting tasks in a single workflow.</li></ul> |
+| **Pipette throughput** | <ul><li>Flex pipettes have 1, 8, or 96 channels. The 96-channel pipette is available only for Flex.</li><li> Flex pipettes have large volume ranges. The 5–1000 µL pipettes work with any volume of Opentrons Flex tips, making it easy to automate a wide range of pipetting tasks in a single workflow.</li></ul> |
 | **Gripper** | The Opentrons Flex Gripper picks up and moves labware around the deck automatically, without user intervention. The gripper enables more complex workflows within a single protocol run.                                                                             |
 | **Automated calibration** | Positional calibration of Flex pipettes and the gripper is fully automated. Press one button, and the instrument will move to precision-machined points on the deck to determine its exact position, saving that data for use in your protocols.                      |
 | **Touchscreen** | Flex has its own touchscreen interface that lets you control it directly, in addition to using the Opentrons App. Use the touchscreen to start protocol runs, perform quick transfers, check job status, and change settings right on the robot.                                                 |
+| **Module Caddies** | Flex modules fit into caddies that occupy space below the deck. Caddies place your labware closer to the deck surface and allow for below-deck cable routing. Caddies enable even more module and labware configurations on the deck. |
+| **Moveable trash** | The trash bin can go in multiple deck locations on Flex. The default location (slot A3) is the recommended position. You can also use the gripper to dispose of trash in the optional waste chute. |
 | **Liquid detection** | Pressure sensors in Flex pipettes detect liquid in wells, including tip contact and liquid level. This feature lets you control the Flex's pipetting relative to a liquid meniscus, and alerts you if wells are empty. |
 | **Liquid classes** | Use [liquid class settings](https://docs.opentrons.com/v2/liquid_classes.html) to optimize Flex's pipetting behavior for your liquids, including fine-tuned control of pipette actions like flow rate and submerge speed. You can easily apply Opentrons-verified settings for aqueous, viscous, or volatile liquids using Python commands, in a quick transfer, or in Protocol Designer. |
 
 ## Flex and OT-2 
 
-Both the Opentrons Flex and OT-2 robots run on open-source software, and the Opentrons App can control both types of robots at once. In this manual, you can read more about differences in operating the Flex and its hardware, like module caddies, deck slot coordinates, and the moveable trash bin. A detailed [comparison of robot technical specifications](https://opentrons.com/products/robots/) is available on the Opentrons website.
+Opentrons Flex is part of the Opentrons liquid handler series of robots. Flex goes beyond the capabilities of the Opentrons OT-2, our personal pipetting robot, in several key areas, delivering higher throughput and walkaway time. 
+
+Both the Opentrons Flex and OT-2 robots run on open-source software, and the Opentrons App can control both types of robots at once. In this manual, you can read more about differences in operating the Flex and its hardware. A detailed [comparison of robot technical specifications](https://opentrons.com/products/robots/) is available on the Opentrons website.
 
 While OT-2 protocols can't be run directly on Flex, it's straightforward to adapt them (see the [OT-2 Protocols section][ot-2-python-protocols] of the Protocol Development chapter for details).
 
