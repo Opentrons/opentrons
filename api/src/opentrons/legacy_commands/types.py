@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing_extensions import Literal, Final, TypedDict
-from typing import Optional, List, Sequence, TYPE_CHECKING, Union
+from typing import Optional, List, Sequence, TYPE_CHECKING, Union, Tuple
 from opentrons.hardware_control.modules import ThermocyclerStep
 
 if TYPE_CHECKING:
@@ -25,6 +25,7 @@ PAUSE: Final = "command.PAUSE"
 RESUME: Final = "command.RESUME"
 COMMENT: Final = "command.COMMENT"
 MOVE_LABWARE: Final = "command.MOVE_LABWARE"
+CAPTURE_IMAGE: Final = "command.CAPTURE_IMAGE"
 
 # Pipette #
 
@@ -636,6 +637,14 @@ class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
 
 
+class CaptureImageCommandPayload(TextOnlyPayload):
+    resolution: Optional[Tuple[int, int]]
+    zoom: Optional[float]
+    contrast: Optional[float]
+    brightness: Optional[float]
+    saturation: Optional[float]
+
+
 class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     liquid_class: LiquidClass
     volume: float
@@ -689,6 +698,11 @@ class ConfigureNozzleLayoutPayload(TypedDict, TextOnlyPayload):
 class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
+
+
+class CaptureImageCommand(TypedDict):
+    name: Literal["command.CAPTURE_IMAGE"]
+    payload: CaptureImageCommandPayload
 
 
 class SealCommand(TypedDict):
@@ -840,6 +854,7 @@ Command = Union[
     PressurizeCommand,
     ConfigureForVolumeCommand,
     ConfigureNozzleLayoutCommand,
+    CaptureImageCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
@@ -914,6 +929,7 @@ CommandPayload = Union[
     PressurizeCommandPayload,
     ConfigureForVolumePayload,
     ConfigureNozzleLayoutPayload,
+    CaptureImageCommandPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,
