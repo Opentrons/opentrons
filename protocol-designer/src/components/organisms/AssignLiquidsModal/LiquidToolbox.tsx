@@ -93,6 +93,9 @@ export function LiquidToolbox({
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  console.log('showLiquidLayoutOverlay', showLiquidLayoutOverlay)
+  console.log('selectedLabwareIds', selectedLabwareIds)
+
   const {
     liquids,
     labwareId,
@@ -297,9 +300,10 @@ export function LiquidToolbox({
           </StyledText>
         }
       >
-        {(liquidsInLabware != null && liquidsInLabware.length > 0) ||
-        selectedWells.length > 0 &&
-        !showLiquidLayoutOverlay ? (
+        {(!showLiquidLayoutOverlay &&
+          liquidsInLabware != null &&
+          liquidsInLabware.length > 0) ||
+        selectedWells.length > 0 ? (
           <form onSubmit={handleSubmit(handleSaveSubmit)}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {selectedWells.length > 0 ? (
@@ -520,8 +524,6 @@ export function LiquidToolboxContainer({
   showLiquidLayoutOverlay,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
-  console.log('showLiquidLayoutOverlay', showLiquidLayoutOverlay)
-  console.log('selectedLabwareIds', selectedLabwareIds)
   const liquids = useSelector(getLiquidEntities)
   const labwareId = selectedLabwareIds[0] //useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
