@@ -11,8 +11,6 @@ from opentrons_shared_data.data_files import (
     RunFileNameMetadata,
 )
 
-from ..errors import StorageLimitReachedError
-
 
 @dataclass(frozen=True)
 class FileNameCmdMetadata:

@@ -22,7 +22,6 @@ from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
-    StorageLimitReachedError,
 )
 from opentrons.system.camera import image_capture
 
@@ -65,25 +64,6 @@ def camera_provider_image_capture() -> CameraProvider:
     return CameraProvider(
         camera_settings_callback=None, image_capture_callback=image_capture
     )
-
-
-async def test_capture_image_raises_storage_limit(
-    decoy: Decoy,
-    state_view: StateView,
-    file_provider: FileProvider,
-    camera_provider: CameraProvider,
-) -> None:
-    """It should raise StorageLimitReachedError when it would generate too many images."""
-    subject = CaptureImageImpl(
-        state_view=state_view,
-        file_provider=file_provider,
-        camera_provider=camera_provider,
-    )
-    params = CaptureImageParams(fileName=None)
-
-    decoy.when(state_view.files.get_filecount()).then_return(400)
-    with pytest.raises(StorageLimitReachedError):
-        await subject.execute(params=params)
 
 
 @pytest.mark.parametrize(
