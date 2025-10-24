@@ -16,6 +16,6 @@ export function deleteCalibration(
     `/calibration/${endpoint}`,
     null,
     config,
-    apiParams
+    { params: apiParams }
   )
 }
