@@ -847,7 +847,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     dispense_with_delay(push_out=None)
         return self
 
-    @requires_version(2, 28)
+    @requires_version(2, 27)
     def dynamic_mix(  # noqa: C901
         self,
         aspirate_start_location: types.Location,
