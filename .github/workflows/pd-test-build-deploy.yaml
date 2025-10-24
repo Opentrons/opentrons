@@ -110,6 +110,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
+      - id: resolve-tag
+        uses: ./.github/actions/git/resolve-tag
       - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:
@@ -129,6 +131,7 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
+          release: ${{ steps.resolve-tag.outputs.tag }}
           sourcemaps: protocol-designer/dist
           set_commits: auto
           ignore_missing: true
