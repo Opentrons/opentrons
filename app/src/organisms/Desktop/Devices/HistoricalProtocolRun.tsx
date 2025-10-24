@@ -16,6 +16,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { useOutputCsvDataFileIds } from '/app/resources/dataFiles/useCsvDataFiles'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
@@ -45,15 +46,14 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const [drawerOpen, setDrawerOpen] = useState(false)
-  let countRunDataFiles =
+  const csvDataFileIds = useOutputCsvDataFileIds(run.id)
+  const countRunDataFiles =
     'runTimeParameters' in run
       ? run?.runTimeParameters.filter(
           parameter => parameter.type === 'csv_file'
-        ).length
-      : 0
-  if ('outputFileIds' in run) {
-    countRunDataFiles += run.outputFileIds.length
-  }
+        ).length + csvDataFileIds.length
+      : csvDataFileIds.length
+
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
