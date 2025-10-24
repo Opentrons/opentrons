@@ -16,9 +16,13 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { openIngredientsSelector, createContainer } from '/protocol-designer/labware-ingred/actions'
+import {
+  createContainer,
+  openIngredientSelector,
+  openIngredientsSelector,
+} from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
-
+import { saveProtocolFile } from '/protocol-designer/load-file/actions'
 import {
   getInitialDeckSetup,
   getLabwareEntities,
@@ -70,10 +74,18 @@ export function LabwareStackToolbox({
 
   const handleAddAnotherLabware = (): void => {
     console.log('labwareEntities[labwareId]', labwareEntities[labwareId])
-    dispatch(createContainer({
-      labwareDefURIStack: labwareEntities[labwareId].defURI,
-      slot: labwareId ?? ''
-    })
+    // recreate the stack
+    const arrayOfLabwareDefURI = Array(parseInt(labwareStack.length) - 1).fill(
+      labwareEntities[labwareId ?? '']?.labwareDefURI ?? ''
+    )
+    const createdIds = dispatch(
+      createContainer({
+        labwareDefURIStack: arrayOfLabwareDefURI as string[],
+        slot: labwareId ?? '',
+      })
+    ) as string[]
+    console.log('createdIds', createdIds)
+    dispatch(openIngredientSelector(createdIds[0] ?? ''))
   }
 
   const handleSelectAllLabware = (): void => {
@@ -202,8 +214,9 @@ export function LabwareStackToolboxContainer({
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const labwareIds =
     useSelector(labwareIngredSelectors.getSelectedLabwareIds) ?? []
-    console.log('labwareIds', labwareIds)
+  console.log('labwareIds', labwareIds)
   const { labware } = useSelector(getInitialDeckSetup)
+  console.log('labware:', labware)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )

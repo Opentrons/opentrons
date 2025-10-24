@@ -104,6 +104,7 @@ export function AssignLiquidsModal(
   }
 
   const labwareStack = labware[labwareId].stack
+  console.log('labwareStack:', labwareStack)
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 

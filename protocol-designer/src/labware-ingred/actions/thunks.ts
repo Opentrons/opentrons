@@ -55,8 +55,9 @@ export const renameLabware: (
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction | string[]
 > = args => (dispatch, getState) => {
+  const createdIds: string[] = []
   const { labwareDefURIStack, slot } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
@@ -71,6 +72,7 @@ export const createContainer: (
     let currentSlot = availableSlot
     labwareDefURIStack.forEach(labwareUri => {
       const id = `${uuid()}:${labwareUri}`
+      createdIds.push(id)
       const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
         labwareUri
       ]
@@ -106,6 +108,7 @@ export const createContainer: (
   } else {
     console.warn('no slots available, cannot create labware')
   }
+  return createdIds
 }
 
 export const duplicateLabware: (
