@@ -617,39 +617,47 @@ async def _stream_zip_from_subprocess(
     try:
         tmp_dir_obj = TemporaryDirectory()
         tmp_path = Path(tmp_dir_obj.name)
-
         files_dir = tmp_path / "images"
         files_dir.mkdir()
 
+        file_names = []
         for file_path, file_name in files:
             dest_path = files_dir / file_name
             dest_path.symlink_to(file_path)
+            file_names.append(file_name)
 
-        zip_file_path = tmp_path / "images.zip"
-
-        file_paths = [str(files_dir / file_name) for _, file_name in files]
-        cmd = ["python3", "-m", "zipfile", "-c", str(zip_file_path)] + file_paths
-
+        # -q: quiet
+        # -j: junk paths (store only filenames, not directory structure)
+        # -: write to stdout instead of a file
         process = await asyncio.create_subprocess_exec(
-            *cmd,
+            "zip",
+            "-q",
+            "-j",
+            "-",
+            *file_names,
+            cwd=str(files_dir),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
 
-        _, stderr_output = await process.communicate()
+        # Stream chunks from stdout as they're produced
+        while True:
+            chunk = await process.stdout.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk
+
+        await process.wait()
 
         if process.returncode != 0:
+            stderr_output = await process.stderr.read()
             error_msg = stderr_output.decode() if stderr_output else "Unknown error"
-            raise Exception(f"Failed to create zip file: {error_msg}")
-
-        with open(zip_file_path, "rb") as zip_file:
-            while True:
-                chunk = zip_file.read(chunk_size)
-                if not chunk:
-                    break
-                yield chunk
+            raise Exception(
+                f"zip command failed with code {process.returncode}: {error_msg}"
+            )
 
     except Exception as e:
+        # Clean up process if still running
         if process is not None and process.returncode is None:
             process.kill()
             await process.wait()
