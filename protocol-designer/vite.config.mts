@@ -61,6 +61,9 @@ export default defineConfig(
           org: 'opentrons-sw',
           project: 'protocol-designer',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          release: {
+            name: OT_PD_VERSION,
+          },
           telemetry: false,
           reactComponentAnnotation: {
             enabled: true,
