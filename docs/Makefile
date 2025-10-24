@@ -19,3 +19,8 @@ clean:
 .PHONY: serve
 serve:
 	uv run mkdocs serve -f ./mkdocs.yml
+
+.PHONY: pdf-flex
+pdf-flex:
+	MKDOCS_EXPORTER_PDF_ENABLED=true \
+	uv run mkdocs build -f ./flex/mkdocs.yml
