@@ -69,6 +69,7 @@ export interface LegacyGoodRunData {
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
   runTimeParameters: RunTimeParameter[]
+  /** @deprecated Prefer using bindings for /dataFiles/:runId/all */
   outputFileIds: string[]
 }
 
