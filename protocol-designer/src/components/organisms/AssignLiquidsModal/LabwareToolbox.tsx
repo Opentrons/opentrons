@@ -16,8 +16,9 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { openIngredientsSelector } from '/protocol-designer/labware-ingred/actions'
+import { openIngredientsSelector, createContainer } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+
 import {
   getInitialDeckSetup,
   getLabwareEntities,
@@ -62,13 +63,17 @@ export function LabwareStackToolbox({
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const { labware, labwareId, allWellContents } = data
+  const { labware, labwareId, allWellContents, labwareEntities } = data
 
   const labwareStack: string[] =
     labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
-  const handleConfirmClick = (): void => {
-    navigate('/designer')
+  const handleAddAnotherLabware = (): void => {
+    console.log('labwareEntities[labwareId]', labwareEntities[labwareId])
+    dispatch(createContainer({
+      labwareDefURIStack: labwareEntities[labwareId].defURI,
+      slot: labwareId ?? ''
+    })
   }
 
   const handleSelectAllLabware = (): void => {
@@ -135,7 +140,7 @@ export function LabwareStackToolbox({
             gridGap={SPACING.spacing8}
             width="100%"
             data-testid="Toolbox_confirmButton"
-            onClick={handleConfirmClick}
+            onClick={handleAddAnotherLabware}
           >
             <Icon size="1.5rem" name="plus" />
             <StyledText
@@ -197,6 +202,7 @@ export function LabwareStackToolboxContainer({
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const labwareIds =
     useSelector(labwareIngredSelectors.getSelectedLabwareIds) ?? []
+    console.log('labwareIds', labwareIds)
   const { labware } = useSelector(getInitialDeckSetup)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
