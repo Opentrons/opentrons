@@ -9,10 +9,13 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
+import { latestLabwareVersions } from '../scripts/git-version.mjs'
+
 import {
-  latestLabwareVersions,
-  versionForProject,
-} from '../scripts/git-version.mjs'
+  getVersion,
+  generateBuildInfoHtml,
+} from '../scripts/git-version-protocol-designer.mjs'
+
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
@@ -22,7 +25,7 @@ const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(
   async (): Promise<UserConfig> => {
-    const OT_PD_VERSION = await versionForProject('protocol-designer')
+    const OT_PD_VERSION = await getVersion()
     const OT_PD_BUILD_DATE = new Date().toUTCString()
     const OT_PD_LATEST_LABWARE_VERSIONS = await latestLabwareVersions(
       REQUIRED_APP_VERSION
@@ -70,6 +73,13 @@ export default defineConfig(
               mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
+        {
+          name: 'build-info-generator',
+          closeBundle: async () => {
+            const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
+            await generateBuildInfoHtml(outputPath)
+          },
+        },
         ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
       ],
       optimizeDeps: {

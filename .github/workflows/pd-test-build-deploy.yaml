@@ -15,6 +15,7 @@ on:
       - '.github/actions/git/resolve-tag/action.yml'
       - '.github/actions/environment/complex-variables/action.yml'
       - 'scripts/static-deploy/**'
+      - 'scripts/git-version-protocol-designer.mjs'
   push:
     branches:
       - 'edge'
@@ -152,7 +153,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.PD_SANDBOX_ROLE }}
+          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
           aws-region: us-east-2
       - name: Checkout Repository
         uses: actions/checkout@v4

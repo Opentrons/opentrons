@@ -18,6 +18,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_END,
   Modal,
+  OVERFLOW_AUTO,
   PrimaryButton,
   SecondaryButton,
   SPACING,
@@ -37,42 +38,43 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
-
-import { LINK_BUTTON_STYLE } from '../../../components/atoms'
-import { getRobotType } from '../../../file-data/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { createCustomLabwareDef } from '../../../labware-defs/actions'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
-} from '../../../pages/Designer/DeckSetup/constants'
-import { getLabwareIsRecommended } from '../../../pages/Designer/DeckSetup/utils'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getPipetteEntities } from '../../../step-forms/selectors'
-import { getHas96Channel } from '../../../utils'
+} from '/protocol-designer/pages/Designer/DeckSetup/constants'
+import { getLabwareIsRecommended } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { TIPRACK_LID_LOADNAME } from '/protocol-designer/pages/Designer/utils'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithModule,
-} from '../../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
 
 import type { ChangeEvent } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
-import type { ModuleOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type { CategoryExpand } from '/protocol-designer/pages/Designer/DeckSetup/DeckSetupToolbox'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
 const PLATE_READER_LOADNAME =
   'opentrons_flex_lid_absorbance_plate_reader_module'
 const UNIVERSAL_LID_LOADNAME = 'opentrons_tough_universal_lid'
+const STACK_LIMIT = 1
 
 interface SelectLabwareModalProps {
   slot: DeckSlotId
@@ -281,6 +283,25 @@ export function SelectLabwareModal(
     setAreCategoriesExpanded(updatedExpandState)
   }
 
+  const validateQuantity = (): boolean => {
+    const { selectedTopLabware } = zoomedInSlotInfo
+    if (selectedTopLabware.labwareDefURI == null) {
+      return true
+    }
+    const selectedLabwareDef =
+      defs[selectedTopLabware.labwareDefURI] ??
+      customLabwareDefs[selectedTopLabware.labwareDefURI]
+
+    const amount = selectedTopLabware.amount ?? 0
+    const stackLimit = selectedLabwareDef.stackLimit ?? STACK_LIMIT // the range is 1-5
+
+    if (amount < 1 || amount > stackLimit) {
+      return false
+    }
+
+    return true
+  }
+
   const handleAddLabwareClick = (): void => {
     if (slotFull) {
       setError(t('no_space') as string)
@@ -288,10 +309,16 @@ export function SelectLabwareModal(
     }
     if (hasNoLabware) {
       setError(t('select_before_proceeding') as string)
-    } else {
-      onConfirm()
-      handleResetLabwareTools()
+      return
     }
+
+    if (!validateQuantity()) {
+      setError(t('quantity_out_of_limit') as string)
+      return
+    }
+
+    onConfirm()
+    handleResetLabwareTools()
   }
 
   return createPortal(
@@ -300,34 +327,42 @@ export function SelectLabwareModal(
       title={t('add_labware')}
       type="info"
       width="37.125rem"
+      maxHeight="39.5rem"
+      childrenPadding={SPACING.spacing24}
       onClose={() => {
         onClose()
         handleResetLabwareTools()
       }}
       footer={
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
-          gridGap="36px"
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           {!slotFull ? (
-            <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER}>
-              <StyledLabel css={LINK_BUTTON_STYLE}>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {t('upload_custom_labware')}
-                </StyledText>
-                <input
-                  data-testid="customLabwareInput"
-                  type="file"
-                  onChange={e => {
-                    dispatch(createCustomLabwareDef(e))
-                    handleCategoryClick(CUSTOM_CATEGORY, true)
-                  }}
-                />
-              </StyledLabel>
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              padding={`${SPACING.spacing4} ${SPACING.spacing12}`}
+            >
+              <Flex padding={SPACING.spacing4}>
+                <StyledLabel css={LINK_BUTTON_STYLE}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('upload_custom_labware')}
+                  </StyledText>
+                  <input
+                    data-testid="customLabwareInput"
+                    type="file"
+                    onChange={e => {
+                      dispatch(createCustomLabwareDef(e))
+                      handleCategoryClick(CUSTOM_CATEGORY, true)
+                    }}
+                  />
+                </StyledLabel>
+              </Flex>
             </Flex>
           ) : null}
-          <Flex justifyContent={JUSTIFY_END} gridGap={SPACING.spacing8}>
+          <Flex
+            gridGap={SPACING.spacing8}
+            justifyContent={JUSTIFY_END}
+            alignItems={ALIGN_CENTER}
+            padding={`0 ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing24}`}
+          >
             {error != null && (
               <InlineNotification type="error" heading={error} hug />
             )}
@@ -350,14 +385,14 @@ export function SelectLabwareModal(
       }
     >
       <Flex
-        paddingTop={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
+        height="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <InputField
             value={searchTerm}
-            onChange={e => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setSearchTerm(e.target.value)
             }}
             placeholder={t('search_labware')}
@@ -392,8 +427,8 @@ export function SelectLabwareModal(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          overflowY="scroll"
-          maxHeight="15.5rem"
+          flex="1"
+          overflowY={OVERFLOW_AUTO}
           paddingTop={SPACING.spacing8}
         >
           <SelectCustomLabware

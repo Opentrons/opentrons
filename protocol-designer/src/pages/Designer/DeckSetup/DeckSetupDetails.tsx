@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
-import { Module } from '@opentrons/components'
+import { DeckLabelSet, Module } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getModuleDef,
@@ -187,6 +187,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           activeDeckSetup.labware
         )
       : null
+
+  // make sure the top labware (lid) is rendered first in the stack if
+  // it gets moved there later on
+  const sortedLabware = [...allLabware].sort((a, b) => {
+    // get how deep each labware is in its stack
+    const aDepth = a.stack.length
+    const bDepth = b.stack.length
+
+    // render deeper stacks last (on top)
+    return aDepth - bDepth
+  })
 
   return (
     <>
@@ -437,7 +448,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         })}
 
       {/* all labware on deck NOT those in modules */}
-      {allLabware.map(labware => {
+      {sortedLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||
@@ -447,6 +458,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           return null
         }
         const slot = getSlotInLocationStack(labware.stack)
+        const labwareAmount = labware.stack.reduce(
+          (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
+          0
+        )
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
           ?.boundingBox
@@ -464,6 +479,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
+            {labwareAmount > 1 ? (
+              <DeckLabelSet
+                deckLabels={[]}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                width={labware.def.dimensions.xDimension}
+                height={labware.def.dimensions.yDimension}
+                showModuleIcon
+                showBorder={false}
+              />
+            ) : null}
             <HighlightLabware
               labwareOnDeck={labware}
               position={slotPosition}

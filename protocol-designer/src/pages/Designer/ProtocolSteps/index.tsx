@@ -74,12 +74,14 @@ const DETAILS_HOVER_SPACE = 60
 interface ProtocolStepsProps {
   zoomedInSlot: string | null
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  showDefineLiquidModal: boolean
   targetWidth: number
   setTargetWidth: (width: number) => void
 }
 export function ProtocolSteps({
   zoomedInSlot,
   showLiquidOverflowMenu,
+  showDefineLiquidModal,
   targetWidth,
   setTargetWidth,
 }: ProtocolStepsProps): JSX.Element {
@@ -259,7 +261,7 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
-                zIndex={1000}
+                zIndex={showDefineLiquidModal ? 1 : 1000}
               >
                 <ExportButton onClick={handleExportClick} />
               </Flex>

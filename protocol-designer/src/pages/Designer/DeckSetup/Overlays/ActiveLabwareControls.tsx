@@ -10,15 +10,11 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getIsLid } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { getIsWellContentsEmpty } from '/protocol-designer/components/organisms'
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
-import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { DECK_CONTROLS_STYLE } from '../constants'
 
@@ -48,25 +44,13 @@ export function ActiveLabwareControls(
   const { t } = useTranslation('starting_deck_state')
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const allWellContentsForActiveItem = useSelector(
-    wellContentsSelectors.getAllWellContentsForActiveItem
-  )
   const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
-  const hasNoLiquidContents = getIsWellContentsEmpty(
-    allWellContentsForActiveItem,
-    fullStack[0]
-  )
   const filteredStack = fullStack.filter(
-    item =>
-      activeDeckSetup.labware[item] != null &&
-      !getIsAdapterFromDef(activeDeckSetup.labware[item].def)
+    item => activeDeckSetup.labware[item] != null
   )
-  const isLidOnTopOfSlot = Object.values(activeDeckSetup.labware).some(
-    lw => lw.stack.includes(fullStack[0]) && getIsLid(lw.def)
-  )
+
   if (
     (terminalItemId != null && terminalItemId !== END_TERMINAL_ITEM_ID) ||
-    (hasNoLiquidContents && !isLidOnTopOfSlot) ||
     slotPosition == null
   ) {
     return null
