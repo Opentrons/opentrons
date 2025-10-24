@@ -100,9 +100,11 @@ Typically runs on <http://localhost:5173>
 
 **`make test`** - Run Playwright tests with current snapshots
 
+Note: You must run `make test-setup` first to install browsers.
+
 **`make test-setup`** - Install Playwright browsers (one-time setup)
 
-Installs Chromium with dependencies for running visual tests.
+Installs Chromium with dependencies for running visual tests. Run this once before running tests for the first time.
 
 **`make test-update-snapshots`** - Update visual snapshots after intentional style changes
 
@@ -142,8 +144,8 @@ When you make changes to the source `components` or `shared-data` packages:
 
 1. Run `make clean-local-packages` to unlink old packages
 2. Run `make install-local-packages` to rebuild and relink
-3. Run `make test` to verify visual tests still pass
-4. Run `make dev` to see changes in the browser
+3. Run `make dev` to see changes in the browser
+4. Run `make test` to verify visual tests still pass
 
 ### Updating Visual Snapshots
 
@@ -161,6 +163,8 @@ If you encounter issues:
 
 1. Run `make teardown` to completely clean the environment
 2. Run `make setup` to rebuild everything from scratch
+3. Run `make test-setup` to install Playwright browsers
+4. Run `make test` to verify tests pass
 
 ## What's Being Tested
 

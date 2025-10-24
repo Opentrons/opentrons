@@ -65,11 +65,11 @@ Preview production build
 
 #### `make test`
 
-Run Playwright tests with current snapshots
+Run Playwright tests with current snapshots. Note: You must run `make test-setup` first to install browsers.
 
 #### `make test-setup`
 
-Install Playwright browser dependencies (Chromium). Run this once before running tests.
+Install Playwright browser dependencies (Chromium). Run this once before running tests for the first time.
 
 #### `make test-update-snapshots`
 
@@ -104,7 +104,8 @@ Remove only local packages (keeps node_modules). Useful when you want to refresh
 
 1. Run `make setup` to build packages and link dependencies
 2. Run `make test-setup` to install Playwright browsers (one-time setup)
-3. Run `make test` to verify everything works
+3. Run `make test` to verify visual tests pass
+4. Run `make dev` to start the development server
 
 ### Development Workflow
 

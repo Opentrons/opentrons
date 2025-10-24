@@ -56,15 +56,15 @@ clean-local-packages:
 
 # Run Playwright tests
 .PHONY: test
-test: test-setup
+test:
 	pnpm playwright test --config=playwright.config.ts
 
 # Install Playwright browser dependencies
 .PHONY: test-setup
-test-setup: setup
+test-setup:
 	pnpm dlx playwright install --with-deps chromium
 
 # Update Playwright snapshots (use after intentional style changes)
 .PHONY: test-update-snapshots
-test-update-snapshots: test-setup
+test-update-snapshots:
 	pnpm playwright test --config=playwright.config.ts --update-snapshots

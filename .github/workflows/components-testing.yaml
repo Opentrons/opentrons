@@ -39,6 +39,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9.0.0
+      - name: 'setup components-testing environment'
+        working-directory: components-testing
+        run: make setup
+      - name: 'install playwright browsers'
+        working-directory: components-testing
+        run: make test-setup
       - name: 'run components-testing tests'
         working-directory: components-testing
         run: make test
