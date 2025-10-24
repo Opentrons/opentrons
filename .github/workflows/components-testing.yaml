@@ -36,10 +36,9 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
-      - name: 'setup pnpm'
-        run: |
-          corepack enable
-          corepack prepare pnpm@9.0.0 --activate
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
       - name: 'run components-testing tests'
         working-directory: components-testing
         run: make test

@@ -62,7 +62,7 @@ test: test-setup
 # Install Playwright browser dependencies
 .PHONY: test-setup
 test-setup: setup
-	npx playwright install --with-deps chromium
+	pnpm dlx playwright install --with-deps chromium
 
 # Update Playwright snapshots (use after intentional style changes)
 .PHONY: test-update-snapshots

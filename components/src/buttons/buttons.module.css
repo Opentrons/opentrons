@@ -3,6 +3,56 @@
 
 :root {
   --button-pad: 0.5rem;
+
+  --button-inverted: {
+    border-color: var(--c-font-light);
+
+    /* VVV from legacy --button-inverted VVV */
+    color: var(--c-font-light);
+
+    &:active {
+      background-color: color-mod(var(--c-bg-dark) tint(10%));
+      font-weight: var(--fw-regular);
+    }
+
+    &:focus {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    &:hover {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    &:disabled,
+    &.disabled {
+      /* from legacy --button-disabled */
+      border-color: var(--c-font-disabled);
+      background-color: transparent;
+
+      /* from legacy --button-disabled */
+      color: var(--c-font-disabled);
+
+      /* from legacy --button-disabled */
+      cursor: default;
+
+      /* from legacy --button-disabled */
+      fill: var(--c-font-disabled);
+
+      /* from legacy --button-disabled */
+      font-weight: normal;
+
+      /* from legacy --button-disabled */
+      pointer-events: none;
+
+      /* from legacy --button-disabled */
+    }
+
+    &.hover {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    /* ^^^ from legacy --button-default ^^^ */
+  }
 }
 
 /* TODO(ka, 2017-2-14): standardize primary button vars */

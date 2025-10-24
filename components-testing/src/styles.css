@@ -14,16 +14,12 @@
 
 .protocol_deck_container {
   overflow: hidden;
-  width: 1200px;
-  min-width: 1200px;
-  max-width: 1200px;
-  height: 800px;
-  min-height: 800px;
-  max-height: 800px;
+  width: 75rem;
+  height: 50rem;
   box-sizing: border-box;
   padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 0.0625rem solid #ccc;
+  border-radius: 0.5rem;
   margin-top: 1rem;
   background-color: #fff;
 
