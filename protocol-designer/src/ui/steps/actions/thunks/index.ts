@@ -182,28 +182,7 @@ export const addAndSelectStep: (arg: {
     }
   }
 }
-export interface ReorderSelectedStepAction {
-  type: 'REORDER_SELECTED_STEP'
-  payload: {
-    delta: number
-    stepId: StepIdType
-  }
-}
-export const reorderSelectedStep: (
-  delta: number
-) => ThunkAction<ReorderSelectedStepAction> = delta => (dispatch, getState) => {
-  const stepId = getSelectedStepId(getState())
 
-  if (stepId != null) {
-    dispatch({
-      type: 'REORDER_SELECTED_STEP',
-      payload: {
-        delta,
-        stepId,
-      },
-    })
-  }
-}
 export const duplicateStep: (
   stepId: StepIdType
 ) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {

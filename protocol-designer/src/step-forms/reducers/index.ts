@@ -1598,22 +1598,6 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
       state: OrderedStepIdsState,
       action: LoadFileAction
     ): OrderedStepIdsState => getPDMetadata(action.payload.file).orderedStepIds,
-    REORDER_SELECTED_STEP: (
-      state: OrderedStepIdsState,
-      action: ReorderSelectedStepAction
-    ): OrderedStepIdsState => {
-      // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
-      const { delta, stepId } = action.payload
-      const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
-      const selectedIndex = state.findIndex(s => s === stepId)
-      const nextIndex = selectedIndex + delta
-      if (delta <= 0 && selectedIndex === 0) return state
-      return [
-        ...stepsWithoutSelectedStep.slice(0, nextIndex),
-        stepId,
-        ...stepsWithoutSelectedStep.slice(nextIndex),
-      ]
-    },
     DUPLICATE_STEP: (
       state: OrderedStepIdsState,
       action: DuplicateStepAction
