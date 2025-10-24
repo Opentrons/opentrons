@@ -2,11 +2,13 @@ import asyncio
 import os
 from pathlib import Path
 import logging
+from functools import lru_cache
 from enum import Enum
 from typing import Dict
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons.config import IS_ROBOT
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     ImageParameters,
@@ -21,7 +23,9 @@ FLEX_EMBEDDED_CAMERA = "/dev/video2"
 OT2_CAMERA = "/dev/video0"
 
 # Stream Globals
-STREAM_CONF_FILE = "opentrons-live-stream.conf"
+DEFAULT_CONF_FILE = (
+    "/lib/systemd/system/opentrons-live-stream/opentrons-live-stream.env"
+)
 STREAM_CONF_FILE_KEYS = [
     "BOOT_ID",
     "STATUS",
@@ -103,16 +107,27 @@ async def take_picture(filename: Path) -> None:
 
 def get_stream_configuration_filepath() -> Path:
     """Return the file path to the Opentrons Live Stream Configuration file."""
-    return get_opentrons_path("live_stream_configuration_file")
+    filepath = get_opentrons_path("live_stream_environment_file")
+    if IS_ROBOT and not os.path.exists(filepath):
+        # If the dynamic configuration file doesn't exist make it using our defaults file
+        with open(DEFAULT_CONF_FILE, "r") as default_config:
+            content = default_config.read()
+        with open(filepath, "w") as new_config_file:
+            new_config_file.write(content)
+    return filepath
 
 
 async def update_live_stream_status(
     stream_status: bool, camera_provider: CameraProvider
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
+    if not IS_ROBOT:
+        # If we are not on a robot we simply no-op updating the stream
+        return None
+
     contents = load_stream_configuration_file_data()
     if contents is None:
-        log.error("Opentrons Live Stream Configuraiton file cannot be updated.")
+        log.error("Opentrons Live Stream Configuration file cannot be updated.")
         return None
 
     # Validate the stream status
@@ -132,6 +147,7 @@ async def update_live_stream_status(
         # Enable the stream
         status = "ON"
     # Overwrite the contents
+    contents["BOOT_ID"] = get_boot_id()
     contents["STATUS"] = status
     write_stream_configuration_file_data(contents)
     await restart_live_stream()
@@ -200,7 +216,7 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(contents.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Opentrons Live Stream Configuraiton file data is incorrect or missing."
+            "Opentrons Live Stream Configuration file data is incorrect or missing."
         )
         # We don't want to write bad or incomplete data to the file
         return None
@@ -216,7 +232,7 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
     enum_stream_keys = {stream_key.value for stream_key in StreamConfigurationKeys}
     if sorted(list(data.keys())) != sorted(enum_stream_keys):
         log.error(
-            "Data provided to write is not compatible with Opentrons Live Stream Configuraiton file."
+            "Data provided to write is not compatible with Opentrons Live Stream Configuration file."
         )
         return None
 
@@ -307,3 +323,11 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         # Restart the live stream service
         await restart_live_stream()
     return result
+
+
+@lru_cache(maxsize=1)
+def get_boot_id() -> str:
+    if IS_ROBOT:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    else:
+        return "SIMULATED_BOOT_ID"

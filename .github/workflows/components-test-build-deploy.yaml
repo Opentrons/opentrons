@@ -13,18 +13,12 @@ on:
       - 'app/src/atoms/**'
       - 'app/src/molecules/**'
       - 'protocol-designer/src/components/**'
+      - 'scripts/static-deploy/**'
   push:
-    paths:
-      - Makefile
-      - 'package.json'
-      - '.github/workflows/components-test-build-deploy.yaml'
-      - '**.stories.*'
-      - 'components/**'
-      - 'app/src/atoms/**'
-      - 'app/src/molecules/**'
-      - 'protocol-designer/src/components/**'
     branches:
-      - '**'
+      - 'edge'
+      - 'release'
+      - 'chore_release*'
     tags:
       - 'components*'
   workflow_dispatch:
@@ -39,35 +33,40 @@ defaults:
 
 env:
   CI: true
+  RELATIVE_ARTIFACT_DIR: '../../dist'
 
 jobs:
+  determine-deploy-config:
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
+
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.12.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'run components unit tests'
         run: make -C components test-cov
       - name: 'Upload coverage report'
@@ -79,32 +78,10 @@ jobs:
   build-components-storybook:
     name: 'build components artifact'
     runs-on: 'ubuntu-24.04'
-    if: github.event_name != 'pull_request'
-    needs: ['js-unit-test']
+    needs: ['determine-deploy-config', 'js-unit-test']
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.12.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'build components'
         run: make -C components
       - name: 'upload github artifact'
@@ -113,75 +90,53 @@ jobs:
           name: 'components-artifact'
           path: storybook-static
 
-  determine-build-type:
-    runs-on: 'ubuntu-latest'
-    name: 'Determine build type'
-    outputs:
-      type: ${{steps.determine-build-type.outputs.type}}
-    steps:
-      - id: determine-build-type
-        run: |
-          echo "Determining build type for event ${{github.event_name}} and ref ${{github.ref}}"
-          if [ "${{ format('{0}', github.event_name == 'pull_request') }}" = "true" ] ; then
-            echo "No builds for pull requests"
-            echo 'type=none' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/heads/')) }}" = "true" ] ; then
-            echo "storybook s3 builds for branch ${{ github.ref_name }}"
-            echo 'type=storybook' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
-            echo "publish builds for components tags"
-            echo 'type=publish' >> $GITHUB_OUTPUT
-          else
-            echo "No build for ref ${{github.ref}} and event ${{github.event_name}}"
-            echo 'type=none' >> $GITHUB_OUTPUT
-          fi
 
   deploy-components:
     name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-24.04'
-    needs:
-      ['js-unit-test', 'build-components-storybook', 'determine-build-type']
-    if: needs.determine-build-type.outputs.type != 'none'
+    needs: ['determine-deploy-config', 'js-unit-test', 'build-components-storybook']
+    if: always() && needs.build-components-storybook.result == 'success' && needs.determine-deploy-config.result == 'success'
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          aws-region: us-east-2
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: resolve-tag
+        uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
         run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.12.0'
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
+          make setup
       - name: 'download components build'
         uses: 'actions/download-artifact@v4'
         with:
           name: components-artifact
           path: ./dist
-      - name: 'deploy builds to s3'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        run: |
-          aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
-      - name: 'Set generated URL'
-        run: |
-          echo 'Created component storybook for [${{ env.OT_BRANCH }}](https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/)' >> $GITHUB_STEP_SUMMARY
-          echo 'Created component storybook for https://s3-us-west-2.amazonaws.com/opentrons-components/${{ env.OT_BRANCH }}/index.html?path=/'
+      - name: Deploy to S3
+        working-directory: scripts/static-deploy
+        run: make deploy \
+          APPLICATION=${{ needs.determine-deploy-config.outputs.application }} \
+          ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
+          SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
+          RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
 
   publish-components:
     name: 'publish components package to npm'
     runs-on: 'ubuntu-latest'
-    needs: ['js-unit-test', 'determine-build-type']
-    if: needs.determine-build-type.outputs.type == 'publish'
+    needs: ['js-unit-test']
+    if: startsWith(github.ref, 'refs/tags/components')
     steps:
       - uses: 'actions/checkout@v4'
       # https://github.com/actions/checkout/issues/290
@@ -190,20 +145,7 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.12.0'
-          registry-url: 'https://registry.npmjs.org'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'build typescript types'
         run: make -C components build-ts
       # replace package.json stub version number with version from tag

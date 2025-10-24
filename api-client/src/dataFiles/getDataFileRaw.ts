@@ -2,13 +2,13 @@ import { GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { DownloadedCsvFileResponse } from './types'
+import type { DownloadedDataFileResponse } from './types'
 
-export function getCsvFileRaw(
+export function getDataFileRaw(
   config: HostConfig,
   fileId: string
-): ResponsePromise<DownloadedCsvFileResponse> {
-  return request<DownloadedCsvFileResponse>(
+): ResponsePromise<DownloadedDataFileResponse> {
+  return request<DownloadedDataFileResponse>(
     GET,
     `/dataFiles/${fileId}/download`,
     null,

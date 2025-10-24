@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
+from opentrons_shared_data.data_files import RunFileNameMetadata
 
 from opentrons import config
 from opentrons.types import NozzleMapInterface
@@ -28,10 +29,6 @@ from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
-from robot_server.file_provider.provider import (
-    FileProviderExecutor,
-    RunFileNameMetadata,
-)
 from . import error_recovery_mapping
 from .error_recovery_models import ErrorRecoveryRule
 
@@ -168,7 +165,7 @@ class RunDataManager:
         camera_setting_store: CameraSettingStore,
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
-        file_provider_executor: FileProviderExecutor,
+        file_provider: FileProvider,
     ) -> None:
         self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
@@ -183,7 +180,7 @@ class RunDataManager:
 
         self._task_runner = task_runner
         self._runs_publisher = runs_publisher
-        self._file_provider_executor = file_provider_executor
+        self._file_provider = file_provider
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -196,7 +193,6 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        file_provider: FileProvider,
         camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
@@ -248,8 +244,8 @@ class RunDataManager:
             if protocol is not None
             else None
         )
-        self._file_provider_executor.set_run_metadata(
-            RunFileNameMetadata.model_construct(
+        self._file_provider.set_run_metadata(
+            RunFileNameMetadata(
                 robot_name=config.name(),
                 run_id=run_id,
                 run_created_at=created_at,
@@ -262,7 +258,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
-            file_provider=file_provider,
+            file_provider=self._file_provider,
             camera_provider=camera_provider,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
@@ -418,7 +414,7 @@ class RunDataManager:
                 run_time_parameters=run_result.parameters,
             )
             self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
-            self._file_provider_executor.clear_run_metadata()
+            self._file_provider.clear_run_metadata()
         else:
             state_summary = self._run_orchestrator_store.get_state_summary()
             parameters = self._run_orchestrator_store.get_run_time_parameters()

@@ -221,7 +221,7 @@ export function VisualizerContainer(
       <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
         <CommandSteps
           analysis={analysis}
-          currentCommandIndex={selectedCommandIndex}
+          currentCommandIndex={filteredSelectedCommandIndex}
           groupedCommands={groupedCommands}
           setSelectedCommand={setSelectedCommand}
           percentComplete={percentComplete}

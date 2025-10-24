@@ -36,6 +36,47 @@ def test_create_step() -> None:
         assert set(present_nodes) == set(step.keys())
 
 
+def test_add_group_delay() -> None:
+    origin = {
+        Axis.X: 0,
+        Axis.Y: 0,
+        Axis.Z_L: 0,
+        Axis.Z_R: 0,
+        Axis.P_L: 0,
+        Axis.P_R: 0,
+    }
+    moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
+    for block in moves[0].blocks:
+        block.distance = f64(25.0)
+        block.time = f64(1.0)
+        block.initial_speed = f64(25.0)
+        block.acceleration = f64(0.0)
+        block.final_speed = f64(25.0)
+    present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l]
+    move_group, final_pos = ot3utils.create_move_group(
+        origin=origin,
+        moves=moves,
+        present_nodes=present_nodes,
+    )
+    assert len(move_group) == 3
+
+    new_move_group = ot3utils.add_delay_to_move_group(
+        move_group, present_nodes, ([NodeId.gantry_x], 3.0)
+    )
+    # new group should be one step longer
+    assert len(new_move_group) == 4
+    # all nodes have the same duration of all steps
+    for node in present_nodes:
+        assert sum([step[node].duration_sec for step in new_move_group]) == 6.0
+
+    assert new_move_group[0][NodeId.gantry_x].duration_sec == 3.0
+    assert new_move_group[0][NodeId.gantry_y].duration_sec == 1.0
+    assert new_move_group[0][NodeId.head_l].duration_sec == 1.0
+    assert new_move_group[3][NodeId.gantry_x].duration_sec == 1.0
+    assert new_move_group[3][NodeId.gantry_y].duration_sec == 3.0
+    assert new_move_group[3][NodeId.head_l].duration_sec == 3.0
+
+
 def test_filter_zero_duration_step() -> None:
     origin = {
         Axis.X: 0,

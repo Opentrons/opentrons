@@ -1,4 +1,4 @@
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, locationIsOnLabware } from '@opentrons/shared-data'
 
 import type {
   FlexStackerFillRunTimeCommand,
@@ -85,9 +85,7 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       const lidCommand = loadLabwareCommands.find(
         (c): c is LoadLidRunTimeCommand =>
           c.commandType === 'loadLid' &&
-          c.params.location !== 'offDeck' &&
-          c.params.location !== 'systemLocation' &&
-          'labwareId' in c.params.location &&
+          locationIsOnLabware(c.params.location) &&
           c.params.location.labwareId === command.result?.labwareId
       )
       let defUri = getLabwareDefURI(command.result?.definition)

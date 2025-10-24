@@ -1,12 +1,40 @@
 import { COLORS } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getHoveredOffsetFromWell } from '../utils'
 import { EightChannelFlexShadow } from './EightChannelFlexShadow'
-import { NinetySixFlexShadow } from './NinetySixFlexShadow'
+import { EightChannelOT2Shadow } from './EightChannelOT2Shadow'
+import { NinetySixChannelFlexShadow } from './NinetySixChannelFlexShadow'
+import { SingleChannelOT2Shadow } from './SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from './SingleChannelShadow'
 
-import type { CoordinateTuple, PipetteV2Specs } from '@opentrons/shared-data'
+import type { Channels } from '@opentrons/components'
+import type {
+  CoordinateTuple,
+  PipetteV2Specs,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
+import type { PipetteShadowProps } from '../types'
+
+const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
+  RobotType,
+  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
+> = {
+  [OT2_ROBOT_TYPE]: {
+    1: SingleChannelOT2Shadow,
+    8: EightChannelOT2Shadow,
+    96: () => {
+      console.warn('96-channel not supported on OT-2')
+      return <></>
+    },
+  },
+  [FLEX_ROBOT_TYPE]: {
+    1: SingleChannelFlexShadow,
+    8: EightChannelFlexShadow,
+    96: NinetySixChannelFlexShadow,
+  },
+}
 
 // TODO: adjust once partial tip selection is enabled
 export function PipetteShadow(props: {
@@ -17,6 +45,7 @@ export function PipetteShadow(props: {
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
   primaryNozzle: string
+  robotType: RobotType
 }): JSX.Element {
   const {
     pipetteSpec,
@@ -26,6 +55,7 @@ export function PipetteShadow(props: {
     labwareState,
     isAccessible,
     primaryNozzle,
+    robotType,
   } = props
   const [slotX, slotY] = slotPosition
 
@@ -51,10 +81,7 @@ export function PipetteShadow(props: {
       ? `${COLORS.black90}${COLORS.opacity20HexCode}`
       : `${COLORS.red50}${COLORS.opacity20HexCode}`,
   }
-  if (channels === 1) {
-    return <SingleChannelFlexShadow {...shadowProps} />
-  } else if (channels === 8) {
-    return <EightChannelFlexShadow {...shadowProps} />
-  }
-  return <NinetySixFlexShadow {...shadowProps} />
+
+  const ShadowComponent = SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
+  return <ShadowComponent {...shadowProps} />
 }

@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     LabwareWellId,
+    PreconditionTypes,
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -402,6 +403,13 @@ class FilesAddedUpdate:
 
 
 @dataclasses.dataclass
+class PreconditionUpdate:
+    """An update that changes command preconditions flags."""
+
+    preconditions: dict[PreconditionTypes, bool]
+
+
+@dataclasses.dataclass
 class AddressableAreaUsedUpdate:
     """An update that says an addressable area has been used."""
 
@@ -476,6 +484,8 @@ class StateUpdate:
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
 
     ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
+
+    precondition_update: PreconditionUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.

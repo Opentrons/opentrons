@@ -1,4 +1,5 @@
 """Shared utilities for ot3 hardware control."""
+import copy
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
 from logging import getLogger
@@ -57,6 +58,8 @@ from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_gripper_jaw_step,
     create_tip_action_step,
+    SingleMoveStep,
+    MoveGroupSingleAxisStep,
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
@@ -374,6 +377,40 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
     motor_nodes -= hepa_uv_nodes
     # filter out usb nodes
     return {NodeId(target) for target in motor_nodes if target in NodeId}
+
+
+def add_delay_to_move_group(
+    group: MoveGroup,
+    present_nodes: Iterable[NodeId],
+    delay: Tuple[List[NodeId], float],
+) -> MoveGroup:
+    delay_nodes, delay_time = delay
+    if delay_time == 0.0:
+        return group
+
+    as_single_moves: Dict[NodeId, List[SingleMoveStep]] = {}
+    for node in present_nodes:
+        as_single_moves[node] = [step[node] for step in group]
+
+    delay_step = MoveGroupSingleAxisStep(
+        distance_mm=np.float64(0),
+        velocity_mm_sec=np.float64(0),
+        duration_sec=np.float64(delay_time),
+    )
+    for node in present_nodes:
+        if node in delay_nodes:
+            # Add the delay at the beginning
+            as_single_moves[node] = [copy.deepcopy(delay_step)] + as_single_moves[node]
+        else:
+            # Add the delay at the end.
+            as_single_moves[node] = as_single_moves[node] + [copy.deepcopy(delay_step)]
+
+    new_move_group: MoveGroup = []
+    for i in range(len(group) + 1):
+        new_move_group.append(
+            {node: as_single_moves[node][i] for node in present_nodes}
+        )
+    return new_move_group
 
 
 def create_move_group(

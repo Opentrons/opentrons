@@ -79,6 +79,12 @@ Starting in API version 2.18, you can define user-customizable variables in your
 
 Runtime parameters can customize Boolean, numerical, and string values in your protocol. And starting in API version 2.20, you can require a CSV file of data to be parsed and used in the protocol. See the [API documentation on runtime parameters](https://docs.opentrons.com/v2/runtime_parameters.html) for information on writing them into protocols, and see the [Runtime Parameters section](../touchscreen/protocol-setup.md#runtime-parameters) of the Touchscreen chapter for information on changing parameter values during run setup.
 
+### Robot motor control 
+
+Starting in API version 2.22, you can move individual robot motors like the gantry, pipette plunger, and gripper jaws with [robot motor control commands](https://docs.opentrons.com/v2/advanced_control/motor_control.html#motor-control). Use helper and movement commands to calculate and move robot axes to precise positions on the Flex deck, and gripper commands to open or close the Flex Gripper jaws. 
+
+Unlike other protocol commands, robot motor control commands execute movements independent of labware and hardware positions on the Flex. This lets you complete advanced tasks, like using 3D-printed labware in your protocols, moving the Flex's z-axis carriage without a pipette attached, or simultaneously pipetting and holding labware with the Flex Gripper. 
+
 ### Non-blocking commands
 
 Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).

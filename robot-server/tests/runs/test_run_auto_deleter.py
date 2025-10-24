@@ -15,6 +15,7 @@ from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource, ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore, RunResource, BadRunResource
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 
 
 def _make_dummy_run_resource(run_id: str, protocol_id: str) -> RunResource:
@@ -33,12 +34,14 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
     mock_run_store = decoy.mock(cls=RunStore)
     mock_protocol_store = decoy.mock(cls=ProtocolStore)
     mock_protocol_source = decoy.mock(cls=ProtocolSource)
+    mock_data_file_auto_deleter = decoy.mock(cls=DataFileAutoDeleter)
 
     subject = RunAutoDeleter(
         run_store=mock_run_store,
         protocol_store=mock_protocol_store,
         deletion_planner=RunDeletionPlanner(1),
         protocol_kind=ProtocolKind.STANDARD,
+        data_file_auto_deleter=mock_data_file_auto_deleter,
     )
 
     protocol_resources: List[ProtocolResource] = [
@@ -65,6 +68,11 @@ def test_make_room_for_new_run(decoy: Decoy, caplog: pytest.LogCaptureFixture) -
     with caplog.at_level(logging.INFO):
         subject.make_room_for_new_run()
 
+    decoy.verify(
+        mock_data_file_auto_deleter.make_room_for_new_generated_files(
+            {"run-id-1", "run-id-2", "run-id-3"}
+        )
+    )
     decoy.verify(mock_run_store.remove(run_id="run-id-1"))
     decoy.verify(mock_run_store.remove(run_id="run-id-2"))
     decoy.verify(mock_run_store.remove(run_id="run-id-3"))
@@ -83,12 +91,14 @@ def test_quick_transfer_protocol_runs(
     mock_run_store = decoy.mock(cls=RunStore)
     mock_protocol_store = decoy.mock(cls=ProtocolStore)
     mock_protocol_source = decoy.mock(cls=ProtocolSource)
+    mock_data_file_auto_deleter = decoy.mock(cls=DataFileAutoDeleter)
 
     subject = RunAutoDeleter(
         run_store=mock_run_store,
         protocol_store=mock_protocol_store,
         deletion_planner=RunDeletionPlanner(1),
         protocol_kind=ProtocolKind.QUICK_TRANSFER,
+        data_file_auto_deleter=mock_data_file_auto_deleter,
     )
 
     protocol_resources: List[ProtocolResource] = [
@@ -120,6 +130,11 @@ def test_quick_transfer_protocol_runs(
     with caplog.at_level(logging.INFO):
         subject.make_room_for_new_run()
 
+    decoy.verify(
+        mock_data_file_auto_deleter.make_room_for_new_generated_files(
+            {"run-id-2", "run-id-5", "run-id-6"}
+        )
+    )
     decoy.verify(mock_run_store.remove(run_id="run-id-2"))
     decoy.verify(mock_run_store.remove(run_id="run-id-5"))
 
