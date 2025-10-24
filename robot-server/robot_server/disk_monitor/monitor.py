@@ -1,5 +1,6 @@
 """Monitor disk space and directory usage."""
 import os
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -7,6 +8,8 @@ from fastapi import Depends
 
 from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.settings import get_settings, RobotServerSettings
+
+_FALLBACK_DEFAULT_DISK_SPACE_MB = 10_000.0
 
 
 class DiskMonitor:
@@ -22,6 +25,9 @@ class DiskMonitor:
 
     def get_available_disk_space_mb(self) -> float:
         """Get the available disk space in megabytes."""
+        if sys.platform == "win32" or not hasattr(os, "statvfs"):
+            return _FALLBACK_DEFAULT_DISK_SPACE_MB
+
         stat = os.statvfs(self._images_directory)
         available_bytes = stat.f_bavail * stat.f_frsize
 

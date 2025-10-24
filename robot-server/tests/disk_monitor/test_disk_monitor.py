@@ -1,11 +1,15 @@
 """Tests for the `DiskMonitor` class."""
 import os
+import sys
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
-from robot_server.disk_monitor.monitor import DiskMonitor
+from robot_server.disk_monitor.monitor import (
+    DiskMonitor,
+    _FALLBACK_DEFAULT_DISK_SPACE_MB,
+)
 from robot_server.settings import RobotServerSettings
 
 
@@ -33,6 +37,13 @@ def subject(images_directory: Path, mock_settings: RobotServerSettings) -> DiskM
         images_directory=images_directory,
         settings=mock_settings,
     )
+
+
+def test_get_available_disk_space_mb_on_windows(subject: DiskMonitor) -> None:
+    """It should return a constant value on Windows."""
+    with patch.object(sys, "platform", "win32"):
+        available_space = subject.get_available_disk_space_mb()
+        assert available_space == _FALLBACK_DEFAULT_DISK_SPACE_MB
 
 
 def test_is_disk_space_low_when_below_threshold(subject: DiskMonitor) -> None:
