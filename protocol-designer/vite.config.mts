@@ -58,7 +58,7 @@ export default defineConfig(
           },
         },
         sentryVitePlugin({
-          org: 'opentrons-sw',
+          org: 'opentrons-76',
           project: 'protocol-designer',
           authToken: process.env.OT_SENTRY_AUTH_TOKEN,
           release: OT_PD_VERSION,
