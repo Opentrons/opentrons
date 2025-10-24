@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { describe, expect, it } from 'vitest'
 
-import { getAllLabwareDefs, labwareImages } from '../labware'
+import { getAllDefinitions, labwareImages } from '../labware'
 
 const ignoredLoadNames = new Set([
   'opentrons_1_trash_1100ml_fixed',
@@ -22,7 +22,7 @@ const ignoredLoadNames = new Set([
 
 const loadNames = Array.from(
   new Set(
-    Object.keys(getAllLabwareDefs()).map(uri => {
+    Object.keys(getAllDefinitions()).map(uri => {
       const parts = uri.split('/')
       return parts[1] ?? uri
     })
