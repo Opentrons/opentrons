@@ -12,7 +12,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.6.1!**
 
-Protocol Designer v8.6.1 updates user information for protocol generation and software versions.
+This hotfix release updates user information for protocol generation and software versions.
 
 ## Opentrons Protocol Designer Changes in 8.6.0
 
