@@ -1,25 +1,15 @@
-# Vacuum Pump Driver
+"""Vacuum Pump Driver"""
+
 from serial import Serial # type: ignore[import]
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from time import time
 import asyncio
 import logging
-from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 
 COMMANDS = {'Pump_State': 'TurnOnPump', 
             'Set_Pressure': 'SetPressure'}
-"""
-The commands:
-TurnOnPump:1
-Will enable the pump to start controlling the pressure
-SetPressure:<pressure in mbarr>
-Will set the pressure setpoint in absolute mbarr of pressure.
-So if you want a vacuum pressure of -100mbarr, that would be:
-SetPressure:900
-since atmospheric pressure is ~1000mbarr
-"""
 
 V_BAUDRATE = 115200
 DEFAULT_V_TIMEOUT = 1
@@ -39,14 +29,43 @@ class OpentronsVacuumBase(ABC):
         ...
 
     @abstractmethod
-    def set_pressure(self, int: int = 1.0) -> int:
+    def set_pressure(self, pressure: int = 1000) -> int:
         """Set Pressure."""
         ...
 
     @abstractmethod
-    def read_continous_data(self, duration: int = 1.0) -> List:
+    def read_continous_data(self, duration: int = 1) -> List:
         """Read continous data."""
         ...
+
+
+class SimOpentronsVacuumBase(OpentronsVacuumBase):
+    """Simulating Mark 10 Driver."""
+
+    def __init__(self) -> None:
+        """Simulating Vacuum Pump Driver."""
+        self._pressure = 0.0
+        super().__init__()
+
+    def is_simulator(self) -> bool:
+        """Is a simulator."""
+        return True
+
+    def connect(self) -> None:
+        """Connect."""
+        return
+
+    def disconnect(self) -> None:
+        """Disconnect."""
+        return
+
+    def set_pressure(self, timeout: float = 1.0) -> float:
+        """Read Force."""
+        return self._pressure
+
+    def read_continous_data(self, pressure: float) -> None:
+        """Set simulation pressure."""
+        self._pressure = pressure
 
 
 class OpentronsVacuum():
@@ -95,10 +114,11 @@ class OpentronsVacuum():
             # Offload readline to another thread to avoid blocking the event loop
             return (await asyncio.to_thread(self.connection.readline)).decode("utf-8")
         except Exception as e:
-            # logger.error(f"Error reading from force gauge: {e} ")
             raise(e)
 
     async def set_pressure(self, pressure: int):
+        """Pressure(mbar), 1ATM is ~1000mbar"""
+        # Relative pressure from ~ATM, EX set 900, would be 100mbar 1000-900mbar
         command = COMMANDS['Set_Pressure'] + ':'+  str(pressure) + V_ACK
         print(command.encode())
         await self._write(command.encode())
