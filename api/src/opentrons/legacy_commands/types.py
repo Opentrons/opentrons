@@ -542,6 +542,21 @@ class MixCommand(TypedDict):
     payload: MixCommandPayload
 
 
+class DynamicMixCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    aspirate_start_location: Location
+    dispense_start_location: Location
+    aspirate_end_location: Union[None, Location]
+    dispense_end_location: Union[None, Location]
+    volume: float
+    repetitions: int
+    movement_delay: float
+
+
+class DynamicMixCommand(TypedDict):
+    name: Literal["command.MIX"]
+    payload: DynamicMixCommandPayload
+
+
 class BlowOutCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Optional[Location]
 
@@ -804,6 +819,7 @@ Command = Union[
     BlowOutCommand,
     BlowOutInDisposalLocationCommand,
     MixCommand,
+    DynamicMixCommand,
     TransferCommand,
     DistributeCommand,
     ConsolidateCommand,
@@ -906,6 +922,7 @@ CommandPayload = Union[
     BlowOutCommandPayload,
     BlowOutInDisposalLocationCommandPayload,
     MixCommandPayload,
+    DynamicMixCommandPayload,
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
@@ -997,6 +1014,10 @@ class BlowOutInDisposalLocationMessage(
 
 
 class MixMessage(CommandMessageFields, MixCommand):
+    pass
+
+
+class DynamicMixMessage(CommandMessageFields, DynamicMixCommand):
     pass
 
 
