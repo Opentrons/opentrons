@@ -7,6 +7,8 @@
 
 export type FileData = File | string
 
+export type MimeType = 'text/csv' | 'image/jpeg'
+
 export interface CsvFileData {
   id: string
   createdAt: string
@@ -21,6 +23,18 @@ export type UploadedCsvFileResponse = DataFileDataResponse
 
 export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
+}
+
+export interface RunDataFileMetadata {
+  id: string
+  stored: boolean
+  generated: boolean
+  mimeType: MimeType
+}
+
+export interface RunDataFileMetadataResponse {
+  data: RunDataFileMetadata[]
+  meta: { cursor: number; totalLength: number }
 }
 
 export type DownloadedDataFileResponse = string
