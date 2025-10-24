@@ -55,7 +55,7 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
     }
 
 
-def capture_Image(
+def capture_image(
     resolution: Optional[Tuple[int, int]],
     zoom: Optional[float],
     contrast: Optional[float],

@@ -1822,7 +1822,7 @@ class ProtocolContext(CommandPublisher):
             )
         return None
 
-    @requires_version(2, 28)
+    @requires_version(2, 27)
     def capture_image(
         self,
         home_before: Optional[bool] = False,
@@ -1843,7 +1843,7 @@ class ProtocolContext(CommandPublisher):
         :param brightness: Brightness level to be applied to an image, range is 0% to 100%.
         :param saturation: Saturation level to be applied to an image, range is 0% to 100%.
 
-        .. versionadded:: 2.28
+        .. versionadded:: 2.27
 
         """
         if home_before is True:
@@ -1851,7 +1851,7 @@ class ProtocolContext(CommandPublisher):
 
         with publish_context(
             broker=self.broker,
-            command=cmds.capture_Image(
+            command=cmds.capture_image(
                 resolution=resolution,
                 zoom=zoom,
                 contrast=contrast,
