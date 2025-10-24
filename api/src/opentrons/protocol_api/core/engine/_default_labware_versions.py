@@ -142,8 +142,6 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 4,
         "usascientific_12_reservoir_22ml": 4,
         "usascientific_96_wellplate_2.4ml_deep": 4,
-    },
-    APIVersion(2, 28): {
         "opentrons_tough_universal_lid": 2,
     },
 }
