@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -27,12 +30,24 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
+  const location = useLocation()
   const isFlex = useIsFlex(robotName)
   const isCameraEnabled = useFeatureFlag('camera')
   const { data: estopStatus, error: estopError } = useEstopQuery({
     enabled: isFlex,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
+
+  // If we are explicitly redirected to an anchor link on this page,
+  // scroll to it.
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+  }, [location])
 
   return (
     <Box
@@ -70,7 +85,9 @@ export function DeviceDetailsComponent({
         )}
       </Flex>
       {isFlex ? <DeviceDetailsDeckConfiguration robotName={robotName} /> : null}
-      <RecentProtocolRuns robotName={robotName} />
+      <Flex id="recent-protocol-runs">
+        <RecentProtocolRuns robotName={robotName} />
+      </Flex>
     </Box>
   )
 }
