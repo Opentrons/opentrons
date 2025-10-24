@@ -232,6 +232,35 @@ def mix(
     }
 
 
+def dynamic_mix(
+    instrument: InstrumentContext,
+    repetitions: int,
+    volume: float,
+    aspirate_start_location: Location,
+    aspirate_end_location: Union[Location, None],
+    dispense_start_location: Location,
+    dispense_end_location: Union[Location, None],
+    movement_delay: float,
+) -> command_types.DynamicMixCommand:
+    text = "Dynamically mixing {repetitions} times with a volume of {volume} ul".format(
+        repetitions=repetitions, volume=float(volume)
+    )
+    return {
+        "name": command_types.MIX,
+        "payload": {
+            "instrument": instrument,
+            "aspirate_start_location": aspirate_start_location,
+            "aspirate_end_location": aspirate_end_location,
+            "dispense_start_location": dispense_start_location,
+            "dispense_end_location": dispense_end_location,
+            "volume": volume,
+            "repetitions": repetitions,
+            "text": text,
+            "movement_delay": movement_delay,
+        },
+    }
+
+
 def blow_out(
     instrument: InstrumentContext, location: Location
 ) -> command_types.BlowOutCommand:
