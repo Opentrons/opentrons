@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": {
     "packages": [
+      "api-client",
       "app",
       "app-shell",
       "app-shell-odd",
@@ -12,12 +13,10 @@
       "labware-library",
       "opentrons-ai-client",
       "protocol-designer",
+      "react-api-client",
       "shared-data",
       "step-generation",
-      "api-client",
-      "react-api-client",
-      "usb-bridge/node-client",
-      "opentrons-ai-client"
+      "usb-bridge/node-client"
     ]
   },
   "config": {
