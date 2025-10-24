@@ -75,7 +75,7 @@ export function LabwareSlotContainer(
   const labwareDisplayName = labwareDef.metadata.displayName
 
   const liquidDisplayColors = Object.fromEntries(
-    liquids.map(liquid => [liquid.id, liquid.displayColor ?? COLORS.grey40])
+    liquids.map(({ id, displayColor }) => [id, displayColor ?? COLORS.grey40])
   )
   const allWellContentsForActiveItem = getAllWellContentsAtFrame(
     liquidState,
@@ -187,7 +187,7 @@ export function LabwareSlotContainer(
                           handleMouseLeaveWell(mouseEventArgs.event)
                         }}
                         onMouseEnterWell={({ wellName, event }) => {
-                          if (wellContents !== null) {
+                          if (wellContents != null) {
                             makeHandleMouseEnterWell(
                               wellName,
                               wellContents[wellName]?.ingreds

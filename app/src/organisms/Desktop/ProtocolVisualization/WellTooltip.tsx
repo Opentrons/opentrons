@@ -47,32 +47,31 @@ const initialTooltipState: TooltipState = {
   tooltipWellIngreds: null,
   tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
-export const WellTooltip = ({
+export function WellTooltip({
   children,
   ingredNames,
-}: WellTooltipProps): JSX.Element => {
+}: WellTooltipProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
-  const [tooltipState, setTooltipState] =
-    useState<TooltipState>(initialTooltipState)
+  const [tooltipState, setTooltipState] = useState<TooltipState>(
+    initialTooltipState
+  )
 
-  const makeHandleMouseEnterWell =
-    (wellName: string, wellIngreds: LocationLiquidState) =>
-    (e: MouseEvent): void => {
-      const target = e.target as HTMLElement
-      if (!target) {
-        return
-      }
-      const { left, top, height, width } = target.getBoundingClientRect()
-      if (Object.keys(wellIngreds).length > 0 && left && top) {
-        setTooltipState({
-          tooltipX: left + width / 2,
-          tooltipY: top + height / 2,
-          tooltipWellName: wellName,
-          tooltipWellIngreds: wellIngreds,
-          tooltipOffset: height / 2,
-        })
-      }
+  const makeHandleMouseEnterWell = (
+    wellName: string,
+    wellIngreds: LocationLiquidState
+  ) => (e: MouseEvent): void => {
+    const target = e.target as HTMLElement
+    const { left, top, height, width } = target.getBoundingClientRect()
+    if (Object.keys(wellIngreds).length > 0 && left && top) {
+      setTooltipState({
+        tooltipX: left + width / 2,
+        tooltipY: top + height / 2,
+        tooltipWellName: wellName,
+        tooltipWellIngreds: wellIngreds,
+        tooltipOffset: height / 2,
+      })
     }
+  }
 
   const handleMouseLeaveWell = (): void => {
     setTooltipState(initialTooltipState)

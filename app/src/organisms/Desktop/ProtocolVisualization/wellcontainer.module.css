@@ -64,3 +64,7 @@
   justify-content: center;
   padding: var(--spacing-6);
 }
+
+.svg_container {
+  padding-top: 1rem;
+}

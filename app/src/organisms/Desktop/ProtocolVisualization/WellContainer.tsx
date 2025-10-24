@@ -53,7 +53,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
   const labwareWellMaxVolume = wells.A1.totalLiquidVolume
-  const zValue = 'wellLocation' in params ? (params.wellLocation.z ?? 1) : 1
+  const zValue = 'wellLocation' in params ? params.wellLocation.z ?? 1 : 1
 
   //  TODO: add support for rest of references
   const reference =
@@ -88,82 +88,79 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
       ? getWellVolume(labwareLocationLiquidState)
       : 0
   return (
-    <>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <Tag text={t('well_view')} type="default" shrinkToContent />
-          <RobotInfoLabel
-            deckLabel={t('well_name', { wellName: activeWellName })}
-          />
-        </div>
-
-        <div>
-          <div className={styles.main_content}>
-            <div className={styles.well_detail_svg_positioning}>
-              <div className={styles.well_detail_svg_container}>
-                <TipSvg
-                  volume={tipCurrentVolume}
-                  maxVolume={tipMaxVolume}
-                  roundedXPositionPixels={roundedXPositionPixels}
-                  bottomPx={bottomPx}
-                  color={tipColor}
-                  setIsHovered={setIsTipHovered}
-                  isHovered={isTipHovered}
-                />
-                {isTipHovered ? (
-                  <div className={styles.tip_details_volume}>
-                    <Tag
-                      text={t('well_volume', {
-                        volume: tipCurrentVolume.toString(),
-                      })}
-                      type="flex"
-                    />
-                  </div>
-                ) : null}
-                {isWellHovered ? (
-                  <div className={styles.well_details_volume}>
-                    <Tag
-                      text={t('well_volume', {
-                        volume: totalVolumeInWell.toString(),
-                      })}
-                      type="flex"
-                    />
-                  </div>
-                ) : null}
-                <div style={{ paddingTop: '1rem' }}>
-                  <WellSvg
-                    volume={totalVolumeInWell}
-                    maxVolume={labwareWellMaxVolume}
-                    color={wellColor}
-                    setIsHovered={setIsWellHovered}
-                    isHovered={isWellHovered}
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <Tag text={t('well_view')} type="default" shrinkToContent />
+        <RobotInfoLabel
+          deckLabel={t('well_name', { wellName: activeWellName })}
+        />
+      </div>
+      <div>
+        <div className={styles.main_content}>
+          <div className={styles.well_detail_svg_positioning}>
+            <div className={styles.well_detail_svg_container}>
+              <TipSvg
+                volume={tipCurrentVolume}
+                maxVolume={tipMaxVolume}
+                roundedXPositionPixels={roundedXPositionPixels}
+                bottomPx={bottomPx}
+                color={tipColor}
+                setIsHovered={setIsTipHovered}
+                isHovered={isTipHovered}
+              />
+              {isTipHovered ? (
+                <div className={styles.tip_details_volume}>
+                  <Tag
+                    text={t('well_volume', {
+                      volume: tipCurrentVolume.toString(),
+                    })}
+                    type="flex"
                   />
                 </div>
-                {labwareDepth !== null && (
-                  <div className={styles.well_details_caption_side}>
-                    <StyledText
-                      desktopStyle="captionRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t('well_dimension', { number: round(labwareDepth, 0) })}
-                    </StyledText>
-                  </div>
-                )}
-                {xLabwareWellWidth !== null && (
-                  <div className={styles.well_details_caption_bottom}>
-                    <StyledText
-                      desktopStyle="captionRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t('well_dimension', { number: xLabwareWellWidth })}
-                    </StyledText>
-                  </div>
-                )}
+              ) : null}
+              {isWellHovered ? (
+                <div className={styles.well_details_volume}>
+                  <Tag
+                    text={t('well_volume', {
+                      volume: totalVolumeInWell.toString(),
+                    })}
+                    type="flex"
+                  />
+                </div>
+              ) : null}
+              <div className={styles.svg_container}>
+                <WellSvg
+                  volume={totalVolumeInWell}
+                  maxVolume={labwareWellMaxVolume}
+                  color={wellColor}
+                  setIsHovered={setIsWellHovered}
+                  isHovered={isWellHovered}
+                />
               </div>
+              {labwareDepth !== null && (
+                <div className={styles.well_details_caption_side}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {t('well_dimension', { number: round(labwareDepth, 0) })}
+                  </StyledText>
+                </div>
+              )}
+              {xLabwareWellWidth !== null && (
+                <div className={styles.well_details_caption_bottom}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {t('well_dimension', { number: xLabwareWellWidth })}
+                  </StyledText>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

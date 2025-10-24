@@ -13,6 +13,7 @@ import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   Liquid,
+  PipetteMount,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
@@ -30,10 +31,10 @@ import type {
 type WellContentsByLabware = Record<string, ContentsByWell>
 
 const VOLUME_SIG_DIGITS_DEFAULT = 2
-export function formatVolume(
+export const formatVolume = (
   inputVolume?: string | number | null,
   sigDigits: number = VOLUME_SIG_DIGITS_DEFAULT
-): string {
+): string => {
   if (typeof inputVolume === 'number') {
     const digits = inputVolume.toString().includes('.') ? sigDigits : 0
     return String(round(inputVolume, digits))
@@ -187,7 +188,7 @@ export const getWellVolume = (
   )
 
 export const getIsPipetteActive = (
-  side: 'left' | 'right',
+  side: PipetteMount,
   pipettes: RobotState['pipettes'],
   currentCommand: RunTimeCommand
 ): boolean => {
