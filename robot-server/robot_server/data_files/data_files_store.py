@@ -72,11 +72,7 @@ class DataFilesStore:
                 return _convert_row_to_data_file_info(result)
 
     def get_files_info_by_run_mime_type(
-        self,
-        run_id: str,
-        mime_type: MimeType,
-        limit: int,
-        offset: int,
+        self, run_id: str, mime_type: MimeType, offset: int, limit: Optional[int]
     ) -> DataFileWithCommandsInfoSlice:
         """Get all data files associated with a specific run, ordered oldest to newest."""
         statement = (
@@ -93,9 +89,11 @@ class DataFilesStore:
             .where(output_data_files_table.c.run_id == run_id)
             .where(data_files_table.c.mime_type == mime_type.value)
             .order_by(data_files_table.c.created_at.desc())
-            .limit(limit)
             .offset(offset)
         )
+
+        if limit is not None:
+            statement = statement.limit(limit)
 
         with self._sql_engine.begin() as transaction:
             rows = transaction.execute(statement).all()
