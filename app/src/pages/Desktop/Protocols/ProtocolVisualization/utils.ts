@@ -40,7 +40,6 @@ import type {
   LabwareTemporalProperties,
   LocationLiquidState,
   ModuleEntities,
-  PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
@@ -241,13 +240,9 @@ interface ActiveLayer {
 }
 
 export const getActiveLayer = (
-  pipettes: PipetteTemporalProperties[],
   id: string,
   selectedRunTimeCommand?: RunTimeCommand
 ): ActiveLayer => {
-  const isStepAssosciatedWithLabwareState = pipettes.some(
-    pipette => pipette.entityId === id || pipette.tiprackId === id
-  )
   const isStepAssosciatedWithLabwareId =
     selectedRunTimeCommand != null &&
     'labwareId' in selectedRunTimeCommand.params &&
@@ -259,9 +254,7 @@ export const getActiveLayer = (
     selectedRunTimeCommand.params.labwareId === id
 
   const isStepAssosciatedWithLabware =
-    isStepAssosciatedWithLabwareState ||
-    isStepAssosciatedWithLabwareId ||
-    isMoveStepAssosciatedWithLabwareId
+    isStepAssosciatedWithLabwareId || isMoveStepAssosciatedWithLabwareId
 
   return {
     isActiveLayerVisible: isStepAssosciatedWithLabware,

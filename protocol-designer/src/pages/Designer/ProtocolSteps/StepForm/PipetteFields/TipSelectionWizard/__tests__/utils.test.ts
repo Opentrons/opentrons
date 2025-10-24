@@ -35,10 +35,12 @@ const activeDeckSetup = {
     },
   },
 } as any
+const mockTiprackId = 'mockTiprackId'
 const MOCK_ADAPTER_ID = 'mockAdapterId'
 const MOCK_ADAPTER_URI = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 const labware = {
+  id: mockTiprackId,
   labwareDefURI: MOCK_TIPRACK_URI,
   stack: ['A1'],
 } as LabwareOnDeck
@@ -61,6 +63,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(true)
   })
@@ -73,6 +76,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(false)
   })
@@ -86,6 +90,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(false)
   })
@@ -99,6 +104,7 @@ describe('getIsTiprackSelectable', () => {
         pipetteSpecs: { channels: 1 } as PipetteV2Specs,
         nozzles: ALL,
         labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(false)
   })
@@ -116,6 +122,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(true)
   })
@@ -133,6 +140,7 @@ describe('getIsTiprackSelectable', () => {
         labwareEntities: {
           [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
         },
+        validTiprackIds: [mockTiprackId],
       })
     ).toBe(false)
   })
@@ -149,11 +157,12 @@ describe('getIsTiprackSelectable', () => {
               stack: [MOCK_ADAPTER_ID],
             },
             formTiprackUri: MOCK_TIPRACK_URI,
-            pipetteSpecs: { channels: channels } as PipetteV2Specs,
+            pipetteSpecs: { channels } as PipetteV2Specs,
             nozzles: ALL,
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            validTiprackIds: [mockTiprackId],
           })
         ).toBe(false)
       })
@@ -166,11 +175,12 @@ describe('getIsTiprackSelectable', () => {
               stack: [],
             },
             formTiprackUri: MOCK_TIPRACK_URI,
-            pipetteSpecs: { channels: channels } as PipetteV2Specs,
+            pipetteSpecs: { channels } as PipetteV2Specs,
             nozzles: ALL,
             labwareEntities: {
               [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
             },
+            validTiprackIds: [mockTiprackId],
           })
         ).toBe(true)
       })

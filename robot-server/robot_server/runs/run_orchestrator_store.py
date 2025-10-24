@@ -280,6 +280,7 @@ class RunOrchestratorStore:
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
             file_provider=file_provider,
+            camera_provider=camera_provider,
             notify_publishers=notify_publishers,
         )
 
@@ -332,6 +333,7 @@ class RunOrchestratorStore:
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
         command_annotations = self.run_orchestrator.get_command_annotations()
+        preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
             self._run_orchestrator.clear_command_history()
@@ -342,6 +344,7 @@ class RunOrchestratorStore:
             commands=commands,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=preconditions,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?

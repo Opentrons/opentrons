@@ -297,6 +297,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -304,6 +305,13 @@ export const useLabwareDropdownOptions = (
         labwareId
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
+      const topId = fullStackFromLabwares[0]
+      const isLabwareLidCombo =
+        (fullStackFromLabwares[1] === labwareId &&
+          labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('adapter')) ??
+        false
       const isLabwareInTrash =
         deckSlot === 'gripperWasteChute' ||
         MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
@@ -325,12 +333,14 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        !isTopOfStack
+        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'labware' && !isTopOfStack)
           ? acc
           : [
               ...acc,
@@ -387,9 +397,29 @@ export const getUnoccupiedStackOptions = (args: {
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
       const { displayName } = labwareOnDeckDef.metadata
-      const { loadName } = labwareOnDeckDef.parameters
+      const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
+      const isUniversalLid =
+        def.parameters.loadName === 'opentrons_tough_universal_lid'
+      const isLabwareOnSlotTuberack =
+        labwareOnDeckDef.metadata.displayCategory === 'tubeRack'
+      const isLabwareOnSlotAluminumBlock =
+        labwareOnDeckDef.metadata.displayCategory === 'aluminumBlock'
+      const isLabwareOnSlotTiprack = labwareOnDeckDef.parameters.isTiprack
 
-      const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
+      const allowedRoles = labwareOnDeckDef.allowedRoles ?? []
+      const isLidRole = allowedRoles.includes('lid')
+
+      const isCompatible =
+        labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
+        // allow universal lid can go anywhere except for tubeRacks, aluminum blocks, and tipracks and other lids
+        // since it doesn't have a labwareCompatibleLabware array, we need to special-case it, huhu
+        (isUniversalLid &&
+          !isLabwareOnSlotTuberack &&
+          !isLabwareOnSlotAluminumBlock &&
+          !isLabwareOnSlotTiprack &&
+          (labwareOnDeckLoadName === 'opentrons_tough_universal_lid' ||
+            !isLidRole))
+
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )

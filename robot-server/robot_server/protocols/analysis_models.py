@@ -7,6 +7,7 @@ from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
     CommandAnnotation,
+    CommandPreconditions,
 )
 from opentrons_shared_data.robot.types import RobotType
 from pydantic import BaseModel, Field
@@ -202,6 +203,10 @@ class CompletedAnalysis(BaseModel):
     commandAnnotations: List[CommandAnnotation] = Field(
         default_factory=list,
         description="Optional annotations for commands in this run.",
+    )
+    commandPreconditions: Optional[CommandPreconditions] = Field(
+        default=None,
+        description="Optional preconditions for commands used in this run.",
     )
 
 

@@ -303,7 +303,7 @@ class StackerStoredLabwareGroup(BaseModel):
 
 @dataclass
 class StackerPoolDefinition:
-    """Represents an internal configuraiton of stored labware."""
+    """Represents an internal configuration of stored labware."""
 
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None

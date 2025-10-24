@@ -93,7 +93,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         flow_rate: float,
         in_place: bool,
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        end_location: Optional[types.Location] = None,
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -139,7 +142,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         in_place: bool,
         push_out: Optional[float],
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        end_location: Optional[types.Location] = None,
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:

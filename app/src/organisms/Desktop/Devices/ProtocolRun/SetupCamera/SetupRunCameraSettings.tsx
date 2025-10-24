@@ -6,10 +6,10 @@ import { ToggleButton } from '/app/atoms/buttons'
 
 import styles from './setupcamera.module.css'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
-  settings: UseStubCameraUsageSettingsResult
+  settings: UseCameraUsageSettingsResult
 }
 
 export function SetupRunCameraUsage({

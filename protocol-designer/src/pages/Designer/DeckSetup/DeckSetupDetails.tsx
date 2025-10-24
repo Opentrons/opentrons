@@ -189,6 +189,17 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         )
       : null
 
+  // make sure the top labware (lid) is rendered first in the stack if
+  // it gets moved there later on
+  const sortedLabware = [...allLabware].sort((a, b) => {
+    // get how deep each labware is in its stack
+    const aDepth = a.stack.length
+    const bDepth = b.stack.length
+
+    // render deeper stacks last (on top)
+    return aDepth - bDepth
+  })
+
   return (
     <>
       {/* all modules */}
@@ -438,7 +449,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         })}
 
       {/* all labware on deck NOT those in modules */}
-      {allLabware.map(labware => {
+      {sortedLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
           allModules.some(m => labware.stack.includes(m.id)) ||

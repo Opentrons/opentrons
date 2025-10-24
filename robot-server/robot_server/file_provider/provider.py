@@ -1,33 +1,30 @@
 """Executor for Protocol Engine File Provider callbacks."""
 import os
 import asyncio
+import hashlib
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 from fastapi import Depends
-from pydantic import BaseModel
-from datetime import datetime
+
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from robot_server.data_files.models import DataFileSource
+from opentrons_shared_data.data_files import (
+    OutputDataFileInfo,
+    DataFileInfo,
+    CmdDataFileInfo,
+)
 from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
+    ImageCaptureCmdFileNameMetadata,
 )
-
-
-class RunFileNameMetadata(BaseModel):
-    """Data from the run used that may be used to build a finalized file name."""
-
-    robot_name: str
-    run_created_at: datetime
-    protocol_name: Optional[str]
 
 
 class FileProviderExecutor:
@@ -36,6 +33,7 @@ class FileProviderExecutor:
     def __init__(
         self,
         data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
+        images_directory: Annotated[Path, Depends(get_images_directory)],
         data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     ) -> None:
         """Initialize the file provider executor.
@@ -45,31 +43,26 @@ class FileProviderExecutor:
             data_files_store: The data files store utilized for database interaction when creating files.
         """
         self._data_files_directory = data_files_directory
+        self._images_directory = images_directory
         self._data_files_store = data_files_store
-        self._run_metadata: RunFileNameMetadata | None = None
 
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
 
-    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
-        """Sets metadata specific to the run."""
-        self._run_metadata = metadata
-
-    def clear_run_metadata(self) -> None:
-        """Clears metadata specific to the run."""
-        self._run_metadata = None
-
     async def write_file_cb(
         self,
         file_data: FileData,
-    ) -> str:
-        """Write the provided file data to disk. Returns the File ID of the created file."""
+    ) -> DataFileInfo:
+        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
         async with self._lock:
             file_id = await get_unique_id()
             final_filename = self._format_filename(file_data, file_id)
             final_filepath = self._format_filepath(
                 filename=final_filename, file_id=file_id, file_data=file_data
             )
+            md5sum = self._get_md5sum(file_data)
+            command_id = file_data.command_metadata.command_id
+            prev_command_id = file_data.command_metadata.prev_command_id
 
             os.makedirs(os.path.dirname(final_filepath), exist_ok=True)
 
@@ -80,18 +73,28 @@ class FileProviderExecutor:
             file_info = DataFileInfo(
                 id=file_id,
                 name=final_filename,
-                file_hash="",
+                file_hash=md5sum,
+                path=str(final_filepath),
                 created_at=created_at,
-                source=DataFileSource.GENERATED,
+                mime_type=file_data.mime_type,
+                stored=True,
+                generated=True,
             )
+            output_file_info = OutputDataFileInfo(
+                file_id=file_id,
+                run_id=file_data.run_metadata.run_id,
+                command_info=CmdDataFileInfo(
+                    command_id=command_id, prev_command_id=prev_command_id
+                ),
+            )
+
             await self._data_files_store.insert(file_info)
-            return file_id
+            await self._data_files_store.insert_output_file(output_file_info)
+            return file_info
 
     async def filecount_cb(self) -> int:
         """Return the current count of generated files stored within the data files directory."""
-        data_file_usage_info = self._data_files_store.get_usage_info(
-            DataFileSource.GENERATED
-        )
+        data_file_usage_info = self._data_files_store.get_usage_info(generated=True)
         return len(data_file_usage_info)
 
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
@@ -104,6 +107,27 @@ class FileProviderExecutor:
                 base_name = base_name[:-4]
 
             return base_name + str(metadata.wavelength) + "nm.csv"
+        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            cmd_metadata = file_data.command_metadata
+            base_name = (
+                f"{cmd_metadata.base_filename}_" if cmd_metadata.base_filename else ""
+            )
+            protocol_name = file_data.run_metadata.protocol_name or ""
+
+            return (
+                base_name
+                + file_data.run_metadata.robot_name
+                + "_"
+                + protocol_name
+                + "_"
+                + str(file_data.run_metadata.run_created_at)
+                + "_"
+                + str(cmd_metadata.step_number)
+                + "_"
+                + str(cmd_metadata.command_timestamp)
+                + ".jpeg"
+            )
+
         else:
             return f"{file_id}.dat"
 
@@ -113,5 +137,11 @@ class FileProviderExecutor:
         """Given a finalized filename, return the full filepath for the filename."""
         if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
             return self._data_files_directory / file_id / filename
+        elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
+            return self._images_directory / file_data.run_metadata.run_id / filename
         else:
             return self._data_files_directory / filename
+
+    def _get_md5sum(self, file_data: FileData) -> str:
+        """Returns the md5 checksum of the provided file data."""
+        return hashlib.md5(file_data.data).hexdigest()

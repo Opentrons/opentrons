@@ -8,12 +8,9 @@ from automation.analyze import gen_analyses_files
 from automation.data.collect import protocols_under_test
 from automation.data.protocol import Protocol
 from citools.generate_analyses import ANALYSIS_SUFFIX
-from rich.console import Console
 from syrupy.types import SerializableData
 
 from tests.custom_json_snapshot_extension import CustomJSONSnapshotExtension
-
-console = Console()
 
 
 @pytest.fixture
@@ -69,11 +66,9 @@ def test_analysis_snapshot(snapshot_custom: SerializableData, protocol: Protocol
         "analysis_results",
         f"{protocol.file_stem}_{ANALYSIS_SUFFIX}",
     )
-    console.print(f"Analysis file: {analysis}")
     if analysis.exists():
         with open(analysis, "r") as f:
             data = json.load(f)
-            print(f"Test name: {protocol.file_stem}")
             data = sort_all_lists(data, sort_key="name")
         assert snapshot_custom(name=protocol.file_stem) == data
     else:

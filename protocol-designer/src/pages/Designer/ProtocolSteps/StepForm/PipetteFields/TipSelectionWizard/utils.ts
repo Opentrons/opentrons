@@ -1,7 +1,9 @@
 import {
   ALL,
+  COLUMN,
   getIsTiprack,
   getPositionFromSlotId,
+  SINGLE,
 } from '@opentrons/shared-data'
 import {
   COLUMN_4_SLOTS,
@@ -10,6 +12,7 @@ import {
 
 import type {
   DeckDefinition,
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
@@ -118,10 +121,17 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
+  validTiprackIds: string[]
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const { labware, formTiprackUri, pipetteSpecs, nozzles, labwareEntities } =
-    args
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+  } = args
   const { channels } = pipetteSpecs
   const { def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
@@ -136,6 +146,37 @@ export function getIsTiprackSelectable(args: {
     getIsTiprack(def) &&
     labwareDefURI === formTiprackUri &&
     !COLUMN_4_SLOTS.includes(slot) &&
-    isPickupCompatibleWithPossibleAdapter
+    isPickupCompatibleWithPossibleAdapter &&
+    validTiprackIds.includes(labware.id)
   )
+}
+
+export const getAllWellsInColumn = (
+  wellName: string,
+  labwareDef: LabwareDefinition
+): string[] => {
+  const column = getColumnFromWellName(wellName)
+  return Object.keys(labwareDef.wells).filter(
+    well => getColumnFromWellName(well) === column
+  )
+}
+
+export const getAffectedWells = (args: {
+  wellName: string | null
+  labwareDef: LabwareDefinition
+  channels: number
+  nozzles: NozzleConfigurationStyle
+}): string[] => {
+  const { wellName, labwareDef, channels, nozzles } = args
+  if (wellName == null) {
+    return []
+  }
+  if (channels === 1 || nozzles === SINGLE) {
+    return [wellName]
+  } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
+    return getAllWellsInColumn(wellName, labwareDef)
+  } else if (channels === 96) {
+    return Object.keys(labwareDef.wells)
+  }
+  return []
 }

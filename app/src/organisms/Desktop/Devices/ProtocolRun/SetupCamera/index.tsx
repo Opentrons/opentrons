@@ -12,10 +12,10 @@ import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/
 
 import styles from './setupcamera.module.css'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
-  settings: UseStubCameraUsageSettingsResult
+  settings: UseCameraUsageSettingsResult
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
 }
@@ -64,8 +64,8 @@ function CameraRequiredNotification(): JSX.Element {
 }
 
 interface CameraStatusProps {
-  toggleCameraEnabled: UseStubCameraUsageSettingsResult['toggleCameraEnabled']
-  isCameraEnabled: UseStubCameraUsageSettingsResult['isCameraEnabled']
+  toggleCameraEnabled: UseCameraUsageSettingsResult['toggleCameraEnabled']
+  isCameraEnabled: UseCameraUsageSettingsResult['isCameraEnabled']
 }
 
 function CameraStatus({

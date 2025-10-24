@@ -13,10 +13,11 @@
   "calibration/calibrateModule": "Calibrate",
   "calibration/calibratePipette": "Calibrate",
   "calibration/moveToMaintenancePosition": "Calibrate",
+  "captureImage": "Take a photo",
   "comment": "Comment",
   "configureForVolume": "Configure",
   "configureNozzleLayout": "Configure",
-  "createTimer": "Create tiimer",
+  "createTimer": "Create timer",
   "custom": "Custom",
   "delay": "Wait",
   "dispense": "Dispense",
@@ -108,7 +109,7 @@
   "unsafe/updatePositionEstimators": "Unsafe",
   "unsealPipetteFromTip": "Unseal pipette",
   "verifyTipPresence": "Tip presence",
-  "waitForDuration": "WaitForDuration",
+  "waitForDuration": "Wait",
   "waitForResume": "Wait",
   "waitForTasks": "Wait"
 }

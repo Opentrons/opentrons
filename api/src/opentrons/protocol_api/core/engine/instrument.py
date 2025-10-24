@@ -203,7 +203,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         flow_rate: float,
         in_place: bool,
         meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
+        end_location: Optional[Location] = None,
+        end_meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -215,7 +218,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             in_place: whether this is a in-place command.
             meniscus_tracking: Optional data about where to aspirate from.
         """
-        if meniscus_tracking == MeniscusTrackingTarget.START:
+        if meniscus_tracking == MeniscusTrackingTarget.START and end_location is None:
             raise ValueError("Cannot aspirate at the starting liquid height.")
         if well_core is None:
             if not in_place:
@@ -262,9 +265,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_location=well_location,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
-            if dynamic_liquid_tracking:
-                # TODO replace this declaration with an argument, leaving it like this until I do that ticket
-                end_location: Optional[Location] = None
+            # the dynamic liquid tracking flag is for the prototype dynamic tracking method
+            if dynamic_liquid_tracking or end_location is not None:
                 # Keep this part when above TODO is done
                 if end_location is None:
                     end_location = location
@@ -276,7 +278,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     well_name=well_name,
                     absolute_point=end_location.point,
                     location_type=WellLocationFunction.LIQUID_HANDLING,
-                    meniscus_tracking=meniscus_tracking,
+                    meniscus_tracking=end_meniscus_tracking,
                 )
                 assert isinstance(end_well_location, LiquidHandlingWellLocation)
                 self._engine_client.execute_command(
@@ -289,6 +291,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         volume=volume,
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
+                        movement_delay=movement_delay,
                     )
                 )
             else:
@@ -316,7 +319,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         in_place: bool,
         push_out: Optional[float],
         meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
+        end_location: Optional[Location] = None,
+        end_meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -392,10 +398,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            if dynamic_liquid_tracking:
-                # TODO replace this declaration with an argument, leaving it like this until I do that ticket
-                end_location: Optional[Location] = None
-                # Keep this part when above TODO is done
+            # the dynamic liquid tracking flag is for the prototype dynamic tracking method
+            if dynamic_liquid_tracking or end_location is not None:
                 if end_location is None:
                     end_location = location
                 (
@@ -406,7 +410,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     well_name=well_name,
                     absolute_point=end_location.point,
                     location_type=WellLocationFunction.LIQUID_HANDLING,
-                    meniscus_tracking=meniscus_tracking,
+                    meniscus_tracking=end_meniscus_tracking,
                 )
                 assert isinstance(end_well_location, LiquidHandlingWellLocation)
                 self._engine_client.execute_command(
@@ -420,6 +424,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         flowRate=flow_rate,
                         pushOut=push_out,
                         correctionVolume=correction_volume,
+                        movement_delay=movement_delay,
                     )
                 )
             else:
