@@ -86,6 +86,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useAttachedModules } from '/app/resources/modules'
 import {
@@ -857,6 +858,7 @@ export function ProtocolSetup(): JSX.Element {
     protocolName,
   })
   const offsetSource = useSelector(selectOffsetSource(runId))
+  const storageInfo = useRobotStorageInfo()
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -909,6 +911,7 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={cameraSettingsConfirmed}
         confirmCameraPreferences={confirmCameraSettings}
+        storageInfo={storageInfo}
       />
     ),
     'view only parameters': (
