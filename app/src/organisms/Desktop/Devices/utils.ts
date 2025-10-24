@@ -5,22 +5,32 @@ import type {
   Mount,
 } from '/app/redux/pipettes/types'
 
-export function downloadFile(data: object | string, fileName: string): void {
-  // Create a blob with the data we want to download as a file
-  const blobContent = typeof data === 'string' ? data : JSON.stringify(data)
-  const blob = new Blob([blobContent], { type: 'text/json' })
-  // Create an anchor element and dispatch a click event on it
-  // to trigger a download
+export function downloadFile(
+  data: Blob | ArrayBuffer | object | string,
+  fileName: string,
+  mimeType?: string
+): void {
+  const createBlob = (data: Blob | ArrayBuffer | object | string): Blob => {
+    if (data instanceof Blob) {
+      return data
+    }
+    if (data instanceof ArrayBuffer) {
+      return new Blob([data])
+    }
+    const content = typeof data === 'string' ? data : JSON.stringify(data)
+    return new Blob([content], { type: mimeType ?? 'text/json' })
+  }
+
+  const blob = createBlob(data)
+
+  const url = window.URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.download = fileName
-  a.href = window.URL.createObjectURL(blob)
-  const clickEvt = new MouseEvent('click', {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  })
-  a.dispatchEvent(clickEvt)
+  a.href = url
+  a.click()
+
   a.remove()
+  window.URL.revokeObjectURL(url)
 }
 
 export function getIs96ChannelPipetteAttached(
