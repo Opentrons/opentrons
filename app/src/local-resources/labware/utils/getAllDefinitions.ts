@@ -27,11 +27,7 @@ const getOnlyLatestDefs = (
 }
 
 export function getAllLatestDefs(): LabwareDefinition[] {
-  const allDefs = Object.values(getAllDefinitions()).filter(
-    (d: LabwareDefinition) =>
-      // eslint-disable-next-line @typescript-eslint/prefer-includes
-      LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
-  )
+  const allDefs = Object.values(getAllDefinitions(LABWAREV2_DO_NOT_LIST))
   const definitions = getOnlyLatestDefs(allDefs)
 
   return definitions

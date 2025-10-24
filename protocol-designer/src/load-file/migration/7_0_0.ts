@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { uuid } from '../../utils'
@@ -65,7 +65,7 @@ export const migrateFile = (
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
-  const allLabwareDefs = getAllLabwareDefs()
+  const allLabwareDefs = getAllDefinitions()
 
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
