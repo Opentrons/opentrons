@@ -92,7 +92,8 @@ plugins:
           aggregator:
             enabled: true
             output: Opentrons-Flex-Instruction-Manual.pdf
-            covers: none
+          stylesheets:
+            - docs/print-pdf.css
 
 markdown_extensions:
   - admonition

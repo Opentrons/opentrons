@@ -1,0 +1,12 @@
+@page {
+  margin-bottom: 2cm;
+
+  @bottom-right {
+    content: "Page " counter(page);
+    font-size: 10pt;
+    font-family: "Public Sans", sans-serif;
+    color: #4A4C4E;
+    padding-right: 10mm;
+    vertical-align: top;
+  }
+}
