@@ -167,6 +167,7 @@ async def test_analyze(
     )
 
     command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -199,6 +200,7 @@ async def test_analyze(
             ),
             parameters=[bool_parameter],
             command_annotations=[command_annotation],
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -218,6 +220,7 @@ async def test_analyze(
             liquids=[],
             liquidClasses=[],
             command_annotations=[command_annotation],
+            command_preconditions=command_preconditions,
         )
     )
 

@@ -24,7 +24,11 @@ from opentrons.protocol_engine import (
     Liquid,
 )
 from opentrons import config
-from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
+from opentrons.protocol_engine.types import (
+    BooleanParameter,
+    CSVParameter,
+    CommandPreconditions,
+)
 from opentrons.protocol_runner import RunResult
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -166,6 +170,12 @@ def command_annotations() -> List[pe_types.CommandAnnotation]:
             machineReadableName="hello world",
         )
     ]
+
+
+@pytest.fixture
+def command_preconditions() -> CommandPreconditions:
+    """Get a CommandPreconditions result."""
+    return CommandPreconditions(isCameraUsed=False)
 
 
 @pytest.fixture
@@ -731,6 +741,7 @@ async def test_update_current(
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
     command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -748,6 +759,7 @@ async def test_update_current(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -878,6 +890,7 @@ async def test_create_archives_existing(
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
     command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -898,6 +911,7 @@ async def test_create_archives_existing(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 

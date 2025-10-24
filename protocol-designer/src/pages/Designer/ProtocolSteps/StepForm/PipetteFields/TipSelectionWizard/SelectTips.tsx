@@ -7,7 +7,9 @@ import {
   Chip,
   COLORS,
   Flex,
+  INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
+  NO,
   SELECTED,
   SELECTED_ERROR,
   SELECTED_USED,
@@ -23,13 +25,14 @@ import {
 import { EMPTY, getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TIP_STATE_TO_TIP_TYPE } from './constants'
 import { DeckOverlay } from './DeckOverlay'
-import { PipetteShadow } from './PipetteShadows/PipetteFlexShadow'
+import { PipetteShadow } from './PipetteShadows/PipetteShadow'
 import { TipLegend } from './TipLegend'
 import styles from './tipselectionwizard.module.css'
 import {
@@ -62,6 +65,7 @@ export function SelectTips(
 ): JSX.Element {
   const { t } = useTranslation('tip_selection')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
+  const robotType = useSelector(getRobotType)
   const [hoveredWell, setHoveredWell] = useState<string | null>(null)
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const currentHoveredWellRef = useRef<string | null>(null)
@@ -216,9 +220,10 @@ export function SelectTips(
     const tipState = robotState?.tipState.tipracks[selectedTiprackId ?? '']
     const selectedWellsByIndex = selectedTips.reduce<Record<string, number>>(
       (acc, tipList, index) => {
-        const innerAcc = tipList.reduce<Record<string, number>>((acc, tip) => {
-          return { ...acc, [tip]: index }
-        }, {})
+        const innerAcc = tipList.reduce<Record<string, number>>(
+          (acc, tip) => ({ ...acc, [tip]: index }),
+          {}
+        )
         return { ...acc, ...innerAcc }
       },
       {}
@@ -230,6 +235,9 @@ export function SelectTips(
             (acc, [wellName, state]) => {
               const rawState = TIP_STATE_TO_TIP_TYPE[state]
               let status = rawState
+              if (!tipAccessibileStatusByWellName[wellName]) {
+                status = rawState === NO ? NO : INACCESSIBLE
+              }
               if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
                 status = rawState === USED ? SELECTED_USED : SELECTED
               } else if (allWellsAffectedByHover.includes(wellName)) {
@@ -267,6 +275,7 @@ export function SelectTips(
         />
         {hoveredWell != null ? (
           <PipetteShadow
+            robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
