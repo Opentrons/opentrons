@@ -105,7 +105,7 @@ function getAllImages(): Record<string, string> {
 
 const loadNames = Array.from(
   new Set(
-    Object.keys(getAllLabwareDefs()).map(uri => {
+    Object.keys(getAllDefinitions()).map(uri => {
       const parts = uri.split('/')
       return parts[1] ?? uri
     })
