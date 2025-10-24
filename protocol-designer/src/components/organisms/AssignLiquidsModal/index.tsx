@@ -282,8 +282,8 @@ export function LiquidLayoutOverlayModalContainer({
         onClick: () => {
           dispatch(
             removeWellsContents({
-              labwareId: labwareId,
-              wells: allWellContents[labwareId].groupIds[0],
+              labwareId: labwareId ?? '',
+              wells: allWellContents[labwareId ?? '']?.groupIds[0] ?? '',
             })
           )
         },

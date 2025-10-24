@@ -22,7 +22,6 @@ import {
   openIngredientsSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
-import { saveProtocolFile } from '/protocol-designer/load-file/actions'
 import {
   getInitialDeckSetup,
   getLabwareEntities,
@@ -73,19 +72,14 @@ export function LabwareStackToolbox({
     labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
   const handleAddAnotherLabware = (): void => {
-    console.log('labwareEntities[labwareId]', labwareEntities[labwareId])
-    // recreate the stack
-    const arrayOfLabwareDefURI = Array(parseInt(labwareStack.length) - 1).fill(
-      labwareEntities[labwareId ?? '']?.labwareDefURI ?? ''
-    )
-    const createdIds = dispatch(
+    dispatch(
       createContainer({
-        labwareDefURIStack: arrayOfLabwareDefURI as string[],
+        labwareDefURIStack: [
+          labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
+        ],
         slot: labwareId ?? '',
       })
-    ) as string[]
-    console.log('createdIds', createdIds)
-    dispatch(openIngredientSelector(createdIds[0] ?? ''))
+    )
   }
 
   const handleSelectAllLabware = (): void => {

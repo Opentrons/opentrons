@@ -17,6 +17,7 @@ import type {
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  OpenIngredientSelectorAction,
   ZoomedIntoSlotAction,
 } from './actions'
 
@@ -55,7 +56,10 @@ export const renameLabware: (
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction | string[]
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const createdIds: string[] = []
   const { labwareDefURIStack, slot } = args
@@ -88,6 +92,13 @@ export const createContainer: (
           displayCategory: labwareDisplayCategory,
         },
       })
+
+      if (args.updateSelectedContainerId) {
+        dispatch({
+          type: 'OPEN_INGREDIENT_SELECTOR',
+          payload: id,
+        })
+      }
 
       if (isTiprack) {
         // Tipracks cannot be named, but should auto-increment.
