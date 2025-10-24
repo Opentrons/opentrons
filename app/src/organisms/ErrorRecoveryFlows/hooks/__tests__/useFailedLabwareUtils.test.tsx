@@ -20,7 +20,7 @@ vi.mock('@opentrons/shared-data', async () => {
   return {
     ...actual,
     getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
-    getAllLabwareDefs: vi.fn(() => ({
+    getAllDefinitions: vi.fn(() => ({
       'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
         some: 'definition',
       },
@@ -46,7 +46,7 @@ vi.mock('@opentrons/shared-data', async () => {
   return {
     ...actual,
     getLabwareDisplayName: vi.fn(() => 'Mock Labware Name'),
-    getAllLabwareDefs: vi.fn(() => ({
+    getAllDefinitions: vi.fn(() => ({
       'opentrons/thermoscientificnunc_96_wellplate_1300ul/1': {
         some: 'definition',
       },
