@@ -1,4 +1,5 @@
 import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+import { AUTOMATIC } from '@opentrons/step-generation'
 
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -36,6 +37,9 @@ export const mixFormToArgs = (
     blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
+    tip_tracking,
+    tips_selected,
+    tiprack_selected,
   } = castFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
@@ -122,5 +126,8 @@ export const mixFormToArgs = (
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
+    tip_tracking: tip_tracking ?? AUTOMATIC,
+    tips_selected: tips_selected ?? [],
+    tiprack_selected: tiprack_selected ?? null,
   }
 }
