@@ -12,16 +12,21 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
+  Link,
   MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_HIDDEN,
   RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDataFileQuery } from '@opentrons/react-api-client'
+import {
+  useAllRunImagesRaw,
+  useDataFileQuery,
+} from '@opentrons/react-api-client'
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -33,6 +38,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
+import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -45,6 +51,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
+  protocolName: string
   robotName: string
 }
 
@@ -60,7 +67,9 @@ export function HistoricalProtocolRunDrawer(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) ?? []
-  const runDataFileIds =
+  const totalOutputFileCount =
+    outputFileIds.jpeg.length + outputFileIds.csv.length
+  const runCsvFileIds =
     'runTimeParameters' in run
       ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
           if (parameter.type === 'csv_file') {
@@ -71,7 +80,7 @@ export function HistoricalProtocolRunDrawer(
           return acc
         }, [])
       : []
-  runDataFileIds.push(...outputFileIds.csv)
+  runCsvFileIds.push(...outputFileIds.csv)
 
   const uniqueLabwareOffsets = allLabwareOffsets.filter(
     (offset, index, array) => {
@@ -133,7 +142,7 @@ export function HistoricalProtocolRunDrawer(
   ) : null
 
   const protocolFilesData =
-    runDataFileIds.length === 0 ? (
+    totalOutputFileCount === 0 ? (
       <InfoScreen content={t('no_files_included')} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -172,7 +181,14 @@ export function HistoricalProtocolRunDrawer(
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {runDataFileIds.map((fileId, index) => {
+          {outputFileIds.jpeg.length > 0 && (
+            <ImagesFileDataRow
+              run={run}
+              robotName={robotName}
+              protocolName={props.protocolName}
+            />
+          )}
+          {runCsvFileIds.map((fileId, index) => {
             return <CsvFileDataRow key={`csv_file_${index}`} fileId={fileId} />
           })}
         </Flex>
@@ -348,6 +364,70 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
       </Box>
       <Box width="34%">
         <DownloadCsvFileLink fileId={fileId} fileName={name} />
+      </Box>
+    </Flex>
+  )
+}
+
+function ImagesFileDataRow({
+  run,
+  protocolName,
+  robotName,
+}: {
+  run: RunData
+  protocolName: string
+  robotName: string
+}): JSX.Element {
+  const { t } = useTranslation('run_details')
+  const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
+  const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
+  const buildImagesZipName = (): string =>
+    `${robotName}_${protocolName}_${runTimestamp}_${t('images')}.zip`
+
+  return (
+    <Flex
+      justifyContent={JUSTIFY_FLEX_START}
+      alignItems={ALIGN_CENTER}
+      padding={SPACING.spacing12}
+      backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius4}
+      gridGap={SPACING.spacing24}
+    >
+      <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
+        <LegacyStyledText
+          as="p"
+          css={css`
+            overflow: ${OVERFLOW_HIDDEN};
+            text-overflow: ellipsis;
+          `}
+        >
+          {buildImagesZipName()}
+        </LegacyStyledText>
+      </Flex>
+      <Box width="33%">
+        <LegacyStyledText as="p">{runTimestamp}</LegacyStyledText>
+      </Box>
+      <Box width="34%">
+        <Link
+          role="button"
+          css={
+            imagesZipFile == null
+              ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+              : TYPOGRAPHY.linkPSemiBold
+          }
+          onClick={() => {
+            if (imagesZipFile != null) {
+              downloadFile(imagesZipFile, buildImagesZipName())
+            }
+          }}
+        >
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+            <LegacyStyledText as="p">
+              {isLoading ? t('loading') : t('download')}
+            </LegacyStyledText>
+            {!isLoading && <Icon name="download" size="1rem" />}
+          </Flex>
+        </Link>
       </Box>
     </Flex>
   )

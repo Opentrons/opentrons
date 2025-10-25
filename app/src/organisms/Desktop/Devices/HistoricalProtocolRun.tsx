@@ -145,7 +145,9 @@ export function HistoricalProtocolRun(
           />
         </Flex>
       </Flex>
-      {drawerOpen ? <Drawer run={run} robotName={robotName} /> : null}
+      {drawerOpen ? (
+        <Drawer run={run} robotName={robotName} protocolName={protocolName} />
+      ) : null}
     </>
   )
 }
