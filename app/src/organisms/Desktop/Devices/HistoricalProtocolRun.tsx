@@ -40,6 +40,8 @@ interface HistoricalProtocolRunProps {
   protocolKey?: string
 }
 
+// TODO(jh, 10-24-25): Refactor this component and children component to a
+//  singularly exported namespace.
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
@@ -142,6 +144,7 @@ export function HistoricalProtocolRun(
             runId={run.id}
             robotName={robotName}
             robotIsBusy={robotIsBusy}
+            runHasImages={imageFileCount > 0}
           />
         </Flex>
       </Flex>
