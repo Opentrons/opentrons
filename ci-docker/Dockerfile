@@ -73,10 +73,7 @@ RUN ARCH=$(dpkg --print-architecture) && \
         ln -sf ${NODE_DIR}/bin/node /usr/local/bin/node && \
         ln -sf ${NODE_DIR}/bin/npm /usr/local/bin/npm && \
         ln -sf ${NODE_DIR}/bin/npx /usr/local/bin/npx && \
-        ln -sf ${NODE_DIR}/bin/corepack /usr/local/bin/corepack && \
-        corepack enable && \
         npm install --global yarn@1.22.19 && \
-        npm install --global corepack@0.31.0 && \
         rm -f /tmp/node.tar.xz
 
 # Align Python tooling with composite setup-py action.
