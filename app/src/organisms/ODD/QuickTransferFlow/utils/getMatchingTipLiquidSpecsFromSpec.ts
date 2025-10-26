@@ -1,4 +1,4 @@
-import { getAllLabwareDefs, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import { getAllDefinitions, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
 
 import { getPipetteNameFromSpecs } from './getPipetteNameFromSpecs'
 
@@ -11,7 +11,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   volume: number,
   tiprackUri: string
 ): SupportedTip {
-  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
+  const matchingLabwareDef = getAllDefinitions()[tiprackUri]
   const pipetteName = getPipetteNameFromSpecs(pipetteSpecs)
 
   console.assert(

@@ -1,4 +1,10 @@
-import { POSITION_ABSOLUTE } from '@opentrons/components'
+import {
+  COLORS,
+  CURSOR_POINTER,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 interface TipSvgProps {
   volume: number
@@ -6,6 +12,8 @@ interface TipSvgProps {
   roundedXPositionPixels: number
   bottomPx: number
   color: string
+  setIsHovered: Dispatch<SetStateAction<boolean>>
+  isHovered: boolean
 }
 
 export const TipSvg = ({
@@ -14,8 +22,11 @@ export const TipSvg = ({
   roundedXPositionPixels,
   bottomPx,
   color,
+  setIsHovered,
+  isHovered,
 }: TipSvgProps): JSX.Element => {
   const percent = Math.min(Math.max(volume / maxVolume, 0), 1)
+
   const pathTopY = 0.2
   const pathBottomY = 80
   const pathHeight = pathBottomY - pathTopY
@@ -39,9 +50,16 @@ export const TipSvg = ({
       <g>
         <path
           d="M71.2.2l3.5,77c0,1.1.6,2.1,1.5,2.6s1,.4,1.6.4.2,0,.4,0c1.4-.2,2.4-1.5,2.4-3L84.2.2"
-          fill={color}
+          fill={isHovered ? COLORS.flex50 : color}
           stroke="none"
           clipPath="url(#fillClip)"
+          onMouseEnter={() => {
+            setIsHovered(true)
+          }}
+          onMouseLeave={() => {
+            setIsHovered(false)
+          }}
+          cursor={CURSOR_POINTER}
         />
 
         <path

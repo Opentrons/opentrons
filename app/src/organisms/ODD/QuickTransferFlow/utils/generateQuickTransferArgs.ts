@@ -10,6 +10,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
@@ -485,6 +486,10 @@ export function generateQuickTransferArgs(
       quickTransferState.touchTipAspirate ?? null,
     touchTipAfterDispenseMmFromEdge:
       quickTransferState.touchTipDispense ?? null,
+    // Tip selection not currently allowed in Quick Transfer, so we set to automatic
+    tip_tracking: AUTOMATIC,
+    tips_selected: [],
+    tiprack_selected: null,
   }
 
   switch (quickTransferState.path) {

@@ -34,6 +34,7 @@ import {
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useOutputCsvDataFileIds } from '/app/resources/dataFiles/useCsvDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
@@ -53,6 +54,7 @@ export function HistoricalProtocolRunDrawer(
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
   const isFlex = useIsFlex(robotName)
+  const csvDataFileIds = useOutputCsvDataFileIds(run.id)
   const allLabwareOffsets: LabwareOffset[] =
     run.labwareOffsets?.sort(
       (a, b) =>
@@ -69,9 +71,7 @@ export function HistoricalProtocolRunDrawer(
           return acc
         }, [])
       : []
-  if ('outputFileIds' in run && run.outputFileIds.length > 0) {
-    runDataFileIds.push(...run.outputFileIds)
-  }
+  runDataFileIds.push(...csvDataFileIds)
 
   const uniqueLabwareOffsets = allLabwareOffsets.filter(
     (offset, index, array) => {

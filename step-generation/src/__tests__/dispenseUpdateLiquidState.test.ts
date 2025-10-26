@@ -1,4 +1,4 @@
-import produce from 'immer'
+import { produce } from 'immer'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { beforeEach, describe, expect, it } from 'vitest'
