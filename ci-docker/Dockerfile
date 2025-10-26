@@ -106,14 +106,13 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 USER ${USERNAME}
 WORKDIR ${OT_REPO_CACHE}
 
+# Sanity check that the ci user can escalate without a password.
+RUN sudo -n true
+
 # Warm dependency caches and capture dependency metadata for runtime checks.
 RUN make --output-sync=target -j setup-py && \
     make setup-js && \
     make -C ci-docker dependency-checksums OUTPUT="${OT_REPO_CACHE}/.ci-dependency-checksums.json" TITLE="Container Dependency Checksums" && \
-    python3 -m pip cache purge && \
-    npm cache clean --force && \
-    yarn cache clean && \
-    rm -rf /home/${USERNAME}/.cache /home/${USERNAME}/.npm /root/.cache && \
     git reset --hard
 
 RUN git rev-parse HEAD > ${OT_REPO_CACHE}/.ci-default-ref

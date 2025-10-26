@@ -52,72 +52,204 @@ jobs:
         working-directory: ci-docker
         run: make determine-container-tag
 
-  tests:
-    name: API tests in container
+  prefetch-image:
+    name: Cache CI container image
     needs: select-image
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: read
     env:
-      OT_REPO_CACHE: /opt/opentrons
-      HOME: /home/ci
-    container:
-      image: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-      options: --init
+      IMAGE_REF: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
+    outputs:
+      cache-key: ${{ steps.digest.outputs.cache-key }}
+      image-ref: ${{ steps.digest.outputs.image-ref }}
     steps:
-      - name: Confirm container tag
-        run: |
-          echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
+      - name: Ensure cache directory exists
+        run: mkdir -p .docker-cache
 
-      - name: Ensure summary path writable
-        run: |
-          sudo mkdir -p "$(dirname "$GITHUB_STEP_SUMMARY")"
-          sudo touch "$GITHUB_STEP_SUMMARY"
-          sudo chown $(whoami):$(whoami) "$GITHUB_STEP_SUMMARY" "$(dirname "$GITHUB_STEP_SUMMARY")"
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git access
+      - name: Resolve image digest
+        id: digest
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
-          git -C "$OT_REPO_CACHE" remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/Opentrons/opentrons.git"
+          set -euo pipefail
+          digest=$(docker manifest inspect "$IMAGE_REF" | jq -r '.config.digest' || true)
+          if [[ -z "$digest" || "$digest" == "null" ]]; then
+            docker pull "$IMAGE_REF" >/dev/null
+            digest=$(docker image inspect "$IMAGE_REF" --format '{{index .RepoDigests 0}}')
+          fi
+          sanitized=${digest//:/-}
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "sanitized=$sanitized" >> "$GITHUB_OUTPUT"
+          echo "cache-key=ci-docker-image-$sanitized" >> "$GITHUB_OUTPUT"
+          echo "image-ref=$IMAGE_REF" >> "$GITHUB_OUTPUT"
 
-      - name: Update cached repository
+      - name: Restore cached image tarball
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .docker-cache
+          key: ${{ steps.digest.outputs.cache-key }}
+          compression: zstd
+
+      - name: Populate image cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          rm -rf .docker-cache
+          mkdir -p .docker-cache
+          docker pull "$IMAGE_REF"
+          docker save "$IMAGE_REF" -o .docker-cache/image.tar
+          docker image inspect "$IMAGE_REF" --format '{{index .RepoDigests 0}}' > .docker-cache/digest.txt
+
+  lint:
+    name: API lint (CI Docker)
+    needs:
+      - select-image
+      - prefetch-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMAGE_REF: ${{ needs.prefetch-image.outputs.image-ref }}
+      OT_REPO_CACHE: /opt/opentrons
+    steps:
+      - name: Restore cached image
+        id: image-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .docker-cache
+          key: ${{ needs.prefetch-image.outputs.cache-key }}
+
+      - name: Load cached image
+        if: steps.image-cache.outputs.cache-hit == 'true'
+        run: docker load -i .docker-cache/image.tar
+
+      - name: Pull image when cache miss
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        env:
+          IMAGE_REF: ${{ env.IMAGE_REF }}
+        run: docker pull "$IMAGE_REF"
+
+      - name: Run lint inside container
         env:
           TARGET_REF: ${{ github.ref }}
           TARGET_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          cd "$OT_REPO_CACHE"
-          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
-          git checkout --force "$TARGET_SHA"
+          docker run --rm --init \
+            -e OT_REPO_CACHE="$OT_REPO_CACHE" \
+            -e TARGET_REF="$TARGET_REF" \
+            -e TARGET_SHA="$TARGET_SHA" \
+            -e GITHUB_ACTOR="$GITHUB_ACTOR" \
+            -e GITHUB_TOKEN="$GITHUB_TOKEN" \
+            "$IMAGE_REF" \
+            bash -lc "set -euo pipefail
+          git -C \"\$OT_REPO_CACHE\" remote set-url origin \"https://\$GITHUB_ACTOR:\$GITHUB_TOKEN@github.com/Opentrons/opentrons.git\"
+          cd \"\$OT_REPO_CACHE\"
+          git fetch --no-tags --prune origin \"\$TARGET_REF\" --depth=1 || git fetch --no-tags origin \"\$TARGET_SHA\" --depth=1
+          git checkout --force \"\$TARGET_SHA\"
+          make -C api lint"
 
-      - name: Check dependency drift
-        id: deps
-        working-directory: ${{ env.OT_REPO_CACHE }}/ci-docker
-        run: make check-dependency-drift
-
-      - name: Refresh dependencies when manifests change
-        if: steps.deps.outputs.dependencies_changed == 'true'
-        working-directory: ${{ env.OT_REPO_CACHE }}
+      - name: Summarize lint
+        if: always()
         run: |
-          make teardown
-          make setup
-          make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
+          echo "## API Lint (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Run API unit tests
-        working-directory: ${{ env.OT_REPO_CACHE }}
-        run: make -C api test-cov
+  api-tests:
+    name: API tests (CI Docker)
+    needs:
+      - select-image
+      - prefetch-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMAGE_REF: ${{ needs.prefetch-image.outputs.image-ref }}
+      OT_REPO_CACHE: /opt/opentrons
+    steps:
+      - name: Restore cached image
+        id: image-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .docker-cache
+          key: ${{ needs.prefetch-image.outputs.cache-key }}
+
+      - name: Load cached image
+        if: steps.image-cache.outputs.cache-hit == 'true'
+        run: docker load -i .docker-cache/image.tar
+
+      - name: Pull image when cache miss
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        env:
+          IMAGE_REF: ${{ env.IMAGE_REF }}
+        run: docker pull "$IMAGE_REF"
+
+      - name: Prepare output file permissions
+        run: |
+          sudo mkdir -p "$(dirname "$GITHUB_OUTPUT")"
+          sudo touch "$GITHUB_OUTPUT"
+          sudo chmod 666 "$GITHUB_OUTPUT"
+
+      - name: Run API unit tests inside container
+        id: tests
+        env:
+          TARGET_REF: ${{ github.ref }}
+          TARGET_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
+        run: |
+          docker run --rm --init \
+            -e OT_REPO_CACHE="$OT_REPO_CACHE" \
+            -e TARGET_REF="$TARGET_REF" \
+            -e TARGET_SHA="$TARGET_SHA" \
+            -e GITHUB_ACTOR="$GITHUB_ACTOR" \
+            -e GITHUB_TOKEN="$GITHUB_TOKEN" \
+            -e GITHUB_OUTPUT="$GITHUB_OUTPUT" \
+            -v "$(dirname "$GITHUB_OUTPUT")":"$(dirname "$GITHUB_OUTPUT")" \
+            "$IMAGE_REF" \
+            bash -lc "set -euo pipefail
+          user=\"\$(whoami)\"
+          sudo -n mkdir -p \"\$(dirname \"\$GITHUB_OUTPUT\")\"
+          sudo -n touch \"\$GITHUB_OUTPUT\"
+          sudo -n chown \"\$user\":\"\$user\" \"\$GITHUB_OUTPUT\" \"\$(dirname \"\$GITHUB_OUTPUT\")\"
+          truncate -s 0 \"\$GITHUB_OUTPUT\"
+          git -C \"\$OT_REPO_CACHE\" remote set-url origin \"https://\$GITHUB_ACTOR:\$GITHUB_TOKEN@github.com/Opentrons/opentrons.git\"
+          cd \"\$OT_REPO_CACHE\"
+          git fetch --no-tags --prune origin \"\$TARGET_REF\" --depth=1 || git fetch --no-tags origin \"\$TARGET_SHA\" --depth=1
+          git checkout --force \"\$TARGET_SHA\"
+          make -C ci-docker check-dependency-drift
+          deps_changed=\$(awk -F= '/^dependencies_changed=/{print \$2}' \"\$GITHUB_OUTPUT\" | tail -n1)
+          if [ \"\$deps_changed\" = \"true\" ]; then
+            make teardown
+            make setup
+            make -C ci-docker dependency-checksums OUTPUT=\"\$OT_REPO_CACHE/.ci-dependency-checksums.json\" TITLE=\"Updated Dependency Checksums\"
+          fi
+          make -C api test-cov"
 
       - name: Summarize results
         if: always()
+        env:
+          DEPENDENCIES_CHANGED: ${{ steps.tests.outputs.dependencies_changed || 'false' }}
         run: |
           echo "## API Tests (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.deps.outputs.dependencies_changed || 'false' }}" = 'true' ]; then
+          if [ "$DEPENDENCIES_CHANGED" = "true" ]; then
             echo "- Dependencies refreshed: ✅" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "- Dependencies refreshed: ❌" >> "$GITHUB_STEP_SUMMARY"
