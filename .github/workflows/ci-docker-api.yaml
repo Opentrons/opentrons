@@ -47,7 +47,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
           REF_NAME: ${{ github.ref_name }}
-          DEFAULT_TAG: branch-ci-docker-init  # Temporary: validate ci-docker/init image
+          DEFAULT_TAG: ci-docker-init
           RELEASE_PREFIX: chore_release
         working-directory: ci-docker
         run: make determine-container-tag
