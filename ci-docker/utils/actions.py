@@ -1,7 +1,7 @@
 """Utility helpers for GitHub Actions workflows.
 
-This module centralises small bits of branching logic so that multiple
-workflows can share the same behaviour. Each sub-command writes outputs back to
+This module centralizes small bits of branching logic so that multiple
+workflows can share the same behavior. Each sub-command writes outputs back to
 GitHub Actions, prints a nicely formatted table via rich, and appends a concise
 summary block.
 """
@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import os
-import subprocess
 import sys
 from dataclasses import dataclass
 from typing import Dict, Iterable, Sequence, Tuple
@@ -29,13 +28,11 @@ def _ensure_rich() -> None:
     try:
         from rich.console import Console  # type: ignore
         from rich.table import Table  # type: ignore
-    except ImportError:  # pragma: no cover - only hit on first GH runner execution
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "rich>=13,<14"],
-            stdout=subprocess.DEVNULL,
-        )
-        from rich.console import Console  # type: ignore
-        from rich.table import Table  # type: ignore
+    except ImportError as exc:  # pragma: no cover - environment misconfiguration
+        raise RuntimeError(
+            "The 'rich' package is required. Run 'make -C ci-docker setup' to "
+            "synchronize the uv environment before invoking this helper."
+        ) from exc
 
     _RICH_CONSOLE = Console()
     _RICH_TABLE = Table

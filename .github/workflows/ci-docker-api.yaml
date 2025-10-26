@@ -37,10 +37,12 @@ jobs:
           sparse-checkout: |
             ci-docker/Makefile
             ci-docker/pyproject.toml
+            ci-docker/uv.lock
             ci-docker/utils
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
+
 
       - name: Determine container tag
         id: tag
@@ -74,11 +76,6 @@ jobs:
         uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-
-      - name: Sync cache baseline
-        run: |
-          rsync -a --delete --exclude='.git' "$OT_REPO_CACHE/" "${{ github.workspace }}/"
-          git -C "${{ github.workspace }}" reset --hard "${{ github.sha }}"
 
       - name: Bootstrap API
         run: make -C api setup

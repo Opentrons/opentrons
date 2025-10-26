@@ -19,6 +19,9 @@ source .venv/bin/activate
 ## Quick Start
 
 ```bash
+# Install project dependencies (creates .venv via uv)
+make -C ci-docker setup
+
 # Build the image (defaults to ghcr.io/opentrons/ci-bootstrap:local)
 make -C ci-docker build
 

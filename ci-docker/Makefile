@@ -13,26 +13,38 @@ BASE_REF ?=
 EVENT_NAME ?=
 TITLE ?=
 
-.PHONY: build publish shell clean help determine-source-ref determine-container-tag
+# Ensure dependency graph runs the setup before any primary entrypoints
+build publish shell determine-source-ref determine-container-tag: setup
 
+.PHONY: build
 build:
 	$(UV) run $(SCRIPT) build --tag $(TAG) $(ARGS)
 
+.PHONY: publish
 publish:
 	$(UV) run $(SCRIPT) build --tag $(TAG) --push $(ARGS)
 
+.PHONY: shell
 shell:
 	$(UV) run $(SCRIPT) shell --image $(TAG) $(ARGS)
 
+.PHONY: determine-source-ref
 determine-source-ref:
 	$(UV) run $(UTILS_SCRIPT) determine-source-ref --ref "$(REF)" --default-branch "$(DEFAULT_BRANCH)" --title "$(if $(TITLE),$(TITLE),CI Docker Source Ref)"
 
+.PHONY: determine-container-tag
 determine-container-tag:
 	$(UV) run $(UTILS_SCRIPT) determine-container-tag --event-name "$(EVENT_NAME)" --base-ref "$(BASE_REF)" --ref-name "$(REF_NAME)" --default-tag "$(if $(DEFAULT_TAG),$(DEFAULT_TAG),edge)" --release-prefix "$(if $(RELEASE_PREFIX),$(RELEASE_PREFIX),chore_release)" --title "$(if $(TITLE),$(TITLE),CI Docker Container Tag)"
 
+.PHONY: setup
+setup:
+	$(UV) sync --frozen
+
+.PHONY: clean
 clean:
 	-@docker image rm $(TAG)
 
+.PHONY: help
 help:
 	@printf "Available targets:\n"
 	@printf "  make build    # Build the CI container (override TAG/ARGS as needed)\n"
