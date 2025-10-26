@@ -61,6 +61,7 @@ jobs:
       packages: read
     env:
       OT_REPO_CACHE: /opt/opentrons
+      HOME: /home/ci
     container:
       image: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
       credentials:
