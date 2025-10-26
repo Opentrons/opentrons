@@ -73,6 +73,12 @@ jobs:
         run: |
           echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
 
+      - name: Ensure summary path writable
+        run: |
+          sudo mkdir -p "$(dirname "$GITHUB_STEP_SUMMARY")"
+          sudo touch "$GITHUB_STEP_SUMMARY"
+          sudo chown $(whoami):$(whoami) "$GITHUB_STEP_SUMMARY" "$(dirname "$GITHUB_STEP_SUMMARY")"
+
       - name: Configure Git access
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -99,7 +99,9 @@ COPY ci-docker ${OT_REPO_CACHE}/ci-docker
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
     useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
     mkdir -p /workspace && \
-    chown -R ${USERNAME}:${USERNAME} /workspace ${OT_REPO_CACHE}
+    chown -R ${USERNAME}:${USERNAME} /workspace ${OT_REPO_CACHE} && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
+    chmod 0440 /etc/sudoers.d/${USERNAME}
 
 USER ${USERNAME}
 WORKDIR ${OT_REPO_CACHE}

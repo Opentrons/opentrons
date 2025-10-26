@@ -63,17 +63,20 @@ def _append_summary(title: str, rows: Sequence[Tuple[str, str]], notes: Iterable
     if not summary_path:
         return
 
-    with open(summary_path, "a", encoding="utf-8") as handle:
-        handle.write(f"## {title}\n\n")
-        handle.write("| Key | Value |\n")
-        handle.write("| --- | ----- |\n")
-        for key, value in rows:
-            handle.write(f"| {key} | `{value}` |\n")
-        if notes:
+    try:
+        with open(summary_path, "a", encoding="utf-8") as handle:
+            handle.write(f"## {title}\n\n")
+            handle.write("| Key | Value |\n")
+            handle.write("| --- | ----- |\n")
+            for key, value in rows:
+                handle.write(f"| {key} | `{value}` |\n")
+            if notes:
+                handle.write("\n")
+                for note in notes:
+                    handle.write(f"{note}\n")
             handle.write("\n")
-            for note in notes:
-                handle.write(f"{note}\n")
-        handle.write("\n")
+    except OSError as exc:  # pragma: no cover - best effort fallback
+        print(f"::warning::Unable to append GitHub summary at {summary_path}: {exc}")
 
 
 def _write_outputs(outputs: Dict[str, str]) -> None:
