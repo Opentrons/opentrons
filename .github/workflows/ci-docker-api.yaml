@@ -68,12 +68,18 @@ jobs:
       - name: Ensure cache directory exists
         run: mkdir -p .docker-cache
 
+      - name: Install skopeo
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Authenticate skopeo
+        run: skopeo login ghcr.io --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Resolve image digest
         id: digest
@@ -98,17 +104,23 @@ jobs:
         with:
           path: .docker-cache
           key: ${{ steps.digest.outputs.cache-key }}
-          compression: zstd
 
       - name: Populate image cache
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
-          rm -rf .docker-cache
-          mkdir -p .docker-cache
-          docker pull "$IMAGE_REF"
-          docker save "$IMAGE_REF" -o .docker-cache/image.tar
-          docker image inspect "$IMAGE_REF" --format '{{index .RepoDigests 0}}' > .docker-cache/digest.txt
+          rm -rf .docker-cache/image
+          mkdir -p .docker-cache/image
+          skopeo copy \
+            --override-arch amd64 \
+            --override-os linux \
+            docker://"$IMAGE_REF" \
+            dir://.docker-cache/image
+          skopeo inspect \
+            --override-arch amd64 \
+            --override-os linux \
+            docker://"$IMAGE_REF" \
+            --format '{{.Digest}}' > .docker-cache/digest.txt
 
   lint:
     name: API lint (CI Docker)
@@ -121,9 +133,14 @@ jobs:
       packages: read
     env:
       IMAGE_REF: ${{ needs.prefetch-image.outputs.image-ref }}
+      IMAGE_TAG: ${{ needs.select-image.outputs.tag }}
+      LOCAL_IMAGE: opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
       OT_REPO_CACHE: /opt/opentrons
     steps:
-      - name: Restore cached image
+      - name: Install skopeo
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+
+      - name: Restore cached image directory
         id: image-cache
         uses: actions/cache/restore@v4
         with:
@@ -132,12 +149,17 @@ jobs:
 
       - name: Load cached image
         if: steps.image-cache.outputs.cache-hit == 'true'
-        run: docker load -i .docker-cache/image.tar
+        run: |
+          set -euo pipefail
+          sudo skopeo copy \
+            --override-arch amd64 \
+            --override-os linux \
+            dir://.docker-cache/image \
+            docker-daemon:"$LOCAL_IMAGE"
+          docker tag "$LOCAL_IMAGE" "$IMAGE_REF"
 
       - name: Pull image when cache miss
         if: steps.image-cache.outputs.cache-hit != 'true'
-        env:
-          IMAGE_REF: ${{ env.IMAGE_REF }}
         run: docker pull "$IMAGE_REF"
 
       - name: Run lint inside container
@@ -179,9 +201,14 @@ jobs:
       packages: read
     env:
       IMAGE_REF: ${{ needs.prefetch-image.outputs.image-ref }}
+      IMAGE_TAG: ${{ needs.select-image.outputs.tag }}
+      LOCAL_IMAGE: opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
       OT_REPO_CACHE: /opt/opentrons
     steps:
-      - name: Restore cached image
+      - name: Install skopeo
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+
+      - name: Restore cached image directory
         id: image-cache
         uses: actions/cache/restore@v4
         with:
@@ -190,12 +217,17 @@ jobs:
 
       - name: Load cached image
         if: steps.image-cache.outputs.cache-hit == 'true'
-        run: docker load -i .docker-cache/image.tar
+        run: |
+          set -euo pipefail
+          sudo skopeo copy \
+            --override-arch amd64 \
+            --override-os linux \
+            dir://.docker-cache/image \
+            docker-daemon:"$LOCAL_IMAGE"
+          docker tag "$LOCAL_IMAGE" "$IMAGE_REF"
 
       - name: Pull image when cache miss
         if: steps.image-cache.outputs.cache-hit != 'true'
-        env:
-          IMAGE_REF: ${{ env.IMAGE_REF }}
         run: docker pull "$IMAGE_REF"
 
       - name: Prepare output file permissions
