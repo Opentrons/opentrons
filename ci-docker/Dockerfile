@@ -92,6 +92,8 @@ RUN git clone --single-branch --filter=blob:none --branch ${OPENTRONS_DEFAULT_RE
     git -C ${OT_REPO_CACHE} fetch --tags --force && \
     git config --system --add safe.directory ${OT_REPO_CACHE}
 
+COPY ci-docker ${OT_REPO_CACHE}/ci-docker
+
 # Create predictable non-root CI user.
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
     useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \

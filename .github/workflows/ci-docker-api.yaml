@@ -76,8 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global --add safe.directory "$OT_REPO_CACHE"
-          git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf https://github.com/
+          git -C "$OT_REPO_CACHE" remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/Opentrons/opentrons.git"
 
       - name: Update cached repository
         env:
