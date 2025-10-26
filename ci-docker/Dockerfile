@@ -33,7 +33,7 @@ RUN apt-get update && \
         gnupg \
         jq \
         libffi-dev \
-    libsystemd-dev \
+        libsystemd-dev \
         libssl-dev \
         libudev-dev \
         libusb-1.0-0-dev \
@@ -86,10 +86,10 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
         virtualenv==20.30.0 \
         uv==0.4.29
 
-# Pre-clone the repository with full history so ref checkouts are near instant.
-RUN git clone ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE} && \
-    git -C ${OT_REPO_CACHE} fetch --all --tags && \
-    git -C ${OT_REPO_CACHE} checkout ${OPENTRONS_DEFAULT_REF} && \
+# Pre-clone repository with minimal history while keeping tags for versioning.
+RUN git clone --single-branch --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE} && \
+    git -C ${OT_REPO_CACHE} fetch --tags --force && \
     git config --system --add safe.directory ${OT_REPO_CACHE}
 
 # Create predictable non-root CI user.

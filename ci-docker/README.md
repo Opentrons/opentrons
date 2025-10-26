@@ -8,8 +8,7 @@ that `make setup` becomes nearly instantaneous inside CI.
 ## Prerequisites
 
 - Docker 24.x or newer with BuildKit enabled
-- Python 3.10 (used to run the orchestration script; managed via `uv` or your
-  preferred virtual environment)
+- Python 3.10 (used to run the orchestration script via `uv`)
 
 ```bash
 # Optional: create an isolated environment with uv
@@ -36,9 +35,13 @@ Use it for `--platform`, extra `--build-arg`, or additional options.
 ## Python CLI Reference
 
 ```bash
-python ci-docker/main.py --help
-python ci-docker/main.py build --tag <image> --platform linux/amd64
-python ci-docker/main.py shell --image <image> --env FOO=bar -- npm test
+uv run ci-docker/main.py --help
+uv run ci-docker/main.py build --tag <image> --platform linux/amd64
+uv run ci-docker/main.py shell --image <image> --env FOO=bar -- npm test
+
+# Helper utilities exposed via make
+EVENT_NAME=pull_request BASE_REF=edge DEFAULT_TAG=edge make -C ci-docker determine-container-tag
+REF=refs/heads/edge DEFAULT_BRANCH=edge make -C ci-docker determine-source-ref
 ```
 
 The `shell` sub-command mounts the repository root to `/workspace` so you can

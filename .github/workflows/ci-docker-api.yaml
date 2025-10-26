@@ -1,0 +1,94 @@
+name: API Tests (CI Docker)
+
+on:
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'Makefile'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
+      - 'hardware/**'
+      - 'scripts/**.mk'
+      - 'scripts/**.py'
+      - '.github/workflows/ci-docker-api.yaml'
+      - '.github/workflows/utils.js'
+  push:
+    branches:
+      - edge
+      - chore_release*
+      - ci-docker/**
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  select-image:
+    name: Determine container tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout utilities
+        uses: 'actions/checkout@v4'
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            ci-docker/Makefile
+            ci-docker/pyproject.toml
+            ci-docker/utils
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Determine container tag
+        id: tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_TAG: branch-ci-docker-init  # Temporary: validate ci-docker/init image
+          RELEASE_PREFIX: chore_release
+        run: make -C ci-docker determine-container-tag
+
+  tests:
+    name: API tests in container
+    needs: select-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --init
+    steps:
+      - name: Confirm container tag
+        run: |
+          echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
+
+      - name: Checkout repository
+        uses: 'actions/checkout@v4'
+        with:
+          fetch-depth: 0
+
+      - name: Sync cache baseline
+        run: |
+          rsync -a --delete --exclude='.git' "$OT_REPO_CACHE/" "${{ github.workspace }}/"
+          git -C "${{ github.workspace }}" reset --hard "${{ github.sha }}"
+
+      - name: Bootstrap API
+        run: make -C api setup
+
+      - name: Run API unit tests
+        run: make -C api test-cov
+
+      - name: Summarize results
+        if: always()
+        run: |
+          echo "## API Tests (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
