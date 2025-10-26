@@ -59,6 +59,8 @@ jobs:
     permissions:
       contents: read
       packages: read
+    env:
+      OT_REPO_CACHE: /opt/opentrons
     container:
       image: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
       credentials:
@@ -70,15 +72,37 @@ jobs:
         run: |
           echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
 
-      - name: Checkout repository
-        uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
+      - name: Configure Git access
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global --add safe.directory "$OT_REPO_CACHE"
+          git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf https://github.com/
 
-      - name: Bootstrap API
-        run: make -C api setup
+      - name: Update cached repository
+        env:
+          TARGET_REF: ${{ github.ref }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          cd "$OT_REPO_CACHE"
+          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
+          git checkout --force "$TARGET_SHA"
+
+      - name: Check dependency drift
+        id: deps
+        working-directory: ${{ env.OT_REPO_CACHE }}/ci-docker
+        run: make check-dependency-drift
+
+      - name: Refresh dependencies when manifests change
+        if: steps.deps.outputs.dependencies_changed == 'true'
+        working-directory: ${{ env.OT_REPO_CACHE }}
+        run: |
+          make teardown
+          make setup
+          make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
 
       - name: Run API unit tests
+        working-directory: ${{ env.OT_REPO_CACHE }}
         run: make -C api test-cov
 
       - name: Summarize results
@@ -87,3 +111,8 @@ jobs:
           echo "## API Tests (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.deps.outputs.dependencies_changed || 'false' }}" = 'true' ]; then
+            echo "- Dependencies refreshed: ✅" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Dependencies refreshed: ❌" >> "$GITHUB_STEP_SUMMARY"
+          fi

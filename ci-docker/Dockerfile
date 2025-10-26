@@ -101,12 +101,11 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 USER ${USERNAME}
 WORKDIR ${OT_REPO_CACHE}
 
-# Warm dependency caches without keeping project virtualenvs or node_modules.
+# Warm dependency caches and capture dependency metadata for runtime checks.
 RUN make --output-sync=target -j setup-py && \
     make setup-js && \
-    make teardown && \
-    git reset --hard && \
-    git clean -ffdx
+    make -C ci-docker dependency-checksums OUTPUT="${OT_REPO_CACHE}/.ci-dependency-checksums.json" TITLE="Container Dependency Checksums" && \
+    git reset --hard
 
 RUN git rev-parse HEAD > ${OT_REPO_CACHE}/.ci-default-ref
 

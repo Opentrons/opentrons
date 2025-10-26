@@ -2,6 +2,7 @@ UV ?= uv
 TAG ?= ghcr.io/opentrons/ci-bootstrap:local
 SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/main.py
 UTILS_SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/utils/actions.py
+REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 
 # Optional parameters consumed by helper targets. Defaults make local testing easy.
 DEFAULT_BRANCH ?= edge
@@ -14,7 +15,7 @@ EVENT_NAME ?=
 TITLE ?=
 
 # Ensure dependency graph runs the setup before any primary entrypoints
-build publish shell determine-source-ref determine-container-tag: setup
+build publish shell determine-source-ref determine-container-tag dependency-checksums check-dependency-drift: setup
 
 .PHONY: build
 build:
@@ -35,6 +36,14 @@ determine-source-ref:
 .PHONY: determine-container-tag
 determine-container-tag:
 	$(UV) run $(UTILS_SCRIPT) determine-container-tag --event-name "$(EVENT_NAME)" --base-ref "$(BASE_REF)" --ref-name "$(REF_NAME)" --default-tag "$(if $(DEFAULT_TAG),$(DEFAULT_TAG),edge)" --release-prefix "$(if $(RELEASE_PREFIX),$(RELEASE_PREFIX),chore_release)" --title "$(if $(TITLE),$(TITLE),CI Docker Container Tag)"
+
+.PHONY: dependency-checksums
+dependency-checksums:
+	$(UV) run $(UTILS_SCRIPT) dependency-checksums --root "$(REPO_ROOT)" --output "$(if $(OUTPUT),$(OUTPUT),$(REPO_ROOT)/.ci-dependency-checksums.json)" --title "$(if $(TITLE),$(TITLE),CI Dependency Checksums)"
+
+.PHONY: check-dependency-drift
+check-dependency-drift:
+	$(UV) run $(UTILS_SCRIPT) dependency-checksums --root "$(REPO_ROOT)" --baseline "$(if $(BASELINE),$(BASELINE),$(REPO_ROOT)/.ci-dependency-checksums.json)" --title "$(if $(TITLE),$(TITLE),CI Dependency Drift)"
 
 .PHONY: setup
 setup:

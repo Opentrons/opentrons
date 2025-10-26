@@ -9,13 +9,20 @@ summary block.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import sys
 from dataclasses import dataclass
-from typing import Dict, Iterable, Sequence, Tuple
+from pathlib import Path
+from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 _RICH_CONSOLE = None
 _RICH_TABLE = None
+
+_DEPENDENCY_DIR_EXCLUDES = {".git", "node_modules", ".venv", "__pycache__", ".mypy_cache", ".pytest_cache"}
+_PYTHON_DEP_FILES = ("Pipfile", "Pipfile.lock")
+_JS_DEP_FILES = ("package.json", "package-lock.json", "yarn.lock")
 
 
 def _ensure_rich() -> None:
@@ -77,6 +84,56 @@ def _write_outputs(outputs: Dict[str, str]) -> None:
     with open(output_path, "a", encoding="utf-8") as handle:
         for key, value in outputs.items():
             handle.write(f"{key}={value}\n")
+
+
+def _should_skip(path: Path, root: Path) -> bool:
+    rel = path.relative_to(root)
+    return any(part in _DEPENDENCY_DIR_EXCLUDES for part in rel.parts)
+
+
+def _collect_dependency_files(root: Path, patterns: Sequence[str]) -> List[Path]:
+    files: List[Path] = []
+    seen = set()
+    for pattern in patterns:
+        for candidate in root.rglob(pattern):
+            if not candidate.is_file():
+                continue
+            if _should_skip(candidate, root):
+                continue
+            rel = candidate.relative_to(root)
+            key = rel.as_posix()
+            if key in seen:
+                continue
+            seen.add(key)
+            files.append(candidate)
+    files.sort(key=lambda path_: path_.relative_to(root).as_posix())
+    return files
+
+
+def _hash_files(root: Path, files: Sequence[Path]) -> str:
+    digest = hashlib.sha256()
+    for file in files:
+        rel = file.relative_to(root).as_posix().encode("utf-8")
+        digest.update(rel)
+        with open(file, "rb") as handle:
+            for chunk in iter(lambda: handle.read(65536), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _compute_dependency_checksums(root: Path) -> Dict[str, Dict[str, object]]:
+    python_files = _collect_dependency_files(root, _PYTHON_DEP_FILES)
+    js_files = _collect_dependency_files(root, _JS_DEP_FILES)
+    return {
+        "python": {
+            "checksum": _hash_files(root, python_files),
+            "files": [file.relative_to(root).as_posix() for file in python_files],
+        },
+        "javascript": {
+            "checksum": _hash_files(root, js_files),
+            "files": [file.relative_to(root).as_posix() for file in js_files],
+        },
+    }
 
 
 @dataclass
@@ -165,6 +222,73 @@ def _run_determine_container_tag(args: argparse.Namespace) -> None:
     _write_outputs({"tag": result.tag})
 
 
+def _load_baseline(path: Path) -> Mapping[str, Dict[str, object]] | None:
+    if not path.exists():
+        return None
+    with open(path, "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _run_dependency_checksums(args: argparse.Namespace) -> None:
+    root = Path(args.root).resolve()
+    data = _compute_dependency_checksums(root)
+
+    python_checksum = str(data["python"]["checksum"])
+    javascript_checksum = str(data["javascript"]["checksum"])
+    rows = [
+        ("Python checksum", python_checksum),
+        ("JavaScript checksum", javascript_checksum),
+    ]
+    notes: List[str] = []
+    outputs: Dict[str, str] = {
+        "python_checksum": python_checksum,
+        "javascript_checksum": javascript_checksum,
+        "python_changed": "false",
+        "javascript_changed": "false",
+        "dependencies_changed": "false",
+    }
+
+    baseline_path = Path(args.baseline).resolve() if args.baseline else None
+    python_changed = False
+    javascript_changed = False
+
+    if baseline_path:
+        baseline = _load_baseline(baseline_path)
+        if baseline is None:
+            notes.append(f"- Baseline file `{baseline_path}` not found; treating dependencies as changed")
+            python_changed = True
+            javascript_changed = True
+        else:
+            baseline_python = str(baseline.get("python", {}).get("checksum", ""))
+            baseline_js = str(baseline.get("javascript", {}).get("checksum", ""))
+            python_changed = baseline_python != data["python"]["checksum"]
+            javascript_changed = baseline_js != data["javascript"]["checksum"]
+
+            if python_changed:
+                notes.append("- Python dependency manifest checksum differs from baseline")
+            if javascript_changed:
+                notes.append("- JavaScript dependency manifest checksum differs from baseline")
+
+    outputs["python_changed"] = "true" if python_changed else "false"
+    outputs["javascript_changed"] = "true" if javascript_changed else "false"
+    outputs["dependencies_changed"] = "true" if (python_changed or javascript_changed) else "false"
+
+    if args.output:
+        output_path = Path(args.output).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as handle:
+            json.dump(data, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+
+    _print_table(args.title, rows)
+    summary_notes = notes if notes else None
+    _append_summary(args.title, rows, notes=summary_notes)
+    _write_outputs(outputs)
+
+    if args.fail_on_change and (python_changed or javascript_changed):
+        raise SystemExit(1)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Shared helpers for CI Docker workflows")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -191,6 +315,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     tag_parser.add_argument("--title", default="CI Docker Container Tag", help="Heading used for summary output")
     tag_parser.set_defaults(func=_run_determine_container_tag)
+
+    deps_parser = subparsers.add_parser("dependency-checksums", help="Compute dependency manifest checksums")
+    deps_parser.add_argument("--root", default=".", help="Repository root to scan")
+    deps_parser.add_argument("--output", help="Optional path to write checksums as JSON")
+    deps_parser.add_argument("--baseline", help="Baseline JSON file to compare against")
+    deps_parser.add_argument(
+        "--fail-on-change",
+        action="store_true",
+        help="Exit with a non-zero status when checksums differ from baseline",
+    )
+    deps_parser.add_argument("--title", default="CI Dependency Checksums", help="Heading used for summary output")
+    deps_parser.set_defaults(func=_run_dependency_checksums)
 
     return parser
 

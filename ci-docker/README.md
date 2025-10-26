@@ -45,6 +45,8 @@ uv run ci-docker/main.py shell --image <image> --env FOO=bar -- npm test
 # Helper utilities exposed via make
 EVENT_NAME=pull_request BASE_REF=edge DEFAULT_TAG=edge make -C ci-docker determine-container-tag
 REF=refs/heads/edge DEFAULT_BRANCH=edge make -C ci-docker determine-source-ref
+make -C ci-docker dependency-checksums
+make -C ci-docker check-dependency-drift
 ```
 
 The `shell` sub-command mounts the repository root to `/workspace` so you can
@@ -68,9 +70,11 @@ commands automatically reference the cache via
 - Pre-installed system packages required by the monorepo builds
 - Full clone of `Opentrons/opentrons` default branch for faster checkouts
 - During build the container executes `make setup-py -j` and `make setup-js`
-  (followed by `make teardown`) to pre-populate pip/pipenv/npm/yarn caches while
-  keeping project virtual environments and `node_modules` directories out of the
-  final image
+  so virtual environments and `node_modules` directories are ready for use in
+  downstream CI runs without additional bootstrapping
+- Dependency manifest checksums are stored in `.ci-dependency-checksums.json`
+  so GitHub Actions jobs can detect when cached environments need to be
+  refreshed
 
 Future enhancements (lockfile caching layers, CI publication workflow, etc.)
 can extend this baseline without changing developer ergonomics.
