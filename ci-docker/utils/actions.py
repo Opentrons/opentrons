@@ -58,8 +58,10 @@ def _append_summary(title: str, rows: Sequence[Tuple[str, str]], notes: Iterable
 
     with open(summary_path, "a", encoding="utf-8") as handle:
         handle.write(f"## {title}\n\n")
+        handle.write("| Key | Value |\n")
+        handle.write("| --- | ----- |\n")
         for key, value in rows:
-            handle.write(f"- {key}: `{value}`\n")
+            handle.write(f"| {key} | `{value}` |\n")
         if notes:
             handle.write("\n")
             for note in notes:

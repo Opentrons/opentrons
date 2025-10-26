@@ -102,7 +102,7 @@ USER ${USERNAME}
 WORKDIR ${OT_REPO_CACHE}
 
 # Warm dependency caches without keeping project virtualenvs or node_modules.
-RUN make setup-py && \
+RUN make --output-sync=target -j setup-py && \
     make setup-js && \
     make teardown && \
     git reset --hard && \
