@@ -60,21 +60,25 @@ RUN apt-get update && \
 RUN locale-gen en_US.UTF-8
 
 # Install Node.js toolchain that matches actions/setup-node configuration.
-RUN ARCH=$(dpkg --print-architecture) && \
-        case "$ARCH" in \
-            amd64) NODE_DIST_ARCH="x64" ;; \
-            arm64) NODE_DIST_ARCH="arm64" ;; \
-            *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
-        esac && \
-        curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" -o /tmp/node.tar.xz && \
-        mkdir -p /usr/local/lib/nodejs && \
-        tar -xJf /tmp/node.tar.xz -C /usr/local/lib/nodejs && \
-        NODE_DIR="/usr/local/lib/nodejs/node-v${NODE_VERSION}-linux-${NODE_DIST_ARCH}" && \
-        ln -sf ${NODE_DIR}/bin/node /usr/local/bin/node && \
-        ln -sf ${NODE_DIR}/bin/npm /usr/local/bin/npm && \
-        ln -sf ${NODE_DIR}/bin/npx /usr/local/bin/npx && \
-        npm install --global yarn@1.22.19 && \
-        rm -f /tmp/node.tar.xz
+RUN set -eux; \
+    ARCH=$(dpkg --print-architecture); \
+    case "$ARCH" in \
+        amd64) NODE_DIST_ARCH="x64" ;; \
+        arm64) NODE_DIST_ARCH="arm64" ;; \
+        *) echo "Unsupported architecture: $ARCH"; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" -o /tmp/node.tar.xz; \
+    mkdir -p /usr/local/lib/nodejs; \
+    tar -xJf /tmp/node.tar.xz -C /usr/local/lib/nodejs; \
+    NODE_DIR="/usr/local/lib/nodejs/node-v${NODE_VERSION}-linux-${NODE_DIST_ARCH}"; \
+    ln -sf "${NODE_DIR}/bin/node" /usr/local/bin/node; \
+    ln -sf "${NODE_DIR}/bin/npm" /usr/local/bin/npm; \
+    ln -sf "${NODE_DIR}/bin/npx" /usr/local/bin/npx; \
+    npm install --global yarn@1.22.19; \
+    YARN_BIN_DIR="$(npm root -g)/yarn/bin"; \
+    ln -sf "${YARN_BIN_DIR}/yarn" /usr/local/bin/yarn; \
+    ln -sf "${YARN_BIN_DIR}/yarnpkg" /usr/local/bin/yarnpkg; \
+    rm -f /tmp/node.tar.xz
 
 # Align Python tooling with composite setup-py action.
 RUN python3 -m pip install --no-cache-dir --upgrade pip && \
