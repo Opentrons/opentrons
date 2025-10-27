@@ -19,7 +19,6 @@ export interface ImageFileData {
   cameraId: string
   commandId?: string
   prevCommandId?: string
-  name?: string
 }
 
 export interface DataFileDataResponse {
@@ -32,9 +31,7 @@ export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
 }
 
-export type DownloadedDataFileResponse = string
-
-export type ImageFileDataResponse = DataFileDataResponse
+export type DownloadedDataFileResponse = MediaSource
 
 export interface ImageFilesDataResponse {
   data: ImageFileData[]

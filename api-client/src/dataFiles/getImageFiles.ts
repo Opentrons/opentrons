@@ -2,13 +2,13 @@ import { GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { ImageFileDataResponse } from './types'
+import type { ImageFilesDataResponse } from './types'
 
-export function getImageFile(
+export function getImageFiles(
   config: HostConfig,
   runId: string
-): ResponsePromise<ImageFileDataResponse> {
-  return request<ImageFileDataResponse>(
+): ResponsePromise<ImageFilesDataResponse> {
+  return request<ImageFilesDataResponse>(
     GET,
     `/dataFiles/${runId}/images`,
     null,

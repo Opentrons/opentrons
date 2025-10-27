@@ -1,34 +1,43 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { GalleryItemCard } from '../GalleryItemCard'
 
-import type { UseStubImagesInfoResult } from '../hooks/useStubImagesInfo'
+import type { GalleryItemCardProps } from '../GalleryItemCard'
 
-const render = (props: UseStubImagesInfoResult) => {
+const render = (props: GalleryItemCardProps) => {
   return renderWithProviders(<GalleryItemCard {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-const MOCK_IMG_PATH = '/path/to/test-image.jpg'
-const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
-const MOCK_CMD_TEXT = 'Test step command'
-const MOCK_PREV_CMD_TEXT = 'Previous test command'
+const mockProtocolAnalysis = {
+  commands: [],
+  labware: [],
+} as any
 
+const MOCK_IMAGE_ITEM = {
+  imageId: 'imageid123',
+  stepCommandId: 'step1',
+  previousStepCommandId: 'step2',
+  timestamp: '2024-01-01 12:00:00',
+}
+
+const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
-  let mockProps: UseStubImagesInfoResult
+  let mockProps: GalleryItemCardProps
 
   beforeEach(() => {
     mockProps = {
-      imagePath: MOCK_IMG_PATH,
-      stepCommandText: MOCK_CMD_TEXT,
-      previousStepCommandText: MOCK_PREV_CMD_TEXT,
-      timestamp: MOCK_TIMESTAMP,
+      item: MOCK_IMAGE_ITEM,
+      protocolAnalysis: mockProtocolAnalysis,
+      runId: MOCK_RUN_ID,
+      robotType: 'OT-3 Standard',
+      allRunDefs: [],
     }
   })
 
@@ -36,11 +45,11 @@ describe('GalleryItemCard', () => {
     render(mockProps)
 
     const image = screen.getByAltText('camera-photo')
+    expect(image).toHaveAttribute('src', 'mock-image-path.png')
 
-    expect(image).toHaveAttribute('src', MOCK_IMG_PATH)
-    screen.getByText(MOCK_CMD_TEXT)
-    screen.getByText(MOCK_PREV_CMD_TEXT)
-    screen.getByText(MOCK_TIMESTAMP)
+    screen.getByText('Step 1/100: Current command text')
+    screen.getByText('Previous command text')
+    screen.getByText(MOCK_IMAGE_ITEM.timestamp)
   })
 
   it('shows "View image" on hover', async () => {

@@ -9,8 +9,16 @@ import { ImageGalleryContainer } from './ImageGalleryContainer'
 import { LaunchLivestreamBtn } from './LaunchLivestreamBtn'
 import styles from './runcamera.module.css'
 
-export function ProtocolRunCamera(): JSX.Element {
+import type { RobotType } from '@opentrons/shared-data'
+
+export interface ProtocolRunCameraProps {
+  runId: string
+  robotType: RobotType
+}
+
+export function ProtocolRunCamera(props: ProtocolRunCameraProps): JSX.Element {
   const { t } = useTranslation('run_details')
+  const { runId, robotType } = props
   const { isCameraEnabled } = useCameraUsageSettings()
   return (
     <div className={styles.content_container}>
@@ -30,7 +38,7 @@ export function ProtocolRunCamera(): JSX.Element {
         {isCameraEnabled ? <LaunchLivestreamBtn /> : null}
       </div>
       <Divider width="100%" />
-      <ImageGalleryContainer />
+      <ImageGalleryContainer run_id={runId} robotType={robotType} />
     </div>
   )
 }

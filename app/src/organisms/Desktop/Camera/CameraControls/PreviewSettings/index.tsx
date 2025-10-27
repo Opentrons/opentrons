@@ -2,11 +2,13 @@ import { useTranslation } from 'react-i18next'
 
 import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
 
-import { useStubPreviewImage } from './hooks/useStubPreviewImage'
+import { Skeleton } from '/app/atoms/Skeleton'
+
+import { usePreviewImage } from './hooks/usePreviewImage'
 import styles from './previewsettings.module.css'
 
 export function PreviewSettings(): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = useStubPreviewImage()
+  const { isLoading, imgPath, takePhoto } = usePreviewImage()
 
   return (
     <div className={styles.container}>
@@ -27,8 +29,6 @@ function PreviewImage({
 }: {
   imgPath: string | undefined
 }): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
   if (imgPath != null) {
     return (
       <img
@@ -41,9 +41,7 @@ function PreviewImage({
     return (
       <div className={styles.no_image_container}>
         <Icon name="ot-alert" className={styles.no_image_alert} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('no_image_available')}
-        </StyledText>
+        <Skeleton width="100%" height="100%" backgroundSize="47rem"></Skeleton>
       </div>
     )
   }

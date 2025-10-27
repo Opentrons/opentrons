@@ -44,6 +44,7 @@
 .gallery_content_container {
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-4);
   gap: var(--spacing-4);
 }
 
@@ -51,8 +52,8 @@
   display: flex;
   padding: var(--spacing-12);
   border: 1px solid var(--grey-30);
-  border-radius: var(--border-radius-8);
-  gap: var(--spacing-24);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
 }
 
 .gallery_card_thumbnail {

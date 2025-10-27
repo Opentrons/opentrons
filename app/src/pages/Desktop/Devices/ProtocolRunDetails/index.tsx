@@ -167,7 +167,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       backToTop: null,
     },
     camera: {
-      content: <ProtocolRunCamera />,
+      content: <ProtocolRunCamera runId={runId} robotType={robotType} />,
       backToTop: null,
     },
   }
