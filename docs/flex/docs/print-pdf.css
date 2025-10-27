@@ -1,22 +1,18 @@
 @page {
   margin-bottom: 2cm;
 
-  @bottom-right {
-    content: "Page " counter(page);
+  @bottom-center {
+    content: "-" counter(page) "-";
     font-size: 10pt;
     font-family: "Public Sans", sans-serif;
     color: #4A4C4E;
-    padding-right: 10mm;
+    padding-top: 5mm;
     vertical-align: top;
   }
 }
 
 @media print {
-  table {
-    break-inside: avoid;
-  }
-
-  tr {
+  tr, figure {
     break-inside: avoid;
   }
 
@@ -25,7 +21,7 @@
   }
 
   p {
-    orphans: 2;
-    widows: 2;
+    orphans: 3;
+    widows: 3;
   }
 }
