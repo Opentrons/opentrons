@@ -93,7 +93,6 @@ import type {
   AddStepAction,
   DuplicateMultipleStepsAction,
   DuplicateStepAction,
-  ReorderSelectedStepAction,
   SelectMultipleStepsAction,
   SelectStepAction,
   SelectTerminalItemAction,
