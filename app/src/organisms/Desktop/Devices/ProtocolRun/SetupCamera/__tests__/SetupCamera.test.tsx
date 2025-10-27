@@ -198,7 +198,7 @@ describe('SetupCamera', () => {
 
     screen.getByText('Image storage almost full.')
     screen.getByText(
-      'To free up space, clear images from a previous run record in Recent Runs.'
+      'The run may fail if storage space is not freed up by clearing images from a previous run record.'
     )
 
     const link = screen.getByText('View Recent Runs')

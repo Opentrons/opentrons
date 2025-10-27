@@ -172,7 +172,7 @@
   "find_and_join_network": "Find and join a Wi-Fi network",
   "finish_setup": "Finish setup",
   "firmware_version": "Firmware Version",
-  "free_disk_space": "To free up space, clear images from a previous run record in Recent Runs",
+  "free_disk_space": "The run may fail if storage space is not freed up by clearing images from a previous run record",
   "fully_calibrate_before_checking_health": "Fully calibrate your robot before checking calibration health",
   "gantry_homing": "Home Gantry on Restart",
   "gantry_homing_description": "Homes the gantry along the z-axis.",
