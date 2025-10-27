@@ -54,6 +54,9 @@ export interface ConnectedStepInfoProps {
   sidebarWidth: number
 }
 
+// This debounce reduces flickering when the cursor moves across steps in the timeline.
+// Although there's no hover gap between adjacent `StepContainer`s (they have a visual
+// gap but it's made out of internal padding), there are hover gaps in `ConcurrentStepGroup`s.
 const DEBOUNCE_DURATION_MS = 500
 
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
