@@ -43,10 +43,10 @@ export function useImageInfo(run_id: string): UseImagesInfoResult {
   )
   const items = useMemo(() => {
     if (data == null) return []
-    return data.data.map((img: any) => ({
-      imageId: img.imageId,
-      stepCommandId: img.commandId,
-      previousStepCommandId: img.prevCommandId,
+    return data.data.map(img => ({
+      imageId: img.id,
+      stepCommandId: img.commandId ?? '',
+      previousStepCommandId: img.prevCommandId ?? '',
       timestamp: format(new Date(String(img.createdAt)), 'M/d/yy HH:mm:ss'),
     }))
   }, [data, isLoading, error])
