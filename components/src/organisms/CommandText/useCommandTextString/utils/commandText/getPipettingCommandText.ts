@@ -61,6 +61,14 @@ export const getPipettingCommandText = ({
   const volume = formatCmdParamDecimal(command, 'volume')
   const flowRate = formatCmdParamDecimal(command, 'flowRate')
   const pushOutVolume = formatCmdParamDecimal(command, 'pushOut')
+  const trackFromLocation =
+    command != null && 'trackFromLocation' in command.params
+      ? command.params.wellName
+      : ''
+  const trackToLocation =
+    command != null && 'trackToLocation' in command.params
+      ? command.params.wellName
+      : ''
 
   switch (command?.commandType) {
     case 'aspirate': {
@@ -68,6 +76,14 @@ export const getPipettingCommandText = ({
         well_name: wellName,
         labware: labwareName,
         labware_location: displayLocation,
+        volume,
+        flow_rate: flowRate,
+      })
+    }
+    case 'aspirate_while_tracking': {
+      return t('aspirate_while_tracking', {
+        track_from_location: trackFromLocation,
+        track_to_location: trackToLocation,
         volume,
         flow_rate: flowRate,
       })
