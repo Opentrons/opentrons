@@ -1,16 +1,17 @@
-name: API Checks (CI Docker)
+name: PD Checks (CI Docker)
 
 on:
   pull_request:
     paths:
-      - 'api/**'
-      - 'Makefile'
+      - 'protocol-designer/**'
+      - 'step-generation/**'
       - 'shared-data/**'
-      - '!shared-data/js/**'
-      - 'hardware/**'
+      - 'components/**'
+      - 'Makefile'
+      - 'package.json'
       - 'scripts/**.mk'
       - 'scripts/**.py'
-      - '.github/workflows/ci-docker-api.yaml'
+      - '.github/workflows/ci-docker-pd.yaml'
       - '.github/workflows/utils.js'
   push:
     branches:
@@ -51,7 +52,7 @@ jobs:
         run: make determine-container-tag
 
   lint:
-    name: API lint (CI Docker)
+    name: PD lint (CI Docker)
     needs: select-image
     runs-on: ubuntu-latest
     permissions:
@@ -101,14 +102,14 @@ jobs:
 
       - name: Run lint
         working-directory: ${{ env.OT_REPO_CACHE }}
-        run: make -C api lint
+        run: make -C protocol-designer lint
 
       - name: Summarize lint
         if: always()
         env:
           DEPENDENCIES_CHANGED: ${{ steps.deps.outputs.dependencies_changed || 'false' }}
         run: |
-          echo "## API Lint (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## PD Lint (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ "$DEPENDENCIES_CHANGED" = "true" ]; then
@@ -117,8 +118,8 @@ jobs:
             echo "- Dependencies refreshed: ❌" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-  api-tests:
-    name: API tests (CI Docker)
+  pd-tests:
+    name: PD unit tests (CI Docker)
     needs: select-image
     runs-on: ubuntu-latest
     permissions:
@@ -166,16 +167,16 @@ jobs:
           make setup
           make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
 
-      - name: Run API unit tests
+      - name: Run PD unit tests
         working-directory: ${{ env.OT_REPO_CACHE }}
-        run: make -C api test-cov
+        run: make -C protocol-designer test-cov
 
       - name: Summarize results
         if: always()
         env:
           DEPENDENCIES_CHANGED: ${{ steps.deps.outputs.dependencies_changed || 'false' }}
         run: |
-          echo "## API Tests (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## PD Unit Tests (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ "$DEPENDENCIES_CHANGED" = "true" ]; then
