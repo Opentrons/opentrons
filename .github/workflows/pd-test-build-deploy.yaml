@@ -201,4 +201,3 @@ jobs:
         with:
           release: ${{ steps.resolve-tag.outputs.tag }}
           finalize: true
-          environment: production
