@@ -51,23 +51,9 @@ jobs:
         working-directory: ci-docker
         run: make determine-container-tag
 
-  wait-for-build:
-    name: Wait for container build
-    runs-on: ubuntu-latest
-    needs: select-image
-    steps:
-      - name: Wait for Build CI Docker image workflow
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.sha }}
-          check-name: 'Build and push container'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          allowed-conclusions: success,skipped
-
   lint:
     name: PD lint (CI Docker)
-    needs: [select-image, wait-for-build]
+    needs: select-image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -127,7 +113,7 @@ jobs:
 
   pd-tests:
     name: PD unit tests (CI Docker)
-    needs: [select-image, wait-for-build]
+    needs: select-image
     runs-on: ubuntu-latest
     permissions:
       contents: read
