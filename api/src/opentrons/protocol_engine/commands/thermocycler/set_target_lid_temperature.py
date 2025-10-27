@@ -82,10 +82,13 @@ class SetTargetLidTemperatureImpl(
 
         async def set_target_lid_temperature(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
-                await thermocycler_hardware.set_target_lid_temperature(
-                    target_temperature
-                )
-                await thermocycler_hardware.wait_for_lid_target()
+                async with task_handler.synchronize_cancel_latest(
+                    thermocycler_state.module_id + "-lid"
+                ):
+                    await thermocycler_hardware.set_target_lid_temperature(
+                        target_temperature
+                    )
+                    await thermocycler_hardware.wait_for_lid_target()
 
         task = await self._task_handler.create_task(
             task_function=set_target_lid_temperature, id=params.taskId
