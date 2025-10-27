@@ -8,7 +8,6 @@ import styles from './pipettecontainer.module.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
 
-// Note these props might be changed
 interface PipetteContainerProps {
   mount: string
   pipetteName: PipetteName
@@ -23,7 +22,6 @@ export function PipetteContainer({
   const { t } = useTranslation('protocol_visualization')
   const pipetteDisplayName = usePipetteNameSpecs(pipetteName)?.displayName ?? ''
 
-  // ToDo (kk:2025/10/06) make the following clickable
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -31,7 +29,9 @@ export function PipetteContainer({
         <RobotInfoLabel deckLabel={t(mount)} />
       </div>
       <div className={styles.main_content}>
-        <StyledText>{pipetteDisplayName}</StyledText>
+        <StyledText desktopStyle="captionRegular">
+          {pipetteDisplayName}
+        </StyledText>
         {selected ? <Chip text={t('active')} type="success" /> : null}
       </div>
     </div>

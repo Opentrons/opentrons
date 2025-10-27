@@ -15,10 +15,12 @@ from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine as ensure_sql_engine_is_ready,
 )
 from robot_server.service.legacy.models import V1BasicResponse
+from robot_server.disk_monitor.monitor import DiskMonitor
+from robot_server.disk_monitor.dependencies import get_disk_monitor
 
 from opentrons_shared_data.robot.types import RobotType
 
-from .models import Health, HealthLinks
+from .models import Health, HealthLinks, DiskDetails
 
 _log = logging.getLogger(__name__)
 
@@ -138,6 +140,7 @@ async def get_health(
     sql_engine: Annotated[object, Depends(ensure_sql_engine_is_ready)],
     versions: Annotated[ComponentVersions, Depends(get_versions)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
+    disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
 ) -> Health:
     """Get information about the health of the robot server.
 
@@ -173,4 +176,8 @@ async def get_health(
         robot_model=robot_type,
         links=health_links,
         robot_serial=(await hardware.get_serial_number()),
+        disk_details=DiskDetails(
+            systemAvailableMb=disk_monitor.get_available_disk_space_mb(),
+            imagesDirectorySizeMb=disk_monitor.get_images_directory_size_mb(),
+        ),
     )

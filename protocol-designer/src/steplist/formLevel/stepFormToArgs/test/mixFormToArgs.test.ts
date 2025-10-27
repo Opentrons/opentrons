@@ -5,6 +5,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
+import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
 
@@ -73,6 +74,9 @@ beforeEach(() => {
     // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type hints, this should be a number.
     // Clarify the expected input and change this to a number if it's safe.
     dispense_delay_seconds: null,
+    tip_tracking: AUTOMATIC,
+    tips_selected: [],
+    tiprack_selected: null,
   }
 })
 
@@ -108,6 +112,9 @@ describe('mix step form -> command creator args', () => {
       nozzles: undefined,
       xOffset: 0,
       yOffset: 0,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     })
   })
 

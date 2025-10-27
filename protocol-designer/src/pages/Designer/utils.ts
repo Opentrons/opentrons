@@ -4,7 +4,7 @@ import { reduce } from 'lodash'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getIsLid,
   getIsPipettableLabware,
   getIsTiprack,
@@ -93,7 +93,7 @@ export const getSlotInformation = (
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
-  const latestDefs = getAllLabwareDefs()
+  const latestDefs = getAllDefinitions()
   const lidLoadNames = Object.values(latestDefs)
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)

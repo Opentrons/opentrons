@@ -14,7 +14,7 @@ import type {
 
 let _definitions: LabwareDef2ByDefURI | null = null
 
-const BLOCK_LIST = [...RETIRED_LABWARE, ...LABWAREV2_DO_NOT_LIST]
+const BLOCK_LIST = new Set([...RETIRED_LABWARE, ...LABWAREV2_DO_NOT_LIST])
 
 export function getAllDefinitions(): LabwareDef2ByDefURI {
   if (_definitions == null) {
