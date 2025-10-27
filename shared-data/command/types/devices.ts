@@ -28,5 +28,5 @@ export interface CaptureImageRunTimeCommand
   extends CommonCommandRunTimeInfo,
     CaptureImageCreateCommand {
   // eslint-disable-next-line @typescript-eslint/ban-types
-  result: {} // Returns an empty object currently.
+  result?: {} // Returns an empty object currently.
 }
