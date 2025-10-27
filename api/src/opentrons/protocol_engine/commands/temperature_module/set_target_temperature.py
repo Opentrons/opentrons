@@ -82,7 +82,7 @@ class SetTargetTemperatureImpl(
 
         async def start_set_temperature(task_handler: TaskHandler) -> None:
             if temp_hardware_module is not None:
-                async with task_handler.synchronize_cancel_latest(
+                async with task_handler.synchronize_cancel_previous(
                     module_substate.module_id
                 ):
                     await temp_hardware_module.start_set_temperature(

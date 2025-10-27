@@ -99,7 +99,7 @@ class SetShakeSpeedImpl(
 
         async def start_shake(task_handler: TaskHandler) -> None:
             if hs_hardware_module is not None:
-                async with task_handler.synchronize_cancel_latest(
+                async with task_handler.synchronize_cancel_previous(
                     hs_module_substate.module_id + "-shake"
                 ):
                     await hs_hardware_module.set_speed(rpm=validated_speed)
