@@ -89,7 +89,7 @@ function GalleryTableHeaders(): JSX.Element {
         desktopStyle="captionSemiBold"
         className={styles.header_thumbnail}
       >
-        {t('Thumbnail')}
+        {t('thumbnail')}
       </StyledText>
       <StyledText
         desktopStyle="captionSemiBold"

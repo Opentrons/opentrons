@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import { ImageGalleryContainer } from '..'
 import { GalleryItemCard } from '../GalleryItemCard'
@@ -17,7 +18,10 @@ const render = () => {
   const RUN_ID = 'run123'
   const robotType = 'OT-3 Standard'
   return renderWithProviders(
-    <ImageGalleryContainer run_id={RUN_ID} robotType={robotType} />
+    <ImageGalleryContainer run_id={RUN_ID} robotType={robotType} />,
+    {
+      i18nInstance: i18n,
+    }
   )
 }
 
