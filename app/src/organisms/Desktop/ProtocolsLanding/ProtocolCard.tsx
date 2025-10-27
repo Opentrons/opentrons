@@ -146,6 +146,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
   const robotType = mostRecentAnalysis?.robotType ?? null
+  const hasPeripherals =
+    mostRecentAnalysis?.commandPreconditions?.isCameraUsed ?? false
 
   return (
     <Flex
@@ -336,7 +338,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                       {requiredModuleTypes.map((moduleType, index) => (
                         <ModuleIcon
                           key={index}
-                          color={COLORS.grey60}
+                          color={COLORS.grey50}
                           moduleType={moduleType}
                           height="1rem"
                           marginRight={SPACING.spacing8}
@@ -346,6 +348,30 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   </>
                 ) : null}
               </Flex>
+              {hasPeripherals && (
+                <Flex
+                  flex="0 0 6rem"
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  width="5.313rem"
+                >
+                  <>
+                    <StyledText
+                      desktopStyle="bodyDefaultRegular"
+                      color={COLORS.grey60}
+                    >
+                      {t('peripherals')}
+                    </StyledText>
+                    <Flex flexWrap={WRAP}>
+                      <Icon
+                        color={COLORS.grey50}
+                        name="photo-camera"
+                        height="1rem"
+                      />
+                    </Flex>
+                  </>
+                </Flex>
+              )}
             </Flex>
             <Flex
               justifyContent={JUSTIFY_FLEX_END}
