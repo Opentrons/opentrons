@@ -12,7 +12,67 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
 import type { StepIdType } from '/protocol-designer/form-types'
 
-export interface ConnectedStepItemProps {
+interface DraggableStepsProps {
+  orderedStepIds: StepIdType[]
+  reorderSteps: (steps: StepIdType[]) => void
+  sidebarWidth: number
+}
+export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
+  const { orderedStepIds, reorderSteps, sidebarWidth } = props
+  const { t } = useTranslation('shared')
+  const [openedOverflowMenuId, setOpenedOverflowMenuId] = useState<
+    string | null
+  >(null)
+
+  const findStepIndex = (stepId: StepIdType): number =>
+    orderedStepIds.findIndex(id => stepId === id)
+
+  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
+    const currentIndex = findStepIndex(stepId)
+
+    const currentRemoved = [
+      ...orderedStepIds.slice(0, currentIndex),
+      ...orderedStepIds.slice(currentIndex + 1, orderedStepIds.length),
+    ]
+    // need to account for whether we are dragging onto a step above or below the current step
+    const reinsertOffset = currentIndex < targetIndex ? 1 : 0
+    const currentReinserted = [
+      ...currentRemoved.slice(0, targetIndex - reinsertOffset),
+      stepId,
+      ...currentRemoved.slice(
+        targetIndex - reinsertOffset,
+        currentRemoved.length
+      ),
+    ]
+    if (confirm(t('confirm_reorder') as string)) {
+      reorderSteps(currentReinserted)
+    }
+  }
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+      {orderedStepIds.map((stepId: StepIdType, index: number) => (
+        <DragDropStep
+          key={`${stepId}_${index}`}
+          stepNumber={index + 1}
+          stepId={stepId}
+          moveStep={moveStep}
+          findStepIndex={findStepIndex}
+          orderedStepIds={orderedStepIds}
+          openedOverflowMenuId={openedOverflowMenuId}
+          setOpenedOverflowMenuId={setOpenedOverflowMenuId}
+          sidebarWidth={sidebarWidth}
+        />
+      ))}
+    </Flex>
+  )
+}
+
+interface DropType {
+  stepId: StepIdType
+}
+
+interface ConnectedStepItemProps {
   stepId: StepIdType
   stepNumber: number
   onStepContextMenu?: () => void
@@ -26,10 +86,6 @@ interface DragDropStepProps extends ConnectedStepItemProps {
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
-}
-
-interface DropType {
-  stepId: StepIdType
 }
 
 function DragDropStep(props: DragDropStepProps): JSX.Element {
@@ -95,61 +151,5 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
         sidebarWidth={sidebarWidth}
       />
     </Box>
-  )
-}
-
-interface DraggableStepsProps {
-  orderedStepIds: StepIdType[]
-  reorderSteps: (steps: StepIdType[]) => void
-  sidebarWidth: number
-}
-export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
-  const { orderedStepIds, reorderSteps, sidebarWidth } = props
-  const { t } = useTranslation('shared')
-  const [openedOverflowMenuId, setOpenedOverflowMenuId] = useState<
-    string | null
-  >(null)
-
-  const findStepIndex = (stepId: StepIdType): number =>
-    orderedStepIds.findIndex(id => stepId === id)
-
-  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
-    const currentIndex = findStepIndex(stepId)
-
-    const currentRemoved = [
-      ...orderedStepIds.slice(0, currentIndex),
-      ...orderedStepIds.slice(currentIndex + 1, orderedStepIds.length),
-    ]
-    // need to account for whether we are dragging onto a step above or below the current step
-    const reinsertOffset = currentIndex < targetIndex ? 1 : 0
-    const currentReinserted = [
-      ...currentRemoved.slice(0, targetIndex - reinsertOffset),
-      stepId,
-      ...currentRemoved.slice(
-        targetIndex - reinsertOffset,
-        currentRemoved.length
-      ),
-    ]
-    if (confirm(t('confirm_reorder') as string)) {
-      reorderSteps(currentReinserted)
-    }
-  }
-
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {orderedStepIds.map((stepId: StepIdType, index: number) => (
-        <DragDropStep
-          key={`${stepId}_${index}`}
-          stepNumber={index + 1}
-          stepId={stepId}
-          moveStep={moveStep}
-          findStepIndex={findStepIndex}
-          orderedStepIds={orderedStepIds}
-          openedOverflowMenuId={openedOverflowMenuId}
-          setOpenedOverflowMenuId={setOpenedOverflowMenuId}
-          sidebarWidth={sidebarWidth}
-        />
-      ))}
-    </Flex>
   )
 }
