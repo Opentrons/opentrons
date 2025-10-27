@@ -1,6 +1,10 @@
 name: Build CI Docker image
 
 on:
+  pull_request:
+    paths:
+      - 'ci-docker/**'
+      - '.github/workflows/ci-docker-build.yaml'
   push:
     branches:
       - edge
