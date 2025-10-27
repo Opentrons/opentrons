@@ -97,17 +97,30 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 # Cache mount for git objects speeds up rebuilds significantly.
 RUN --mount=type=cache,target=/root/.git-cache,sharing=locked \
     set -e; \
+    echo "Cloning ref: ${OPENTRONS_DEFAULT_REF}"; \
     if [ -d "/root/.git-cache/opentrons.git" ]; then \
         echo "Using cached git objects for faster clone"; \
-        git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+        git clone --depth=150 --filter=blob:none \
             --reference /root/.git-cache/opentrons.git \
             ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
     else \
         echo "First build - cloning without cache"; \
-        git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+        git clone --depth=150 --filter=blob:none \
             ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
     fi; \
-    git -C ${OT_REPO_CACHE} fetch --tags --depth=150; \
+    cd ${OT_REPO_CACHE}; \
+    if git show-ref --verify --quiet "refs/remotes/origin/${OPENTRONS_DEFAULT_REF}"; then \
+        echo "Checking out branch: ${OPENTRONS_DEFAULT_REF}"; \
+        git checkout -b local-branch "origin/${OPENTRONS_DEFAULT_REF}"; \
+    elif [ "${OPENTRONS_DEFAULT_REF}" = "edge" ]; then \
+        echo "Defaulting to edge branch"; \
+        git checkout -b local-branch origin/edge; \
+    else \
+        echo "Fetching and checking out ref: ${OPENTRONS_DEFAULT_REF}"; \
+        git fetch origin "${OPENTRONS_DEFAULT_REF}:local-branch" --depth=150 || \
+        git fetch origin "${OPENTRONS_DEFAULT_REF}" --depth=150 && git checkout FETCH_HEAD; \
+    fi; \
+    git fetch --tags --depth=150; \
     git config --system --add safe.directory ${OT_REPO_CACHE}; \
     git clone --mirror ${OT_REPO_CACHE} /root/.git-cache/opentrons.git || true; \
     chown -R ${USERNAME}:${USERNAME} ${OT_REPO_CACHE}
