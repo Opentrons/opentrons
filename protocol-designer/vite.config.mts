@@ -60,8 +60,8 @@ export default defineConfig(
         sentryVitePlugin({
           org: 'opentrons-76',
           project: 'protocol-designer',
-          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
-          release: OT_PD_VERSION,
+          // Don't provide authToken - we don't want to upload during build
+          // Uploads happen in dedicated workflow steps in GitHub Actions
           telemetry: false,
           reactComponentAnnotation: {
             enabled: true,
@@ -70,8 +70,6 @@ export default defineConfig(
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
-            filesToDeleteAfterUpload:
-              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
         {
