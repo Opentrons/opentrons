@@ -325,7 +325,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   flex="0 0 6rem"
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
-                  width="5.313rem"
+                  width="85px"
                 >
                   {requiredModuleTypes.length > 0 ? (
                     <>
@@ -354,7 +354,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                     flex="0 0 6rem"
                     flexDirection={DIRECTION_COLUMN}
                     gridGap={SPACING.spacing4}
-                    width="5.313rem"
+                    width="85px"
                   >
                     <>
                       <StyledText

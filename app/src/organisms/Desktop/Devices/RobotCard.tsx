@@ -151,7 +151,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      width="5.313rem"
+      width="85px"
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
@@ -179,7 +179,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      width="5.313rem"
+      width="85px"
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('peripherals')}
