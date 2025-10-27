@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { COLORS, Icon } from '@opentrons/components'
 
@@ -20,6 +20,7 @@ export function ProtocolVisualization(): JSX.Element {
   const { protocolKey } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
@@ -27,11 +28,21 @@ export function ProtocolVisualization(): JSX.Element {
   const groupedCommands = useSelector((state: State) =>
     getStoredProtocolGroupedCommands(state, protocolKey)
   )
+
   useEffect(() => {
     dispatch(fetchProtocols())
-  }, [])
+  }, [dispatch])
 
-  return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
+  // this is for an edge case
+  // a user tries to access the visualization page from the protocol setup page by re-running the protocol
+  // this will be fixed in protocol visualization phase 2
+  useEffect(() => {
+    if (storedProtocol?.mostRecentAnalysis == null) {
+      navigate(-1)
+    }
+  }, [storedProtocol?.mostRecentAnalysis, navigate])
+
+  return storedProtocol?.mostRecentAnalysis != null ? (
     <VisualizerContainer
       analysis={storedProtocol.mostRecentAnalysis}
       groupedCommands={groupedCommands}
