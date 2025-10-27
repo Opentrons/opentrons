@@ -6,7 +6,7 @@ import type {
 } from '/app/redux/pipettes/types'
 
 export function downloadFile(
-  data: Blob | ArrayBuffer | object | string,
+  data: Blob | object | string,
   fileName: string,
   mimeType?: string
 ): void {
