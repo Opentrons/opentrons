@@ -1,6 +1,6 @@
 UV ?= uv
 TAG ?= ghcr.io/opentrons/ci-bootstrap:local
-SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/main.py
+DOCKERFILE := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/Dockerfile
 UTILS_SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/utils/actions.py
 REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 
@@ -13,21 +13,32 @@ REF_NAME ?=
 BASE_REF ?=
 EVENT_NAME ?=
 TITLE ?=
+OPENTRONS_DEFAULT_REF ?= edge
+PLATFORM ?= linux/$(shell uname -m | sed 's/x86_64/amd64/; s/aarch64/arm64/')
 
-# Ensure dependency graph runs the setup before any primary entrypoints
-build publish shell determine-source-ref determine-container-tag dependency-checksums check-dependency-drift: setup
+# Ensure dependency graph runs the setup before utility commands
+determine-source-ref determine-container-tag dependency-checksums check-dependency-drift: setup
 
 .PHONY: build
 build:
-	$(UV) run $(SCRIPT) build --tag $(TAG) $(ARGS)
+	docker build \
+		--file $(DOCKERFILE) \
+		--tag $(TAG) \
+		--platform $(PLATFORM) \
+		--build-arg OPENTRONS_DEFAULT_REF=$(OPENTRONS_DEFAULT_REF) \
+		$(REPO_ROOT)
 
-.PHONY: publish
-publish:
-	$(UV) run $(SCRIPT) build --tag $(TAG) --push $(ARGS)
+.PHONY: push
+push: build
+	docker push $(TAG)
 
 .PHONY: shell
 shell:
-	$(UV) run $(SCRIPT) shell --image $(TAG) $(ARGS)
+	docker run --rm -it \
+		-v $(REPO_ROOT):/workspace \
+		-w /workspace \
+		$(TAG) \
+		/bin/bash
 
 .PHONY: determine-source-ref
 determine-source-ref:
@@ -56,7 +67,11 @@ clean:
 .PHONY: help
 help:
 	@printf "Available targets:\n"
-	@printf "  make build    # Build the CI container (override TAG/ARGS as needed)\n"
-	@printf "  make publish  # Build and push the container\n"
-	@printf "  make shell    # Start an interactive shell with the repo mounted\n"
-	@printf "  make clean    # Remove the local container image\n"
+	@printf "  make build           # Build the CI container (override TAG/PLATFORM/OPENTRONS_DEFAULT_REF as needed)\n"
+	@printf "  make push            # Build and push the container\n"
+	@printf "  make shell           # Start an interactive shell with the repo mounted\n"
+	@printf "  make clean           # Remove the local container image\n"
+	@printf "\n"
+	@printf "Examples:\n"
+	@printf "  make build TAG=ghcr.io/opentrons/ci-bootstrap:test PLATFORM=linux/amd64\n"
+	@printf "  make shell TAG=ghcr.io/opentrons/ci-bootstrap:edge\n"

@@ -88,35 +88,44 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
         virtualenv==20.30.0 \
         uv==0.4.29
 
-# Pre-clone repository with minimal history while keeping tags for versioning.
-RUN git clone --single-branch --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
-        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE} && \
-    git -C ${OT_REPO_CACHE} fetch --tags --force && \
-    git config --system --add safe.directory ${OT_REPO_CACHE}
-
-COPY ci-docker ${OT_REPO_CACHE}/ci-docker
-
 # Create predictable non-root CI user.
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
-    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
-    mkdir -p /workspace ${OT_REPO_CACHE} && \
-    chown -R ${USERNAME}:${USERNAME} /workspace ${OT_REPO_CACHE} && \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
-    chmod 0440 /etc/sudoers.d/${USERNAME}
+    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}
+
+# Pre-clone repository with reasonable history depth while keeping tags for versioning.
+# Use --depth=150 to provide enough history for sentry tracking and other tools that need commit context.
+# Cache mount for git objects speeds up rebuilds significantly.
+RUN --mount=type=cache,target=/root/.git-cache,sharing=locked \
+    git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+        --reference-if-able /root/.git-cache/opentrons.git \
+        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE} || \
+    git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
+    git -C ${OT_REPO_CACHE} fetch --tags --depth=150 && \
+    git config --system --add safe.directory ${OT_REPO_CACHE} && \
+    git clone --mirror ${OT_REPO_CACHE} /root/.git-cache/opentrons.git || true && \
+    chown -R ${USERNAME}:${USERNAME} ${OT_REPO_CACHE}
+
+COPY --chown=${USERNAME}:${USERNAME} ci-docker ${OT_REPO_CACHE}/ci-docker
 
 USER ${USERNAME}
 WORKDIR ${OT_REPO_CACHE}
 
-# Sanity check that the ci user can escalate without a password.
-RUN sudo -n true
+# Configure Yarn to use consistent cache location and optimize download speed
+RUN yarn config set cache-folder /home/ci/.cache/yarn && \
+    yarn config set network-concurrency 16
 
 # Warm dependency caches and capture dependency metadata for runtime checks.
-RUN make --output-sync=target -j setup-py && \
-    make setup-js && \
+# Cache mounts speed up rebuilds in GitHub Actions and locally with BuildKit.
+RUN --mount=type=cache,target=/home/ci/.cache,uid=${USER_UID},gid=${USER_GID},sharing=locked \
+    --mount=type=cache,target=/home/ci/.local/share/virtualenvs,uid=${USER_UID},gid=${USER_GID},sharing=locked \
+    make setup && \
     make -C ci-docker dependency-checksums OUTPUT="${OT_REPO_CACHE}/.ci-dependency-checksums.json" TITLE="Container Dependency Checksums" && \
     git reset --hard
 
 RUN git rev-parse HEAD > ${OT_REPO_CACHE}/.ci-default-ref
+
+RUN mkdir -p /workspace
 
 WORKDIR /workspace
 
