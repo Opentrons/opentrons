@@ -1972,7 +1972,8 @@ class InstrumentContext(publisher.CommandPublisher):
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
         :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
-            complete the transfer, the API will raise an error.
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
@@ -2137,7 +2138,8 @@ class InstrumentContext(publisher.CommandPublisher):
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
         :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
-            complete the transfer, the API will raise an error.
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
@@ -2311,7 +2313,8 @@ class InstrumentContext(publisher.CommandPublisher):
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
         :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
-            complete the transfer, the API will raise an error.
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
