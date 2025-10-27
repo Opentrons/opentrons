@@ -28,5 +28,6 @@
   "well_dimension": "{{number}} mm",
   "well_name": "Well {{wellName}}",
   "well_view": "Well view",
+  "seconds_per_step": "{{seconds}}s per step",
   "well_volume": "{{volume}} µl"
 }

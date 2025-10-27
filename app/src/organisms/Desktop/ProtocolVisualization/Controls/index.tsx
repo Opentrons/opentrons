@@ -1,10 +1,20 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { Chip, COLORS, NewIconButton } from '@opentrons/components'
+import {
+  Chip,
+  COLORS,
+  NewIconButton,
+  NO_WRAP,
+  StyledText,
+  TertiaryButton,
+} from '@opentrons/components'
 
 import { stepDetailViewerUpdateAction } from '/app/redux/shell'
 
-import styles from './preview.module.css'
+import styles from './controls.module.css'
+import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 
 // import {
 //   getNextGroupFirstCommandId,
@@ -39,6 +49,7 @@ interface ControlsProps {
     slot: string | null
     command?: RunTimeCommand
   }
+  setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -52,9 +63,13 @@ export function Controls(props: ControlsProps): JSX.Element {
     commands,
     // groupedCommands,
     spotlightWindowData,
+    setMilliSecondsPerFrame,
   } = props
+  const { t } = useTranslation('protocol_visualization')
   const dispatch = useDispatch()
 
+  const [showPerStepOverflowMenu, setShowPerStepOverflowMenu] = useState(false)
+  const [selectedPerdStep, setSelectedPerdStep] = useState(2)
   // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
   // const currentCommandId = commands[currentCommandIndex].id
   // const nextGroupFirstCommandId = getNextGroupFirstCommandId(
@@ -80,6 +95,12 @@ export function Controls(props: ControlsProps): JSX.Element {
   //     setSelectedCommand(commands[commands.length - 1].id)
   //   }
   // }
+
+  const handlePerStepOverflowClick = (): void => {
+    setShowPerStepOverflowMenu(
+      showPerStepOverflowMenu => !showPerStepOverflowMenu
+    )
+  }
   return (
     <>
       <div className={styles.container}>
@@ -96,6 +117,26 @@ export function Controls(props: ControlsProps): JSX.Element {
               </div>
             </div>
             <div className={styles.buttons}>
+              <div className={styles.per_step_button_wrapper}>
+                <TertiaryButton
+                  buttonType="white"
+                  onClick={handlePerStepOverflowClick}
+                >
+                  <StyledText
+                    desktopStyle="captionSemiBold"
+                    whiteSpace={NO_WRAP}
+                  >
+                    {t('seconds_per_step', { seconds: selectedPerdStep })}
+                  </StyledText>
+                </TertiaryButton>
+                {showPerStepOverflowMenu ? (
+                  <PerStepOverflowMenu
+                    setSelectedPerdStep={setSelectedPerdStep}
+                    setShowPerStepOverflowMenu={setShowPerStepOverflowMenu}
+                    setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+                  />
+                ) : null}
+              </div>
               <NewIconButton
                 variant="primary"
                 iconName={isPlaying ? 'pause' : 'play'}
