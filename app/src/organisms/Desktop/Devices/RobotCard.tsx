@@ -119,7 +119,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             >
               <AttachedInstruments robotName={robotName} />
               <Flex
-                flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 flexWrap={WRAP}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -150,11 +149,15 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const attachedModules = modulesData?.data ?? []
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="5.313rem"
+    >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
       </StyledText>
-      <Flex>
+      <Flex flexWrap={WRAP}>
         {attachedModules.map((module, i) => (
           <ModuleIcon
             key={`${String(module.moduleModel)}_${i}_${robotName}`}
@@ -174,9 +177,13 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { t } = useTranslation('devices_landing')
   const { data } = useCamera()
   return data?.cameraEnabled ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="5.313rem"
+    >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-        {t('input_devices')}
+        {t('peripherals')}
       </StyledText>
       <Icon
         key={`${String('camera')}_${robotName}`}
@@ -189,7 +196,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
 }
 
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
-  const { t } = useTranslation('devices_landing')
+  const { t, i18n } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
   const { data: pipettesData, isLoading: isPipetteQueryLoading } =
     usePipettesQuery()
@@ -218,9 +225,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <LegacyStyledText as="h6" color={COLORS.grey60}>
-        {t('shared:instruments')}
-      </LegacyStyledText>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {i18n.format(t('shared:instruments'), 'capitalize')}
+      </StyledText>
 
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
