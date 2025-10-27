@@ -21,6 +21,7 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
+  type ContentsByWell,
   getSlotInLocationStack,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
@@ -154,7 +155,7 @@ export function AssignLiquidsModal(
               <DeckInfoLabel
                 size="large"
                 deckLabel={
-                  getSlotInLocationStack(labware[labwareId].stack) ?? ''
+                  getSlotInLocationStack(labware[labwareId].stack as string[]) ?? ''
                 }
               />
               <StyledText
@@ -205,7 +206,7 @@ export function AssignLiquidsModal(
                       positioningMode: 'offsetInSlot',
                       highlightedWells,
                       wellFill: wellFillFromWellContents(
-                        wellContents,
+                        wellContents as ContentsByWell,
                         liquidDisplayColors
                       ),
                     }}

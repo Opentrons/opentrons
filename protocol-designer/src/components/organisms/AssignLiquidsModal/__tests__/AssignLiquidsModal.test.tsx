@@ -2,7 +2,7 @@ import { NavigateFunction } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { fixture96Plate } from '@opentrons/shared-data'
+import type { fixture96Plate, LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -10,7 +10,6 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { AssignLiquidsModal } from '..'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 const mockDispatch = vi.fn()
