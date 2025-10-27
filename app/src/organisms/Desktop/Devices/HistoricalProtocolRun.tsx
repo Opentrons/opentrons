@@ -16,7 +16,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useOutputCsvDataFileIds } from '/app/resources/dataFiles/useCsvDataFiles'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
@@ -46,13 +46,15 @@ export function HistoricalProtocolRun(
   const { t } = useTranslation('run_details')
   const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const csvDataFileIds = useOutputCsvDataFileIds(run.id)
+  const outputFileIds = useRunGeneratedDataFiles(run.id)
+  const imageFileCount = outputFileIds.jpeg.length > 0 ? 1 : 0
+  const totalOutputFiles = outputFileIds.csv.length + imageFileCount
   const countRunDataFiles =
     'runTimeParameters' in run
       ? run?.runTimeParameters.filter(
           parameter => parameter.type === 'csv_file'
-        ).length + csvDataFileIds.length
-      : csvDataFileIds.length
+        ).length + totalOutputFiles
+      : totalOutputFiles
 
   const runStatus = run.status
   const runDisplayName = formatTimestamp(run.createdAt)
@@ -143,7 +145,9 @@ export function HistoricalProtocolRun(
           />
         </Flex>
       </Flex>
-      {drawerOpen ? <Drawer run={run} robotName={robotName} /> : null}
+      {drawerOpen ? (
+        <Drawer run={run} robotName={robotName} protocolName={protocolName} />
+      ) : null}
     </>
   )
 }

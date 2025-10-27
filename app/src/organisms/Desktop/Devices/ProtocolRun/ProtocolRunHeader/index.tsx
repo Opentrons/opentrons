@@ -13,7 +13,7 @@ import {
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useIsRobotViewable } from '/app/redux-resources/robots'
-import { useOutputCsvDataFileIds } from '/app/resources/dataFiles/useCsvDataFiles'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
   useCloseCurrentRun,
   useNotifyRunQuery,
@@ -91,7 +91,7 @@ export function ProtocolRunHeader(
   }
 
   useRunAnalytics({ runId, robotName, enteredER })
-  const csvDataFileIds = useOutputCsvDataFileIds(runId)
+  const outputFileIds = useRunGeneratedDataFiles(runId)
 
   return (
     <>
@@ -110,7 +110,7 @@ export function ProtocolRunHeader(
           isResetRunLoading={isResetRunLoadingRef.current}
           runErrors={runErrors}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          hasDownloadableFiles={csvDataFileIds.length > 0}
+          hasDownloadableFiles={outputFileIds.csv.length > 0}
           {...props}
         />
         <RunHeaderContent
