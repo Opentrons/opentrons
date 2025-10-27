@@ -49,6 +49,7 @@ interface ControlsProps {
     slot: string | null
     command?: RunTimeCommand
   }
+  milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
 export function Controls(props: ControlsProps): JSX.Element {
@@ -63,13 +64,13 @@ export function Controls(props: ControlsProps): JSX.Element {
     commands,
     // groupedCommands,
     spotlightWindowData,
+    milliSecondsPerFrame,
     setMilliSecondsPerFrame,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const dispatch = useDispatch()
 
   const [showPerStepOverflowMenu, setShowPerStepOverflowMenu] = useState(false)
-  const [selectedPerdStep, setSelectedPerdStep] = useState(2)
   // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
   // const currentCommandId = commands[currentCommandIndex].id
   // const nextGroupFirstCommandId = getNextGroupFirstCommandId(
@@ -126,12 +127,13 @@ export function Controls(props: ControlsProps): JSX.Element {
                     desktopStyle="captionSemiBold"
                     whiteSpace={NO_WRAP}
                   >
-                    {t('seconds_per_step', { seconds: selectedPerdStep })}
+                    {t('seconds_per_step', {
+                      seconds: milliSecondsPerFrame / 1000,
+                    })}
                   </StyledText>
                 </TertiaryButton>
                 {showPerStepOverflowMenu ? (
                   <PerStepOverflowMenu
-                    setSelectedPerdStep={setSelectedPerdStep}
                     setShowPerStepOverflowMenu={setShowPerStepOverflowMenu}
                     setMilliSecondsPerFrame={setMilliSecondsPerFrame}
                   />

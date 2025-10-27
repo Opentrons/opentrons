@@ -15,6 +15,7 @@
   "quantity": "Quantity: {{quantity}}",
   "remaining_tips": "{{remaining}} tips",
   "right_mount": "RIGHT MOUNT",
+  "seconds_per_step": "{{seconds}}s per step",
   "source_tips": "Source tips",
   "source_well_view": "Source well view",
   "step": "Step {{number}}",
@@ -28,6 +29,5 @@
   "well_dimension": "{{number}} mm",
   "well_name": "Well {{wellName}}",
   "well_view": "Well view",
-  "seconds_per_step": "{{seconds}}s per step",
   "well_volume": "{{volume}} µl"
 }

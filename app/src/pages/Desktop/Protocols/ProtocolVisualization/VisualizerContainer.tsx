@@ -16,7 +16,6 @@ import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
-// import { Controls } from './Controls'
 import { DeckView } from './DeckView'
 import styles from './visualizercontainer.module.css'
 
@@ -263,6 +262,7 @@ export function VisualizerContainer(
             analysis,
             liquids,
           }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
           setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />
 

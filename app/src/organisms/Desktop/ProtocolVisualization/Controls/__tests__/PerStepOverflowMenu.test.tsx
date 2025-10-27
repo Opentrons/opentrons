@@ -14,7 +14,6 @@ const render = (props: ComponentProps<typeof PerStepOverflowMenu>) => {
   })
 }
 
-const mockSetSelectedPerdStep = vi.fn()
 const mockSetShowPerStepOverflowMenu = vi.fn()
 const mockSetMilliSecondsPerFrame = vi.fn()
 
@@ -23,7 +22,6 @@ describe('PerStepOverflowMenu', () => {
 
   beforeEach(() => {
     props = {
-      setSelectedPerdStep: mockSetSelectedPerdStep,
       setShowPerStepOverflowMenu: mockSetShowPerStepOverflowMenu,
       setMilliSecondsPerFrame: mockSetMilliSecondsPerFrame,
     }
@@ -38,6 +36,7 @@ describe('PerStepOverflowMenu', () => {
   it('calls the setSelectedPerdStep function when clicking the 2 seconds per step button', () => {
     render(props)
     fireEvent.click(screen.getByText('2s per step'))
-    expect(mockSetSelectedPerdStep).toHaveBeenCalledWith(2)
+    expect(mockSetMilliSecondsPerFrame).toHaveBeenCalledWith(2000)
+    expect(mockSetShowPerStepOverflowMenu).toHaveBeenCalledWith(false)
   })
 })

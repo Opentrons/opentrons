@@ -5,7 +5,6 @@ import { MenuItem, MenuList, useOnClickOutside } from '@opentrons/components'
 import styles from './perstepoverflowmenu.module.css'
 
 interface PerStepOverflowMenuProps {
-  setSelectedPerdStep: (perdStep: number) => void
   setShowPerStepOverflowMenu: (showPerStepOverflowMenu: boolean) => void
   setMilliSecondsPerFrame: (secondsPerFrame: number) => void
 }
@@ -16,11 +15,7 @@ export function PerStepOverflowMenu(
   props: PerStepOverflowMenuProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
-  const {
-    setSelectedPerdStep,
-    setShowPerStepOverflowMenu,
-    setMilliSecondsPerFrame,
-  } = props
+  const { setShowPerStepOverflowMenu, setMilliSecondsPerFrame } = props
   const perStepOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowPerStepOverflowMenu(false)
@@ -28,7 +23,6 @@ export function PerStepOverflowMenu(
   })
 
   const handleClick = (seconds: number): void => {
-    setSelectedPerdStep(seconds)
     setMilliSecondsPerFrame(seconds * 1000)
     setShowPerStepOverflowMenu(false)
   }
