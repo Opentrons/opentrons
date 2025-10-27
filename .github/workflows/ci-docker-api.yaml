@@ -70,42 +70,37 @@ jobs:
       - name: Confirm container tag
         run: echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Restore warmed dependencies
+      - name: Configure Git access
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          if [ -d "$OT_REPO_CACHE/node_modules" ]; then
-            cp -a "$OT_REPO_CACHE/node_modules" .
-          fi
-          find "$OT_REPO_CACHE" -maxdepth 2 -type d -name '.venv' -o -name 'node_modules' | while read dir; do
-            project=$(dirname "$dir" | xargs basename)
-            if [ -d "$project" ] && [ -d "$dir" ]; then
-              cp -a "$dir" "$project/"
-            fi
-          done
+          git -C "$OT_REPO_CACHE" remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/Opentrons/opentrons.git"
 
-      - name: Restore dependency checksums
+      - name: Update cached repository
+        env:
+          TARGET_REF: ${{ github.ref }}
+          TARGET_SHA: ${{ github.sha }}
         run: |
-          if [ -f "$OT_REPO_CACHE/.ci-dependency-checksums.json" ]; then
-            cp "$OT_REPO_CACHE/.ci-dependency-checksums.json" .ci-dependency-checksums.json
-          fi
+          cd "$OT_REPO_CACHE"
+          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
+          git checkout --force "$TARGET_SHA"
 
       - name: Check dependency drift
         id: deps
-        working-directory: ci-docker
+        working-directory: ${{ env.OT_REPO_CACHE }}/ci-docker
         run: make check-dependency-drift
 
       - name: Refresh dependencies when manifests change
         if: steps.deps.outputs.dependencies_changed == 'true'
+        working-directory: ${{ env.OT_REPO_CACHE }}
         run: |
           make teardown
           make setup
-          make -C ci-docker dependency-checksums OUTPUT=".ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
+          make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
 
       - name: Run lint
+        working-directory: ${{ env.OT_REPO_CACHE }}
         run: make -C api lint
 
       - name: Summarize lint
@@ -142,42 +137,37 @@ jobs:
       - name: Confirm container tag
         run: echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Restore warmed dependencies
+      - name: Configure Git access
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          if [ -d "$OT_REPO_CACHE/node_modules" ]; then
-            cp -a "$OT_REPO_CACHE/node_modules" .
-          fi
-          find "$OT_REPO_CACHE" -maxdepth 2 -type d -name '.venv' -o -name 'node_modules' | while read dir; do
-            project=$(dirname "$dir" | xargs basename)
-            if [ -d "$project" ] && [ -d "$dir" ]; then
-              cp -a "$dir" "$project/"
-            fi
-          done
+          git -C "$OT_REPO_CACHE" remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/Opentrons/opentrons.git"
 
-      - name: Restore dependency checksums
+      - name: Update cached repository
+        env:
+          TARGET_REF: ${{ github.ref }}
+          TARGET_SHA: ${{ github.sha }}
         run: |
-          if [ -f "$OT_REPO_CACHE/.ci-dependency-checksums.json" ]; then
-            cp "$OT_REPO_CACHE/.ci-dependency-checksums.json" .ci-dependency-checksums.json
-          fi
+          cd "$OT_REPO_CACHE"
+          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
+          git checkout --force "$TARGET_SHA"
 
       - name: Check dependency drift
         id: deps
-        working-directory: ci-docker
+        working-directory: ${{ env.OT_REPO_CACHE }}/ci-docker
         run: make check-dependency-drift
 
       - name: Refresh dependencies when manifests change
         if: steps.deps.outputs.dependencies_changed == 'true'
+        working-directory: ${{ env.OT_REPO_CACHE }}
         run: |
           make teardown
           make setup
-          make -C ci-docker dependency-checksums OUTPUT=".ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
+          make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
 
       - name: Run API unit tests
+        working-directory: ${{ env.OT_REPO_CACHE }}
         run: make -C api test-cov
 
       - name: Summarize results
