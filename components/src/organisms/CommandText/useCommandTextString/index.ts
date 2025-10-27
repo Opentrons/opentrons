@@ -354,6 +354,16 @@ export function useCommandTextString(
       }
     }
 
+    case 'captureImage': {
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotDevicesCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    }
+
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }
