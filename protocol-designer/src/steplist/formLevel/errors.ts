@@ -1599,3 +1599,5 @@ export const composeErrors: ComposeErrors =
     errorCheckers
       .map(checker => checker(formData, moduleEntities, labwareEntities))
       .filter((error): error is FormError => error !== null)
+
+// TODO: Some kind of error here for "does this point to a valid TC module that's currently profiling?"
