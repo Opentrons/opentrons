@@ -99,8 +99,6 @@ export function VisualizerContainer(
   useEffect(() => {
     if (!isPlaying) return
 
-    console.log('milliSecondsPerFrame', milliSecondsPerFrame)
-
     const intervalId = setInterval(() => {
       setSelectedCommand(prevId => {
         const currentIndex = commands.findIndex(cmd => cmd.id === prevId)
