@@ -18,8 +18,7 @@ ENV TZ=Etc/UTC \
     LC_ALL=en_US.UTF-8 \
     PATH=/home/${USERNAME}/.local/bin:${PATH} \
     OT_PYTHON=/usr/bin/python3 \
-    OT_REPO_CACHE=/opt/opentrons \
-    GIT_ALTERNATE_OBJECT_DIRECTORIES=/opt/opentrons/.git/objects
+    OT_REPO_CACHE=/opt/opentrons
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

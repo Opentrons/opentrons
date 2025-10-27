@@ -22,7 +22,7 @@ _RICH_TABLE = None
 
 _DEPENDENCY_DIR_EXCLUDES = {".git", "node_modules", ".venv", "__pycache__", ".mypy_cache", ".pytest_cache"}
 _PYTHON_DEP_FILES = ("Pipfile", "Pipfile.lock")
-_JS_DEP_FILES = ("package.json", "package-lock.json", "yarn.lock")
+_JS_DEP_FILES = ("package.json", "yarn.lock")
 
 
 def _ensure_rich() -> None:
@@ -188,15 +188,15 @@ def determine_container_tag(
     tag = default_tag
     reason = f"Defaulting to {default_tag}"
 
-    def _sanitise(branch: str) -> str:
+    def _sanitize(branch: str) -> str:
         return branch.replace("/", "-")
 
     if event_name == "pull_request" and base_ref.startswith(release_prefix):
-        sanitized = _sanitise(base_ref)
+        sanitized = _sanitize(base_ref)
         tag = f"branch-{sanitized}"
         reason = f"Base ref {base_ref} matches release prefix"
     elif event_name != "pull_request" and ref_name.startswith(release_prefix):
-        sanitized = _sanitise(ref_name)
+        sanitized = _sanitize(ref_name)
         tag = f"branch-{sanitized}"
         reason = f"Branch {ref_name} matches release prefix"
 
