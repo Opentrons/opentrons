@@ -30,12 +30,11 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { TipSelectionWizard } from './TipSelectionWizard'
-import {
-  useMemoizedTipAccessibilityByTiprackIdByWellName,
-  useValidTiprackIds,
-} from './TipSelectionWizard/hooks'
+import { useMemoizedTipAccessibilityByTiprackIdByWellName } from './TipSelectionWizard/hooks'
+import { getValidTiprackIds } from './TipSelectionWizard/utils'
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
@@ -65,6 +64,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
   const robotType = useSelector(getRobotType)
   const invariantContext = useSelector(getInvariantContext)
   const labwareEntities = useSelector(getLabwareEntities)
+  const robotState = useSelector(getRobotStateAtActiveItem) ?? null
   const pipette = pipetteEntities[pipetteId]
   const { spec: pipetteSpecs } = pipette
   const { channels } = pipetteSpecs
@@ -166,13 +166,15 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
       tiprackUri: formData.tipRack,
     })
 
-  const validTiprackIds = useValidTiprackIds({
+  const validTiprackIds = getValidTiprackIds({
     pipetteId,
     nozzles,
     channels,
     numPickups,
     primaryNozzle,
     tipAccessibilityStatus,
+    invariantContext,
+    robotState,
   })
 
   const hasValidTiprackForPickup = validTiprackIds.length > 0
