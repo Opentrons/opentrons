@@ -74,7 +74,7 @@ _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
 _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
 """The version after which the user can supply liquid class transfers with non-assigned tip racks."""
-_LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
+_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
 """The version after which the user can supply liquid class transfers with selected tips."""
 
 
@@ -1998,11 +1998,11 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if (
             tips is not None
-            and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
-                api_element="selected_tips",
-                until_version=f"{_LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN}",
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
@@ -2163,11 +2163,11 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if (
             tips is not None
-            and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
-                api_element="selected_tips",
-                until_version=f"{_LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN}",
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
@@ -2337,11 +2337,11 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         if (
             tips is not None
-            and self.api_version < _LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
         ):
             raise APIVersionError(
-                api_element="selected_tips",
-                until_version=f"{_LIQUID_CLASS_SELECTED_TIPS_ARG_ADDED_IN}",
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
 
