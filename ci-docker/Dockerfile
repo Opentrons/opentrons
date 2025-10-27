@@ -19,7 +19,8 @@ ENV TZ=Etc/UTC \
     PATH=/home/${USERNAME}/.local/bin:${PATH} \
     OT_PYTHON=/usr/bin/python3 \
     OT_REPO_CACHE=/opt/opentrons \
-    GIT_ALTERNATE_OBJECT_DIRECTORIES=/opt/opentrons/.git/objects
+    GIT_ALTERNATE_OBJECT_DIRECTORIES=/opt/opentrons/.git/objects \
+    NODE_OPTIONS="--max-old-space-size=6144"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
