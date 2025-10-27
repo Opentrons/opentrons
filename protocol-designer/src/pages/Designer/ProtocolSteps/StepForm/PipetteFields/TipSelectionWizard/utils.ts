@@ -239,7 +239,7 @@ export const getValidTiprackIds = (args: {
               channels,
               nozzleConfiguration: nozzles,
               wellName,
-              tiprackDef: tiprackDef,
+              tiprackDef,
               tipsToIgnore: addedWells,
             })
           const isSafeMoveConsideringDeck =
