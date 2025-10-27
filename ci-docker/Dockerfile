@@ -96,14 +96,20 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 # Use --depth=150 to provide enough history for sentry tracking and other tools that need commit context.
 # Cache mount for git objects speeds up rebuilds significantly.
 RUN --mount=type=cache,target=/root/.git-cache,sharing=locked \
-    git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
-        --reference-if-able /root/.git-cache/opentrons.git \
-        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE} || \
-    git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
-        ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
-    git -C ${OT_REPO_CACHE} fetch --tags --depth=150 && \
-    git config --system --add safe.directory ${OT_REPO_CACHE} && \
-    git clone --mirror ${OT_REPO_CACHE} /root/.git-cache/opentrons.git || true && \
+    set -e; \
+    if [ -d "/root/.git-cache/opentrons.git" ]; then \
+        echo "Using cached git objects for faster clone"; \
+        git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+            --reference /root/.git-cache/opentrons.git \
+            ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
+    else \
+        echo "First build - cloning without cache"; \
+        git clone --depth=150 --filter=blob:none --branch ${OPENTRONS_DEFAULT_REF} \
+            ${OPENTRONS_REPO_URL} ${OT_REPO_CACHE}; \
+    fi; \
+    git -C ${OT_REPO_CACHE} fetch --tags --depth=150; \
+    git config --system --add safe.directory ${OT_REPO_CACHE}; \
+    git clone --mirror ${OT_REPO_CACHE} /root/.git-cache/opentrons.git || true; \
     chown -R ${USERNAME}:${USERNAME} ${OT_REPO_CACHE}
 
 COPY --chown=${USERNAME}:${USERNAME} ci-docker ${OT_REPO_CACHE}/ci-docker
