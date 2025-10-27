@@ -10,3 +10,22 @@
     vertical-align: top;
   }
 }
+
+@media print {
+  table {
+    break-inside: avoid;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  h2, h3, h4, h5 {
+    break-after: avoid;
+  }
+
+  p {
+    orphans: 2;
+    widows: 2;
+  }
+}
