@@ -105,8 +105,6 @@ export function LabwareStackToolbox({
   ): void => {
     console.log('newItem', newItem)
     console.log('labwareId', labwareId)
-    console.log('allWellContents[newItem]', allWellContents[newItem])
-    console.log('allWellContents[labwareId]', allWellContents[labwareId])
     console.log('selectedLabwareIds', selectedLabwareIds)
     if (
       labwareId &&

@@ -108,6 +108,7 @@ export const createContainer: (
           labwareId: id,
         })(dispatch, getState)
       }
+
       if (availableSlot === 'offDeck') {
         dispatch({
           type: 'ZOOMED_INTO_SLOT',
