@@ -109,8 +109,8 @@ ignore = [
     "D105",
 ]
 fixable = ["ALL"]
+docstring-convention = "google"
 
-[tool.ruff.lint.docstring-convention] = "google"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.

@@ -146,6 +146,7 @@ ignore = [
     "ANN102",
 ]
 fixable = ["ALL"]
+docstring-convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "python/opentrons_shared_data/load.py" = ["D"]
@@ -156,7 +157,6 @@ fixable = ["ALL"]
 "python/opentrons_shared_data/protocol/*" = ["D"]
 "python_tests/*" = ["ANN", "D"]
 
-[tool.ruff.lint.docstring-convention] = "google"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
