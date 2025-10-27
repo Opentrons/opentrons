@@ -70,8 +70,6 @@ export default defineConfig(
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
-            // Don't delete sourcemaps - they need to be uploaded in workflow steps
-            filesToDeleteAfterUpload: undefined,
           },
         }),
         {

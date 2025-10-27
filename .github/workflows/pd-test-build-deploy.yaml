@@ -112,6 +112,9 @@ jobs:
           fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
+      - name: "extract version from tag"
+        id: version
+        run: echo "number=${GITHUB_REF_NAME##*@}" >> $GITHUB_OUTPUT
       - uses: ./.github/actions/js/setup
       - name: "build PD"
         env:
@@ -131,7 +134,7 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          release: ${{ steps.resolve-tag.outputs.tag }}
+          release: ${{ steps.version.outputs.number }}
           sourcemaps: protocol-designer/dist
           set_commits: auto
           ignore_missing: true
@@ -166,6 +169,9 @@ jobs:
           fetch-depth: 0
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
+      - name: "extract version from tag"
+        id: version
+        run: echo "number=${GITHUB_REF_NAME##*@}" >> $GITHUB_OUTPUT
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
@@ -199,5 +205,5 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          release: ${{ steps.resolve-tag.outputs.tag }}
+          release: ${{ steps.version.outputs.number }}
           finalize: true
