@@ -24,11 +24,7 @@ export function getLabwareOffsets(
   config: HostConfig,
   params: LabwareOffsetsSearchParams = {}
 ): ResponsePromise<LabwareOffsetsResponse> {
-  return request<LabwareOffsetsResponse>(
-    GET,
-    '/labwareOffsets',
-    null,
-    config,
-    params
-  )
+  return request<LabwareOffsetsResponse>(GET, '/labwareOffsets', null, config, {
+    params,
+  })
 }

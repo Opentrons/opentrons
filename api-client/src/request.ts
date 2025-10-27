@@ -29,7 +29,7 @@ export function request<ResData, ReqData = null>(
   url: string,
   data: ReqData,
   config: HostConfig,
-  params?: AxiosRequestConfig['params']
+  axiosConfig?: AxiosRequestConfig
 ): ResponsePromise<ResData> {
   const {
     hostname,
@@ -43,5 +43,12 @@ export function request<ResData, ReqData = null>(
 
   const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
 
-  return requestor<ResData>({ headers, method, baseURL, url, data, params })
+  return requestor<ResData>({
+    headers,
+    method,
+    baseURL,
+    url,
+    data,
+    ...axiosConfig,
+  })
 }

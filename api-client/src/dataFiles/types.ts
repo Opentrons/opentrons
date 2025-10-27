@@ -38,3 +38,4 @@ export interface RunDataFileMetadataResponse {
 }
 
 export type DownloadedDataFileResponse = string
+export type DownloadedImageFileResponse = Blob
