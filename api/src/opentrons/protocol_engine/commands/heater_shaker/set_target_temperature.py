@@ -78,18 +78,18 @@ class SetTargetTemperatureImpl(
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id
         )
+        async with self._task_handler.synchronize_cancel_latest(
+            hs_module_substate.module_id
+        ):
 
-        async def start_set_temperature(task_handler: TaskHandler) -> None:
-            if hs_hardware_module is not None:
-                async with task_handler.synchronize_cancel_previous(
-                    hs_module_substate.module_id
-                ):
+            async def start_set_temperature(task_handler: TaskHandler) -> None:
+                if hs_hardware_module is not None:
                     await hs_hardware_module.start_set_temperature(validated_temp)
                     await hs_hardware_module.await_temperature(validated_temp)
 
-        task = await self._task_handler.create_task(
-            task_function=start_set_temperature, id=params.taskId
-        )
+            task = await self._task_handler.create_task(
+                task_function=start_set_temperature, id=params.taskId
+            )
         return SuccessData(
             public=SetTargetTemperatureResult(taskId=task.id),
         )
