@@ -1,4 +1,4 @@
-name: API Tests (CI Docker)
+name: API Checks (CI Docker)
 
 on:
   pull_request:
@@ -70,6 +70,21 @@ jobs:
     steps:
       - name: Confirm container tag
         run: echo "Using image ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}"
+
+      - name: Prepare output file permissions
+        run: |
+          sudo mkdir -p "$(dirname "$GITHUB_OUTPUT")"
+          sudo touch "$GITHUB_OUTPUT"
+          sudo chmod 666 "$GITHUB_OUTPUT"
+          sudo mkdir -p "$(dirname "$GITHUB_PATH")"
+          sudo touch "$GITHUB_PATH"
+          sudo chmod 666 "$GITHUB_PATH"
+
+      - name: Ensure summary path writable
+        run: |
+          sudo mkdir -p "$(dirname "$GITHUB_STEP_SUMMARY")"
+          sudo touch "$GITHUB_STEP_SUMMARY"
+          sudo chown $(whoami):$(whoami) "$GITHUB_STEP_SUMMARY" "$(dirname "$GITHUB_STEP_SUMMARY")"
 
       - name: Configure Git access
         env:
@@ -143,6 +158,9 @@ jobs:
           sudo mkdir -p "$(dirname "$GITHUB_OUTPUT")"
           sudo touch "$GITHUB_OUTPUT"
           sudo chmod 666 "$GITHUB_OUTPUT"
+          sudo mkdir -p "$(dirname "$GITHUB_PATH")"
+          sudo touch "$GITHUB_PATH"
+          sudo chmod 666 "$GITHUB_PATH"
 
       - name: Ensure summary path writable
         run: |
