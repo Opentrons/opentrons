@@ -1,10 +1,6 @@
 import { useSelector } from 'react-redux'
 
 import {
-  NozzleConfigurationStyle,
-  PipetteChannels,
-} from '@opentrons/shared-data'
-import {
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
 } from '@opentrons/step-generation'
@@ -16,6 +12,11 @@ import {
   getAffectedWells,
   getIsPickupCompatibleWithPossibleAdapter,
 } from '../utils'
+
+import type {
+  NozzleConfigurationStyle,
+  PipetteChannels,
+} from '@opentrons/shared-data'
 
 export const useValidTiprackIds = (args: {
   pipetteId: string
