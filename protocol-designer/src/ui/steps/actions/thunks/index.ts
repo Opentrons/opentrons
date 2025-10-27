@@ -25,7 +25,7 @@ import {
 } from '/protocol-designer/tutorial'
 import { uuid } from '/protocol-designer/utils'
 
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import { getMultiSelectLastSelected } from '../../selectors'
 import { addStep, selectDropdownItem } from '../actions'
 
 import type {
