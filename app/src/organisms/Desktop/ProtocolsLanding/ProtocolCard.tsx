@@ -320,58 +320,60 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   }[analysisStatus]
                 }
               </Flex>
-              <Flex
-                flex="0 0 6rem"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-                width="5.313rem"
-              >
-                {requiredModuleTypes.length > 0 ? (
-                  <>
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      color={COLORS.grey60}
-                    >
-                      {i18n.format('modules', 'capitalize')}
-                    </StyledText>
-                    <Flex flexWrap={WRAP}>
-                      {requiredModuleTypes.map((moduleType, index) => (
-                        <ModuleIcon
-                          key={index}
-                          color={COLORS.grey50}
-                          moduleType={moduleType}
-                          height="1rem"
-                          marginRight={SPACING.spacing8}
-                        />
-                      ))}
-                    </Flex>
-                  </>
-                ) : null}
-              </Flex>
-              {hasPeripherals && (
+              <Flex gridGap={SPACING.spacing4}>
                 <Flex
                   flex="0 0 6rem"
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
                   width="5.313rem"
                 >
-                  <>
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t('peripherals')}
-                    </StyledText>
-                    <Flex flexWrap={WRAP}>
-                      <Icon
-                        color={COLORS.grey50}
-                        name="photo-camera"
-                        height="1rem"
-                      />
-                    </Flex>
-                  </>
+                  {requiredModuleTypes.length > 0 ? (
+                    <>
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        color={COLORS.grey60}
+                      >
+                        {i18n.format('modules', 'capitalize')}
+                      </StyledText>
+                      <Flex flexWrap={WRAP}>
+                        {requiredModuleTypes.map((moduleType, index) => (
+                          <ModuleIcon
+                            key={index}
+                            color={COLORS.grey50}
+                            moduleType={moduleType}
+                            height="1rem"
+                            marginRight={SPACING.spacing8}
+                          />
+                        ))}
+                      </Flex>
+                    </>
+                  ) : null}
                 </Flex>
-              )}
+                {hasPeripherals && (
+                  <Flex
+                    flex="0 0 6rem"
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                    width="5.313rem"
+                  >
+                    <>
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        color={COLORS.grey60}
+                      >
+                        {t('peripherals')}
+                      </StyledText>
+                      <Flex flexWrap={WRAP}>
+                        <Icon
+                          color={COLORS.grey50}
+                          name="photo-camera"
+                          height="1rem"
+                        />
+                      </Flex>
+                    </>
+                  </Flex>
+                )}
+              </Flex>
             </Flex>
             <Flex
               justifyContent={JUSTIFY_FLEX_END}
