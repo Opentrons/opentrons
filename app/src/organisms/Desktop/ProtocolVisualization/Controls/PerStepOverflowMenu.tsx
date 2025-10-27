@@ -36,13 +36,25 @@ export function PerStepOverflowMenu(
   return (
     <div ref={perStepOverflowWrapperRef} className={styles.container}>
       <MenuList>
-        <MenuItem onClick={() => handleClick(PER_STEP_OPTIONS[0])}>
+        <MenuItem
+          onClick={() => {
+            handleClick(PER_STEP_OPTIONS[0])
+          }}
+        >
           {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[0] })}
         </MenuItem>
-        <MenuItem onClick={() => handleClick(PER_STEP_OPTIONS[1])}>
+        <MenuItem
+          onClick={() => {
+            handleClick(PER_STEP_OPTIONS[1])
+          }}
+        >
           {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[1] })}
         </MenuItem>
-        <MenuItem onClick={() => handleClick(PER_STEP_OPTIONS[2])}>
+        <MenuItem
+          onClick={() => {
+            handleClick(PER_STEP_OPTIONS[2])
+          }}
+        >
           {t('seconds_per_step', { seconds: PER_STEP_OPTIONS[2] })}
         </MenuItem>
       </MenuList>
