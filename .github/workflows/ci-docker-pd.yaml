@@ -76,6 +76,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore warmed dependencies
+        run: |
+          if [ -d "$OT_REPO_CACHE/node_modules" ]; then
+            cp -a "$OT_REPO_CACHE/node_modules" .
+          fi
+          find "$OT_REPO_CACHE" -maxdepth 2 -type d -name '.venv' -o -name 'node_modules' | while read dir; do
+            project=$(dirname "$dir" | xargs basename)
+            if [ -d "$project" ] && [ -d "$dir" ]; then
+              cp -a "$dir" "$project/"
+            fi
+          done
+
       - name: Restore dependency checksums
         run: |
           if [ -f "$OT_REPO_CACHE/.ci-dependency-checksums.json" ]; then
@@ -135,6 +147,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Restore warmed dependencies
+        run: |
+          if [ -d "$OT_REPO_CACHE/node_modules" ]; then
+            cp -a "$OT_REPO_CACHE/node_modules" .
+          fi
+          find "$OT_REPO_CACHE" -maxdepth 2 -type d -name '.venv' -o -name 'node_modules' | while read dir; do
+            project=$(dirname "$dir" | xargs basename)
+            if [ -d "$project" ] && [ -d "$dir" ]; then
+              cp -a "$dir" "$project/"
+            fi
+          done
 
       - name: Restore dependency checksums
         run: |
