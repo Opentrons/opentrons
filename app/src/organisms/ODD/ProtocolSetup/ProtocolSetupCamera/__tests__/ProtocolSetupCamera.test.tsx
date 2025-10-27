@@ -27,6 +27,7 @@ describe('ProtocolSetupCamera', () => {
       confirmCameraPreferences: vi.fn(),
       isConfirmed: false,
       setSetupScreen: vi.fn(),
+      storageInfo: {} as any,
     }
     vi.mocked(CameraSettings).mockImplementation(({ headerElement }) => (
       <div>

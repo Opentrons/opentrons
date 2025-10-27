@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -17,6 +18,7 @@ import { useFeatureFlag } from '/app/redux/config'
 
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
+vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/organisms/Desktop/Devices/InstrumentsAndModules')
@@ -51,6 +53,7 @@ describe('DeviceDetailsComponent', () => {
     vi.mocked(InputDevices).mockReturnValue(<div>MOCK INPUT DEVICES</div>)
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
+    vi.mocked(useLocation).mockReturnValue({ hash: 'mock-hash' } as any)
   })
 
   it('renders a RobotOverview when a robot is found and syncs clock', () => {
