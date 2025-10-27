@@ -281,7 +281,7 @@ export const getIsSafePipetteMovement = (args: {
   invariantContext: InvariantContext
   pipetteId: string
   labwareId: string
-  wellLocationOffset: Point
+  wellLocationOffset?: Point
   wellTargetName?: string
   primaryNozzle?: string
   nozzleConfiguration?: NozzleConfigurationStyle
@@ -291,7 +291,7 @@ export const getIsSafePipetteMovement = (args: {
     invariantContext,
     pipetteId,
     labwareId,
-    wellLocationOffset,
+    wellLocationOffset = { x: 0, y: 0, z: 0 },
     wellTargetName,
     primaryNozzle: primaryNozzleOverride,
     nozzleConfiguration: nozzleConfigurationOverride,
@@ -395,6 +395,91 @@ export const getIsSafePipetteMovement = (args: {
   )
 }
 
+// export const getIsSafePickupWithinTiprack = (args: {
+//   tipState: Record<string, TipState>
+//   primaryNozzle: string
+//   channels: PipetteChannels
+//   nozzleConfiguration: NozzleConfigurationStyle
+//   wellName: string
+//   tiprackDef: LabwareDefinition
+//   tipsToIgnore?: string[]
+// }): boolean => {
+//   const {
+//     tipState,
+//     primaryNozzle,
+//     channels,
+//     nozzleConfiguration,
+//     wellName,
+//     tiprackDef,
+//     tipsToIgnore = [],
+//   } = args
+//   const { ordering } = tiprackDef
+//   if (channels === 1) {
+//     return true
+//   } else if (channels === 8) {
+//     if (nozzleConfiguration === SINGLE) {
+//       const shouldReverse = primaryNozzle === 'H1'
+//       const columnIndex = getTipColumnIndex(wellName)
+//       const tipColumn = ordering[columnIndex]
+//       const tipColumnOrdered = shouldReverse
+//         ? [...tipColumn].reverse()
+//         : tipColumn
+//       const targetWellIndex = tipColumnOrdered.indexOf(wellName)
+//       return tipColumnOrdered
+//         .slice(targetWellIndex + 1) // don't check the actual target well
+//         .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well))
+//     }
+//     return true
+//   }
+//   // channels === 96
+//   if (nozzleConfiguration === ALL) {
+//     return true
+//   } else if (nozzleConfiguration === COLUMN) {
+//     const shouldReverseColumns = primaryNozzle === 'A12'
+//     const columnIndex = getTipColumnIndex(wellName)
+//     const columnPreOrdering = ordering[columnIndex]
+//     const tipColumnsOrdered = shouldReverseColumns
+//       ? [...ordering].reverse()
+//       : ordering
+//     const targetColumnIndex = tipColumnsOrdered.indexOf(columnPreOrdering)
+//     return tipColumnsOrdered
+//       .slice(targetColumnIndex + 1) // don't check the actual target column
+//       .flat()
+//       .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well))
+//   } else if (nozzleConfiguration === SINGLE) {
+//     const primaryRowName = getTipRowName(primaryNozzle)
+//     const primaryColumnName = getTipColumnName(primaryNozzle)
+//     const shouldReverseRows = primaryRowName === 'H'
+//     const shouldReverseColumns = primaryColumnName === '12'
+//     const tipColumnsOrdered = shouldReverseColumns
+//       ? [...ordering].reverse()
+//       : ordering
+//     const targetColumnIndex = tipColumnsOrdered.findIndex(column =>
+//       column.some(columnWell => columnWell === wellName)
+//     )
+
+//     return tipColumnsOrdered.slice(targetColumnIndex).every(column => {
+//       const columnOrdered = shouldReverseRows ? [...column].reverse() : column
+//       const rowIndex = columnOrdered.findIndex(
+//         colWell => getTipRowName(colWell) === getTipRowName(wellName)
+//       )
+//       return columnOrdered.slice(rowIndex).every(
+//         well =>
+//           tipState[well] === EMPTY ||
+//           tipsToIgnore.includes(well) ||
+//           // need to include the well's own row and column, so ignore its own tip state
+//           well === wellName
+//       )
+//     })
+//   }
+//   return false
+// }
+
+interface TipPickupAvailability {
+  isSafe: boolean
+  isComplete?: boolean
+}
+
 export const getIsSafePickupWithinTiprack = (args: {
   tipState: Record<string, TipState>
   primaryNozzle: string
@@ -402,8 +487,8 @@ export const getIsSafePickupWithinTiprack = (args: {
   nozzleConfiguration: NozzleConfigurationStyle
   wellName: string
   tiprackDef: LabwareDefinition
-  tipsToIgnore: string[]
-}): boolean => {
+  tipsToIgnore?: string[]
+}): TipPickupAvailability => {
   const {
     tipState,
     primaryNozzle,
@@ -411,30 +496,49 @@ export const getIsSafePickupWithinTiprack = (args: {
     nozzleConfiguration,
     wellName,
     tiprackDef,
-    tipsToIgnore,
+    tipsToIgnore = [],
   } = args
   const { ordering } = tiprackDef
+
   if (channels === 1) {
-    return true
-  } else if (channels === 8) {
-    if (nozzleConfiguration === SINGLE) {
-      const shouldReverse = primaryNozzle === 'H1'
-      const columnIndex = getTipColumnIndex(wellName)
-      const tipColumn = ordering[columnIndex]
-      const tipColumnOrdered = shouldReverse
-        ? [...tipColumn].reverse()
-        : tipColumn
-      const targetWellIndex = tipColumnOrdered.indexOf(wellName)
-      return tipColumnOrdered
-        .slice(targetWellIndex + 1) // don't check the actual target well
-        .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well))
-    }
-    return true
+    return { isSafe: true, isComplete: tipState[wellName] !== EMPTY }
   }
-  // channels === 96
+  if (channels === 8) {
+    const shouldReverse = primaryNozzle === 'H1'
+    const columnIndex = getTipColumnIndex(wellName)
+    const tipColumn = ordering[columnIndex]
+    const tipColumnOrdered = shouldReverse
+      ? [...tipColumn].reverse()
+      : tipColumn
+    if (nozzleConfiguration === SINGLE) {
+      const targetWellIndex = tipColumnOrdered.indexOf(wellName)
+      return {
+        isSafe: tipColumnOrdered
+          .slice(targetWellIndex + 1) // don't check the actual target well
+          .every(
+            well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
+          ),
+        isComplete: tipState[wellName] !== EMPTY,
+      }
+    }
+    // 8 channel pickup, full column
+    return {
+      isSafe: true,
+      isComplete: tipColumnOrdered.every(well => tipState[well] !== EMPTY),
+    }
+  }
+
+  // channels = 96, all nozzles configured
   if (nozzleConfiguration === ALL) {
-    return true
-  } else if (nozzleConfiguration === COLUMN) {
+    return {
+      isSafe: true,
+      isComplete: Object.keys(tiprackDef.wells).every(
+        well => tipState[well] !== EMPTY
+      ),
+    }
+  }
+  // channels = 96, 8 nozzles configured
+  if (nozzleConfiguration === COLUMN) {
     const shouldReverseColumns = primaryNozzle === 'A12'
     const columnIndex = getTipColumnIndex(wellName)
     const columnPreOrdering = ordering[columnIndex]
@@ -442,11 +546,18 @@ export const getIsSafePickupWithinTiprack = (args: {
       ? [...ordering].reverse()
       : ordering
     const targetColumnIndex = tipColumnsOrdered.indexOf(columnPreOrdering)
-    return tipColumnsOrdered
-      .slice(targetColumnIndex + 1) // don't check the actual target column
-      .flat()
-      .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well))
-  } else if (nozzleConfiguration === SINGLE) {
+    return {
+      isSafe: tipColumnsOrdered
+        .slice(targetColumnIndex + 1) // don't check the actual target column
+        .flat()
+        .every(well => tipState[well] === EMPTY || tipsToIgnore.includes(well)),
+      isComplete: tipColumnsOrdered[targetColumnIndex].every(
+        well => tipState[well] !== EMPTY
+      ),
+    }
+  }
+  // channels = 96, 1 nozzle configured
+  if (nozzleConfiguration === SINGLE) {
     const primaryRowName = getTipRowName(primaryNozzle)
     const primaryColumnName = getTipColumnName(primaryNozzle)
     const shouldReverseRows = primaryRowName === 'H'
@@ -458,26 +569,31 @@ export const getIsSafePickupWithinTiprack = (args: {
       column.some(columnWell => columnWell === wellName)
     )
 
-    return tipColumnsOrdered.slice(targetColumnIndex).every(column => {
-      const columnOrdered = shouldReverseRows ? [...column].reverse() : column
-      const rowIndex = columnOrdered.findIndex(
-        colWell => getTipRowName(colWell) === getTipRowName(wellName)
-      )
-      return columnOrdered.slice(rowIndex).every(
-        well =>
-          tipState[well] === EMPTY ||
-          tipsToIgnore.includes(well) ||
-          // need to include the well's own row and column, so ignore its own tip state
-          well === wellName
-      )
-    })
+    return {
+      isSafe: tipColumnsOrdered.slice(targetColumnIndex).every(column => {
+        const columnOrdered = shouldReverseRows ? [...column].reverse() : column
+        const rowIndex = columnOrdered.findIndex(
+          colWell => getTipRowName(colWell) === getTipRowName(wellName)
+        )
+        return columnOrdered.slice(rowIndex).every(
+          well =>
+            tipState[well] === EMPTY ||
+            tipsToIgnore.includes(well) ||
+            // need to include the well's own row and column, so ignore its own tip state
+            well === wellName
+        )
+      }),
+      isComplete: tipState[wellName] !== EMPTY,
+    }
   }
-  return false
+
+  // should not hit
+  return { isSafe: false }
 }
 
-const getTipRowName = (wellName: string): string => wellName.slice(0, 1)
+export const getTipRowName = (wellName: string): string => wellName.slice(0, 1)
 
-const getTipColumnName = (wellName: string): string => wellName.slice(1)
+export const getTipColumnName = (wellName: string): string => wellName.slice(1)
 
 export const getTipColumnIndex = (wellName: string): number =>
   parseInt(wellName.slice(1)) - 1

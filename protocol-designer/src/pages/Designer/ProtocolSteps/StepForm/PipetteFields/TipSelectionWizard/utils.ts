@@ -99,7 +99,7 @@ export const getHoveredOffsetFromWell = (args: {
 export const getColumnFromWellName = (wellName: string): string =>
   wellName.slice(1, wellName.length)
 
-const _getIsPickupCompatibleWithPossibleAdapter = (
+export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
   labwareEntities: LabwareEntities,
   nozzles: NozzleConfigurationStyle,
@@ -135,7 +135,7 @@ export function getIsTiprackSelectable(args: {
   const { channels } = pipetteSpecs
   const { def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
-    _getIsPickupCompatibleWithPossibleAdapter(
+    getIsPickupCompatibleWithPossibleAdapter(
       stack,
       labwareEntities,
       nozzles,
