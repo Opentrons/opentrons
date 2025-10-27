@@ -1,6 +1,6 @@
 import { NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
@@ -92,7 +92,7 @@ describe('LabwareStackToolboxContainer', () => {
     props.data.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
-    ;(props.data.allWellContents = {
+    props.data.allWellContents = {
       mockLabwareId: {
         A1: {
           groupIds: ['mockGroupId'],
@@ -103,8 +103,8 @@ describe('LabwareStackToolboxContainer', () => {
           groupIds: ['mockGroupId'],
         },
       },
-    }),
-      render(props)
+    }
+    render(props)
 
     expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
     const firstButton = screen.getByTestId('LabwareButton-1')

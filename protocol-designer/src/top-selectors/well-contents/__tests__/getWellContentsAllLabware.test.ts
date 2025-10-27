@@ -14,7 +14,6 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  LabwareEntities,
   LabwareLiquidState,
   TimelineFrame,
 } from '@opentrons/step-generation'

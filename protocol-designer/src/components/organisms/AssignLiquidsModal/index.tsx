@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -37,7 +37,6 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
-  deselectAllWells,
   deselectWells,
   selectWells,
 } from '/protocol-designer/well-selection/actions'

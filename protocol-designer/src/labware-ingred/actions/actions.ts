@@ -53,9 +53,7 @@ export interface CloseIngredientSelectorAction {
 export const openIngredientsSelector: (
   payload: string[]
 ) => OpenIngredientsSelectorAction = createAction('OPEN_INGREDIENTS_SELECTOR')
-export interface CloseIngredientSelectorAction {
-  type: 'CLOSE_INGREDIENT_SELECTOR'
-}
+
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
 export const closeIngredientSelector: () => CloseIngredientSelectorAction = createAction(
   'CLOSE_INGREDIENT_SELECTOR'

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -18,7 +17,6 @@ import {
 
 import {
   createContainer,
-  openIngredientSelector,
   openIngredientsSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
@@ -63,7 +61,6 @@ export function LabwareStackToolbox({
   setSelectedLabware,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
-  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const { labware, labwareId, allWellContents, labwareEntities } = data
@@ -118,7 +115,6 @@ export function LabwareStackToolbox({
       console.log('newItem with ctrl key')
       setSelectedLabware(prevItems => [...prevItems, newItem])
       dispatch(openIngredientsSelector([...selectedLabwareIds, newItem]))
-      console.log('selectedLabwareIds', selectedLabwareIds)
     } else {
       console.log('newItem')
       setSelectedLabware([newItem])
