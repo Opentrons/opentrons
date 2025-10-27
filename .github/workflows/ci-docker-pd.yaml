@@ -52,7 +52,7 @@ jobs:
         run: make determine-container-tag
 
   lint:
-    name: PD lint (CI Docker)
+    name: PD build (CI Docker)
     needs: select-image
     runs-on: ubuntu-latest
     permissions:
@@ -100,16 +100,16 @@ jobs:
           make setup
           make -C ci-docker dependency-checksums OUTPUT="$OT_REPO_CACHE/.ci-dependency-checksums.json" TITLE="Updated Dependency Checksums"
 
-      - name: Run lint
+      - name: Run build
         working-directory: ${{ env.OT_REPO_CACHE }}
-        run: make -C protocol-designer lint
+        run: make -C protocol-designer build
 
-      - name: Summarize lint
+      - name: Summarize build
         if: always()
         env:
           DEPENDENCIES_CHANGED: ${{ steps.deps.outputs.dependencies_changed || 'false' }}
         run: |
-          echo "## PD Lint (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## PD Build (CI Docker)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Image tag: \`${{ needs.select-image.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Outcome: \`${{ job.status }}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ "$DEPENDENCIES_CHANGED" = "true" ]; then
