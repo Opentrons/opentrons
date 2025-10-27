@@ -16,6 +16,12 @@
   padding: var(--spacing-20);
 }
 
+.controls_info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
 .heading_text {
   font-size: var(--font-size-28);
   font-weight: var(--font-weight-bold);
