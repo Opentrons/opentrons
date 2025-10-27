@@ -92,6 +92,10 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
     useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}
 
+# Create workspace directory with proper ownership
+RUN mkdir -p /workspace && \
+    chown ${USERNAME}:${USERNAME} /workspace
+
 # Pre-clone repository with reasonable history depth while keeping tags for versioning.
 # Use --depth=150 to provide enough history for sentry tracking and other tools that need commit context.
 # Cache mount for git objects speeds up rebuilds significantly.
@@ -143,8 +147,6 @@ RUN --mount=type=cache,target=/home/ci/.cache,uid=${USER_UID},gid=${USER_GID},sh
     git reset --hard
 
 RUN git rev-parse HEAD > ${OT_REPO_CACHE}/.ci-default-ref
-
-RUN mkdir -p /workspace
 
 WORKDIR /workspace
 
