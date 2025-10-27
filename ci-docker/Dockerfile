@@ -98,7 +98,7 @@ COPY ci-docker ${OT_REPO_CACHE}/ci-docker
 # Create predictable non-root CI user.
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
     useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
-    mkdir -p /workspace && \
+    mkdir -p /workspace ${OT_REPO_CACHE} && \
     chown -R ${USERNAME}:${USERNAME} /workspace ${OT_REPO_CACHE} && \
     echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
     chmod 0440 /etc/sudoers.d/${USERNAME}
@@ -112,10 +112,20 @@ RUN sudo -n true
 # Warm dependency caches and capture dependency metadata for runtime checks.
 RUN make --output-sync=target -j setup-py && \
     make setup-js && \
-    make -C ci-docker dependency-checksums OUTPUT="${OT_REPO_CACHE}/.ci-dependency-checksums.json" TITLE="Container Dependency Checksums" && \
-    git reset --hard
+    make -C ci-docker dependency-checksums OUTPUT="${OT_REPO_CACHE}/.ci-dependency-checksums.json" TITLE="Container Dependency Checksums"
 
-RUN git rev-parse HEAD > ${OT_REPO_CACHE}/.ci-default-ref
+# Remove the cloned repository to save space, keeping only warmed caches
+# The workflow will checkout a fresh copy
+RUN cd / && \
+    rm -rf ${OT_REPO_CACHE}/.git ${OT_REPO_CACHE}/api ${OT_REPO_CACHE}/app* ${OT_REPO_CACHE}/robot-server \
+           ${OT_REPO_CACHE}/hardware ${OT_REPO_CACHE}/shared-data ${OT_REPO_CACHE}/protocol-designer \
+           ${OT_REPO_CACHE}/components* ${OT_REPO_CACHE}/step-generation ${OT_REPO_CACHE}/labware* \
+           ${OT_REPO_CACHE}/scripts ${OT_REPO_CACHE}/docs ${OT_REPO_CACHE}/discovery-client \
+           ${OT_REPO_CACHE}/*.md ${OT_REPO_CACHE}/*.json ${OT_REPO_CACHE}/*.js ${OT_REPO_CACHE}/*.cjs \
+           ${OT_REPO_CACHE}/*.mts ${OT_REPO_CACHE}/*.yml ${OT_REPO_CACHE}/*.mk ${OT_REPO_CACHE}/Makefile \
+           ${OT_REPO_CACHE}/.github && \
+    mkdir -p ${OT_REPO_CACHE} && \
+    chown -R ${USERNAME}:${USERNAME} ${OT_REPO_CACHE}
 
 WORKDIR /workspace
 
