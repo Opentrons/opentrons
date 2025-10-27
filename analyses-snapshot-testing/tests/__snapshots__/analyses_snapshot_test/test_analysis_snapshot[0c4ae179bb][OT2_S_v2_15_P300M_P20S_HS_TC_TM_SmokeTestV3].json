@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -15761,11 +15764,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0ffb66aa28155d4b2605e6fb23ab6132",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/setTargetBlockTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4b9f5b10b6a009e8ba444c21f9245e3b",
+      "key": "19e3ad14a86b254100f5548cfa8aa5d9",
       "notes": [],
       "params": {
         "celsius": 28.0,
@@ -15780,11 +15797,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "37a43aab2d7f328ee8e8c51ba2097a1c",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "405fbdc58fef3d5d77b97d42138f2f1c",
+      "key": "34e74eeef278159f57f5f3dffb88f20c",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15798,7 +15829,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ffa5527048ca39fa5c134139c287766e",
+      "key": "35e29ef2e8471935094db8ea32393c83",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15812,7 +15843,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "45136fcc3e912d6492e45666881ae061",
+      "key": "6c10db389ff3c558ffd33adf7337337c",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15826,7 +15857,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "25432c5d0e8131c33795ec9b22239eba",
+      "key": "e6cfc8160f4750c60f65e875b24a821c",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15840,7 +15871,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9eb4441a67b1aa91883a3050ac29e755",
+      "key": "53a6319eddd1f000ffd2d294b2478879",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15873,7 +15904,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b91d1b10f82dde18d9c9105533570367",
+      "key": "6f38900e516618bff325e3b8578d3848",
       "notes": [],
       "params": {
         "flowRate": 7.56,
@@ -15907,7 +15938,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5eb224cdf9eeef05261a3ef420fab4a0",
+      "key": "e27d33b140319d1c5f34949ac7cf1c5e",
       "notes": [],
       "params": {
         "flowRate": 7.56,
@@ -15941,7 +15972,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b7f4725b3228f36bab04bd46a682d5b3",
+      "key": "16b189b342de67c0e1015961b1cbca74",
       "notes": [],
       "params": {
         "alternateDropLocation": true,
@@ -15973,7 +16004,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4a5813d51d366d9ff2f4ffc465f4ab1b",
+      "key": "89ead1e119d23ebab45fef158aad6cec",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -16006,7 +16037,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5157042c4e99077b2342a89b3d7455b0",
+      "key": "e7ca2c48c36df5dd67cbfd88dc4ff656",
       "notes": [],
       "params": {
         "flowRate": 94.0,
@@ -16040,7 +16071,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4ec72f56ab2db2b9d7e0790fa35b82d8",
+      "key": "ab27b2d596bc0fc5025f58257883c8ac",
       "notes": [],
       "params": {
         "flowRate": 94.0,
@@ -16074,7 +16105,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "97670abb49ecf58eb475d09c32b6de6b",
+      "key": "7eac19c09783f213f53a737b875e6dc5",
       "notes": [],
       "params": {
         "moduleId": "UUID",
@@ -16091,7 +16122,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "66819af3e9a96b2e628dc2cba73da21b",
+      "key": "a2c96e373a307884c17df97bd212c0ab",
       "notes": [],
       "params": {
         "seconds": 5.0
@@ -16105,7 +16136,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "08b28f7c5cc6b18ffb361c41d57be5fd",
+      "key": "36da2f91a81462c41589e74d35a8b041",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -16119,7 +16150,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "28b33684adb7c526a11a12c92caf8500",
+      "key": "e30cdbd42ce4341bb78d07acfd38ed29",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -16152,7 +16183,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d86351ca1d3ed16b99a8d3bffa80b07f",
+      "key": "f1af3ae2ef7b10d74ead10e73714623c",
       "notes": [],
       "params": {
         "flowRate": 15.12,
@@ -16186,7 +16217,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "eb71bb98e1bd853cc7b7e8482a1ec138",
+      "key": "af20d729dcb4528e5c884a1afb8688ce",
       "notes": [],
       "params": {
         "flowRate": 11.34,
@@ -16220,7 +16251,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3f14408f69cf889530abfa7d4a326547",
+      "key": "aca777981d8ff4650b26b8e0a77b77fc",
       "notes": [],
       "params": {
         "alternateDropLocation": true,
@@ -16252,7 +16283,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "964a830cb17afbbec3b8b2c1a1276013",
+      "key": "a09a4ea2bb7b159d4ae5b0c315f0a061",
       "notes": [],
       "params": {
         "flowRate": 94.0,
@@ -16286,7 +16317,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b92717659f8e40aa918ff04503719909",
+      "key": "952190aa7776fa9362d39e85e6aca5d4",
       "notes": [],
       "params": {
         "flowRate": 94.0,
@@ -16320,7 +16351,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5ea04800eb57ebc8769c24974fdbb919",
+      "key": "4860c90288ba32fd972e976684dcb9fb",
       "notes": [],
       "params": {
         "alternateDropLocation": true,

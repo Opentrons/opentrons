@@ -121,10 +121,17 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
+  validTiprackIds: string[]
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
-  const { labware, formTiprackUri, pipetteSpecs, nozzles, labwareEntities } =
-    args
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+  } = args
   const { channels } = pipetteSpecs
   const { def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
@@ -139,7 +146,8 @@ export function getIsTiprackSelectable(args: {
     getIsTiprack(def) &&
     labwareDefURI === formTiprackUri &&
     !COLUMN_4_SLOTS.includes(slot) &&
-    isPickupCompatibleWithPossibleAdapter
+    isPickupCompatibleWithPossibleAdapter &&
+    validTiprackIds.includes(labware.id)
   )
 }
 
@@ -166,11 +174,9 @@ export const getAffectedWells = (args: {
   if (channels === 1 || nozzles === SINGLE) {
     return [wellName]
   } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
-    const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
-    return allWellsInColumn
+    return getAllWellsInColumn(wellName, labwareDef)
   } else if (channels === 96) {
-    const allWells = Object.keys(labwareDef.wells)
-    return allWells
+    return Object.keys(labwareDef.wells)
   }
   return []
 }

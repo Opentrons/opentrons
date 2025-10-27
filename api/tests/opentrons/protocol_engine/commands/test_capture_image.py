@@ -8,7 +8,9 @@ from opentrons.system import camera
 from opentrons.system import ffmpeg
 from opentrons.protocol_engine.resources import FileProvider, CameraProvider
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import PreconditionTypes
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.capture_image import (
     CaptureImageParams,
@@ -20,7 +22,6 @@ from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
-    StorageLimitReachedError,
 )
 from opentrons.system.camera import image_capture
 
@@ -63,25 +64,6 @@ def camera_provider_image_capture() -> CameraProvider:
     return CameraProvider(
         camera_settings_callback=None, image_capture_callback=image_capture
     )
-
-
-async def test_capture_image_raises_storage_limit(
-    decoy: Decoy,
-    state_view: StateView,
-    file_provider: FileProvider,
-    camera_provider: CameraProvider,
-) -> None:
-    """It should raise StorageLimitReachedError when it would generate too many images."""
-    subject = CaptureImageImpl(
-        state_view=state_view,
-        file_provider=file_provider,
-        camera_provider=camera_provider,
-    )
-    params = CaptureImageParams(fileName=None)
-
-    decoy.when(state_view.files.get_filecount()).then_return(400)
-    with pytest.raises(StorageLimitReachedError):
-        await subject.execute(params=params)
 
 
 @pytest.mark.parametrize(
@@ -195,3 +177,29 @@ async def test_capture_image_returns_success(
     with mock.patch("os.path.exists", mock.Mock(return_value=True)):
         result = await subject.execute(params=params)
         assert isinstance(result, SuccessData)
+
+
+async def test_ensure_camera_used_precondition_set(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+) -> None:
+    """It should validate that the isCamerUsed precondition is set after an image is captured."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(fileName="coolpic")
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        result = await subject.execute(params=params)
+        assert isinstance(result, SuccessData)
+        assert isinstance(
+            result.state_update.precondition_update, update_types.PreconditionUpdate
+        )
+        assert result.state_update.precondition_update.preconditions == {
+            PreconditionTypes.IS_CAMERA_USED: True
+        }

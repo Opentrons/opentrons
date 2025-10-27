@@ -8,15 +8,14 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.data_files import MimeType
+from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
-    StorageLimitReachedError,
     CameraDisabledError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
 from ..resources.file_provider import (
-    MAXIMUM_FILE_LIMIT,
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
@@ -118,13 +117,9 @@ class CaptureImageImpl(
     ) -> SuccessData[CaptureImageResult]:
         """Initiate an image capture with a camera."""
         state_update = update_types.StateUpdate()
-
-        # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
-
-        if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
-            raise StorageLimitReachedError(
-                message=f"Attempt to write image file exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
-            )
+        state_update.precondition_update = update_types.PreconditionUpdate(
+            {PreconditionTypes.IS_CAMERA_USED: True}
+        )
 
         # Handle capturing an image with the CameraProvider
         camera_settings = await self._camera_provider.get_camera_settings()

@@ -1,16 +1,20 @@
 """Router for /dataFiles endpoints."""
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Optional, Literal, Union, Final
+from typing import Annotated, Optional, Literal, Union, Final, AsyncIterator
 
 from fastapi import UploadFile, File, Form, Depends, Response, status, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
-from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.runs.dependencies import get_run_data_manager, get_run_store
 from robot_server.runs.router.base_router import RunNotFound
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import RunStore
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.service.json_api import (
@@ -36,8 +40,15 @@ from .models import (
     FileIdNotFound,
     FileInUseError,
     ImageFileMetadata,
+    NoImagesFound,
+    ZipCreationFailed,
+    DataFileMetadataResponse,
 )
-from ..protocols.dependencies import get_file_hasher, get_file_reader_writer
+from ..protocols.dependencies import (
+    get_file_hasher,
+    get_file_reader_writer,
+    get_protocol_store,
+)
 from ..service.dependencies import get_current_time, get_unique_id
 
 datafiles_router = LightRouter()
@@ -342,11 +353,74 @@ async def delete_file_by_id(
 
 @PydanticResponse.wrap_route(
     datafiles_router.get,
+    path="/dataFiles/{runId}/all",
+    summary="Get metadata for all data files associated with a run",
+    description="""
+        Get metadata for all data files associated with a specific run.
+
+        Metadata includes the related command id when applicable.
+    """,
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[DataFileMetadataResponse]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def get_data_files_by_run_id(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+) -> PydanticResponse[SimpleMultiBody[DataFileMetadataResponse]]:
+    """Get all data files associated with a run.
+
+    Args:
+        runId: The unique identifier of the run to query for data files.
+        data_files_store: Store for accessing data file information from the database.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        run_data_manager.get(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    data_files_info = data_files_store.get_data_files_by_run_id(runId)
+    response_data = []
+
+    for file_info in data_files_info.input_files:
+        response_data.append(
+            DataFileMetadataResponse(
+                id=file_info.id,
+                stored=file_info.stored,
+                generated=file_info.generated,
+                mimeType=file_info.mime_type,
+            )
+        )
+
+    for file_info in data_files_info.output_files:
+        response_data.append(
+            DataFileMetadataResponse(
+                id=file_info.id,
+                stored=file_info.stored,
+                generated=file_info.generated,
+                mimeType=file_info.mime_type,
+            )
+        )
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.model_construct(
+            data=response_data,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
+        ),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    datafiles_router.get,
     path="/dataFiles/{runId}/images",
-    summary="Get a list of metadata for all camera image files associated with a given run.",
+    summary="Get a list of image-specific metadata for all camera image files associated with a given run.",
     description=dedent(
         """
-        Get a list of metadata for camera image files associated with a given run.
+        Get a list of image-specific metadata for camera image files associated with a given run.
         "\n\n"
         The camera image file metadata are returned in order from newest to oldest.
         "\n\n"
@@ -460,3 +534,152 @@ async def delete_run_images(
         content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
     )
+
+
+@datafiles_router.get(
+    path="/dataFiles/{runId}/images/download",
+    summary="Download all camera images for a run as a zip file",
+    description=dedent(
+        """
+        Download all camera image files associated with a run as a single zip archive.
+
+        The zip file will contain all JPEG images captured during the protocol run.
+        """
+    ),
+    responses={
+        status.HTTP_200_OK: {
+            "content": {"application/zip": {}},
+            "description": "A zip file containing all camera images for the run",
+        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoImagesFound]},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[ZipCreationFailed]},
+    },
+)
+async def download_run_images(
+    runId: str,
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+) -> StreamingResponse:
+    """Download all camera images for a run as a zip file.
+
+    Streams the resultant zip file via a spawned subprocess.
+
+    Arguments:
+        runId: The run ID associated with the camera image files.
+        data_files_store: Store for data files database access.
+        run_store: Store for run data management.
+        protocol_store: Store for protocol storage access.
+    """
+    info_slice = data_files_store.get_files_info_by_run_mime_type(
+        run_id=runId,
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=None,
+    )
+
+    if not info_slice.file_info:
+        raise NoImagesFound(detail=f"No images found for run '{runId}'").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    existing_files = []
+    for file_info in info_slice.file_info:
+        image_path = Path(file_info.path)
+        if image_path.exists() and image_path.is_file():
+            existing_files.append((image_path, file_info.name))
+
+    if not existing_files:
+        raise NoImagesFound(
+            detail=f"No accessible images found for run '{runId}'"
+        ).as_error(status.HTTP_404_NOT_FOUND)
+
+    zip_filename = _build_zip_filename(
+        run_id=runId, run_store=run_store, protocol_store=protocol_store
+    )
+
+    return StreamingResponse(
+        _stream_zip_from_subprocess(existing_files),
+        media_type="application/zip",
+        headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
+    )
+
+
+async def _stream_zip_from_subprocess(
+    files: list[tuple[Path, str]],
+    chunk_size: int = 65536,
+) -> AsyncIterator[bytes]:
+    """Offload zipping to a subprocess, yielding the final zip file chunks, `chunk_size` bytes in size."""
+    process = None
+
+    try:
+        file_paths = [str(file_path) for file_path, _ in files]
+
+        process = await asyncio.create_subprocess_exec(
+            "zip",
+            "-q",  # quiet
+            "-j",  # junk paths (store only filenames)
+            "-",  # write zip output to stdout
+            *file_paths,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        if process.stdout is None:
+            raise RuntimeError("stdout was not captured")
+        if process.stderr is None:
+            raise RuntimeError("stderr was not captured")
+
+        while True:
+            chunk = await process.stdout.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk
+
+        await process.wait()
+
+        if process.returncode != 0:
+            stderr_output = await process.stderr.read()
+            error_msg = stderr_output.decode() if stderr_output else "Unknown error"
+            raise Exception(
+                f"zip command failed with code {process.returncode}: {error_msg}"
+            )
+
+    except Exception as e:
+        # Clean up process if still running
+        if process is not None and process.returncode is None:
+            process.kill()
+            await process.wait()
+
+        raise ZipCreationFailed(
+            detail=f"Unexpected error during zip creation: {str(e)}"
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
+
+
+def _build_zip_filename(
+    run_id: str, run_store: RunStore, protocol_store: ProtocolStore
+) -> str:
+    run_info = run_store.get(run_id)
+    protocol_id = run_info.protocol_id if run_info else None
+
+    if protocol_id is not None:
+        protocol = protocol_store.get(protocol_id)
+        protocol_name = (
+            protocol.source.metadata.get(
+                "protocolName", protocol.source.files[0].path.name
+            )
+            if protocol is not None
+            else None
+        )
+        robot_name = config.name()
+        timestamp = run_info.created_at.strftime("%Y%m%d_%H%M%S")
+        final_str = f"{robot_name}_{_sanitize_str(protocol_name)}_{timestamp}.zip"
+
+        return final_str
+
+    return f"{run_id}_images.zip"
+
+
+def _sanitize_str(input_str: str) -> str:
+    """Ensure that the input string contains only alphanumeric characters."""
+    return "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in input_str)

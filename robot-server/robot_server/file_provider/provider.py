@@ -16,10 +16,14 @@ from opentrons_shared_data.data_files import (
     DataFileInfo,
     CmdDataFileInfo,
 )
+from robot_server.settings import get_settings, RobotServerSettings
 from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
+from opentrons.protocol_engine.errors import StorageLimitReachedError
+from robot_server.disk_monitor.dependencies import get_disk_monitor
+from robot_server.disk_monitor.monitor import DiskMonitor
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
@@ -35,6 +39,8 @@ class FileProviderExecutor:
         data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
         images_directory: Annotated[Path, Depends(get_images_directory)],
         data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+        disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
+        settings: Annotated[RobotServerSettings, Depends(get_settings)],
     ) -> None:
         """Initialize the file provider executor.
 
@@ -45,6 +51,9 @@ class FileProviderExecutor:
         self._data_files_directory = data_files_directory
         self._images_directory = images_directory
         self._data_files_store = data_files_store
+        self._disk_monitor = disk_monitor
+        self._images_directory_max_size_mb = settings.images_directory_max_size_mb
+        self._system_low_space_threshold_mb = settings.system_low_space_threshold_mb
 
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
@@ -53,7 +62,26 @@ class FileProviderExecutor:
         self,
         file_data: FileData,
     ) -> DataFileInfo:
-        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file."""
+        """Write the provided file data to disk. Returns the `DataFileInfo` of the created file.
+
+        Raises:
+            A StorageLimitReachedError on disk space limit violations.
+        """
+        if (
+            isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata)
+            and self._disk_monitor.is_images_directory_over_limit()
+        ):
+            raise StorageLimitReachedError(
+                message=f"Attempt to write file to disk exceeds file the "
+                f"image file storage limit of {self._images_directory_max_size_mb}MB"
+            )
+
+        if self._disk_monitor.is_disk_space_low():
+            raise StorageLimitReachedError(
+                message=f"Attempt to write file to disk exceeds file the "
+                f"system free disk space requirement of {self._system_low_space_threshold_mb}MB"
+            )
+
         async with self._lock:
             file_id = await get_unique_id()
             final_filename = self._format_filename(file_data, file_id)
@@ -91,11 +119,6 @@ class FileProviderExecutor:
             await self._data_files_store.insert(file_info)
             await self._data_files_store.insert_output_file(output_file_info)
             return file_info
-
-    async def filecount_cb(self) -> int:
-        """Return the current count of generated files stored within the data files directory."""
-        data_file_usage_info = self._data_files_store.get_usage_info(generated=True)
-        return len(data_file_usage_info)
 
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
         """Build the finalized filename."""

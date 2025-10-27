@@ -36,10 +36,21 @@ const getMoveLabwareError = (
     const adapterLoadName =
       invariantContext.labwareEntities[newLocation.labwareId].def.parameters
         .loadName
-    errorString =
-      labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
-        ? 'Labware incompatible with this adapter'
-        : null
+
+    if (labware?.def.parameters.loadName === 'opentrons_tough_universal_lid') {
+      errorString = null
+    } else if (
+      labware?.def.compatibleParentLabware?.some(
+        loadName => loadName === adapterLoadName
+      )
+    ) {
+      errorString = null
+    } else {
+      errorString =
+        labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
+          ? 'Labware incompatible with this adapter'
+          : null
+    }
   }
   return errorString
 }

@@ -17,7 +17,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   _wellContentsForLabware,
-  AIR,
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
   getVolumesPerLiquid,
@@ -38,7 +37,6 @@ import type {
   ContentsByWell,
   DeckSlot,
   LabwareTemporalProperties,
-  LocationLiquidState,
   ModuleEntities,
   RobotState,
   SingleLabwareLiquidState,
@@ -283,36 +281,6 @@ export const getChannels = (
     numChannels = 12
   }
   return numChannels
-}
-
-interface TipSvgInfo {
-  tipColor: string
-  tipCurrentVolume: number
-}
-
-export const getTipSvgInfo = (
-  pipetteLocationLiquidState: LocationLiquidState,
-  liquids: Liquid[]
-): TipSvgInfo => {
-  const ingredIds = Object.keys(pipetteLocationLiquidState)
-  const colorsInTip = liquids
-    .filter(liquid => ingredIds.includes(liquid.id))
-    ?.map(liquid => liquid.displayColor)
-  const tipColor =
-    colorsInTip.length > 1 ? COLORS.grey40 : (colorsInTip[0] ?? COLORS.grey40)
-  const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
-    (sum, { volume }) => sum + volume,
-    0
-  )
-  return { tipColor, tipCurrentVolume }
-}
-
-export const getWellVolume = (
-  labwareLocationLiquidState: LocationLiquidState
-): number => {
-  return Object.entries(labwareLocationLiquidState)
-    .filter(([id, _]) => id !== AIR) // filter out air gap volume
-    .reduce((sum, [_, volume]) => sum + volume.volume, 0)
 }
 
 export function getNextGroupFirstCommandId(
