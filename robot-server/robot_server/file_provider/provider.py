@@ -15,6 +15,7 @@ from opentrons_shared_data.data_files import (
     OutputDataFileInfo,
     DataFileInfo,
     CmdDataFileInfo,
+    MimeType,
 )
 from robot_server.settings import get_settings, RobotServerSettings
 from ..service.dependencies import get_current_time, get_unique_id
@@ -29,6 +30,10 @@ from opentrons.protocol_engine.resources.file_provider import (
     ReadCmdFileNameMetadata,
     ImageCaptureCmdFileNameMetadata,
 )
+from robot_server.service.notifications.publishers import (
+    DataFilePublisher,
+    get_data_file_publisher,
+)
 
 
 class FileProviderExecutor:
@@ -41,6 +46,7 @@ class FileProviderExecutor:
         data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
         disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
         settings: Annotated[RobotServerSettings, Depends(get_settings)],
+        publisher: Annotated[DataFilePublisher, Depends(get_data_file_publisher)],
     ) -> None:
         """Initialize the file provider executor.
 
@@ -54,6 +60,7 @@ class FileProviderExecutor:
         self._disk_monitor = disk_monitor
         self._images_directory_max_size_mb = settings.images_directory_max_size_mb
         self._system_low_space_threshold_mb = settings.system_low_space_threshold_mb
+        self._publisher = publisher
 
         # data file store is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
@@ -118,6 +125,10 @@ class FileProviderExecutor:
 
             await self._data_files_store.insert(file_info)
             await self._data_files_store.insert_output_file(output_file_info)
+
+            if file_data.mime_type == MimeType.IMAGE_JPEG:
+                self._publisher.publish_run_images(file_data.run_metadata.run_id)
+
             return file_info
 
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
