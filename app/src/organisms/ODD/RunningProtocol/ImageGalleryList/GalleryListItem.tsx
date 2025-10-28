@@ -13,8 +13,7 @@ import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/Image
 
 import styles from './gallery.module.css'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import type { UseImagesInfoItem } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 export interface GalleryListItemProps extends UseImagesInfoItem {
   protocolAnalysis: any

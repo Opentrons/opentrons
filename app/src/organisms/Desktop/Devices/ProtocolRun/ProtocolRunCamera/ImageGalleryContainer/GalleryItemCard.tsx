@@ -19,7 +19,7 @@ import type {
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
-import type { UseImagesInfoItem } from './hooks/useImageInfo'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 const PHOTO_VIEWER_PADDING_PX = 16 * 2
 

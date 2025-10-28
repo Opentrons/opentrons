@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { ListTable, StyledText } from '@opentrons/components'
 
 import { FloatingActionButton } from '/app/atoms/buttons'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useImageInfo } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
 
@@ -16,8 +15,7 @@ import type {
   LabwareDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import type { UseImagesInfoItem } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 export interface ImageGalleryListProps {
   runStatus: RunStatus | null

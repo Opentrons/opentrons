@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
 
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
+
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
-import { useImageInfo } from './hooks/useImageInfo'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { GalleryItemCardProps } from './GalleryItemCard'
