@@ -13,8 +13,6 @@ import styles from './gallery.module.css'
 
 import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
-const PHOTO_VIEWER_PADDING_PX = 16 * 2
-
 export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const { item } = props
   const {
@@ -47,10 +45,6 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
               step: 'Step 1 / 999999',
               timestamp,
             }),
-            dimensions: {
-              width: img.naturalWidth + PHOTO_VIEWER_PADDING_PX,
-              height: img.naturalHeight + PHOTO_VIEWER_PADDING_PX,
-            },
           })
         )
       }

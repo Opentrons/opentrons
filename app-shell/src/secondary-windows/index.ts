@@ -71,7 +71,6 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         photoUrl: action.payload.photoUrl,
         robotName: action.payload.robotName,
         windowTitle: action.payload.windowTitle,
-        dimensions: action.payload.dimensions,
         log,
       })
     case STEP_DETAIL_VIEWER_OPEN:
