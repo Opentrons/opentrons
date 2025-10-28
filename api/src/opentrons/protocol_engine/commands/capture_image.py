@@ -121,9 +121,15 @@ class CaptureImageImpl(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
 
-        # Handle capturing an image with the CameraProvider
+        # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
-        if camera_settings.camera_enabled is False:
+        engine_camera_settings = self._state_view.camera.get_enablement_settings()
+        if (
+            engine_camera_settings is None and camera_settings.camera_enabled is False
+        ) or (
+            engine_camera_settings is not None
+            and engine_camera_settings.camera_enabled is False
+        ):
             raise CameraDisabledError(
                 "Cannot capture image because Camera is disabled."
             )

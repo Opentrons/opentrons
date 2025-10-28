@@ -40,6 +40,7 @@ from .preconditions import (
     CommandPreconditionStore,
     CommandPreconditionView,
 )
+from .camera import CameraState, CameraView, CameraStore
 
 
 _ParamsT = ParamSpec("_ParamsT")
@@ -62,6 +63,7 @@ class State:
     files: FileState
     tasks: TaskState
     preconditions: CommandPreconditionState
+    camera: CameraState
 
 
 class StateView(HasState[State]):
@@ -83,6 +85,7 @@ class StateView(HasState[State]):
     _config: Config
     _tasks: TaskView
     _preconditions: CommandPreconditionView
+    _camera: CameraView
 
     @property
     def commands(self) -> CommandView:
@@ -155,6 +158,11 @@ class StateView(HasState[State]):
         return self._preconditions
 
     @property
+    def camera(self) -> CameraView:
+        """Get state view for the Camera."""
+        return self._camera
+
+    @property
     def tasks(self) -> TaskView:
         """Get state view selectors for task state."""
         return self._tasks
@@ -183,6 +191,7 @@ class StateView(HasState[State]):
                 for liquid_class_id, liquid_class_record in self._liquid_classes.get_all().items()
             ],
             tasks=self._tasks.get_summary(),
+            cameraSettings=self._camera.get_enablement_settings(),
         )
 
 
@@ -254,6 +263,7 @@ class StateStore(StateView, ActionHandler):
         self._file_store = FileStore()
         self._task_store = TaskStore()
         self._precondition_store = CommandPreconditionStore()
+        self._camera_store = CameraStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -393,6 +403,7 @@ class StateStore(StateView, ActionHandler):
             files=self._file_store.state,
             tasks=self._task_store.state,
             preconditions=self._precondition_store.state,
+            camera=self._camera_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -413,6 +424,7 @@ class StateStore(StateView, ActionHandler):
         self._files = FileView(state.files)
         self._tasks = TaskView(state.tasks)
         self._preconditions = CommandPreconditionView(state.preconditions)
+        self._camera = CameraView(state.camera)
 
         # Derived states
         self._geometry = GeometryView(
@@ -446,6 +458,7 @@ class StateStore(StateView, ActionHandler):
         self._tips._state = next_state.tips
         self._wells._state = next_state.wells
         self._tasks._state = next_state.tasks
+        self._camera._state = next_state.camera
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()

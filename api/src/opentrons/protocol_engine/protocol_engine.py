@@ -24,6 +24,7 @@ from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization, labware_offset_standardization
 from .resources import ModelUtils, ModuleDataProvider, FileProvider, CameraProvider
+from .resources.camera_provider import CameraSettings
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -56,6 +57,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    AddCameraSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
@@ -636,6 +638,17 @@ class ProtocolEngine:
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id
         )
+
+    def add_camera_enablement_settings(
+        self, enablement_settings: CameraSettings
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        self._action_dispatcher.dispatch(
+            AddCameraSettingsAction(enablement_settings=enablement_settings)
+        )
+        camera_settings = self.state_view.camera.get_enablement_settings()
+        assert camera_settings is not None
+        return camera_settings
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""

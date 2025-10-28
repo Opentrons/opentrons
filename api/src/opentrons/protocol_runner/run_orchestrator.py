@@ -46,7 +46,7 @@ from ..protocol_engine.types import (
     ModuleModel,
     CommandPreconditions,
 )
-from ..protocol_engine.resources.camera_provider import CameraProvider
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -377,6 +377,13 @@ class RunOrchestrator:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self._protocol_engine.add_labware_definition(definition)
+
+    def add_camera_enablement_settings(
+        self,
+        enablement_settings: CameraSettings,
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
 
     async def add_command_and_wait_for_interval(
         self,

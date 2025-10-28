@@ -58,7 +58,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    CameraSettings,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
@@ -474,6 +477,12 @@ class RunOrchestratorStore:
     ) -> None:
         """Create run policy rules for error recovery."""
         self.run_orchestrator.set_error_recovery_policy(policy)
+
+    def add_camera_enablement_settings(
+        self, enablement_settings: CameraSettings
+    ) -> None:
+        """Add new camera enablement settings to state."""
+        return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
 
     async def add_command_and_wait_for_interval(
         self,
