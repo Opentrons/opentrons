@@ -37,6 +37,7 @@ import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -95,6 +96,7 @@ interface PageContentsProps {
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
+  const runStatus = useNotifyRunQuery(runId)?.data?.data.status ?? null
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
@@ -167,7 +169,13 @@ function PageContents(props: PageContentsProps): JSX.Element {
       backToTop: null,
     },
     camera: {
-      content: <ProtocolRunCamera runId={runId} robotType={robotType} />,
+      content: (
+        <ProtocolRunCamera
+          runStatus={runStatus}
+          runId={runId}
+          robotType={robotType}
+        />
+      ),
       backToTop: null,
     },
   }

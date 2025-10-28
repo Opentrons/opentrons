@@ -16,7 +16,11 @@ const render = () => {
   const RUN_ID = 'run123'
   const robotType = 'OT-3 Standard'
   return renderWithProviders(
-    <ProtocolRunCamera runId={RUN_ID} robotType={robotType} />,
+    <ProtocolRunCamera
+      runId={RUN_ID}
+      robotType={robotType}
+      runStatus={'MOCK-RUN-STATUS' as any}
+    />,
     {
       i18nInstance: i18n,
     }
