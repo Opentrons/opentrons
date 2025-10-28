@@ -1662,7 +1662,7 @@
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": ">=0.12.0"
+            "version": "==0.12.12"
         },
         "pytest-xdist": {
             "hashes": [
