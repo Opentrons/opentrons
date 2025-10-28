@@ -52,8 +52,8 @@
   display: flex;
   padding: var(--spacing-12);
   border-radius: var(--border-radius-4);
-  gap: var(--spacing-24);
   background-color: var(--grey-20);
+  gap: var(--spacing-24);
 }
 
 .gallery_card_thumbnail {
@@ -99,8 +99,8 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--spacing-2);
   justify-content: center;
+  gap: var(--spacing-2);
 }
 
 .gallery_card_timestamp {
