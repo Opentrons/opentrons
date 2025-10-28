@@ -3,16 +3,27 @@
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
-  padding: var(--spacing-16);
-  gap: var(--spacing-12);
+  /* padding: var(--spacing-16); */
+  /* gap: var(--spacing-12); */
 }
 
 .track_container {
   position: relative;
   display: flex;
   width: 100%;
-  height: 28px;
+  height: 0px;
   align-items: center;
+  cursor: pointer;
+}
+
+.track_container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 28px;
+  transform: translateY(-50%);
   cursor: pointer;
 }
 
@@ -21,7 +32,6 @@
   position: absolute;
   top: 50%;
   height: 6px;
-  border-radius: 3px;
   pointer-events: none;
   transform: translateY(-50%);
 }
@@ -46,7 +56,9 @@
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.8);
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
 }
 
 /* track thumb is needed to be visible when hovering over the track or when dragging */

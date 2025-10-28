@@ -1,10 +1,21 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { Chip, COLORS, NewIconButton } from '@opentrons/components'
+import {
+  Chip,
+  COLORS,
+  NewIconButton,
+  NO_WRAP,
+  StyledText,
+  TertiaryButton,
+  TimelineScrubber,
+} from '@opentrons/components'
 
 import { stepDetailViewerUpdateAction } from '/app/redux/shell'
 
-import styles from './preview.module.css'
+import styles from './controls.module.css'
+import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 
 // import {
 //   getNextGroupFirstCommandId,
@@ -39,6 +50,8 @@ interface ControlsProps {
     slot: string | null
     command?: RunTimeCommand
   }
+  milliSecondsPerFrame: number
+  setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
 export function Controls(props: ControlsProps): JSX.Element {
   const {
@@ -52,9 +65,13 @@ export function Controls(props: ControlsProps): JSX.Element {
     commands,
     // groupedCommands,
     spotlightWindowData,
+    milliSecondsPerFrame,
+    setMilliSecondsPerFrame,
   } = props
+  const { t } = useTranslation('protocol_visualization')
   const dispatch = useDispatch()
 
+  const [showPerStepOverflowMenu, setShowPerStepOverflowMenu] = useState(false)
   // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
   // const currentCommandId = commands[currentCommandIndex].id
   // const nextGroupFirstCommandId = getNextGroupFirstCommandId(
@@ -80,6 +97,55 @@ export function Controls(props: ControlsProps): JSX.Element {
   //     setSelectedCommand(commands[commands.length - 1].id)
   //   }
   // }
+
+  const handlePerStepOverflowClick = (): void => {
+    setShowPerStepOverflowMenu(
+      showPerStepOverflowMenu => !showPerStepOverflowMenu
+    )
+  }
+
+  const handleTrackChange = (updatedTrack: {
+    id: string
+    value: number
+  }): void => {
+    const normalizedValue = updatedTrack.value / 100
+    const nextIndex = Math.min(
+      Math.max(Math.round(normalizedValue * (numCommandLength - 1)), 0),
+      numCommandLength - 1
+    )
+
+    setSelectedCommand(commands[nextIndex].id)
+
+    if (
+      spotlightWindowData.slot != null &&
+      spotlightWindowData.command != null
+    ) {
+      dispatch(
+        stepDetailViewerUpdateAction({
+          protocolKey: spotlightWindowData.protocolKey,
+          slot: spotlightWindowData.slot,
+          command: spotlightWindowData.command,
+          robotState: spotlightWindowData.robotState,
+          invariantContext: spotlightWindowData.invariantContext,
+          analysis: spotlightWindowData.analysis,
+          liquids: spotlightWindowData.liquids,
+        })
+      )
+    }
+  }
+
+  const currentProgress =
+    numCommandLength > 0
+      ? (currentCommandIndex / (numCommandLength - 1)) * 100
+      : 0
+
+  const tracks = [
+    {
+      id: 'protocol-timeline',
+      value: currentProgress,
+    },
+  ]
+
   return (
     <>
       <div className={styles.container}>
@@ -96,6 +162,27 @@ export function Controls(props: ControlsProps): JSX.Element {
               </div>
             </div>
             <div className={styles.buttons}>
+              <div className={styles.per_step_button_wrapper}>
+                <TertiaryButton
+                  buttonType="white"
+                  onClick={handlePerStepOverflowClick}
+                >
+                  <StyledText
+                    desktopStyle="captionSemiBold"
+                    whiteSpace={NO_WRAP}
+                  >
+                    {t('seconds_per_step', {
+                      seconds: milliSecondsPerFrame / 1000,
+                    })}
+                  </StyledText>
+                </TertiaryButton>
+                {showPerStepOverflowMenu ? (
+                  <PerStepOverflowMenu
+                    setShowPerStepOverflowMenu={setShowPerStepOverflowMenu}
+                    setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+                  />
+                ) : null}
+              </div>
               <NewIconButton
                 variant="primary"
                 iconName={isPlaying ? 'pause' : 'play'}
@@ -107,40 +194,7 @@ export function Controls(props: ControlsProps): JSX.Element {
             </div>
           </div>
         </div>
-        <input
-          type="range"
-          min={1}
-          max={numCommandLength}
-          value={currentCommandIndex + 1}
-          className={styles.range_input}
-          style={{
-            //  @ts-expect-error: TODO figure out how to fix this - seems like
-            //  an issue with thinking i'm using styled-components?
-            '--progress': `${
-              ((currentCommandIndex + 1) / numCommandLength) * 100
-            }%`,
-          }}
-          onChange={e => {
-            const nextIndex = Number(e.target.value) - 1
-            setSelectedCommand(commands[nextIndex].id)
-            if (
-              spotlightWindowData.slot != null &&
-              spotlightWindowData.command != null
-            ) {
-              dispatch(
-                stepDetailViewerUpdateAction({
-                  protocolKey: spotlightWindowData.protocolKey,
-                  slot: spotlightWindowData.slot,
-                  command: spotlightWindowData.command,
-                  robotState: spotlightWindowData.robotState,
-                  invariantContext: spotlightWindowData.invariantContext,
-                  analysis: spotlightWindowData.analysis,
-                  liquids: spotlightWindowData.liquids,
-                })
-              )
-            }
-          }}
-        />
+        <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
       </div>
     </>
   )
