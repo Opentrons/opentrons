@@ -93,9 +93,7 @@ export interface GalleryItemCardProps {
   allRunDefs: LabwareDefinition[]
 }
 
-export function GalleryItemCard(
-  props: GalleryItemCardProps
-): JSX.Element | null {
+export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
   const { item } = props
   const {
     currentCommandString,
@@ -188,13 +186,13 @@ export function GalleryItemCard(
           </StyledText>
         )}
       </div>
-      {isSkeleton ? (
-        <Skeleton width="18%" height="1rem" backgroundSize="47rem" />
-      ) : (
-        <div className={styles.gallery_card_timestamp}>
+      <div className={styles.gallery_card_timestamp}>
+        {isSkeleton ? (
+          <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
+        ) : (
           <StyledText desktopStyle="bodyDefaultRegular">{timestamp}</StyledText>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

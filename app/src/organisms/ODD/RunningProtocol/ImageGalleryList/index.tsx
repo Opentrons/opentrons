@@ -59,10 +59,10 @@ export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
 
 interface GalleryListContentProps {
   imagesInfo: UseImagesInfoItem[]
-  protocolAnalysis: any
+  protocolAnalysis: CompletedProtocolAnalysis | null
   runId: string
-  robotType: any
-  allRunDefs: any
+  robotType: RobotType
+  allRunDefs: LabwareDefinition[]
 }
 
 function GalleryListContent({
@@ -71,7 +71,7 @@ function GalleryListContent({
   runId,
   robotType,
   allRunDefs,
-}: GalleryListContentProps): JSX.Element | null {
+}: GalleryListContentProps): JSX.Element {
   return (
     <ListTable headers={[<GalleryTableHeaders key="1" />]}>
       {imagesInfo.map(item => (
