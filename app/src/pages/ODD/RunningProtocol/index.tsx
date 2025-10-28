@@ -311,7 +311,10 @@ function CurrentOptionView({
     case 'ImageGallery':
       return (
         <>
-          <ImageGalleryList {...rest} />
+          <ImageGalleryList
+            {...rest}
+            protocolAnalysis={rest.robotSideAnalysis}
+          />
           <div className={styles.gradient_overlay} />
         </>
       )
