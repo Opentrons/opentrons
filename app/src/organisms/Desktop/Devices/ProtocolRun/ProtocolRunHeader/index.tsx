@@ -110,7 +110,8 @@ export function ProtocolRunHeader(
           isResetRunLoading={isResetRunLoadingRef.current}
           runErrors={runErrors}
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
-          hasDownloadableFiles={outputFileIds.csv.length > 0}
+          hasImages={outputFileIds.jpeg.length > 0}
+          hasCsvFiles={outputFileIds.csv.length > 0}
           {...props}
         />
         <RunHeaderContent
