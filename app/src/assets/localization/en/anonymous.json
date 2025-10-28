@@ -45,6 +45,7 @@
   "labware_offsets_conflict_description": "Your robot's stored labware offsets were updated after the last protocol run on <strong>{{timestamp}}</strong>. Which offsets do you want to use to run this protocol again?",
   "language_preference_description": "The app matches your system language unless you select another language below. You can change the language later in the app settings.",
   "learn_uninstalling": "Learn more about uninstalling the app",
+  "livestream_window_title": "Robot Live Camera",
   "loosen_screws_and_detach": "Loosen screws and detach gripper",
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box.",
   "module_calibration_failed": "<block>Module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact support.</block><block>{{error}}</block>",

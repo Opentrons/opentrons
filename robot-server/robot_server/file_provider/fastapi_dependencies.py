@@ -15,6 +15,10 @@ from opentrons.protocol_engine.resources.file_provider import FileProvider
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.settings import get_settings, RobotServerSettings
+from robot_server.service.notifications.publishers import (
+    DataFilePublisher,
+    get_data_file_publisher,
+)
 
 
 async def get_file_provider_executor(
@@ -23,6 +27,7 @@ async def get_file_provider_executor(
     images_directory: Annotated[Path, fastapi.Depends(get_images_directory)],
     disk_monitor: Annotated[DiskMonitor, fastapi.Depends(get_disk_monitor)],
     settings: Annotated[RobotServerSettings, fastapi.Depends(get_settings)],
+    publisher: Annotated[DataFilePublisher, fastapi.Depends(get_data_file_publisher)],
 ) -> FileProviderExecutor:
     """Return the server's singleton `FileProviderExecutor` which provides the engine related callbacks for FileProvider."""
     file_provider_wrapper = FileProviderExecutor(
@@ -31,6 +36,7 @@ async def get_file_provider_executor(
         images_directory=images_directory,
         disk_monitor=disk_monitor,
         settings=settings,
+        publisher=publisher,
     )
 
     return file_provider_wrapper

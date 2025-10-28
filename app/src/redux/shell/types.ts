@@ -160,6 +160,7 @@ export type NotifyTopic =
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
   | `robot-server/runs/pre_serialized_commands/${string}`
+  | `robot-server/dataFiles/${string}/images`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -180,7 +181,7 @@ export interface SendFilePathsAction {
 
 export interface CameraStreamOpenAction {
   type: 'shell:CAMERA_STREAM_OPEN'
-  payload: { hostname: string; robotName: string }
+  payload: { hostname: string; robotName: string; runId: string }
   meta: { shell: true }
 }
 

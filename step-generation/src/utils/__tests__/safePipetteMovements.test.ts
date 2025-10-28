@@ -37,7 +37,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return true even with occupied wells for single channel', () => {
@@ -50,7 +52,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
   })
 
@@ -65,7 +69,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return true when wells after target are empty (A1 primary nozzle)', () => {
@@ -78,7 +84,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return false when wells after target are occupied (A1 primary nozzle)', () => {
@@ -91,7 +99,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: false })
+      )
     })
 
     it('should return true when wells after target are empty (H1 primary nozzle - reversed)', () => {
@@ -104,7 +114,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return false when wells after target are occupied (H1 primary nozzle - reversed)', () => {
@@ -117,7 +129,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should ignore wells in tipsToIgnore list', () => {
@@ -130,7 +144,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: ['B1'],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return true for 8-channel with non-SINGLE configuration', () => {
@@ -143,7 +159,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
   })
 
@@ -158,7 +176,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
   })
 
@@ -173,7 +193,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return false when columns after target have occupied wells', () => {
@@ -186,7 +208,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: false })
+      )
     })
 
     it('should return true when columns after target are empty (A12 primary nozzle)', () => {
@@ -199,7 +223,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return true when columns after target are empty (H12 primary nozzle - reversed)', () => {
@@ -212,7 +238,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should ignore wells in tipsToIgnore list for COLUMN configuration', () => {
@@ -225,7 +253,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: ['A2'],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
   })
 
@@ -240,7 +270,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should return false when wells in path are occupied', () => {
@@ -253,7 +285,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: false })
+      )
     })
 
     it('should return true when target well is occupied but others are empty', () => {
@@ -266,7 +300,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should handle H12 primary nozzle with row reversal', () => {
@@ -279,7 +315,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should handle A12 primary nozzle with column reversal', () => {
@@ -292,7 +330,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should ignore wells in tipsToIgnore list for SINGLE configuration', () => {
@@ -305,7 +345,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: ['B1'],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
 
     it('should handle complex path with multiple occupied wells', () => {
@@ -318,7 +360,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: tiprackDefinition,
         tipsToIgnore: ['B1', 'C1'],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(true)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: true })
+      )
     })
   })
 
@@ -339,7 +383,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: customTiprackDef,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: false })
+      )
     })
 
     it('should handle single column tiprack', () => {
@@ -355,7 +401,9 @@ describe('getIsSafePickupWithinTiprack', () => {
         tiprackDef: singleColumnTiprackDef,
         tipsToIgnore: [],
       } as any
-      expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+      expect(getIsSafePickupWithinTiprack(args)).toEqual(
+        expect.objectContaining({ isSafe: false })
+      )
     })
   })
 })

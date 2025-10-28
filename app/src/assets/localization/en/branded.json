@@ -45,6 +45,7 @@
   "labware_offsets_conflict_description": "Your Flex's stored labware offsets were updated after the last protocol run on <strong>{{timestamp}}</strong>. Which offsets do you want to use to run this protocol again?",
   "language_preference_description": "The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.",
   "learn_uninstalling": "Learn more about uninstalling the Opentrons App",
+  "livestream_window_title": "Opentrons Live Camera",
   "loosen_screws_and_detach": "Loosen screws and detach Flex Gripper",
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.",
   "module_calibration_failed": "<block>Module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact Opentrons Support.</block><block>{{error}}</block>",

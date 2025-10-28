@@ -1,15 +1,12 @@
 import { useState } from 'react'
 
-import stubCameraImage from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/stubCameraImage.jpg'
-
-export interface UseStubPreviewImageResult {
+export interface UsePreviewImageResult {
   imgPath: string | undefined
   isLoading: boolean
   takePhoto: () => void
 }
 
-// Stubs the preview image functionality
-export function useStubPreviewImage(): UseStubPreviewImageResult {
+export function usePreviewImage(): UsePreviewImageResult {
   const [isLoading, setIsLoading] = useState(false)
   const [imgPath, setImgPath] = useState<string | undefined>(undefined)
 
@@ -17,7 +14,7 @@ export function useStubPreviewImage(): UseStubPreviewImageResult {
     setIsLoading(true)
 
     setTimeout(() => {
-      setImgPath(stubCameraImage)
+      setImgPath(imgPath)
       setIsLoading(false)
     }, 3000)
   }
