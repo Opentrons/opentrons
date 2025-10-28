@@ -14,6 +14,9 @@ inputs:
   channel_override:
     description: 'Override default channel (optional)'
     required: false
+  webhook_url:
+    description: 'Slack webhook URL'
+    required: true
 
 runs:
   using: 'composite'
@@ -78,4 +81,4 @@ runs:
             ]
           }
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ inputs.webhook_url }}
