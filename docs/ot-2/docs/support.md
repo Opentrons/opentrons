@@ -8,6 +8,7 @@ Contact us if you have any questions about the OT-2. Opentrons teams are here to
 - Technical support
 - Applications support
 - Warranty service
+- Supplies and accessories
 
 ## Support
 
