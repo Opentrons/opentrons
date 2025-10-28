@@ -2,23 +2,18 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import { COLORS, StyledText } from '@opentrons/components'
-import { useDataFileRawQuery, useHost } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
 
 import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
 const PHOTO_VIEWER_PADDING_PX = 16 * 2
-
-export function useImage(imageId: string = 'stubId'): string | null {
-  useDataFileRawQuery(imageId)
-  const imagePath = null
-  return imagePath
-}
 
 export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const { item } = props

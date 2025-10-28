@@ -5,9 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useImage } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import { GalleryListItem } from '../GalleryListItem'
 
@@ -19,13 +18,7 @@ vi.mock(
   })
 )
 vi.mock('/app/local-resources/dataFiles/hooks/useImageGalleryData')
-// Mock the image and command hooks
-vi.mock(
-  '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard',
-  () => ({
-    useImage: vi.fn(),
-  })
-)
+vi.mock('/app/resources/dataFiles/useImage')
 
 const MOCK_IMG_PATH = '/path/to/test-image.jpg'
 const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
