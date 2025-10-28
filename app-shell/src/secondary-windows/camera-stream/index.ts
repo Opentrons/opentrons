@@ -38,7 +38,7 @@ const STREAM_URL = (robotName: string, runId: string): string =>
     SECONDARY_WINDOW_CONFIG.url.protocol
   }//${SECONDARY_WINDOW_URL_PATH}#/devices/${encodeURIComponent(
     robotName
-  )}/camera-stream/?runId=${encodeURIComponent(runId)}`
+  )}/camera-stream?runId=${encodeURIComponent(runId)}`
 
 function createCameraStreamUi({
   log,
