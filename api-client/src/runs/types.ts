@@ -1,5 +1,3 @@
-import { CameraData } from '../camera'
-
 import type {
   LabwareDefinition,
   Liquid,
@@ -13,6 +11,7 @@ import type {
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
+import type { CameraData } from '../camera'
 import type {
   ErrorDetails,
   LabwareOffsetLocationSequence,
