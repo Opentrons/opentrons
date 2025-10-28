@@ -44,14 +44,15 @@
 .gallery_content_container {
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-4);
   gap: var(--spacing-4);
 }
 
 .gallery_card {
   display: flex;
   padding: var(--spacing-12);
-  border: 1px solid var(--grey-30);
-  border-radius: var(--border-radius-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
   gap: var(--spacing-24);
 }
 
@@ -98,6 +99,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: var(--spacing-2);
 }
 

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubPreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { CameraControlsHome } from '../CameraControlsHome'
@@ -15,7 +15,7 @@ import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/C
 import type { CameraControlsHomeProps } from '../CameraControlsHome'
 
 vi.mock(
-  '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+  '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 )
 vi.mock('/app/organisms/ODD/ChildNavigation')
 vi.mock('../ImagePreviewModal')
@@ -47,7 +47,7 @@ describe('CameraControlsHome', () => {
       toggleShowControls: vi.fn(),
       settings: mockSettings,
     }
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
       takePhoto: vi.fn(),
@@ -191,7 +191,7 @@ describe('CameraControlsHome', () => {
 
   it('calls takePhoto when preview button is clicked', () => {
     const mockTakePhoto = vi.fn()
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
       takePhoto: mockTakePhoto,
@@ -212,7 +212,7 @@ describe('CameraControlsHome', () => {
 
   it('shows ImagePreviewModal after taking photo', () => {
     const mockTakePhoto = vi.fn()
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: '/path/to/image.jpg',
       takePhoto: mockTakePhoto,
@@ -232,7 +232,7 @@ describe('CameraControlsHome', () => {
   })
 
   it('shows spinner icon when loading and no image path', () => {
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: true,
       imgPath: undefined,
       takePhoto: vi.fn(),
