@@ -23,6 +23,7 @@ describe('unsavedChanges', () => {
       'DELETE_STEP',
       'DELETE_MULTIPLE_STEPS',
       'REORDER_STEPS',
+      'REORDER_SELECTED_STEP',
       'SAVE_STEP_FORM',
       'SAVE_FILE_METADATA',
       'REPLACE_CUSTOM_LABWARE_DEF',
