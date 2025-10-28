@@ -41,6 +41,7 @@ from robot_server.runs.run_models import RunNotFoundError
 from robot_server.data_files.router import download_run_images
 from robot_server.runs.run_store import RunStore
 from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.service.notifications.publishers import DataFilePublisher
 
 
 @pytest.fixture
@@ -83,6 +84,12 @@ def run_store(decoy: Decoy) -> RunStore:
 def protocol_store(decoy: Decoy) -> ProtocolStore:
     """Get a mocked out ProtocolStore."""
     return decoy.mock(cls=ProtocolStore)
+
+
+@pytest.fixture
+def data_file_publisher(decoy: Decoy) -> DataFilePublisher:
+    """Get a mocked out DataFilePublisher."""
+    return decoy.mock(cls=DataFilePublisher)
 
 
 async def test_upload_new_data_file(
@@ -645,6 +652,7 @@ async def test_delete_run_images(
     decoy: Decoy,
     data_files_store: DataFilesStore,
     run_data_manager: RunDataManager,
+    data_file_publisher: DataFilePublisher,
 ) -> None:
     """It should delete all images for a run."""
     decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
@@ -654,9 +662,12 @@ async def test_delete_run_images(
         runId="run-id",
         data_files_store=data_files_store,
         run_data_manager=run_data_manager,
+        data_file_publisher=data_file_publisher,
     )
 
     decoy.verify(data_files_store.remove_all_by_run_id("run-id"))
+    decoy.verify(data_file_publisher.publish_run_images("run-id"))
+
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
 
@@ -665,6 +676,7 @@ async def test_delete_run_images_run_not_found(
     decoy: Decoy,
     data_files_store: DataFilesStore,
     run_data_manager: RunDataManager,
+    data_file_publisher: DataFilePublisher,
 ) -> None:
     """It should raise an error if the run doesn't exist."""
     decoy.when(run_data_manager.get("run-id")).then_raise(
@@ -676,6 +688,7 @@ async def test_delete_run_images_run_not_found(
             runId="run-id",
             data_files_store=data_files_store,
             run_data_manager=run_data_manager,
+            data_file_publisher=data_file_publisher,
         )
 
     assert exc_info.value.status_code == 404

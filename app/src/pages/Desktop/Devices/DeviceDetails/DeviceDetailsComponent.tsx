@@ -14,13 +14,13 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
 import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
-import { InputDevices } from '/app/organisms/Desktop/Devices/InputDevices'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { Peripherals } from '/app/organisms/Desktop/Devices/Peripherals'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 interface DeviceDetailsComponentProps {
@@ -37,6 +37,7 @@ export function DeviceDetailsComponent({
     enabled: isFlex,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
+  const isRobotViewable = useIsRobotViewable(robotName)
 
   // If we are explicitly redirected to an anchor link on this page,
   // scroll to it.
@@ -76,11 +77,14 @@ export function DeviceDetailsComponent({
         width="100%"
       >
         <RobotOverview robotName={robotName} />
-        <InstrumentsAndModules robotName={robotName} />
-        {isCameraEnabled && (
+        <InstrumentsAndModules
+          robotName={robotName}
+          isRobotViewable={isRobotViewable}
+        />
+        {isCameraEnabled && isRobotViewable && (
           <>
             <Divider width="100%" />
-            <InputDevices isFlex={isFlex} robotName={robotName} />
+            <Peripherals isFlex={isFlex} robotName={robotName} />
           </>
         )}
       </Flex>

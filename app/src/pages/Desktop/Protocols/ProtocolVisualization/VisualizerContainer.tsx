@@ -10,12 +10,12 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
-import { Controls } from './Controls'
 import { DeckView } from './DeckView'
 import styles from './visualizercontainer.module.css'
 
@@ -23,7 +23,7 @@ import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const SEC_PER_FRAME = 1000
+const INITIAL_MILLI_SECONDS_PER_FRAME = 2000
 const INITIAL_WIDTH_PX = 200
 const MIN_CENTER_WIDTH_PX = 200
 const MIN_COLUMN_WIDTH_PX = 100
@@ -46,6 +46,9 @@ export function VisualizerContainer(
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+  const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
+    INITIAL_MILLI_SECONDS_PER_FRAME
+  )
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
@@ -104,12 +107,12 @@ export function VisualizerContainer(
 
         return nextId
       })
-    }, SEC_PER_FRAME)
+    }, milliSecondsPerFrame)
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [isPlaying, commands])
+  }, [isPlaying, commands, milliSecondsPerFrame])
 
   const { robotState } = frame
   const selectedRunTimeCommand = commands.find(
@@ -259,6 +262,8 @@ export function VisualizerContainer(
             analysis,
             liquids,
           }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
+          setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />
 
         <DeckView

@@ -74,6 +74,7 @@ def _build_run(
             liquidClasses=state_summary.liquidClasses,
             outputFileIds=state_summary.files,
             runTimeParameters=run_time_parameters,
+            cameraSettings=state_summary.cameraSettings,
         )
 
     errors: List[EnumeratedError] = []
