@@ -13,7 +13,7 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { mockMagneticModule } from '/app/redux/modules/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
@@ -25,6 +25,7 @@ import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 
+import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -47,14 +48,20 @@ vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
 
-const render = () => {
-  return renderWithProviders(<InstrumentsAndModules robotName={ROBOT_NAME} />, {
+const render = (props: ComponentProps<typeof InstrumentsAndModules>) => {
+  return renderWithProviders(<InstrumentsAndModules {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('InstrumentsAndModules', () => {
+  let props: ComponentProps<typeof InstrumentsAndModules>
+
   beforeEach(() => {
+    props = {
+      robotName: ROBOT_NAME,
+      isRobotViewable: true,
+    }
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
@@ -75,16 +82,14 @@ describe('InstrumentsAndModules', () => {
   })
 
   it('renders an empty state message when robot is not on the network', () => {
-    vi.mocked(useIsRobotViewable).mockReturnValue(false)
-    render()
+    render({ ...props, isRobotViewable: false })
 
     screen.getByText(
-      'Robot must be on the network to see connected instruments and modules'
+      'Robot must be on the network to see connected instruments, modules, and peripherals'
     )
   })
 
   it('renders a Module card when a robot is viewable', () => {
-    vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockMagneticModule] },
     } as any)
@@ -94,11 +99,10 @@ describe('InstrumentsAndModules', () => {
         right: null,
       },
     } as any)
-    render()
+    render(props)
     expect(vi.mocked(ModuleCard)).toHaveBeenCalled()
   })
   it('renders pipette cards when a ot2 robot is viewable', () => {
-    vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockMagneticModule] },
     } as any)
@@ -108,21 +112,21 @@ describe('InstrumentsAndModules', () => {
         right: null,
       },
     } as any)
-    render()
+    render(props)
     expect(vi.mocked(PipetteCard)).toHaveBeenCalledTimes(2)
   })
   it('renders gripper and flex pipette cards when a robot is Flex', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useIsRobotViewable).mockReturnValue(true)
-    render()
+
+    render(props)
     expect(vi.mocked(GripperCard)).toHaveBeenCalled()
     expect(vi.mocked(FlexPipetteCard)).toHaveBeenCalledTimes(2)
   })
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
-    render()
+    render(props)
     screen.getByText(
-      'Robot must be on the network to see connected instruments and modules'
+      'Some robot controls are not available when run is in progress'
     )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
@@ -141,18 +145,18 @@ describe('InstrumentsAndModules', () => {
         ],
       },
     } as any)
-    vi.mocked(useIsRobotViewable).mockReturnValue(true)
-    render()
+
+    render(props)
     expect(vi.mocked(FlexPipetteCard)).toHaveBeenCalledTimes(1)
   })
   it('renders pipette recalibration recommendation banner when offsets fail reasonability checks', () => {
     vi.mocked(getShowPipetteCalibrationWarning).mockReturnValue(true)
-    vi.mocked(useIsRobotViewable).mockReturnValue(true)
-    render()
+
+    render(props)
     expect(vi.mocked(PipetteRecalibrationWarning)).toHaveBeenCalled()
   })
   it('fetches pipette and modules on short poll for ot2', () => {
-    render()
+    render(props)
     expect(usePipettesQuery).toHaveBeenCalledWith(
       {},
       { refetchInterval: 5000, enabled: true }
@@ -165,7 +169,7 @@ describe('InstrumentsAndModules', () => {
   })
   it('fetches instruments and modules on short poll for flex', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    render()
+    render(props)
     expect(usePipettesQuery).toHaveBeenCalledWith(
       {},
       { refetchInterval: 5000, enabled: false }
