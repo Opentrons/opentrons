@@ -85,18 +85,18 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   },
   null
 )
-export type SelectedContainerIds = string[] | null | undefined
+export type SelectedMultipleContainerIds = string[] | null | undefined
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
-const selectedContainerIds: Reducer<SelectedContainerIds, any> = handleActions(
+const selectedMultipleContainerIds: Reducer<SelectedMultipleContainerIds, any> = handleActions(
   {
     OPEN_INGREDIENT_SELECTOR: (
       state,
       action: MultipleIngredientsSelectorAction
-    ): SelectedContainerIds => action.payload,
+    ): SelectedMultipleContainerIds => action.payload,
     CLOSE_INGREDIENT_SELECTOR: (
       state,
       action: CloseIngredientSelectorAction
-    ): SelectedContainerIds => null,
+    ): SelectedMultipleContainerIds => null,
   },
   null
 )
@@ -485,7 +485,7 @@ export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
-  selectedContainerIds: SelectedContainerIds
+  selectedMultipleContainerIds: SelectedMultipleContainerIds
   drillDownLabwareId: DrillDownLabwareId
   containers: ContainersState
   selectedLiquidGroup: SelectedLiquidGroupState
@@ -500,10 +500,10 @@ export const rootReducer = combineReducers({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,
-  selectedContainerIds,
+  selectedMultipleContainerIds,
   drillDownLabwareId,
   containers,
   ingredients,
-  ingredLocations,
+  ingredLocations, 
   generateNewProtocol,
 }) as Reducer<RootState, Action>

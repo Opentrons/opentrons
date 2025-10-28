@@ -15,7 +15,7 @@ import type {
   IngredientsState,
   RootState,
   SelectedContainerId,
-  SelectedContainerIds,
+  SelectedMultipleContainerIds,
   SelectedLiquidGroupState,
 } from './reducers'
 import type {
@@ -80,10 +80,10 @@ const getSelectedLabwareId: Selector<
   RootSlice,
   SelectedContainerId
 > = createSelector(rootSelector, rootState => rootState.selectedContainerId)
-const getSelectedLabwareIds: Selector<
+const getMultipleSelectedLabwareIds: Selector<
   RootSlice,
-  SelectedContainerIds
-> = createSelector(rootSelector, rootState => rootState.selectedContainerIds)
+  SelectedMultipleContainerIds
+> = createSelector(rootSelector, rootState => rootState.selectedMultipleContainerIds)
 const getSelectedLiquidGroupState: Selector<
   RootSlice,
   SelectedLiquidGroupState
@@ -186,7 +186,7 @@ export const selectors = {
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
   getSelectedLabwareId,
-  getSelectedLabwareIds,
+  getSelectedLabwareIds: getMultipleSelectedLabwareIds,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
   allIngredientGroupFields,
