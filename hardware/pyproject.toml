@@ -111,7 +111,6 @@ ignore = [
 fixable = ["ALL"]
 docstring-convention = "google"
 
-
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"

@@ -155,8 +155,6 @@ docstring-convention = "google"
 "tests/opentrons/util/test_linal.py" = ["ANN", "D"]
 "tests/opentrons/util/test_entrypoint_util.py" = ["ANN", "D"]
 
-docstring-convention = "google"
-
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"

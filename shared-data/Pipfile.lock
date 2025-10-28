@@ -386,6 +386,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.9'",
             "version": "==3.21.0"
+        },
+        "ruff": {
+            "hashes": [
+                "sha256:8c4c14c6c8bc0f3048f5ad9c900687af307f612277fd864134c40b8d29adc6a7"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==0.12.12"
         }
     },
     "develop": {
