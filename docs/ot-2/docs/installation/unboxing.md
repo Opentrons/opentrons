@@ -53,34 +53,22 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 13. Install the window covers.
     ![installing window covers](../images/install-window-covers.png)
 
+</div>
+
 ## Post-assembly checklist
 
-At this point you should have an assembled robot, but it isn't time to power it up and start running protocols, at least not yet. There are a few more items to work through first.
+At this point you should have a fully assembled robot, but it isn't time to power it up and start running protocols, at least not yet. Before going forward, check your work against the items in this list:
 
-14. Perform the following assembly check:
-    - Confirm that 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
-    - Confirm that you are not missing any required cables or parts. If you are missing components, contact [Opentrons Support](https://opentrons.com/opentrons-support).
-    - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
-    - Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
-    - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact .
-
-15. Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
+  - Confirm that 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
+  - Confirm that you are not missing any required cables or parts. If you are missing components, contact [Opentrons Support](https://opentrons.com/opentrons-support).
+  - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
+  - Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
+  - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Opentrons Support.
+  - Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
 
     !!!note
         During during cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
 
-## Final steps and power on
+## Next steps
 
-16. Download and install the Opentrons App, which is available at <https://opentrons.com/ot-app>.
-
-17. Connect the Ethernet cable to the OT-2 and laptop. If your computer does not have an Ethernet port, use the provided Ethernet-to-USB dongle.
-    ![laptop USB-Ethernet connection](../images/computer-connection.png)
-
-18. Connect the external power supply to the OT-2 and then connect the power cable to a wall outlet.
-    ![external power supply connection](../images/OT2-power.png)
-
-19. Turn on the power by pressing the power button on the OT-2. It may take up to 45 seconds before the OT-2 starts running. After starting up, the robot will move the gantry to its home position.
-
-</div>
-
-At this point your OT-2 is ready for use. You can attach pipettes to the gantry, add modules to the deck, and upload protocols to the robot using the Opentrons App.
+At this point your OT-2 is almost ready for use. Review the instructions and information in [First Run](first-run.md) to finish preparing your robot so you can start running protocols.

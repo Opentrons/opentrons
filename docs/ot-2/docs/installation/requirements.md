@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Installation Requirements"
 ---
 
-Before setting up an OT-2, make sure that your installation site meets the requirements described in this section. And, follow all of the safety guidance here and throughout the installation instructions.
+Before setting up an OT-2, make sure that your installation site meets the requirements described in this section. Also, follow all of the safety guidance here and throughout the installation instructions.
 
 ## Placement
 
@@ -10,11 +10,9 @@ Before setting up an OT-2, make sure that your installation site meets the requi
 
 - **Bench surface:** A good workspace is stationary, sturdy, level, and liquid-resistant. Tables or benches with wheels (even locking wheels) are not recommended. OT-2 gantry movements can shake light weight or moveable tables.
 
-- **Operating space:** The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x25"). The working area must include extra clearance on the sides and back beyond the space occupied by the robot. This additional space is needed to accommodate cables and USB connections, and to allow for proper exhaust dissipation from modules that heat or cool.
+- **Operating space:** The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x25"). The working area should include extra clearance on the sides and back, beyond the space occupied by the robot. This additional room is needed to accommodate cables, USB connections, and to allow for proper exhaust dissipation from modules that heat or cool.
 
 ![OT2 length, width, height](../images/OT2-dimensions.png)
-
-
 
 ## Power consumption
 
