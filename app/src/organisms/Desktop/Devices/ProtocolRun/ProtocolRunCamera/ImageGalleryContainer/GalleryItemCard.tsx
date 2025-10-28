@@ -1,106 +1,33 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { COLORS, StyledText, useCommandTextString } from '@opentrons/components'
-import {
-  useCommandQuery,
-  useDataFileRawQuery,
-  useHost,
-} from '@opentrons/react-api-client'
+import { COLORS, StyledText } from '@opentrons/components'
+import { useDataFileRawQuery, useHost } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
+import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 
 import styles from './gallery.module.css'
 
-import type {
-  CompletedProtocolAnalysis,
-  LabwareDefinition,
-  ProtocolAnalysisOutput,
-  RobotType,
-} from '@opentrons/shared-data'
-import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
 const PHOTO_VIEWER_PADDING_PX = 16 * 2
 
-interface UseImageAndCommandResult {
-  currentCommandString: string
-  previousCommandString: string
-  stubStepFraction: string
-  isLoading: boolean
-}
 export function useImage(imageId: string = 'stubId'): string | null {
   useDataFileRawQuery(imageId)
   const imagePath = null
   return imagePath
 }
 
-export function useImageAndCommand({
-  item,
-  protocolAnalysis,
-  runId,
-  robotType,
-  allRunDefs,
-}: GalleryItemCardProps): UseImageAndCommandResult {
-  const { stepCommandId, previousStepCommandId } = item
-
-  const { data: currentCommandDetails, isLoading: currentLoading } =
-    useCommandQuery(runId, stepCommandId)
-  const { data: previousCommandDetails, isLoading: previousLoading } =
-    useCommandQuery(runId, previousStepCommandId)
-
-  const currentCommand = currentCommandDetails?.data
-  const previousCommand = previousCommandDetails?.data
-
-  const currentCommandString = useCommandTextString({
-    command: currentCommand ?? null,
-    allRunDefs,
-    commandTextData: protocolAnalysis,
-    robotType,
-  })
-
-  const previousCommandString = useCommandTextString({
-    command: previousCommand ?? null,
-    allRunDefs,
-    commandTextData: protocolAnalysis,
-    robotType,
-  })
-
-  const stubTotalSteps = '100'
-  const stubCurrentStep = '1'
-  const stubStepFraction = `${stubCurrentStep}/${stubTotalSteps}`
-  const isLoading = currentLoading || previousLoading
-
-  return {
-    currentCommandString:
-      currentCommandString.commandText.length === 0
-        ? '?'
-        : currentCommandString.commandText,
-    previousCommandString:
-      previousCommandString.commandText.length === 0
-        ? '?'
-        : previousCommandString.commandText,
-    stubStepFraction,
-    isLoading,
-  }
-}
-
-export interface GalleryItemCardProps {
-  item: UseImagesInfoItem
-  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
-  runId: string
-  robotType: RobotType
-  allRunDefs: LabwareDefinition[]
-}
-
-export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
+export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const { item } = props
   const {
     currentCommandString,
     previousCommandString,
     stubStepFraction,
     isLoading,
-  } = useImageAndCommand(props)
+  } = useImageGalleryData(props)
 
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp

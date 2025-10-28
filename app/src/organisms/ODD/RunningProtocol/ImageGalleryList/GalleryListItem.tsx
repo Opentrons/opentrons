@@ -4,11 +4,9 @@ import { ListItem, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
+import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 // eslint-disable-next-line opentrons/no-imports-across-applications
-import {
-  useImage,
-  useImageAndCommand,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard'
+import { useImage } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
 
 import styles from './gallery.module.css'
@@ -40,7 +38,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     currentCommandString: stepCommandText,
     previousCommandString,
     isLoading,
-  } = useImageAndCommand({
+  } = useImageGalleryData({
     item: { imageId, stepCommandId, previousStepCommandId, timestamp },
     protocolAnalysis,
     runId,

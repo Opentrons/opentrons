@@ -8,7 +8,7 @@ import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { GalleryItemCardProps } from './GalleryItemCard'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
 export function ImageGalleryContainer({
   runId,
@@ -70,7 +70,7 @@ function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
   )
 }
 
-function GalleryContent(props: GalleryItemCardProps): JSX.Element {
+function GalleryContent(props: UseImageGalleryDataProps): JSX.Element {
   return (
     <div className={styles.gallery_content_container}>
       <GalleryItemCard {...props} />

@@ -7,9 +7,9 @@ import { i18n } from '/app/i18n'
 import { GalleryItemCard } from '../GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { GalleryItemCardProps } from '../GalleryItemCard'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
-const render = (props: GalleryItemCardProps) => {
+const render = (props: UseImageGalleryDataProps) => {
   return renderWithProviders(<GalleryItemCard {...props} />, {
     i18nInstance: i18n,
   })
@@ -28,7 +28,7 @@ const MOCK_IMAGE_ITEM = {
 }
 const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
-  let mockProps: GalleryItemCardProps
+  let mockProps: UseImageGalleryDataProps
   beforeEach(() => {
     mockProps = {
       item: MOCK_IMAGE_ITEM,
