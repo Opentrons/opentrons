@@ -60,14 +60,19 @@ async def command_loop(pump):
 async def main(args) -> None:
     t = Timer()
     pump = await vacuum_pump.OpentronsVacuum.create('COM9', 9600, loop=asyncio.get_running_loop())
+    pump.csv_path = args.file_name
     await pump.connect()
     await asyncio.gather(command_loop(pump),
                          pump.read_continuous_data()
     )
 
+def flow_rate(value: int):
+    # Q = m*A
+    pass
+
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
-    arg_parser.add_argument("-c", "--cycles", default = 100, type = int, help = "number of cycles to execute")
+    arg_parser = argparse.ArgumentParser(description="Vacuum Manifold Test Script")
+    arg_parser.add_argument("-file_name", "--file_name", default = "test.csv", type = str, help = "File name to stream")
     return arg_parser
 
 if __name__ == '__main__':

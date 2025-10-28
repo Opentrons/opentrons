@@ -5,8 +5,7 @@ import plotly.graph_objs as go
 import os
 import webbrowser
 from threading import Timer
-
-CSV_PATH = "pump_test.csv"  # Path to your log file
+import argparse
 
 app = Dash(__name__)
 app.title = "Live Pressure Monitor"
@@ -28,14 +27,14 @@ app.layout = html.Div([
 @app.callback(Output('graphid', 'figure'),
               [Input(f'{refresh_interval}ms_intervals', 'n_intervals')])
 def update_layout(n):
-    # Probes
-    # data= pd.read_csv(folder + HS_fname, skiprows=detail_rows)
-    df = pd.read_csv(CSV_PATH)
+    df = pd.read_csv(options.file_name)
     try:
         figure={
                 'data': [
                     go.Scattergl(x=df['timestamp'], y=df['PA_FILTERED'], mode = 'lines+markers', name = 'PA FILTERED'),
-                    go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
+                    # go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
+                    go.Scattergl(x=df['timestamp'], y=df['PB_FILTERED'], mode = 'lines+markers', name = 'PB FILTERED'),
+                    # go.Scattergl(x=df['timestamp'], y=df['PB_RAW'], mode = 'lines+markers', name = 'PB RAW'),
                 ],
                 'layout': {
                     'title': 'Vacuum Pressure RT',
@@ -53,8 +52,16 @@ def update_layout(n):
         return figure, f"No data yet: {e}"
     return figure
 
+
+def build_arg_parser():
+    arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
+    arg_parser.add_argument("-file_name", "--file_name", default = "test.csv", type = str, help = "File name to stream")
+    return arg_parser
+
 if __name__ == "__main__":
-    df = pd.read_csv(CSV_PATH)
+    arg_parser = build_arg_parser()
+    options = arg_parser.parse_args()
+    df = pd.read_csv(options.file_name)
     print(df)
     app.layout = html.Div([
         dcc.Graph(
@@ -62,9 +69,9 @@ if __name__ == "__main__":
             figure={
                     'data': [
                         go.Scattergl(x=df['timestamp'], y=df['PA_FILTERED'], mode = 'lines+markers', name = 'PA FILTERED'),
-                        go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
+                        # go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
                         go.Scattergl(x=df['timestamp'], y=df['PB_FILTERED'], mode = 'lines+markers', name = 'PB FILTERED'),
-                        go.Scattergl(x=df['timestamp'], y=df['PB_RAW'], mode = 'lines+markers', name = 'PB RAW'),
+                        # go.Scattergl(x=df['timestamp'], y=df['PB_RAW'], mode = 'lines+markers', name = 'PB RAW'),
                     ],
                     'layout': {
                         'title': 'Vacuum Pressure RT',

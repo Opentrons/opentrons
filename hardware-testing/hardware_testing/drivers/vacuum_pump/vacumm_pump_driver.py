@@ -151,7 +151,7 @@ class OpentronsVacuum():
             with open(self.csv_path, "a", newline="") as f:
                 writer = csv.writer(f)
                 if write_header:
-                    writer.writerow(["timestamp", "PA_FILTERED", "PA_RAW", "PB_FILTERED", "PB_RAW", "SET_PRESSURE"])
+                    writer.writerow(["timestamp", "PA_RAW", "PA_FILTERED",  "PB_RAW", "PB_FILTERED",  "SET_PRESSURE"])
                     self._csv_initialized = True
                 writer.writerow([
                     f"{timestamp:.6f}",
@@ -159,7 +159,7 @@ class OpentronsVacuum():
                     f"{data[1]:.6f}",
                     f"{data[2]:.6f}",
                     f"{data[3]:.6f}",
-                    self.pressure_set if self.pressure_set is not None else "",
+                    self.pressure_set if self.pressure_set is not None else 0,
                 ])
 
         await asyncio.to_thread(_append)
