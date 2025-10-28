@@ -359,7 +359,7 @@ export function generateQuickTransferArgs(
       getLabwareDefURI(quickTransferState.tipRack)
 
   const dropTipLocation = dropTipIsTiprack
-    ? quickTransferState.dropTipLocation
+    ? (quickTransferState.dropTipLocation as string)
     : (dropTipTrashBinLocationEntity?.id ??
       dropTipWasteChuteLocationEntity?.id ??
       '')
