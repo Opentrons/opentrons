@@ -4,7 +4,7 @@ title: "Opentrons OT-2: Safety and Regulatory Information"
 
 ## Safety information
 
-The Opentrons OT-2 liquid handling robot has been designed for safe operation. Refer to the specifications and compliance guidelines in this section to ensure safe usage of your robot. These guidelines cover safe use of input and output connections for the product, including the power and data connections, as well as warning labels found on the OT-2 and related hardware. Using the device in a manner other than those specified in this manual may put the user and equipment at risk.
+The OT-2 has been designed for safe operation. Refer to the specifications and compliance guidelines in this section to ensure safe usage of your robot. These guidelines cover safe use of input and output connections for the product, including the power and data connections, as well as warning labels found on the OT-2 and related hardware. Using the device in a manner other than those specified in this manual may put the user and equipment at risk.
 
 ### Safety symbols
 
