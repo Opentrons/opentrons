@@ -66,6 +66,7 @@ describe('AssignLiquidsModal', () => {
       showLiquidOverflowMenu: vi.fn(),
       setDefineLiquidModal: vi.fn(),
       data: {
+        selectedLabwareIds: [],
         nickNames: {},
         labwareId: 'mockLabwareId',
         selectedWells: {},

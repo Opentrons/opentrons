@@ -30,7 +30,10 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
-import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
+import {
+  openIngredientsSelector,
+  removeWellsContents,
+} from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -54,6 +57,7 @@ import type { ContentsByWell } from '@opentrons/step-generation'
 const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalData {
+  selectedLabwareIds: string[]
   nickNames: Record<string, string>
   labwareId: string | null
   selectedWells: WellGroup
@@ -87,11 +91,12 @@ export function AssignLiquidsModal(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
+    selectedLabwareIds,
   } = data
 
-  const [selectedLabwareArray, setSelectedLabware] = useState<string[]>([
-    labwareId ?? '',
-  ])
+  const setSelectedLabware = (labwareIds: string[]) => {
+    dispatch(openIngredientsSelector(labwareIds))
+  }
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 
@@ -104,7 +109,6 @@ export function AssignLiquidsModal(
   }
 
   const labwareStack = labware[labwareId].stack
-  console.log('labwareStack:', labwareStack)
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
 
@@ -124,11 +128,10 @@ export function AssignLiquidsModal(
         {labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
-            selectedLabwareIds={selectedLabwareArray}
+            selectedLabwareIds={selectedLabwareIds}
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
             setDefineLiquidModal={setDefineLiquidModal}
-            setSelectedLabware={setSelectedLabware}
           />
         ) : null}
         <Flex
@@ -246,7 +249,7 @@ export function AssignLiquidsModal(
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
         </Box>
         <LiquidToolboxContainer
-          selectedLabwareIds={selectedLabwareArray}
+          selectedLabwareIds={selectedLabwareIds}
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
           setDefineLiquidModal={setDefineLiquidModal}
@@ -314,7 +317,7 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
@@ -331,6 +334,7 @@ export function AssignLiquidsModalContainer(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
+    selectedLabwareIds: selectedLabwareIds ?? [],
   }
 
   return (

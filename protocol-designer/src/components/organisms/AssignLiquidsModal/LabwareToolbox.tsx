@@ -53,13 +53,11 @@ interface LabwareStackToolboxProps {
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
-  setSelectedLabware: Dispatch<SetStateAction<string[]>>
 }
 export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
   selectedLabwareIds,
-  setSelectedLabware,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch()
@@ -70,13 +68,13 @@ export function LabwareStackToolbox({
     labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
   const handleAddAnotherLabware = (): void => {
-      dispatch(
-        createContainerAndSelectLabware({
-          labwareDefURIStack: [
-            labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
-          ],
-          slot: labwareId ?? '',
-        })
+    dispatch(
+      createContainerAndSelectLabware({
+        labwareDefURIStack: [
+          labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
+        ],
+        slot: labwareId ?? '',
+      })
     )
   }
 
@@ -93,7 +91,6 @@ export function LabwareStackToolbox({
       return
     }
     dispatch(openIngredientsSelector(labwareStack))
-    setSelectedLabware(labwareStack)
   }
 
   const handleAssignToLabware = (
@@ -113,11 +110,10 @@ export function LabwareStackToolbox({
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
       console.log('newItem with ctrl key')
-      setSelectedLabware(prevItems => [...prevItems, newItem])
       dispatch(openIngredientsSelector([...selectedLabwareIds, newItem]))
     } else {
       console.log('newItem')
-      setSelectedLabware([newItem])
+      dispatch(openIngredientsSelector([newItem]))
     }
   }
 
@@ -191,7 +187,6 @@ interface LiquidToolboxContainerProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   selectedLabwareIds: string[]
-  setSelectedLabware: Dispatch<SetStateAction<string[]>>
 }
 
 export function LabwareStackToolboxContainer({
@@ -200,7 +195,6 @@ export function LabwareStackToolboxContainer({
   setDefineLiquidModal,
   selectedLabwareIds,
   setShowLiquidLayoutOverlay,
-  setSelectedLabware,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
@@ -228,7 +222,6 @@ export function LabwareStackToolboxContainer({
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}
       selectedLabwareIds={selectedLabwareIds}
-      setSelectedLabware={setSelectedLabware}
       data={data}
     />
   )

@@ -1,3 +1,5 @@
+import { useDispatch } from 'react-redux'
+
 import { type NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
@@ -28,6 +30,14 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
+vi.mock('react-redux', async () => {
+  const actual = await vi.importActual('react-redux')
+  return {
+    ...actual,
+    useDispatch: vi.fn(),
+  }
+})
+
 const render = (props: ComponentProps<typeof LabwareStackToolbox>) => {
   return renderWithProviders(<LabwareStackToolbox {...props} />, {
     i18nInstance: i18n,
@@ -37,14 +47,15 @@ const render = (props: ComponentProps<typeof LabwareStackToolbox>) => {
 describe('LabwareStackToolboxContainer liquids dont match', () => {
   let props: ComponentProps<typeof LabwareStackToolbox>
   let setShowLiquidLayoutOverlay: Mock
-  let setSelectedLabware: Mock
+  let mockDispatch: Mock
+
   beforeEach(() => {
     setShowLiquidLayoutOverlay = vi.fn()
-    setSelectedLabware = vi.fn()
+    mockDispatch = vi.fn()
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     props = {
       showBadFormState: false,
       setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
-      setSelectedLabware: setSelectedLabware,
       data: {
         labwareEntities: {
           mockLabwareId: {
@@ -120,14 +131,15 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
 describe('LabwareStackToolboxContainer liquids match', () => {
   let props: ComponentProps<typeof LabwareStackToolbox>
   let setShowLiquidLayoutOverlay: Mock
-  let setSelectedLabware: Mock
+  let mockDispatch: Mock
+
   beforeEach(() => {
+    mockDispatch = vi.fn()
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     setShowLiquidLayoutOverlay = vi.fn()
-    setSelectedLabware = vi.fn()
     props = {
       showBadFormState: false,
       setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
-      setSelectedLabware: setSelectedLabware,
       data: {
         labwareEntities: {
           mockLabwareId: {
@@ -195,7 +207,7 @@ describe('LabwareStackToolboxContainer liquids match', () => {
 
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton)
-    expect(setSelectedLabware).toHaveBeenCalledWith(['labware2'])
+    expect(mockDispatch).toBeCalledWith({payload: ['labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
   })
 
   it('loads the modal with multiple selectable labware', () => {
@@ -207,10 +219,7 @@ describe('LabwareStackToolboxContainer liquids match', () => {
 
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton, { ctrlKey: true })
-    expect(setSelectedLabware).toHaveBeenCalledWith([
-      'mockLabwareId',
-      'labware2',
-    ])
+    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
   })
 
   it('select all labware buttons', () => {
@@ -219,6 +228,6 @@ describe('LabwareStackToolboxContainer liquids match', () => {
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
     fireEvent.click(allLabwareButton)
-    expect(setSelectedLabware).toBeCalledWith(['mockLabwareId', 'labware2'])
+    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
   })
 })

@@ -56,9 +56,7 @@ export const renameLabware: (
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<
-  | CreateContainerAction
-  | RenameLabwareAction
-  | ZoomedIntoSlotAction
+  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
 > = args => (dispatch, getState) => {
   const createdIds: string[] = []
   const { labwareDefURIStack, slot } = args
@@ -114,7 +112,6 @@ export const createContainer: (
   }
   return createdIds
 }
-
 
 export const createContainerAndSelectLabware: (
   args: CreateContainerArgs
