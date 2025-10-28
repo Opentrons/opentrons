@@ -24,7 +24,7 @@ Opentrons Flex is part of the Opentrons liquid handler series of robots. Users o
 
 A detailed [comparison of robot technical specifications](https://opentrons.com/products/robots/) is available on the Opentrons website.
 
-Both Flex and OT-2 robots run on our open-source software, and the Opentrons App can control both types of robots at once. While OT-2 protocols can't be run directly on Flex, it's straightforward to adapt them (see the [OT-2 Protocols section][ot-2.md] of the Protocol Development chapter for details).
+Both Flex and OT-2 robots run on our open-source software, and the Opentrons App can control both types of robots at once. While OT-2 protocols can't be run directly on Flex, it's straightforward to adapt them (see the [OT-2 Protocols section](protocols/ot-2.md) of the Protocol Development chapter for details).
 
 ## Flex workstations
 
