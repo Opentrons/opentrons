@@ -10,7 +10,7 @@ When you're finished, import your new protocol into the Opentrons App. Check the
 
 ## Converting to Python
 
-First, you'll need to make sure your OT-2 protocol is a Python protocol. Older protocols created in Protocol Designer may be JSON files. 
+To begin, you'll need to make sure your OT-2 protocol is a Python protocol. Older protocols created in Protocol Designer may be JSON files. 
 
 Currently, Protocol Designer can't convert an OT-2 protocol to a Flex protocol. You have to choose which robot the protocol will run on when you create it. Instead, use Protocol Designer to convert your JSON file to a Python file. 
 
