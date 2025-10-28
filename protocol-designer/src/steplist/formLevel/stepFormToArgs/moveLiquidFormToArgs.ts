@@ -392,9 +392,9 @@ export const moveLiquidFormToArgs = (
       castFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
         ? null
         : (castFormData.liquidClass ?? null),
-    tip_tracking: tip_tracking ?? AUTOMATIC,
-    tips_selected: tips_selected ?? [],
-    tiprack_selected: tiprack_selected ?? null,
+    tipTracking: tip_tracking ?? AUTOMATIC,
+    tipsSelected: tips_selected ?? [],
+    tiprackSelected: tiprack_selected ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

@@ -18,6 +18,7 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   getNextTiprack,
@@ -29,9 +30,11 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -141,6 +144,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     sourceLabware,
     sourceWell,
     tipRack,
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -437,6 +443,32 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const targetTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+      ? getTargetTipsFromWellSets({
+          wellSets: tipsSelected,
+          nozzles: nozzles ?? ALL,
+          channels: pipetteSpecs.channels,
+          primaryNozzle,
+        })
+      : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -455,6 +487,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],

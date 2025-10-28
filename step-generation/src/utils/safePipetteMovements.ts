@@ -498,3 +498,29 @@ export const getDefaultPrimaryNozzle = (args: {
   }
   return 'A1'
 }
+
+export const getTargetTipsFromWellSets = (args: {
+  wellSets: string[][]
+  nozzles: NozzleConfigurationStyle
+  channels: PipetteChannels
+  primaryNozzle: string
+}): string[] => {
+  const { wellSets, nozzles, channels, primaryNozzle } = args
+  return wellSets.map(wellSet => {
+    // 96-channel pipette with ALL nozzle configuration
+    if (channels === 96 && nozzles === ALL) {
+      return primaryNozzle
+    }
+    // 96- or 8-channel pipette with COLUMN nozzle configuration
+    if (nozzles === COLUMN || (channels === 8 && nozzles === ALL)) {
+      const shouldReverse = getTipRowName(primaryNozzle) === 'H'
+      return shouldReverse ? wellSet[wellSet.length - 1] : wellSet[0]
+    }
+    // any pipette with SINGLE nozzle configuration
+    console.assert(
+      wellSet.length === 1,
+      'Well set for SINGLE nozzle configuration should have exactly 1 well'
+    )
+    return wellSet[0]
+  })
+}

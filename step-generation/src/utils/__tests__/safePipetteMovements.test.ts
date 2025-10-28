@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   fixtureTiprack300ul as _fixtureTiprack300ul,
@@ -8,7 +8,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { CLEAN, EMPTY } from '../../constants'
-import { getIsSafePickupWithinTiprack } from '../safePipetteMovements'
+import {
+  getIsSafePickupWithinTiprack,
+  getTargetTipsFromWellSets,
+} from '../safePipetteMovements'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { TipState } from '../../types'
@@ -356,6 +359,92 @@ describe('getIsSafePickupWithinTiprack', () => {
         tipsToIgnore: [],
       } as any
       expect(getIsSafePickupWithinTiprack(args)).toBe(false)
+    })
+  })
+})
+
+describe('getTargetTipsFromWellSets', () => {
+  let args: any = {}
+  describe('96-channel pipette', () => {
+    beforeEach(() => {
+      args = {
+        wellSets: [['A1', 'H1', 'A12', 'H12']],
+        channels: 96,
+        primaryNozzle: 'A1',
+        nozzles: ALL,
+      }
+    })
+
+    it('should return the correct target tips for ALL configuration', () => {
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1'])
+    })
+    it('should return the correct target tips for COLUMN configuration, primary nozzle is A1', () => {
+      args = { ...args, wellSets: [['A1', 'H1']], nozzles: COLUMN }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1'])
+    })
+    it('should return the correct target tips for COLUMN configuration, primary nozzle is H1', () => {
+      args = {
+        ...args,
+        wellSets: [['A1', 'H1']],
+        primaryNozzle: 'H1',
+        nozzles: COLUMN,
+      }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['H1'])
+    })
+    it('should return the correct target tips for SINGLE configuration', () => {
+      args = {
+        ...args,
+        wellSets: [['A1']],
+        primaryNozzle: 'A1',
+        nozzles: SINGLE,
+      }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1'])
+    })
+  })
+  describe('8-channel pipette', () => {
+    beforeEach(() => {
+      args = {
+        wellSets: [
+          ['A1', 'H1'],
+          ['A2', 'H2'],
+        ],
+        channels: 8,
+        primaryNozzle: 'A1',
+        nozzles: COLUMN,
+      }
+    })
+    it('should return the correct target tips for COLUMN configuration, primary nozzle is A1', () => {
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1', 'A2'])
+    })
+    it('should return the correct target tips for COLUMN configuration, primary nozzle is H1', () => {
+      args = { ...args, primaryNozzle: 'H1' }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['H1', 'H2'])
+    })
+    it('should return the correct target tips for SINGLE configuration, primary nozzle is A1', () => {
+      args = { ...args, nozzles: SINGLE, wellSets: [['A1'], ['A2']] }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1', 'A2'])
+    })
+    it('should return the correct target tips for SINGLE configuration, primary nozzle is H1', () => {
+      args = {
+        ...args,
+        primaryNozzle: 'H1',
+        nozzles: SINGLE,
+        wellSets: [['H1'], ['H2']],
+      }
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['H1', 'H2'])
+    })
+  })
+  describe('single-channel pipette', () => {
+    beforeEach(() => {
+      args = {
+        wellSets: [['A1'], ['H1']],
+        channels: 1,
+        primaryNozzle: 'A1',
+        nozzles: SINGLE,
+      }
+    })
+    it('should return the correct target tips', () => {
+      expect(getTargetTipsFromWellSets(args)).toStrictEqual(['A1', 'H1'])
     })
   })
 })
