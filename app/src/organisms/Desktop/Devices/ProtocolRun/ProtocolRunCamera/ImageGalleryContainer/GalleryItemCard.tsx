@@ -25,7 +25,7 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
 
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'branded'])
   const dispatch = useDispatch()
   const host = useHost()
 
@@ -41,8 +41,8 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
           cameraPhotoOpenAction({
             robotName: host.robotName,
             photoUrl: imagePath,
-            windowTitle: t('image_capture_window_title', {
-              step: 'Step 1 / 999999',
+            windowTitle: t('branded:image_capture_window_title', {
+              step: '1 / 999999',
               timestamp,
             }),
           })

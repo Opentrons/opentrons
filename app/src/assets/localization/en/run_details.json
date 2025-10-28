@@ -65,7 +65,6 @@
   "ignore_stored_data": "Ignore stored data",
   "image_at_step_at_timestamp": "Image at {{step}} at {{timestamp}}",
   "image_capture": "Image capture",
-  "image_capture_window_title": "Image capture of {{step}} at {{timestamp}}",
   "image_gallery": "Image Gallery",
   "images": "Images",
   "images_available_download": "Image files associated with the run are available on the robot’s Recent Runs screen and Camera tab.",
