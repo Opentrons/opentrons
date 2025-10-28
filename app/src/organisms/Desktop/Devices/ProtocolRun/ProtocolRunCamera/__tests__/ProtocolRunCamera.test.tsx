@@ -12,9 +12,15 @@ vi.mock('../LaunchLivestreamBtn')
 vi.mock('../ImageGalleryContainer')
 
 const render = () => {
-  return renderWithProviders(<ProtocolRunCamera />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <ProtocolRunCamera
+      runId="MOCK-RUN-STATUS"
+      runStatus={'MOCK-RUN-STATUS' as any}
+    />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('ProtocolRunCamera', () => {
