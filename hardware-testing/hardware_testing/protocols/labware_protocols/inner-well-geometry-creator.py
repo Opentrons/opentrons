@@ -217,7 +217,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="dial_indicator_used",
         display_name="Dial Indicator Use",
-        description="Dial Indicator Used.",
+        description="Used to calibrate tip overlap.",
         default=True,
     )
 
