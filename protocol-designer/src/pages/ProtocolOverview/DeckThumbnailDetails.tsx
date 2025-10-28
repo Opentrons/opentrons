@@ -3,6 +3,7 @@ import values from 'lodash/values'
 
 import { Module } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getModuleDef,
   getPositionFromSlotId,
@@ -91,7 +92,7 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode="passThrough"
+              childrenPositioningMode={moduleState.type === FLEX_STACKER_MODULE_TYPE ? 'passThrough' : 'offsetToSlot'}
             >
               <>
                 {rightBelowTopId != null ? (
