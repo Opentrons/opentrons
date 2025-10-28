@@ -220,6 +220,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """
         if meniscus_tracking == MeniscusTrackingTarget.START and end_location is None:
             raise ValueError("Cannot aspirate at the starting liquid height.")
+        final_location = location
         if well_core is None:
             if not in_place:
                 self._engine_client.execute_command(
@@ -280,6 +281,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     location_type=WellLocationFunction.LIQUID_HANDLING,
                     meniscus_tracking=end_meniscus_tracking,
                 )
+                final_location=end_location
                 assert isinstance(end_well_location, LiquidHandlingWellLocation)
                 self._engine_client.execute_command(
                     cmd.AspirateWhileTrackingParams(
@@ -307,7 +309,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 )
 
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+        self._protocol_core.set_last_location(location=final_location, mount=self.get_mount())
 
     def dispense(
         self,
@@ -343,7 +345,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             # Newer API versions raise an error if you try to dispense more than
             # you can. Let the error come from Protocol Engine's validation.
             pass
-
+        final_location=location
         if well_core is None:
             if not in_place:
                 if isinstance(location, (TrashBin, WasteChute)):
@@ -402,6 +404,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if dynamic_liquid_tracking or end_location is not None:
                 if end_location is None:
                     end_location = location
+                final_location=end_location
                 (
                     end_well_location,
                     _,
@@ -441,7 +444,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 )
 
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+        self._protocol_core.set_last_location(location=final_location, mount=self.get_mount())
 
     def blow_out(
         self,
