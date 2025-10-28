@@ -21,7 +21,6 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
-  type ContentsByWell,
   getSlotInLocationStack,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
@@ -50,6 +49,7 @@ import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
+import type { ContentsByWell } from '@opentrons/step-generation'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -155,7 +155,9 @@ export function AssignLiquidsModal(
               <DeckInfoLabel
                 size="large"
                 deckLabel={
-                  getSlotInLocationStack(labware[labwareId].stack as string[]) ?? ''
+                  getSlotInLocationStack(
+                    labware[labwareId].stack as string[]
+                  ) ?? ''
                 }
               />
               <StyledText

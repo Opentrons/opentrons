@@ -20,7 +20,7 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LiquidEntities } from '@opentrons/step-generation'
+import { type LiquidEntities } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
@@ -40,7 +40,7 @@ import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
-import type { DropdownOption } from '@opentrons/components'
+import type { DropdownOption, WellGroup } from '@opentrons/components'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 export interface LiquidInfo {
@@ -63,7 +63,7 @@ interface ToolboxFormValues {
 interface LiquidToolboxData {
   liquids: LiquidEntities
   labwareId: string | null
-  selectedWellGroups: any
+  selectedWellGroups: Record<string, WellGroup>
   nickNames: Record<string, string>
   liquidLocations: any
   commonSelectedLiquidId: string | null

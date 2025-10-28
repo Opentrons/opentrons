@@ -1,4 +1,4 @@
-import { NavigateFunction } from 'react-router-dom'
+import { type NavigateFunction } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 
@@ -8,7 +8,7 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { LabwareStackToolbox } from '../LabwareToolbox'
 
 import type { ComponentProps } from 'react'
-import type { LabwareDefinition2, fixture96Plate } from '@opentrons/shared-data'
+import  { type LabwareDefinition2, fixture96Plate } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 
@@ -118,7 +118,7 @@ describe('LabwareStackToolboxContainer', () => {
     props.data.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
-    ;(props.data.allWellContents = {
+    props.data.allWellContents = {
       mockLabwareId: {
         A1: {
           groupIds: ['mockGroupId'],
@@ -129,8 +129,8 @@ describe('LabwareStackToolboxContainer', () => {
           groupIds: ['mockGroupId'],
         },
       },
-    }),
-      render(props)
+    }
+    render(props)
 
     expect(screen.getAllByText('ANSI 96 Standard Microplate').length).toBe(2)
     const firstButton = screen.getByTestId('LabwareButton-1')
@@ -149,7 +149,7 @@ describe('LabwareStackToolboxContainer', () => {
     props.data.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
-    ;(props.data.allWellContents = {
+    props.data.allWellContents = {
       mockLabwareId: {
         A1: {
           groupIds: ['mockGroupId'],
@@ -160,8 +160,9 @@ describe('LabwareStackToolboxContainer', () => {
           groupIds: ['mockGroupId'],
         },
       },
-    }),
-      render(props)
+    }
+    
+    render(props)
 
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
