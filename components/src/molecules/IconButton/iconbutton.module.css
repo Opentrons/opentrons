@@ -5,11 +5,12 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-12);
+  background-color: var(--variant-default);
   border-radius: 50%;
 }
 
 .icon_button:active {
-  background-color: var(--active-color);
+  background-color: var(--variant-active);
 }
 
 .icon_button:hover {
