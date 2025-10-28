@@ -14,6 +14,6 @@ export function getRunCommandErrors(
     `/runs/${runId}/commandErrors`,
     null,
     config,
-    params
+    { params }
   )
 }

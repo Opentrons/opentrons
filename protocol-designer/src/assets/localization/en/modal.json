@@ -51,6 +51,11 @@
       "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
       "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
     },
+    "genericStartingFrom861": {
+      "heading": "{{version}} Announcements",
+      "body1": "All protocols created in Protocol Designer v{{version}} generate Python protocols using API version {{apiVersion}} and now require Opentrons App version {{appVersion}} or newer to run.",
+      "footer": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+    },
     "header": "We've updated the {{pd}}",
     "heaterShakerSupport": {
       "body1": "The {{opd}} now supports our Heater-Shaker Module!",

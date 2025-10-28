@@ -21,6 +21,10 @@ from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
 from opentrons.protocol_engine.resources import ModelUtils, FileProvider, CameraProvider
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraSettings,
+    ImageParameters,
+)
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -396,23 +400,37 @@ async def test_execute(
 
 
 @pytest.mark.parametrize(
-    ["command_error", "expected_error"],
+    ["command_error", "expected_error", "use_camera"],
     [
         (
             errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+            False,
         ),
         (
             EStopActivatedError(),
             matchers.ErrorMatching(PE_EStopActivatedError),
+            False,
         ),
         (
             RuntimeError("oh no"),
             matchers.ErrorMatching(PythonException, match="oh no"),
+            False,
         ),
         (
             asyncio.CancelledError(),
             matchers.ErrorMatching(errors.RunStoppedError),
+            False,
+        ),
+        (
+            errors.ProtocolEngineError(message="oh no"),
+            matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+            True,
+        ),
+        (
+            RuntimeError("oh no"),
+            matchers.ErrorMatching(PythonException, match="oh no"),
+            True,
         ),
     ],
 )
@@ -439,6 +457,7 @@ async def test_execute_undefined_error(
     error_recovery_policy: ErrorRecoveryPolicy,
     command_error: Exception,
     expected_error: Any,
+    use_camera: bool,
 ) -> None:
     """It should handle an undefined error raised from execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
@@ -542,6 +561,15 @@ async def test_execute_undefined_error(
 
     decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
 
+    if use_camera:
+        decoy.when(await subject._camera_provider.get_camera_settings()).then_return(
+            CameraSettings(
+                camera_enabled=True,
+                live_stream_enabled=True,
+                error_recovery_enabled=True,
+            )
+        )
+
     await subject.execute("command-id")
 
     decoy.verify(
@@ -558,7 +586,23 @@ async def test_execute_undefined_error(
         ),
     )
 
+    if use_camera:
+        decoy.verify(
+            await subject._camera_provider.capture_image(ImageParameters()), times=1
+        )
+    else:
+        decoy.verify(
+            await subject._camera_provider.capture_image(ImageParameters()), times=0
+        )
 
+
+@pytest.mark.parametrize(
+    "use_camera",
+    [
+        True,
+        False,
+    ],
+)
 async def test_execute_defined_error(
     decoy: Decoy,
     subject: CommandExecutor,
@@ -580,6 +624,7 @@ async def test_execute_defined_error(
     model_utils: ModelUtils,
     command_note_tracker: CommandNoteTracker,
     error_recovery_policy: ErrorRecoveryPolicy,
+    use_camera: bool,
 ) -> None:
     """It should handle a defined error returned from execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
@@ -687,6 +732,15 @@ async def test_execute_defined_error(
         )
     ).then_return(ErrorRecoveryType.WAIT_FOR_RECOVERY)
 
+    if use_camera:
+        decoy.when(await subject._camera_provider.get_camera_settings()).then_return(
+            CameraSettings(
+                camera_enabled=True,
+                live_stream_enabled=True,
+                error_recovery_enabled=True,
+            )
+        )
+
     await subject.execute("command-id")
 
     decoy.verify(
@@ -702,3 +756,12 @@ async def test_execute_defined_error(
             )
         )
     )
+
+    if use_camera:
+        decoy.verify(
+            await subject._camera_provider.capture_image(ImageParameters()), times=1
+        )
+    else:
+        decoy.verify(
+            await subject._camera_provider.capture_image(ImageParameters()), times=0
+        )

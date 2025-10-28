@@ -3,7 +3,7 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getDeckDefFromRobotType,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
@@ -191,7 +191,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   volume: number,
   tiprackUri: string
 ): SupportedTip {
-  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
+  const matchingLabwareDef = getAllDefinitions()[tiprackUri]
 
   console.assert(
     matchingLabwareDef,
@@ -247,10 +247,10 @@ export function getMatchingTipLiquidSpecs(
     ) ||
     // The `tiprack` from a step might not be in `pipetteEntity.tiprackLabwareDef`
     // anymore because the user removed the tiprack from the pipette. So we can try
-    // looking up the `tiprack` in getAllLabwareDefs() as well.
-    // TODO: But getAllLabwareDefs() only contains standard labware, so this would still
+    // looking up the `tiprack` in getAllDefinitions() as well.
+    // TODO: But getAllDefinitions() only contains standard labware, so this would still
     // fail if `tiprack` is a custom tiprack.
-    getAllLabwareDefs()[tiprack]
+    getAllDefinitions()[tiprack]
 
   console.assert(
     matchingLabwareDef,
