@@ -79,8 +79,8 @@ export interface CreateContainerArgs {
   labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
-  updateSelectedContainerId?: boolean
 }
+
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
   payload: {

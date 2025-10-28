@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
-  Flex,
   Icon,
   InfoScreen,
   JUSTIFY_CENTER,
@@ -17,6 +17,7 @@ import {
 
 import {
   createContainer,
+  createContainerAndSelectLabware,
   openIngredientsSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
@@ -69,13 +70,13 @@ export function LabwareStackToolbox({
     labwareId != null ? labware[labwareId]?.stack ?? [] : []
 
   const handleAddAnotherLabware = (): void => {
-    dispatch(
-      createContainer({
-        labwareDefURIStack: [
-          labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
-        ],
-        slot: labwareId ?? '',
-      })
+      dispatch(
+        createContainerAndSelectLabware({
+          labwareDefURIStack: [
+            labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
+          ],
+          slot: labwareId ?? '',
+        })
     )
   }
 
@@ -87,7 +88,6 @@ export function LabwareStackToolbox({
         JSON.stringify(currentLiquidContents)
     )
 
-    console.log('allEqual', allEqual)
     if (!allEqual) {
       setShowLiquidLayoutOverlay(true)
       return
@@ -120,6 +120,11 @@ export function LabwareStackToolbox({
       setSelectedLabware([newItem])
     }
   }
+
+  const CSSStyle = css`
+    flex-direction: ${DIRECTION_COLUMN};
+    width: 224px;
+  `
 
   return (
     <>
@@ -161,14 +166,14 @@ export function LabwareStackToolbox({
         }
       >
         {labwareStack.length > 0 ? (
-          <Flex flexDirection={DIRECTION_COLUMN} width="224px">
+          <div css={CSSStyle}>
             <LabwareButtonBasket
               stackOfLabware={labwareStack}
               labware={labware}
               setSelectedLabware={handleAssignToLabware}
               selectedLabware={selectedLabwareIds}
             />
-          </Flex>
+          </div>
         ) : (
           <InfoScreen
             content={t('no_liquids_defined')}

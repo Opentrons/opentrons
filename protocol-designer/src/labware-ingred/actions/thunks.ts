@@ -59,6 +59,69 @@ export const createContainer: (
   | CreateContainerAction
   | RenameLabwareAction
   | ZoomedIntoSlotAction
+> = args => (dispatch, getState) => {
+  const createdIds: string[] = []
+  const { labwareDefURIStack, slot } = args
+  const state = getState()
+  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+  const robotType = getRobotType(state)
+  const labwareDefForOt2HS = labwareDefSelectors.getLabwareDefsByURI(state)[
+    labwareDefURIStack[0]
+  ]
+  const availableSlot =
+    slot ||
+    getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
+  if (availableSlot) {
+    let currentSlot = availableSlot
+    labwareDefURIStack.forEach(labwareUri => {
+      const id = `${uuid()}:${labwareUri}`
+      createdIds.push(id)
+      const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
+        labwareUri
+      ]
+      const labwareDisplayCategory = labwareDef.metadata.displayCategory
+      const isTiprack = getIsTiprack(labwareDef)
+
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          id,
+          labwareDefURI: labwareUri,
+          slot: currentSlot,
+          displayCategory: labwareDisplayCategory,
+        },
+      })
+
+      if (isTiprack) {
+        // Tipracks cannot be named, but should auto-increment.
+        // We can't rely on reducers to do that themselves bc they don't have access
+        // to both the nickname state and the isTiprack condition
+        renameLabware({
+          labwareId: id,
+        })(dispatch, getState)
+      }
+
+      if (availableSlot === 'offDeck') {
+        dispatch({
+          type: 'ZOOMED_INTO_SLOT',
+          payload: { slot: id, cutout: null },
+        })
+      }
+      currentSlot = id
+    })
+  } else {
+    console.warn('no slots available, cannot create labware')
+  }
+  return createdIds
+}
+
+
+export const createContainerAndSelectLabware: (
+  args: CreateContainerArgs
+) => ThunkAction<
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const createdIds: string[] = []
@@ -93,12 +156,10 @@ export const createContainer: (
         },
       })
 
-      if (args.updateSelectedContainerId) {
-        dispatch({
-          type: 'OPEN_INGREDIENT_SELECTOR',
-          payload: id,
-        })
-      }
+      dispatch({
+        type: 'OPEN_INGREDIENT_SELECTOR',
+        payload: id,
+      })
 
       if (isTiprack) {
         // Tipracks cannot be named, but should auto-increment.
