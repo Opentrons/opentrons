@@ -30,7 +30,7 @@ import {
   computeStepMove,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
-} from './concurrentStepGroupUtils'
+} from './stepHierarchyUtils'
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'

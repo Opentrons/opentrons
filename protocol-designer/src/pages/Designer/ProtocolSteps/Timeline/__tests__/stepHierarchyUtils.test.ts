@@ -9,10 +9,10 @@ import {
   computeStepMove,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
-} from '../concurrentStepGroupUtils'
+} from '../stepHierarchyUtils'
 
 import type { FormData } from '/protocol-designer/form-types'
-import type { StepHierarchy } from '../concurrentStepGroupUtils'
+import type { StepHierarchy } from '../stepHierarchyUtils'
 
 describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray()', () => {
   test.each([
