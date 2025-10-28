@@ -7,11 +7,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 By using Opentrons Protocol Designer, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
 ---
-## Opentrons Protocol Designer Changes in 8.6.2 
 
-**Welcome to Protocol Designer 8.6.2!** 
+## Opentrons Protocol Designer Changes in 8.6.2
 
-This hotfix release improves bug tracking for future software updates.  
+**Welcome to Protocol Designer 8.6.2!**
+
+This hotfix release improves bug tracking for future software updates.
 
 ## Opentrons Protocol Designer Changes in 8.6.1
 
@@ -83,6 +84,7 @@ This hotfix release addresses several bugs.
 
 - Crashes and protocol loss no longer occur when:
 - Crashes and protocol loss no longer occur when:
+
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
