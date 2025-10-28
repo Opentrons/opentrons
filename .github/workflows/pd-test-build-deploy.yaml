@@ -124,7 +124,7 @@ jobs:
           OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
         run: |
-          make -C protocol-designer NODE_ENV=${{ needs.determine-deploy-config.outputs.environment == 'production' && 'production' || 'development' }}
+          make -C protocol-designer ${{ needs.determine-deploy-config.outputs.environment == 'production' && 'NODE_ENV=production OT_PD_PRERELEASE_MODE=0' || 'NODE_ENV=development OT_PD_PRERELEASE_MODE=1' }}
       - name: "upload sourcemaps to Sentry"
         # Only on production releases (tagged with protocol-designer*)
         if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/protocol-designer')
