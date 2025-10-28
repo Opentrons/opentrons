@@ -57,6 +57,6 @@ export function useUpdateCamera(
 
   return {
     ...mutation,
-    updateCamera: mutation.mutate,
+    addCameraSettingsToRUn: mutation.mutate,
   }
 }
