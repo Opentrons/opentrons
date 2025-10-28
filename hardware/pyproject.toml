@@ -108,7 +108,6 @@ ignore = [
     # is covered separately by D107)
     "D105",
 ]
-docstring-convention = "google"
 fixable = ["ALL"]
 
 [tool.ruff.format]
