@@ -37,6 +37,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     currentCommandString: stepCommandText,
     previousCommandString,
     isLoading,
+    stubStepFraction,
   } = useImageGalleryData({
     item: { imageId, stepCommandId, previousStepCommandId, timestamp },
     protocolAnalysis,
@@ -81,7 +82,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
                 handleCameraPhotoModal({
                   imagePath,
                   timestamp,
-                  stepCommandText,
+                  stepCountStr: stubStepFraction,
                 })
               }}
               buttonText={t('view_image')}

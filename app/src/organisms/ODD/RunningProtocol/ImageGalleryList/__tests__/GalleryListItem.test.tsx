@@ -78,7 +78,7 @@ describe('GalleryListItem', () => {
     expect(handleCameraPhotoModal).toHaveBeenCalledWith({
       imagePath: MOCK_IMG_PATH,
       timestamp: MOCK_TIMESTAMP,
-      stepCommandText: MOCK_CMD_TEXT,
+      stepCountStr: MOCK_STEP,
     })
   })
 })

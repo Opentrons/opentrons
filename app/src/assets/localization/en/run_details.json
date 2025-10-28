@@ -63,7 +63,7 @@
   "failed_step": "Failed step",
   "final_step": "Final Step",
   "ignore_stored_data": "Ignore stored data",
-  "image_at_step_at_timestamp": "Image at {{step}} at {{timestamp}}",
+  "image_at_step_at_timestamp": "Image at step {{step}} at {{timestamp}}",
   "image_capture": "Image capture",
   "image_gallery": "Image Gallery",
   "image_loading": "Image loading",
