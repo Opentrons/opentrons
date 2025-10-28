@@ -150,7 +150,7 @@ class StartRunExtendedProfileImpl(
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
                 async with task_handler.synchronize_cancel_latest(
-                    thermocycler_state.module_id
+                    thermocycler_state.module_id + "-block"
                 ):
                     await thermocycler_hardware.execute_profile(
                         profile=profile, volume=target_volume

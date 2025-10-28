@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import {
   InlineNotification,
@@ -9,29 +10,36 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
+  robotName: string
   settings: UseCameraUsageSettingsResult
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
 }
 
 export function SetupCamera({
+  robotName,
   settings,
   cameraConfirmed,
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const storageInfo = useRobotStorageInfo()
 
   return (
     <div className={styles.container}>
       {/* TODO(jh, 09-29-25): Only show this noti if the camera is required to run this protocol.
        Update the confirm preferences btn, too. */}
       {!settings.isCameraEnabled && <CameraRequiredNotification />}
+      {!storageInfo.isLoading && storageInfo.isImageStorageLow && (
+        <StorageAlmostFullNotification robotName={robotName} />
+      )}
       <CameraStatus {...settings} />
       {settings.isCameraEnabled && (
         <>
@@ -48,6 +56,29 @@ export function SetupCamera({
         </PrimaryButton>
       </div>
     </div>
+  )
+}
+
+function StorageAlmostFullNotification({
+  robotName,
+}: {
+  robotName: string
+}): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const navigate = useNavigate()
+
+  const onLinkClick = (): void => {
+    navigate(`/devices/${robotName}/#recent-protocol-runs`)
+  }
+
+  return (
+    <InlineNotification
+      type="alert"
+      heading={t('image_storage_almost_full')}
+      message={t('free_disk_space')}
+      linkText={t('view_recent_runs')}
+      onLinkClick={onLinkClick}
+    />
   )
 }
 

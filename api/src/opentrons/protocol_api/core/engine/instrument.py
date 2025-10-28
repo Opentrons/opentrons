@@ -1339,6 +1339,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute transfer using liquid class properties.
 
@@ -1361,10 +1362,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the transfer.
+            tips: If provided, transfer will pick up the tips in the order given. If this
+                  is less than the amount of tips needed, an error will be raised.
         """
-        if not tip_racks:
+        if not tip_racks and not tips:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tip racks or tips found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
         transfer_props = self._get_transfer_properties_for_tip_rack(
@@ -1406,7 +1409,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip == TransferTipPolicyV2.ONCE:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks, starting_tip, tiprack_uri_for_transfer_props, tips
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
@@ -1446,7 +1449,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 if prev_src is not None and prev_dest is not None:
                     self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    tips,
                 )
                 post_disp_tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1503,6 +1509,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute a distribution using liquid class properties.
 
@@ -1526,6 +1533,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the distribute.
+            tips: If provided, transfer will pick up the tips in the order given. If this
+                  is less than the amount of tips needed, an error will be raised.
 
         This method distributes the liquid in the source well into multiple destinations.
         It can accomplish this by either doing a multi-dispense (aspirate once and then
@@ -1537,7 +1546,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         """
         if not tip_racks:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tip racks found for pipette in order to perform transfer"
             )
         assert new_tip in [
             TransferTipPolicyV2.NEVER,
@@ -1585,6 +1594,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 trash_location=trash_location,
                 return_tip=return_tip,
                 keep_last_tip=keep_last_tip,
+                tips=tips,
             )
 
         # TODO: use the ID returned by load_liquid_class in command annotations
@@ -1615,7 +1625,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip != TransferTipPolicyV2.NEVER:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks,
+                starting_tip,
+                tiprack_uri_for_transfer_props,
+                tips,
             )
 
         tip_contents = [
@@ -1683,7 +1696,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1789,6 +1805,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         trash_location: Union[Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[WellCore]],
     ) -> None:
         """Execute consolidate using liquid class properties.
 
@@ -1813,10 +1830,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             return_tip: If `True`, return tips to the tip rack location they were picked up from,
                         otherwise drop in `trash_location`
             keep_last_tip: When set to `True`, do not drop the final tip used in the consolidate.
+            tips: If provided, transfer will pick up the tips in the order given. If this
+                  is less than the amount of tips needed, an error will be raised.
         """
         if not tip_racks:
             raise RuntimeError(
-                "No tipracks found for pipette in order to perform transfer"
+                "No tip racks found for pipette in order to perform transfer"
             )
         # NOTE: Tip option of "always" in consolidate is equivalent to "after every dispense",
         #       or more specifically, "before the next chunk of aspirates".
@@ -1867,7 +1886,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         if new_tip in [TransferTipPolicyV2.ONCE, TransferTipPolicyV2.ALWAYS]:
             self._pick_up_tip_for_liquid_class(
-                tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                tip_racks,
+                starting_tip,
+                tiprack_uri_for_transfer_props,
+                tips,
             )
 
         aspirate_air_gap_by_volume = transfer_props.aspirate.retract.air_gap_by_volume
@@ -1900,7 +1922,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if not is_first_step and new_tip == TransferTipPolicyV2.ALWAYS:
                 self._drop_tip_for_liquid_class(trash_location, return_tip)
                 self._pick_up_tip_for_liquid_class(
-                    tip_racks, starting_tip, tiprack_uri_for_transfer_props
+                    tip_racks,
+                    starting_tip,
+                    tiprack_uri_for_transfer_props,
+                    tips,
                 )
                 tip_contents = [
                     tx_comps_executor.LiquidAndAirGapPair(
@@ -1996,22 +2021,34 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         tip_racks: List[Tuple[Location, LabwareCore]],
         starting_tip: Optional[WellCore],
         tiprack_uri_for_transfer_props: str,
+        selected_tips: Optional[List[WellCore]],
     ) -> None:
         """Resolve next tip and pick it up, for use in liquid class transfer code."""
-        next_tip = self.get_next_tip(
-            tip_racks=[core for loc, core in tip_racks],
-            starting_well=starting_tip,
-        )
-        if next_tip is None:
-            raise RuntimeError(
-                f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
-                f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
+        next_tip: Optional[NextTipInfo]
+        if selected_tips is not None:
+            try:
+                tip_core = selected_tips.pop(0)
+            except IndexError:
+                raise RuntimeError("No more selected tips available for liquid class.")
+            next_tip = NextTipInfo(
+                labwareId=tip_core.labware_id, tipStartingWell=tip_core.get_name()
             )
+        else:
+            next_tip = self.get_next_tip(
+                tip_racks=[core for loc, core in tip_racks],
+                starting_well=starting_tip,
+            )
+            if next_tip is None:
+                raise RuntimeError(
+                    f"No tip available among the tipracks assigned for {self.get_pipette_name()}:"
+                    f" {[f'{tip_rack[1].get_display_name()} in {tip_rack[1].get_deck_slot()}' for tip_rack in tip_racks]}"
+                )
         (
             tiprack_loc,
             tiprack_uri,
             tip_well,
         ) = self._get_location_and_well_core_from_next_tip_info(next_tip, tip_racks)
+
         if tiprack_uri != tiprack_uri_for_transfer_props:
             raise RuntimeError(
                 f"Tiprack {tiprack_uri} does not match the tiprack designated "

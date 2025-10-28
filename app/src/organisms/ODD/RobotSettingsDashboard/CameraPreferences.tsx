@@ -26,6 +26,7 @@ export function CameraPreferences({
           marginBottom="7.75rem"
         />
       }
+      storageInfo={null}
     />
   )
 }

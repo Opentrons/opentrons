@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  EMPTY,
   getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
 } from '@opentrons/step-generation'
@@ -10,8 +9,6 @@ import {
 import { OFFDECK } from '/protocol-designer/constants'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
-
-import { getAffectedWells } from '../utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -72,41 +69,35 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
       }
       return {
         ...acc,
-        [id]: Object.keys(def.wells).reduce(
-          (acc, wellName) => ({
+        [id]: Object.keys(def.wells).reduce((acc, wellName) => {
+          const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
+            tipState,
+            primaryNozzle,
+            channels: pipetteSpecs.channels,
+            nozzleConfiguration: nozzles,
+            wellName,
+            tiprackDef: def,
+            tipsToIgnore: selectedTips.flat(),
+          })
+          return {
             ...acc,
             [wellName]:
               // check accessibility of tips in tiprack
-              getIsSafePickupWithinTiprack({
-                tipState,
-                primaryNozzle,
-                channels: pipetteSpecs.channels,
-                nozzleConfiguration: nozzles,
-                wellName,
-                tiprackDef: def,
-                tipsToIgnore: selectedTips.flat(),
-              }) &&
+              isSafe &&
+              // check if tip(s) is/are not empty
+              isComplete &&
               // check if pipette movement is safe relative to surrounding labware and pipette bounds
               getIsSafePipetteMovement({
                 robotState,
                 invariantContext,
                 pipetteId,
                 labwareId: id,
-                wellLocationOffset: { x: 0, y: 0 },
                 wellTargetName: wellName,
                 primaryNozzle,
                 nozzleConfiguration: nozzles,
-              }) &&
-              // check if tip(s) is/are not empty
-              getAffectedWells({
-                wellName,
-                labwareDef: def,
-                channels: pipetteSpecs.channels,
-                nozzles,
-              }).every(well => tipState[well] !== EMPTY),
-          }),
-          {}
-        ),
+              }),
+          }
+        }, {}),
       }
     }, {})
   }, [selectedTips])
