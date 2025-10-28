@@ -66,6 +66,7 @@
   "image_at_step_at_timestamp": "Image at {{step}} at {{timestamp}}",
   "image_capture": "Image capture",
   "image_gallery": "Image Gallery",
+  "image_loading": "Image loading",
   "images": "Images",
   "images_available_download": "Image files associated with the run are available on the robot’s Recent Runs screen and Camera tab.",
   "labware": "labware",
