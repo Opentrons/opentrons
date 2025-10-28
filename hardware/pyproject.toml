@@ -108,8 +108,8 @@ ignore = [
     # is covered separately by D107)
     "D105",
 ]
-fixable = ["ALL"]
 docstring-convention = "google"
+fixable = ["ALL"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
