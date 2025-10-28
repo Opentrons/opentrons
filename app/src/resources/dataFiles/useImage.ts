@@ -1,7 +1,21 @@
+import { useMemo } from 'react'
+
 import { useDataFileRawQuery } from '@opentrons/react-api-client'
 
-export function useImage(imageId: string = 'stubId'): string | null {
-  useDataFileRawQuery(imageId)
-  const imagePath = null
-  return imagePath
+import { MIME_TYPES } from '/app/resources/dataFiles/constants'
+
+// Axios needs to know the `responseType` of the incoming data to parse it appropriately,
+//  so we wrap the network hook with an expected `blob` type for images.
+export function useImage(imageId: string): string | null {
+  const { data } = useDataFileRawQuery(imageId, {}, { responseType: 'blob' })
+
+  return useMemo(() => {
+    if (data == null) {
+      return null
+    } else {
+      const blob = new Blob([data], { type: MIME_TYPES.IMAGE })
+
+      return URL.createObjectURL(blob)
+    }
+  }, [data])
 }
