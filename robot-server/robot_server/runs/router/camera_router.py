@@ -33,8 +33,6 @@ camera_router = LightRouter()
     description=(
         "Add camera settings to an existing run, returning the implemented settings."
         "\n\n"
-        "There is no matching `GET /runs/{runId}/camera/settings` endpoint."
-        "\n\n"
         "The response body's `data` will be the settings provided once set."
     ),
     status_code=status.HTTP_201_CREATED,

@@ -650,7 +650,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             AddCameraSettingsAction(enablement_settings=enablement_settings)
         )
-        camera_settings = self.state_view.camera.get_enablement_settings()
+        camera_settings = self.state_view._camera.get_enablement_settings()
         assert camera_settings is not None
         return camera_settings
 
