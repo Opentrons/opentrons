@@ -568,7 +568,7 @@
         },
         "ruff": {
             "hashes": [
-                "sha256:8c4c14c6c8bc0f3048f5ad9c900687af307f612277fd864134c40b8d29adc6a7"
+                "sha256:2afc2fa864197634e549d87fb1e7b6feb01df0a80fd510d6489e1ce8c0b1cc45"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
