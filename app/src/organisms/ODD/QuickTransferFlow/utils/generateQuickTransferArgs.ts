@@ -352,13 +352,19 @@ export function generateQuickTransferArgs(
       typeof quickTransferState.dropTipLocation !== 'string' &&
       entity.location === quickTransferState.dropTipLocation.cutoutId
   )
-  const dropTipLocation =
-    dropTipTrashBinLocationEntity?.id ??
-    dropTipWasteChuteLocationEntity?.id ??
-    ''
+
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  const dropTipLocation = dropTipIsTiprack
+    ? quickTransferState.dropTipLocation
+    : (dropTipTrashBinLocationEntity?.id ??
+      dropTipWasteChuteLocationEntity?.id ??
+      '')
 
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
-
   const sourceLabwareId = Object.keys(robotState.labware).find(
     labwareId =>
       getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
