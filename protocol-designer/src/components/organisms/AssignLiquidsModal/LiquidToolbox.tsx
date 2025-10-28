@@ -63,7 +63,7 @@ interface ToolboxFormValues {
 interface LiquidToolboxData {
   liquids: LiquidEntities
   labwareId: string | null
-  selectedWellGroups: Record<string, WellGroup>
+  selectedWellGroups: WellGroup
   nickNames: Record<string, string>
   liquidLocations: any
   commonSelectedLiquidId: string | null
@@ -550,7 +550,7 @@ export function LiquidToolboxContainer({
   const data: LiquidToolboxData = {
     liquids,
     labwareId: labwareId ?? null,
-    selectedWellGroups,
+    selectedWellGroups: selectedWellGroups ?? {},
     nickNames,
     liquidLocations,
     commonSelectedLiquidId: commonSelectedLiquidId ?? null,
