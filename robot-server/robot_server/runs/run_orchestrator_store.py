@@ -480,7 +480,7 @@ class RunOrchestratorStore:
 
     def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
-    ) -> None:
+    ) -> CameraSettings:
         """Add new camera enablement settings to state."""
         return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
 
