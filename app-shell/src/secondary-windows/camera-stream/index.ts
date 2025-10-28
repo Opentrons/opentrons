@@ -56,7 +56,6 @@ function createCameraStreamUi({
     'ready-to-show',
     () => {
       log.debug('Camera stream window ready to show')
-      cameraStreamWindow.setTitle('Live camera view')
       cameraStreamWindow.show()
     }
   )
