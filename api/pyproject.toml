@@ -114,8 +114,8 @@ ignore = [
     # Don't forbid the function signature from being mentioned in the first line of the docstring
     "D402",
 ]
-fixable = ["ALL"]
 docstring-convention = "google"
+fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
 "setup.py" = ["ANN", "D"]
