@@ -8,6 +8,7 @@ import { ImageGalleryContainer } from '..'
 import { GalleryItemCard } from '../GalleryItemCard'
 import { useImageInfo } from '../hooks/useImageInfo'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { UseImagesInfoItem } from '../hooks/useImageInfo'
 
 vi.mock('../GalleryItemCard')
@@ -16,9 +17,9 @@ vi.mock('/app/redux/protocol-runs')
 
 const render = () => {
   const RUN_ID = 'run123'
-  const robotType = 'OT-3 Standard'
+  const robotType = 'OT-3 Standard' as RobotType
   return renderWithProviders(
-    <ImageGalleryContainer run_id={RUN_ID} robotType={robotType} />,
+    <ImageGalleryContainer runId={RUN_ID} robotType={robotType} />,
     {
       i18nInstance: i18n,
     }

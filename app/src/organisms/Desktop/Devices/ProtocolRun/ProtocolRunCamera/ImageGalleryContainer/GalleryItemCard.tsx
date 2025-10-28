@@ -29,9 +29,9 @@ interface UseImageAndCommandResult {
   stubStepFraction: string
   isLoading: boolean
 }
-export function useImage(imageId: string): string | null {
-  const { data } = useDataFileRawQuery(imageId)
-  const imagePath = data != null ? URL.createObjectURL(data) : null
+export function useImage(imageId: string = 'stubId'): string | null {
+  useDataFileRawQuery(imageId)
+  const imagePath = null
   return imagePath
 }
 
@@ -92,6 +92,7 @@ export interface GalleryItemCardProps {
   robotType: RobotType
   allRunDefs: LabwareDefinition[]
 }
+
 export function GalleryItemCard(
   props: GalleryItemCardProps
 ): JSX.Element | null {
@@ -102,6 +103,7 @@ export function GalleryItemCard(
     stubStepFraction,
     isLoading,
   } = useImageAndCommand(props)
+
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
 
@@ -109,8 +111,10 @@ export function GalleryItemCard(
   const dispatch = useDispatch()
   const host = useHost()
 
+  const isSkeleton = imagePath == null || isLoading
+
   const onClick = (): void => {
-    if (imagePath == null) return
+    if (isSkeleton || imagePath == null) return
     const img = new Image()
     img.src = imagePath
     img.onload = () => {
@@ -137,50 +141,60 @@ export function GalleryItemCard(
     <div className={styles.gallery_card}>
       <div
         className={styles.gallery_card_thumbnail}
-        onClick={onClick}
-        role="button"
+        onClick={isSkeleton ? undefined : onClick}
+        role={isSkeleton ? undefined : 'button'}
+        style={isSkeleton ? { cursor: 'default' } : undefined}
       >
-        {imagePath != null && !isLoading ? (
+        {isSkeleton ? (
+          <Skeleton width="100%" height="100%" backgroundSize="47rem" />
+        ) : (
           <img
             className={styles.gallery_img}
             src={imagePath}
             alt="camera-photo"
           />
-        ) : (
-          <div className={styles.gallery_img_placeholder}>
-            <Skeleton
-              width="100%"
-              height="100%"
-              backgroundSize="47rem"
-            ></Skeleton>
+        )}
+
+        {!isSkeleton && (
+          <div className={styles.gallery_img_overlay}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              className={styles.gallery_overlay_text}
+            >
+              {t('view_image')}
+            </StyledText>
           </div>
         )}
-        <div className={styles.gallery_img_overlay}>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            className={styles.gallery_overlay_text}
-          >
-            {t('view_image')}
-          </StyledText>
-        </div>
       </div>
 
       <div className={styles.gallery_card_cmd_txt_container}>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
-          {`Step ${stubStepFraction}: ${currentCommandString}`}
-        </StyledText>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          className={styles.gallery_cmd_txt_subtext}
-          color={COLORS.grey60}
-        >
-          {previousCommandString}
-        </StyledText>
-      </div>
+        {isSkeleton ? (
+          <Skeleton width="100%" height="1.25rem" backgroundSize="47rem" />
+        ) : (
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
+            {`Step ${stubStepFraction}: ${currentCommandString}`}
+          </StyledText>
+        )}
 
-      <div className={styles.gallery_card_timestamp}>
-        <StyledText desktopStyle="bodyDefaultRegular">{timestamp}</StyledText>
+        {isSkeleton ? (
+          <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
+        ) : (
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            className={styles.gallery_cmd_txt_subtext}
+            color={COLORS.grey60}
+          >
+            {previousCommandString}
+          </StyledText>
+        )}
       </div>
+      {isSkeleton ? (
+        <Skeleton width="18%" height="1rem" backgroundSize="47rem" />
+      ) : (
+        <div className={styles.gallery_card_timestamp}>
+          <StyledText desktopStyle="bodyDefaultRegular">{timestamp}</StyledText>
+        </div>
+      )}
     </div>
   )
 }

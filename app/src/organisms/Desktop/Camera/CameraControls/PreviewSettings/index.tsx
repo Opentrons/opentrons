@@ -41,7 +41,7 @@ function PreviewImage({
     return (
       <div className={styles.no_image_container}>
         <Icon name="ot-alert" className={styles.no_image_alert} />
-        <Skeleton width="100%" height="100%" backgroundSize="47rem"></Skeleton>
+        <Skeleton width="100%" height="100%" backgroundSize="47rem" />
       </div>
     )
   }

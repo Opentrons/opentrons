@@ -2,8 +2,6 @@ import { useTranslation } from 'react-i18next'
 
 import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
 
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
-
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
 import { useImageInfo } from './hooks/useImageInfo'
@@ -12,22 +10,21 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { GalleryItemCardProps } from './GalleryItemCard'
 
 export function ImageGalleryContainer({
-  run_id,
+  runId,
   robotType,
 }: {
-  run_id: string
+  runId: string
   robotType: RobotType
 }): JSX.Element {
   const { t } = useTranslation('run_details')
-  const { items, protocolAnalysis, allRunDefs } = useImageInfo(run_id)
+  const { items, protocolAnalysis, allRunDefs } = useImageInfo(runId)
 
   const imagesLength = items.length
-  const { isCameraEnabled } = useCameraUsageSettings()
 
   return (
     <div className={styles.gallery_container}>
       <GalleryHeader imagesCount={imagesLength} />
-      {isCameraEnabled && imagesLength > 0 ? (
+      {imagesLength > 0 ? (
         <ListTable headers={[<GalleryTableHeaders key="1" />]}>
           <div className={styles.gallery_content_wrapper}>
             {items.map(item => (
@@ -35,7 +32,7 @@ export function ImageGalleryContainer({
                 key={item.timestamp}
                 item={item}
                 protocolAnalysis={protocolAnalysis}
-                runId={run_id}
+                runId={runId}
                 robotType={robotType}
                 allRunDefs={allRunDefs}
               />

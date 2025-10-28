@@ -37,14 +37,18 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
   } = props
 
   const imagePath = useImage(imageId)
-  const { currentCommandString: stepCommandText, previousCommandString } =
-    useImageAndCommand({
-      item: { imageId, stepCommandId, previousStepCommandId, timestamp },
-      protocolAnalysis,
-      runId,
-      robotType,
-      allRunDefs,
-    })
+  const {
+    currentCommandString: stepCommandText,
+    previousCommandString,
+    isLoading,
+  } = useImageAndCommand({
+    item: { imageId, stepCommandId, previousStepCommandId, timestamp },
+    protocolAnalysis,
+    runId,
+    robotType,
+    allRunDefs,
+  })
+  const isSkeleton = imagePath == null || isLoading
 
   return (
     <ListItem type="default">
@@ -54,37 +58,41 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
             <StyledText oddStyle="bodyTextSemiBold">{timestamp}</StyledText>
           </div>
           <div className={styles.list_item_step}>
-            <StyledText
-              className={styles.list_item_step_text}
-              oddStyle="bodyTextSemiBold"
-            >
-              {stepCommandText}
-            </StyledText>
-            <StyledText
-              className={styles.list_item_step_text}
-              oddStyle="bodyTextRegular"
-            >
-              {previousCommandString}
-            </StyledText>
+            {isSkeleton ? (
+              <Skeleton width="100%" height="100%" backgroundSize="47rem" />
+            ) : (
+              <StyledText
+                className={styles.list_item_step_text}
+                oddStyle="bodyTextSemiBold"
+              >
+                {stepCommandText}
+              </StyledText>
+            )}
+            {isSkeleton ? (
+              <Skeleton width="100%" height="100%" backgroundSize="47rem" />
+            ) : (
+              <StyledText
+                className={styles.list_item_step_text}
+                oddStyle="bodyTextRegular"
+              >
+                {previousCommandString}
+              </StyledText>
+            )}
           </div>
-          <SmallButton
-            onClick={() => {
-              imagePath
-                ? handleCameraPhotoModal({
-                    imagePath,
-                    timestamp,
-                    stepCommandText,
-                  })
-                : Skeleton({
-                    width: '45.625rem',
-                    height: 'max-content',
-                    backgroundSize: 'small',
-                  })
-            }}
-            buttonText={t('view_image')}
-            buttonType="secondary"
-            buttonCategory="rounded"
-          />
+          {!isSkeleton && (
+            <SmallButton
+              onClick={() => {
+                handleCameraPhotoModal({
+                  imagePath,
+                  timestamp,
+                  stepCommandText,
+                })
+              }}
+              buttonText={t('view_image')}
+              buttonType="secondary"
+              buttonCategory="rounded"
+            />
+          )}
         </div>
       </div>
     </ListItem>

@@ -11,6 +11,11 @@ import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shar
 import styles from './gallery.module.css'
 
 import type { RunStatus } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+  RobotType,
+} from '@opentrons/shared-data'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import type { UseImagesInfoItem } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
 
@@ -20,9 +25,9 @@ export interface ImageGalleryListProps {
   onTogglePlayPause: () => void
   protocolName: string | undefined
   runId: string
-  protocolAnalysis: any
-  robotType: any
-  allRunDefs: any
+  protocolAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
+  allRunDefs: LabwareDefinition[]
 }
 
 export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {

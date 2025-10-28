@@ -38,7 +38,7 @@ export function ProtocolRunCamera(props: ProtocolRunCameraProps): JSX.Element {
         {isCameraEnabled ? <LaunchLivestreamBtn /> : null}
       </div>
       <Divider width="100%" />
-      <ImageGalleryContainer run_id={runId} robotType={robotType} />
+      <ImageGalleryContainer runId={runId} robotType={robotType} />
     </div>
   )
 }

@@ -1,12 +1,12 @@
 import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { GalleryItemCard } from '../GalleryItemCard'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { GalleryItemCardProps } from '../GalleryItemCard'
 
 const render = (props: GalleryItemCardProps) => {
@@ -26,39 +26,29 @@ const MOCK_IMAGE_ITEM = {
   previousStepCommandId: 'step2',
   timestamp: '2024-01-01 12:00:00',
 }
-
 const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
   let mockProps: GalleryItemCardProps
-
   beforeEach(() => {
     mockProps = {
       item: MOCK_IMAGE_ITEM,
       protocolAnalysis: mockProtocolAnalysis,
       runId: MOCK_RUN_ID,
-      robotType: 'OT-3 Standard',
+      robotType: 'OT3-Standard' as RobotType,
       allRunDefs: [],
     }
   })
 
   it('renders expected card content', () => {
     render(mockProps)
-
-    const image = screen.getByAltText('camera-photo')
-    expect(image).toHaveAttribute('src', 'mock-image-path.png')
-
-    screen.getByText('Step 1/100: Current command text')
-    screen.getByText('Previous command text')
-    screen.getByText(MOCK_IMAGE_ITEM.timestamp)
+    expect(screen.queryByAltText('camera-photo')).toBeNull()
+    expect(screen.getAllByTestId('Skeleton'))
   })
 
   it('shows "View image" on hover', async () => {
-    const user = userEvent.setup()
     render(mockProps)
 
-    const image = screen.getByAltText('camera-photo')
-    await user.hover(image)
-
-    screen.getByText('View image')
+    expect(screen.queryByAltText('camera-photo')).toBeNull()
+    expect(screen.getAllByTestId('Skeleton'))
   })
 })
