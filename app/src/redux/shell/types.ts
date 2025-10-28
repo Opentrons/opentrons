@@ -180,7 +180,7 @@ export interface SendFilePathsAction {
 
 export interface CameraStreamOpenAction {
   type: 'shell:CAMERA_STREAM_OPEN'
-  payload: { hostname: string; robotName: string }
+  payload: { hostname: string; robotName: string; runId: string }
   meta: { shell: true }
 }
 

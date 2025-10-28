@@ -14,10 +14,12 @@ import type { RunStatus } from '@opentrons/api-client'
 
 export interface ProtocolRunCameraProps {
   runStatus: RunStatus | null
+  runId: string
 }
 
 export function ProtocolRunCamera({
   runStatus,
+  runId,
 }: ProtocolRunCameraProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const { isCameraEnabled } = useCameraUsageSettings()
@@ -40,7 +42,7 @@ export function ProtocolRunCamera({
           </Flex>
         </div>
         {!isTerminalRunStatus(runStatus) && isCameraEnabled ? (
-          <LaunchLivestreamBtn />
+          <LaunchLivestreamBtn runId={runId} />
         ) : null}
       </div>
       <Divider width="100%" />

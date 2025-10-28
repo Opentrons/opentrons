@@ -14,6 +14,7 @@ interface CameraStreamDetails extends SecondaryWindowDetails {
 }
 
 interface OpenCameraStreamParams {
+  runId: string
   robotIp: string
   robotName: string
   log: Logger
@@ -32,17 +33,18 @@ function getWindowIdCameraStream(robotIp: string): string {
   return `camera-stream-${robotIp}`
 }
 
-const STREAM_URL = (robotName: string): string =>
+const STREAM_URL = (robotName: string, runId: string): string =>
   `${
     SECONDARY_WINDOW_CONFIG.url.protocol
   }//${SECONDARY_WINDOW_URL_PATH}#/devices/${encodeURIComponent(
     robotName
-  )}/camera-stream`
+  )}/camera-stream/?runId=${encodeURIComponent(runId)}`
 
 function createCameraStreamUi({
   log,
   robotName,
   robotIp,
+  runId,
 }: OpenCameraStreamParams): BrowserWindow {
   log.debug('Creating camera stream window', {
     robotIp,
@@ -59,9 +61,9 @@ function createCameraStreamUi({
     }
   )
 
-  log.info(`Loading camera stream from ${STREAM_URL(robotName)}`)
+  log.info(`Loading camera stream from ${STREAM_URL(robotName, runId)}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  cameraStreamWindow.loadURL(STREAM_URL(robotName), {
+  cameraStreamWindow.loadURL(STREAM_URL(robotName, runId), {
     extraHeaders: 'pragma: no-cache\n',
   })
 
