@@ -196,7 +196,11 @@ class RunOrchestrator:
     ) -> RunResult:
         """Start the run."""
         if self._camera_provider:
-            await camera.update_live_stream_status(True, self._camera_provider)
+            await camera.update_live_stream_status(
+                True,
+                self._camera_provider,
+                self._protocol_engine.state_view.camera.get_enablement_settings(),
+            )
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,

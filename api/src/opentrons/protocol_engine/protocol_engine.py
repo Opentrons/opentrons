@@ -598,7 +598,11 @@ class ProtocolEngine:
             finish_error_details = None
 
         try:
-            await camera.update_live_stream_status(False, self._camera_provider)
+            await camera.update_live_stream_status(
+                False,
+                self._camera_provider,
+                self.state_view.camera.get_enablement_settings(),
+            )
         except Exception as e:
             _log.exception(f"Exception during live stream post-run cleanup: {e}")
 
