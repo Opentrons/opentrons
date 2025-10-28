@@ -4,7 +4,7 @@ from pathlib import Path
 import logging
 from functools import lru_cache
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
@@ -13,6 +13,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     ImageParameters,
     CameraError,
+    CameraSettings,
 )
 from opentrons.system import ffmpeg
 
@@ -118,7 +119,9 @@ def get_stream_configuration_filepath() -> Path:
 
 
 async def update_live_stream_status(
-    stream_status: bool, camera_provider: CameraProvider
+    stream_status: bool,
+    camera_provider: CameraProvider,
+    override_settings: Optional[CameraSettings] = None,
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
     if not IS_ROBOT:
@@ -131,12 +134,15 @@ async def update_live_stream_status(
         return None
 
     # Validate the stream status
-    camera_enable_settings = await camera_provider.get_camera_settings()
+    if override_settings is not None:
+        camera_enable_settings = override_settings
+    else:
+        camera_enable_settings = await camera_provider.get_camera_settings()
     status = "OFF"
     if (
         stream_status
-        and camera_enable_settings.camera_enabled
-        and camera_enable_settings.live_stream_enabled
+        and camera_enable_settings.cameraEnabled
+        and camera_enable_settings.liveStreamEnabled
     ):
         # Check to see if the camera device is available
         raw_device = str(contents["SOURCE"])[1:-1]

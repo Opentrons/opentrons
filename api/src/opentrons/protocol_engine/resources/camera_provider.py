@@ -19,13 +19,13 @@ class CameraError(BaseModel):
 class CameraSettings(BaseModel):
     """Camera API settings for general enablement and use."""
 
-    camera_enabled: bool = Field(
+    cameraEnabled: bool = Field(
         ..., description="Enablement status for general camera use."
     )
-    live_stream_enabled: bool = Field(
+    liveStreamEnabled: bool = Field(
         ..., description="Enablement status for the Opentrons Live Stream service."
     )
-    error_recovery_enabled: bool = Field(
+    errorRecoveryEnabled: bool = Field(
         ..., description="Enablement status for camera usage with Error Recovery."
     )
 
@@ -81,7 +81,7 @@ class CameraProvider:
             return self._camera_settings_callback()
         # If we are in analysis or simulation, return as if the camera is enabled
         return CameraSettings(
-            camera_enabled=True, live_stream_enabled=True, error_recovery_enabled=True
+            cameraEnabled=True, liveStreamEnabled=True, errorRecoveryEnabled=True
         )
 
     async def capture_image(self, parameters: ImageParameters) -> bytes | None:

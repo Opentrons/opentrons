@@ -564,9 +564,9 @@ async def test_execute_undefined_error(
     if use_camera:
         decoy.when(await subject._camera_provider.get_camera_settings()).then_return(
             CameraSettings(
-                camera_enabled=True,
-                live_stream_enabled=True,
-                error_recovery_enabled=True,
+                cameraEnabled=True,
+                liveStreamEnabled=True,
+                errorRecoveryEnabled=True,
             )
         )
 
@@ -735,9 +735,9 @@ async def test_execute_defined_error(
     if use_camera:
         decoy.when(await subject._camera_provider.get_camera_settings()).then_return(
             CameraSettings(
-                camera_enabled=True,
-                live_stream_enabled=True,
-                error_recovery_enabled=True,
+                cameraEnabled=True,
+                liveStreamEnabled=True,
+                errorRecoveryEnabled=True,
             )
         )
 

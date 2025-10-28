@@ -130,9 +130,9 @@ async def test_raises_camera_disabled_error(
     decoy.when(state_view.files.get_filecount()).then_return(0)
     decoy.when(await camera_provider.get_camera_settings()).then_return(
         CameraSettings(
-            camera_enabled=False,
-            live_stream_enabled=False,
-            error_recovery_enabled=False,
+            cameraEnabled=False,
+            liveStreamEnabled=False,
+            errorRecoveryEnabled=False,
         )
     )
 
