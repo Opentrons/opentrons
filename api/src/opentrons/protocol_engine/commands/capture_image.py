@@ -125,10 +125,10 @@ class CaptureImageImpl(
         camera_settings = await self._camera_provider.get_camera_settings()
         engine_camera_settings = self._state_view.camera.get_enablement_settings()
         if (
-            engine_camera_settings is None and camera_settings.camera_enabled is False
+            engine_camera_settings is None and camera_settings.cameraEnabled is False
         ) or (
             engine_camera_settings is not None
-            and engine_camera_settings.camera_enabled is False
+            and engine_camera_settings.cameraEnabled is False
         ):
             raise CameraDisabledError(
                 "Cannot capture image because Camera is disabled."

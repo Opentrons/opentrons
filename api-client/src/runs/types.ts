@@ -1,3 +1,5 @@
+import { CameraData } from '../camera'
+
 import type {
   LabwareDefinition,
   Liquid,
@@ -64,6 +66,7 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
+  cameraSettings?: CameraData
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {

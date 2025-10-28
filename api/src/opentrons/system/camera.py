@@ -141,8 +141,8 @@ async def update_live_stream_status(
     status = "OFF"
     if (
         stream_status
-        and camera_enable_settings.camera_enabled
-        and camera_enable_settings.live_stream_enabled
+        and camera_enable_settings.cameraEnabled
+        and camera_enable_settings.liveStreamEnabled
     ):
         # Check to see if the camera device is available
         raw_device = str(contents["SOURCE"])[1:-1]
