@@ -31,7 +31,7 @@ import {
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
 import {
-  openIngredientsSelector,
+  multipleIngredientsSelector,
   removeWellsContents,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
@@ -93,10 +93,6 @@ export function AssignLiquidsModal(
     liquidDisplayColors,
     selectedLabwareIds,
   } = data
-
-  const setSelectedLabware = (labwareIds: string[]) => {
-    dispatch(openIngredientsSelector(labwareIds))
-  }
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 

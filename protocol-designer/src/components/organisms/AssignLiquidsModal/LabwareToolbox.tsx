@@ -16,9 +16,9 @@ import {
 } from '@opentrons/components'
 
 import {
-  createContainer,
   createContainerAndSelectLabware,
-  openIngredientsSelector,
+  multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import {
@@ -90,16 +90,13 @@ export function LabwareStackToolbox({
       setShowLiquidLayoutOverlay(true)
       return
     }
-    dispatch(openIngredientsSelector(labwareStack))
+    dispatch(multipleIngredientsSelector(labwareStack))
   }
 
   const handleAssignToLabware = (
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    console.log('newItem', newItem)
-    console.log('labwareId', labwareId)
-    console.log('selectedLabwareIds', selectedLabwareIds)
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
@@ -109,11 +106,9 @@ export function LabwareStackToolbox({
       console.error('selected labware have different liquid layouts')
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
-      console.log('newItem with ctrl key')
-      dispatch(openIngredientsSelector([...selectedLabwareIds, newItem]))
+      dispatch(multipleIngredientsSelector([...selectedLabwareIds, newItem]))
     } else {
-      console.log('newItem')
-      dispatch(openIngredientsSelector([newItem]))
+      dispatch(multipleIngredientsSelector([newItem]))
     }
   }
 

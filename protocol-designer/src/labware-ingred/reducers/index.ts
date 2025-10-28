@@ -34,7 +34,7 @@ import type {
   GenerateNewProtocolAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
-  OpenIngredientsSelectorAction,
+  MultipleIngredientsSelectorAction,
   RemoveWellsContentsAction,
   RenameLabwareAction,
   SelectAdapterAction,
@@ -91,7 +91,7 @@ const selectedContainerIds: Reducer<SelectedContainerIds, any> = handleActions(
   {
     OPEN_INGREDIENT_SELECTOR: (
       state,
-      action: OpenIngredientsSelectorAction
+      action: MultipleIngredientsSelectorAction
     ): SelectedContainerIds => action.payload,
     CLOSE_INGREDIENT_SELECTOR: (
       state,

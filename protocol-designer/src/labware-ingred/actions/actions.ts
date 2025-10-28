@@ -32,8 +32,8 @@ export const closeLabwareSelector: () => CloseLabwareSelectorAction = createActi
   'CLOSE_LABWARE_SELECTOR'
 )
 // ===== Open and close multiple Ingredient Selector modal ====
-export interface OpenIngredientsSelectorAction {
-  type: 'OPEN_INGREDIENTS_SELECTOR'
+export interface MultipleIngredientsSelectorAction {
+  type: 'MULTIPLE_INGREDIENTS_SELECTOR'
   payload: string[]
 }
 
@@ -50,9 +50,9 @@ export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
 }
 // @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
-export const openIngredientsSelector: (
+export const multipleIngredientsSelector: (
   payload: string[]
-) => OpenIngredientsSelectorAction = createAction('OPEN_INGREDIENTS_SELECTOR')
+) => MultipleIngredientsSelectorAction = createAction('OPEN_INGREDIENTS_SELECTOR')
 
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
 export const closeIngredientSelector: () => CloseIngredientSelectorAction = createAction(
