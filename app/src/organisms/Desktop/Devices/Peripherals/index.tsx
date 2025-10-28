@@ -5,21 +5,21 @@ import { StyledText } from '@opentrons/components'
 import { CameraCard } from './CameraCard'
 import styles from './inputdevices.module.css'
 
-export interface InputDevicesProps {
+export interface PeripheralsProps {
   isFlex: boolean
   robotName: string
 }
 
-export function InputDevices({
+export function Peripherals({
   isFlex,
   robotName,
-}: InputDevicesProps): JSX.Element {
+}: PeripheralsProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
   return (
     <div className={styles.container}>
       <StyledText desktopStyle="bodyLargeSemiBold">
-        {t('input_devices')}
+        {t('peripherals')}
       </StyledText>
       <CameraCard isFlex={isFlex} robotName={robotName} />
     </div>

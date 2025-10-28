@@ -64,6 +64,7 @@ module.exports = {
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
               'useSearchLabwareOffsets',
+              'useImageFileQuery',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
