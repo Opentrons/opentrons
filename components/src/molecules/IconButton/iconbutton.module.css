@@ -5,8 +5,8 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-12);
-  background-color: var(--variant-default);
   border-radius: 50%;
+  background-color: var(--variant-default);
 }
 
 .icon_button:active {
