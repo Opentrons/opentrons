@@ -29,7 +29,7 @@ jobs:
       - name: "Checkout Repository"
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0  # Need full history for git version script
 
       - name: "Setup JS Environment"
         uses: ./.github/actions/js/setup
