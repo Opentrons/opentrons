@@ -1,0 +1,37 @@
+name: "CI Docker Utils - Lint & Test"
+
+on:
+  pull_request:
+    paths:
+      - "ci-docker/**"
+      - ".github/workflows/ci-docker-utils-test.yaml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint and Test CI Docker Utilities
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ci-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: make setup
+
+      - name: Run linting
+        run: make lint
+
+      - name: Run tests with coverage
+        run: make test-cov

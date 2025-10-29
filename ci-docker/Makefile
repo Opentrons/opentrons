@@ -1,7 +1,7 @@
 UV ?= uv
 TAG ?= ghcr.io/opentrons/ci-bootstrap:local
 DOCKERFILE := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/Dockerfile
-UTILS_SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/utils/actions.py
+UTILS_SCRIPT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/ci_docker/utils/actions.py
 REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 
 # Optional parameters consumed by helper targets. Defaults make local testing easy.
@@ -62,12 +62,20 @@ setup:
 
 .PHONY: format
 format: setup
-	$(UV) run ruff format utils/
-	$(UV) run ruff check --fix utils/
+	$(UV) run ruff format ci_docker/ tests/
+	$(UV) run ruff check --fix ci_docker/ tests/
 
 .PHONY: lint
 lint: setup
-	$(UV) run ruff check utils/
+	$(UV) run ruff check ci_docker/ tests/
+
+.PHONY: test
+test: setup
+	$(UV) run pytest tests/
+
+.PHONY: test-cov
+test-cov: setup
+	$(UV) run pytest --cov=ci_docker --cov-report=term-missing --cov-report=html tests/
 
 .PHONY: clean
 clean:
@@ -81,6 +89,8 @@ help:
 	@printf "  make shell           # Start an interactive shell with the repo mounted\n"
 	@printf "  make format          # Format and fix Python code with ruff\n"
 	@printf "  make lint            # Check Python code with ruff (no changes)\n"
+	@printf "  make test            # Run tests with pytest\n"
+	@printf "  make test-cov        # Run tests with coverage reporting\n"
 	@printf "  make clean           # Remove the local container image\n"
 	@printf "\n"
 	@printf "Examples:\n"

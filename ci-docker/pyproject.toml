@@ -7,7 +7,7 @@ requires-python = ">=3.10"
 dependencies = ["rich>=14.2.0"]
 
 [dependency-groups]
-dev = ["ruff>=0.8.0"]
+dev = ["ruff>=0.8.0", "pytest>=8.0.0", "pytest-cov>=6.0.0"]
 
 [tool.ruff]
 target-version = "py310"
@@ -40,3 +40,14 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]

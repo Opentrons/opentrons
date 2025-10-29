@@ -44,10 +44,16 @@ This folder provides a **shared, faster, hermetic** baseline for all workflow jo
 ```
 ci-docker/
 ├── Dockerfile              # Container definition with pre-warmed dependencies
-├── utils/
-│   └── actions.py          # GitHub Actions helpers (ref/tag/checksum logic)
+├── ci_docker/              # Python package for utilities
+│   ├── __init__.py
+│   └── utils/
+│       ├── __init__.py
+│       └── actions.py      # GitHub Actions helpers (ref/tag/checksum logic)
+├── tests/                  # pytest tests for utilities
+│   ├── __init__.py
+│   └── test_actions.py     # Comprehensive tests for actions.py
 ├── Makefile                # Docker build/shell commands and utility wrappers
-├── pyproject.toml          # uv project with rich + ruff dependencies
+├── pyproject.toml          # uv project with rich + ruff + pytest dependencies
 ├── uv.lock                 # Lockfile for reproducible builds
 ├── .python-version         # Python 3.10 for local uv environment
 ├── README.md               # User-facing documentation
@@ -57,6 +63,11 @@ ci-docker/
 All Python dependencies for these scripts are managed using **uv** in a local virtual environment.
 
 > Scripts never implicitly rely on global python tools - always use `uv run` or activate the venv.
+
+Tests are written using **pytest** with comprehensive coverage of tag selection, ref parsing, and checksum logic.
+- **44 tests** covering all major functionality
+- **99% code coverage** (243/245 statements)
+- Tests include CLI integration, GitHub Actions helpers, dependency checksums, and edge cases
 
 All Docker operations use native `docker` commands via the Makefile - no Python wrapper needed.
 
@@ -183,12 +194,22 @@ make -C ci-docker check-dependency-drift
 
 ### CI Workflows Using Container
 
+**Setup pattern in all workflows:**
+
+All workflows use `astral-sh/setup-uv@v7` with `python-version: '3.10'` to ensure consistent Python environment.
+
 **Example: `.github/workflows/ci-docker-api.yaml`**
 
 ```yaml
 jobs:
   select-image:
     # Determines which container tag to use (edge, branch-*, etc.)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.10'
+      - run: make determine-container-tag
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
 
@@ -225,8 +246,10 @@ jobs:
 
 **Active workflows:**
 
-- `.github/workflows/ci-docker-api.yaml` - API linting and unit tests
-- `.github/workflows/ci-docker-pd.yaml` - Protocol Designer build and unit tests
+- `.github/workflows/ci-docker-build.yaml` - Container build and push
+- `.github/workflows/ci-docker-utils-test.yaml` - Lint and test Python utilities
+- `.github/workflows/ci-docker-api.yaml` - API linting and unit tests (using container)
+- `.github/workflows/ci-docker-pd.yaml` - Protocol Designer build and unit tests (using container)
 
 ---
 
@@ -240,6 +263,8 @@ jobs:
 | `make shell`                   | Interactive shell with repo mounted at `/workspace`                       |
 | `make format`                  | Auto-format and fix Python code with ruff                                 |
 | `make lint`                    | Check Python code with ruff (no changes)                                  |
+| `make test`                    | Run tests with pytest                                                     |
+| `make test-cov`                | Run tests with coverage reporting                                         |
 | `make clean`                   | Remove local container image                                              |
 | `make determine-source-ref`    | Compute Git ref for container build (used by build workflow)              |
 | `make determine-container-tag` | Select container tag for CI jobs (used by test workflows)                 |

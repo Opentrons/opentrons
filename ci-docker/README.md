@@ -49,7 +49,7 @@ make -C ci-docker build TAG=my-image:test OPENTRONS_DEFAULT_REF=my-branch
 
 ## Python CLI Reference
 
-The `utils/actions.py` script provides helper utilities for GitHub Actions workflows:
+The `ci_docker/utils/actions.py` script provides helper utilities for GitHub Actions workflows:
 
 ```bash
 # Helper utilities for GitHub Actions (exposed via Makefile)
@@ -57,6 +57,27 @@ make -C ci-docker determine-container-tag EVENT_NAME=pull_request BASE_REF=edge
 make -C ci-docker determine-source-ref REF=refs/heads/edge DEFAULT_BRANCH=edge
 make -C ci-docker dependency-checksums OUTPUT=/path/to/checksums.json
 make -C ci-docker check-dependency-drift BASELINE=/path/to/checksums.json
+```
+
+## Development Commands
+
+Python utilities are managed with `uv` and thoroughly tested with pytest:
+
+```bash
+# Setup local environment
+make -C ci-docker setup
+
+# Format and fix code
+make -C ci-docker format
+
+# Lint code
+make -C ci-docker lint
+
+# Run tests (44 tests, 99% coverage)
+make -C ci-docker test
+
+# Run tests with coverage report
+make -C ci-docker test-cov
 ```
 
 All Docker operations use native `docker` commands via the Makefile:
@@ -121,6 +142,25 @@ The pre-cloned repo at `/opt/opentrons` has:
 - PRs targeting `edge` → use `edge` tag
 - PRs targeting `chore_release-*` → use `branch-chore_release-*` tag
 - PRs targeting other branches → use fallback tag (currently `branch-ci-docker-init`, will be `edge` after merge)
+
+### Utils Lint & Test (`.github/workflows/ci-docker-utils-test.yaml`)
+
+**Triggered by:**
+
+- PRs modifying `ci-docker/**` or the workflow itself
+- Manual workflow dispatch
+
+**Behavior:**
+
+Runs on standard GitHub-hosted runner (not using the container):
+
+1. Setup uv with Python 3.10 via `astral-sh/setup-uv@v7`
+2. Install dependencies via `make setup`
+3. Run linting via `make lint`
+4. Run tests with coverage via `make test-cov`
+5. Upload HTML coverage report as artifact
+
+This workflow validates the Python utilities themselves with **99% test coverage**.
 
 ### CI Test Workflows (using container)
 
@@ -204,11 +244,3 @@ make -C api test
 - Performance: Skip refresh when dependencies unchanged (common case)
 - Correctness: Always use fresh dependencies when manifests change
 - Visibility: Workflow logs show whether refresh occurred
-
-## Development Commands
-
-```bash
-# Code formatting and linting
-make -C ci-docker format  # Auto-format and fix Python code with ruff
-make -C ci-docker lint    # Check Python code without changes
-```
