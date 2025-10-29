@@ -6,15 +6,15 @@ import type {
 } from '/app/redux/pipettes/types'
 
 export function downloadFile(
-  data: Blob | string,
+  data: Blob | string | object,
   fileName: string,
   mimeType?: string
 ): void {
-  const createBlob = (data: Blob | string): Blob => {
+  const createBlob = (data: Blob | string | object): Blob => {
     if (data instanceof Blob) {
       return data
     } else {
-      const content = JSON.stringify(data)
+      const content = typeof data === 'string' ? data : JSON.stringify(data)
       return new Blob([content], { type: mimeType ?? 'text/json' })
     }
   }
