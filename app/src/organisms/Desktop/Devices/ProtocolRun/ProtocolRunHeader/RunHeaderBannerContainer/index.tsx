@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Banner, Box, SPACING } from '@opentrons/components'
+import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { DataFilesInfoBanner } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/RunHeaderBannerContainer/DataFilesInfoBanner'
 
@@ -81,7 +81,7 @@ export function RunHeaderBannerContainer(
   const terminalBannerType = useTerminalRunBannerContainer(props)
 
   return (
-    <Box>
+    <Flex gap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
       {analysisErrorModalUtils.showModal ? (
         <ProtocolAnalysisErrorBanner
           errors={analysisErrorModalUtils.modalProps.errors}
@@ -105,6 +105,6 @@ export function RunHeaderBannerContainer(
           robotName={robotName}
         />
       ) : null}
-    </Box>
+    </Flex>
   )
 }
