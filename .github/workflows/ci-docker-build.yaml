@@ -3,14 +3,15 @@ name: Build CI Docker image
 on:
   pull_request:
     paths:
-      - 'ci-docker/**'
-      - '.github/workflows/ci-docker-build.yaml'
-      - '**/Pipfile'
-      - '**/Pipfile.lock'
-      - '**/package.json'
-      - '**/yarn.lock'
+      - "ci-docker/**"
+      - ".github/workflows/ci-docker-build.yaml"
+      - "**/Pipfile"
+      - "**/Pipfile.lock"
+      - "**/package.json"
+      - "**/yarn.lock"
   push:
     branches:
+      - "ci-docker/init"
       - edge
       - chore_release*
   workflow_dispatch: {}
@@ -27,7 +28,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: 'actions/checkout@v4'
+        uses: "actions/checkout@v4"
         with:
           fetch-depth: 0
 

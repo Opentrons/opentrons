@@ -3,15 +3,15 @@ name: API Checks (CI Docker)
 on:
   pull_request:
     paths:
-      - 'api/**'
-      - 'Makefile'
-      - 'shared-data/**'
-      - '!shared-data/js/**'
-      - 'hardware/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/ci-docker-api.yaml'
-      - '.github/workflows/utils.js'
+      - "api/**"
+      - "Makefile"
+      - "shared-data/**"
+      - "!shared-data/js/**"
+      - "hardware/**"
+      - "scripts/**.mk"
+      - "scripts/**.py"
+      - ".github/workflows/ci-docker-api.yaml"
+      - ".github/workflows/utils.js"
   push:
     branches:
       - edge
@@ -30,7 +30,7 @@ jobs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout utilities
-        uses: 'actions/checkout@v4'
+        uses: "actions/checkout@v4"
         with:
           fetch-depth: 1
           sparse-checkout: |
