@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { COLORS, StyledText } from '@opentrons/components'
+import { Chip, COLORS, StyledText } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
@@ -16,6 +16,7 @@ import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/ho
 export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const { item } = props
   const {
+    currentCommand,
     currentCommandString,
     previousCommandString,
     stubStepFraction,
@@ -24,6 +25,7 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
 
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
+  const isCurrentCmdError = currentCommand?.error != null
 
   const { t } = useTranslation(['run_details', 'branded'])
   const dispatch = useDispatch()
@@ -82,6 +84,14 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
       </div>
 
       <div className={styles.gallery_card_cmd_txt_container}>
+        {!isSkeleton && isCurrentCmdError && (
+          <Chip
+            text={t('error_event')}
+            type="error"
+            width="fit-content"
+            chipSize="small"
+          />
+        )}
         {isSkeleton ? (
           <Skeleton width="100%" height="1.25rem" backgroundSize="47rem" />
         ) : (
