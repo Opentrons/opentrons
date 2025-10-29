@@ -173,6 +173,8 @@
   "status_stopped": "Canceled",
   "status_succeeded": "Completed",
   "step": "Step",
+  "step_current_total": "Step {{current}} / {{total}}",
+  "step_command": "{{step}}: {{command}}",
   "step_detail": "Step Detail",
   "step_failed": "Step failed",
   "step_na": "Step: N/A",
