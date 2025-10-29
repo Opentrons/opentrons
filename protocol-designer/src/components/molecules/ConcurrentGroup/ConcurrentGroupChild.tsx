@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import styles from './childrencommon.module.css'
+import styles from './concurrentgroupchild.module.css'
 
 import type { PropsWithChildren } from 'react'
 
