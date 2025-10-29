@@ -191,7 +191,6 @@ export interface CameraPhotoOpenAction {
     robotName: string
     windowTitle: string
     photoUrl: string
-    dimensions: { width: number; height: number }
   }
   meta: {
     shell: true

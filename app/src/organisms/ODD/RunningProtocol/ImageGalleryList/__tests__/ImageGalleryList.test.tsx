@@ -6,18 +6,15 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useImageInfo } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryList } from '..'
 
 import type { ImageGalleryListProps } from '..'
 
-vi.mock(
-  '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
-)
+vi.mock('/app/resources/dataFiles/useImageInfo')
 vi.mock('/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem')
 vi.mock('/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader')
 

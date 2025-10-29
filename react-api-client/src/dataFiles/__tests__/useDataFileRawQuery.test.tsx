@@ -20,18 +20,7 @@ vi.mock('../../api/useHost')
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const FILE_ID = 'file123'
 
-const mockMediaSource = (): MediaSource =>
-  ({
-    addSourceBuffer: vi.fn(),
-    removeSourceBuffer: vi.fn(),
-    clearLiveSeekableRange: vi.fn(),
-    duration: 0,
-    endOfStream: vi.fn(),
-    readyState: 'open',
-    activeSourceBuffers: [],
-    sourceBuffers: [],
-    setLiveSeekableRange: vi.fn(),
-  }) as unknown as MediaSource
+const mockMediaSource = (): Blob | string => 'test'
 
 const FILE_CONTENT_RESPONSE = mockMediaSource() as DownloadedDataFileResponse
 

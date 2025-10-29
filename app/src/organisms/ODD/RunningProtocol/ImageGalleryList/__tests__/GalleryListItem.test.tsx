@@ -4,12 +4,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import {
-  useImage,
-  useImageAndCommand,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard'
+import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import { GalleryListItem } from '../GalleryListItem'
 
@@ -20,15 +17,8 @@ vi.mock(
     handleCameraPhotoModal: vi.fn(),
   })
 )
-
-// Mock the image and command hooks
-vi.mock(
-  '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard',
-  () => ({
-    useImage: vi.fn(),
-    useImageAndCommand: vi.fn(),
-  })
-)
+vi.mock('/app/local-resources/dataFiles/hooks/useImageGalleryData')
+vi.mock('/app/resources/dataFiles/useImage')
 
 const MOCK_IMG_PATH = '/path/to/test-image.jpg'
 const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
@@ -60,7 +50,7 @@ const render = (props = mockProps) =>
 describe('GalleryListItem', () => {
   beforeEach(() => {
     vi.mocked(useImage).mockReturnValue(MOCK_IMG_PATH)
-    vi.mocked(useImageAndCommand).mockReturnValue({
+    vi.mocked(useImageGalleryData).mockReturnValue({
       currentCommandString: MOCK_CMD_TEXT,
       previousCommandString: MOCK_PREV_CMD_TEXT,
       stubStepFraction: MOCK_STEP,
@@ -88,7 +78,7 @@ describe('GalleryListItem', () => {
     expect(handleCameraPhotoModal).toHaveBeenCalledWith({
       imagePath: MOCK_IMG_PATH,
       timestamp: MOCK_TIMESTAMP,
-      stepCommandText: MOCK_CMD_TEXT,
+      stepCountStr: MOCK_STEP,
     })
   })
 })
