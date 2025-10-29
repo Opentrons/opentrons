@@ -92,14 +92,14 @@ const selectedMultipleContainerIds: Reducer<
   any
 > = handleActions(
   {
-    MULTIPLE_INGREDIENTS_SELECTOR: (
+    OPEN_MULTIPLE_INGREDIENTS_SELECTOR: (
       state,
       action: MultipleIngredientsSelectorAction
     ): SelectedMultipleContainerIds => action.payload,
     CLOSE_INGREDIENT_SELECTOR: (
       state,
       action: CloseIngredientSelectorAction
-    ): SelectedMultipleContainerIds => null,
+    ): SelectedContainerId => null,
   },
   null
 )
