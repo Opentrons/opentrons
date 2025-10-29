@@ -134,6 +134,7 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
 
         print(f"\nStarting protocol-designer preview server on {base_url}...")
         print("Building Protocol Designer (this may take 2-3 minutes)...")
+        print("=" * 80)
 
         # Start the preview server (vite preview serves production build)
         process = subprocess.Popen(
@@ -155,19 +156,18 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
                 # Process has exited - capture remaining output
                 if process.stdout:
                     remaining_output = process.stdout.read()
-                    output_lines.append(remaining_output)
+                    if remaining_output:
+                        print(remaining_output, end="")
+                        output_lines.append(remaining_output)
                 print(f"\n❌ Server process exited unexpectedly with code {process.returncode}")
-                print("Last 50 lines of output:")
-                print("\n".join(output_lines[-50:]))
                 raise Exception(f"Server process exited with code {process.returncode}. Check output above for errors.")
 
-            # Check if process has output about the port
+            # Check if process has output - print ALL lines in real-time
             if process.stdout and select.select([process.stdout], [], [], 0.1)[0]:
                 line = process.stdout.readline()
-                output_lines.append(line)
-                # Print important lines
-                if any(keyword in line for keyword in ["Local:", "error", "Error", "ERROR", "failed", "Failed"]):
-                    print(f"  {line.strip()}")
+                if line:
+                    print(line, end="")  # Print everything in real-time
+                    output_lines.append(line)
 
             # Try to connect to possible ports
             for port in ports_to_try:
@@ -190,8 +190,6 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
 
             if attempt == max_attempts - 1:
                 print(f"\n❌ Server failed to start after {max_attempts * 2} seconds")
-                print("Last 50 lines of output:")
-                print("\n".join(output_lines[-50:]))
                 process.kill()
                 raise Exception(
                     f"Preview server failed to start on any port: {ports_to_try}. "
@@ -199,6 +197,7 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
                 )
             time.sleep(2)
 
+        print("=" * 80)
         yield process
 
         # Cleanup - only kill if we started it

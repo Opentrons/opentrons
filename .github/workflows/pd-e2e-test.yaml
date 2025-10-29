@@ -34,9 +34,6 @@ jobs:
       - name: "Setup JS Environment"
         uses: ./.github/actions/js/setup
 
-      - name: Setup Protocol Designer
-        run: make -C protocol-designer setup
-
       - name: "Setup UV for E2E tests"
         uses: astral-sh/setup-uv@v7
         with:
