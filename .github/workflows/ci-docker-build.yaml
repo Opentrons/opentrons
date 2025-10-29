@@ -11,7 +11,7 @@ on:
       - "**/yarn.lock"
   push:
     branches:
-      - "ci-docker/init"
+      - "ci-docker/init" # TODO remove before merging to edge
       - edge
       - chore_release*
   workflow_dispatch: {}
@@ -72,7 +72,9 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=edge,enable={{is_default_branch}}
-            type=ref,event=branch
+            # TODO: Remove this temporary tag when merging to edge
+            type=raw,value=branch-ci-docker-init,enable=${{ github.ref_name == 'ci-docker/init' }}
+            type=raw,value=branch-{{branch}},enable=${{ startsWith(github.ref_name, 'chore_release') }}
             type=sha
 
       - name: Build and push image

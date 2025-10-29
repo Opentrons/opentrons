@@ -32,7 +32,7 @@ These containers are runner-agnostic:
 | Container user               | UID `1001`, GID `121` (user `ci`)                        | Aligned with GitHub Actions runner to avoid permission issues                        |
 | Pre-cloned repository        | `/opt/opentrons` (env: `OT_REPO_CACHE`)                  | Clone with `--depth=150 --filter=blob:none`, tags fetched, `edge` branch checked out |
 | Warmed dependencies          | `make setup` during build with BuildKit cache mounts     | Python venvs and node_modules pre-installed with persistent caching                  |
-| Dependency checksums         | `.ci-dependency-checksums.json`                          | SHA256 hashes of all `Pipfile*` and `package.json/yarn.lock` files                   |
+| Dependency checksums         | `.ci-dependency-checksums.json`                          | SHA256 hashes of `Pipfile*`, `package.json/yarn.lock`, and `ci-docker/Dockerfile`    |
 | Heap size for Node.js builds | `NODE_OPTIONS="--max-old-space-size=6144"`               | 6GB heap to prevent OOM during Protocol Designer builds                              |
 
 This folder provides a **shared, faster, hermetic** baseline for all workflow jobs that rely on Node + Python.
@@ -47,9 +47,11 @@ ci-docker/
 ├── utils/
 │   └── actions.py          # GitHub Actions helpers (ref/tag/checksum logic)
 ├── Makefile                # Docker build/shell commands and utility wrappers
-├── pyproject.toml          # uv project definition with rich dependency
+├── pyproject.toml          # uv project with rich + ruff dependencies
+├── uv.lock                 # Lockfile for reproducible builds
 ├── .python-version         # Python 3.10 for local uv environment
-└── README.md               # User-facing documentation
+├── README.md               # User-facing documentation
+└── TODO-BEFORE-MERGE.md    # Checklist for edge merge (temporary)
 ```
 
 All Python dependencies for these scripts are managed using **uv** in a local virtual environment.
@@ -90,7 +92,7 @@ At runtime, GitHub Actions workflows:
 
 ```bash
 cd ci-docker
-make setup  # Creates venv via `uv sync --frozen`
+make setup  # Creates venv via `uv sync --frozen --all-groups`
 ```
 
 ### 2️⃣ Build the CI container locally
@@ -169,9 +171,15 @@ make -C ci-docker check-dependency-drift
 
 **Tags generated:**
 
-- `edge` (for default branch pushes)
-- `branch-<name>` (for branch pushes)
-- `sha-<commit>` (for all events)
+- `edge` - Pushes to the default branch
+- `branch-chore_release-*` - Pushes to release branches (e.g., `branch-chore_release-8.0.0`)
+- `sha-<commit>` - All push events for debugging
+
+**Tag selection logic:**
+
+- PRs targeting `edge` → use `edge` tag
+- PRs targeting `chore_release-*` → use `branch-chore_release-*` tag
+- PRs targeting other branches → fallback to default tag
 
 ### CI Workflows Using Container
 
@@ -226,10 +234,12 @@ jobs:
 
 | Command                        | Description                                                               |
 | ------------------------------ | ------------------------------------------------------------------------- |
-| `make setup`                   | Install uv dependencies (`uv sync --frozen`)                              |
+| `make setup`                   | Install uv dependencies (`uv sync --frozen --all-groups`)                 |
 | `make build`                   | Build container locally (default: `ghcr.io/opentrons/ci-bootstrap:local`) |
 | `make push`                    | Build and push container (set `TAG=` to override)                         |
 | `make shell`                   | Interactive shell with repo mounted at `/workspace`                       |
+| `make format`                  | Auto-format and fix Python code with ruff                                 |
+| `make lint`                    | Check Python code with ruff (no changes)                                  |
 | `make clean`                   | Remove local container image                                              |
 | `make determine-source-ref`    | Compute Git ref for container build (used by build workflow)              |
 | `make determine-container-tag` | Select container tag for CI jobs (used by test workflows)                 |
@@ -253,7 +263,7 @@ make push TAG=ghcr.io/opentrons/ci-bootstrap:edge
 
 ## Dependency Drift Detection
 
-The container stores checksums of all dependency manifests (Pipfile, Pipfile.lock, package.json, yarn.lock) in `.ci-dependency-checksums.json` during build.
+The container stores checksums of all dependency manifests (Pipfile, Pipfile.lock, package.json, yarn.lock, ci-docker/Dockerfile) in `.ci-dependency-checksums.json` during build.
 
 At runtime, workflows:
 

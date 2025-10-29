@@ -112,9 +112,15 @@ The pre-cloned repo at `/opt/opentrons` has:
 
 **Generated tags:**
 
-- `edge` - Latest from default branch
-- `branch-<name>` - Branch-specific builds
-- `sha-<commit>` - Commit-specific builds
+- `edge` - Pushes to the default branch
+- `branch-chore_release-*` - Pushes to release branches (e.g., `branch-chore_release-8.0.0`)
+- `sha-<commit>` - All push events for debugging
+
+**Tag selection for CI jobs:**
+
+- PRs targeting `edge` → use `edge` tag
+- PRs targeting `chore_release-*` → use `branch-chore_release-*` tag
+- PRs targeting other branches → use fallback tag (currently `branch-ci-docker-init`, will be `edge` after merge)
 
 ### CI Test Workflows (using container)
 
@@ -147,9 +153,12 @@ These workflows:
 
 Workflows automatically detect when dependency manifests change:
 
-1. Container stores baseline checksums during build (`.ci-dependency-checksums.json`)
+1. Container stores baseline checksums during build in `.ci-dependency-checksums.json`
+   - Python: `Pipfile`, `Pipfile.lock`
+   - JavaScript: `package.json`, `yarn.lock`
+   - Container: `ci-docker/Dockerfile`
 2. Workflows run `make -C ci-docker check-dependency-drift` at runtime
-3. If manifests changed, run `make teardown && make setup` to refresh
+3. If checksums differ, run `make teardown && make setup` to refresh
 4. Update checksums for next run
 
 This ensures fast startup when dependencies haven't changed, while guaranteeing
@@ -196,9 +205,10 @@ make -C api test
 - Correctness: Always use fresh dependencies when manifests change
 - Visibility: Workflow logs show whether refresh occurred
 
-## Future Enhancements
+## Development Commands
 
-- Migrate additional CI workflows to use this container
-- Multi-platform builds (arm64) if needed for self-hosted runners
-- VS Code dev containers using same base image
-- Scheduled weekly rebuilds for security updates
+```bash
+# Code formatting and linting
+make -C ci-docker format  # Auto-format and fix Python code with ruff
+make -C ci-docker lint    # Check Python code without changes
+```

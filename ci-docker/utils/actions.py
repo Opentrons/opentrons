@@ -13,9 +13,10 @@ import hashlib
 import json
 import os
 import sys
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import cast
 
 _RICH_CONSOLE = None
 _RICH_TABLE = None
@@ -23,6 +24,7 @@ _RICH_TABLE = None
 _DEPENDENCY_DIR_EXCLUDES = {".git", "node_modules", ".venv", "__pycache__", ".mypy_cache", ".pytest_cache"}
 _PYTHON_DEP_FILES = ("Pipfile", "Pipfile.lock")
 _JS_DEP_FILES = ("package.json", "yarn.lock")
+_DOCKERFILE_PATH = "ci-docker/Dockerfile"
 
 
 def _ensure_rich() -> None:
@@ -45,7 +47,7 @@ def _ensure_rich() -> None:
     _RICH_TABLE = Table
 
 
-def _print_table(title: str, rows: Sequence[Tuple[str, str]]) -> None:
+def _print_table(title: str, rows: Sequence[tuple[str, str]]) -> None:
     _ensure_rich()
     assert _RICH_CONSOLE is not None and _RICH_TABLE is not None
 
@@ -58,7 +60,7 @@ def _print_table(title: str, rows: Sequence[Tuple[str, str]]) -> None:
     _RICH_CONSOLE.print(table)
 
 
-def _append_summary(title: str, rows: Sequence[Tuple[str, str]], notes: Iterable[str] | None) -> None:
+def _append_summary(title: str, rows: Sequence[tuple[str, str]], notes: Iterable[str] | None) -> None:
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_path:
         return
@@ -79,7 +81,7 @@ def _append_summary(title: str, rows: Sequence[Tuple[str, str]], notes: Iterable
         print(f"::warning::Unable to append GitHub summary at {summary_path}: {exc}")
 
 
-def _write_outputs(outputs: Dict[str, str]) -> None:
+def _write_outputs(outputs: dict[str, str]) -> None:
     output_path = os.environ.get("GITHUB_OUTPUT")
     if not output_path:
         return
@@ -94,8 +96,8 @@ def _should_skip(path: Path, root: Path) -> bool:
     return any(part in _DEPENDENCY_DIR_EXCLUDES for part in rel.parts)
 
 
-def _collect_dependency_files(root: Path, patterns: Sequence[str]) -> List[Path]:
-    files: List[Path] = []
+def _collect_dependency_files(root: Path, patterns: Sequence[str]) -> list[Path]:
+    files: list[Path] = []
     seen = set()
     for pattern in patterns:
         for candidate in root.rglob(pattern):
@@ -124,9 +126,16 @@ def _hash_files(root: Path, files: Sequence[Path]) -> str:
     return digest.hexdigest()
 
 
-def _compute_dependency_checksums(root: Path) -> Dict[str, Dict[str, object]]:
+def _compute_dependency_checksums(root: Path) -> dict[str, dict[str, object]]:
     python_files = _collect_dependency_files(root, _PYTHON_DEP_FILES)
     js_files = _collect_dependency_files(root, _JS_DEP_FILES)
+
+    # Hash the Dockerfile separately since it affects the container environment
+    dockerfile_path = root / _DOCKERFILE_PATH
+    dockerfile_checksum = ""
+    if dockerfile_path.exists():
+        dockerfile_checksum = _hash_files(root, [dockerfile_path])
+
     return {
         "python": {
             "checksum": _hash_files(root, python_files),
@@ -135,6 +144,10 @@ def _compute_dependency_checksums(root: Path) -> Dict[str, Dict[str, object]]:
         "javascript": {
             "checksum": _hash_files(root, js_files),
             "files": [file.relative_to(root).as_posix() for file in js_files],
+        },
+        "dockerfile": {
+            "checksum": dockerfile_checksum,
+            "path": _DOCKERFILE_PATH,
         },
     }
 
@@ -179,7 +192,11 @@ def determine_container_tag(
     default_tag: str,
     release_prefix: str,
 ) -> ContainerTagResult:
-    """Select the container tag to use for downstream jobs."""
+    """Select the container tag to use for downstream jobs.
+
+    TODO: Before merging to edge, ensure default_tag is set to "edge" in all workflow files
+          and remove the temporary "ci-docker-init" fallback.
+    """
 
     event_name = (event_name or "").strip()
     base_ref = (base_ref or "").strip()
@@ -225,10 +242,10 @@ def _run_determine_container_tag(args: argparse.Namespace) -> None:
     _write_outputs({"tag": result.tag})
 
 
-def _load_baseline(path: Path) -> Mapping[str, Dict[str, object]] | None:
+def _load_baseline(path: Path) -> Mapping[str, dict[str, object]] | None:
     if not path.exists():
         return None
-    with open(path, "r", encoding="utf-8") as handle:
+    with open(path, encoding="utf-8") as handle:
         return json.load(handle)
 
 
@@ -238,22 +255,53 @@ def _run_dependency_checksums(args: argparse.Namespace) -> None:
 
     python_checksum = str(data["python"]["checksum"])
     javascript_checksum = str(data["javascript"]["checksum"])
+    dockerfile_checksum = str(data["dockerfile"]["checksum"])
+    python_files = cast(list[str], data["python"].get("files", []))
+    javascript_files = cast(list[str], data["javascript"].get("files", []))
+    dockerfile_path = str(data["dockerfile"]["path"])
+
     rows = [
         ("Python checksum", python_checksum),
+        ("Python files", f"{len(python_files)} files"),
         ("JavaScript checksum", javascript_checksum),
+        ("JavaScript files", f"{len(javascript_files)} files"),
+        ("Dockerfile checksum", dockerfile_checksum),
+        ("Dockerfile path", dockerfile_path),
     ]
-    notes: List[str] = []
-    outputs: Dict[str, str] = {
+    notes: list[str] = []
+
+    # Add detailed file lists to notes
+    if python_files:
+        notes.append(f"**Python dependency files ({len(python_files)}):**")
+        for file in python_files:
+            notes.append(f"  - `{file}`")
+        notes.append("")
+
+    if javascript_files:
+        notes.append(f"**JavaScript dependency files ({len(javascript_files)}):**")
+        for file in javascript_files:
+            notes.append(f"  - `{file}`")
+        notes.append("")
+
+    if dockerfile_checksum:
+        notes.append("**Dockerfile:**")
+        notes.append(f"  - `{dockerfile_path}`")
+        notes.append("")
+
+    outputs: dict[str, str] = {
         "python_checksum": python_checksum,
         "javascript_checksum": javascript_checksum,
+        "dockerfile_checksum": dockerfile_checksum,
         "python_changed": "false",
         "javascript_changed": "false",
+        "dockerfile_changed": "false",
         "dependencies_changed": "false",
     }
 
     baseline_path = Path(args.baseline).resolve() if args.baseline else None
     python_changed = False
     javascript_changed = False
+    dockerfile_changed = False
 
     if baseline_path:
         baseline = _load_baseline(baseline_path)
@@ -261,20 +309,28 @@ def _run_dependency_checksums(args: argparse.Namespace) -> None:
             notes.append(f"- Baseline file `{baseline_path}` not found; treating dependencies as changed")
             python_changed = True
             javascript_changed = True
+            dockerfile_changed = True
         else:
             baseline_python = str(baseline.get("python", {}).get("checksum", ""))
             baseline_js = str(baseline.get("javascript", {}).get("checksum", ""))
+            baseline_dockerfile = str(baseline.get("dockerfile", {}).get("checksum", ""))
             python_changed = baseline_python != data["python"]["checksum"]
             javascript_changed = baseline_js != data["javascript"]["checksum"]
+            dockerfile_changed = baseline_dockerfile != data["dockerfile"]["checksum"]
 
             if python_changed:
                 notes.append("- Python dependency manifest checksum differs from baseline")
             if javascript_changed:
                 notes.append("- JavaScript dependency manifest checksum differs from baseline")
+            if dockerfile_changed:
+                notes.append("- Dockerfile checksum differs from baseline")
 
     outputs["python_changed"] = "true" if python_changed else "false"
     outputs["javascript_changed"] = "true" if javascript_changed else "false"
-    outputs["dependencies_changed"] = "true" if (python_changed or javascript_changed) else "false"
+    outputs["dockerfile_changed"] = "true" if dockerfile_changed else "false"
+    outputs["dependencies_changed"] = (
+        "true" if (python_changed or javascript_changed or dockerfile_changed) else "false"
+    )
 
     if args.output:
         output_path = Path(args.output).resolve()
@@ -310,7 +366,10 @@ def build_parser() -> argparse.ArgumentParser:
     tag_parser.add_argument("--event-name", required=True, help="GitHub event name (push, pull_request, etc.)")
     tag_parser.add_argument("--base-ref", help="Base ref for pull requests")
     tag_parser.add_argument("--ref-name", help="Branch or tag name for push events")
-    tag_parser.add_argument("--default-tag", default="edge", help="Fallback image tag when no overrides match")
+    # TODO: Change default back to "edge" before merging to edge branch
+    tag_parser.add_argument(
+        "--default-tag", default="branch-ci-docker-init", help="Fallback image tag when no overrides match"
+    )
     tag_parser.add_argument(
         "--release-prefix",
         default="chore_release",

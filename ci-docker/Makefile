@@ -58,7 +58,16 @@ check-dependency-drift:
 
 .PHONY: setup
 setup:
-	$(UV) sync --frozen
+	$(UV) sync --frozen --all-groups
+
+.PHONY: format
+format: setup
+	$(UV) run ruff format utils/
+	$(UV) run ruff check --fix utils/
+
+.PHONY: lint
+lint: setup
+	$(UV) run ruff check utils/
 
 .PHONY: clean
 clean:
@@ -70,6 +79,8 @@ help:
 	@printf "  make build           # Build the CI container (override TAG/PLATFORM/OPENTRONS_DEFAULT_REF as needed)\n"
 	@printf "  make push            # Build and push the container\n"
 	@printf "  make shell           # Start an interactive shell with the repo mounted\n"
+	@printf "  make format          # Format and fix Python code with ruff\n"
+	@printf "  make lint            # Check Python code with ruff (no changes)\n"
 	@printf "  make clean           # Remove the local container image\n"
 	@printf "\n"
 	@printf "Examples:\n"
