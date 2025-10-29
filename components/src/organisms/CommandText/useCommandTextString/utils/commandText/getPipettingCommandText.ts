@@ -83,9 +83,9 @@ export const getPipettingCommandText = ({
       })
     }
     case 'dispenseWhileTracking': {
-      return t('dispense_while_tracking', {
       const trackFromLocation = command.params.trackFromLocation
       const trackToLocation = command.params.trackToLocation
+      return t('dispense_while_tracking', {
         track_from_location: trackFromLocation,
         track_to_location: trackToLocation,
         volume,
