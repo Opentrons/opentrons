@@ -40,6 +40,7 @@ export function ProtocolRunCamera({
                 text={isCameraEnabled ? t('enabled') : t('disabled')}
                 type={isCameraEnabled ? 'success' : 'neutral'}
                 iconName="connection-status"
+                chipSize="small"
               />
             )}
           </Flex>
