@@ -29,7 +29,8 @@ app.layout = html.Div([
 def update_layout(n):
     try:
         df = pd.read_csv(options.file_name)
-        value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
+        # value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
+        value_cols = [c for c in df.columns if c.endswith("_FILTERED")]
         figure={
                 'data': [
                         go.Scattergl(
@@ -69,7 +70,6 @@ if __name__ == "__main__":
     options = arg_parser.parse_args()
     df = pd.read_csv(options.file_name)
     headers = pd.read_csv(options.file_name).columns.tolist()
-    print(df)
     value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
     app.layout = html.Div([
         dcc.Graph(
