@@ -18,7 +18,7 @@ export interface AddCameraSettingsToRunParams {
   settings: CameraData
 }
 
-export type UseUpdateCameraMutationResult = UseMutationResult<
+export type UseAddCameraSettingsToRunMutationResult = UseMutationResult<
   CameraResponse,
   AxiosError<ErrorResponse>,
   AddCameraSettingsToRunParams
@@ -30,7 +30,7 @@ export type UseUpdateCameraMutationResult = UseMutationResult<
   >
 }
 
-export function useAddCameraSettingsToRunMutation(): UseUpdateCameraMutationResult {
+export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
