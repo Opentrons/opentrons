@@ -155,7 +155,16 @@ const MOCK_ADAPTER_EXTENSION_COMMANDS = [
   },
 ]
 
-vi.mock('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const original =
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    await importOriginal<typeof import('@opentrons/shared-data')>()
+  return {
+    ...original,
+    getLabwareDisplayName: vi.fn(),
+    getLabwareStackCountAndLocation: vi.fn(),
+  }
+})
 
 describe('getLocationInfoNames', () => {
   beforeEach(() => {

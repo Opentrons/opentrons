@@ -44,8 +44,9 @@ from ..protocol_engine.types import (
     CSVRuntimeParamPaths,
     CommandAnnotation,
     ModuleModel,
+    CommandPreconditions,
 )
-from ..protocol_engine.resources.camera_provider import CameraProvider
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -195,7 +196,11 @@ class RunOrchestrator:
     ) -> RunResult:
         """Start the run."""
         if self._camera_provider:
-            await camera.update_live_stream_status(True, self._camera_provider)
+            await camera.update_live_stream_status(
+                True,
+                self._camera_provider,
+                self._protocol_engine.state_view.camera.get_enablement_settings(),
+            )
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -223,9 +228,6 @@ class RunOrchestrator:
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
-        # Shut down the live stream, if there is one
-        if self._camera_provider:
-            await camera.update_live_stream_status(False, self._camera_provider)
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
@@ -249,6 +251,10 @@ class RunOrchestrator:
     def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
+
+    def get_preconditions(self) -> CommandPreconditions:
+        """Get the preconditions of a protocol run."""
+        return self._protocol_engine.state_view.preconditions.get_precondition()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
@@ -375,6 +381,13 @@ class RunOrchestrator:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self._protocol_engine.add_labware_definition(definition)
+
+    def add_camera_enablement_settings(
+        self,
+        enablement_settings: CameraSettings,
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
 
     async def add_command_and_wait_for_interval(
         self,

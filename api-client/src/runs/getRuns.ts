@@ -8,5 +8,5 @@ export function getRuns(
   config: HostConfig,
   params: GetRunsParams
 ): ResponsePromise<Runs> {
-  return request<Runs>(GET, `/runs`, null, config, params)
+  return request<Runs>(GET, `/runs`, null, config, { params })
 }

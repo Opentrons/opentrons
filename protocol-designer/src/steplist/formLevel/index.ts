@@ -71,6 +71,8 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
+  tiprackRequired,
+  tipSelectionRequired,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -180,7 +182,8 @@ const stepFormHelperMap: {
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       mixTipPositionInTube,
@@ -232,11 +235,13 @@ const stepFormHelperMap: {
       blowoutFlowRateRequired,
       transferVolumeMin,
       pipetteRequired,
+      tiprackRequired,
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
       dispenseRetractSpeedRequired,
-      disposalVolumeRequired
+      disposalVolumeRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       maxDispenseWellVolume,

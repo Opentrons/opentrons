@@ -10,6 +10,10 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwarePoolNotCompatibleWithModuleError,
+)
+
 
 from ...errors import ErrorOccurrence
 from ...types import (
@@ -34,6 +38,15 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.resources import ModelUtils
     from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+
+
+# The stacker cannot dispense labware where there is no gap between the top surface
+# of the bottom labware being dispensed, and bottom surface of the top labware.
+# This is because the stacker latch, which holds the labware stack, needs enough
+# empty space to free the bottom labware, but still hold the top labware once it
+# closes.
+STACKER_INCOMPATIBLE_LABWARE = set(["opentrons_tough_universal_lid"])
+
 
 INITIAL_COUNT_DESCRIPTION = dedent(
     """\
@@ -911,3 +924,25 @@ def build_retrieve_labware_move_updates(
             lid_offset_location,
         )
     return locations_for_ids, offset_ids_by_id
+
+
+def validate_labware_pool_compatible_with_stacker(
+    pool_primary_definition: LabwareDefinition,
+    pool_adapter_definition: LabwareDefinition | None,
+    pool_lid_definition: LabwareDefinition | None,
+) -> None:
+    """Verifies that the given labware pool is compatible with the stacker."""
+    labware_pool = set(
+        lw.parameters.loadName
+        for lw in [
+            pool_primary_definition,
+            pool_adapter_definition,
+            pool_lid_definition,
+        ]
+        if lw is not None
+    )
+    incompatible_labware = list(labware_pool & STACKER_INCOMPATIBLE_LABWARE)
+    if incompatible_labware:
+        raise LabwarePoolNotCompatibleWithModuleError(
+            f"The stacker cannot store {incompatible_labware}"
+        )

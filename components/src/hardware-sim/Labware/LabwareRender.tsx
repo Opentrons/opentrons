@@ -113,6 +113,7 @@ export interface LabwareRenderProps {
   tipStatusByWellName?: Record<string, TipType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
+  fill?: CSSProperties['fill']
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -139,6 +140,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
     selectedTipsByIndex,
     disabledWells,
     highlightedWells,
+    fill,
+    labwareStroke,
   } = props
 
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
@@ -204,6 +207,8 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         tipStatusByWellName={tipStatusByWellName}
         handleClickWell={handleClickWell}
         selectedTipsByIndex={selectedTipsByIndex}
+        fill={fill}
+        borderStroke={labwareStroke}
       />
       {wellStroke != null ? (
         <StrokedWells definition={definition} strokeByWell={wellStroke} />

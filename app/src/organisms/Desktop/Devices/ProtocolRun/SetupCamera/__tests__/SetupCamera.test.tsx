@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react'
+import { useNavigate } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -6,18 +7,22 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
 
+import type { Mock } from 'vitest'
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import type { SetupCameraProps } from '..'
 
+vi.mock('react-router-dom')
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 )
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
+vi.mock('/app/resources/health/useIsImageStorageLow')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -28,8 +33,10 @@ const render = (props: SetupCameraProps) => {
 describe('SetupCamera', () => {
   let mockSettings: UseCameraUsageSettingsResult
   let mockProps: SetupCameraProps
+  let mockNavigate: Mock
 
   beforeEach(() => {
+    mockNavigate = vi.fn()
     mockSettings = {
       toggleCameraEnabled: vi.fn(),
       isCameraEnabled: true,
@@ -42,6 +49,7 @@ describe('SetupCamera', () => {
       settings: mockSettings,
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
+      robotName: 'test-robot',
     }
     vi.mocked(SetupRunCameraControls).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_CONTROLS</div>
@@ -49,6 +57,14 @@ describe('SetupCamera', () => {
     vi.mocked(SetupRunCameraUsage).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_USAGE</div>
     )
+    vi.mocked(useRobotStorageInfo).mockReturnValue({
+      isImageStorageLow: true,
+      isSystemStorageLow: true,
+      imageDirSizeMb: 1000,
+      robotDiskAvailableMb: 1000,
+      isLoading: false,
+    })
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
   })
 
   it('renders camera status section', () => {
@@ -175,5 +191,21 @@ describe('SetupCamera', () => {
     await user.click(confirmButton)
 
     expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders the image storage almost full notification if storage is almost full', () => {
+    render(mockProps)
+
+    screen.getByText('Image storage almost full.')
+    screen.getByText(
+      'The run may fail if storage space is not freed up by clearing images from a previous run record.'
+    )
+
+    const link = screen.getByText('View Recent Runs')
+    fireEvent.click(link)
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/devices/test-robot/#recent-protocol-runs'
+    )
   })
 })

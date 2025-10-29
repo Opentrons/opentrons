@@ -7,6 +7,7 @@ import {
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   CLEAN,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
@@ -192,6 +193,9 @@ describe('quickTransferStepCommands', () => {
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     }
     expect(
       quickTransferStepCommands({
@@ -346,6 +350,9 @@ pipette.drop_tip()`.trimStart()
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     }
     expect(
       quickTransferStepCommands({
@@ -501,6 +508,9 @@ pipette.drop_tip()`.trimStart()
       description: 'transferring from 1 well to another',
       disposalVolume: null,
       pushOut: null,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     }
     expect(
       quickTransferStepCommands({

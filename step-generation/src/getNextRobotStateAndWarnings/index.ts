@@ -1,5 +1,5 @@
 import assert from 'assert'
-import produce from 'immer'
+import { produce } from 'immer'
 
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
 import {

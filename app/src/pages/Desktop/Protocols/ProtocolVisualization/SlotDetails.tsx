@@ -1,25 +1,17 @@
-import {
-  COLORS,
-  CommandText,
-  Divider,
-  Icon,
-  RobotInfoLabel,
-  StyledText,
-} from '@opentrons/components'
+import { Divider, RobotInfoLabel, StyledText } from '@opentrons/components'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareSlotDetails } from './LabwareSlotDetails'
+import { LabwareSlotContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
+
 import { ModuleSlotDetails } from './ModuleSlotDetails'
 import styles from './preview.module.css'
 import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
 import { TrashSlotDetails } from './TrashSlotDetails'
 
 import type {
-  LabwareDefinition,
   Liquid,
   ProtocolAnalysisOutput,
-  RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
@@ -29,26 +21,12 @@ interface SlotDetailsProps {
   command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
-  onClose: () => void
-  robotType: RobotType
-  allRunDefs: LabwareDefinition[]
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
-  percentComplete: number
 }
 export function SlotDetails(props: SlotDetailsProps): JSX.Element {
-  const {
-    slotId,
-    command,
-    robotState,
-    invariantContext,
-    onClose,
-    robotType,
-    allRunDefs,
-    analysis,
-    liquids,
-    percentComplete,
-  } = props
+  const { slotId, command, robotState, invariantContext, analysis, liquids } =
+    props
   const { labware, modules } = robotState
   const {
     labwareEntities,
@@ -73,28 +51,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     )
   return (
     <div className={styles.slot_container}>
-      <div className={styles.command_step}>
-        <div className={styles.command_step_header}>
-          <StyledText desktopStyle="bodyDefaultRegular">Timeline</StyledText>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-          >{`${percentComplete.toFixed(0)}% complete`}</StyledText>
-        </div>
-        <Divider />
-        <div className={styles.command_text_container}>
-          <StyledText desktopStyle="bodyDefaultRegular">Active step</StyledText>
-          <div className={styles.command_text}>
-            <CommandText
-              command={command}
-              robotType={robotType}
-              color={COLORS.black90}
-              commandTextData={analysis}
-              allRunDefs={allRunDefs}
-            />
-          </div>
-        </div>
-      </div>
       <div className={styles.slot_details}>
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
@@ -110,9 +66,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
               }
             />
           </div>
-          <div onClick={onClose} className={styles.cursor_pointer}>
-            <Icon name="close" size="1.75rem" />
-          </div>
         </div>
         <Divider />
         {moduleOnSlot != null ? (
@@ -123,7 +76,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
           />
         ) : null}
         {topMostLabwareOnSlot != null ? (
-          <LabwareSlotDetails
+          <LabwareSlotContainer
             topLabwareOnSlotId={topMostLabwareOnSlot}
             labwareEntities={labwareEntities}
             commands={commands}
@@ -131,6 +84,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             liquids={liquids}
             robotState={robotState}
             pipetteEntities={pipetteEntities}
+            moduleEntities={moduleEntities}
           />
         ) : null}
         {isTrashOnSlot ? (

@@ -8,11 +8,7 @@ export function createRegistration(
   config: HostConfig,
   params: CreateRegistrationParams
 ): ResponsePromise<RegistrationToken> {
-  return request<RegistrationToken>(
-    POST,
-    '/system/register',
-    null,
-    config,
-    params
-  )
+  return request<RegistrationToken>(POST, '/system/register', null, config, {
+    params,
+  })
 }

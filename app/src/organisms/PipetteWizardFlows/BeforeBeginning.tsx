@@ -13,7 +13,6 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WASTE_CHUTE_CUTOUT,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
@@ -24,7 +23,6 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import {
   BODY_STYLE,
@@ -35,16 +33,17 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   PIPETTE,
 } from './constants'
-import { getIsGantryEmpty } from './utils'
+import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
 
 import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
+import type { UseMutateFunction, UseQueryResult } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type {
   CreateCommand,
+  DeckConfiguration,
   LoadedPipette,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -59,6 +58,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   >
   isCreateLoading: boolean
   createdMaintenanceRunId: string | null
+  deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
 }
 export const BeforeBeginning = (
@@ -80,6 +80,7 @@ export const BeforeBeginning = (
     requiredPipette,
     maintenanceRunId,
     createdMaintenanceRunId,
+    deckConfig,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   useEffect(() => {
@@ -93,11 +94,6 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useNotifyDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
-
   const pipetteDisplayName = usePipetteNameSpecs(
     requiredPipette?.pipetteName as PipetteName
   )?.displayName
@@ -119,6 +115,12 @@ export const BeforeBeginning = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       bodyTranslationKey = 'remove_labware_to_get_started'
+      if (
+        selectedPipette === NINETY_SIX_CHANNEL &&
+        isWasteChuteOnDeck(deckConfig)
+      ) {
+        equipmentList.push(hexScrewdriverWithSubtitle)
+      }
       break
     }
     case FLOWS.ATTACH: {
@@ -268,37 +270,18 @@ export const BeforeBeginning = (
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&
-              flowType === FLOWS.ATTACH &&
-              !Boolean(isOnDevice) && (
-                <LegacyStyledText css={BODY_STYLE}>
+              (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH) && (
+                <Banner
+                  type="warning"
+                  size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
+                  marginTop={
+                    Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
+                  }
+                >
                   {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-                </LegacyStyledText>
+                </Banner>
               )}
           </Flex>
-          {selectedPipette === NINETY_SIX_CHANNEL &&
-            (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
-              <Banner
-                type={Boolean(isWasteChuteOnDeck) ? 'error' : 'warning'}
-                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
-                marginTop={
-                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-                }
-              >
-                {Boolean(isWasteChuteOnDeck)
-                  ? t('waste_chute_error')
-                  : t('waste_chute_warning')}
-              </Banner>
-            ) : (
-              <Banner
-                type="warning"
-                size={Boolean(isOnDevice) ? '1.5rem' : '1rem'}
-                marginTop={
-                  Boolean(isOnDevice) ? SPACING.spacing24 : SPACING.spacing16
-                }
-              >
-                {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-              </Banner>
-            ))}
         </>
       }
       proceedButtonText={proceedButtonText}

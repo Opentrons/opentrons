@@ -1,6 +1,12 @@
 import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
+import type {
+  Liquid,
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -154,6 +160,7 @@ export type NotifyTopic =
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
   | `robot-server/runs/pre_serialized_commands/${string}`
+  | `robot-server/dataFiles/${string}/images`
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -174,7 +181,7 @@ export interface SendFilePathsAction {
 
 export interface CameraStreamOpenAction {
   type: 'shell:CAMERA_STREAM_OPEN'
-  payload: { hostname: string; robotName: string }
+  payload: { hostname: string; robotName: string; runId: string }
   meta: { shell: true }
 }
 
@@ -195,6 +202,28 @@ export interface StepDetailViewerOpenAction {
   type: 'shell:STEP_DETAIL_VIEWER_OPEN'
   payload: {
     protocolKey: string
+    slot: string
+    command: RunTimeCommand
+    robotState: RobotState
+    invariantContext: InvariantContext
+    analysis: ProtocolAnalysisOutput
+    liquids: Liquid[]
+  }
+  meta: {
+    shell: true
+  }
+}
+
+export interface StepDetailViewerUpdateAction {
+  type: 'shell:STEP_DETAIL_VIEWER_UPDATE'
+  payload: {
+    protocolKey: string
+    slot: string
+    command: RunTimeCommand
+    robotState: RobotState
+    invariantContext: InvariantContext
+    analysis: ProtocolAnalysisOutput
+    liquids: Liquid[]
   }
   meta: {
     shell: true

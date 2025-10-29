@@ -368,6 +368,7 @@ export function ProtocolRunSetup({
     [CAMERA_SETUP_STEP_KEY]: {
       stepInternals: (
         <SetupCamera
+          robotName={robotName}
           settings={cameraSettings}
           cameraConfirmed={!missingSteps.includes(CAMERA_SETUP_STEP_KEY)}
           confirmCameraSettings={() => {

@@ -10,11 +10,7 @@ export function getCommands(
   runId: string,
   params: GetRunCommandsParamsRequest
 ): ResponsePromise<CommandsData> {
-  return request<CommandsData>(
-    GET,
-    `/runs/${runId}/commands`,
-    null,
-    config,
-    params
-  )
+  return request<CommandsData>(GET, `/runs/${runId}/commands`, null, config, {
+    params,
+  })
 }

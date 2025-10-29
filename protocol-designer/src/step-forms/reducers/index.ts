@@ -8,7 +8,6 @@ import { handleActions } from 'redux-actions'
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,
-  getAllLabwareDefs,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -1183,7 +1182,7 @@ export const labwareInvariantProperties: Reducer<
           const latestLabwareId =
             latestDefURI != null
               ? `${labwareIdString}:${latestDefURI}`
-              : labwareDefURI
+              : `${labwareIdString}:${labwareDefURI}`
 
           acc[latestLabwareId] = {
             labwareDefURI: latestDefURI ?? labwareDefURI,
@@ -1323,7 +1322,7 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const allLabwareDefs = getAllLabwareDefs()
+      const allLabwareDefs = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
       const pipettes = Object.entries(metadata.pipettes).reduce(
         (

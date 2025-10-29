@@ -451,6 +451,14 @@ from .identify_module import (
     IdentifyModuleCommandType,
 )
 
+from .capture_image import (
+    CaptureImage,
+    CaptureImageParams,
+    CaptureImageCreate,
+    CaptureImageResult,
+    CaptureImageCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -796,4 +804,10 @@ __all__ = [
     "WaitForTasksParams",
     "WaitForTasksResult",
     "WaitForTasksCommandType",
+    # capture image command bundle
+    "CaptureImage",
+    "CaptureImageCreate",
+    "CaptureImageParams",
+    "CaptureImageResult",
+    "CaptureImageCommandType",
 ]

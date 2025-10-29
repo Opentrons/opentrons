@@ -12,7 +12,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { LiquidIconProps } from '../../molecules/LiquidIcon'
 
-export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
+export type TagType = 'default' | 'interactive' | 'branded' | 'onColor' | 'flex'
 
 export interface TagProps {
   /** Tag content */
@@ -49,6 +49,10 @@ const TAG_PROPS_BY_TYPE: Record<
   onColor: {
     backgroundColor: COLORS.white,
     color: COLORS.black90,
+  },
+  flex: {
+    backgroundColor: COLORS.flex50,
+    color: COLORS.white,
   },
 }
 

@@ -13,6 +13,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
+from opentrons.system import camera
 
 from .actions.actions import (
     ResumeFromRecoveryAction,
@@ -22,7 +23,8 @@ from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllow
 from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
 from . import commands, slot_standardization, labware_offset_standardization
-from .resources import ModelUtils, ModuleDataProvider, FileProvider
+from .resources import ModelUtils, ModuleDataProvider, FileProvider, CameraProvider
+from .resources.camera_provider import CameraSettings
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -55,6 +57,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    AddCameraSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
@@ -96,6 +99,7 @@ class ProtocolEngine:
         door_watcher: DoorWatcher,
         module_data_provider: ModuleDataProvider,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -107,6 +111,7 @@ class ProtocolEngine:
         """
         self._hardware_api = hardware_api
         self._file_provider = file_provider
+        self._camera_provider = camera_provider
         self._state_store = state_store
         self._model_utils = model_utils
         self._action_dispatcher = action_dispatcher
@@ -478,7 +483,7 @@ class ProtocolEngine:
         )
         self._state_store.commands.raise_fatal_command_error()
 
-    async def finish(
+    async def finish(  # noqa: C901
         self,
         error: Optional[Exception] = None,
         drop_tips_after_run: bool = True,
@@ -592,6 +597,15 @@ class ProtocolEngine:
         else:
             finish_error_details = None
 
+        try:
+            await camera.update_live_stream_status(
+                False,
+                self._camera_provider,
+                self.state_view.camera.get_enablement_settings(),
+            )
+        except Exception as e:
+            _log.exception(f"Exception during live stream post-run cleanup: {e}")
+
         self._action_dispatcher.dispatch(
             HardwareStoppedAction(
                 completed_at=self._model_utils.get_timestamp(),
@@ -628,6 +642,17 @@ class ProtocolEngine:
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id
         )
+
+    def add_camera_enablement_settings(
+        self, enablement_settings: CameraSettings
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        self._action_dispatcher.dispatch(
+            AddCameraSettingsAction(enablement_settings=enablement_settings)
+        )
+        camera_settings = self.state_view.camera.get_enablement_settings()
+        assert camera_settings is not None
+        return camera_settings
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""
@@ -709,6 +734,7 @@ class ProtocolEngine:
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
             file_provider=self._file_provider,
+            camera_provider=self._camera_provider,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
             command_generator=command_generator,

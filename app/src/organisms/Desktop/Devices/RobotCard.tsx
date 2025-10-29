@@ -10,16 +10,17 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   WRAP,
 } from '@opentrons/components'
 import {
+  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -116,7 +117,14 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <AttachedInstruments robotName={robotName} />
-              <AttachedModules robotName={robotName} />
+              <Flex
+                gridGap={SPACING.spacing4}
+                flexWrap={WRAP}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+              >
+                <AttachedModules robotName={robotName} />
+                <AttachedDevices robotName={robotName} />
+              </Flex>
             </Flex>
           ) : null}
         </Flex>
@@ -140,15 +148,15 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const attachedModules = modulesData?.data ?? []
 
   return !isModulesQueryLoading && attachedModules.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <LegacyStyledText
-        as="h6"
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey60}
-      >
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="85px"
+    >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
-      </LegacyStyledText>
-      <Flex>
+      </StyledText>
+      <Flex flexWrap={WRAP}>
         {attachedModules.map((module, i) => (
           <ModuleIcon
             key={`${String(module.moduleModel)}_${i}_${robotName}`}
@@ -163,8 +171,31 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   ) : null
 }
 
-function AttachedInstruments(props: { robotName: string }): JSX.Element {
+function AttachedDevices(props: { robotName: string }): JSX.Element | null {
+  const { robotName } = props
   const { t } = useTranslation('devices_landing')
+  const { data } = useCamera()
+  return data?.cameraEnabled ? (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      width="85px"
+    >
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {t('peripherals')}
+      </StyledText>
+      <Icon
+        key={`${String('camera')}_${robotName}`}
+        name="photo-camera"
+        color={COLORS.grey50}
+        size={SPACING.spacing16}
+      ></Icon>
+    </Flex>
+  ) : null
+}
+
+function AttachedInstruments(props: { robotName: string }): JSX.Element {
+  const { t, i18n } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
   const { data: pipettesData, isLoading: isPipetteQueryLoading } =
     usePipettesQuery()
@@ -193,9 +224,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <LegacyStyledText as="h6" color={COLORS.grey60}>
-        {t('shared:instruments')}
-      </LegacyStyledText>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {i18n.format(t('shared:instruments'), 'capitalize')}
+      </StyledText>
 
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>

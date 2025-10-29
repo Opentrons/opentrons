@@ -1,9 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
+import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useDeleteRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteRunImages,
+  useDeleteRunMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -44,9 +48,11 @@ const render = (
   props: ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
 ) => {
   return renderWithProviders(
-    <MemoryRouter>
-      <HistoricalProtocolRunOverflowMenu {...props} />
-    </MemoryRouter>,
+    <NiceModal.Provider>
+      <MemoryRouter>
+        <HistoricalProtocolRunOverflowMenu {...props} />
+      </MemoryRouter>
+    </NiceModal.Provider>,
     {
       i18nInstance: i18n,
     }
@@ -57,6 +63,7 @@ const RUN_ID = 'id'
 const ROBOT_NAME = 'otie'
 let mockTrackEvent: any
 let mockTrackProtocolRunEvent: any
+const mockDeleteRunImages = vi.fn().mockResolvedValue(undefined)
 const mockDownloadRunLog = vi.fn()
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
@@ -109,10 +116,15 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       runId: RUN_ID,
       robotName: ROBOT_NAME,
       robotIsBusy: false,
+      runHasImages: true,
     }
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectableRobot)
+
+    vi.mocked(useDeleteRunImages).mockReturnValue({
+      mutateAsync: mockDeleteRunImages,
+    } as any)
   })
 
   it('renders the correct menu when a runId is present', () => {
@@ -184,5 +196,21 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(screen.getByRole('button')).toBeDisabled()
+  })
+
+  it('correctly renders the clear run images flow when images are present', () => {
+    render(props)
+
+    const btn = screen.getByRole('button')
+    fireEvent.click(btn)
+
+    const overFlowBtn = screen.getByText('Clear run images')
+    fireEvent.click(overFlowBtn)
+
+    screen.getByText('Cancel')
+    const modalDeleteBtn = screen.getByText('Clear images')
+    fireEvent.click(modalDeleteBtn)
+
+    expect(mockDeleteRunImages).toHaveBeenCalled()
   })
 })

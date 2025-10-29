@@ -316,5 +316,17 @@ class AbstractProtocol(
         """Get labware parent location."""
 
     @abstractmethod
+    def capture_image(
+        self,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        "Capture an image using a camera."
+
+    @abstractmethod
     def load_robot(self) -> AbstractRobot:
         """Load a Robot Core context into a protocol"""

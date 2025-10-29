@@ -667,15 +667,8 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> Task:
+    ) -> None:
         """Set the target temperature for the well block, in °C.
-
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -706,28 +699,56 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        task = self._core.set_target_block_temperature(
+        self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.wait_for_block_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_block_temp)
+    @requires_version(2, 27)
+    def start_set_block_temperature(
+        self,
+        temperature: float,
+        ramp_rate: Optional[float] = None,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Starts to set the target temperature for the well block, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
+        """
+
+        if block_max_volume is None:
+            block_max_volume = self._get_current_labware_max_vol()
+        task = self._core.start_set_target_block_temperature(
+            celsius=temperature,
+            block_max_volume=block_max_volume,
+            ramp_rate=ramp_rate,
+        )
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> Task:
+    def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -738,11 +759,29 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        task = self._core.set_target_lid_temperature(celsius=temperature)
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.set_target_lid_temperature(celsius=temperature)
+        self._core.wait_for_lid_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_lid_temperature)
+    @requires_version(2, 27)
+    def start_set_lid_temperature(self, temperature: float) -> Task:
+        """Set the target temperature for the heated lid, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 37 and 110, representing the target
+                            temperature in °C.
+
+        .. note::
+
+            The Thermocycler will proceed to the next command immediately after
+            ``temperature`` is reached.
+
+        """
+        task = self._core.start_set_target_lid_temperature(celsius=temperature)
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)

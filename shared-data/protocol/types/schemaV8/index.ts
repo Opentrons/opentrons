@@ -1,6 +1,7 @@
 import type { CreateCommand } from '../../../command/types'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
+  CommandPreconditions,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -178,6 +179,7 @@ export interface ProtocolAnalysisOutput {
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 
