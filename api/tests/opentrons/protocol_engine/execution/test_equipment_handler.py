@@ -182,6 +182,7 @@ def loaded_static_pipette_data(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={},
     )
 
 

@@ -71,6 +71,7 @@ class LoadedStaticPipetteData:
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
     volume_mode: pip_types.LiquidClasses  # pip_types Liquid Classes refers to volume modes
+    available_volume_modes_min_vol: Dict[pip_types.LiquidClasses, float]  # Ditto
 
 
 class VirtualPipetteDataProvider:
@@ -300,6 +301,10 @@ class VirtualPipetteDataProvider:
             available_sensors=config.available_sensors
             or pipette_definition.AvailableSensorDefinition(sensors=[]),
             volume_mode=liquid_class,
+            available_volume_modes_min_vol={
+                volume_mode: props.min_volume
+                for volume_mode, props in config.liquid_properties.items()
+            },
         )
 
     def get_virtual_pipette_static_config(
@@ -356,6 +361,10 @@ def get_pipette_static_config(
         shaft_ul_per_mm=pipette_dict["shaft_ul_per_mm"],
         available_sensors=available_sensors,
         volume_mode=pipette_dict["volume_mode"],
+        available_volume_modes_min_vol={
+            volume_mode: props.min_volume
+            for volume_mode, props in pipette_dict["available_volume_modes"].items()
+        },
     )
 
 

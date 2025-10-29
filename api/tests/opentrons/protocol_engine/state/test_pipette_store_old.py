@@ -227,6 +227,7 @@ def test_handles_load_pipette(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={},
     )
     config_update = update_types.PipetteConfigUpdate(
         pipette_id="pipette-id",
@@ -669,6 +670,7 @@ def test_add_pipette_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={},
     )
 
     subject.handle_action(
