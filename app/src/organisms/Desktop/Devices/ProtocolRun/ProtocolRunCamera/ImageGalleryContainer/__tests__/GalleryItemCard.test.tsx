@@ -8,7 +8,7 @@ import { useImage } from '/app/resources/dataFiles/useImage'
 import { GalleryItemCard } from '../GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 vi.mock('/app/resources/dataFiles/useImage')
 

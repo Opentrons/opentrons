@@ -4,7 +4,7 @@ import { Chip, ListItem, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
