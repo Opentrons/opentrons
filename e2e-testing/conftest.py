@@ -319,3 +319,4 @@ def pytest_terminal_summary(terminalreporter: Any) -> None:
 
     except Exception as e:
         print(f"⚠️  Failed to post-process HTML report: {e}\n")
+# Trigger CI rebuild
