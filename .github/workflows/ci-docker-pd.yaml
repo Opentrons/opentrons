@@ -98,7 +98,7 @@ jobs:
       - name: Update cached repository
         env:
           EVENT_NAME: ${{ github.event_name }}
-          TARGET_REF: ${{ github.ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           TARGET_SHA: ${{ github.sha }}
         run: |
           cd "$OT_REPO_CACHE"
@@ -108,8 +108,8 @@ jobs:
             git checkout --force "$TARGET_SHA"
           else
             # Use ref for push events (actual branch tip)
-            git fetch --no-tags --prune origin "$TARGET_REF" --depth=1
-            git checkout --force "$TARGET_REF"
+            git fetch --no-tags --prune origin "$BRANCH_NAME" --depth=1
+            git checkout --force -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
           fi
 
       - name: Check dependency drift
@@ -173,7 +173,7 @@ jobs:
       - name: Update cached repository
         env:
           EVENT_NAME: ${{ github.event_name }}
-          TARGET_REF: ${{ github.ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           TARGET_SHA: ${{ github.sha }}
         run: |
           cd "$OT_REPO_CACHE"
@@ -183,8 +183,8 @@ jobs:
             git checkout --force "$TARGET_SHA"
           else
             # Use ref for push events (actual branch tip)
-            git fetch --no-tags --prune origin "$TARGET_REF" --depth=1
-            git checkout --force "$TARGET_REF"
+            git fetch --no-tags --prune origin "$BRANCH_NAME" --depth=1
+            git checkout --force -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
           fi
 
       - name: Check dependency drift

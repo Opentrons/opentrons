@@ -50,8 +50,9 @@ jobs:
             git checkout ${{ github.sha }}
           else
             # Use ref for push events (actual branch tip)
-            git fetch origin ${{ github.ref }}
-            git checkout ${{ github.ref }}
+            BRANCH_NAME="${{ github.ref_name }}"
+            git fetch origin "$BRANCH_NAME"
+            git checkout -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
           fi
 
       - name: Set up Docker Buildx
