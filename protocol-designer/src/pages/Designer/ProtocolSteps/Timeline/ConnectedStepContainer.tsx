@@ -3,15 +3,9 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  BORDERS,
   Box,
-  COLORS,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
-  DIRECTION_COLUMN,
-  Divider,
-  Flex,
-  SPACING,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -64,7 +58,6 @@ export interface ConnectedStepContainerProps {
   hovered?: boolean
   hasError?: boolean
   isStepAfterError?: boolean
-  dragHovered?: boolean
 }
 
 export function ConnectedStepContainer(
@@ -84,7 +77,6 @@ export function ConnectedStepContainer(
     subtext,
     hasError = false,
     isStepAfterError = false,
-    dragHovered = false,
     setOpenedOverflowMenuId,
     openedOverflowMenuId,
     sidebarWidth,
@@ -196,7 +188,7 @@ export function ConnectedStepContainer(
           onCancelClick={cancelMultiDelete}
         />
       )}
-      <Flex
+      <Box
         id={stepId}
         {...(!isStepAfterError
           ? {
@@ -204,21 +196,7 @@ export function ConnectedStepContainer(
               onMouseLeave,
             }
           : {})}
-        flexDirection={DIRECTION_COLUMN}
       >
-        {dragHovered && (
-          <Box paddingY={SPACING.spacing2}>
-            <Divider
-              // eslint-disable-next-line opentrons/no-margins-inline
-              marginY="0"
-              height="0.25rem"
-              width="100%"
-              backgroundColor={COLORS.blue50}
-              borderRadius={BORDERS.borderRadius2}
-            />
-          </Box>
-        )}
-
         <StepContainer
           stepNumber={stepNumber}
           // todo(mm, 2025-09-05): This can be simplified now that stepNumber has been
@@ -252,7 +230,7 @@ export function ConnectedStepContainer(
           }}
           dataTestId={`StepContainer_${stepId}`}
         />
-      </Flex>
+      </Box>
       {stepId != null &&
       openedOverflowMenuId === stepId &&
       setOpenedOverflowMenuId != null

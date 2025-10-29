@@ -19,6 +19,7 @@ import type {
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from './constants'
@@ -201,9 +202,13 @@ export type HydratedPauseFormData = AnnotationFields & {
     | typeof PAUSE_UNTIL_RESUME
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP
+    | typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
   pauseMessage?: string
+  /** If `PAUSE_UNTIL_TEMP`, the temperature to wait for. */
   pauseTemperature?: string
+  /** If `PAUSE_UNTIL_TIME`, how long to wait. */
   pauseTime?: string
+  /** If `PAUSE_UNTIL_TEMP` or `PAUSE_UNTIL_TC_PROFILE_COMPLETE`, the module to wait for. */
   moduleId?: string
 }
 export interface FormData {
