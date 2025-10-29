@@ -9,7 +9,6 @@ import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
 
-const { reportLiveFeedUsage } = useCameraAnalytics({})
 
 export function LaunchLivestreamBtn({ runId }: { runId: string }): JSX.Element {
   const { t } = useTranslation('run_details')
@@ -17,7 +16,7 @@ export function LaunchLivestreamBtn({ runId }: { runId: string }): JSX.Element {
   const host = useHost()
   const isLaunchCameraEnabled =
     host?.robotName != null && host?.hostname != null
-
+  const { reportLiveFeedUsage } = useCameraAnalytics({})
   const handleOpenCameraStream = (): void => {
     dispatch(
       cameraStreamOpenAction(
