@@ -86,23 +86,20 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   null
 )
 export type SelectedMultipleContainerIds = string[] | null | undefined
-// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+
 const selectedMultipleContainerIds: Reducer<
   SelectedMultipleContainerIds,
   any
-> = handleActions(
-  {
-    OPEN_MULTIPLE_INGREDIENTS_SELECTOR: (
-      state,
-      action: MultipleIngredientsSelectorAction
-    ): SelectedMultipleContainerIds => action.payload,
-    CLOSE_INGREDIENT_SELECTOR: (
-      state,
-      action: CloseIngredientSelectorAction
-    ): SelectedContainerId => null,
-  },
-  null
-)
+> = (state, action): SelectedMultipleContainerIds => {
+  switch (action.type) {
+    case 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR':
+      return action.payload
+    case 'CLOSE_INGREDIENT_SELECTOR':
+      return null
+    default:
+      return state
+  }
+}
 
 export type DrillDownLabwareId = string | null | undefined
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type

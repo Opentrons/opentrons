@@ -25,6 +25,7 @@ import {
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { ThunkDispatch } from '/protocol-designer/types'
 
 import { LabwareButtonBasket } from '../../molecules'
 
@@ -59,7 +60,7 @@ export function LabwareStackToolbox({
   selectedLabwareIds,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const { labware, labwareId, allWellContents, labwareEntities } = data
 
