@@ -96,12 +96,20 @@ jobs:
 
       - name: Update cached repository
         env:
+          EVENT_NAME: ${{ github.event_name }}
           TARGET_REF: ${{ github.ref }}
           TARGET_SHA: ${{ github.sha }}
         run: |
           cd "$OT_REPO_CACHE"
-          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
-          git checkout --force "$TARGET_SHA"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            # Use SHA for pull requests (merge commit)
+            git fetch --no-tags --prune origin "$TARGET_SHA" --depth=1
+            git checkout --force "$TARGET_SHA"
+          else
+            # Use ref for push events (actual branch tip)
+            git fetch --no-tags --prune origin "$TARGET_REF" --depth=1
+            git checkout --force "$TARGET_REF"
+          fi
 
       - name: Check dependency drift
         id: deps
@@ -163,12 +171,20 @@ jobs:
 
       - name: Update cached repository
         env:
+          EVENT_NAME: ${{ github.event_name }}
           TARGET_REF: ${{ github.ref }}
           TARGET_SHA: ${{ github.sha }}
         run: |
           cd "$OT_REPO_CACHE"
-          git fetch --no-tags --prune origin "$TARGET_REF" --depth=1 || git fetch --no-tags origin "$TARGET_SHA" --depth=1
-          git checkout --force "$TARGET_SHA"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            # Use SHA for pull requests (merge commit)
+            git fetch --no-tags --prune origin "$TARGET_SHA" --depth=1
+            git checkout --force "$TARGET_SHA"
+          else
+            # Use ref for push events (actual branch tip)
+            git fetch --no-tags --prune origin "$TARGET_REF" --depth=1
+            git checkout --force "$TARGET_REF"
+          fi
 
       - name: Check dependency drift
         id: deps

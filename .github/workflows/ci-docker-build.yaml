@@ -44,8 +44,15 @@ jobs:
 
       - name: Align repository to this workflow run's commit
         run: |
-          git fetch origin ${{ github.sha }}
-          git checkout ${{ github.sha }}
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Use SHA for pull requests (merge commit)
+            git fetch origin ${{ github.sha }}
+            git checkout ${{ github.sha }}
+          else
+            # Use ref for push events (actual branch tip)
+            git fetch origin ${{ github.ref }}
+            git checkout ${{ github.ref }}
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
