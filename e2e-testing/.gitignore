@@ -21,7 +21,6 @@ __pycache__/
 # UV/venv
 .venv/
 venv/
-uv.lock
 
 # IDE
 .vscode/
