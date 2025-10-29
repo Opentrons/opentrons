@@ -8,7 +8,7 @@ import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 export function ImageGalleryContainer({
   runId,
