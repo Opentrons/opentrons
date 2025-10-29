@@ -2153,7 +2153,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 air_gap=0,
             )
         )
-        if volume_for_pipette_mode_configuration is not None:
+        # TODO put a version gate on this
+        if (
+            volume_for_pipette_mode_configuration is not None
+            and self._engine_client.state.pipettes.get_will_volume_mode_change(
+                self._pipette_id, volume_for_pipette_mode_configuration
+            )
+        ):
             prep_location = Location(
                 point=source_well.get_top(LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z),
                 labware=source_loc.labware,
@@ -2171,7 +2177,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 location=prep_location,
             )
             last_liquid_and_airgap_in_tip.air_gap = 0
-            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
             self.configure_for_volume(volume_for_pipette_mode_configuration)
             self.prepare_to_aspirate()
 

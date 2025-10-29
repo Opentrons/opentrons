@@ -2179,6 +2179,9 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
     assert result == [LiquidAndAirGapPair(air_gap=222, liquid=111)]
 
 
+# TODO if a version gate is added for this new change, make this only test
+#   specific versions before it, remove the added line, and add new tests
+#   for the newer version
 @pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 24)))
 def test_aspirate_liquid_class_using_volume_config(
     decoy: Decoy,
@@ -2222,6 +2225,9 @@ def test_aspirate_liquid_class_using_volume_config(
             meniscus_tracking=None,
         )
     ).then_return((LiquidHandlingWellLocation(origin=WellOrigin.BOTTOM), True))
+    decoy.when(
+        mock_engine_client.state.pipettes.get_will_volume_mode_change(pipette_id="abc123", volume=123)
+    ).then_return(True)
     decoy.when(
         transfer_components_executor.absolute_point_from_position_reference_and_offset(
             well=source_well,
