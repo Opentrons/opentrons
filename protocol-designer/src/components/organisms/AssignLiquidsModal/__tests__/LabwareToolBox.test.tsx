@@ -207,7 +207,7 @@ describe('LabwareStackToolboxContainer liquids match', () => {
 
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton)
-    expect(mockDispatch).toBeCalledWith({payload: ['labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
+    expect(mockDispatch).toBeCalledWith({payload: ['labware2'], type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'})
   })
 
   it('loads the modal with multiple selectable labware', () => {
@@ -219,7 +219,7 @@ describe('LabwareStackToolboxContainer liquids match', () => {
 
     const scondButton = screen.getByTestId('LabwareButton-0')
     fireEvent.click(scondButton, { ctrlKey: true })
-    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
+    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'})
   })
 
   it('select all labware buttons', () => {
@@ -228,6 +228,6 @@ describe('LabwareStackToolboxContainer liquids match', () => {
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
     fireEvent.click(allLabwareButton)
-    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_INGREDIENTS_SELECTOR'})
+    expect(mockDispatch).toBeCalledWith({payload: ['mockLabwareId', 'labware2'], type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'})
   })
 })
