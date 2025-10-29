@@ -151,6 +151,9 @@ jobs:
     needs: [python-test]
     runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required for checkout
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -191,11 +194,10 @@ jobs:
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to pypi'
-        uses: './.github/actions/python/pypi-deploy'
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          project: 'shared-data'
-          repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS_SHARED_DATA }}'
+          packages-dir: shared-data/dist/
+          repository-url: https://upload.pypi.org/legacy/
 
   publish-switch:
     runs-on: 'ubuntu-latest'

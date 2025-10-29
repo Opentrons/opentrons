@@ -8,5 +8,5 @@ export function getPipettes(
   config: HostConfig,
   params: GetPipettesParams
 ): ResponsePromise<Pipettes> {
-  return request<Pipettes>(GET, `/pipettes`, null, config, params)
+  return request<Pipettes>(GET, `/pipettes`, null, config, { params })
 }

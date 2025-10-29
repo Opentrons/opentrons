@@ -22,7 +22,7 @@ import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
@@ -42,10 +42,12 @@ import type {
 const EQUIPMENT_POLL_MS = 5000
 interface InstrumentsAndModulesProps {
   robotName: string
+  isRobotViewable: boolean
 }
 
 export function InstrumentsAndModules({
   robotName,
+  isRobotViewable,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const isFlex = useIsFlex(robotName)
@@ -56,7 +58,6 @@ export function InstrumentsAndModules({
       enabled: !isFlex,
     }
   )?.data ?? { left: undefined, right: undefined }
-  const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)

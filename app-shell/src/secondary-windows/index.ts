@@ -61,6 +61,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
       return openCameraStream({
+        runId: action.payload.runId,
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
         log,

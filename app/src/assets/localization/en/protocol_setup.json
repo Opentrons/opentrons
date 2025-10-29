@@ -113,6 +113,7 @@
   "home_stacker_warning_description": "For your safety, ensure doors are closed prior to homing the stacker.",
   "home_stacker_warning_title": "Close robot and stacker doors",
   "how_offset_data_works": "How labware offsets work",
+  "image_storage_almost_full": "Image storage almost full",
   "individiual_well_volume": "Individual well volume",
   "initial_liquids_num": "{{count}} initial liquid",
   "initial_liquids_num_plural": "{{count}} initial liquids",

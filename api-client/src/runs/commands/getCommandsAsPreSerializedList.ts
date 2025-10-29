@@ -17,6 +17,6 @@ export function getCommandsAsPreSerializedList(
     `/runs/${runId}/commandsAsPreSerializedList`,
     null,
     config,
-    params
+    { params }
   )
 }

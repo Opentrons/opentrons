@@ -50,6 +50,10 @@ from ..protocols.dependencies import (
     get_protocol_store,
 )
 from ..service.dependencies import get_current_time, get_unique_id
+from robot_server.service.notifications.publishers import (
+    DataFilePublisher,
+    get_data_file_publisher,
+)
 
 datafiles_router = LightRouter()
 
@@ -515,6 +519,7 @@ async def delete_run_images(
     runId: str,
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    data_file_publisher: Annotated[DataFilePublisher, Depends(get_data_file_publisher)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete all camera images for a run.
 
@@ -522,6 +527,7 @@ async def delete_run_images(
         runId: The run ID whose images should be deleted.
         data_files_store: Store for data files database access.
         run_data_manager: Current and historical run data management.
+        data_file_publisher: The data file MQTT event publisher.
     """
     try:
         run_data_manager.get(runId)
@@ -529,6 +535,7 @@ async def delete_run_images(
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     data_files_store.remove_all_by_run_id(runId)
+    data_file_publisher.publish_run_images(runId)
 
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),

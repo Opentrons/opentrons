@@ -6,45 +6,62 @@ import { i18n } from '/app/i18n'
 
 import { ImageGalleryContainer } from '..'
 import { GalleryItemCard } from '../GalleryItemCard'
-import { useStubImagesInfo } from '../hooks/useStubImagesInfo'
+import { useImageInfo } from '../hooks/useImageInfo'
 
-import type { UseStubImagesInfoResult } from '../hooks/useStubImagesInfo'
+import type { RobotType } from '@opentrons/shared-data'
+import type { UseImagesInfoItem } from '../hooks/useImageInfo'
 
 vi.mock('../GalleryItemCard')
-vi.mock('../hooks/useStubImagesInfo')
+vi.mock('../hooks/useImageInfo')
+vi.mock('/app/redux/protocol-runs')
 
 const render = () => {
-  return renderWithProviders(<ImageGalleryContainer />, {
-    i18nInstance: i18n,
-  })
+  const RUN_ID = 'run123'
+  const robotType = 'OT-3 Standard' as RobotType
+  return renderWithProviders(
+    <ImageGalleryContainer runId={RUN_ID} robotType={robotType} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
-const mockImagesInfo: UseStubImagesInfoResult[] = [
+const mockImagesInfo: UseImagesInfoItem[] = [
   {
-    imagePath: '/path/to/image1.jpg',
-    stepCommandText: 'Step 1 command',
-    previousStepCommandText: 'Previous step 1',
+    imageId: '/path/to/image1.jpg',
+    stepCommandId: 'Step 1 command',
+    previousStepCommandId: 'Previous step 1',
     timestamp: '2024-01-01 10:00:00',
   },
   {
-    imagePath: '/path/to/image2.jpg',
-    stepCommandText: 'Step 2 command',
-    previousStepCommandText: 'Previous step 2',
+    imageId: '/path/to/image2.jpg',
+    stepCommandId: 'Step 2 command',
+    previousStepCommandId: 'Previous step 2',
     timestamp: '2024-01-01 11:00:00',
   },
   {
-    imagePath: '/path/to/image3.jpg',
-    stepCommandText: 'Step 3 command',
-    previousStepCommandText: 'Previous step 3',
+    imageId: '/path/to/image3.jpg',
+    stepCommandId: 'Step 3 command',
+    previousStepCommandId: 'Previous step 3',
     timestamp: '2024-01-01 12:00:00',
   },
 ]
 
+const mockProtocolAnalysis = {
+  commands: [],
+  labware: [],
+} as any
+
 describe('ImageGalleryContainer', () => {
   beforeEach(() => {
-    vi.mocked(useStubImagesInfo).mockReturnValue(mockImagesInfo)
-    vi.mocked(GalleryItemCard).mockImplementation(({ timestamp }) => (
-      <div>MOCK_GALLERY_ITEM_CARD_{timestamp}</div>
+    vi.mocked(useImageInfo).mockReturnValue({
+      items: mockImagesInfo,
+      protocolAnalysis: mockProtocolAnalysis,
+      isLoadingImages: false,
+      allRunDefs: [],
+    })
+    vi.mocked(GalleryItemCard).mockImplementation(({ item }) => (
+      <div>MOCK_GALLERY_ITEM_CARD_{item.timestamp}</div>
     ))
   })
 
