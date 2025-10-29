@@ -447,18 +447,19 @@ export const transfer: CommandCreator<TransferArgs> = (
     channels: pipetteSpecs.channels,
   })
 
-  const targetTips =
+  const shouldSelectManualTips =
     tipTracking === MANUAL &&
     tiprackSelected != null &&
     tipsSelected != null &&
     tipsSelected.length > 0
-      ? getTargetTipsFromWellSets({
-          wellSets: tipsSelected,
-          nozzles: nozzles ?? ALL,
-          channels: pipetteSpecs.channels,
-          primaryNozzle,
-        })
-      : null
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
 
   const tiprackName =
     tiprackSelected != null
