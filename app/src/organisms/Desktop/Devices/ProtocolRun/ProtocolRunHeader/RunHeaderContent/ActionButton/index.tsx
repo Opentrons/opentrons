@@ -7,6 +7,7 @@ import {
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
+  NO_WRAP,
   PrimaryButton,
   SIZE_1,
   SPACING,
@@ -127,7 +128,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
         // TODO(jh, 05-05-25): These boolean checks should live in useActionBtnDisabledUtils as a part of the singular disabled check.
         disabled={
           isDisabled && (!validRunAgainButRequiresSetup || isClosingCurrentRun)
@@ -150,7 +150,9 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText as="pSemiBold">{buttonText}</StyledText>
+        <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
+          {buttonText}
+        </StyledText>
       </PrimaryButton>
       {disabledReason && (
         <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">

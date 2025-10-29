@@ -1052,9 +1052,13 @@ class InstrumentContext(publisher.CommandPublisher):
                     # starting in 2.16, we disable push_out on all but the last
                     # dispense() to prevent the tip from jumping out of the liquid
                     # during the mix (PR #14004):
+                    self.move_to(dispense_start_location, force_direct=True)
                     dispense_with_delay(push_out=0.0)
+                    self.move_to(aspirate_start_location, force_direct=True)
                     aspirate_with_delay()
                     repetitions -= 1
+
+                self.move_to(dispense_start_location, force_direct=True)
                 if final_push_out is not None:
                     dispense_with_delay(push_out=final_push_out)
                 else:

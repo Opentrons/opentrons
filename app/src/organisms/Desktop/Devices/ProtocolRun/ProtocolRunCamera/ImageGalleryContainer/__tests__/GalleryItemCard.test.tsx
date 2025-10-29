@@ -1,55 +1,71 @@
 import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import { GalleryItemCard } from '../GalleryItemCard'
 
-import type { UseStubImagesInfoResult } from '../hooks/useStubImagesInfo'
+import type { RobotType } from '@opentrons/shared-data'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
-const render = (props: UseStubImagesInfoResult) => {
+vi.mock('/app/resources/dataFiles/useImage')
+
+const render = (props: UseImageGalleryDataProps) => {
   return renderWithProviders(<GalleryItemCard {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-const MOCK_IMG_PATH = '/path/to/test-image.jpg'
-const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
-const MOCK_CMD_TEXT = 'Test step command'
-const MOCK_PREV_CMD_TEXT = 'Previous test command'
+const mockProtocolAnalysis = {
+  commands: [],
+  labware: [],
+} as any
 
+const MOCK_IMAGE_ITEM = {
+  imageId: 'imageid123',
+  stepCommandId: 'step1',
+  previousStepCommandId: 'step2',
+  timestamp: '2024-01-01 12:00:00',
+}
+const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
-  let mockProps: UseStubImagesInfoResult
-
+  let mockProps: UseImageGalleryDataProps
   beforeEach(() => {
     mockProps = {
-      imagePath: MOCK_IMG_PATH,
-      stepCommandText: MOCK_CMD_TEXT,
-      previousStepCommandText: MOCK_PREV_CMD_TEXT,
-      timestamp: MOCK_TIMESTAMP,
+      item: MOCK_IMAGE_ITEM,
+      protocolAnalysis: mockProtocolAnalysis,
+      runId: MOCK_RUN_ID,
+      robotType: 'OT3-Standard' as RobotType,
+      allRunDefs: [],
     }
+
+    vi.mocked(useImage).mockReturnValue('img-id')
   })
 
   it('renders expected card content', () => {
+    vi.mocked(useImage).mockReturnValue(null)
+
     render(mockProps)
-
-    const image = screen.getByAltText('camera-photo')
-
-    expect(image).toHaveAttribute('src', MOCK_IMG_PATH)
-    screen.getByText(MOCK_CMD_TEXT)
-    screen.getByText(MOCK_PREV_CMD_TEXT)
-    screen.getByText(MOCK_TIMESTAMP)
+    expect(screen.queryByAltText('camera-photo')).toBeNull()
+    expect(screen.getAllByTestId('Skeleton'))
   })
 
   it('shows "View image" on hover', async () => {
-    const user = userEvent.setup()
+    vi.mocked(useImage).mockReturnValue(null)
+
     render(mockProps)
 
-    const image = screen.getByAltText('camera-photo')
-    await user.hover(image)
+    expect(screen.queryByAltText('camera-photo')).toBeNull()
+    expect(screen.getAllByTestId('Skeleton'))
+  })
 
+  it('renders appropriate card copy when there is an image', () => {
+    render(mockProps)
+
+    screen.getByText('Step 1/100: ?')
     screen.getByText('View image')
+    screen.getByText('2024-01-01 12:00:00')
   })
 })

@@ -354,7 +354,6 @@ async def test_hw_aspirate_while_tracking(
         await mock_hardware_api.aspirate_while_tracking(
             mount=Mount.LEFT,
             end_point=Point(0, 0, 0),
-            flow_rate=2.5,
             volume=25,
             movement_delay=None,
         )

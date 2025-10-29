@@ -1,4 +1,4 @@
-import { DELETE, request } from '../request'
+import { createAxiosConfig, DELETE, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { EmptyResponse, HostConfig } from '../types'
@@ -16,6 +16,6 @@ export function deleteCalibration(
     `/calibration/${endpoint}`,
     null,
     config,
-    { params: apiParams }
+    apiParams && createAxiosConfig({ params: apiParams })
   )
 }

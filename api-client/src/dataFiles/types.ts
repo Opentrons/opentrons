@@ -15,6 +15,14 @@ export interface CsvFileData {
   name: string
 }
 
+export interface ImageFileData {
+  id: string
+  createdAt: string
+  cameraId: string
+  commandId?: string
+  prevCommandId?: string
+}
+
 export interface DataFileDataResponse {
   data: CsvFileData
 }
@@ -25,6 +33,9 @@ export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
 }
 
+export interface ImageFilesDataResponse {
+  data: ImageFileData[]
+}
 export interface RunDataFileMetadata {
   id: string
   stored: boolean
@@ -37,5 +48,5 @@ export interface RunDataFileMetadataResponse {
   meta: { cursor: number; totalLength: number }
 }
 
-export type DownloadedDataFileResponse = string
+export type DownloadedDataFileResponse = Blob | string
 export type DownloadedImageFileResponse = Blob

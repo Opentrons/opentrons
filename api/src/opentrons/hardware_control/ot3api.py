@@ -3086,7 +3086,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         end_point: top_types.Point,
         volume: float,
-        flow_rate: float = 1.0,
+        rate: float = 1.0,
         movement_delay: Optional[float] = None,
     ) -> None:
         """
@@ -3095,12 +3095,12 @@ class OT3API(
         :param mount: A robot mount that the instrument is on.
         :param z_distance: The distance the z axis will move during apsiration.
         :param volume: The volume of liquid to be aspirated.
-        :param flow_rate: The flow rate to aspirate with.
+        :param rate: The rate multiplier to aspirate with.
         :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
-            realmount, volume, flow_rate
+            realmount, volume, rate
         )
         if not aspirate_spec:
             return
@@ -3149,7 +3149,7 @@ class OT3API(
         end_point: top_types.Point,
         volume: float,
         push_out: Optional[float],
-        flow_rate: float = 1.0,
+        rate: float = 1.0,
         is_full_dispense: bool = False,
         movement_delay: Optional[float] = None,
     ) -> None:
@@ -3159,12 +3159,12 @@ class OT3API(
         :param mount: A robot mount that the instrument is on.
         :param z_distance: The distance the z axis will move during dispensing.
         :param volume: The volume of liquid to be dispensed.
-        :param flow_rate: The flow rate to dispense with.
+        :param rate: The rate multiplier to dispense with.
         :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, flow_rate, push_out, is_full_dispense
+            realmount, volume, rate, push_out, is_full_dispense
         )
         if not dispense_spec:
             return

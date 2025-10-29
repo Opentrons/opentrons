@@ -61,6 +61,8 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
       return openCameraStream({
+        runId: action.payload.runId,
+        windowTitle: action.payload.windowTitle,
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
         log,
@@ -70,7 +72,6 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         photoUrl: action.payload.photoUrl,
         robotName: action.payload.robotName,
         windowTitle: action.payload.windowTitle,
-        dimensions: action.payload.dimensions,
         log,
       })
     case STEP_DETAIL_VIEWER_OPEN:
