@@ -27,20 +27,26 @@ app.layout = html.Div([
 @app.callback(Output('graphid', 'figure'),
               [Input(f'{refresh_interval}ms_intervals', 'n_intervals')])
 def update_layout(n):
-    df = pd.read_csv(options.file_name)
     try:
+        df = pd.read_csv(options.file_name)
+        value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
         figure={
                 'data': [
-                    go.Scattergl(x=df['timestamp'], y=df['PA_FILTERED'], mode = 'lines+markers', name = 'PA FILTERED'),
-                    # go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
-                    go.Scattergl(x=df['timestamp'], y=df['PB_FILTERED'], mode = 'lines+markers', name = 'PB FILTERED'),
-                    # go.Scattergl(x=df['timestamp'], y=df['PB_RAW'], mode = 'lines+markers', name = 'PB RAW'),
+                        go.Scattergl(
+                            x=df["timestamp"],
+                            y=df[c],
+                            mode="lines+markers",
+                            name=c.replace("_", " "),
+
+                                    )
+                        for c in value_cols
+                        if c in df.columns
                 ],
                 'layout': {
-                    'title': 'Vacuum Pressure RT',
-                    'xaxis':{'title': 'Time(mins)','scaleanchor': 'x','autorange': True},
-                    'yaxis': {'title': 'Pressure(mbar)', 'scaleanchor': 'y','autorange': True},
-                    'uirevision': True
+                    'title': {'text': 'Vacuum Pressure RT'},
+                    'xaxis': {'title': {'text': 'Time (mins)'}, 'autorange': True},
+                    'yaxis': {'title': {'text': 'Pressure (mbar)'}, 'autorange': True},
+                    'uirevision': 'static'
                 }
             }   
     except Exception as e:
@@ -49,12 +55,12 @@ def update_layout(n):
             title="Waiting for data...",
             template="plotly_dark"
         )
-        return figure, f"No data yet: {e}"
+        return figure
     return figure
 
 
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description="Motion Parameter Test Script")
+    arg_parser = argparse.ArgumentParser(description="Realtime Test Script")
     arg_parser.add_argument("-file_name", "--file_name", default = "test.csv", type = str, help = "File name to stream")
     return arg_parser
 
@@ -62,22 +68,29 @@ if __name__ == "__main__":
     arg_parser = build_arg_parser()
     options = arg_parser.parse_args()
     df = pd.read_csv(options.file_name)
+    headers = pd.read_csv(options.file_name).columns.tolist()
     print(df)
+    value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
     app.layout = html.Div([
         dcc.Graph(
             id='graphid',
             figure={
                     'data': [
-                        go.Scattergl(x=df['timestamp'], y=df['PA_FILTERED'], mode = 'lines+markers', name = 'PA FILTERED'),
-                        # go.Scattergl(x=df['timestamp'], y=df['PA_RAW'], mode = 'lines+markers', name = 'RAW'),
-                        go.Scattergl(x=df['timestamp'], y=df['PB_FILTERED'], mode = 'lines+markers', name = 'PB FILTERED'),
-                        # go.Scattergl(x=df['timestamp'], y=df['PB_RAW'], mode = 'lines+markers', name = 'PB RAW'),
+                        go.Scattergl(
+                            x=df["timestamp"],
+                            y=df[c],
+                            mode="lines+markers",
+                            name=c.replace("_", " "),
+
+                                     )
+                        for c in value_cols
+                        if c in df.columns
                     ],
                     'layout': {
-                        'title': 'Vacuum Pressure RT',
-                        'xaxis':{'title': 'Time(mins)','scaleanchor': 'x','autorange': True},
-                        'yaxis': {'title': 'Pressure(mbar)', 'scaleanchor': 'y','autorange': True},
-                        'uirevision': True
+                        'title': {'text': 'Vacuum Pressure RT'},
+                        'xaxis': {'title': {'text': 'Time (mins)'}, 'autorange': True},
+                        'yaxis': {'title': {'text': 'Pressure (mbar)'}, 'autorange': True},
+                        'uirevision': 'static'
                     }
         }
     ),

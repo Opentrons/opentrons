@@ -154,11 +154,11 @@ class OpentronsVacuum():
                     writer.writerow(["timestamp", "PA_RAW", "PA_FILTERED",  "PB_RAW", "PB_FILTERED",  "SET_PRESSURE"])
                     self._csv_initialized = True
                 writer.writerow([
-                    f"{timestamp:.6f}",
-                    f"{data[0]:.6f}",
-                    f"{data[1]:.6f}",
-                    f"{data[2]:.6f}",
-                    f"{data[3]:.6f}",
+                    f"{timestamp:.2f}",
+                    f"{data[0]:.2f}",
+                    f"{data[1]:.2f}",
+                    f"{data[2]:.2f}",
+                    f"{data[3]:.2f}",
                     self.pressure_set if self.pressure_set is not None else 0,
                 ])
 
