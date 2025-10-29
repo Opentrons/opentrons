@@ -181,7 +181,12 @@ export interface SendFilePathsAction {
 
 export interface CameraStreamOpenAction {
   type: 'shell:CAMERA_STREAM_OPEN'
-  payload: { hostname: string; robotName: string; runId: string }
+  payload: {
+    hostname: string
+    robotName: string
+    runId: string
+    windowTitle: string
+  }
   meta: { shell: true }
 }
 

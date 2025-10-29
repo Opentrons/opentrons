@@ -11,15 +11,10 @@ import {
 import styles from './livestream.module.css'
 
 export function LivestreamViewer(): JSX.Element {
-  const { t } = useTranslation('branded')
   const { videoRef, videoError } = useHlsVideo()
   const [searchParams] = useSearchParams()
   const runId = searchParams.get('runId') ?? ''
   const infoScreenType = useLivestreamInfoScreen(runId, videoError)
-
-  useLayoutEffect(() => {
-    document.title = t('livestream_window_title')
-  }, [])
 
   return (
     <div className={styles.container}>
