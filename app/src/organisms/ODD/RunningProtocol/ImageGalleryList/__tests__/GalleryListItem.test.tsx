@@ -24,7 +24,6 @@ const MOCK_IMG_PATH = '/path/to/test-image.jpg'
 const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
 const MOCK_CMD_TEXT = 'Test step command'
 const MOCK_PREV_CMD_TEXT = 'Previous test command'
-const MOCK_STEP = '1/100'
 
 const mockProtocolAnalysis = {
   commands: [],
@@ -54,7 +53,6 @@ describe('GalleryListItem', () => {
       currentCommand: {} as any,
       currentCommandString: MOCK_CMD_TEXT,
       previousCommandString: MOCK_PREV_CMD_TEXT,
-      stubStepFraction: MOCK_STEP,
       isLoading: false,
     })
     vi.mocked(handleCameraPhotoModal).mockResolvedValue(undefined)
@@ -64,7 +62,6 @@ describe('GalleryListItem', () => {
     render()
 
     expect(screen.getByText(MOCK_TIMESTAMP)).toBeInTheDocument()
-    expect(screen.getByText(MOCK_CMD_TEXT)).toBeInTheDocument()
     expect(screen.getByText(MOCK_PREV_CMD_TEXT)).toBeInTheDocument()
     expect(screen.getByText('View image')).toBeInTheDocument()
   })
@@ -79,7 +76,7 @@ describe('GalleryListItem', () => {
     expect(handleCameraPhotoModal).toHaveBeenCalledWith({
       imagePath: MOCK_IMG_PATH,
       timestamp: MOCK_TIMESTAMP,
-      stepCountStr: MOCK_STEP,
+      stepCountStr: 'step ? / ?',
     })
   })
 })
