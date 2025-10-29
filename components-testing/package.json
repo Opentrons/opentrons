@@ -11,10 +11,10 @@
     "test:update-snapshots": "playwright test --update-snapshots"
   },
   "dependencies": {
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.56.1",
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
-    "@vitejs/plugin-react": "4.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.3.3",
