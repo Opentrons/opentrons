@@ -2,7 +2,6 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
 import { NOT_CONFIGURED } from '../../../../../DoorOpenControl/useIsDoorOpen'
@@ -18,7 +17,6 @@ interface ShowGenericRunHeaderBannersParams {
 }
 
 interface ShowGenericRunHeaderBannersResult {
-  showRunCanceledBanner: boolean
   showDoorOpenDuringRunBanner: boolean
   showDoorOpenBeforeRunBanner: boolean
   showStackerDoorOpenDuringRunBanner: boolean
@@ -39,8 +37,6 @@ export function getShowGenericRunHeaderBanners({
     runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
     runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
     runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
-
-  const showRunCanceledBanner = runStatus === RUN_STATUS_STOPPED && !enteredER
 
   const showDoorOpenBeforeRunBanner =
     doorStatus.moduleDoorLocation === null && beforeRunCondition
@@ -67,7 +63,6 @@ export function getShowGenericRunHeaderBanners({
     doorStatus.moduleDoorLocation !== NOT_CONFIGURED
 
   return {
-    showRunCanceledBanner,
     showDoorOpenBeforeRunBanner,
     showDoorOpenDuringRunBanner,
     showStackerDoorOpenDuringRunBanner,

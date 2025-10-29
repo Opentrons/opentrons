@@ -1,20 +1,48 @@
 import { useTranslation } from 'react-i18next'
 
-import { ListTable, StyledText } from '@opentrons/components'
+import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
+
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
-import { useStubImagesInfo } from './hooks/useStubImagesInfo'
 
-import type { UseStubImagesInfoResult } from './hooks/useStubImagesInfo'
+import type { RobotType } from '@opentrons/shared-data'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
-export function ImageGalleryContainer(): JSX.Element {
-  const imagesInfo = useStubImagesInfo()
+export function ImageGalleryContainer({
+  runId,
+  robotType,
+}: {
+  runId: string
+  robotType: RobotType
+}): JSX.Element {
+  const { t } = useTranslation('run_details')
+  const { items, protocolAnalysis, allRunDefs } = useImageInfo(runId)
+
+  const imagesLength = items.length
 
   return (
     <div className={styles.gallery_container}>
-      <GalleryHeader imagesCount={imagesInfo.length} />
-      <GalleryContent imagesInfo={imagesInfo} />
+      <GalleryHeader imagesCount={imagesLength} />
+      {imagesLength > 0 ? (
+        <ListTable headers={[<GalleryTableHeaders key="1" />]}>
+          <div className={styles.gallery_content_wrapper}>
+            {items.map(item => (
+              <GalleryContent
+                key={item.timestamp}
+                item={item}
+                protocolAnalysis={protocolAnalysis}
+                runId={runId}
+                robotType={robotType}
+                allRunDefs={allRunDefs}
+              />
+            ))}
+          </div>
+        </ListTable>
+      ) : (
+        <InfoScreen content={t('no_images_available')} />
+      )}
     </div>
   )
 }
@@ -42,19 +70,11 @@ function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
   )
 }
 
-function GalleryContent({
-  imagesInfo,
-}: {
-  imagesInfo: UseStubImagesInfoResult[]
-}): JSX.Element {
+function GalleryContent(props: UseImageGalleryDataProps): JSX.Element {
   return (
-    <ListTable headers={[<GalleryTableHeaders key="1" />]}>
-      <div className={styles.gallery_content_container}>
-        {imagesInfo.map(imgInfo => (
-          <GalleryItemCard key={imgInfo.timestamp} {...imgInfo} />
-        ))}
-      </div>
-    </ListTable>
+    <div className={styles.gallery_content_container}>
+      <GalleryItemCard {...props} />
+    </div>
   )
 }
 
@@ -67,7 +87,7 @@ function GalleryTableHeaders(): JSX.Element {
         desktopStyle="captionSemiBold"
         className={styles.header_thumbnail}
       >
-        {t('Thumbnail')}
+        {t('thumbnail')}
       </StyledText>
       <StyledText
         desktopStyle="captionSemiBold"

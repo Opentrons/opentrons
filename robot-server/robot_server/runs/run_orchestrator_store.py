@@ -58,7 +58,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    CameraSettings,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
@@ -333,6 +336,7 @@ class RunOrchestratorStore:
         commands = self.run_orchestrator.get_all_commands()
         run_time_parameters = self.run_orchestrator.get_run_time_parameters()
         command_annotations = self.run_orchestrator.get_command_annotations()
+        preconditions = self.run_orchestrator.get_preconditions()
 
         if self._run_orchestrator is not None:
             self._run_orchestrator.clear_command_history()
@@ -343,6 +347,7 @@ class RunOrchestratorStore:
             commands=commands,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=preconditions,
         )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
@@ -472,6 +477,12 @@ class RunOrchestratorStore:
     ) -> None:
         """Create run policy rules for error recovery."""
         self.run_orchestrator.set_error_recovery_policy(policy)
+
+    def add_camera_enablement_settings(
+        self, enablement_settings: CameraSettings
+    ) -> CameraSettings:
+        """Add new camera enablement settings to state."""
+        return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
 
     async def add_command_and_wait_for_interval(
         self,

@@ -7,16 +7,15 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons_shared_data.data_files import MimeType
+from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
-    StorageLimitReachedError,
     CameraDisabledError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
 from ..resources.file_provider import (
-    MAXIMUM_FILE_LIMIT,
-    MimeType,
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
@@ -118,17 +117,19 @@ class CaptureImageImpl(
     ) -> SuccessData[CaptureImageResult]:
         """Initiate an image capture with a camera."""
         state_update = update_types.StateUpdate()
+        state_update.precondition_update = update_types.PreconditionUpdate(
+            {PreconditionTypes.IS_CAMERA_USED: True}
+        )
 
-        # todo (chb, 2025-10-13): Implement App image parameter setting pass through when core override parameters not provided.
-
-        if self._state_view.files.get_filecount() + 1 > MAXIMUM_FILE_LIMIT:
-            raise StorageLimitReachedError(
-                message=f"Attempt to write image file exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
-            )
-
-        # Handle capturing an image with the CameraProvider
+        # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
-        if camera_settings.camera_enabled is False:
+        engine_camera_settings = self._state_view.camera.get_enablement_settings()
+        if (
+            engine_camera_settings is None and camera_settings.cameraEnabled is False
+        ) or (
+            engine_camera_settings is not None
+            and engine_camera_settings.cameraEnabled is False
+        ):
             raise CameraDisabledError(
                 "Cannot capture image because Camera is disabled."
             )
@@ -139,6 +140,10 @@ class CaptureImageImpl(
         # Conditionally save file if camera data was returned - in simulation we don't return anything.
         file_id: str | None = None
         if camera_data:
+            this_cmd_id = self._state_view.commands.get_running_command_id()
+            prev_cmd = self._state_view.commands.get_most_recently_finalized_command()
+            prev_cmd_id = prev_cmd.command.id if prev_cmd is not None else None
+
             file_info = await self._file_provider.write_file(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
@@ -146,6 +151,8 @@ class CaptureImageImpl(
                     step_number=len(self._state_view.commands.get_all()) + 1,
                     command_timestamp=datetime.now(),
                     base_filename=params.fileName,
+                    command_id=this_cmd_id or "",
+                    prev_command_id=prev_cmd_id or "",
                 ),
             )
             file_id = file_info.id

@@ -2,7 +2,6 @@ import logging
 import os
 import io
 import tempfile
-from functools import lru_cache
 from typing import Annotated
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends
@@ -38,7 +37,8 @@ router = APIRouter()
 JPG = "image/jpg"
 
 # todo(chb, 2025-09-19): This temporary for an initial implementation while we determine if some units will ship without cameras
-DEFAULT_CAMERA = "/dev/ot_system_camera"
+DEFAULT_CAMERA_ID = "ot_system_camera"
+DEFAULT_CAMERA_PATH = f"/dev/{DEFAULT_CAMERA_ID}"
 
 
 @router.post(
@@ -382,7 +382,7 @@ def _live_stream_settings_to_configuration_file(
     settings: LiveStreamSettings, stream_status: StreamStatusType
 ) -> None:
     contents: dict[str, str] = {
-        StreamConfigurationKeys.BOOT_ID: _get_boot_id(),
+        StreamConfigurationKeys.BOOT_ID: camera.get_boot_id(),
         StreamConfigurationKeys.STATUS: stream_status,
         StreamConfigurationKeys.SOURCE: settings.source,
         StreamConfigurationKeys.RESOLUTION: f"{settings.resolution.width}x{settings.resolution.height}",
@@ -393,18 +393,10 @@ def _live_stream_settings_to_configuration_file(
 
 
 def _validate_camera_present() -> None:
-    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA):
+    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA_PATH):
         # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements
         # incase the camera isn't present, however eventually we can change this to support dynamically set third party cameras
         raise LegacyErrorResponse(
-            message=f"No video device found with device path: {DEFAULT_CAMERA}",
+            message=f"No video device found with device path: {DEFAULT_CAMERA_PATH}",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
-
-
-@lru_cache(maxsize=1)
-def _get_boot_id() -> str:
-    if IS_ROBOT:
-        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
-    else:
-        return "SIMULATED_BOOT_ID"

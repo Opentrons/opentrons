@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
-import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -10,20 +10,20 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
+import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { CommandSteps } from './CommandSteps'
-import { Controls } from './Controls'
 import { DeckView } from './DeckView'
-import { SlotDetails } from './SlotDetails'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const SEC_PER_FRAME = 1000
+const INITIAL_MILLI_SECONDS_PER_FRAME = 2000
 const INITIAL_WIDTH_PX = 200
 const MIN_CENTER_WIDTH_PX = 200
 const MIN_COLUMN_WIDTH_PX = 100
@@ -41,15 +41,18 @@ interface VisualizerContainerProps {
 export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
+  const dispatch = useDispatch()
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+  const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
+    INITIAL_MILLI_SECONDS_PER_FRAME
+  )
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
   )
-
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
   const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -59,7 +62,6 @@ export function VisualizerContainer(
   const startWidthRef = useRef<number>(0)
   const leftWidthRef = useRef<number>(leftWidth)
   const rightWidthRef = useRef<number>(rightWidth)
-
   useEffect(() => {
     leftWidthRef.current = leftWidth
   }, [leftWidth])
@@ -105,12 +107,12 @@ export function VisualizerContainer(
 
         return nextId
       })
-    }, SEC_PER_FRAME)
+    }, milliSecondsPerFrame)
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [isPlaying, commands])
+  }, [isPlaying, commands, milliSecondsPerFrame])
 
   const { robotState } = frame
   const selectedRunTimeCommand = commands.find(
@@ -119,7 +121,6 @@ export function VisualizerContainer(
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
   )
-  const allRunDefs = getLabwareDefinitionsFromCommands(commands)
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
@@ -221,33 +222,16 @@ export function VisualizerContainer(
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
       <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
-        {selectedSlot != null && selectedRunTimeCommand != null ? (
-          <SlotDetails
-            slotId={selectedSlot}
-            command={selectedRunTimeCommand}
-            robotState={robotState}
-            onClose={() => {
-              setSelectedSlot(null)
-            }}
-            percentComplete={percentComplete}
-            analysis={analysis}
-            robotType={robotType ?? FLEX_ROBOT_TYPE}
-            allRunDefs={allRunDefs}
-            invariantContext={invariantContext}
-            liquids={liquids}
-          />
-        ) : (
-          <CommandSteps
-            analysis={analysis}
-            currentCommandIndex={selectedCommandIndex}
-            groupedCommands={groupedCommands}
-            setSelectedCommand={setSelectedCommand}
-            percentComplete={percentComplete}
-            handlePause={() => {
-              setIsPlaying(false)
-            }}
-          />
-        )}
+        <CommandSteps
+          analysis={analysis}
+          currentCommandIndex={filteredSelectedCommandIndex}
+          groupedCommands={groupedCommands}
+          setSelectedCommand={setSelectedCommand}
+          percentComplete={percentComplete}
+          handlePause={() => {
+            setIsPlaying(false)
+          }}
+        />
         {/* Left column resizer */}
         <div
           className={`${styles.resizer} ${styles.resizer_right}`}
@@ -269,6 +253,17 @@ export function VisualizerContainer(
           isPlaying={isPlaying}
           commands={filteredCommands}
           groupedCommands={groupedCommands}
+          spotlightWindowData={{
+            protocolKey,
+            slot: selectedSlot,
+            command: selectedRunTimeCommand,
+            robotState,
+            invariantContext,
+            analysis,
+            liquids,
+          }}
+          milliSecondsPerFrame={milliSecondsPerFrame}
+          setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />
 
         <DeckView
@@ -278,7 +273,22 @@ export function VisualizerContainer(
           robotState={robotState}
           robotType={robotType ?? FLEX_ROBOT_TYPE}
           selectedSlot={selectedSlot}
-          setSelectedSlot={setSelectedSlot}
+          setSelectedSlot={slot => {
+            setSelectedSlot(slot)
+            if (selectedRunTimeCommand != null && selectedSlot != null) {
+              dispatch(
+                stepDetailViewerOpenAction({
+                  protocolKey,
+                  slot: selectedSlot,
+                  command: selectedRunTimeCommand,
+                  robotState,
+                  invariantContext,
+                  analysis,
+                  liquids,
+                })
+              )
+            }
+          }}
           selectedRunTimeCommand={selectedRunTimeCommand}
         />
       </div>
@@ -291,14 +301,16 @@ export function VisualizerContainer(
             handleMouseDown(e, 'right')
           }}
         />
-        <StepDetailContainer
-          protocolKey={protocolKey}
-          commands={commands}
-          selectedSlot={selectedSlot}
-          robotState={robotState}
-          invariantContext={invariantContext}
-          selectedRunTimeCommand={selectedRunTimeCommand}
-        />
+        {selectedRunTimeCommand != null ? (
+          <StepDetailContainer
+            protocolKey={protocolKey}
+            commands={commands}
+            robotState={robotState}
+            invariantContext={invariantContext}
+            currentCommand={selectedRunTimeCommand}
+            liquids={liquids}
+          />
+        ) : null}
       </div>
     </div>
   )

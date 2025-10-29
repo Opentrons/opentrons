@@ -1,34 +1,35 @@
 """File interaction resource provider."""
 from datetime import datetime
-from enum import Enum
 from io import StringIO
 import csv
 from typing import List, Optional, Callable, Awaitable, Dict
 from dataclasses import dataclass
 from pydantic import BaseModel
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource
-
-from ..errors import StorageLimitReachedError
-
-MAXIMUM_FILE_LIMIT = 400
-
-
-class MimeType(str, Enum):
-    """File mime types."""
-
-    TEXT_CSV = "text/csv"
-    IMAGE_JPEG = "image/jpeg"
+from opentrons_shared_data.data_files import (
+    DataFileInfo,
+    MimeType,
+    RunFileNameMetadata,
+)
 
 
 @dataclass(frozen=True)
-class ReadCmdFileNameMetadata:
+class FileNameCmdMetadata:
+    """Command metadata associated with a specific data file."""
+
+    command_id: str
+    prev_command_id: str
+
+
+@dataclass(frozen=True)
+class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a plate reader `read` command used to build the finalized file name."""
 
     base_filename: str
     wavelength: int
 
 
-class ImageCaptureCmdFileNameMetadata(BaseModel):
+@dataclass(frozen=True)
+class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a camera capture command used to build the finalized file name."""
 
     step_number: int
@@ -36,9 +37,7 @@ class ImageCaptureCmdFileNameMetadata(BaseModel):
     base_filename: Optional[str]
 
 
-CommandFileNameMetadata = (
-    ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata | None
-)
+CommandFileNameMetadata = ReadCmdFileNameMetadata | ImageCaptureCmdFileNameMetadata
 
 
 class FileData:
@@ -46,18 +45,21 @@ class FileData:
 
     data: bytes
     mime_type: MimeType
+    run_metadata: RunFileNameMetadata
     command_metadata: CommandFileNameMetadata
 
     @staticmethod
     def build(
         data: bytes,
         mime_type: MimeType,
-        command_metadata: CommandFileNameMetadata = None,
+        run_metadata: RunFileNameMetadata,
+        command_metadata: CommandFileNameMetadata,
     ) -> "FileData":
         """Build a generic file data class."""
         file_data = FileData()
         file_data.data = data
         file_data.mime_type = mime_type
+        file_data.run_metadata = run_metadata
         file_data.command_metadata = command_metadata
         return file_data
 
@@ -156,7 +158,6 @@ class FileProvider:
         data_files_write_file_cb: Optional[
             Callable[[FileData], Awaitable[DataFileInfo]]
         ] = None,
-        data_files_filecount: Optional[Callable[[], Awaitable[int]]] = None,
     ) -> None:
         """Initialize the interface callbacks of the File Provider for data file handling within the Protocol Engine.
 
@@ -165,33 +166,47 @@ class FileProvider:
             data_files_filecount: Callback to check the amount of data files already present in the data files directory.
         """
         self._data_files_write_file_cb = data_files_write_file_cb
-        self._data_files_filecount = data_files_filecount
+        self._run_metadata: RunFileNameMetadata | None = None
 
     async def write_file(
         self,
         data: bytes,
         mime_type: MimeType,
-        command_metadata: CommandFileNameMetadata = None,
+        command_metadata: CommandFileNameMetadata,
     ) -> DataFileInfo:
-        """Writes arbitrary data to a file in the Data Files directory. Returns the `DataFileInfo` of the file created."""
-        if self._data_files_filecount is not None:
-            file_count = await self._data_files_filecount()
-            if file_count >= MAXIMUM_FILE_LIMIT:
-                raise StorageLimitReachedError(
-                    f"Not enough space to store file. Maximum file limit of {MAXIMUM_FILE_LIMIT} reached."
-                )
-            if self._data_files_write_file_cb is not None:
-                file_data = FileData.build(
-                    data=data,
-                    mime_type=mime_type,
-                    command_metadata=command_metadata,
-                )
-                return await self._data_files_write_file_cb(file_data)
+        """Writes arbitrary data to a file in the Data Files directory.
+
+        Returns the `DataFileInfo` of the file created.
+
+        Raises:
+            Note that the callback may raise a StorageLimitReachedError.
+        """
+        if self._data_files_write_file_cb is not None:
+            assert self._run_metadata is not None
+            file_data = FileData.build(
+                data=data,
+                mime_type=mime_type,
+                command_metadata=command_metadata,
+                run_metadata=self._run_metadata,
+            )
+
+            return await self._data_files_write_file_cb(file_data)
         # If we are in an analysis or simulation state, return an empty `DataFileInfo`
         return DataFileInfo(
             id="",
             name="",
             file_hash="",
             created_at=datetime.now(),
-            source=DataFileSource.GENERATED,
+            generated=True,
+            stored=False,
+            path="",
+            mime_type=mime_type,
         )
+
+    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
+        """Sets metadata specific to the run."""
+        self._run_metadata = metadata
+
+    def clear_run_metadata(self) -> None:
+        """Clears metadata specific to the run."""
+        self._run_metadata = None

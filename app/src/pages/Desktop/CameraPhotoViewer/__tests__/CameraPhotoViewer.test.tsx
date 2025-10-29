@@ -28,4 +28,15 @@ describe('CameraPhotoViewer', () => {
 
     screen.getByAltText('camera-capture')
   })
+
+  it('renders the loading copy when the photo URL is not provided', () => {
+    vi.mocked(useSearchParams).mockReturnValue([
+      { get: () => null } as any,
+      vi.fn(),
+    ])
+
+    render()
+
+    screen.getByText('Image loading')
+  })
 })

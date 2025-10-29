@@ -58,9 +58,10 @@ export default defineConfig(
           },
         },
         sentryVitePlugin({
-          org: 'opentrons-sw',
+          org: 'opentrons-76',
           project: 'protocol-designer',
-          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          // Don't provide authToken - we don't want to upload during build
+          // Uploads happen in dedicated workflow steps in GitHub Actions
           telemetry: false,
           reactComponentAnnotation: {
             enabled: true,
@@ -69,8 +70,6 @@ export default defineConfig(
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
-            filesToDeleteAfterUpload:
-              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
         {
@@ -118,6 +117,10 @@ export default defineConfig(
       },
       resolve: {
         alias: {
+          // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+          // files being processed with the wrong config (the config from the
+          // consuming project vs. the config from the source project).
+          // Can these be replaced with regular package.json dependencies?
           '@opentrons/components/styles/global': path.resolve(
             '../components/src/styles/global.css'
           ),

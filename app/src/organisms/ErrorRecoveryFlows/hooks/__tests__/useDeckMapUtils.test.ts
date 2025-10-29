@@ -412,6 +412,16 @@ describe('getSlotNameAndLwLocFrom', () => {
     expect(result).toEqual([null, null])
   })
 
+  it('should return [null, null] if location is "systemLocation"', () => {
+    const result = getSlotNameAndLwLocFrom('systemLocation', {} as any, false)
+    expect(result).toEqual([null, null])
+  })
+
+  it('should return [null, null] if location is "wasteChuteLocation"', () => {
+    const result = getSlotNameAndLwLocFrom('systemLocation', {} as any, false)
+    expect(result).toEqual([null, null])
+  })
+
   it('should return [null, null] if location has a moduleId and moduleModel and excludeModules is true', () => {
     vi.mocked(getLabwareLocation).mockReturnValue({
       slotName: 'A1',

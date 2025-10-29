@@ -75,6 +75,60 @@ def test_resolve_ci_config_sandbox():
     assert config.relative_artifact_dir == "/test/artifacts"
 
 
+def test_resolve_ci_config_pull_request_special_branch_suffix():
+    """Special PR branches should deploy to alternate sandbox prefixes."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/123/merge",
+        "GITHUB_REF_NAME": "123/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "chore_release-pd-8.6.0",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "chore_release-pd-8.6.0-pr"
+
+
+def test_resolve_ci_config_pull_request_edge_branch_suffix():
+    """Edge PRs should deploy to alternate sandbox prefixes."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/321/merge",
+        "GITHUB_REF_NAME": "321/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "edge",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "edge-pr"
+
+
+def test_resolve_ci_config_pull_request_regular_branch_passthrough():
+    """Non-special PR branches should preserve the branch name prefix."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/42/merge",
+        "GITHUB_REF_NAME": "42/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "feature-add-new-widget",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "feature-add-new-widget"
+
+
 def test_resolve_ci_config_staging():
     """Test CI config resolution for staging environment."""
     env = {

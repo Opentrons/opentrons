@@ -607,6 +607,7 @@ describe('moveLabware', () => {
         [ADAPTER_ID]: {
           ...invariantContext.labwareEntities[ADAPTER_ID],
           def: {
+            metadata: { displayCategory: 'wellPlate' },
             parameters: {
               loadName: 'opentrons_96_wellplate_200ul_pcr_full_skirt',
             },

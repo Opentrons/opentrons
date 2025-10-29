@@ -63,6 +63,7 @@ class PipettingHandler(TypingProtocol):
         flow_rate: float,
         end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and aspirate while tracking."""
 
@@ -76,6 +77,7 @@ class PipettingHandler(TypingProtocol):
         end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and dispense while tracking."""
 
@@ -188,6 +190,7 @@ class HardwarePipettingHandler(PipettingHandler):
         flow_rate: float,
         end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and aspirate.
 
@@ -203,8 +206,8 @@ class HardwarePipettingHandler(PipettingHandler):
             await self._hardware_api.aspirate_while_tracking(
                 mount=hw_pipette.mount,
                 end_point=end_point,
-                flow_rate=flow_rate,
                 volume=adjusted_volume,
+                movement_delay=movement_delay,
             )
         return adjusted_volume
 
@@ -218,6 +221,7 @@ class HardwarePipettingHandler(PipettingHandler):
         end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and dispense.
 
@@ -231,10 +235,10 @@ class HardwarePipettingHandler(PipettingHandler):
             await self._hardware_api.dispense_while_tracking(
                 mount=hw_pipette.mount,
                 end_point=end_point,
-                flow_rate=flow_rate,
                 volume=adjusted_volume,
                 push_out=push_out,
                 is_full_dispense=is_full_dispense,
+                movement_delay=movement_delay,
             )
         return adjusted_volume
 
@@ -464,6 +468,7 @@ class VirtualPipettingHandler(PipettingHandler):
         flow_rate: float,
         end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Virtually aspirate (no-op)."""
         self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
@@ -485,6 +490,7 @@ class VirtualPipettingHandler(PipettingHandler):
         end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Virtually dispense (no-op)."""
         # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329

@@ -27,7 +27,7 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 
-from opentrons_shared_data.data_files import DataFileSource, DataFileInfo
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
     RequestModel,
@@ -169,7 +169,6 @@ async def test_create_run(
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
@@ -190,7 +189,6 @@ async def test_create_run(
         run_auto_deleter=mock_run_auto_deleter,
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider=mock_file_provider,
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
@@ -257,7 +255,10 @@ async def test_create_protocol_run(
             name="abc.xyz",
             file_hash="987",
             created_at=datetime(month=1, day=2, year=2024),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path="/dev/null/123/abc.xyz",
         )
     )
     decoy.when(
@@ -273,7 +274,6 @@ async def test_create_protocol_run(
             created_at=run_created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
@@ -299,7 +299,6 @@ async def test_create_protocol_run(
         run_auto_deleter=mock_run_auto_deleter,
         quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider=mock_file_provider,
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
@@ -337,7 +336,6 @@ async def test_create_protocol_run_bad_protocol_id(
             run_data_manager=mock_run_data_manager,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             run_id="run-id",
             created_at=datetime.now(),
@@ -374,7 +372,6 @@ async def test_create_run_conflict(
             created_at=created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
@@ -395,7 +392,6 @@ async def test_create_run_conflict(
             deck_configuration_store=mock_deck_configuration_store,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider=mock_file_provider,
             camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,

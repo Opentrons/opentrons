@@ -79,10 +79,11 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
           />
         </Flex>
       </Flex>
-      {enableTipSelection ? (
+      {enableTipSelection && formData.changeTip !== 'never' ? (
         <TipTrackingField
           propsForFields={propsForFields}
           padding={`0 ${SPACING.spacing16}`}
+          formData={formData}
         />
       ) : null}
     </Flex>

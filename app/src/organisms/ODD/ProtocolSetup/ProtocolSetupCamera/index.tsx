@@ -10,8 +10,10 @@ import styles from './setupcamera.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
+import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 export interface ProtocolSetupCameraProps {
+  storageInfo: RobotStorageInfo
   confirmCameraPreferences: () => void
   isConfirmed: boolean
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
@@ -26,6 +28,7 @@ export function ProtocolSetupCamera(
     <CameraSettings
       headerElement={<SetupCameraHeader {...props} />}
       sectionHeadingText={t('review_camera_preferences')}
+      storageInfo={props.storageInfo}
     />
   )
 }

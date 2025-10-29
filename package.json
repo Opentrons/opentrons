@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": {
     "packages": [
+      "api-client",
       "app",
       "app-shell",
       "app-shell-odd",
@@ -12,12 +13,10 @@
       "labware-library",
       "opentrons-ai-client",
       "protocol-designer",
+      "react-api-client",
       "shared-data",
       "step-generation",
-      "api-client",
-      "react-api-client",
-      "usb-bridge/node-client",
-      "opentrons-ai-client"
+      "usb-bridge/node-client"
     ]
   },
   "config": {
@@ -106,8 +105,6 @@
     "glob": "^7.1.2",
     "globby": "^10.0.1",
     "graphviz": "^0.0.9",
-    "handlebars": "^4.2.0",
-    "handlebars-loader": "^1.7.1",
     "html-webpack-plugin": "^3.2.0",
     "i18next": "^19.8.3",
     "identity-obj-proxy": "^3.0.0",
@@ -128,7 +125,6 @@
     "react-i18next": "14.0.0",
     "react-query": "3.35.0",
     "react-scan": "^0.0.38",
-    "react-snap": "^1.23.0",
     "redux-mock-store": "1.5.5",
     "rehype": "^9.0.0",
     "rehype-urls": "^1.0.0",

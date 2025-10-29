@@ -7,15 +7,14 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons_shared_data.data_files import MimeType
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors import CannotPerformModuleAction, StorageLimitReachedError
+from ...errors import CannotPerformModuleAction
 from ...errors.error_occurrence import ErrorOccurrence
 
 from ...resources.file_provider import (
     PlateReaderData,
     ReadData,
-    MAXIMUM_FILE_LIMIT,
-    MimeType,
     ReadCmdFileNameMetadata,
 )
 from ...resources import FileProvider
@@ -95,21 +94,6 @@ class ReadAbsorbanceImpl(
                 "Absorbance Plate Reader can't read a plate with the lid open. Call `close_lid()` first."
             )
 
-        # TODO: we need to return a file ID and increase the file count even when a moduel is not attached
-        if (
-            params.fileName is not None
-            and abs_reader_substate.configured_wavelengths is not None
-        ):
-            # Validate that the amount of files we are about to generate does not put us higher than the limit
-            if (
-                self._state_view.files.get_filecount()
-                + len(abs_reader_substate.configured_wavelengths)
-                > MAXIMUM_FILE_LIMIT
-            ):
-                raise StorageLimitReachedError(
-                    message=f"Attempt to write file {params.fileName} exceeds file creation limit of {MAXIMUM_FILE_LIMIT} files."
-                )
-
         asbsorbance_result: Dict[int, Dict[str, float]] = {}
         transform_results = []
         # Handle the measurement and begin building data for return
@@ -174,6 +158,12 @@ class ReadAbsorbanceImpl(
             )
 
             if isinstance(plate_read_result, PlateReaderData):
+                this_cmd_id = self._state_view.commands.get_running_command_id()
+                prev_cmd = (
+                    self._state_view.commands.get_most_recently_finalized_command()
+                )
+                prev_cmd_id = prev_cmd.command.id if prev_cmd is not None else None
+
                 # Write a CSV file for each of the measurements taken
                 for measurement in plate_read_result.read_results:
                     csv_bytes = plate_read_result.build_csv_bytes(
@@ -185,6 +175,8 @@ class ReadAbsorbanceImpl(
                         command_metadata=ReadCmdFileNameMetadata(
                             base_filename=params.fileName,
                             wavelength=measurement.wavelength,
+                            command_id=this_cmd_id or "",
+                            prev_command_id=prev_cmd_id or "",
                         ),
                     )
                     file_ids.append(file_info.id)

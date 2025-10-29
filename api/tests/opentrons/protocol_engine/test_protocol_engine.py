@@ -54,6 +54,7 @@ from opentrons.protocol_engine.resources import (
     ModelUtils,
     ModuleDataProvider,
 )
+from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
@@ -66,6 +67,7 @@ from opentrons.protocol_engine.actions import (
     AddAddressableAreaAction,
     AddLiquidAction,
     AddModuleAction,
+    AddCameraSettingsAction,
     PlayAction,
     PauseAction,
     PauseSource,
@@ -1317,6 +1319,26 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(well_plate_def)
 
     assert result == "some/definition/uri"
+
+
+def test_add_camera_settings(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch an AddCameraSettingsAction action."""
+    settings = CameraSettings(
+        cameraEnabled=True, liveStreamEnabled=True, errorRecoveryEnabled=True
+    )
+    decoy.when(subject.state_view.camera.get_enablement_settings()).then_return(
+        settings
+    )
+    subject.add_camera_enablement_settings(settings)
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddCameraSettingsAction(enablement_settings=settings)
+        )
+    )
 
 
 def test_add_addressable_area(

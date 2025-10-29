@@ -7,6 +7,7 @@ import {
   GEN_ONE_MULTI_PIPETTES,
   getCutoutDisplayName,
   getPipetteSpecsV2,
+  locationIsOnSlot,
   OT2_CUTOUT_BY_SLOT_ID,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -264,12 +265,7 @@ export const getUnoccupiedSlotForTrash = (
     )
     .reduce((acc: string[], command) => {
       const location = command.params.location
-      if (
-        location !== 'offDeck' &&
-        location !== 'systemLocation' &&
-        location !== null &&
-        'slotName' in location
-      ) {
+      if (location !== null && locationIsOnSlot(location)) {
         return [...acc, location.slotName]
       }
       return acc
@@ -296,12 +292,7 @@ export const getUnoccupiedSlotForTrash = (
     )
     .reduce((acc: string[], command) => {
       const newLocation = command.params.newLocation
-      if (
-        newLocation !== 'offDeck' &&
-        newLocation !== 'systemLocation' &&
-        newLocation !== null &&
-        'slotName' in newLocation
-      ) {
+      if (newLocation !== null && locationIsOnSlot(newLocation)) {
         return [...acc, newLocation.slotName]
       }
       return acc

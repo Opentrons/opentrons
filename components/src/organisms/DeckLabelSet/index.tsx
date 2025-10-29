@@ -22,6 +22,9 @@ interface DeckLabelSetProps {
   showModuleIcon?: boolean
   showBorder?: boolean
 }
+//  +15/30 to leave room for the deck info label to be fully visible in the viewbox
+const WIDTH_ADJUSTED = 15
+const HEIGHT_ADJUSTED = 30
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
@@ -42,9 +45,8 @@ const DeckLabelSetComponent = (
     <RobotCoordsForeignDiv
       x={x}
       y={y}
-      //  +5 to leave room for the deck info label
-      width={showBorder ? '100%' : width + 5}
-      height={showBorder ? '100%' : height + 5}
+      width={width + WIDTH_ADJUSTED}
+      height={height + HEIGHT_ADJUSTED}
       innerDivProps={{
         transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
       }}

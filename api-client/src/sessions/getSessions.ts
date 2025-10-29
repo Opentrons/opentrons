@@ -1,4 +1,4 @@
-import { GET, request } from '../request'
+import { createAxiosConfig, GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -8,5 +8,11 @@ export function getSessions(
   config: HostConfig,
   params?: { session_type: SessionType }
 ): ResponsePromise<Sessions> {
-  return request<Sessions>(GET, `/sessions`, null, config, params)
+  return request<Sessions>(
+    GET,
+    `/sessions`,
+    null,
+    config,
+    params && createAxiosConfig({ params })
+  )
 }

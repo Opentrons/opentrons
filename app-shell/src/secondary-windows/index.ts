@@ -12,11 +12,16 @@ import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
   STEP_DETAIL_VIEWER_OPEN,
+  STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
 import { createLogger } from '../log'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
-import { openStepDetailViewer } from './step-detail-viewer'
+import {
+  createStepDetailViewerUi,
+  openStepDetailViewer,
+  updateStepDetailViewerData,
+} from './step-detail-viewer'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
@@ -47,11 +52,16 @@ export function registerCameraStream(
     }
   }
 }
+//  setting this variable outside of the below function so
+//  that it gets called only once in the life-cycle when the
+//  main process is running
+let stepDetailViewerWindow: BrowserWindow | null = null
 
 function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
       return openCameraStream({
+        runId: action.payload.runId,
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
         log,
@@ -61,14 +71,44 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         photoUrl: action.payload.photoUrl,
         robotName: action.payload.robotName,
         windowTitle: action.payload.windowTitle,
-        dimensions: action.payload.dimensions,
         log,
       })
     case STEP_DETAIL_VIEWER_OPEN:
-      return openStepDetailViewer({
-        protocolKey: action.payload.protocolKey,
-        log,
+      if (stepDetailViewerWindow == null) {
+        stepDetailViewerWindow = createStepDetailViewerUi({
+          ...action.payload,
+          log,
+        })
+        return openStepDetailViewer({
+          protocolKey: action.payload.protocolKey,
+          slot: action.payload.slot,
+          command: action.payload.command,
+          robotState: action.payload.robotState,
+          invariantContext: action.payload.invariantContext,
+          analysis: action.payload.analysis,
+          liquids: action.payload.liquids,
+          log,
+        })
+      } else {
+        // if 2nd window is already open, update its contents
+        updateStepDetailViewerData(action.payload.protocolKey, {
+          slot: action.payload.slot,
+          command: action.payload.command,
+          robotState: action.payload.robotState,
+          analysis: action.payload.analysis,
+          liquids: action.payload.liquids,
+        })
+        return null
+      }
+    case STEP_DETAIL_VIEWER_UPDATE:
+      updateStepDetailViewerData(action.payload.protocolKey, {
+        slot: action.payload.slot,
+        command: action.payload.command,
+        robotState: action.payload.robotState,
+        analysis: action.payload.analysis,
+        liquids: action.payload.liquids,
       })
+      return null
     default:
       return null
   }

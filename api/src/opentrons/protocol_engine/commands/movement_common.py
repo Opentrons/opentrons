@@ -81,6 +81,15 @@ class DynamicLiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
         default_factory=LiquidHandlingWellLocation,
         description="Relative well location at which to end the operation",
     )
+    movement_delay: float | SkipJsonSchema[None] = Field(
+        None,
+        description=(
+            "Optional movement delay in seconds."
+            " When this argument is used, the x/y/z movement will wait movement_delay seconds"
+            " after the pipetting action starts before beginning the x/y/z move."
+        ),
+        json_schema_extra=_remove_default,
+    )
 
 
 class MovementMixin(BaseModel):
