@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
 import { RECOMMENDED_LABWARE_BY_MODULE } from '../pages/Designer/DeckSetup/constants'
 
 import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'

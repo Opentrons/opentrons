@@ -92,7 +92,11 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode={moduleState.type === FLEX_STACKER_MODULE_TYPE ? 'passThrough' : 'offsetToSlot'}
+              childrenPositioningMode={
+                moduleState.type === FLEX_STACKER_MODULE_TYPE
+                  ? 'passThrough'
+                  : 'offsetToSlot'
+              }
             >
               <>
                 {rightBelowTopId != null ? (
