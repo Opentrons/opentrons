@@ -4,15 +4,14 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '/protocol-designer/constants'
-
 import {
   computeStepMove,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
-} from '../stepHierarchyUtils'
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import type { FormData } from '/protocol-designer/form-types'
-import type { StepHierarchy } from '../stepHierarchyUtils'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray()', () => {
   test.each([
