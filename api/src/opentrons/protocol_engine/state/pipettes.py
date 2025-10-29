@@ -111,6 +111,7 @@ class StaticPipetteConfig:
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
     volume_mode: VolumeModes
+    available_volume_modes_min_vol: Dict[VolumeModes, float]
 
 
 @dataclasses.dataclass
@@ -318,6 +319,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 shaft_ul_per_mm=config.shaft_ul_per_mm,
                 available_sensors=config.available_sensors,
                 volume_mode=config.volume_mode,
+                available_volume_modes_min_vol=config.available_volume_modes_min_vol,
             )
             self._state.flow_rates_by_id[
                 state_update.pipette_config.pipette_id
@@ -875,6 +877,30 @@ class PipetteView:
     def get_is_low_volume_mode(self, pipette_id: str) -> bool:
         """Determine if the pipette is currently in low volume mode."""
         return self.get_config(pipette_id).volume_mode == VolumeModes.lowVolumeDefault
+
+    def get_volume_mode_from_volume(
+        self, pipette_id: str, volume: float
+    ) -> VolumeModes:
+        """Get the volume mode for the given pipette and volume quantity."""
+        available_volume_modes_min_vol = self.get_config(
+            pipette_id
+        ).available_volume_modes_min_vol
+        has_low_volume_mode = (
+            VolumeModes.lowVolumeDefault in available_volume_modes_min_vol
+        )
+
+        if not has_low_volume_mode:
+            return VolumeModes.default
+        if volume >= available_volume_modes_min_vol[VolumeModes.default]:
+            return VolumeModes.default
+        return VolumeModes.lowVolumeDefault
+
+    def get_will_volume_mode_change(self, pipette_id: str, volume: float) -> bool:
+        """Determine if the pipette will change volume mode based on current volume mode and new volume."""
+        return (
+            self.get_volume_mode_from_volume(pipette_id, volume)
+            != self.get_config(pipette_id).volume_mode
+        )
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str
