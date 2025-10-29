@@ -133,6 +133,7 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
             )
 
         print(f"\nStarting protocol-designer preview server on {base_url}...")
+        print("Building Protocol Designer (this may take 2-3 minutes)...")
 
         # Start the preview server (vite preview serves production build)
         process = subprocess.Popen(
@@ -143,23 +144,37 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
         )
 
         # Wait for server to be ready, checking both common ports
-        max_attempts = 60
+        max_attempts = 120  # Increased from 60 to 120 (4 minutes total)
         ports_to_try = [4173, 4174, 4175]  # vite preview will try these in order
         server_ready = False
+        output_lines = []  # Capture all output for debugging
 
         for attempt in range(max_attempts):
+            # Check if process has terminated unexpectedly
+            if process.poll() is not None:
+                # Process has exited - capture remaining output
+                if process.stdout:
+                    remaining_output = process.stdout.read()
+                    output_lines.append(remaining_output)
+                print(f"\n❌ Server process exited unexpectedly with code {process.returncode}")
+                print("Last 50 lines of output:")
+                print("\n".join(output_lines[-50:]))
+                raise Exception(f"Server process exited with code {process.returncode}. Check output above for errors.")
+
             # Check if process has output about the port
             if process.stdout and select.select([process.stdout], [], [], 0.1)[0]:
                 line = process.stdout.readline()
-                if "Local:" in line:
-                    print(f"Server output: {line.strip()}")
+                output_lines.append(line)
+                # Print important lines
+                if any(keyword in line for keyword in ["Local:", "error", "Error", "ERROR", "failed", "Failed"]):
+                    print(f"  {line.strip()}")
 
             # Try to connect to possible ports
             for port in ports_to_try:
                 try:
                     test_url = f"http://localhost:{port}"
                     urllib.request.urlopen(test_url, timeout=1)
-                    print(f"Preview server is ready on {test_url}")
+                    print(f"✅ Preview server is ready on {test_url}")
                     server_ready = True
                     break
                 except Exception:
@@ -168,9 +183,20 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
             if server_ready:
                 break
 
+            # Print progress every 10 attempts
+            if attempt > 0 and attempt % 10 == 0:
+                elapsed = attempt * 2
+                print(f"  Still waiting for server... ({elapsed}s elapsed)")
+
             if attempt == max_attempts - 1:
+                print(f"\n❌ Server failed to start after {max_attempts * 2} seconds")
+                print("Last 50 lines of output:")
+                print("\n".join(output_lines[-50:]))
                 process.kill()
-                raise Exception(f"Preview server failed to start on any port: {ports_to_try}")
+                raise Exception(
+                    f"Preview server failed to start on any port: {ports_to_try}. "
+                    f"Waited {max_attempts * 2} seconds. Check output above for errors."
+                )
             time.sleep(2)
 
         yield process
@@ -319,4 +345,3 @@ def pytest_terminal_summary(terminalreporter: Any) -> None:
 
     except Exception as e:
         print(f"⚠️  Failed to post-process HTML report: {e}\n")
-# Trigger CI rebuild
