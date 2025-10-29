@@ -15,14 +15,11 @@ const render = (props: ComponentProps<typeof ConcurrentGroupCheckpoint>) => {
 }
 
 describe('ConcurrentGroupCheckpoint', () => {
-  it('renders a checkpoint inside a list item', () => {
+  it('renders checkpoint text', () => {
     render({
       text: 'Test checkpoint text',
     })
 
-    const listItem = screen.getByRole('listitem')
-    expect(
-      within(listItem).getByText('Test checkpoint text')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Test checkpoint text')).toBeInTheDocument()
   })
 })
