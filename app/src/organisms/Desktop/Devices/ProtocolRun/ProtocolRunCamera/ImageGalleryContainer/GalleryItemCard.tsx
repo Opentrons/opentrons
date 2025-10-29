@@ -5,13 +5,13 @@ import { Chip, COLORS, StyledText } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
 
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
   const { item } = props
