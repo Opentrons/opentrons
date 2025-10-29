@@ -3,16 +3,16 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryContainer } from '..'
 import { GalleryItemCard } from '../GalleryItemCard'
-import { useImageInfo } from '../hooks/useImageInfo'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseImagesInfoItem } from '../hooks/useImageInfo'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 vi.mock('../GalleryItemCard')
-vi.mock('../hooks/useImageInfo')
+vi.mock('/app/resources/dataFiles/useImageInfo')
 vi.mock('/app/redux/protocol-runs')
 
 const render = () => {

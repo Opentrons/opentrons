@@ -29,6 +29,7 @@ export interface UseImagesInfoResult {
   allRunDefs: LabwareDefinition[]
 }
 
+// Returns relevant info coupled with image metadata associated with a specific run.
 export function useImageInfo(runId: string): UseImagesInfoResult {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

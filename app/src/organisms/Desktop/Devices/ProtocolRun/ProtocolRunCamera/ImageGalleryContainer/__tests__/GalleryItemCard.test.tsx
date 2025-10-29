@@ -1,15 +1,18 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import { GalleryItemCard } from '../GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { GalleryItemCardProps } from '../GalleryItemCard'
+import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 
-const render = (props: GalleryItemCardProps) => {
+vi.mock('/app/resources/dataFiles/useImage')
+
+const render = (props: UseImageGalleryDataProps) => {
   return renderWithProviders(<GalleryItemCard {...props} />, {
     i18nInstance: i18n,
   })
@@ -28,7 +31,7 @@ const MOCK_IMAGE_ITEM = {
 }
 const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
-  let mockProps: GalleryItemCardProps
+  let mockProps: UseImageGalleryDataProps
   beforeEach(() => {
     mockProps = {
       item: MOCK_IMAGE_ITEM,
@@ -37,18 +40,32 @@ describe('GalleryItemCard', () => {
       robotType: 'OT3-Standard' as RobotType,
       allRunDefs: [],
     }
+
+    vi.mocked(useImage).mockReturnValue('img-id')
   })
 
   it('renders expected card content', () => {
+    vi.mocked(useImage).mockReturnValue(null)
+
     render(mockProps)
     expect(screen.queryByAltText('camera-photo')).toBeNull()
     expect(screen.getAllByTestId('Skeleton'))
   })
 
   it('shows "View image" on hover', async () => {
+    vi.mocked(useImage).mockReturnValue(null)
+
     render(mockProps)
 
     expect(screen.queryByAltText('camera-photo')).toBeNull()
     expect(screen.getAllByTestId('Skeleton'))
+  })
+
+  it('renders appropriate card copy when there is an image', () => {
+    render(mockProps)
+
+    screen.getByText('Step 1/100: ?')
+    screen.getByText('View image')
+    screen.getByText('2024-01-01 12:00:00')
   })
 })

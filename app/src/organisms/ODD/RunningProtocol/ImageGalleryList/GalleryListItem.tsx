@@ -4,17 +4,13 @@ import { ListItem, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import {
-  useImage,
-  useImageAndCommand,
-} from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemCard'
+import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
+import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import type { UseImagesInfoItem } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/hooks/useImageInfo'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 export interface GalleryListItemProps extends UseImagesInfoItem {
   protocolAnalysis: any
@@ -41,7 +37,8 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     currentCommandString: stepCommandText,
     previousCommandString,
     isLoading,
-  } = useImageAndCommand({
+    stubStepFraction,
+  } = useImageGalleryData({
     item: { imageId, stepCommandId, previousStepCommandId, timestamp },
     protocolAnalysis,
     runId,
@@ -85,7 +82,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
                 handleCameraPhotoModal({
                   imagePath,
                   timestamp,
-                  stepCommandText,
+                  stepCountStr: stubStepFraction,
                 })
               }}
               buttonText={t('view_image')}
