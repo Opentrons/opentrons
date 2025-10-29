@@ -509,7 +509,6 @@ interface LiquidToolboxContainerProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
-  selectedLabwareIds: string[]
   showLiquidLayoutOverlay: boolean
 }
 
@@ -517,13 +516,12 @@ export function LiquidToolboxContainer({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,
-  selectedLabwareIds,
   showLiquidLayoutOverlay,
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
-  console.log('selectedLabwareIds[0]', selectedLabwareIds[0])
   const liquids = useSelector(getLiquidEntities)
-  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const multipleSelectedLabwareIds = useSelector(labwareIngredSelectors.getSelectedLabwareIds)
+  const labwareId = multipleSelectedLabwareIds?.[0] ?? useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
   const liquidLocations = useSelector(
@@ -563,9 +561,9 @@ export function LiquidToolboxContainer({
       showBadFormState={showBadFormState}
       setShowBadFormState={setShowBadFormState}
       setDefineLiquidModal={setDefineLiquidModal}
-      selectedLabwareIds={selectedLabwareIds}
       showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
+      selectedLabwareIds={multipleSelectedLabwareIds ?? []}
     />
   )
 }

@@ -31,7 +31,6 @@ import {
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
 import {
-  multipleIngredientsSelector,
   removeWellsContents,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
@@ -245,7 +244,6 @@ export function AssignLiquidsModal(
           <LiquidButton showLiquidOverflowMenu={showLiquidOverflowMenu} />
         </Box>
         <LiquidToolboxContainer
-          selectedLabwareIds={selectedLabwareIds}
           showBadFormState={showBadFormState}
           setShowBadFormState={setShowBadFormState}
           setDefineLiquidModal={setDefineLiquidModal}

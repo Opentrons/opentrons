@@ -25,7 +25,7 @@ import {
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { ThunkDispatch } from '/protocol-designer/types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 import { LabwareButtonBasket } from '../../molecules'
 

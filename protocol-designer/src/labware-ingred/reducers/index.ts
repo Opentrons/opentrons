@@ -32,7 +32,6 @@ import type {
   EditMultipleLiquidGroupsAction,
   EditSlotInfoAction,
   GenerateNewProtocolAction,
-  MultipleIngredientsSelectorAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
   RemoveWellsContentsAction,

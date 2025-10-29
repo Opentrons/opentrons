@@ -113,6 +113,7 @@ export const createContainer: (
   return createdIds
 }
 
+// create container and select labware
 export const createContainerAndSelectLabware: (
   args: CreateContainerArgs
 ) => ThunkAction<
@@ -163,16 +164,7 @@ export const createContainerAndSelectLabware: (
         // We can't rely on reducers to do that themselves bc they don't have access
         // to both the nickname state and the isTiprack condition
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        dispatch(
-          renameLabware({
-            labwareId: id,
-          } as RenameLabwareAction['payload']) as ThunkAction<
-            | CreateContainerAction
-            | RenameLabwareAction
-            | ZoomedIntoSlotAction
-            | OpenIngredientSelectorAction
-          >
-        )
+        dispatch(renameLabware({ labwareId: id } as RenameLabwareAction['payload']) as ThunkAction<CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction | OpenIngredientSelectorAction>)
       }
 
       if (availableSlot === 'offDeck') {
