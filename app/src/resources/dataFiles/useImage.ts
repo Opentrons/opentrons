@@ -7,7 +7,11 @@ import { MIME_TYPES } from '/app/resources/dataFiles/constants'
 // Axios needs to know the `responseType` of the incoming data to parse it appropriately,
 //  so we wrap the network hook with an expected `blob` type for images.
 export function useImage(imageId: string): string | null {
-  const { data } = useDataFileRawQuery(imageId, {}, { responseType: 'blob' })
+  const { data, dataUpdatedAt } = useDataFileRawQuery(
+    imageId,
+    {},
+    { responseType: 'blob' }
+  )
 
   return useMemo(() => {
     if (data == null) {
@@ -17,5 +21,5 @@ export function useImage(imageId: string): string | null {
 
       return URL.createObjectURL(blob)
     }
-  }, [data])
+  }, [dataUpdatedAt])
 }

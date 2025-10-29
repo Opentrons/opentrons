@@ -64,6 +64,8 @@ function createCameraPhotoUi({
   }).once('ready-to-show', () => {
     log.debug('Camera photo window ready to show')
     cameraPhotoWindow.setTitle(windowTitle)
+    // TODO(jh, 10-29-25): We should set the aspect ratio based on the default
+    //  pic dimensions themselves.
     cameraPhotoWindow.setAspectRatio(
       WINDOW_DEFAULT_WIDTH_PX / WINDOW_DEFAULT_HEIGHT_PX
     )
