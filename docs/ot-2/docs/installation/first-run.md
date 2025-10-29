@@ -41,11 +41,40 @@ After turning on the power, it may take up to 45 seconds, or longer, before the 
 !!!note
     If the blue light on the front of the robot does not turn solid after the robot has been powered on for more than five minutes, contact Opentrons Support.
 
-## Connecting an OT-2 to a network
+## Making a LAN connection
 
-### Ethernet
+Along with a direct connection to a computer, you can also connect the OT-2 to your local area network (LAN) using the supplied ethernet cable. For a LAN, just connect the ethernet cable to the robot and a wall jack. You can also plug the ethernet cable into a nearby networked switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons App.
 
-Along with a direct connection to a computer, you can also connect the OT-2 to your local network using the supplied ethernet cable to connect to wall jack or a nearby switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons App.
+## Making a Wi-Fi connection
 
+If you need to connect to a Wi-Fi network that uses enterprise authentication (including "eduroam" and similar academic networks that require a username and password), first connect to the Opentrons App by Ethernet or USB to complete initial setup. Then use the Opentrons App and connect to the enterprise Wi-Fi network in the networking settings for your OT-2. To access the networking settings:
 
+1. Click Devices in the left sidebar of the Opentrons App.
+2. Click the three-dot menu (⋮) for your OT-2 and choose Robot Settings.
+3. Click the Networking tab.
+4. Select your network from the dropdown menu or choose "Join other network..." and enter its SSID. Choose the enterprise authentication method that your network uses. See the following section for the supported security types.
 
+### Wi-Fi security
+
+The OT-2 can connect to Wi-Fi networks with the following security types:
+
+- Open networks (not recommended because anyone can access and control your robot)
+- 802.1x [eduroam](https://eduroam.org/how/) (common to academic institutions)
+- WPA2 personal
+- WPA2 enterprise, including:
+    - EAP-TTLS with TLS
+    - EAP-TTLS with MS-CHAP v2
+    - EAP-TTLS with MD5
+    - EAP-PEAP with MS-CHAP v2
+    - EAP-TLS
+
+!!!note "Captive portals not supported"
+    The OT-2 cannot be used on or connect to a [captive portal network](https://en.wikipedia.org/wiki/Captive_portal). Typically, these are the kind of networks deployed at airports, hotels, and other public access points. If no other networks are available, use a direct USB or ethernet connection to manage your robot.
+
+## Install software updates
+
+Now that you've connected the OT-2 to a network or computer, the robot can check for software and firmware updates and download them if needed. If there is an update, it may take a few minutes to install. Once the update is complete, the robot will restart.
+
+## Naming your robot
+
+Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, next step you'll want to take is attaching instruments.
