@@ -58,6 +58,7 @@
   "end_of_protocol": "End of protocol",
   "end_step_time": "End",
   "error_details": "Error details",
+  "error_event": "Error event",
   "error_info": "Error {{errorCode}}: {{errorType}}",
   "error_type": "Error: {{errorType}}",
   "failed_step": "Failed step",
