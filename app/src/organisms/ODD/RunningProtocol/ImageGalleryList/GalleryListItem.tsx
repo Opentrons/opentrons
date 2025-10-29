@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { ListItem, StyledText } from '@opentrons/components'
+import { Chip, ListItem, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { Skeleton } from '/app/atoms/Skeleton'
@@ -38,6 +38,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     previousCommandString,
     isLoading,
     stubStepFraction,
+    currentCommand,
   } = useImageGalleryData({
     item: { imageId, stepCommandId, previousStepCommandId, timestamp },
     protocolAnalysis,
@@ -46,6 +47,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     allRunDefs,
   })
   const isSkeleton = imagePath == null || isLoading
+  const isCurrentCmdError = currentCommand?.error != null
 
   return (
     <ListItem type="default">
@@ -55,6 +57,14 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
             <StyledText oddStyle="bodyTextSemiBold">{timestamp}</StyledText>
           </div>
           <div className={styles.list_item_step}>
+            {!isSkeleton && isCurrentCmdError && (
+              <Chip
+                text={t('error_event')}
+                type="error"
+                width="fit-content"
+                chipSize="small"
+              />
+            )}
             {isSkeleton ? (
               <Skeleton width="100%" height="100%" backgroundSize="47rem" />
             ) : (
