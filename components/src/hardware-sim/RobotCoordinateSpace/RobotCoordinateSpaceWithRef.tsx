@@ -51,9 +51,21 @@ export function RobotCoordinateSpaceWithRef(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
-    wholeDeckViewBox = adjustViewBoxForStacker
-      ? `${viewBoxOriginX + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginX} ${viewBoxOriginY + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginY} ${deckXDimension + STACKER_VIEWBOX_ADJUSTMENTS.deckXDimension} ${deckYDimension + STACKER_VIEWBOX_ADJUSTMENTS.deckYDimension}`
-      : `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
+    const base = [
+      viewBoxOriginX,
+      viewBoxOriginY,
+      deckXDimension,
+      deckYDimension,
+    ] as const
+    const adj = [
+      base[0] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginX,
+      base[1] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginY,
+      base[2] + STACKER_VIEWBOX_ADJUSTMENTS.deckXDimension,
+      base[3] + STACKER_VIEWBOX_ADJUSTMENTS.deckYDimension,
+    ] as const
+
+    const adjustedViewBox = adjustViewBoxForStacker ? adj : base
+    wholeDeckViewBox = `${adjustedViewBox[0]} ${adjustedViewBox[1]} ${adjustedViewBox[2]} ${adjustedViewBox[3]}`
   }
 
   return (

@@ -110,6 +110,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   )
   const hasRightColumnFixtures =
     stagingAreaFixtures.length + wasteChuteFixtures.length > 0 || hasFlexStacker
+  const rightColumnAdjustment = hasFlexStacker
+    ? FLEX_STACKER_FIXTURE_PADDING
+    : RIGHT_COLUMN_FIXTURE_PADDING
 
   return (
     <Flex
@@ -132,10 +135,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             : deckDef.cornerOffsetFromOrigin[1]
         } ${
           hasRightColumnFixtures
-            ? deckDef.dimensions[0] +
-              (hasFlexStacker
-                ? FLEX_STACKER_FIXTURE_PADDING
-                : RIGHT_COLUMN_FIXTURE_PADDING)
+            ? deckDef.dimensions[0] + rightColumnAdjustment
             : deckDef.dimensions[0]
         } ${deckDef.dimensions[1]}`}
         zoomed

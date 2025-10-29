@@ -119,15 +119,12 @@ const _getLabwareCompatibleWithAbsorbanceReader = (
 
 const _getLabwareCompatibleWithFlexStacker = (
   def: LabwareDefinition2
-): boolean => {
-  return (
-    RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE].includes(
-      def.parameters.loadName
-    ) ||
-    def.metadata.displayCategory === 'wellPlate' ||
-    def.metadata.displayCategory === 'reservoir'
-  )
-}
+): boolean =>
+  RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE].includes(
+    def.parameters.loadName
+  ) ||
+  def.metadata.displayCategory === 'wellPlate' ||
+  def.metadata.displayCategory === 'reservoir'
 
 export const getLabwareCompatibleWithModule = (
   def: LabwareDefinition2,
