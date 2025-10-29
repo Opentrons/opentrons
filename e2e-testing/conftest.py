@@ -24,6 +24,15 @@ except ImportError:
     pytest_html_extras = None
 
 
+def pytest_configure(config: Any) -> None:
+    """Create test-results directory if it doesn't exist.
+
+    This runs before any tests and ensures the directory exists for
+    pytest-html to write the report.
+    """
+    os.makedirs("test-results", exist_ok=True)
+
+
 @pytest.fixture(scope="session")
 def browser_context_args() -> dict[str, Any]:
     """Configure browser context.
