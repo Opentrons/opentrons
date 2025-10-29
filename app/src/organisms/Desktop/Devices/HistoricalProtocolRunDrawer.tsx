@@ -39,6 +39,7 @@ import {
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -47,7 +48,10 @@ import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
@@ -61,6 +65,7 @@ export function HistoricalProtocolRunDrawer(
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
   const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const allLabwareOffsets: LabwareOffset[] =
     run.labwareOffsets?.sort(
@@ -69,6 +74,13 @@ export function HistoricalProtocolRunDrawer(
     ) ?? []
   const totalOutputFileCount =
     outputFileIds.jpeg.length + outputFileIds.csv.length
+  const { reportImageCaptureUsage } = useCameraAnalytics({
+    robotType: robotType,
+    runId: run.id,
+  })
+  reportImageCaptureUsage({
+    amount: outputFileIds.jpeg.length,
+  })
   const runCsvFileIds =
     'runTimeParameters' in run
       ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
