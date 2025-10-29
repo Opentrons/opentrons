@@ -93,9 +93,6 @@ export function LiquidToolbox({
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  console.log('showLiquidLayoutOverlay', showLiquidLayoutOverlay)
-  console.log('selectedLabwareIds', selectedLabwareIds)
-
   const {
     liquids,
     labwareId,
@@ -526,7 +523,7 @@ export function LiquidToolboxContainer({
   // All selectors moved here
   console.log('selectedLabwareIds[0]', selectedLabwareIds[0])
   const liquids = useSelector(getLiquidEntities)
-  const labwareId = selectedLabwareIds[0] //useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
   const liquidLocations = useSelector(

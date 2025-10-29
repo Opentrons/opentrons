@@ -18,7 +18,6 @@ import {
 import {
   createContainerAndSelectLabware,
   multipleIngredientsSelector,
-  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import {
@@ -97,6 +96,7 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
+    console.log('newItem', newItem)
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&

@@ -32,9 +32,9 @@ import type {
   EditMultipleLiquidGroupsAction,
   EditSlotInfoAction,
   GenerateNewProtocolAction,
+  MultipleIngredientsSelectorAction,
   OpenAddLabwareModalAction,
   OpenIngredientSelectorAction,
-  MultipleIngredientsSelectorAction,
   RemoveWellsContentsAction,
   RenameLabwareAction,
   SelectAdapterAction,
@@ -87,9 +87,12 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
 )
 export type SelectedMultipleContainerIds = string[] | null | undefined
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
-const selectedMultipleContainerIds: Reducer<SelectedMultipleContainerIds, any> = handleActions(
+const selectedMultipleContainerIds: Reducer<
+  SelectedMultipleContainerIds,
+  any
+> = handleActions(
   {
-    OPEN_INGREDIENT_SELECTOR: (
+    MULTIPLE_INGREDIENTS_SELECTOR: (
       state,
       action: MultipleIngredientsSelectorAction
     ): SelectedMultipleContainerIds => action.payload,
@@ -504,6 +507,6 @@ export const rootReducer = combineReducers({
   drillDownLabwareId,
   containers,
   ingredients,
-  ingredLocations, 
+  ingredLocations,
   generateNewProtocol,
 }) as Reducer<RootState, Action>

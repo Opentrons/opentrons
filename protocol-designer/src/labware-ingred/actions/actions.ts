@@ -52,7 +52,9 @@ export interface CloseIngredientSelectorAction {
 // @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
 export const multipleIngredientsSelector: (
   payload: string[]
-) => MultipleIngredientsSelectorAction = createAction('OPEN_INGREDIENTS_SELECTOR')
+) => MultipleIngredientsSelectorAction = createAction(
+  'OPEN_INGREDIENTS_SELECTOR'
+)
 
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
 export const closeIngredientSelector: () => CloseIngredientSelectorAction = createAction(
