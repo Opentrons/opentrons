@@ -51,9 +51,26 @@ jobs:
         working-directory: ci-docker
         run: make determine-container-tag
 
+  prepare-container:
+    name: Prepare container
+    needs: select-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --init
+    steps:
+      - name: Container ready
+        run: echo "Container ghcr.io/opentrons/ci-bootstrap:${{ needs.select-image.outputs.tag }} is ready"
+
   lint:
     name: PD build (CI Docker)
-    needs: select-image
+    needs: [select-image, prepare-container]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -120,7 +137,7 @@ jobs:
 
   pd-tests:
     name: PD unit tests (CI Docker)
-    needs: select-image
+    needs: [select-image, prepare-container]
     runs-on: ubuntu-latest
     permissions:
       contents: read
