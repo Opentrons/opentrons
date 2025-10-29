@@ -18,7 +18,7 @@ Launch Protocol Designer and import your OT-2 protocol. Protocol Designer will u
 
 ## Updating to run on Flex
 
-OpentronsAI is the easiest way to convert your OT-2 Python protocol to run on Flex. 
+OpentronsAI makes it easy to convert your OT-2 Python protocol to run on Flex. 
 
 Launch OpentronsAI and select **Update an existing protocol** on the home page. Upload your Python file to OpentronsAI. From the dropdown menu, choose **Adapt Python protocol from OT-2 to Flex**. Be sure to include details of the changes you'd like in the text field. You can request that OpentronsAI include Flex-exclusive modules and features, like a 96-channel pipette or the Flex Stacker Module, in your updated protocol. 
  
