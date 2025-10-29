@@ -26,12 +26,12 @@ import {
   getSelectedStepId,
 } from '/protocol-designer/ui/steps/selectors'
 
+import { ConnectedStepInfo } from './ConnectedStepInfo'
 import {
   computeStepMove,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
 } from './stepHierarchyUtils'
-import { ConnectedStepInfo } from './ConnectedStepInfo'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
