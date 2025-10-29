@@ -1,6 +1,6 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { v4 as uuidv4 } from 'uuid'
 
 import {
   AnimationVideo,
@@ -27,11 +27,13 @@ import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import { getModulePrepCommands } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
 
+import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
 
@@ -64,6 +66,8 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
+  const [didSetup, setDidSetup] = useState<boolean>(false)
+
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
     cc =>
@@ -73,6 +77,74 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
   )?.cutoutId
   const slotName =
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
+  if (!didSetup && !!chainRunCommands) {
+    // Run the module setup commands. This is a little finicky because we might run
+    // them several times if this component is mounted and unmounted.
+    const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
+      attachedModule.moduleModel
+    )
+    if (calibrationAdapterLoadName == null) {
+      setErrorMessage(
+        `could not get calibration adapter load name for ${attachedModule.moduleModel}`
+      )
+    }
+    if (slotName == null) {
+      setErrorMessage(
+        `could not load module ${attachedModule.moduleModel} into location ${slotName}`
+      )
+    }
+
+    const calibrationAdapterId = `${attachedModule.id}-calibration-adapter`
+    // it's always ok to run loadmodule because if you load a module twice we
+    // override the previous one
+    chainRunCommands(
+      [
+        {
+          commandType: 'loadModule',
+          params: {
+            location: { slotName: slotName ?? '' },
+            model: attachedModule.moduleModel,
+            moduleId: attachedModule.id,
+          },
+        },
+      ],
+      false
+    )
+      .then(() =>
+        chainRunCommands(
+          [
+            {
+              commandType: 'loadLabware',
+              params: {
+                labwareId: calibrationAdapterId,
+                location: { moduleId: attachedModule.id },
+                version: 1,
+                namespace: 'opentrons',
+                loadName: calibrationAdapterLoadName ?? '',
+              },
+            },
+          ],
+          true
+        )
+      )
+      // it's not always safe to load labware since the position might be taken,
+      // but this is such a limited interaction that we can be confident that we'll
+      // only fail because that labware was already loaded, and since we load with
+      // fixed ids we can be confident that a labware exists at that id to use
+      .catch(
+        () =>
+          new Promise<CommandData[]>(resolve => {
+            resolve([])
+          })
+      )
+      .finally(() => {
+        setCreatedAdapterId(calibrationAdapterId)
+      })
+      .then(() =>
+        chainRunCommands(getModulePrepCommands(attachedModule), false)
+      )
+    setDidSetup(true)
+  }
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
       attachedModule.moduleModel
@@ -88,26 +160,7 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
       )
     }
 
-    const calibrationAdapterId = uuidv4()
-    const commands: CreateCommand[] = [
-      {
-        commandType: 'loadModule',
-        params: {
-          location: { slotName: slotName ?? '' },
-          model: attachedModule.moduleModel,
-          moduleId: attachedModule.id,
-        },
-      },
-      {
-        commandType: 'loadLabware',
-        params: {
-          labwareId: calibrationAdapterId,
-          location: { moduleId: attachedModule.id },
-          version: 1,
-          namespace: 'opentrons',
-          loadName: calibrationAdapterLoadName ?? '',
-        },
-      },
+    const moveToPositionCommands: CreateCommand[] = [
       { commandType: 'home' as const, params: {} },
       {
         commandType: 'calibration/moveToMaintenancePosition',
@@ -118,10 +171,7 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
       },
     ]
 
-    chainRunCommands?.(commands, false)
-      .then(() => {
-        setCreatedAdapterId(calibrationAdapterId)
-      })
+    chainRunCommands?.(moveToPositionCommands, false)
       .then(() => {
         proceed()
       })
@@ -205,7 +255,9 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         proceedButtonText={t('confirm_placement')}
         proceed={handleOnClick}
         proceedIsDisabled={maintenanceRunId == null}
-        back={goBack}
+        back={() => {
+          goBack()
+        }}
       />
     )
   }
