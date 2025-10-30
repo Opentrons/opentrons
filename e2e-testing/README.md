@@ -412,22 +412,83 @@ The Protocol Designer currently has 13 Cypress test files in `protocol-designer/
 
 ### Migration Progress
 
-**Total Tests:** 13 test files  
-**Ported & Passing:** 5 complete, 1 partial (54%)
+**Total Cypress Test Files:** 13  
+**Ported & Passing:** 7 files (54%)  
+**Remaining:** 6 files (46%)
 
-- ✅ Fully passing: home.cy.ts, urlNavigation.cy.ts (3 tests), settings.cy.ts (1 test), createNewFlex.cy.ts (1 test), import.cy.ts (2 tests)
-- ✅ Partially passing: createNew.cy.ts (1 test passing - OT-2 onboarding)
+#### ✅ **Completed Ports:**
 
-**In Progress:** 0  
-**Remaining:** 7 test files (54%)
+1. **`home.cy.ts`** → `tests/test_home.py` (1 test)
+   - Verifies home page loads with all expected elements
 
-### Next Tests to Port (Recommended Order)
+2. **`urlNavigation.cy.ts`** → `tests/test_url_navigation.py` (3 tests)
+   - Direct URL navigation to /settings, /createNew, /overview
 
-1. **`transferSettings.cy.ts`** - High priority, complex but valuable workflow
-2. **`modules.cy.ts`** - Leverages existing module page objects
-3. **`mixSettings.cy.ts`** - Similar to transfer settings
-4. **`import.cy.ts`** - Important for regression testing
-5. **`thermocycler.cy.ts`** and **`plateReaderTest.cy.ts`** - Lower priority module tests
+3. **`settings.cy.ts`** → `tests/test_settings.py` (1 test)
+   - Settings toggle persistence across navigation
+
+4. **`createNewFlex.cy.ts`** → `tests/test_create_new_flex.py` (1 test)
+   - Flex robot protocol creation onboarding workflow
+
+5. **`import.cy.ts`** → `tests/test_import.py` (2 tests)
+   - Protocol import with v7 migration modal
+   - Protocol import v8 without migration modal
+
+6. **`testfiles.cy.ts`** → `tests/test_testfiles.py` (36 tests)
+   - Validates all protocol fixture files (v1-v8) exist and have proper structure
+
+7. **`pd_sanity_test.py`** (Original, not ported from Cypress) (2 tests)
+   - Basic smoke tests for page load and onboarding flow
+
+**Total Passing Tests:** 46 tests across 7 files
+
+#### ⏭️ **Skipped / Not Applicable:**
+
+- **`batchEdit.cy.ts`** - Entirely commented out in Cypress (TODO: refactor for new batch edit)
+
+#### 🔄 **Remaining to Port (5 files):**
+
+The remaining Cypress tests use the complex `StepExecutor` pattern which requires significant infrastructure:
+
+1. **`createNew.cy.ts`** - OT-2 onboarding flow
+   - Requires: StepExecutor, SetupSteps, SetupVerifications
+   - Complexity: Medium (uses step builder pattern)
+
+2. **`transferSettings.cy.ts`** - Single-channel transfer step testing
+   - Requires: Full protocol setup + transfer step configuration
+   - Complexity: High (end-to-end workflow)
+
+3. **`mixSettings.cy.ts`** - Mix step configuration
+   - Requires: Full protocol setup + mix step configuration
+   - Complexity: High (similar to transferSettings)
+
+4. **`modules.cy.ts`** - Module configuration workflow
+   - Requires: Full protocol setup + module configuration
+   - Complexity: High (thermocycler, heater-shaker, mag block, temp module)
+
+5. **`thermocycler.cy.ts`** - Thermocycler detailed configuration
+   - Requires: Thermocycler profile steps, state management
+   - Complexity: Very High (complex module-specific testing)
+
+6. **`plateReaderTest.cy.ts`** - Plate reader module testing
+   - Requires: Plate reader module setup, wavelength config
+   - Complexity: High (module-specific testing)
+
+### Next Steps for Porting
+
+To port the remaining tests, we would need to either:
+
+**Option A:** Port the StepExecutor pattern infrastructure
+- Port `support/StepBuilder.ts` → Python equivalent
+- Port step configuration classes (SetupSteps, ModuleSteps, etc.)
+- Port verification classes (SetupVerifications, ModuleVerifications, etc.)
+- ~1000-2000 lines of support code
+
+**Option B:** Rewrite tests using direct Playwright API
+- Simpler, more maintainable
+- Better aligned with existing ported tests
+- Each test would be 50-100 lines instead of 10-20 StepExecutor calls
+- More readable and easier to debug
 
 ### Porting Guidelines
 
