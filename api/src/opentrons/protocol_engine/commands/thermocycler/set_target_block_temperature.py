@@ -122,13 +122,16 @@ class SetTargetBlockTemperatureImpl(
 
         async def set_target_block_temperature(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
-                await thermocycler_hardware.set_target_block_temperature(
-                    celsius=target_temperature,
-                    volume=target_volume,
-                    ramp_rate=target_ramp_rate,
-                    hold_time_seconds=hold_time,
-                )
-                await thermocycler_hardware.wait_for_block_target()
+                async with task_handler.synchronize_cancel_latest(
+                    thermocycler_state.module_id + "-block"
+                ):
+                    await thermocycler_hardware.set_target_block_temperature(
+                        celsius=target_temperature,
+                        volume=target_volume,
+                        ramp_rate=target_ramp_rate,
+                        hold_time_seconds=hold_time,
+                    )
+                    await thermocycler_hardware.wait_for_block_target()
 
         task = await self._task_handler.create_task(
             task_function=set_target_block_temperature, id=params.taskId

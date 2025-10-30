@@ -206,7 +206,6 @@ class HardwarePipettingHandler(PipettingHandler):
             await self._hardware_api.aspirate_while_tracking(
                 mount=hw_pipette.mount,
                 end_point=end_point,
-                flow_rate=flow_rate,
                 volume=adjusted_volume,
                 movement_delay=movement_delay,
             )
@@ -236,7 +235,6 @@ class HardwarePipettingHandler(PipettingHandler):
             await self._hardware_api.dispense_while_tracking(
                 mount=hw_pipette.mount,
                 end_point=end_point,
-                flow_rate=flow_rate,
                 volume=adjusted_volume,
                 push_out=push_out,
                 is_full_dispense=is_full_dispense,

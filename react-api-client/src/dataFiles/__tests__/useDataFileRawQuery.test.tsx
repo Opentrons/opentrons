@@ -19,8 +19,10 @@ vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const FILE_ID = 'file123'
-const FILE_CONTENT_RESPONSE =
-  'content,of,my,csv\nfile,' as DownloadedDataFileResponse
+
+const mockMediaSource = (): Blob | string => 'test'
+
+const FILE_CONTENT_RESPONSE = mockMediaSource() as DownloadedDataFileResponse
 
 describe('useDataFileRawQuery hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>

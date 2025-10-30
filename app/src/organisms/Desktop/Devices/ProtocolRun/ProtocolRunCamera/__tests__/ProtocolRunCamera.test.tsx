@@ -10,11 +10,24 @@ import { LaunchLivestreamBtn } from '../LaunchLivestreamBtn'
 
 vi.mock('../LaunchLivestreamBtn')
 vi.mock('../ImageGalleryContainer')
+vi.mock('/app/redux/protocol-runs')
 
 const render = () => {
-  return renderWithProviders(<ProtocolRunCamera />, {
-    i18nInstance: i18n,
-  })
+  const RUN_ID = 'run123'
+  const robotType = 'OT-3 Standard'
+  return renderWithProviders(
+    <ProtocolRunCamera
+      runId={RUN_ID}
+      robotType={robotType}
+      runStatus={'MOCK-RUN-STATUS' as any}
+      protocolName="MOCK-PROTOCOL"
+      runTimestamp="MOCK-RUN-TIMESTAMP"
+      robotName="MOCK-ROBOT-NAME"
+    />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('ProtocolRunCamera', () => {

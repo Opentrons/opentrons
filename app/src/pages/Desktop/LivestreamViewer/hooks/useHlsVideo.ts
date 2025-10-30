@@ -18,7 +18,6 @@ export interface UseHlsVideoResult {
 // camera stream URLs from the main Electron process and displays them.
 export function useHlsVideo(): UseHlsVideoResult {
   const host = useHost()
-  console.log('=>(useHlsVideo.ts:21) host', host)
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
   const [error, setError] = useState<string | null>(null)

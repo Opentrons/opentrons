@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { getModulePrepCommands } from '/app/local-resources/modules'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -11,10 +10,7 @@ import {
   useChainMaintenanceCommands,
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
-import {
-  useChainLiveCommands,
-  useCreateTargetedMaintenanceRunMutation,
-} from '/app/resources/runs'
+import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
 import { useSendIdentifyStacker } from './hooks'
@@ -98,8 +94,6 @@ export function useModuleSetupWizard(
 
   const { chainRunCommands, isCommandMutationLoading } =
     useChainMaintenanceCommands()
-  const { chainLiveCommands, isCommandMutationLoading: isLiveCommandLoading } =
-    useChainLiveCommands()
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation({
@@ -143,14 +137,24 @@ export function useModuleSetupWizard(
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     if (attachedModule != null) sendIdentifyStacker(attachedModule, false)
-    if (maintenanceRunId == null) handleClose()
-    else {
+    if (maintenanceRunId == null) {
+      console.log(
+        'closing module setup wizard: no maintenance run, not deleting'
+      )
+      handleClose()
+    } else {
+      console.log(
+        'closing module setup wizard: homing and clearing maintenance run'
+      )
       chainRunCommands(
         maintenanceRunId,
         [{ commandType: 'home' as const, params: {} }],
-        false
+        true
       )
         .then(() => {
+          console.log(
+            'closing module setup wizard: homed, clearing maintenance run'
+          )
           deleteMaintenanceRun(maintenanceRunId)
           handleClose()
         })
@@ -174,22 +178,12 @@ export function useModuleSetupWizard(
   const [isModuleUpdating, setIsModuleUpdating] = useState<boolean>(false)
 
   useEffect(() => {
-    if (
-      isCommandMutationLoading ||
-      isExiting ||
-      isCreateLoading ||
-      isLiveCommandLoading
-    ) {
+    if (isCommandMutationLoading || isExiting || isCreateLoading) {
       setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
-  }, [
-    isCommandMutationLoading,
-    isExiting,
-    isCreateLoading,
-    isLiveCommandLoading,
-  ])
+  }, [isCommandMutationLoading, isExiting, isCreateLoading])
 
   let chainMaintenanceRunCommands
 
@@ -221,15 +215,6 @@ export function useModuleSetupWizard(
   const buildFlowForSelectedModule = (
     selectedModuleToBuildFlow: AttachedModule
   ): void => {
-    const modulePrepCommands = getModulePrepCommands(selectedModuleToBuildFlow)
-    if (modulePrepCommands.length > 0) {
-      chainLiveCommands(
-        getModulePrepCommands(selectedModuleToBuildFlow),
-        false
-      ).catch((e: Error) => {
-        setErrorMessage(e.message)
-      })
-    }
     dispatch({
       type: ACTIONS.BUILD_FLOW,
       attachedModule: selectedModuleToBuildFlow,

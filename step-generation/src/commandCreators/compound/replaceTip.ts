@@ -116,9 +116,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
   const isWasteChute =
-    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
-  const isTrashBin =
-    invariantContext.trashBinEntities[args.dropTipLocation] != null
+    invariantContext.wasteChuteEntities[dropTipLocation] != null
+  const isTrashBin = invariantContext.trashBinEntities[dropTipLocation] != null
 
   if (!labwareDef) {
     return {
@@ -133,7 +132,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 
   const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
 
-  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin && hasTip)) {
+  if (!dropTipLocation || (!isWasteChute && !isTrashBin && hasTip)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 

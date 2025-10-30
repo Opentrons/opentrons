@@ -126,8 +126,8 @@ export const mixFormToArgs = (
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
-    tip_tracking: tip_tracking ?? AUTOMATIC,
-    tips_selected: tips_selected ?? [],
-    tiprack_selected: tiprack_selected ?? null,
+    tipTracking: tip_tracking ?? AUTOMATIC,
+    tipsSelected: tips_selected ?? [],
+    tiprackSelected: tiprack_selected ?? null,
   }
 }

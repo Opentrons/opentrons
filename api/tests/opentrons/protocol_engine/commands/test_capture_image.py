@@ -3,6 +3,7 @@
 import pytest
 import mock
 from decoy import Decoy
+from typing import Tuple
 
 from opentrons.system import camera
 from opentrons.system import ffmpeg
@@ -15,6 +16,7 @@ from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.capture_image import (
     CaptureImageParams,
     CaptureImageImpl,
+    CaptureImageResult,
 )
 
 
@@ -23,7 +25,7 @@ from opentrons.protocol_engine.errors import (
     CameraDisabledError,
     CameraSettingsInvalidError,
 )
-from opentrons.system.camera import image_capture
+from opentrons.system.camera import image_capture, ZOOM_DEFAULT, RESOLUTION_DEFAULT
 
 
 @pytest.fixture(autouse=True)
@@ -130,9 +132,9 @@ async def test_raises_camera_disabled_error(
     decoy.when(state_view.files.get_filecount()).then_return(0)
     decoy.when(await camera_provider.get_camera_settings()).then_return(
         CameraSettings(
-            camera_enabled=False,
-            live_stream_enabled=False,
-            error_recovery_enabled=False,
+            cameraEnabled=False,
+            liveStreamEnabled=False,
+            errorRecoveryEnabled=False,
         )
     )
 
@@ -203,3 +205,128 @@ async def test_ensure_camera_used_precondition_set(
         assert result.state_update.precondition_update.preconditions == {
             PreconditionTypes.IS_CAMERA_USED: True
         }
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "resolution",
+        "result_resolution",
+        "zoom",
+        "result_zoom",
+        "pan",
+        "result_pan",
+        "contrast",
+        "result_contrast",
+        "brightness",
+        "result_brightness",
+        "saturation",
+        "result_saturation",
+    ],
+    argvalues=[
+        [
+            None,
+            RESOLUTION_DEFAULT,
+            None,
+            ZOOM_DEFAULT,
+            None,
+            None,
+            None,
+            50,
+            None,
+            50,
+            None,
+            50,
+        ],
+        [
+            (1, 2),
+            (1, 2),
+            1.5,
+            1.5,
+            (3, 4),
+            (3, 4),
+            25,
+            25,
+            10,
+            10,
+            75,
+            75,
+        ],
+        [
+            (1, 2),
+            (1, 2),
+            2.0,
+            2.0,
+            (3, 4),
+            (3, 4),
+            75,
+            75,
+            99,
+            99,
+            25,
+            25,
+        ],
+        [
+            (9999999, 9999999),
+            (9999999, 9999999),
+            1.0,
+            1.0,
+            (25, 45),
+            (25, 45),
+            21,
+            21,
+            11,
+            11,
+            59,
+            59,
+        ],
+    ],
+)
+async def test_capture_image_returns_expected_params(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+    resolution: Tuple[int, int] | None,
+    zoom: float | None,
+    pan: Tuple[int, int] | None,
+    contrast: float | None,
+    brightness: float | None,
+    saturation: float | None,
+    result_resolution: Tuple[int, int],
+    result_zoom: float,
+    result_pan: Tuple[int, int] | None,
+    result_contrast: float,
+    result_brightness: float,
+    result_saturation: float,
+) -> None:
+    """It should return the successful result of an image capture with valid parameters."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(
+        fileName="coolpic",
+        resolution=resolution,
+        zoom=zoom,
+        pan=pan,
+        contrast=contrast,
+        brightness=brightness,
+        saturation=saturation,
+    )
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        result = await subject.execute(params=params)
+        assert result == SuccessData(
+            public=CaptureImageResult(
+                fileId=None,
+                resolution=result_resolution,
+                zoom=result_zoom,
+                pan=result_pan,
+                contrast=result_contrast,
+                brightness=result_brightness,
+                saturation=result_saturation,
+            ),
+            state_update=result.state_update,
+        )

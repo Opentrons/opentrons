@@ -74,6 +74,8 @@ _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
 _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
 """The version after which the user can supply liquid class transfers with non-assigned tip racks."""
+_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
+"""The version after which the user can supply liquid class transfers with selected tips."""
 
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
@@ -1050,9 +1052,13 @@ class InstrumentContext(publisher.CommandPublisher):
                     # starting in 2.16, we disable push_out on all but the last
                     # dispense() to prevent the tip from jumping out of the liquid
                     # during the mix (PR #14004):
+                    self.move_to(dispense_start_location, force_direct=True)
                     dispense_with_delay(push_out=0.0)
+                    self.move_to(aspirate_start_location, force_direct=True)
                     aspirate_with_delay()
                     repetitions -= 1
+
+                self.move_to(dispense_start_location, force_direct=True)
                 if final_push_out is not None:
                     dispense_with_delay(push_out=final_push_out)
                 else:
@@ -2154,6 +2160,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
+        tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """Move a particular type of liquid from one well or group of wells to another.
 
@@ -2193,9 +2202,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2214,6 +2228,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
+        if (
+            tips is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
 
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
@@ -2227,6 +2250,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2281,6 +2305,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
+                else None,
             )
 
         return self
@@ -2302,6 +2329,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
+        tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """
         Distribute a particular type of liquid from one well to a group of wells.
@@ -2338,9 +2368,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2359,6 +2394,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
+        if (
+            tips is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
 
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
@@ -2372,6 +2416,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2434,6 +2479,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
+                else None,
             )
 
         return self
@@ -2455,6 +2503,9 @@ class InstrumentContext(publisher.CommandPublisher):
         group_wells: bool = True,
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
+        tips: Optional[
+            Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]]
+        ] = None,
     ) -> InstrumentContext:
         """
         Consolidate a particular type of liquid from a group of wells to one well.
@@ -2492,9 +2543,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
             up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
             value of ``InstrumentContext.tip_racks``.
+        :param tips: An ordered list of tips to use for the transfer. If the list contains fewer tips than needed to
+            complete the transfer, the API will raise an error. The pipette will use only these tips even if
+            ``InstrumentContext.tip_racks`` or the ``tip_racks`` parameter of this method is set.
 
             .. versionchanged:: 2.25
                 Added the ``tip_racks`` parameter.
+            .. versionchanged:: 2.27
+                Added the ``tips`` parameter.
 
         """
         if volume == 0.0:
@@ -2513,6 +2569,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 until_version=f"{_LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN}",
                 current_version=f"{self.api_version}",
             )
+        if (
+            tips is not None
+            and self.api_version < _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN
+        ):
+            raise APIVersionError(
+                api_element="tips",
+                until_version=f"{_LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN}",
+                current_version=f"{self.api_version}",
+            )
 
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
@@ -2526,6 +2591,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
             ),
+            tips=tips,
         )
         verified_keep_last_tip = resolve_keep_last_tip(
             keep_last_tip, transfer_args.tip_policy
@@ -2587,6 +2653,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
+                tips=[tip._core for tip in transfer_args.tips]
+                if transfer_args.tips is not None
+                else None,
             )
 
         return self

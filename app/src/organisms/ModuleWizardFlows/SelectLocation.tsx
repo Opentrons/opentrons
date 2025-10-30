@@ -92,11 +92,14 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
-      createMaintenanceRun({}).catch(error => {
-        setErrorMessage(error.message as string)
-      })
+      createMaintenanceRun({})
+        .catch(error => {
+          setErrorMessage(error.message as string)
+        })
+        .then(proceed)
+    } else {
+      proceed()
     }
-    proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)

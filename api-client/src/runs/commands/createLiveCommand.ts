@@ -1,4 +1,4 @@
-import { POST, request } from '../../request'
+import { createAxiosConfig, POST, request } from '../../request'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../../request'
@@ -16,6 +16,6 @@ export function createLiveCommand(
     `/commands`,
     { data },
     config,
-    params
+    params && createAxiosConfig({ params })
   )
 }

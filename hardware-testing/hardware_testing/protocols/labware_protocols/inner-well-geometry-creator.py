@@ -82,7 +82,7 @@ class SetupState:
     probe_pipette: InstrumentContext
     labware: Labware
     src: Labware
-    dial: Labware
+    dial: Optional[Labware]
     first_dispense: float
     target_height: float
     labware_type: str
@@ -165,6 +165,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         choices=[
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_50",
@@ -175,10 +177,10 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Right Mount",
         description="Liquid Pipette Type on Right Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_1000",
@@ -212,6 +214,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
+    parameters.add_bool(
+        variable_name="dial_indicator_used",
+        display_name="Dial Indicator Use",
+        description="Used to calibrate tip overlap.",
+        default=True,
+    )
+
 
 def _setup(ctx: ProtocolContext) -> SetupState:
     """Sets up the static data for the protocol."""
@@ -223,6 +232,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
+    dial_indicator_used = ctx.params.dial_indicator_used  # type: ignore[attr-defined]
 
     # tipracks
     liquid_racks = [
@@ -237,6 +247,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     probe_pipette = ctx.load_instrument(
         left_mount, PROBING_MOUNT, tip_racks=[probing_rack]
     )
+    if probe_pipette.channels == 8:
+        probe_pipette.configure_nozzle_layout(
+            style=SINGLE, start="H1", tip_racks=[probing_rack]
+        )
     liq_pipette = ctx.load_instrument(right_mount, LIQUID_MOUNT, tip_racks=liquid_racks)
     if liq_pipette.channels == 8:
         liq_pipette.configure_nozzle_layout(
@@ -249,7 +263,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     wells = list(labware.wells_by_name().keys())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+
+    dial: Optional[Labware] = None
+    if dial_indicator_used:
+        dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     # below threshold, alpha low. above threshold, alpha high
     threshold = 4.5
@@ -269,17 +286,11 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class(name="ethanol_80")
 
-    if not ctx.is_simulating() and DIAL_PORT is None:
+    if not ctx.is_simulating():
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-            Mitutoyo_Digimatic_Indicator,
-        )
 
-        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
-        DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(metadata["protocolName"], RUN_ID, labware_type)
-
         _write_line_to_csv(ctx, [RUN_ID])
         _write_line_to_csv(ctx, [right_mount])
         _write_line_to_csv(ctx, [left_mount])
@@ -288,6 +299,14 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
         lpc = str(labware._core.get_calibrated_offset())
         _write_line_to_csv(ctx, ["LPC Offset", labware.load_name, lpc])
+
+        if dial is not None:
+            from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
+                Mitutoyo_Digimatic_Indicator,
+            )
+
+            DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
+            DIAL_PORT.connect()
 
     return SetupState(
         liq_pipette=liq_pipette,
@@ -639,7 +658,8 @@ def geometry_creator(
 ) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
     # initial protocol steps
-    _store_dial_baseline(ctx, state.probe_pipette, state.dial)
+    if state.dial is not None:
+        _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)  # log 0th step as a baseline
     write_trial_log(ctx, ts)
     state.liq_pipette.pick_up_tip()
@@ -671,7 +691,8 @@ def geometry_creator(
         get_dispense_props(state, ts)
 
         pick_up_tips(state.liq_pipette, state.probe_pipette)
-        ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
+        if state.dial is not None:
+            ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
         state.liq_pipette.transfer_with_liquid_class(
             liquid_class=state.ethanol,

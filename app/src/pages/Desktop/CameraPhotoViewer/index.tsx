@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
+import clsx from 'clsx'
+
+import { InfoScreen } from '@opentrons/components'
 
 import styles from './photoviewer.module.css'
 
 export function CameraPhotoViewer(): JSX.Element {
+  const { t } = useTranslation('run_details')
   const [searchParams] = useSearchParams()
   const photoUrl = searchParams.get('photoUrl')
-  // TODO(jh, 09-10-25): Handle loading state once designs are finalized.
-  const [, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    setIsLoading(true)
-  }, [photoUrl])
+  const showLoadingScreen = isLoading || photoUrl == null
 
   const handleImageLoad = (): void => {
     setIsLoading(false)
@@ -23,15 +25,19 @@ export function CameraPhotoViewer(): JSX.Element {
 
   return (
     <div className={styles.container}>
-      {photoUrl != null && (
-        <img
-          className={styles.image}
-          src={photoUrl}
-          alt="camera-capture"
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-        />
+      {showLoadingScreen && (
+        <InfoScreen content={t('image_loading')} iconName="ot-spinner" />
       )}
+      <img
+        className={clsx(
+          styles.image,
+          showLoadingScreen ? styles.image_inactive : styles.active
+        )}
+        src={photoUrl ?? ''}
+        alt="camera-capture"
+        onLoad={handleImageLoad}
+        onError={handleImageError}
+      />
     </div>
   )
 }
