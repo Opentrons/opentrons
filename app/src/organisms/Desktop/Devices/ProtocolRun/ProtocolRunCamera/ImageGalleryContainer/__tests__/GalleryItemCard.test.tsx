@@ -64,7 +64,7 @@ describe('GalleryItemCard', () => {
   it('renders appropriate card copy when there is an image', () => {
     render(mockProps)
 
-    screen.getByText('Step 1/100: ?')
+    screen.getByText('Step ? / ?: ?')
     screen.getByText('View image')
     screen.getByText('2024-01-01 12:00:00')
   })

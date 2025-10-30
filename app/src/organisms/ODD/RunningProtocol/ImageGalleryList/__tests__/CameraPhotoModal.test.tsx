@@ -43,7 +43,7 @@ describe('CameraPhotoModal', () => {
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText(`Image at step ${MOCK_CMD_TEXT} at ${MOCK_TIMESTAMP}`)
+    screen.getByText(`Image at ${MOCK_CMD_TEXT} at ${MOCK_TIMESTAMP}`)
   })
 
   it('renders image with correct src and alt text', () => {
@@ -60,7 +60,7 @@ describe('CameraPhotoModal', () => {
     const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    screen.getByText(`Image at step ${MOCK_CMD_TEXT} at ${MOCK_TIMESTAMP}`)
+    screen.getByText(`Image at ${MOCK_CMD_TEXT} at ${MOCK_TIMESTAMP}`)
 
     const exitButton = screen.getByLabelText('closeIcon')
     fireEvent.click(exitButton)
