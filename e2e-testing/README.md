@@ -440,37 +440,37 @@ The Protocol Designer currently has 13 Cypress test files in `protocol-designer/
 7. **`pd_sanity_test.py`** (Original, not ported from Cypress) (2 tests)
    - Basic smoke tests for page load and onboarding flow
 
-**Total Passing Tests:** 46 tests across 7 files
+8. **`createNew.cy.ts`** → `tests/test_create_new_ot2.py` (1 test) ✨ **NEW**
+   - OT-2 robot selection workflow
+   - Verifies 96-Channel pipette available for Flex, not for OT-2
+
+**Total Passing Tests:** 47 tests across 8 files
 
 #### ⏭️ **Skipped / Not Applicable:**
 
 - **`batchEdit.cy.ts`** - Entirely commented out in Cypress (TODO: refactor for new batch edit)
 
-#### 🔄 **Remaining to Port (5 files):**
+#### 🔄 **Remaining to Port (4 files):**
 
 The remaining Cypress tests use the complex `StepExecutor` pattern which requires significant infrastructure:
 
-1. **`createNew.cy.ts`** - OT-2 onboarding flow
-   - Requires: StepExecutor, SetupSteps, SetupVerifications
-   - Complexity: Medium (uses step builder pattern)
-
-2. **`transferSettings.cy.ts`** - Single-channel transfer step testing
+1. **`transferSettings.cy.ts`** - Single-channel transfer step testing
    - Requires: Full protocol setup + transfer step configuration
    - Complexity: High (end-to-end workflow)
 
-3. **`mixSettings.cy.ts`** - Mix step configuration
+2. **`mixSettings.cy.ts`** - Mix step configuration
    - Requires: Full protocol setup + mix step configuration
    - Complexity: High (similar to transferSettings)
 
-4. **`modules.cy.ts`** - Module configuration workflow
+3. **`modules.cy.ts`** - Module configuration workflow
    - Requires: Full protocol setup + module configuration
    - Complexity: High (thermocycler, heater-shaker, mag block, temp module)
 
-5. **`thermocycler.cy.ts`** - Thermocycler detailed configuration
+4. **`thermocycler.cy.ts`** - Thermocycler detailed configuration
    - Requires: Thermocycler profile steps, state management
    - Complexity: Very High (complex module-specific testing)
 
-6. **`plateReaderTest.cy.ts`** - Plate reader module testing
+5. **`plateReaderTest.cy.ts`** - Plate reader module testing
    - Requires: Plate reader module setup, wavelength config
    - Complexity: High (module-specific testing)
 
