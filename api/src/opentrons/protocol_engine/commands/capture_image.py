@@ -135,7 +135,9 @@ class CaptureImageImpl(
             )
 
         parameters = _converted_image_params(params=params)
-        camera_data = await self._camera_provider.capture_image(parameters)
+        camera_data = await self._camera_provider.capture_image(
+            self._state_view.config.robot_type, parameters
+        )
 
         # Conditionally save file if camera data was returned - in simulation we don't return anything.
         file_id: str | None = None

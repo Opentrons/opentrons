@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 from ..errors import CameraCaptureError, CameraSettingsInvalidError
 import logging
 
+from opentrons_shared_data.robot.types import RobotType
+
 log = logging.getLogger(__name__)
 
 
@@ -63,7 +65,7 @@ class CameraProvider:
         self,
         camera_settings_callback: Optional[Callable[[], CameraSettings]] = None,
         image_capture_callback: Optional[
-            Callable[[ImageParameters], Awaitable[bytes | CameraError]]
+            Callable[[RobotType, ImageParameters], Awaitable[bytes | CameraError]]
         ] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
@@ -84,14 +86,16 @@ class CameraProvider:
             cameraEnabled=True, liveStreamEnabled=True, errorRecoveryEnabled=True
         )
 
-    async def capture_image(self, parameters: ImageParameters) -> bytes | None:
+    async def capture_image(
+        self, robot_type: RobotType, parameters: ImageParameters
+    ) -> bytes | None:
         """Process through the Camera Executor on robot server an image capture request with a given set of filters.
 
         Returns a bytesteam of image data upon success. Raises an error if an error occurred during capture.
         Conditionally returns None if an image capture callback does not exist (simulation).
         """
         if self._image_capture_callback is not None:
-            capture_result = await self._image_capture_callback(parameters)
+            capture_result = await self._image_capture_callback(robot_type, parameters)
             if not isinstance(capture_result, CameraError):
                 return capture_result
             else:
