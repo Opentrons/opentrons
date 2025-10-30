@@ -143,6 +143,7 @@ interface PrepareToRunProps {
   offsetsConfirmed: boolean
   cameraSettingsConfirmed: boolean
   isLPCInitializing: boolean
+  isCameraRequired: boolean
 }
 
 function PrepareToRun({
@@ -158,6 +159,7 @@ function PrepareToRun({
   confirmStepsComplete,
   offsetsConfirmed,
   cameraSettingsConfirmed,
+  isCameraRequired,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -362,14 +364,14 @@ function PrepareToRun({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
+  const isCameraReadyToRun = cameraSettingsConfirmed && isCameraRequired
+
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
     areModulesReady &&
     areFixturesReady &&
     !isAnyNecessaryDefaultOffsetMissing &&
-    // TODO(jh, 10-01-25): Eventually, only block the run if the camera is used in the protocol
-    //  AND the camera is not in an enabled state (unconfirmed enabled is ok).
-    (cameraSettingsConfirmed || !isCameraEnabled)
+    (isCameraReadyToRun || !isCameraEnabled)
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -402,9 +404,9 @@ function PrepareToRun({
             properties: robotAnalyticsData ?? {},
           })
         }
+      } else if (!isCameraReadyToRun) {
+        makeSnackbar(i18n.format(t('enable_camera')))
       } else {
-        // TODO(jh, 10-01-25): Add camera snackbar if the camera is disabled
-        //  but required for this protocol run.
         makeSnackbar(
           i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
         )
@@ -897,6 +899,7 @@ export function ProtocolSetup(): JSX.Element {
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
         offsetsConfirmed={offsetsConfirmed}
         cameraSettingsConfirmed={cameraSettingsConfirmed}
+        isCameraRequired={isCameraRequired}
       />
     ),
     instruments: (
