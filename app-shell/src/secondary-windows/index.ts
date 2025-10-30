@@ -18,6 +18,7 @@ import { createLogger } from '../log'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
 import {
+  getWindowIdStepDetailViewer,
   openStepDetailViewer,
   updateStepDetailViewerData,
 } from './step-detail-viewer'
@@ -75,7 +76,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         log,
       })
     case STEP_DETAIL_VIEWER_OPEN: {
-      const windowId = `step-detail-viewer-${action.payload.protocolKey}`
+      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
       const existingWindow = secondaryWindows.get(windowId)
 
       if (existingWindow == null || existingWindow.isDestroyed()) {

@@ -60,7 +60,7 @@ export function updateStepDetailViewerData(
   })
 }
 
-function getWindowIdStepDetailViewer(protocolKey: string): string {
+export function getWindowIdStepDetailViewer(protocolKey: string): string {
   return `step-detail-viewer-${protocolKey}`
 }
 
@@ -135,6 +135,6 @@ ipcMain.handle('get-step-detail-data', (_event, protocolKey: string) => {
 
 ipcMain.handle('is-step-detail-viewer-open', (_event, protocolKey: string) => {
   // Use the secondaryWindows map to reliably check if window exists
-  const windowId = `step-detail-viewer-${protocolKey}`
+  const windowId = getWindowIdStepDetailViewer(protocolKey)
   return isSecondaryWindowOpen(windowId)
 })
