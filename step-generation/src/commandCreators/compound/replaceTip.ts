@@ -76,7 +76,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         errors: [errorCreators.noTipSelected()],
       }
     }
-    const result = getNextTiprack(
+    const nextTiprackResult = getNextTiprack(
       pipette,
       tipRack,
       invariantContext,
@@ -84,11 +84,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       nozzles
     )
 
-    nextTiprack = result.nextTiprack
-    const tipracks = result.tipracks
+    nextTiprack = nextTiprackResult.nextTiprack
+    const tipracks = nextTiprackResult.tipracks
 
-    const excludedBy96Channel = tipracks?.excludedBy96Channel
-    const excludedByLid = tipracks?.excludedByLid
+    const { excludedBy96Channel, excludedByLid } = tipracks ?? {}
 
     const is96ChannelTipracksAvailable =
       nextTiprack == null && channels === 96 && excludedBy96Channel > 0
