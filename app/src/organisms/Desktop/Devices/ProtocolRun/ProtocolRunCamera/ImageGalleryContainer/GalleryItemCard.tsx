@@ -7,6 +7,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
+import { GalleryItemOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemOverflowMenu'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
@@ -14,7 +15,13 @@ import styles from './gallery.module.css'
 
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
-export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
+export interface GalleryItemCardProps extends UseImageGalleryDataProps {
+  protocolName: string
+  runTimestamp: string
+  robotName: string
+}
+
+export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
   const { item, protocolAnalysis } = props
   const {
     currentCommand,
@@ -136,6 +143,14 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular">{timestamp}</StyledText>
         )}
       </div>
+      <GalleryItemOverflowMenu
+        imagePath={imagePath}
+        robotName={props.robotName}
+        runTimestamp={props.runTimestamp}
+        commandStep={commandStep}
+        imageTimestamp={item.timestamp}
+        protocolName={props.protocolName}
+      />
     </div>
   )
 }
