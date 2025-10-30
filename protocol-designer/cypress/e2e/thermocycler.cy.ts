@@ -1,4 +1,7 @@
-import { verifyImportProtocolPage } from '../support/Import'
+import {
+  verifyImportProtocolPage,
+  verifyOldProtocolModal,
+} from '../support/Import'
 import { StepExecutor } from '../support/StepBuilder'
 import { getTestFile, TestFilePath } from '../support/TestFiles'
 import {
@@ -18,6 +21,7 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
     const protocol = getTestFile(TestFilePath.DoItAllV8)
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
+    verifyOldProtocolModal()
     cy.contains('Edit protocol').click()
   })
 

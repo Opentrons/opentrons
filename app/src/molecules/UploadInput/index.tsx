@@ -64,13 +64,8 @@ export interface UploadInputProps {
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
-  const {
-    dragAndDropText,
-    onClick,
-    onUpload,
-    uploadButtonText,
-    uploadText,
-  } = props
+  const { dragAndDropText, onClick, onUpload, uploadButtonText, uploadText } =
+    props
   const { t } = useTranslation('protocol_info')
 
   const fileInput = useRef<HTMLInputElement>(null)

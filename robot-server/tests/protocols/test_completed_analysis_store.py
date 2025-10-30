@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy.engine import Engine
 from decoy import Decoy
 
-from robot_server.data_files.models import DataFileSource
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.persistence.tables import (
     analysis_table,
     analysis_primitive_type_rtp_table,
@@ -24,7 +24,6 @@ from opentrons.protocol_reader import (
 )
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
@@ -80,7 +79,13 @@ def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
     """
     data_files_dir = tmp_path / "data_files"
     data_files_dir.mkdir()
-    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    return DataFilesStore(
+        sql_engine=sql_engine,
+        data_files_directory=data_files_dir,
+        images_directory=images_dir,
+    )
 
 
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
@@ -332,8 +337,11 @@ async def test_store_and_get_csv_rtps_by_analysis_id(
             id="file-id",
             name="my_csv_file.csv",
             file_hash="file-hash",
-            source=DataFileSource.UPLOADED,
+            path="data_files/file-id/my_csv_file.csv",
+            stored=True,
+            generated=False,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     await subject.make_room_and_add(
@@ -467,8 +475,11 @@ async def test_make_room_and_add_handles_rtp_tables_correctly(
             id="file-id",
             name="my_csv_file.csv",
             file_hash="file-hash",
-            source=DataFileSource.UPLOADED,
+            path="data_files/file-id/my_csv_file.csv",
+            generated=False,
+            stored=True,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            mime_type=MimeType.TEXT_CSV,
         )
     )
     # Set up the database with existing analyses

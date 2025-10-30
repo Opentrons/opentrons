@@ -153,10 +153,11 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     return null // Shouldn't happen.
                   }
 
-                  const slotOriginToLabwareOrigin = getDeckSlotOriginToLabwareOrigin(
-                    addressableArea,
-                    labwareDef
-                  )
+                  const slotOriginToLabwareOrigin =
+                    getDeckSlotOriginToLabwareOrigin(
+                      addressableArea,
+                      labwareDef
+                    )
                   const labwarePosition = getVectorSum(
                     coordinateTupleToVector3D(slotOrigin),
                     slotOriginToLabwareOrigin

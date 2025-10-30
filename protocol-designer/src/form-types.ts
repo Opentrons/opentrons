@@ -8,6 +8,7 @@ import type {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TipTrackingOption,
   TrashBinEntity,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
@@ -18,6 +19,7 @@ import type {
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from './constants'
@@ -200,9 +202,13 @@ export type HydratedPauseFormData = AnnotationFields & {
     | typeof PAUSE_UNTIL_RESUME
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP
+    | typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
   pauseMessage?: string
+  /** If `PAUSE_UNTIL_TEMP`, the temperature to wait for. */
   pauseTemperature?: string
+  /** If `PAUSE_UNTIL_TIME`, how long to wait. */
   pauseTime?: string
+  /** If `PAUSE_UNTIL_TEMP` or `PAUSE_UNTIL_TC_PROFILE_COMPLETE`, the module to wait for. */
   moduleId?: string
 }
 export interface FormData {
@@ -285,7 +291,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
-  aspirate_airGap_volume?: number | null
+  aspirate_airGap_volume?: string | null
   aspirate_delay_seconds?: number | null
   aspirate_flowRate?: number | null
   aspirate_mix_times?: number | null
@@ -314,7 +320,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_location?: string | null
   conditioning_checkbox: boolean | null
   conditioning_volume: number | null
-  dispense_airGap_volume?: number | null
+  dispense_airGap_volume?: string | null
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dispense_mix_times?: number | null
@@ -338,12 +344,15 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_x_position?: number | null
   dispense_y_position?: number | null
   dispense_position_reference: PositionReference
-  disposalVolume_volume?: number | null
+  disposalVolume_volume?: string | null
   dropTip_wellNames?: string[] | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
   liquidClass?: string | null // a liquid class name like "water" or "none" or null
+  tips_selected?: string[][] | null
+  tip_tracking?: TipTrackingOption | null
+  tiprack_selected?: string | null
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
@@ -397,6 +406,9 @@ export interface HydratedMixFormData extends AnnotationFields {
   pushOut_checkbox: boolean
   times?: number | null
   liquidClass?: string | null
+  tips_selected?: string[][] | null
+  tip_tracking?: TipTrackingOption | null
+  tiprack_selected?: string | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

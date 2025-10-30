@@ -17,7 +17,7 @@ export const getFlowRateFields = (
   return {
     [`${liquidHandlingAction}_flowRate`]:
       hardwareMaximum != null
-        ? min([interpolatedFlowRate, hardwareMaximum]) ?? null
+        ? (min([interpolatedFlowRate, hardwareMaximum]) ?? null)
         : interpolatedFlowRate,
   }
 }

@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { uuid } from '../../utils'
@@ -65,7 +65,7 @@ export const migrateFile = (
     ].labwareLocationUpdate
   const ingredLocations = appData.designerApplication?.data?.ingredLocations
 
-  const allLabwareDefs = getAllLabwareDefs()
+  const allLabwareDefs = getAllDefinitions()
 
   const getIsAdapter = (labwareId: string): boolean => {
     const labwareEntity = labware[labwareId]
@@ -132,14 +132,10 @@ export const migrateFile = (
         getIsAdapter(command.params.labwareId)
     )
     .flatMap(command => {
-      const {
-        adapterUri,
-        labwareUri,
-        adapterDisplayName,
-        labwareDisplayName,
-      } = getAdapterAndLabwareSplitInfo(
-        labware[command.params.labwareId].definitionId
-      )
+      const { adapterUri, labwareUri, adapterDisplayName, labwareDisplayName } =
+        getAdapterAndLabwareSplitInfo(
+          labware[command.params.labwareId].definitionId
+        )
       const labwareLocation = command.params.location
       let adapterLocation: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -149,14 +145,10 @@ export const migrateFile = (
       } else if ('slotName' in labwareLocation) {
         adapterLocation = { slotName: labwareLocation.slotName }
       }
-      const {
-        parameters: adapterParameters,
-        version: adapterVersion,
-      } = allLabwareDefs[adapterUri]
-      const {
-        parameters: labwareParameters,
-        version: labwareVersion,
-      } = allLabwareDefs[labwareUri]
+      const { parameters: adapterParameters, version: adapterVersion } =
+        allLabwareDefs[adapterUri]
+      const { parameters: labwareParameters, version: labwareVersion } =
+        allLabwareDefs[labwareUri]
       const adapterId = mappedLabwareIds[command.params.labwareId].newAdapterId
 
       const loadAdapterCommand: LoadLabwareCreateCommand = {
@@ -218,9 +210,8 @@ export const migrateFile = (
     .map(command => {
       const labwareId = command.params.labwareId
       const definitionId = labware[labwareId].definitionId
-      const { namespace, version, parameters } = labwareDefinitions[
-        definitionId
-      ]
+      const { namespace, version, parameters } =
+        labwareDefinitions[definitionId]
       const labwareLocation = command.params.location
       let location: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -278,31 +269,30 @@ export const migrateFile = (
           : `${labwareId}:${definitionId}`
       acc[labId] = labwareLocationUpdate[labwareId]
     } else {
-      const adapterAndLabwareLocationUpdate: LabwareLocationUpdate = Object.entries(
-        loadAdapterAndLabwareCommands
-      ).reduce(
-        (
-          adapterAndLabwareAcc: LabwareLocationUpdate,
-          [id, command]: [string, LoadLabwareCreateCommand]
-        ) => {
-          const { location, labwareId } = command.params
-          const labId = labwareId ?? ''
+      const adapterAndLabwareLocationUpdate: LabwareLocationUpdate =
+        Object.entries(loadAdapterAndLabwareCommands).reduce(
+          (
+            adapterAndLabwareAcc: LabwareLocationUpdate,
+            [id, command]: [string, LoadLabwareCreateCommand]
+          ) => {
+            const { location, labwareId } = command.params
+            const labId = labwareId ?? ''
 
-          let locationString = ''
-          if (location === 'offDeck') {
-            locationString = 'offDeck'
-          } else if ('moduleId' in location) {
-            locationString = location.moduleId
-          } else if ('slotName' in location) {
-            locationString = location.slotName
-          } else if ('labwareId' in location) {
-            locationString = location.labwareId
-          }
-          adapterAndLabwareAcc[labId] = locationString
-          return adapterAndLabwareAcc
-        },
-        {}
-      )
+            let locationString = ''
+            if (location === 'offDeck') {
+              locationString = 'offDeck'
+            } else if ('moduleId' in location) {
+              locationString = location.moduleId
+            } else if ('slotName' in location) {
+              locationString = location.slotName
+            } else if ('labwareId' in location) {
+              locationString = location.labwareId
+            }
+            adapterAndLabwareAcc[labId] = locationString
+            return adapterAndLabwareAcc
+          },
+          {}
+        )
       acc = { ...acc, ...adapterAndLabwareLocationUpdate }
     }
     return acc
@@ -311,7 +301,8 @@ export const migrateFile = (
   const getNewLabwareIngreds = (
     ingredLocations?: DesignerApplicationData['ingredLocations']
   ): DesignerApplicationData['ingredLocations'] => {
-    const updatedIngredLocations: DesignerApplicationData['ingredLocations'] = {}
+    const updatedIngredLocations: DesignerApplicationData['ingredLocations'] =
+      {}
     if (ingredLocations == null) return {}
     for (const [labwareId, wellData] of Object.entries(ingredLocations)) {
       if (getIsAdapter(labwareId)) {
@@ -362,9 +353,10 @@ export const migrateFile = (
           )
         }
 
-        const aspirateTouchTipIncompatible = newAspirateLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const aspirateTouchTipIncompatible =
+          newAspirateLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
 
         let newDispenseLabwareDefinition: LabwareDefinition2 | null = null
 
@@ -394,25 +386,26 @@ export const migrateFile = (
             `expected to find dispense labware definition with labwareId ${dispenseLabware} but could not`
           )
         }
-        const dispenseTouchTipIncompatible = newDispenseLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const dispenseTouchTipIncompatible =
+          newDispenseLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
         return {
           ...stepForm,
           dispense_labware: dispenseLabware,
           aspirate_labware: aspirateLabware,
           aspirate_touchTip_checkbox: aspirateTouchTipIncompatible
             ? false
-            : stepForm.aspirate_touchTip_checkbox ?? false,
+            : (stepForm.aspirate_touchTip_checkbox ?? false),
           aspirate_touchTip_mmFromBottom: aspirateTouchTipIncompatible
             ? null
-            : stepForm.aspirate_touchTip_mmFromBottom ?? null,
+            : (stepForm.aspirate_touchTip_mmFromBottom ?? null),
           dispense_touchTip_checkbox: dispenseTouchTipIncompatible
             ? false
-            : stepForm.dispense_touchTip_checkbox ?? false,
+            : (stepForm.dispense_touchTip_checkbox ?? false),
           dispense_touchTip_mmFromBottom: dispenseTouchTipIncompatible
             ? null
-            : stepForm.dispense_touchTip_mmFromBottom ?? null,
+            : (stepForm.dispense_touchTip_mmFromBottom ?? null),
         }
       } else if (stepForm.stepType === 'mix') {
         let newMixLabwareDefinition: LabwareDefinition2 | null = null
@@ -441,19 +434,20 @@ export const migrateFile = (
           )
         }
 
-        const mixTouchTipIncompatible = newMixLabwareDefinition?.parameters.quirks?.includes(
-          'touchTipDisabled'
-        )
+        const mixTouchTipIncompatible =
+          newMixLabwareDefinition?.parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
 
         return {
           ...stepForm,
           labware: mixLabware,
           mix_touchTip_checkbox: mixTouchTipIncompatible
             ? false
-            : stepForm.mix_touchTip_checkbox ?? false,
+            : (stepForm.mix_touchTip_checkbox ?? false),
           mix_touchTip_mmFromBottom: mixTouchTipIncompatible
             ? null
-            : stepForm.mix_touchTip_mmFromBottom ?? null,
+            : (stepForm.mix_touchTip_mmFromBottom ?? null),
         }
       }
 

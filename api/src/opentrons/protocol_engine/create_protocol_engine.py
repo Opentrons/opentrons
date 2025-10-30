@@ -11,6 +11,7 @@ from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchroni
 from opentrons.protocol_engine.resources.labware_data_provider import (
     LabwareDataProvider,
 )
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.util.async_helpers import async_context_manager_in_thread
 
 from opentrons_shared_data.robot import load as load_robot
@@ -38,6 +39,7 @@ async def create_protocol_engine(
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     file_provider: typing.Optional[FileProvider] = None,
+    camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
@@ -50,6 +52,7 @@ async def create_protocol_engine(
         load_fixed_trash: Automatically load fixed trash labware in engine.
         deck_configuration: The initial deck configuration the engine will be instantiated with.
         file_provider: Provides access to robot server file writing procedures for protocol output.
+        camera_provider: Provides access to camera interface with image capture and callbacks.
         notify_publishers: Notifies robot server publishers of internal state change.
     """
     deck_data = DeckDataProvider(config.deck_type)
@@ -83,6 +86,7 @@ async def create_protocol_engine(
     door_watcher = DoorWatcher(state_store, hardware_api, action_dispatcher)
     module_data_provider = ModuleDataProvider()
     file_provider = file_provider or FileProvider()
+    camera_provider = camera_provider or CameraProvider()
 
     pe = ProtocolEngine(
         hardware_api=hardware_api,
@@ -94,6 +98,7 @@ async def create_protocol_engine(
         door_watcher=door_watcher,
         module_data_provider=module_data_provider,
         file_provider=file_provider,
+        camera_provider=camera_provider,
     )
 
     # todo(mm, 2024-11-08): This is a quick hack to support the absorbance reader, which
@@ -121,6 +126,7 @@ def create_protocol_engine_in_thread(
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
     load_fixed_trash: bool = False,
+    camera_provider: typing.Optional[CameraProvider] = None,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -151,6 +157,7 @@ def create_protocol_engine_in_thread(
             drop_tips_after_run,
             post_run_hardware_state,
             load_fixed_trash,
+            camera_provider,
         )
     ) as (
         protocol_engine,
@@ -169,6 +176,7 @@ async def _protocol_engine(
     drop_tips_after_run: bool,
     post_run_hardware_state: PostRunHardwareState,
     load_fixed_trash: bool = False,
+    camera_provider: typing.Optional[CameraProvider] = None,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
@@ -179,9 +187,13 @@ async def _protocol_engine(
     )
 
     # TODO(tz, 6-20-2024): This feels like a hack, we should probably return the orchestrator instead of pe.
+
     orchestrator = create_run_orchestrator(
         hardware_api=hardware_api,
         protocol_engine=protocol_engine,
+        camera_provider=camera_provider
+        if camera_provider is not None
+        else CameraProvider(),
     )
     try:
         orchestrator.play(deck_configuration)

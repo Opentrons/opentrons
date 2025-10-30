@@ -9,22 +9,23 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
-  Divider,
   Flex,
+  JUSTIFY_SPACE_AROUND,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { NavTab } from '/app/molecules/NavTab'
+import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
-import { getDevtoolsEnabled } from '/app/redux/config'
+import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
 import {
   CONNECTABLE,
   OPENTRONS_USB,
@@ -46,6 +47,7 @@ export function RobotSettings(): JSX.Element | null {
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
+  const isCameraEnabled = useFeatureFlag('camera')
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -66,6 +68,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
+    camera: <RobotSettingsCamera />,
     advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}
@@ -99,71 +102,84 @@ export function RobotSettings(): JSX.Element | null {
   )
 
   return (
-    <Box minWidth="32rem" height="max-content" padding={SPACING.spacing16}>
-      <Flex
-        backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius8}
-        flexDirection={DIRECTION_COLUMN}
-        marginBottom={SPACING.spacing16}
-        minHeight="calc(100vh - 3.5rem)"
-        width="100%"
-      >
-        <Box paddingX={SPACING.spacing16}>
-          <Box
-            color={COLORS.black90}
-            css={TYPOGRAPHY.h1Default}
-            padding={`${SPACING.spacing24} 0`}
-          >
-            {t('robot_settings')}
-          </Box>
+    <>
+      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
+        <Flex
+          color={COLORS.black90}
+          flexDirection={DIRECTION_COLUMN}
+          css={TYPOGRAPHY.h1Default}
+          gridGap={SPACING.spacing4}
+        >
+          {t('robot_settings')}
           {robot != null && (
             <Box marginBottom={SPACING.spacing16}>
               <ReachableBanner robot={robot} />
             </Box>
           )}
           {showRobotBusyBanner && (
-            <Banner type="warning" marginBottom={SPACING.spacing16}>
+            <Banner type="warning" marginBottom={SPACING.spacing8}>
               <LegacyStyledText as="p">
                 {t('some_robot_controls_are_not_available')}
               </LegacyStyledText>
             </Banner>
           )}
-          <Flex gridGap={SPACING.spacing16}>
-            <NavTab
-              to={`/devices/${robotName}/robot-settings/calibration`}
-              tabName={t('calibration')}
-              disabled={isCalibrationDisabled}
+        </Flex>
+      </Box>
+      <Box paddingX={SPACING.spacing16}>
+        <Flex gridGap={SPACING.spacing4}>
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/calibration`}
+            tabName={t('calibration')}
+            disabled={isCalibrationDisabled}
+          />
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/networking`}
+            tabName={t('networking')}
+            disabled={isNetworkingDisabled}
+          />
+          {isCameraEnabled ? (
+            <RoundTab
+              to={`/devices/${robotName}/robot-settings/camera`}
+              tabName={t('camera')}
+              disabled={false}
             />
-            <NavTab
-              to={`/devices/${robotName}/robot-settings/networking`}
-              tabName={t('networking')}
-              disabled={isNetworkingDisabled}
+          ) : null}
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/advanced`}
+            tabName={t('advanced')}
+            disabled={false}
+          />
+          {devToolsOn ? (
+            <RoundTab
+              to={`/devices/${robotName}/robot-settings/feature-flags`}
+              tabName={t('feature_flags')}
+              disabled={false}
             />
-            <NavTab
-              to={`/devices/${robotName}/robot-settings/advanced`}
-              tabName={t('advanced')}
-            />
-            {devToolsOn ? (
-              <NavTab
-                to={`/devices/${robotName}/robot-settings/feature-flags`}
-                tabName={t('feature_flags')}
-              />
-            ) : null}
-          </Flex>
-        </Box>
-        <Divider marginY="0" />
-        <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
-          <ApiHostProvider
-            hostname={robot?.ip ?? null}
-            port={robot?.port ?? null}
-            requestor={
-              robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-            }
+          ) : null}
+        </Flex>
+      </Box>
+      <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
+        <ApiHostProvider
+          hostname={robot?.ip ?? null}
+          port={robot?.port ?? null}
+          requestor={
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+          }
+        >
+          <Flex
+            width="100%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_SPACE_AROUND}
+            backgroundColor={COLORS.white}
+            borderRadius={BORDERS.borderRadius8}
+            marginBottom={SPACING.spacing16}
+            paddingX={SPACING.spacing16}
+            paddingY={SPACING.spacing16}
           >
             {robotSettingsContent}
-          </ApiHostProvider>
-        </Box>
-      </Flex>
-    </Box>
+          </Flex>
+        </ApiHostProvider>
+      </Box>
+    </>
   )
 }

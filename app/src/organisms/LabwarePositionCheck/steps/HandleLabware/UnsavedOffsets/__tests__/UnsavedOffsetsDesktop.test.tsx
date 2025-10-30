@@ -57,7 +57,7 @@ describe('UnsavedOffsetsDesktop', () => {
         ({
           uri: 'test-labware-uri',
           displayName: 'Test Labware',
-        } as any)
+        }) as any
     )
 
     vi.mocked(clearSelectedLabwareWorkingOffsets).mockReturnValue({

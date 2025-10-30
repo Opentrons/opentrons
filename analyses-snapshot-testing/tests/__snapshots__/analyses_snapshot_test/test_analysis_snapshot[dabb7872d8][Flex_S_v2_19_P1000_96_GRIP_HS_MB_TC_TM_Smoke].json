@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -14906,11 +14909,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "56aaddcfd610c2ef06fce593f5078359",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b4f2c3bf97aa2e9acbaff0886a081ba9",
+      "key": "7ab0747b1e81aba42ba062b7844445da",
       "notes": [],
       "params": {
         "celsius": 80.0,
@@ -14924,11 +14941,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3b0b16b60e7c54da388623e97b9abfe1",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d438c70e19a7c171f7950a737d173dc1",
+      "key": "4c5a8cdcf1b80f8b52784c617c6a3935",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -14942,7 +14973,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "954efe554d9d1e053d896bdf43d022a3",
+      "key": "89f39e33eeea745fecab5677e73dd375",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -14956,7 +14987,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f2d46ff405509695e5ebe57768adff22",
+      "key": "1c9e89c5ad50b1e55f2e067c61e7a1e5",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -14972,7 +15003,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4bb4784207fe854f0fa271cd677c9d3f",
+      "key": "260b10dd96e32aaa9819280862ef4de1",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -14986,7 +15017,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "054db24d9fe6437f74c20a8f9b0947ac",
+      "key": "e9fda4fea2acd77b7dc906ec137b9993",
       "notes": [],
       "params": {
         "celsius": 50.0,
@@ -15003,7 +15034,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "94fef99460a0fe1f590b58ac5285f0ab",
+      "key": "cf976c11efc8a4838c9b6519eac529be",
       "notes": [],
       "params": {
         "moduleId": "UUID",
@@ -15020,7 +15051,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d9ade0faf677a8a38a0816ba2b63ef73",
+      "key": "2805479d9b17392b077dceb0104fec1b",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15034,7 +15065,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "89791f57be2d3ffa3282a9a54c47fa70",
+      "key": "4f94f50070ec9fc5a620c23719aafd01",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15048,7 +15079,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4617eb1c97d133bf583d122f7fcdf2b3",
+      "key": "86d319fee8ceae8095389836864b2d43",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15062,7 +15093,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "39ece48a2541ae812e13dc2f09c82c92",
+      "key": "ebba384aa94f7264d7c484a31cbb738f",
       "notes": [],
       "params": {
         "celsius": 50.0,
@@ -15080,7 +15111,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0dbc6654bb881ef808fd37e1bfd971ac",
+      "key": "d043d5ac8a84b6974db1bbbbcba211e0",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15094,7 +15125,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c0011091238239305d7892395c0091a8",
+      "key": "550806039eea80d5525c6001c3a7666d",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -15108,7 +15139,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "23d5b912568776dacd6a20ed2f06dced",
+      "key": "47c406a0d89c37753d88aa54bf7f72b3",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15166,7 +15197,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "13750c65d40eff72a7de201fb0cba47f",
+      "key": "72676cdca5ae8394dd6e6158b9dab9ee",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15208,7 +15239,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "89ca5ed815d9e18a0fefb6bf8cc7b080",
+      "key": "1a284def350e912e902a648cba064cce",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15241,7 +15272,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "24f5e2d7e537c56509c4142c33b8a34f",
+      "key": "20d79f182152c0f3b5c8bcafc07aa4c8",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15273,7 +15304,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "31d51db5a73118e9b5c8d34a365bcf66",
+      "key": "217563003b8a0a95100c4e1153819c38",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be at the LPC calibrated height."
@@ -15287,7 +15318,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "882ce1e2b2ce0c15a1a224f92ad91f63",
+      "key": "efc8bf902896ebfa2df28b5309c0ad2b",
       "notes": [],
       "params": {
         "labwareId": "UUID"
@@ -15317,7 +15348,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "edf9dc44eab94e8395d9e73f5da757a4",
+      "key": "953c0d4cf00b4b15bad57b0068917a1a",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15349,7 +15380,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d6704e50bc83c4b5989604aa101282e2",
+      "key": "11fccc4812167d91db9c6794d60377d2",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be 10mm higher than the LPC calibrated height."
@@ -15363,7 +15394,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5f529996782e3377e5159ef0e4a6944b",
+      "key": "87397b0bc4efe14e59047204629bac0c",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15421,7 +15452,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4aa84ff88b4f09fd36280fe3761eca5d",
+      "key": "5504d2c0b6725179832363f618535123",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15453,7 +15484,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "928f9fde47a29956cb12cfff6f671678",
+      "key": "6db8184e49b8f0dc341fab21cd407193",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot D2? It should be at the LPC calibrated height."
@@ -15467,7 +15498,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8c1e1d32b6f217bf586240b954c03ca5",
+      "key": "598d9f8200e30e4b18930759933c177e",
       "notes": [],
       "params": {
         "labwareId": "UUID"
@@ -15497,7 +15528,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "77ac78644b894a0b6d81384a3d7265b9",
+      "key": "3e47d788bbb80170708184edfe5d5855",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15529,7 +15560,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1c9251a249fdfb0152e858da86e94364",
+      "key": "4d36a2b966013bbc7b01c4b09ff722a5",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot D2? It should be 10mm higher than the LPC calibrated height."
@@ -15543,7 +15574,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "84bedc92d486c49db7641652f6f261f6",
+      "key": "7105ddfa795ef939e45de1f624ad74e2",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15602,7 +15633,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "54f35ee347139254daaa5b19a75901f5",
+      "key": "96531fb16b3554d5394f56a186180323",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15634,7 +15665,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "fbb57b4b2a1f3de0d29e705b9097d9ac",
+      "key": "8ce8f477d0773532932dc9ce801b5161",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the PCR Plate, well A1, in slot C2? It should be 10mm higher than the LPC calibrated height."
@@ -15648,7 +15679,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8314609daf1581387ff97dc5c4c1c9f5",
+      "key": "a756799f8ef42de5f9dc552e9361a39c",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15699,7 +15730,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "316bdac3e21d0054f501222f4edff809",
+      "key": "8a2981064bc103a5a4f9b865d234d674",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -15731,7 +15762,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "df61ffb8d1994859406e2eb94a413891",
+      "key": "77bb267c15b76e8e075a1d8d6e626960",
       "notes": [],
       "params": {
         "message": "Is the pipette tip in the middle of the reservoir , well A1, in slot D2? It should be at the LPC calibrated height."
@@ -15745,7 +15776,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "829d48ca00b8c0a605e8a71e08f3f881",
+      "key": "f98e7bf42290f6ec61132a6d11b082fc",
       "notes": [],
       "params": {
         "alternateDropLocation": false,
@@ -15777,7 +15808,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "fcf333cb92cff88a3f93c0e50ca134cf",
+      "key": "dba1918199fa07e1b9158aeecf0d4794",
       "notes": [],
       "params": {
         "message": "!!!!!!!!!!YOU NEED TO REDO LPC!!!!!!!!!!"
@@ -15791,7 +15822,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f8bd7240ad6717c68af1230b14f13808",
+      "key": "09d6512b2e7f3d96cac736da70819111",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15804,7 +15835,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -15842,7 +15873,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "45d005fae03a2975b084ecf1ea107360",
+      "key": "624e7ca7028f54c8442ef1de0638b427",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -15855,7 +15886,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -15920,13 +15951,13 @@
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",

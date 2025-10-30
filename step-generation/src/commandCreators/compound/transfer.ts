@@ -2,6 +2,7 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
+  ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
@@ -17,6 +18,7 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   getNextTiprack,
@@ -28,8 +30,10 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTrashOrLabware,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -150,6 +154,9 @@ export const transfer: CommandCreator<TransferArgs> = (
     nozzles,
     sourceWells,
     tipRack,
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -175,9 +182,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     args.destLabware
   )
 
-  const isTouchTipDisabled = labwareEntities[
-    sourceLabware
-  ]?.def.parameters.quirks?.includes('touchTipDisabled')
+  const isTouchTipDisabled =
+    labwareEntities[sourceLabware]?.def.parameters.quirks?.includes(
+      'touchTipDisabled'
+    )
 
   if (
     (trashOrLabware === 'labware' &&
@@ -302,9 +310,8 @@ export const transfer: CommandCreator<TransferArgs> = (
   const chunksPerSubTransfer = Math.ceil(volume / effectiveTransferVol)
   const subTransferVol = volume / chunksPerSubTransfer
   // volume of each chunk in a sub-transfer
-  const subTransferVolumes: number[] = Array(chunksPerSubTransfer).fill(
-    subTransferVol
-  )
+  const subTransferVolumes: number[] =
+    Array(chunksPerSubTransfer).fill(subTransferVol)
 
   const aspirateSubmergeLocation: WellLocation = {
     origin:
@@ -435,6 +442,33 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -455,6 +489,9 @@ export const transfer: CommandCreator<TransferArgs> = (
         ]
       : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
@@ -694,7 +731,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseAirGapDispenseFlowRate,
                     ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                     pushOut: 0,
@@ -834,7 +872,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForAspirateAirGap,
                         }
                       : {}),
                   }),
@@ -848,7 +887,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               flowRate: aspirateFlowRateUlSec,
               ...(aspirateCorrectionVolumeForSubtransferTarget > 0
                 ? {
-                    correctionVolume: aspirateCorrectionVolumeForSubtransferTarget,
+                    correctionVolume:
+                      aspirateCorrectionVolumeForSubtransferTarget,
                   }
                 : {}),
             }),
@@ -903,7 +943,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                           pushOut: 0,
                           ...(dispenseCorrectionVolumeForAspirateAirGap > 0
                             ? {
-                                correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                                correctionVolume:
+                                  dispenseCorrectionVolumeForAspirateAirGap,
                               }
                             : {}),
                         }),
@@ -963,7 +1004,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                 : {}),
               ...(dispenseCorrectionVolumeForSubtransferTarget > 0
                 ? {
-                    correctionVolume: dispenseCorrectionVolumeForSubtransferTarget,
+                    correctionVolume:
+                      dispenseCorrectionVolumeForSubtransferTarget,
                   }
                 : {}),
             }),
@@ -1049,7 +1091,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                   }),

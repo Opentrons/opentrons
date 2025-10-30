@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
 import {
-  getAllLabwareDefs,
+  getAllDefinitions,
   getModuleDef,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
@@ -40,7 +40,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getAllLabwareDefs()
+  const defs = getAllDefinitions()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
   const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
@@ -64,12 +64,13 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   )
   const selectedAdapterDef =
     selectedAdapterDefURI != null
-      ? defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
+      ? (defs[selectedAdapterDefURI] ??
+        customLabwareDefs[selectedAdapterDefURI])
       : null
   const selectedTopLabwareDef =
     selectedTopLabware.labwareDefURI != null
-      ? defs[selectedTopLabware.labwareDefURI] ??
-        customLabwareDefs[selectedTopLabware.labwareDefURI]
+      ? (defs[selectedTopLabware.labwareDefURI] ??
+        customLabwareDefs[selectedTopLabware.labwareDefURI])
       : null
 
   const orientation =

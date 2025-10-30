@@ -1339,6 +1339,18 @@ class FlexStackerLabwarePoolNotYetDefinedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwarePoolNotCompatibleWithModuleError(ProtocolEngineError):
+    """Raised when attempting to use a labware pool that is incompatible with a module."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class InvalidLabwarePositionError(ProtocolEngineError):
     """Raised when a labware position is internally invalid."""
 
@@ -1361,3 +1373,42 @@ class InvalidModuleOrientation(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class CameraCaptureError(ProtocolEngineError):
+    """Raised when an Camera Capture attempt fails."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CameraCaptureError."""
+        super().__init__(ErrorCodes.CAMERA_ERROR, message, details, wrapping)
+
+
+class CameraDisabledError(ProtocolEngineError):
+    """Raised when a Camera was referenced while cameras are disabled."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CameraDisabledError."""
+        super().__init__(ErrorCodes.CAMERA_ERROR, message, details, wrapping)
+
+
+class CameraSettingsInvalidError(ProtocolEngineError):
+    """Raised when a Camera was given invalid settings."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CameraSettingsInvalidError."""
+        super().__init__(ErrorCodes.CAMERA_ERROR, message, details, wrapping)

@@ -182,6 +182,11 @@ export const addAndSelectStep: (arg: {
     }
   }
 }
+
+// todo(mm, 2025-10-27): This action, currently only used for moving steps via keyboard,
+// needs to be updated to correctly handle the selected step being the root of a nested
+// group.  Currently, it lets you reorder the root of a group after the paired step
+// that closes the group, which causes all manner of timeline breakage.
 export interface ReorderSelectedStepAction {
   type: 'REORDER_SELECTED_STEP'
   payload: {
@@ -204,6 +209,7 @@ export const reorderSelectedStep: (
     })
   }
 }
+
 export const duplicateStep: (
   stepId: StepIdType
 ) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {
@@ -221,39 +227,40 @@ export const duplicateStep: (
 }
 export const duplicateMultipleSteps: (
   stepIds: StepIdType[]
-) => ThunkAction<
-  DuplicateMultipleStepsAction | SelectMultipleStepsAction
-> = stepIds => (dispatch, getState) => {
-  const orderedStepIds = getOrderedStepIds(getState())
-  const lastSelectedItemId = getMultiSelectLastSelected(getState())
-  // @ts-expect-error(sa, 2021-6-15): lastSelectedItemId might be null, which you cannot pass to indexOf
-  const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
-  stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
-  const duplicateIdsZipped = stepIds.map(stepId => ({
-    stepId: stepId,
-    duplicateStepId: uuid(),
-  }))
-  const duplicateIds = duplicateIdsZipped.map(
-    ({ duplicateStepId }) => duplicateStepId
-  )
-  const duplicateMultipleStepsAction: DuplicateMultipleStepsAction = {
-    type: 'DUPLICATE_MULTIPLE_STEPS',
-    payload: {
-      steps: duplicateIdsZipped,
-      indexToInsert: indexOfLastSelected + 1,
-    },
+) => ThunkAction<DuplicateMultipleStepsAction | SelectMultipleStepsAction> =
+  stepIds => (dispatch, getState) => {
+    const orderedStepIds = getOrderedStepIds(getState())
+    const lastSelectedItemId = getMultiSelectLastSelected(getState())
+    // @ts-expect-error(sa, 2021-6-15): lastSelectedItemId might be null, which you cannot pass to indexOf
+    const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
+    stepIds.sort(
+      (a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b)
+    )
+    const duplicateIdsZipped = stepIds.map(stepId => ({
+      stepId: stepId,
+      duplicateStepId: uuid(),
+    }))
+    const duplicateIds = duplicateIdsZipped.map(
+      ({ duplicateStepId }) => duplicateStepId
+    )
+    const duplicateMultipleStepsAction: DuplicateMultipleStepsAction = {
+      type: 'DUPLICATE_MULTIPLE_STEPS',
+      payload: {
+        steps: duplicateIdsZipped,
+        indexToInsert: indexOfLastSelected + 1,
+      },
+    }
+    const selectMultipleStepsAction: SelectMultipleStepsAction = {
+      type: 'SELECT_MULTIPLE_STEPS',
+      payload: {
+        stepIds: duplicateIds,
+        // @ts-expect-error(sa, 2021-6-15): last might return undefined
+        lastSelected: last(duplicateIds),
+      },
+    }
+    dispatch(duplicateMultipleStepsAction)
+    dispatch(selectMultipleStepsAction)
   }
-  const selectMultipleStepsAction: SelectMultipleStepsAction = {
-    type: 'SELECT_MULTIPLE_STEPS',
-    payload: {
-      stepIds: duplicateIds,
-      // @ts-expect-error(sa, 2021-6-15): last might return undefined
-      lastSelected: last(duplicateIds),
-    },
-  }
-  dispatch(duplicateMultipleStepsAction)
-  dispatch(selectMultipleStepsAction)
-}
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
 export interface SaveStepFormAction {
   type: typeof SAVE_STEP_FORM
@@ -269,191 +276,183 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => {
 }
 
 /** take unsavedForm state and put it into the payload */
-export const saveStepForm: () => ThunkAction<any> = () => (
-  dispatch,
-  getState
-) => {
-  const initialState = getState()
-  const unsavedForm = getUnsavedForm(initialState)
+export const saveStepForm: () => ThunkAction<any> =
+  () => (dispatch, getState) => {
+    const initialState = getState()
+    const unsavedForm = getUnsavedForm(initialState)
 
-  // this check is only for Flow. At this point, unsavedForm should always be populated
-  if (!unsavedForm) {
-    console.assert(
-      false,
-      'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
-    )
-    return
+    // this check is only for Flow. At this point, unsavedForm should always be populated
+    if (!unsavedForm) {
+      console.assert(
+        false,
+        'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
+      )
+      return
+    }
+
+    if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
+      dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
+    }
+
+    if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
+      dispatch(tutorialActions.addHint('waste_chute_warning'))
+    }
+
+    // save the form
+    dispatch(_saveStepForm(unsavedForm))
   }
-
-  if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
-    dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
-  }
-
-  if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
-    dispatch(tutorialActions.addHint('waste_chute_warning'))
-  }
-
-  // save the form
-  dispatch(_saveStepForm(unsavedForm))
-}
 
 /** "power action", mimicking saving the never-saved "set temperature X" step,
  ** then creating and saving a "pause until temp X" step */
-export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = () => (
-  dispatch,
-  getState
-) => {
-  const initialState = getState()
-  const unsavedSetTemperatureForm = getUnsavedForm(initialState)
-  const isPristineSetTempForm = getUnsavedFormIsPristineSetTempForm(
-    initialState
-  )
+export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> =
+  () => (dispatch, getState) => {
+    const initialState = getState()
+    const unsavedSetTemperatureForm = getUnsavedForm(initialState)
+    const isPristineSetTempForm =
+      getUnsavedFormIsPristineSetTempForm(initialState)
 
-  // this check is only for Flow. At this point, unsavedForm should always be populated
-  if (!unsavedSetTemperatureForm) {
+    // this check is only for Flow. At this point, unsavedForm should always be populated
+    if (!unsavedSetTemperatureForm) {
+      console.assert(
+        false,
+        'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
+      )
+      return
+    }
+
+    const { id } = unsavedSetTemperatureForm
+
+    if (!isPristineSetTempForm) {
+      // this check should happen upstream (before dispatching saveSetTempFormWithAddedPauseUntilTemp in the first place)
+      console.assert(
+        false,
+        `tried to saveSetTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set temp form`
+      )
+      return
+    }
+
+    const temperature = unsavedSetTemperatureForm?.targetTemperature
+
     console.assert(
-      false,
-      'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
+      temperature != null && temperature !== '',
+      `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
     )
-    return
+    // save the set temperature step form that is currently open
+    dispatch(_saveStepForm(unsavedSetTemperatureForm))
+    // add a new pause step form
+    dispatch(
+      addStep({
+        stepType: 'pause',
+        robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
+      })
+    )
+    // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
+    // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).
+    dispatch(
+      changeFormInput({
+        update: {
+          pauseAction: PAUSE_UNTIL_TEMP,
+        },
+      })
+    )
+    const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
+    dispatch(
+      changeFormInput({
+        update: {
+          moduleId: tempertureModuleId,
+        },
+      })
+    )
+    dispatch(
+      changeFormInput({
+        update: {
+          pauseTemperature: temperature,
+        },
+      })
+    )
+    // finally save the new pause form
+    const unsavedPauseForm = getUnsavedForm(getState())
+
+    // this conditional is for Flow, the unsaved form should always exist
+    if (unsavedPauseForm != null) {
+      dispatch(_saveStepForm(unsavedPauseForm))
+    } else {
+      console.assert(
+        false,
+        'could not auto-save pause form, getUnsavedForm returned'
+      )
+    }
   }
 
-  const { id } = unsavedSetTemperatureForm
+export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any> =
+  () => (dispatch, getState) => {
+    const initialState = getState()
+    const unsavedHeaterShakerForm = getUnsavedForm(initialState)
+    const isPristineSetHeaterShakerTempForm =
+      getUnsavedFormIsPristineHeaterShakerForm(initialState)
 
-  if (!isPristineSetTempForm) {
-    // this check should happen upstream (before dispatching saveSetTempFormWithAddedPauseUntilTemp in the first place)
+    if (!unsavedHeaterShakerForm) {
+      console.assert(
+        false,
+        'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
+      )
+      return
+    }
+
+    const { id } = unsavedHeaterShakerForm
+
+    if (!isPristineSetHeaterShakerTempForm) {
+      console.assert(
+        false,
+        `tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set heater shaker temp form`
+      )
+      return
+    }
+
+    const temperature = unsavedHeaterShakerForm?.targetHeaterShakerTemperature
+
     console.assert(
-      false,
-      `tried to saveSetTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set temp form`
+      temperature != null && temperature !== '',
+      `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
     )
-    return
-  }
-
-  const temperature = unsavedSetTemperatureForm?.targetTemperature
-
-  console.assert(
-    temperature != null && temperature !== '',
-    `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
-  )
-  // save the set temperature step form that is currently open
-  dispatch(_saveStepForm(unsavedSetTemperatureForm))
-  // add a new pause step form
-  dispatch(
-    addStep({
-      stepType: 'pause',
-      robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
-    })
-  )
-  // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
-  // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).
-  dispatch(
-    changeFormInput({
-      update: {
-        pauseAction: PAUSE_UNTIL_TEMP,
-      },
-    })
-  )
-  const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
-  dispatch(
-    changeFormInput({
-      update: {
-        moduleId: tempertureModuleId,
-      },
-    })
-  )
-  dispatch(
-    changeFormInput({
-      update: {
-        pauseTemperature: temperature,
-      },
-    })
-  )
-  // finally save the new pause form
-  const unsavedPauseForm = getUnsavedForm(getState())
-
-  // this conditional is for Flow, the unsaved form should always exist
-  if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm))
-  } else {
-    console.assert(
-      false,
-      'could not auto-save pause form, getUnsavedForm returned'
+    dispatch(_saveStepForm(unsavedHeaterShakerForm))
+    dispatch(
+      addStep({
+        stepType: 'pause',
+        robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
+      })
     )
-  }
-}
-
-export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any> = () => (
-  dispatch,
-  getState
-) => {
-  const initialState = getState()
-  const unsavedHeaterShakerForm = getUnsavedForm(initialState)
-  const isPristineSetHeaterShakerTempForm = getUnsavedFormIsPristineHeaterShakerForm(
-    initialState
-  )
-
-  if (!unsavedHeaterShakerForm) {
-    console.assert(
-      false,
-      'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
+    dispatch(
+      changeFormInput({
+        update: {
+          pauseAction: PAUSE_UNTIL_TEMP,
+        },
+      })
     )
-    return
-  }
-
-  const { id } = unsavedHeaterShakerForm
-
-  if (!isPristineSetHeaterShakerTempForm) {
-    console.assert(
-      false,
-      `tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set heater shaker temp form`
+    const heaterShakerModuleId = unsavedHeaterShakerForm.moduleId
+    dispatch(
+      changeFormInput({
+        update: {
+          moduleId: heaterShakerModuleId,
+        },
+      })
     )
-    return
-  }
 
-  const temperature = unsavedHeaterShakerForm?.targetHeaterShakerTemperature
-
-  console.assert(
-    temperature != null && temperature !== '',
-    `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
-  )
-  dispatch(_saveStepForm(unsavedHeaterShakerForm))
-  dispatch(
-    addStep({
-      stepType: 'pause',
-      robotStateTimeline: fileDataSelectors.getRobotStateTimeline(getState()),
-    })
-  )
-  dispatch(
-    changeFormInput({
-      update: {
-        pauseAction: PAUSE_UNTIL_TEMP,
-      },
-    })
-  )
-  const heaterShakerModuleId = unsavedHeaterShakerForm.moduleId
-  dispatch(
-    changeFormInput({
-      update: {
-        moduleId: heaterShakerModuleId,
-      },
-    })
-  )
-
-  dispatch(
-    changeFormInput({
-      update: {
-        pauseTemperature: temperature,
-      },
-    })
-  )
-  const unsavedPauseForm = getUnsavedForm(getState())
-
-  if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm))
-  } else {
-    console.assert(
-      false,
-      'could not auto-save pause form, getUnsavedForm returned'
+    dispatch(
+      changeFormInput({
+        update: {
+          pauseTemperature: temperature,
+        },
+      })
     )
+    const unsavedPauseForm = getUnsavedForm(getState())
+
+    if (unsavedPauseForm != null) {
+      dispatch(_saveStepForm(unsavedPauseForm))
+    } else {
+      console.assert(
+        false,
+        'could not auto-save pause form, getUnsavedForm returned'
+      )
+    }
   }
-}

@@ -6,7 +6,7 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount
+from opentrons.types import Mount, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
@@ -345,13 +345,17 @@ async def test_hw_aspirate_while_tracking(
         well_name="A1",
         volume=25,
         flow_rate=2.5,
+        end_point=Point(0, 0, 0),
         command_note_adder=mock_command_note_adder,
     )
     # make sure hw aspirate_while_tracking runs without error
     assert result == 25
     decoy.verify(
         await mock_hardware_api.aspirate_while_tracking(
-            mount=Mount.LEFT, z_distance=4.544, flow_rate=2.5, volume=25
+            mount=Mount.LEFT,
+            end_point=Point(0, 0, 0),
+            volume=25,
+            movement_delay=None,
         )
     )
 

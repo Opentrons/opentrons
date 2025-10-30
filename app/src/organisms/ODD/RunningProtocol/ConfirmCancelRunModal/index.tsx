@@ -46,16 +46,14 @@ export function ConfirmCancelRunModal({
       console.error('Error deleting quick transfer run', error)
     },
   })
-  const {
-    dismissCurrentRun,
-    isLoading: isDismissing,
-  } = useDismissCurrentRunMutation({
-    onSettled: () => {
-      if (isQuickTransfer) {
-        deleteRun(runId)
-      }
-    },
-  })
+  const { dismissCurrentRun, isLoading: isDismissing } =
+    useDismissCurrentRunMutation({
+      onSettled: () => {
+        if (isQuickTransfer) {
+          deleteRun(runId)
+        }
+      },
+    })
   const localRobot = useSelector(getLocalRobot)
   const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
   const runStatus = data?.data.status

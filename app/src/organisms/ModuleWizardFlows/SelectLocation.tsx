@@ -81,9 +81,8 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     deckConfig
   )
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
 
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -93,11 +92,14 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
-      createMaintenanceRun({}).catch(error => {
-        setErrorMessage(error.message as string)
-      })
+      createMaintenanceRun({})
+        .catch(error => {
+          setErrorMessage(error.message as string)
+        })
+        .then(proceed)
+    } else {
+      proceed()
     }
-    proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -137,10 +139,11 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   )
 
   const handleAddFixture = (anchorCutoutId: CutoutId): void => {
-    const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-      anchorCutoutId,
-      moduleFixtures
-    )
+    const selectedFixtureIdByCutoutIds =
+      getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+        anchorCutoutId,
+        moduleFixtures
+      )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
@@ -217,10 +220,11 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   }
 
   const handleRemoveFixture = (anchorCutoutId: CutoutId): void => {
-    const removedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-      anchorCutoutId,
-      moduleFixtures
-    )
+    const removedFixtureIdByCutoutIds =
+      getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+        anchorCutoutId,
+        moduleFixtures
+      )
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {

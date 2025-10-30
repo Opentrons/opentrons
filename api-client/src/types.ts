@@ -67,4 +67,5 @@ export type LabwareOffsetLocationSequenceComponent =
   | OnAddressableAreaOffsetLocationSequenceComponent
   | OnModuleOffsetLocationSequenceComponent
   | OnLabwareOffsetLocationSequenceComponent
-export type LabwareOffsetLocationSequence = LabwareOffsetLocationSequenceComponent[]
+export type LabwareOffsetLocationSequence =
+  LabwareOffsetLocationSequenceComponent[]

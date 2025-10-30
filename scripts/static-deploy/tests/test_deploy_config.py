@@ -98,12 +98,27 @@ def test_get_deploy_config_with_env_vars():
     sandbox_labware = get_config("sandbox", "labware_library")
     production_designer = get_config("production", "protocol_designer")
     sandbox_designer = get_config("sandbox", "protocol_designer")
+    staging_designer = get_config("staging", "protocol_designer")
 
     # Check that static configuration is returned
     assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
     assert sandbox_labware.cloudfront_id is None  # No CloudFront for sandbox
-    assert production_designer.s3_bucket == "opentrons.production.protocol-designer"
-    assert sandbox_designer.s3_bucket == "sandbox.designer.opentrons.com"
+    assert production_designer.s3_bucket == "opentrons.production.designer"
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.designer"
+    assert staging_designer.s3_bucket == "opentrons.staging.designer"
+
+    # Test components configuration
+    sandbox_components = get_config("sandbox", "components")
+    staging_components = get_config("staging", "components")
+    production_components = get_config("production", "components")
+
+    assert sandbox_components.s3_bucket == "opentrons.sandbox.components"
+    assert sandbox_components.url == "http://sandbox.components.opentrons.com/"
+    assert sandbox_components.cloudfront_id is None
+
+    # Components only available in sandbox, so staging and production point to sandbox
+    assert staging_components.s3_bucket == "opentrons.sandbox.components"
+    assert production_components.s3_bucket == "opentrons.sandbox.components"
 
 
 def test_get_deploy_config_with_defaults():
@@ -116,7 +131,7 @@ def test_get_deploy_config_with_defaults():
     # Check that static configuration values are returned
     assert sandbox_labware.s3_bucket == "opentrons.sandbox.labware"
     assert sandbox_labware.cloudfront_id is None  # No CloudFront for sandbox
-    assert sandbox_designer.s3_bucket == "sandbox.designer.opentrons.com"
+    assert sandbox_designer.s3_bucket == "opentrons.sandbox.designer"
     assert sandbox_designer.cloudfront_id is None  # No CloudFront for sandbox
 
 
@@ -325,7 +340,7 @@ def test_determine_deploy_config_from_args_staging_mkdocs():
     assert cfg.sandbox_prefix == "staging-mkdocs-v1.2.3"
     assert cfg.bucket == "opentrons.staging.docs"
     assert cfg.url == "https://staging.docs.opentrons.com/"
-    assert cfg.cloudfront_id == "E8IWASMDOWHYP"
+    assert cfg.cloudfront_id == "E2DBE0K9VT8YB9"
 
 
 def test_determine_deploy_config_from_args_sandbox_branch_url_suffix():

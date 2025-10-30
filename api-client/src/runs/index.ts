@@ -11,6 +11,7 @@ export { getCommandsAsPreSerializedList } from './commands/getCommandsAsPreSeria
 export { createRunAction } from './createRunAction'
 export { getRunCommandErrors } from './commands/getRunCommandErrors'
 export { getRunCurrentState } from './getRunCurrentState'
+export { addCameraSettingsToRun } from './addCameraSettingsToRun'
 export * from './addLabwareOffsetToRun'
 export * from './createLabwareDefinition'
 export * from './constants'

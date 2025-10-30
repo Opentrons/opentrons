@@ -65,8 +65,10 @@ import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
-const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
-  `${prefix}_${fieldName}`
+const addPrefix =
+  (prefix: string) =>
+  (fieldName: string): StepFieldName =>
+    `${prefix}_${fieldName}`
 
 interface SecondStepsMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
@@ -90,9 +92,8 @@ export const SecondStepsMoveLiquidTools = ({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const { trashBinEntities, wasteChuteEntities } = useSelector(
-    getInvariantContext
-  )
+  const { trashBinEntities, wasteChuteEntities } =
+    useSelector(getInvariantContext)
   const enableByVolumeBuilder = useSelector(getEnableByVolumeBuilder)
   const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
   const invariantContext = useSelector(getInvariantContext)
@@ -110,8 +111,8 @@ export const SecondStepsMoveLiquidTools = ({
     ].byPipette.find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
-    .flowRateByVolume
+    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)
+    ?.aspirate.flowRateByVolume
   const highestY = Math.max(
     ...(stubbedByTipValues?.map(point => point[1]) ?? [])
   )
@@ -216,8 +217,9 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   )
   const labwareId = formData[`${tab}_labware`]
+  const shouldCheckLabwareDef = tab === 'aspirate' || !isDestinationTrash
   // The getMinXYDimension() call below is crashing quite often, but I'm not sure why
-  if (!labwareEntities[labwareId]?.def) {
+  if (shouldCheckLabwareDef && !labwareEntities[labwareId]?.def) {
     throw new Error(
       `missing ${tab}_labware def for ${labwareId}, ` +
         `in labwareEntities: ${!!labwareEntities[labwareId]}`

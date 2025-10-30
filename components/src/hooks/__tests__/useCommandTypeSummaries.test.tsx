@@ -1,0 +1,53 @@
+import { I18nextProvider } from 'react-i18next'
+import { renderHook } from '@testing-library/react'
+import { beforeAll, describe, expect, it } from 'vitest'
+
+import { shared_en_resources } from '../../assets'
+import { baseI18nConfig, i18n } from '../../i18n'
+import { getLatestCommandTypeList } from '../testHelpers'
+import { useCommandTypeSummaries } from '../useCommandTypeSummaries'
+
+describe('useCommandTypeSummaries', () => {
+  beforeAll(async () => {
+    await i18n.init({
+      ...baseI18nConfig,
+      resources: { en: shared_en_resources },
+    })
+  })
+  it('returns translation when key exists', () => {
+    const { result } = renderHook(() => useCommandTypeSummaries('aspirate'), {
+      wrapper: ({ children }) => (
+        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+      ),
+    })
+    expect(result.current).toBe('Aspirate')
+  })
+
+  it('returns fallback when key is missing', () => {
+    const { result } = renderHook(
+      () => useCommandTypeSummaries('heaterShaker/turnUpsideDown' as any),
+      {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      }
+    )
+    expect(result.current).toBe('Unknown')
+  })
+
+  it('returns translations for all command types in the latest schema', () => {
+    const commandTypes = getLatestCommandTypeList()
+    for (const cmd of commandTypes) {
+      const { result } = renderHook(() => useCommandTypeSummaries(cmd), {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      })
+
+      // Make sure it returns something non-empty and not the fallback string
+      expect(result.current, cmd).toBeDefined()
+      expect(result.current, cmd).not.toBe('')
+      expect(result.current, cmd).not.toBe('Unknown')
+    }
+  })
+})

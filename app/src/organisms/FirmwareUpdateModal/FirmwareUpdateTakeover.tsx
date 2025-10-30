@@ -19,13 +19,10 @@ import type { InstrumentData, Subsystem } from '@opentrons/api-client'
 const POLL_INTERVAL_MS = 5000
 
 export function FirmwareUpdateTakeover(): JSX.Element {
-  const [showUpdateNeededModal, setShowUpdateNeededModal] = useState<boolean>(
-    false
-  )
-  const [
-    initiatedSubsystemUpdate,
-    setInitiatedSubsystemUpdate,
-  ] = useState<Subsystem | null>(null)
+  const [showUpdateNeededModal, setShowUpdateNeededModal] =
+    useState<boolean>(false)
+  const [initiatedSubsystemUpdate, setInitiatedSubsystemUpdate] =
+    useState<Subsystem | null>(null)
 
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
@@ -50,11 +47,10 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   })
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
-  const {
-    data: currentSubsystemsUpdatesData,
-  } = useCurrentAllSubsystemUpdatesQuery({
-    refetchInterval: POLL_INTERVAL_MS,
-  })
+  const { data: currentSubsystemsUpdatesData } =
+    useCurrentAllSubsystemUpdatesQuery({
+      refetchInterval: POLL_INTERVAL_MS,
+    })
   const externalSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
     update =>
       (update.updateStatus === 'queued' ||

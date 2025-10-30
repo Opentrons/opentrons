@@ -38,9 +38,8 @@ export function Landing(): JSX.Element {
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
-  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
-    false
-  )
+  const [showAnnouncementModal, setShowAnnouncementModal] =
+    useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()

@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getLabwareDefURI,
+  locationIsOffDeck,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -37,10 +38,7 @@ export function getLegacyLabwareLocationCombos(
         )
           return acc
         const definitionUri = getLabwareDefURI(command.result.definition)
-        if (
-          command.params.location === 'offDeck' ||
-          command.params.location === 'systemLocation'
-        ) {
+        if (locationIsOffDeck(command.params.location)) {
           return acc
         } else if ('moduleId' in command.params.location) {
           const { moduleId } = command.params.location
@@ -54,14 +52,12 @@ export function getLegacyLabwareLocationCombos(
                 moduleId,
               })
         } else if ('labwareId' in command.params.location) {
-          const {
-            adapterOffsetLocation,
-            moduleIdUnderAdapter,
-          } = resolveAdapterLocation(
-            labware,
-            modules,
-            command.params.location.labwareId
-          )
+          const { adapterOffsetLocation, moduleIdUnderAdapter } =
+            resolveAdapterLocation(
+              labware,
+              modules,
+              command.params.location.labwareId
+            )
           return adapterOffsetLocation == null
             ? acc
             : appendLocationComboIfUniq(acc, {
@@ -93,10 +89,7 @@ export function getLegacyLabwareLocationCombos(
           )
           return acc
         }
-        if (
-          command.params.newLocation === 'offDeck' ||
-          command.params.newLocation === 'systemLocation'
-        ) {
+        if (locationIsOffDeck(command.params.newLocation)) {
           return acc
         } else if ('moduleId' in command.params.newLocation) {
           const modLocation = resolveModuleLocation(
@@ -112,14 +105,12 @@ export function getLegacyLabwareLocationCombos(
                 moduleId: command.params.newLocation.moduleId,
               })
         } else if ('labwareId' in command.params.newLocation) {
-          const {
-            adapterOffsetLocation,
-            moduleIdUnderAdapter,
-          } = resolveAdapterLocation(
-            labware,
-            modules,
-            command.params.newLocation.labwareId
-          )
+          const { adapterOffsetLocation, moduleIdUnderAdapter } =
+            resolveAdapterLocation(
+              labware,
+              modules,
+              command.params.newLocation.labwareId
+            )
           return adapterOffsetLocation == null
             ? acc
             : appendLocationComboIfUniq(acc, {
@@ -237,20 +228,15 @@ function resolveAdapterLocation(
 
   let moduleIdUnderAdapter
   let adapterOffsetLocation: LegacyLabwareOffsetLocation | null = null
-  if (
-    labwareEntity.location === 'offDeck' ||
-    labwareEntity.location === 'systemLocation'
-  ) {
+  if (locationIsOffDeck(labwareEntity.location)) {
     return { adapterOffsetLocation: null }
     // can't have adapter on top of an adapter
   } else if ('labwareId' in labwareEntity.location) {
     return { adapterOffsetLocation: null }
   } else if ('moduleId' in labwareEntity.location) {
     const moduleId = labwareEntity.location.moduleId
-    const resolvedModuleLocation: LegacyLabwareOffsetLocation | null = resolveModuleLocation(
-      modules,
-      moduleId
-    )
+    const resolvedModuleLocation: LegacyLabwareOffsetLocation | null =
+      resolveModuleLocation(modules, moduleId)
 
     moduleIdUnderAdapter = moduleId
     adapterOffsetLocation =

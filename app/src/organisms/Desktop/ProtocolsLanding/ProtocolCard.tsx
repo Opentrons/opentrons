@@ -21,6 +21,7 @@ import {
   SIZE_2,
   SIZE_3,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -56,17 +57,10 @@ interface ProtocolCardProps {
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const navigate = useNavigate()
-  const {
-    handleRunProtocol,
-    handleSendProtocolToFlex,
-    storedProtocolData,
-  } = props
-  const {
-    protocolKey,
-    srcFileNames,
-    mostRecentAnalysis,
-    modified,
-  } = storedProtocolData
+  const { handleRunProtocol, handleSendProtocolToFlex, storedProtocolData } =
+    props
+  const { protocolKey, srcFileNames, mostRecentAnalysis, modified } =
+    storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -138,7 +132,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis,
     modified,
   } = props
-  const { t } = useTranslation(['protocol_list', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_list', 'shared'])
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -152,6 +146,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
   const robotType = mostRecentAnalysis?.robotType ?? null
+  const hasPeripherals =
+    mostRecentAnalysis?.commandPreconditions?.isCameraUsed ?? false
 
   return (
     <Flex
@@ -255,9 +251,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <LegacyStyledText as="h6" color={COLORS.grey60}>
-                  {t('robot')}
-                </LegacyStyledText>
+                <StyledText
+                  color={COLORS.grey60}
+                  desktopStyle="bodyDefaultRegular"
+                >
+                  {i18n.format('robot', 'capitalize')}
+                </StyledText>
                 <LegacyStyledText as="p">
                   {getRobotTypeDisplayName(robotType)}
                 </LegacyStyledText>
@@ -267,11 +266,13 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
-                minWidth="10.625rem"
               >
-                <LegacyStyledText as="h6" color={COLORS.grey60}>
-                  {t('shared:instruments')}
-                </LegacyStyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  color={COLORS.grey60}
+                >
+                  {i18n.format(t('shared:instruments'), 'capitalize')}
+                </StyledText>
                 {
                   {
                     missing: (
@@ -319,29 +320,59 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   }[analysisStatus]
                 }
               </Flex>
-              <Flex
-                flex="0 0 6rem"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing4}
-              >
-                {requiredModuleTypes.length > 0 ? (
-                  <>
-                    <LegacyStyledText as="h6" color={COLORS.grey60}>
-                      {t('modules')}
-                    </LegacyStyledText>
-                    <Flex>
-                      {requiredModuleTypes.map((moduleType, index) => (
-                        <ModuleIcon
-                          key={index}
-                          color={COLORS.grey60}
-                          moduleType={moduleType}
+              <Flex gridGap={SPACING.spacing4}>
+                <Flex
+                  flex="0 0 6rem"
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                  width="85px"
+                >
+                  {requiredModuleTypes.length > 0 ? (
+                    <>
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        color={COLORS.grey60}
+                      >
+                        {i18n.format('modules', 'capitalize')}
+                      </StyledText>
+                      <Flex flexWrap={WRAP}>
+                        {requiredModuleTypes.map((moduleType, index) => (
+                          <ModuleIcon
+                            key={index}
+                            color={COLORS.grey50}
+                            moduleType={moduleType}
+                            height="1rem"
+                            marginRight={SPACING.spacing8}
+                          />
+                        ))}
+                      </Flex>
+                    </>
+                  ) : null}
+                </Flex>
+                {hasPeripherals && (
+                  <Flex
+                    flex="0 0 6rem"
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                    width="85px"
+                  >
+                    <>
+                      <StyledText
+                        desktopStyle="bodyDefaultRegular"
+                        color={COLORS.grey60}
+                      >
+                        {t('peripherals')}
+                      </StyledText>
+                      <Flex flexWrap={WRAP}>
+                        <Icon
+                          color={COLORS.grey50}
+                          name="photo-camera"
                           height="1rem"
-                          marginRight={SPACING.spacing8}
                         />
-                      ))}
-                    </Flex>
-                  </>
-                ) : null}
+                      </Flex>
+                    </>
+                  </Flex>
+                )}
               </Flex>
             </Flex>
             <Flex

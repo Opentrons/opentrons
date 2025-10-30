@@ -913,3 +913,9 @@ def test_ensure_valid_trash_location_for_transfer_v2_raises(decoy: Decoy) -> Non
         subject.ensure_valid_trash_location_for_transfer_v2(
             Location(point=Point(x=1, y=1, z=1), labware=None)
         )
+
+
+def test_is_96_channel() -> None:
+    """Iterate through the pipette names and make sure that validation identifies 96 channels."""
+    for name in PipetteNameType:
+        assert subject.is_pipette_96_channel(name) == ("96" in name.value)

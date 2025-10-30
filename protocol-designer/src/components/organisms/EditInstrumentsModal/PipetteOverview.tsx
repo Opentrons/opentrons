@@ -178,7 +178,7 @@ export function PipetteOverview({
               pipetteName={
                 isLeftPipette96Channel
                   ? visibleLeftPipette.name
-                  : visibleRightPipette?.name ?? 'p1000_96'
+                  : (visibleRightPipette?.name ?? 'p1000_96')
               }
               tiprackDefURIs={
                 (isLeftPipette96Channel

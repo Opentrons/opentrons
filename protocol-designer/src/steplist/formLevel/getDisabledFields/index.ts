@@ -4,27 +4,18 @@ import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
 import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
 
-import type {
-  HydratedFormData,
-  HydratedHeaterShakerFormData,
-  HydratedMixFormData,
-  HydratedMoveLiquidFormData,
-} from '../../../form-types'
+import type { HydratedFormData } from '../../../form-types'
 
 function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
   switch (hydratedForm.stepType) {
     case 'moveLiquid':
-      return getDisabledFieldsMoveLiquidForm(
-        hydratedForm as HydratedMoveLiquidFormData
-      )
+      return getDisabledFieldsMoveLiquidForm(hydratedForm)
 
     case 'mix':
-      return getDisabledFieldsMixForm(hydratedForm as HydratedMixFormData)
+      return getDisabledFieldsMixForm(hydratedForm)
 
     case 'heaterShaker':
-      return getDisabledFieldsHeaterShaker(
-        hydratedForm as HydratedHeaterShakerFormData
-      )
+      return getDisabledFieldsHeaterShaker(hydratedForm)
 
     case 'comment':
     case 'pause':

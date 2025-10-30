@@ -9,10 +9,13 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
+import { latestLabwareVersions } from '../scripts/git-version.mjs'
+
 import {
-  latestLabwareVersions,
-  versionForProject,
-} from '../scripts/git-version.mjs'
+  getVersion,
+  generateBuildInfoHtml,
+} from '../scripts/git-version-protocol-designer.mjs'
+
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
@@ -22,7 +25,7 @@ const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(
   async (): Promise<UserConfig> => {
-    const OT_PD_VERSION = await versionForProject('protocol-designer')
+    const OT_PD_VERSION = await getVersion()
     const OT_PD_BUILD_DATE = new Date().toUTCString()
     const OT_PD_LATEST_LABWARE_VERSIONS = await latestLabwareVersions(
       REQUIRED_APP_VERSION
@@ -55,9 +58,10 @@ export default defineConfig(
           },
         },
         sentryVitePlugin({
-          org: 'opentrons-sw',
+          org: 'opentrons-76',
           project: 'protocol-designer',
-          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          // Don't provide authToken - we don't want to upload during build
+          // Uploads happen in dedicated workflow steps in GitHub Actions
           telemetry: false,
           reactComponentAnnotation: {
             enabled: true,
@@ -66,10 +70,15 @@ export default defineConfig(
           sourcemaps: {
             assets: ['./dist/**'],
             ignore: ['./node_modules/**'],
-            filesToDeleteAfterUpload:
-              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
           },
         }),
+        {
+          name: 'build-info-generator',
+          closeBundle: async () => {
+            const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
+            await generateBuildInfoHtml(outputPath)
+          },
+        },
         ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
       ],
       optimizeDeps: {
@@ -108,6 +117,10 @@ export default defineConfig(
       },
       resolve: {
         alias: {
+          // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+          // files being processed with the wrong config (the config from the
+          // consuming project vs. the config from the source project).
+          // Can these be replaced with regular package.json dependencies?
           '@opentrons/components/styles/global': path.resolve(
             '../components/src/styles/global.css'
           ),
@@ -149,6 +162,8 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
     'OT_PD_ENABLE_JSON_EXPORT',
     'OT_PD_ENABLE_BY_VOLUME_BUILDER',
+    'OT_PD_ENABLE_TIP_SELCTION',
+    'OT_PD_ENABLE_CAMERA_SUPPORT'
   ])
   return Object.fromEntries(
     Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))

@@ -7,7 +7,6 @@ import {
   BORDERS,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_GRID,
@@ -16,6 +15,7 @@ import {
   OVERFLOW_AUTO,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   WELL_LABEL_OPTIONS,
@@ -148,7 +148,7 @@ export function AssignLiquidsModal(
               gap={SPACING.spacing10}
               marginLeft="auto"
             >
-              <DeckInfoLabel
+              <RobotInfoLabel
                 size="large"
                 deckLabel={
                   getSlotInLocationStack(

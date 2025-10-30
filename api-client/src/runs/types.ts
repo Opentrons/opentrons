@@ -11,6 +11,7 @@ import type {
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
+import type { CameraData } from '../camera'
 import type {
   ErrorDetails,
   LabwareOffsetLocationSequence,
@@ -29,8 +30,10 @@ export const RUN_STATUS_FINISHING = 'finishing' as const
 export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 export const RUN_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
 export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
-export const RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR = 'awaiting-recovery-blocked-by-open-door' as const
-export const RUN_STATUS_AWAITING_RECOVERY_PAUSED = 'awaiting-recovery-paused' as const
+export const RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR =
+  'awaiting-recovery-blocked-by-open-door' as const
+export const RUN_STATUS_AWAITING_RECOVERY_PAUSED =
+  'awaiting-recovery-paused' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
@@ -62,11 +65,13 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
+  cameraSettings?: CameraData
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
   runTimeParameters: RunTimeParameter[]
+  /** @deprecated Prefer using bindings for /dataFiles/:runId/all */
   outputFileIds: string[]
 }
 

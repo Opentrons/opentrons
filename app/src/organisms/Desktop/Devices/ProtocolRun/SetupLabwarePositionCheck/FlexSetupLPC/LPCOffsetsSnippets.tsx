@@ -78,9 +78,8 @@ function LPCOffsetsSnippetsModal({
   lwOffsetsForRun,
 }: LPCOffsetsSnippetsModalProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const [activeSnippet, setActiveSnippet] = useState<SnippetButtonType>(
-    'jupyter'
-  )
+  const [activeSnippet, setActiveSnippet] =
+    useState<SnippetButtonType>('jupyter')
 
   const buildHeader = (): JSX.Element => {
     return (

@@ -181,8 +181,9 @@ function TipSideView({
       />
       {Object.entries(tipContents).map(([liquidId, { volume }]) => {
         if (liquidId === '__air__') return null
-        const displayColor = analysis.liquids.find(l => l.id === liquidId)
-          ?.displayColor
+        const displayColor = analysis.liquids.find(
+          l => l.id === liquidId
+        )?.displayColor
         return (
           <rect
             key={liquidId}

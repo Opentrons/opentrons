@@ -7,6 +7,7 @@ import {
   getModuleModelFromAddressableArea,
   getModuleType,
   getSlotFromAddressableAreaName,
+  locationIsOffDeck,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -117,7 +118,7 @@ export function getLabwareLocationFromSequence(
           moduleModel:
             moduleModel === FLEX_STACKER_MODULE_V1
               ? undefined
-              : moduleModel ?? undefined,
+              : (moduleModel ?? undefined),
         }
       } else if (sequenceItem.kind === 'onModule') {
         const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
@@ -129,7 +130,7 @@ export function getLabwareLocationFromSequence(
             moduleModel:
               moduleModel === FLEX_STACKER_MODULE_V1
                 ? undefined
-                : moduleModel ?? undefined,
+                : (moduleModel ?? undefined),
           }
         }
       } else if (sequenceItem.kind === 'inStackerHopper') {
@@ -193,6 +194,8 @@ export function getLabwareLocation(
     return { slotName: 'offDeck' }
   } else if (location === 'systemLocation') {
     return { slotName: 'systemLocation' }
+  } else if (location === 'wasteChuteLocation') {
+    return { slotName: 'wasteChuteLocation' }
   } else if ('slotName' in location) {
     return { slotName: location.slotName }
   } else if ('addressableAreaName' in location) {
@@ -239,10 +242,7 @@ export function getLabwareLocation(
       const adapterName =
         adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
 
-      if (
-        adapter.location === 'offDeck' ||
-        adapter.location === 'systemLocation'
-      ) {
+      if (locationIsOffDeck(adapter.location)) {
         return { slotName: 'offDeck', adapterName }
       } else if (
         'slotName' in adapter.location ||

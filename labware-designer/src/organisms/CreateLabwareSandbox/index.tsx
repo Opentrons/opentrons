@@ -60,12 +60,8 @@ export function CreateLabwareSandbox(): JSX.Element {
   const [rawOptions, setRawOptions] = React.useState(
     JSON.stringify(IRREGULAR_OPTIONS, undefined, 2)
   )
-  const [
-    labwareToRender,
-    setLabwareToRender,
-  ] = React.useState<LabwareDefinition>(
-    createIrregularLabware(IRREGULAR_OPTIONS)
-  )
+  const [labwareToRender, setLabwareToRender] =
+    React.useState<LabwareDefinition>(createIrregularLabware(IRREGULAR_OPTIONS))
 
   let optionsTextAreaValue = rawOptions
   try {
@@ -76,7 +72,9 @@ export function CreateLabwareSandbox(): JSX.Element {
   }
 
   const regularityLabel = isLabwareRegular ? 'Regular' : 'Irregular'
-  const handleRegularityChange: React.ChangeEventHandler<HTMLInputElement> = e => {
+  const handleRegularityChange: React.ChangeEventHandler<
+    HTMLInputElement
+  > = e => {
     const willBeRegular = e.target.value === 'regular'
     setRawOptions(
       JSON.stringify(
@@ -97,7 +95,9 @@ export function CreateLabwareSandbox(): JSX.Element {
     setViewOnDeck(e.target.value === 'deck')
   }
 
-  const handleInputOptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = event => {
+  const handleInputOptionChange: React.ChangeEventHandler<
+    HTMLTextAreaElement
+  > = event => {
     setRawOptions(event.target.value)
     const createLabware = isLabwareRegular
       ? createRegularLabware
@@ -215,10 +215,11 @@ export function CreateLabwareSandbox(): JSX.Element {
                     return null // Should not happen.
                   }
 
-                  const slotOriginToLabwareOrigin = getDeckSlotOriginToLabwareOrigin(
-                    slotDefinition,
-                    labwareToRender
-                  )
+                  const slotOriginToLabwareOrigin =
+                    getDeckSlotOriginToLabwareOrigin(
+                      slotDefinition,
+                      labwareToRender
+                    )
 
                   return (
                     <g

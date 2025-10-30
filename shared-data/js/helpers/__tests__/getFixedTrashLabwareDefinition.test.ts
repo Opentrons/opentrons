@@ -8,7 +8,7 @@ import type { LabwareDefinition } from '../..'
 describe('getFixedTrashLabwareDefinition', () => {
   it(`should return the fixed trash labware defition`, () => {
     expect(getFixedTrashLabwareDefinition()).toEqual(
-      (fixedTrashUncasted as unknown) as LabwareDefinition
+      fixedTrashUncasted as unknown as LabwareDefinition
     )
   })
 })

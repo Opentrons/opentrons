@@ -79,6 +79,17 @@
     "latch": {
       "closed": "closed",
       "open": "open"
+    },
+    "prior_state": {
+      "heater_label": "Heater set to",
+      "heater_value": "{{value}} °C",
+      "heater_value_off": "Off",
+      "latch_label": "Labware latch",
+      "latch_value_closed": "Closed",
+      "latch_value_open": "Open",
+      "shaker_label": "Shaker set to",
+      "shaker_value": "{{value}} rpm",
+      "shaker_value_off": "Off"
     }
   },
   "heater_shaker_state": "Heater-Shaker state",
@@ -124,6 +135,7 @@
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
+  "prior_state": "Last module state",
   "protocol_steps": "Protocol steps",
   "protocol_timeline": "Protocol timeline",
   "reference_positions": {
@@ -154,6 +166,7 @@
   "select_volume": "Select a volume",
   "select_wells": "Select wells using a {{displayName}}",
   "shake": "Shake",
+  "shake_speed": "Shake speed",
   "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",
@@ -164,12 +177,28 @@
   "temperature": "Temperature",
   "temperature_module": {
     "active": "<semiBoldText>{{module}}</semiBoldText><text>set to</text><tag/>",
-    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>"
+    "deactivated": "<semiBoldText>{{module}}</semiBoldText><text>deactivated</text>",
+    "prior_state": {
+      "temperature_label": "Temperature set to",
+      "temperature_value": "{{value}} °C",
+      "temperature_value_off": "Off"
+    }
   },
   "thermocycler_module": {
     "lid_position": {
       "closed": "closed",
       "open": "open"
+    },
+    "prior_state": {
+      "block_label": "Block set to",
+      "block_value": "{{value}} °C",
+      "block_value_off": "Off",
+      "lid_label": "Lid set to",
+      "lid_value": "{{value}} °C",
+      "lid_value_off": "Off",
+      "lid_position_label": "Lid position",
+      "lid_position_value_open": "Open",
+      "lid_position_value_closed": "Closed"
     },
     "repeat": "Repeat {{repetitions}} times",
     "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
@@ -185,13 +214,17 @@
       "block": "<text>Set thermocycler block to</text><tag/>",
       "lid_position": "<text>Lid position</text><tag/>",
       "lid_temperature": "<text>Set thermocycler lid to</text><tag/>"
+    },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
     }
   },
   "time": "Time",
   "time_in": "{{times}} times in",
   "timeline": "Timeline",
   "tip_handling": {
-    "title": "Tip usage",
+    "title": "Tip handling",
     "tooltip": "Choose tip pickup frequency for aspirations"
   },
   "tip_management": "Tip management",

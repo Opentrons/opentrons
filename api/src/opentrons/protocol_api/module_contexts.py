@@ -667,15 +667,8 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> Task:
+    ) -> None:
         """Set the target temperature for the well block, in °C.
-
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -706,28 +699,56 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        task = self._core.set_target_block_temperature(
+        self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.wait_for_block_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_block_temp)
+    @requires_version(2, 27)
+    def start_set_block_temperature(
+        self,
+        temperature: float,
+        ramp_rate: Optional[float] = None,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Starts to set the target temperature for the well block, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
+        """
+
+        if block_max_volume is None:
+            block_max_volume = self._get_current_labware_max_vol()
+        task = self._core.start_set_target_block_temperature(
+            celsius=temperature,
+            block_max_volume=block_max_volume,
+            ramp_rate=ramp_rate,
+        )
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> Task:
+    def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -738,11 +759,29 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        task = self._core.set_target_lid_temperature(celsius=temperature)
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.set_target_lid_temperature(celsius=temperature)
+        self._core.wait_for_lid_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_lid_temperature)
+    @requires_version(2, 27)
+    def start_set_lid_temperature(self, temperature: float) -> Task:
+        """Set the target temperature for the heated lid, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 37 and 110, representing the target
+                            temperature in °C.
+
+        .. note::
+
+            The Thermocycler will proceed to the next command immediately after
+            ``temperature`` is reached.
+
+        """
+        task = self._core.start_set_target_lid_temperature(celsius=temperature)
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
@@ -1444,7 +1483,7 @@ class FlexStackerContext(ModuleContext):
     def set_stored_labware_items(
         self,
         labware: list[Labware],
-        stacking_offset_z: float | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
         and the end of the list represents the top of the Stacker.
@@ -1537,8 +1576,14 @@ class FlexStackerContext(ModuleContext):
         :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param adapter_version: Applies to ``adapter`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
@@ -1548,8 +1593,17 @@ class FlexStackerContext(ModuleContext):
         :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param lid_version: Applies to ``lid`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
@@ -1573,16 +1627,61 @@ class FlexStackerContext(ModuleContext):
               - Labware with lid and adapter: the adapter (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
         """
 
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            checked_adapter_namespace = namespace
+            checked_adapter_version = version
+            checked_lid_namespace = namespace
+            checked_lid_version = version
+        else:
+            checked_adapter_namespace = adapter_namespace
+            checked_adapter_version = adapter_version
+            checked_lid_namespace = lid_namespace
+            checked_lid_version = lid_version
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=lid_namespace,
-            lid_version=lid_version,
+            lid_namespace=checked_lid_namespace,
+            lid_version=checked_lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=adapter_namespace,
-            adapter_version=adapter_version,
+            adapter_namespace=checked_adapter_namespace,
+            adapter_version=checked_adapter_version,
             count=count,
             stacking_offset_z=stacking_offset_z,
         )

@@ -22,7 +22,7 @@ enum ThermoContent {
   Active = 'Active',
   Open = 'Open',
   Closed = 'Closed',
-  ProfileSettings = 'Profile settings',
+  ProgramProfile = 'Program a Thermocycler profile',
   WellVolume = 'Well volume',
   ProfileSteps = 'Profile steps',
   NoProfileDefined = 'No profile defined',
@@ -569,7 +569,7 @@ export const ThermoVerifications = {
   VerifyThermoProfile: (): StepThunk => ({
     call: () => {
       ThermoVerifications.VerifyThermoSetupHeader('2').call()
-      cy.contains(ThermoContent.ProfileSettings)
+      cy.contains(ThermoContent.ProgramProfile)
         .should('exist')
         .should('be.visible')
       cy.contains(ThermoContent.WellVolume).should('exist').should('be.visible')

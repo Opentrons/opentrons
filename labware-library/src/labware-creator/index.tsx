@@ -115,17 +115,14 @@ interface LabwareCreatorProps {
 
 export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
   const { save, goBack, isOnRunApp = false } = props
-  const [
-    showExportErrorModal,
-    _setShowExportErrorModal,
-  ] = React.useState<boolean>(false)
+  const [showExportErrorModal, _setShowExportErrorModal] =
+    React.useState<boolean>(false)
   const labwareDefinitions = getAllDefinitions()
-  const adapterDefinitions = Object.values(
-    labwareDefinitions
-  ).filter(definition => definition.allowedRoles?.includes('adapter'))
-  const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
-    WIZARD_STEPS
+  const adapterDefinitions = Object.values(labwareDefinitions).filter(
+    definition => definition.allowedRoles?.includes('adapter')
   )
+  const [wizardSteps, setWizardSteps] =
+    React.useState<WizardStep[]>(WIZARD_STEPS)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
 
   const setShowExportErrorModal = React.useMemo(
@@ -379,9 +376,8 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
         validate={formLevelValidation}
         initialStatus={getInitialStatus}
         onSubmit={(values: LabwareFields) => {
-          const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
-            values
-          )
+          const castValues: ProcessedLabwareFields =
+            labwareFormSchema.cast(values)
           const def = fieldsToLabware(castValues, adapterDefinitions)
           const { displayName } = def.metadata
           const { loadName } = def.parameters

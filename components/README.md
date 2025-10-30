@@ -8,6 +8,7 @@ React components for Opentrons' applications. Visit the [Opentrons Components Li
 
 ```javascript
 import { PrimaryButton } from '@opentrons/components'
+
 export default function CowButton(props) {
   return <PrimaryButton onClick={() => console.log('🐄')} />
 }
@@ -43,7 +44,6 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
   - Make sure DOM attributes are mapped correctly
   - Make sure handlers fire correctly
 - Render tests
-
   - Snapshot tests using [jest's snapshot functionality][jest-snapshots]
   - To regenerate snapshots after an intentional rendering change, run:
 

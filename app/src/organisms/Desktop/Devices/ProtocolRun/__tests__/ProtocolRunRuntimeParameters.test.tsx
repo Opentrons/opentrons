@@ -122,9 +122,9 @@ describe('ProtocolRunRuntimeParameters', () => {
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
     vi.mocked(useRunStatus).mockReturnValue('running')
-    vi.mocked(useNotifyRunQuery).mockReturnValue(({
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: { data: mockSucceededRun },
-    } as unknown) as UseQueryResult<Run>)
+    } as unknown as UseQueryResult<Run>)
   })
 
   afterEach(() => {

@@ -136,16 +136,10 @@ export function LiquidToolbox({
     }
   }
 
-  const {
-    handleSubmit,
-    watch,
-    control,
-    setValue,
-    reset,
-    formState,
-  } = useForm<ToolboxFormValues>({
-    defaultValues: getInitialValues(),
-  })
+  const { handleSubmit, watch, control, setValue, reset, formState } =
+    useForm<ToolboxFormValues>({
+      defaultValues: getInitialValues(),
+    })
 
   const { errors: fieldErrors } = formState
 
@@ -362,8 +356,8 @@ export function LiquidToolbox({
                             },
                           }}
                           render={({ field }) => {
-                            const fullOptions: DropdownOption[] = liquidSelectionOptions.map(
-                              option => {
+                            const fullOptions: DropdownOption[] =
+                              liquidSelectionOptions.map(option => {
                                 const liquid = Object.values(liquids).find(
                                   liquid =>
                                     liquid.liquidGroupId === option.value
@@ -374,8 +368,7 @@ export function LiquidToolbox({
                                   value: option.value,
                                   liquidColor: liquid?.displayColor ?? '',
                                 }
-                              }
-                            )
+                              })
                             const selectedLiquid = fullOptions.find(
                               option => option.value === selectedLiquidId
                             )

@@ -4,7 +4,7 @@ import pickBy from 'lodash/pickBy'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
-import { getAllLabwareDefs } from '@opentrons/shared-data'
+import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { getPDMetadata } from '../../file-types'
 import { getOnlyLatestDefs } from '../../labware-defs'
@@ -200,7 +200,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const allLabwareDefs = getAllLabwareDefs()
+      const allLabwareDefs = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
       const containers: ContainersState = Object.entries(
         metadata.labware
@@ -341,7 +341,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     ): LocationsState => {
       const ingredLocations = getPDMetadata(action.payload.file).ingredLocations
       const labware = getPDMetadata(action.payload.file).labware
-      const allLabwareDefs = getAllLabwareDefs()
+      const allLabwareDefs = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
 
       return Object.entries(ingredLocations).reduce(

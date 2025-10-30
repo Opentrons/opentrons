@@ -148,8 +148,8 @@ describe('pipette data accessors', () => {
         orderedColumns: expect.anything(),
         orderedRows: expect.anything(),
         pipetteBoundingBoxOffsets: {
-          backLeftCorner: [-8, -22, -259.15],
-          frontRightCorner: [-8, -22, -259.15],
+          backLeftCorner: [-38, 0, -259.15],
+          frontRightCorner: [11.5, -64, -259.15],
         },
         lldSettings: {
           t50: {

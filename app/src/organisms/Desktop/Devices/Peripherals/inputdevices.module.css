@@ -1,0 +1,62 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+
+  /* Refactor the parent container to use `gap`. */
+  margin-top: var(--spacing-16);
+  margin-bottom: var(--spacing-16);
+  gap: var(--spacing-16);
+}
+
+.card_container {
+  display: flex;
+  width: 19.969rem;
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-10);
+}
+
+.card_content_container {
+  display: flex;
+  flex: 1;
+  padding: var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.card_content_text_container {
+  display: flex;
+  flex-direction: column;
+  padding-right: var(--spacing-24);
+  gap: var(--spacing-8);
+}
+
+.card_text_name_location {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.card_on_deck_text {
+  color: var(--grey-60);
+}
+
+.card_overflow_btn {
+  padding: var(--spacing-4);
+}
+
+.card_overflow_menu_container {
+  position: relative;
+}
+
+.card_overflow_menu_content_container {
+  position: absolute;
+  z-index: 10;
+  top: 2.6rem;
+  right: calc(50% + var(--spacing-6));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--border-radius-4);
+  background-color: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}

@@ -67,7 +67,7 @@ export function SetupFlexPipetteCalibrationItem({
   const requestedPipetteMatch =
     requestedPipette.pipetteName === attachedPipetteOnMount?.instrumentName
   const pipetteCalDate = requestedPipetteMatch
-    ? attachedPipetteOnMount?.data.calibratedOffset?.last_modified ?? null
+    ? (attachedPipetteOnMount?.data.calibratedOffset?.last_modified ?? null)
     : null
   let flowType = ''
   if (pipetteCalDate != null && requestedPipetteMatch) {

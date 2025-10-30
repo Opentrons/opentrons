@@ -41,11 +41,9 @@ describe('SecondaryWindowApp', () => {
       name: 'otie',
       ip: '192.168.1.100',
     } as any)
-    vi.mocked(
-      LocalizationProvider
-    ).mockImplementation((props: LocalizationProviderProps) => (
-      <>{props.children}</>
-    ))
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
+    )
   })
 
   it('renders a LivestreamViewer component from /devices/:robotName/camera-stream', () => {

@@ -75,6 +75,60 @@ def test_resolve_ci_config_sandbox():
     assert config.relative_artifact_dir == "/test/artifacts"
 
 
+def test_resolve_ci_config_pull_request_special_branch_suffix():
+    """Special PR branches should deploy to alternate sandbox prefixes."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/123/merge",
+        "GITHUB_REF_NAME": "123/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "chore_release-pd-8.6.0",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "chore_release-pd-8.6.0-pr"
+
+
+def test_resolve_ci_config_pull_request_edge_branch_suffix():
+    """Edge PRs should deploy to alternate sandbox prefixes."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/321/merge",
+        "GITHUB_REF_NAME": "321/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "edge",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "edge-pr"
+
+
+def test_resolve_ci_config_pull_request_regular_branch_passthrough():
+    """Non-special PR branches should preserve the branch name prefix."""
+    env = {
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_REF": "refs/pull/42/merge",
+        "GITHUB_REF_NAME": "42/merge",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "../../dist",
+        "GITHUB_HEAD_REF": "feature-add-new-widget",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert config.environment == "sandbox"
+    assert config.sandbox_prefix == "feature-add-new-widget"
+
+
 def test_resolve_ci_config_staging():
     """Test CI config resolution for staging environment."""
     env = {
@@ -220,3 +274,87 @@ def test_resolve_ci_config_missing_relative_artifact_dir():
     with patch.dict(os.environ, env, clear=True):  # Clear environment
         with pytest.raises(ValueError, match="CI mode requires RELATIVE_ARTIFACT_DIR environment variable"):
             resolve_ci_config()
+
+
+def test_resolve_ci_config_mixed_case_staging_tag():
+    """Test CI config resolution handles mixed case staging tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/Staging-Protocol-Designer-v1.0.0",
+        "GITHUB_REF_NAME": "Staging-Protocol-Designer-v1.0.0",
+        "GITHUB_WORKFLOW": "PD test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/pd",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "protocol_designer"
+    assert config.environment == "staging"
+    assert config.sandbox_prefix == "Staging-Protocol-Designer-v1.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/pd"
+
+
+def test_resolve_ci_config_mixed_case_production_tag():
+    """Test CI config resolution handles mixed case production tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/Labware-Library-v2.0.0",
+        "GITHUB_REF_NAME": "Labware-Library-v2.0.0",
+        "GITHUB_WORKFLOW": "Labware Library test, build, and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/ll",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "labware_library"
+    assert config.environment == "production"
+    assert config.sandbox_prefix == "Labware-Library-v2.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/ll"
+
+
+def test_resolve_ci_config_uppercase_tag():
+    """Test CI config resolution handles fully uppercase tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/STAGING-MKDOCS-V1.0.0",
+        "GITHUB_REF_NAME": "STAGING-MKDOCS-V1.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/build/docs",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "mkdocs"
+    assert config.environment == "staging"
+    assert config.sandbox_prefix == "STAGING-MKDOCS-V1.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/build/docs"
+
+
+def test_resolve_ci_config_lowercase_tag():
+    """Test CI config resolution handles fully lowercase tags."""
+    env = {
+        "GITHUB_EVENT_NAME": "push",
+        "GITHUB_REF": "refs/tags/docs-v3.0.0",
+        "GITHUB_REF_NAME": "docs-v3.0.0",
+        "GITHUB_WORKFLOW": "Docs build and deploy",
+        "RELATIVE_ARTIFACT_DIR": "/dist/docs",
+        "GITHUB_HEAD_REF": "",
+    }
+
+    with patch.dict(os.environ, env, clear=False):
+        config = resolve_ci_config()
+
+    assert isinstance(config, CIConfig)
+    assert config.application == "docs"
+    assert config.environment == "production"
+    assert config.sandbox_prefix == "docs-v3.0.0"  # Preserves original case
+    assert config.relative_artifact_dir == "/dist/docs"

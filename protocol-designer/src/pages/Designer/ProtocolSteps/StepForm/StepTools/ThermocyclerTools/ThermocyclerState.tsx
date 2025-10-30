@@ -22,17 +22,10 @@ interface ThermocyclerStateProps {
   isHold?: boolean
   showFormErrors?: boolean
   focusedField?: string | null
-  paddingY?: string
 }
 
 export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
-  const {
-    title,
-    propsForFields,
-    formData,
-    isHold = false,
-    paddingY = '0',
-  } = props
+  const { title, propsForFields, formData, isHold = false } = props
   const { i18n, t } = useTranslation(['application', 'form'])
 
   const {
@@ -61,7 +54,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      padding={`${paddingY} ${SPACING.spacing16}`}
+      paddingX={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -108,7 +101,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         toggleValue={propsForFields[lidPositionField].value}
         tooltipContent={
           propsForFields[lidPositionField].disabled
-            ? propsForFields[lidPositionField].tooltipContent ?? null
+            ? (propsForFields[lidPositionField].tooltipContent ?? null)
             : null
         }
       />

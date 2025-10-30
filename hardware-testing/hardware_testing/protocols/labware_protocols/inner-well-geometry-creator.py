@@ -21,8 +21,8 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 import numpy as np
 import json
-from opentrons_shared_data.labware.types import LabwareDefinition3, LabwareDefinition2
 from dataclasses import dataclass, field
+from collections import OrderedDict
 
 ###########################################
 #  GLOBAL VARIABLES - START
@@ -82,7 +82,7 @@ class SetupState:
     probe_pipette: InstrumentContext
     labware: Labware
     src: Labware
-    dial: Labware
+    dial: Optional[Labware]
     first_dispense: float
     target_height: float
     labware_type: str
@@ -165,6 +165,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         choices=[
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_50",
@@ -175,10 +177,10 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Right Mount",
         description="Liquid Pipette Type on Right Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_1000",
@@ -212,6 +214,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
+    parameters.add_bool(
+        variable_name="dial_indicator_used",
+        display_name="Dial Indicator Use",
+        description="Used to calibrate tip overlap.",
+        default=True,
+    )
+
 
 def _setup(ctx: ProtocolContext) -> SetupState:
     """Sets up the static data for the protocol."""
@@ -223,6 +232,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
+    dial_indicator_used = ctx.params.dial_indicator_used  # type: ignore[attr-defined]
 
     # tipracks
     liquid_racks = [
@@ -237,6 +247,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     probe_pipette = ctx.load_instrument(
         left_mount, PROBING_MOUNT, tip_racks=[probing_rack]
     )
+    if probe_pipette.channels == 8:
+        probe_pipette.configure_nozzle_layout(
+            style=SINGLE, start="H1", tip_racks=[probing_rack]
+        )
     liq_pipette = ctx.load_instrument(right_mount, LIQUID_MOUNT, tip_racks=liquid_racks)
     if liq_pipette.channels == 8:
         liq_pipette.configure_nozzle_layout(
@@ -249,7 +263,10 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     wells = list(labware.wells_by_name().keys())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
+
+    dial: Optional[Labware] = None
+    if dial_indicator_used:
+        dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
     # below threshold, alpha low. above threshold, alpha high
     threshold = 4.5
@@ -269,17 +286,11 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
     ethanol = ctx.get_liquid_class(name="ethanol_80")
 
-    if not ctx.is_simulating() and DIAL_PORT is None:
+    if not ctx.is_simulating():
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-            Mitutoyo_Digimatic_Indicator,
-        )
 
-        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
-        DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(metadata["protocolName"], RUN_ID, labware_type)
-
         _write_line_to_csv(ctx, [RUN_ID])
         _write_line_to_csv(ctx, [right_mount])
         _write_line_to_csv(ctx, [left_mount])
@@ -288,6 +299,14 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
         lpc = str(labware._core.get_calibrated_offset())
         _write_line_to_csv(ctx, ["LPC Offset", labware.load_name, lpc])
+
+        if dial is not None:
+            from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
+                Mitutoyo_Digimatic_Indicator,
+            )
+
+            DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
+            DIAL_PORT.connect()
 
     return SetupState(
         liq_pipette=liq_pipette,
@@ -410,12 +429,12 @@ def _get_height_of_liquid_in_well(
         return 0.01
 
 
-def generate_frusta(
-    ctx: ProtocolContext, data: List, labware: Labware
-) -> LabwareDefinition2 | LabwareDefinition3:
-    """Read the geometry creator results and generate frustum dimensions for the IWG."""
+def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
+    """Read geometry creator results and generate frustum dimensions for the IWG."""
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
+    well_diameter = inner_well_json["wells"]["A1"].get("diameter")
+    well_side_length = inner_well_json["wells"]["A1"].get("xDimension")
     well_shape = inner_well_json["wells"]["A1"].get("shape")
 
     if well_shape == "circular":
@@ -429,74 +448,102 @@ def generate_frusta(
         inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
 
     frusta_data = []
-    radius = 0.0
-    side_length = 0.0
+    frustum_side_length = 0.0
+    frustum_diameter = 0.0
 
     for i in range(1, len(data)):
-
         vol1, h1 = data[i - 1]
         vol2, h2 = data[i]
 
         delta_volume = vol2 - vol1
         delta_height = h2 - h1
-
         if delta_height == 0:
             continue
 
         if geoID == "cuboidalWell":
             if not ctx.is_simulating():
-                side_length = round(np.sqrt(delta_volume / delta_height), 2)
+                frustum_side_length = round(np.sqrt(delta_volume / delta_height), 2)
             section = {
-                "shape": geoID[:-4],
-                "bottomXDimension": side_length,
-                "bottomYDimension": side_length,
-                "topXDimension": side_length,
-                "topYDimension": side_length,
+                "shape": "cuboidal",
+                "bottomXDimension": frustum_side_length,
+                "bottomYDimension": frustum_side_length,
+                "topXDimension": frustum_side_length,
+                "topYDimension": frustum_side_length,
                 "topHeight": round(h2, 2),
                 "bottomHeight": round(h1, 2),
             }
         elif geoID == "conicalWell":
             if not ctx.is_simulating():
                 radius = round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
-            diameter = 2 * radius
+                frustum_diameter = 2 * radius
             section = {
-                "shape": geoID[:-4],
-                "bottomDiameter": diameter,
-                "topDiameter": diameter,
+                "shape": "conical",
+                "bottomDiameter": frustum_diameter,
+                "topDiameter": frustum_diameter,
                 "topHeight": round(h2, 2),
                 "bottomHeight": round(h1, 2),
             }
+        else:
+            continue
 
         frusta_data.append(section)
 
-    # add one more frusta to ensure heights add up to total depth
-    last = frusta_data[-1]
-    bottom_height = last["topHeight"]
+    # Add one more frustum to reach full depth
+    if frusta_data:
+        last = frusta_data[-1]
+        bottom_height = last["topHeight"]
 
-    if geoID == "cuboidalWell":
-        final_section = {
-            "shape": geoID[:-4],
-            "topXDimension": side_length,
-            "topYDimension": side_length,
-            "bottomXDimension": side_length,
-            "bottomYDimension": side_length,
-            "topHeight": depth,
-            "bottomHeight": bottom_height,
-        }
-    elif geoID == "conicalWell":
-        final_section = {
-            "shape": geoID[:-4],
-            "topDiameter": diameter,
-            "bottomDiameter": diameter,
-            "topHeight": depth,
-            "bottomHeight": bottom_height,
-        }
+        if geoID == "cuboidalWell":
+            final_section = {
+                "shape": "cuboidal",
+                "topXDimension": well_side_length,
+                "topYDimension": well_side_length,
+                "bottomXDimension": well_side_length,
+                "bottomYDimension": well_side_length,
+                "topHeight": depth,
+                "bottomHeight": bottom_height,
+            }
+        elif geoID == "conicalWell":
+            final_section = {
+                "shape": "conical",
+                "topDiameter": well_diameter,
+                "bottomDiameter": well_diameter,
+                "topHeight": depth,
+                "bottomHeight": bottom_height,
+            }
+        else:
+            final_section = {}
 
-    frusta_data.append(final_section)
+        if final_section:
+            frusta_data.append(final_section)
+
+        frusta_data.reverse()
 
     inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
-    return inner_well_json
+    key_order = [
+        "ordering",
+        "brand",
+        "metadata",
+        "dimensions",
+        "wells",
+        "groups",
+        "parameters",
+        "namespace",
+        "version",
+        "schemaVersion",
+        "cornerOffsetFromSlot",
+        "stackingOffsetWithLabware",
+        "stackingOffsetWithModule",
+        "allowedRoles",
+        "gripperOffsets",
+        "innerLabwareGeometry",
+    ]
+    new_iwg = OrderedDict(
+        (k, dict(inner_well_json)[k]) for k in key_order if k in inner_well_json
+    )
+
+    return new_iwg
 
 
 def get_dispense_props(state: SetupState, ts: TrialState) -> None:
@@ -611,7 +658,8 @@ def geometry_creator(
 ) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
     # initial protocol steps
-    _store_dial_baseline(ctx, state.probe_pipette, state.dial)
+    if state.dial is not None:
+        _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)  # log 0th step as a baseline
     write_trial_log(ctx, ts)
     state.liq_pipette.pick_up_tip()
@@ -643,7 +691,8 @@ def geometry_creator(
         get_dispense_props(state, ts)
 
         pick_up_tips(state.liq_pipette, state.probe_pipette)
-        ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
+        if state.dial is not None:
+            ts.tip_z_error = _get_tip_z_error(ctx, state.probe_pipette, state.dial)
 
         state.liq_pipette.transfer_with_liquid_class(
             liquid_class=state.ethanol,

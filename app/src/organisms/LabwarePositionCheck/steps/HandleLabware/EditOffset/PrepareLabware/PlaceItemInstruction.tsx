@@ -49,7 +49,8 @@ export function PlaceItemInstruction(
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(runId)
   ) as SelectedLwOverview
-  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails =
+    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const isDefaultOffset = offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
 
   const buildHeader = (): string =>
@@ -142,10 +143,8 @@ function ClearDeckCopy({
 >): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
-  const {
-    kind: offsetKind,
-    closestBeneathModuleModel,
-  } = labwareInfo.offsetLocationDetails as OffsetLocationDetails
+  const { kind: offsetKind, closestBeneathModuleModel } =
+    labwareInfo.offsetLocationDetails as OffsetLocationDetails
 
   return offsetKind === OFFSET_KIND_DEFAULT ||
     closestBeneathModuleModel == null ? (

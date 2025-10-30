@@ -29,22 +29,24 @@ export const mockTipLengthCalBlock: CalibrationLabware = {
   definition: fixtureCalibrationBlock as CalibrationLabware['definition'],
 }
 
-export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails = {
-  instrument: {
-    model: 'fake_pipette_model' as any,
-    name: 'fake_pipette_name',
-    tipLength: 42,
-    mount: 'right',
-    serial: 'fake serial 2',
-    defaultTipracks: [],
-  },
-  currentStep: 'labwareLoaded',
-  labware: [mockTipLengthTipRack, mockTipLengthCalBlock],
-  supportedCommands: [],
-}
+export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails =
+  {
+    instrument: {
+      model: 'fake_pipette_model' as any,
+      name: 'fake_pipette_name',
+      tipLength: 42,
+      mount: 'right',
+      serial: 'fake serial 2',
+      defaultTipracks: [],
+    },
+    currentStep: 'labwareLoaded',
+    labware: [mockTipLengthTipRack, mockTipLengthCalBlock],
+    supportedCommands: [],
+  }
 
-export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams = {
-  mount: 'left',
-  hasCalibrationBlock: true,
-  tipRackDefinition: fixtureTiprack300ul as CalibrationLabware['definition'],
-}
+export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams =
+  {
+    mount: 'left',
+    hasCalibrationBlock: true,
+    tipRackDefinition: fixtureTiprack300ul as CalibrationLabware['definition'],
+  }

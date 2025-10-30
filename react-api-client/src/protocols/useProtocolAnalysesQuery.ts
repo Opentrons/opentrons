@@ -23,7 +23,7 @@ export function useProtocolAnalysesQuery(
       (enablePolling == null || enablePolling),
     refetchInterval:
       enablePolling != null
-        ? options?.refetchInterval ?? POLLING_INTERVAL
+        ? (options?.refetchInterval ?? POLLING_INTERVAL)
         : false,
   }
   const query = useQuery<ProtocolAnalyses>(

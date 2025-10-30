@@ -62,6 +62,9 @@ export * from './getStandardDeckViewLayerBlockList'
 export * from './getWellFillFromLabwareId'
 export * from './getModuleDeckLabel'
 export * from './deckConfig'
+export * from './testHelpers'
+export * from './symbolicPositionHelpers'
+
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
 

@@ -20,5 +20,4 @@ export type PipetteInfoByGen = Record<Gen, PipetteInfoByType[]>
 
 export type PipetteVolumes = {
   [key in typeof FLEX_ROBOT_TYPE]?: PipetteInfoByType[]
-} &
-  { [key in typeof OT2_ROBOT_TYPE]?: PipetteInfoByGen[] }
+} & { [key in typeof OT2_ROBOT_TYPE]?: PipetteInfoByGen[] }

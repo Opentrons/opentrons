@@ -151,15 +151,12 @@ export const Module = (props: Props): JSX.Element => {
 
   const transformsForLocation =
     targetSlotId != null && targetDeckId != null
-      ? def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {}
+      ? (def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {})
       : {}
 
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
-  const [
-    [slotTranslateX],
-    [slotTranslateY],
-  ] = multiplyMatrices(
+  const [[slotTranslateX], [slotTranslateY]] = multiplyMatrices(
     transformsForLocation.cornerOffsetFromSlot ?? IDENTITY_AFFINE_TRANSFORM,
     [
       [def.cornerOffsetFromSlot.x],

@@ -41,13 +41,10 @@ export function ProtocolDashboard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
-  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
-    false
-  )
-  const [
-    showDeleteConfirmationModal,
-    setShowDeleteConfirmationModal,
-  ] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] =
+    useState<boolean>(false)
+  const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] =
+    useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = useState<string>('')
   const [isRequiredCSV, setIsRequiredCSV] = useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'

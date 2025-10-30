@@ -74,6 +74,34 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    images_directory: typing.Optional[Path] = Field(
+        default=None,
+        description=(
+            "A directory for the server to store captured images."
+            " If this directory doesn't already exist, the server will create it."
+            " If no directory is supplied, the server will use a fresh temporary directory"
+            " (effectively not persisting anything)."
+        ),
+    )
+
+    images_directory_max_size_mb: int = Field(
+        default=2048,
+        gt=0,
+        description=(
+            "The maximum allowable disk size of the images directory in megabytes. "
+            "Commands that generate image files will fail when the images directory is greater than this threshold."
+        ),
+    )
+
+    system_low_space_threshold_mb: int = Field(
+        default=250,
+        gt=0,
+        description=(
+            "Minimum free disk space required in megabytes. "
+            "Commands that generate data files will fail when available space is less than this threshold."
+        ),
+    )
+
     maximum_runs: int = Field(
         default=20,
         gt=0,

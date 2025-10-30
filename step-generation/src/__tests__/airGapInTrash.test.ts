@@ -23,9 +23,8 @@ const invariantContext: InvariantContext = {
     },
   },
 }
-const prevRobotState: RobotState = getInitialRobotStateStandard(
-  invariantContext
-)
+const prevRobotState: RobotState =
+  getInitialRobotStateStandard(invariantContext)
 
 describe('airGapInTrash', () => {
   it('returns correct commands for airGapInPlace over a trash bin', () => {

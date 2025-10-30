@@ -15,7 +15,7 @@ metadata = {
     "source": "Protocol Library",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.25"}
+requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -31,7 +31,7 @@ def run(protocol: ProtocolContext) -> None:
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     data = all_data[1:]
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])

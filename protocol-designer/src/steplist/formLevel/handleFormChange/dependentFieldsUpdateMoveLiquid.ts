@@ -189,7 +189,8 @@ const updatePatchOnLabwareChange = (
 const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, or disposal volumes to null
@@ -198,9 +199,15 @@ const updatePatchOnPipetteChange = (
     const newPipette = patch.pipette
     let airGapVolume: string | null = null
     let nozzles: NozzleConfigurationStyle | null = null
-
+    let firstDefaultTiprackURIOnDeck: string | null = null
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
       const minVolume = getMinPipetteVolume(pipetteEntities[newPipette])
+      const pipetteTipracks = pipetteEntities[newPipette].tiprackDefURI
+      const labwareURIsOnDeck = new Set(
+        Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
+      )
+      firstDefaultTiprackURIOnDeck =
+        pipetteTipracks?.find(uri => labwareURIsOnDeck.has(uri)) ?? null
       airGapVolume = minVolume.toString()
       const hasPartialTipSupportedChannel =
         pipetteEntities[newPipette].spec.channels !== 1
@@ -221,6 +228,7 @@ const updatePatchOnPipetteChange = (
       nozzles,
       aspirate_airGap_volume: airGapVolume,
       dispense_airGap_volume: airGapVolume,
+      tipRack: firstDefaultTiprackURIOnDeck,
     }
   }
 
@@ -698,6 +706,19 @@ const updatePatchOnPathChange = (
   return patch
 }
 
+const updatePatchOnNozzlesChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'nozzles')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -721,7 +742,12 @@ export function dependentFieldsUpdateMoveLiquid(
         pipetteEntities
       ),
     chainPatch =>
-      updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+      updatePatchOnPipetteChange(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
     chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
     chainPatch =>
       updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
@@ -738,5 +764,6 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
     chainPatch => updatePatchOnPathChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
   ])
 }

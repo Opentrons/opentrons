@@ -35,10 +35,8 @@ export function useRecoveryTipStatus(
   props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
   const [isLoadingTipStatus, setIsLoadingTipStatus] = useState(false)
-  const [
-    failedCommandPipette,
-    setFailedCommandPipette,
-  ] = useState<PipetteWithTip | null>(null)
+  const [failedCommandPipette, setFailedCommandPipette] =
+    useState<PipetteWithTip | null>(null)
 
   const tipAttachmentStatusUtils = useTipAttachmentStatus({
     ...props,

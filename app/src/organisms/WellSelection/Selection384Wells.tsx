@@ -305,13 +305,8 @@ interface ButtonControlsProps {
 }
 
 function ButtonControls(props: ButtonControlsProps): JSX.Element {
-  const {
-    channels,
-    handleMinus,
-    handlePlus,
-    minusDisabled,
-    plusDisabled,
-  } = props
+  const { channels, handleMinus, handlePlus, minusDisabled, plusDisabled } =
+    props
   const { t, i18n } = useTranslation('quick_transfer')
 
   const addOrRemoveButtons =

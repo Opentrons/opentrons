@@ -10,6 +10,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
@@ -305,9 +306,8 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } = getInvariantContextAndRobotState(
-    quickTransferState
-  )
+  const { invariantContext, robotState } =
+    getInvariantContextAndRobotState(quickTransferState)
 
   let blowoutLocation: string | undefined
   if (
@@ -486,6 +486,10 @@ export function generateQuickTransferArgs(
       quickTransferState.touchTipAspirate ?? null,
     touchTipAfterDispenseMmFromEdge:
       quickTransferState.touchTipDispense ?? null,
+    // Tip selection not currently allowed in Quick Transfer, so we set to automatic
+    tipTracking: AUTOMATIC,
+    tipsSelected: [],
+    tiprackSelected: null,
   }
 
   switch (quickTransferState.path) {
@@ -561,7 +565,8 @@ export function generateQuickTransferArgs(
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
-        disposalVolume: quickTransferState.disposalVolume,
+        disposalVolume:
+          quickTransferState.disposalVolumeDispenseSettings?.volume ?? null,
         mixBeforeAspirate:
           quickTransferState.mixOnAspirate != null
             ? {
@@ -571,7 +576,7 @@ export function generateQuickTransferArgs(
             : null,
         sourceWell: sourceWells[0],
         destWells,
-        conditioningVolume: null,
+        conditioningVolume: quickTransferState.conditionAspirate ?? null,
       }
       return {
         stepArgs: distributeStepArguments,

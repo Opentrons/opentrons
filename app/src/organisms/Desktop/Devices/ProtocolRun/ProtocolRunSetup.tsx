@@ -29,12 +29,16 @@ import {
 
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
+import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
+import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
+import { useFeatureFlag } from '/app/redux/config'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
+  CAMERA_SETUP_STEP_KEY,
   getMissingSetupSteps,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -91,10 +95,9 @@ export function ProtocolRunSetup({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const {
-    orderedSteps,
-    orderedApplicableSteps,
-  } = useRequiredSetupStepsInOrder({ runId, protocolAnalysis })
+  const { orderedSteps, orderedApplicableSteps } = useRequiredSetupStepsInOrder(
+    { runId, protocolAnalysis }
+  )
   const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
@@ -169,6 +172,8 @@ export function ProtocolRunSetup({
     }
   }
 
+  const isCameraEnabled = useFeatureFlag('camera')
+
   const isMissingPipette =
     (runPipetteInfoByMount.left != null &&
       runPipetteInfoByMount.left.requestedPipetteMatch === INCOMPATIBLE) ||
@@ -206,6 +211,8 @@ export function ProtocolRunSetup({
   const ot2DeckHardwareDescription = hasModules
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
+
+  const cameraSettings = useCameraUsageSettings()
 
   if (robot == null) {
     return null
@@ -333,7 +340,7 @@ export function ProtocolRunSetup({
               })
             )
             if (confirmed) {
-              setExpandedStepKey(null)
+              setExpandedStepKey(CAMERA_SETUP_STEP_KEY)
             }
           }}
         />
@@ -358,7 +365,38 @@ export function ProtocolRunSetup({
         ),
       },
     },
+    [CAMERA_SETUP_STEP_KEY]: {
+      stepInternals: (
+        <SetupCamera
+          robotName={robotName}
+          settings={cameraSettings}
+          cameraConfirmed={!missingSteps.includes(CAMERA_SETUP_STEP_KEY)}
+          confirmCameraSettings={() => {
+            dispatch(
+              updateRunSetupStepsComplete(runId, {
+                [CAMERA_SETUP_STEP_KEY]: true,
+              })
+            )
+            setExpandedStepKey(null)
+          }}
+        />
+      ),
+      description: t(`${CAMERA_SETUP_STEP_KEY}_description`),
+      descriptionElement: null,
+      rightElProps: {
+        stepKey: CAMERA_SETUP_STEP_KEY,
+        complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
+        // TODO(jh, 09-29-25): Wire this enabled/disabled state to the proper endpoint.
+        completeText: t('camera_enabled'),
+        incompleteText: t('check_preferences'),
+        incompleteElement: null,
+      },
+    },
   }
+
+  const stepsToRender = isCameraEnabled
+    ? orderedSteps
+    : orderedSteps.filter(step => step !== CAMERA_SETUP_STEP_KEY)
 
   return (
     <Flex
@@ -376,7 +414,7 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </LegacyStyledText>
           ) : (
-            orderedSteps.map((stepKey, index) => {
+            stepsToRender.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
                 (stepKey === 'module_setup_step' &&
@@ -417,7 +455,7 @@ export function ProtocolRunSetup({
                       {StepDetailMap[stepKey].stepInternals}
                     </SetupStep>
                   )}
-                  {index !== orderedSteps.length - 1 ? (
+                  {index !== stepsToRender.length - 1 ? (
                     <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
