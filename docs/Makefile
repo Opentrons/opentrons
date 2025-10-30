@@ -19,3 +19,8 @@ clean:
 .PHONY: serve
 serve:
 	uv run mkdocs serve -f ./mkdocs.yml
+
+.PHONY: pdf-flex
+pdf-flex:
+	uv run mkdocs build -f ./flex/mkdocs.yml && \
+	python flex/export_to_pdf.py flex/site/print_page/index.html site/Opentrons-Flex-Instruction-Manual.pdf 'Opentrons Flex Instruction Manual'
