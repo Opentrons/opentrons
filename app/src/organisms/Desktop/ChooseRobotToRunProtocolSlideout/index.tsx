@@ -91,7 +91,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
   useEffect(() => {
     setRunTimeParametersOverrides(runTimeParameters)
-  }, [storedProtocolData])
+  }, [protocolKey])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
