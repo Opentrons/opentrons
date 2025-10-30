@@ -54,28 +54,6 @@ const _getWellContents = (
   )
 }
 
-export const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  labwareIngredSelectors.getLiquidsByLabwareId,
-  labwareIngredSelectors.getSelectedLabwareId,
-  getSelectedWells,
-  getHighlightedWells,
-
-  (
-    labwareEntities,
-    liquidsByLabware,
-    selectedLabwareId,
-    selectedWells,
-    highlightedWells
-  ) => {
-    const allLabwareIds: string[] = Object.keys(labwareEntities)
-    return allLabwareIds.reduce(
-      (
-        acc: WellContentsByLabware,
-        labwareId: string
-      ): WellContentsByLabware => {
-        const liquidsForLabware = liquidsByLabware[labwareId]
-        const isSelectedLabware = selectedLabwareId === labwareId
 export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
   createSelector(
     stepFormSelectors.getLabwareEntities,
@@ -106,57 +84,51 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
             isSelectedLabware ? highlightedWells : null
           )
 
-        // Skip labware ids with no liquids
-        return wellContents ? { ...acc, [labwareId]: wellContents } : acc
-      },
-      {}
-    )
-  }
-)
+          // Skip labware ids with no liquids
+          return wellContents ? { ...acc, [labwareId]: wellContents } : acc
+        },
+        {}
+      )
+    }
+  )
 
-export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  getInitialRobotState,
-  labwareIngredSelectors.getLiquidsByLabwareId,
-  labwareIngredSelectors.getSelectedLabwareId,
-  getSelectedWells,
-  getHighlightedWells,
-  (
-    labwareEntities,
-    initialRobotState,
-    liquidsByLabware,
-    selectedLabwareId,
-    selectedWells,
-    highlightedWells
-  ) => {
-    const selectedLabwareStack = selectedLabwareId
-      ? initialRobotState.labware[selectedLabwareId].stack
-      : []
+export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> =
+  createSelector(
+    stepFormSelectors.getLabwareEntities,
+    getInitialRobotState,
+    labwareIngredSelectors.getLiquidsByLabwareId,
+    labwareIngredSelectors.getSelectedLabwareId,
+    getSelectedWells,
+    getHighlightedWells,
+    (
+      labwareEntities,
+      initialRobotState,
+      liquidsByLabware,
+      selectedLabwareId,
+      selectedWells,
+      highlightedWells
+    ) => {
+      const selectedLabwareStack = selectedLabwareId
+        ? initialRobotState.labware[selectedLabwareId].stack
+        : []
 
-    const allLabwareIds: string[] = selectedLabwareStack ?? []
-    return allLabwareIds.reduce(
-      (
-        acc: WellContentsByLabware,
-        labwareId: string
-      ): WellContentsByLabware => {
-        const liquidsForLabware = liquidsByLabware[labwareId]
-        if (!labwareEntities[labwareId]) {
-          return acc
-        }
-        const wellContents = _getWellContents(
-          labwareEntities[labwareId].def,
-          liquidsForLabware,
-          selectedWells,
-          highlightedWells
-        )
+      const allLabwareIds: string[] = selectedLabwareStack ?? []
+      return allLabwareIds.reduce(
+        (
+          acc: WellContentsByLabware,
+          labwareId: string
+        ): WellContentsByLabware => {
+          const liquidsForLabware = liquidsByLabware[labwareId]
+          if (!labwareEntities[labwareId]) {
+            return acc
+          }
+          const wellContents = _getWellContents(
+            labwareEntities[labwareId].def,
+            liquidsForLabware,
+            selectedWells,
+            highlightedWells
+          )
 
-        // Skip labware ids with no liquids
-        return wellContents ? { ...acc, [labwareId]: wellContents } : acc
-      },
-      {}
-    )
-  }
-)
           // Skip labware ids with no liquids
           return wellContents ? { ...acc, [labwareId]: wellContents } : acc
         },

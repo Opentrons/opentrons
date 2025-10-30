@@ -74,10 +74,8 @@ const getLiquidSelectionOptions: Selector<RootSlice, DropdownOption[]> =
 const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
 
-const getSelectedLabwareId: Selector<
-  RootSlice,
-  SelectedContainerId
-> = createSelector(rootSelector, rootState => rootState.selectedContainerId)
+const getSelectedLabwareId: Selector<RootSlice, SelectedContainerId> =
+  createSelector(rootSelector, rootState => rootState.selectedContainerId)
 
 const getMultipleSelectedLabwareIds: Selector<
   RootSlice,

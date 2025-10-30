@@ -28,9 +28,8 @@ export interface CloseLabwareSelectorAction {
   type: 'CLOSE_LABWARE_SELECTOR'
 }
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
-export const closeLabwareSelector: () => CloseLabwareSelectorAction = createAction(
-  'CLOSE_LABWARE_SELECTOR'
-)
+export const closeLabwareSelector: () => CloseLabwareSelectorAction =
+  createAction('CLOSE_LABWARE_SELECTOR')
 // ===== Open and close multiple Ingredient Selector modal ====
 export interface MultipleIngredientsSelectorAction {
   type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'

@@ -65,7 +65,7 @@ export function LabwareStackToolbox({
   const { labware, labwareId, allWellContents, labwareEntities } = data
 
   const labwareStack: string[] =
-    labwareId != null ? labware[labwareId]?.stack ?? [] : []
+    labwareId != null ? (labware[labwareId]?.stack ?? []) : []
 
   const handleAddAnotherLabware = (): void => {
     dispatch(
