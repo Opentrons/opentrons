@@ -8,7 +8,7 @@ import { useImage } from '/app/resources/dataFiles/useImage'
 import { GalleryItemCard } from '../GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 vi.mock('/app/resources/dataFiles/useImage')
 
@@ -64,7 +64,7 @@ describe('GalleryItemCard', () => {
   it('renders appropriate card copy when there is an image', () => {
     render(mockProps)
 
-    screen.getByText('Step 1/100: ?')
+    screen.getByText('Step ? / ?: ?')
     screen.getByText('View image')
     screen.getByText('2024-01-01 12:00:00')
   })

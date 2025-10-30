@@ -487,9 +487,9 @@ export function generateQuickTransferArgs(
     touchTipAfterDispenseMmFromEdge:
       quickTransferState.touchTipDispense ?? null,
     // Tip selection not currently allowed in Quick Transfer, so we set to automatic
-    tip_tracking: AUTOMATIC,
-    tips_selected: [],
-    tiprack_selected: null,
+    tipTracking: AUTOMATIC,
+    tipsSelected: [],
+    tiprackSelected: null,
   }
 
   switch (quickTransferState.path) {

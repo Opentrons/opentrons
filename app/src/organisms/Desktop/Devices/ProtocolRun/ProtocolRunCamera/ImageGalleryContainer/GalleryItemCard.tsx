@@ -5,33 +5,47 @@ import { Chip, COLORS, StyledText } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
+import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
 
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
-  const { item } = props
+  const { item, protocolAnalysis } = props
   const {
     currentCommand,
     currentCommandString,
     previousCommandString,
-    stubStepFraction,
     isLoading,
   } = useImageGalleryData(props)
 
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
   const isCurrentCmdError = currentCommand?.error != null
+  const { commandStep, totalSteps } = useCommandStepNumbers({
+    currentCommand,
+    protocolAnalysis,
+  })
 
   const { t } = useTranslation(['run_details', 'branded'])
   const dispatch = useDispatch()
   const host = useHost()
 
   const isSkeleton = imagePath == null || isLoading
+
+  const buildStepText = (): string => {
+    const totalStepStr =
+      commandStep === null || totalSteps === null ? '?' : totalSteps.toString()
+
+    return t('step_current_total', {
+      current: commandStep ?? '?',
+      total: totalStepStr,
+    })
+  }
 
   const onClick = (): void => {
     if (isSkeleton || imagePath == null) return
@@ -44,7 +58,7 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
             robotName: host.robotName,
             photoUrl: imagePath,
             windowTitle: t('branded:image_capture_window_title', {
-              step: '1 / 999999',
+              step: buildStepText(),
               timestamp,
             }),
           })
@@ -96,7 +110,10 @@ export function GalleryItemCard(props: UseImageGalleryDataProps): JSX.Element {
           <Skeleton width="100%" height="1.25rem" backgroundSize="47rem" />
         ) : (
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
-            {`Step ${stubStepFraction}: ${currentCommandString}`}
+            {t('step_command', {
+              step: buildStepText(),
+              command: currentCommandString,
+            })}
           </StyledText>
         )}
 
