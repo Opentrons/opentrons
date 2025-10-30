@@ -25,8 +25,8 @@ def test_import_v7_protocol_shows_migration_modal(page: Page, base_url: str) -> 
     page.get_by_text("Import existing protocol").click()
 
     # Upload the v7 protocol file (doItAllV7.json)
-    # Path is relative to protocol-designer directory
-    protocol_file_path = "../protocol-designer/fixtures/protocol/7/doItAllV7.json"
+    # Path is relative to e2e-testing directory
+    protocol_file_path = "fixtures/protocol/7/doItAllV7.json"
     # Use the landing page file input (not the navigation one)
     file_input = page.get_by_label("Import_from_landing")
     file_input.set_input_files(protocol_file_path)
@@ -72,7 +72,7 @@ def test_import_v8_protocol_no_migration_modal(page: Page, base_url: str) -> Non
     page.get_by_text("Import existing protocol").click()
 
     # Upload the v8 protocol file (doItAllV8.json)
-    protocol_file_path = "../protocol-designer/fixtures/protocol/8/doItAllV8.json"
+    protocol_file_path = "fixtures/protocol/8/doItAllV8.json"
     # Use the landing page file input (not the navigation one)
     file_input = page.get_by_label("Import_from_landing")
     file_input.set_input_files(protocol_file_path)

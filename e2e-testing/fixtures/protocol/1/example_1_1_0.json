@@ -1,0 +1,1880 @@
+{
+  "protocol-schema": "1.0.0",
+  "metadata": {
+    "protocol-name": "Some name!",
+    "author": "Author name",
+    "description": "Description here",
+    "created": 1560957631666,
+    "category": null,
+    "subcategory": null,
+    "tags": []
+  },
+  "default-values": {
+    "aspirate-flow-rate": {
+      "p10_single": 5,
+      "p10_multi": 5,
+      "p50_single": 25,
+      "p50_multi": 25,
+      "p300_single": 150,
+      "p300_multi": 150,
+      "p1000_single": 500
+    },
+    "dispense-flow-rate": {
+      "p10_single": 10,
+      "p10_multi": 10,
+      "p50_single": 50,
+      "p50_multi": 50,
+      "p300_single": 300,
+      "p300_multi": 300,
+      "p1000_single": 1000
+    },
+    "aspirate-mm-from-bottom": 1,
+    "dispense-mm-from-bottom": 0.5,
+    "touch-tip-mm-from-top": -1
+  },
+  "designer-application": {
+    "application-name": "opentrons/protocol-designer",
+    "application-version": "1.1.1",
+    "applicationVersion": "1.1.1",
+    "_internalAppBuildDate": "Wed, 03 Apr 2019 17:23:10 GMT",
+    "data": {
+      "pipetteTiprackAssignments": {
+        "c6f45030-92a5-11e9-ac62-1b173f839d9e": "tiprack-10ul",
+        "c6f47740-92a5-11e9-ac62-1b173f839d9e": "tiprack-200ul"
+      },
+      "dismissedWarnings": {
+        "form": {},
+        "timeline": {}
+      },
+      "ingredients": {
+        "0": {
+          "name": "samples",
+          "description": null,
+          "serialize": false,
+          "liquidGroupId": "0"
+        },
+        "1": {
+          "name": "dna",
+          "description": null,
+          "serialize": false,
+          "liquidGroupId": "1"
+        }
+      },
+      "ingredLocations": {
+        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
+          "A1": {
+            "0": {
+              "volume": 121
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 121
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 121
+            }
+          },
+          "D1": {
+            "0": {
+              "volume": 121
+            }
+          },
+          "E1": {
+            "0": {
+              "volume": 121
+            }
+          },
+          "F1": {
+            "1": {
+              "volume": 44
+            }
+          },
+          "G1": {
+            "1": {
+              "volume": 44
+            }
+          },
+          "H1": {
+            "1": {
+              "volume": 44
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__",
+          "labwareLocationUpdate": {
+            "trashId": "12",
+            "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": "1",
+            "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": "2",
+            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": "10"
+          },
+          "pipetteLocationUpdate": {
+            "c6f45030-92a5-11e9-ac62-1b173f839d9e": "left",
+            "c6f47740-92a5-11e9-ac62-1b173f839d9e": "right"
+          }
+        },
+        "e7d36200-92a5-11e9-ac62-1b173f839d9e": {
+          "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
+          "stepType": "moveLiquid",
+          "stepName": "transfer things",
+          "stepDetails": "yeah notes",
+          "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+          "volume": "6",
+          "changeTip": "always",
+          "path": "single",
+          "aspirate_wells_grouped": false,
+          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "aspirate_wells": ["A1"],
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_mix_checkbox": true,
+          "aspirate_mix_times": 3,
+          "aspirate_mix_volume": "2",
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": true,
+          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "dispense_wells": [
+            "C6",
+            "D6",
+            "E6",
+            "C7",
+            "D7",
+            "E7",
+            "C8",
+            "D8",
+            "E8"
+          ],
+          "dispense_wellOrder_first": "b2t",
+          "dispense_wellOrder_second": "r2l",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": 2,
+          "dispense_mix_volume": "3",
+          "dispense_mmFromBottom": 2.5,
+          "dispense_touchTip_checkbox": true,
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": "1",
+          "blowout_checkbox": true,
+          "blowout_location": "trashId",
+          "preWetTip": false,
+          "aspirate_flowRate": 0.6,
+          "aspirate_touchTip_mmFromBottom": 28.5
+        },
+        "18113c80-92a6-11e9-ac62-1b173f839d9e": {
+          "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
+          "stepType": "mix",
+          "stepName": "mix",
+          "stepDetails": "",
+          "changeTip": "always",
+          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "mix_wellOrder_first": "t2b",
+          "mix_wellOrder_second": "l2r",
+          "blowout_checkbox": true,
+          "blowout_location": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "mix_mmFromBottom": 0.5,
+          "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+          "volume": "5.5",
+          "wells": ["F1"],
+          "times": 3,
+          "aspirate_flowRate": 8,
+          "dispense_flowRate": 7,
+          "mix_touchTip_checkbox": true,
+          "mix_touchTip_mmFromBottom": 30.5
+        },
+        "2e622080-92a6-11e9-ac62-1b173f839d9e": {
+          "id": "2e622080-92a6-11e9-ac62-1b173f839d9e",
+          "stepType": "pause",
+          "stepName": "pause",
+          "stepDetails": "",
+          "pauseForAmountOfTime": "true",
+          "pauseHour": 1,
+          "pauseMinute": 2,
+          "pauseSecond": 3,
+          "pauseMessage": "Delay plz"
+        }
+      },
+      "orderedStepIds": [
+        "e7d36200-92a5-11e9-ac62-1b173f839d9e",
+        "18113c80-92a6-11e9-ac62-1b173f839d9e",
+        "2e622080-92a6-11e9-ac62-1b173f839d9e"
+      ]
+    }
+  },
+  "robot": {
+    "model": "OT-2 Standard"
+  },
+  "pipettes": {
+    "c6f45030-92a5-11e9-ac62-1b173f839d9e": {
+      "mount": "left",
+      "model": "p10_single_v1.3",
+      "name": "p10_single"
+    },
+    "c6f47740-92a5-11e9-ac62-1b173f839d9e": {
+      "mount": "right",
+      "model": "p50_single_v1.3",
+      "name": "p50_single"
+    }
+  },
+  "labware": {
+    "trashId": {
+      "slot": "12",
+      "display-name": "Trash",
+      "model": "fixed-trash"
+    },
+    "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": {
+      "slot": "1",
+      "display-name": "tiprack 10ul (1)",
+      "model": "tiprack-10ul"
+    },
+    "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": {
+      "slot": "2",
+      "display-name": "tiprack 200ul (1)",
+      "model": "tiprack-200ul"
+    },
+    "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
+      "slot": "10",
+      "display-name": "96 deep well (1)",
+      "model": "96-deep-well"
+    }
+  },
+  "procedure": [
+    {
+      "annotation": {
+        "name": "TODO Name 0",
+        "description": "todo description"
+      },
+      "subprocedure": [
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "B1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "C1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C8",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "D1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "E1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "F1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C7",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "G1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "E6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "H1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "D6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "A2"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 2,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "A1",
+            "offsetFromBottomMm": 28.5
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 6,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6",
+            "offsetFromBottomMm": 1,
+            "flow-rate": 0.6
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 3,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "C6",
+            "offsetFromBottomMm": 2.5
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        }
+      ]
+    },
+    {
+      "annotation": {
+        "name": "TODO Name 1",
+        "description": "todo description"
+      },
+      "subprocedure": [
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+            "well": "B2"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 8
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 7
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 8
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 7
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 8
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "volume": 5.5,
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 0.5,
+            "flow-rate": 7
+          }
+        },
+        {
+          "command": "blowout",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1"
+          }
+        },
+        {
+          "command": "touch-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+            "well": "F1",
+            "offsetFromBottomMm": 30.5
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        }
+      ]
+    },
+    {
+      "annotation": {
+        "name": "TODO Name 2",
+        "description": "todo description"
+      },
+      "subprocedure": [
+        {
+          "command": "delay",
+          "params": {
+            "message": "Delay plz",
+            "wait": 3723
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -58,17 +58,16 @@ def test_protocol_file_is_valid(test_name: str, file_path: str) -> None:
 
     Args:
         test_name: Name/identifier of the test file
-        file_path: Relative path to the protocol file from protocol-designer directory
+        file_path: Relative path to the protocol file from fixtures directory
 
     This test validates:
     - The file exists
     - The file is valid JSON
     - The file has a metadata.protocolName field (if it's a protocol JSON)
     """
-    # Get the protocol-designer directory (one level up from e2e-testing)
+    # Get the fixtures directory in e2e-testing
     e2e_dir = Path(__file__).parent.parent
-    protocol_designer_dir = e2e_dir.parent / "protocol-designer"
-    full_path = protocol_designer_dir / file_path
+    full_path = e2e_dir / file_path
 
     # Verify file exists
     assert full_path.exists(), f"Test file not found: {full_path}"
