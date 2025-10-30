@@ -114,7 +114,7 @@ def _setup(
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
-    labware_type = LABWARE
+    labware_type = "thermofisher_nunc_maxisorp_lockwell_elisa"
 
     # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
@@ -169,26 +169,23 @@ def _setup(
         ]
         _write_line_to_csv(ctx, heading_for_csv)
 
-    depth = labware["A1"].depth
-
-    # Calculate region heights based on n_regions
-    region_heights: List[float]
+    # Calculate region heights
+    max_vol = labware["A1"].max_volume
+    max_height = extract_float(labware["A1"].height_from_volume(max_vol))
     if n_regions == 3:
-        region_heights = [3, depth / 2, depth * 9 / 10]
+        # special case: 3.0mm, 50%, 100%
+        region_heights = [
+            3.0,
+            max_height * 0.5,
+            max_height
+        ]
     else:
-        region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
-
-    if region_heights:
-        max_vol = labware["A1"].max_volume
-        max_height = extract_float(labware["A1"].height_from_volume(max_vol))
-        for i, h in enumerate(region_heights):
-            if h > max_height:
-                region_heights[
-                    i
-                ] = max_height  # must be lower than height at max volume
-            if h < 1.5:
-                region_heights[i] = 1.5  # must be 1.5mm or higher
-
+        # divide by volume for general case
+        segment_vol = max_vol / float(n_regions)
+        region_heights = [
+            extract_float(labware["A1"].height_from_volume(segment_vol * (i + 1)))
+            for i in range(n_regions)
+        ]
     expected_heights = []
     for h in region_heights:
         expected_heights.extend([h] * number_of_trials)
