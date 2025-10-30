@@ -195,8 +195,6 @@ export function LabwareStackToolboxContainer({
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
-  const labwareIds =
-    useSelector(labwareIngredSelectors.getSelectedLabwareIds) ?? []
   const { labware } = useSelector(getInitialDeckSetup)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack

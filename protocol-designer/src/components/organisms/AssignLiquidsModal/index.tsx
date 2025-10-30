@@ -263,7 +263,6 @@ export function LiquidLayoutOverlayModalContainer({
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
 }): JSX.Element | null {
   const dispatch = useDispatch()
-  const selectedWells = useSelector(getSelectedWells)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
