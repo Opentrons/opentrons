@@ -17,5 +17,5 @@ div.cover {
 
 **Opentrons Labworks Inc.**
 
-May 2025
+October 2025
 </div>
