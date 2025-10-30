@@ -308,9 +308,8 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } = getInvariantContextAndRobotState(
-    quickTransferState
-  )
+  const { invariantContext, robotState } =
+    getInvariantContextAndRobotState(quickTransferState)
 
   let blowoutLocation: string | undefined
   if (
