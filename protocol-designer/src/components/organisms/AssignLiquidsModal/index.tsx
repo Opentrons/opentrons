@@ -191,7 +191,7 @@ export function AssignLiquidsModal(
                   >
                     <StyledText
                       desktopStyle="headingSmallRegular"
-                      css={{ userSelect: 'none' }}
+                      style={{ userSelect: 'none' }}
                     >
                       {t('click_and_drag')}
                     </StyledText>
