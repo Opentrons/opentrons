@@ -7,16 +7,6 @@ async def export_pdf(url, pdf_path, title):
     """
     Navigates to a given file:// URL and saves it as a PDF.
     """
-    
-    # Define header and footer templates, similar to the JS example
-    header_html = f"""
-    <div style="font-size: 10px; padding-right: 1em; text-align: right; width: 100%;">
-      <span>{title}</span>
-      <span class="pageNumber"></span> / <span class="totalPages"></span>
-    </div>
-    """
-    
-    footer_html = "<div></div>" # Empty footer
 
     print(f"Reading from {url}...")
     print(f"Saving PDF to {pdf_path}...")
@@ -25,12 +15,10 @@ async def export_pdf(url, pdf_path, title):
         browser = await p.chromium.launch()
         page = await browser.new_page()
         
-        # Go to the local file URL
-        # wait_until="networkidle" still works and is good practice,
-        # as it waits for any local JS (like themes) to finish.
+        # Load the local HTML file
         await page.goto(url, wait_until="networkidle")
         
-        # Generate the PDF with options matching the puppeteer script
+        # Generate the PDF with options
         await page.pdf(
             path=pdf_path,
             format="letter",
@@ -61,7 +49,6 @@ def main():
     pdf_path = sys.argv[2]
     title = sys.argv[3]
 
-    # --- NEW: Convert local file path to a file:// URL ---
     file_path = Path(html_file_path).resolve()
     
     # Check if the file exists before proceeding
@@ -73,7 +60,6 @@ def main():
         
     # Convert the Path object to a 'file://' URI
     file_url = file_path.as_uri()
-    # --- End of new logic ---
 
     # Run the async function
     asyncio.run(export_pdf(file_url, pdf_path, title))
