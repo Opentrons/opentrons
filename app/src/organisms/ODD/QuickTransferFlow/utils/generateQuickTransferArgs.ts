@@ -176,8 +176,9 @@ export function getInvariantContextAndRobotState(
   let wasteChuteEntities: WasteChuteEntities = {}
 
   if (
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
+      TRASH_BIN_ADAPTER_FIXTURE
   ) {
     const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
@@ -214,6 +215,7 @@ export function getInvariantContextAndRobotState(
   }
 
   if (
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
     )
@@ -339,20 +341,37 @@ export function generateQuickTransferArgs(
   const dropTipTrashBinLocationEntity = Object.values(
     invariantContext.trashBinEntities
   ).find(
-    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+    entity =>
+      typeof quickTransferState.dropTipLocation !== 'string' &&
+      entity.location === quickTransferState.dropTipLocation.cutoutId
   )
   const dropTipWasteChuteLocationEntity = Object.values(
     invariantContext.wasteChuteEntities
   ).find(
-    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+    entity =>
+      typeof quickTransferState.dropTipLocation !== 'string' &&
+      entity.location === quickTransferState.dropTipLocation.cutoutId
   )
-  const dropTipLocation =
-    dropTipTrashBinLocationEntity?.id ??
-    dropTipWasteChuteLocationEntity?.id ??
-    ''
+
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  const dropTipLocation = (() => {
+    if (dropTipIsTiprack) {
+      return quickTransferState.dropTipLocation as string
+    }
+    if (dropTipTrashBinLocationEntity?.id != null) {
+      return dropTipTrashBinLocationEntity.id
+    }
+    if (dropTipWasteChuteLocationEntity?.id != null) {
+      return dropTipWasteChuteLocationEntity.id
+    }
+    return ''
+  })()
 
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
-
   const sourceLabwareId = Object.keys(robotState.labware).find(
     labwareId =>
       getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
