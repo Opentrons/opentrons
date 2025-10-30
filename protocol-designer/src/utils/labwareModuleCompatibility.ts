@@ -9,6 +9,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { RECOMMENDED_LABWARE_BY_MODULE } from '../pages/Designer/DeckSetup/constants'
+
 import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
@@ -77,7 +79,9 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [ABSORBANCE_READER_TYPE]: [
     'opentrons_flex_lid_absorbance_plate_reader_module',
   ],
-  [FLEX_STACKER_MODULE_TYPE]: [],
+  [FLEX_STACKER_MODULE_TYPE]: [
+    ...RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE],
+  ],
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,
@@ -113,13 +117,27 @@ const _getLabwareCompatibleWithAbsorbanceReader = (
   )
 }
 
+const _getLabwareCompatibleWithFlexStacker = (
+  def: LabwareDefinition2
+): boolean =>
+  RECOMMENDED_LABWARE_BY_MODULE[FLEX_STACKER_MODULE_TYPE].includes(
+    def.parameters.loadName
+  ) ||
+  def.metadata.displayCategory === 'wellPlate' ||
+  def.metadata.displayCategory === 'reservoir'
+
 export const getLabwareCompatibleWithModule = (
   def: LabwareDefinition2,
   moduleType: ModuleType
 ): boolean => {
-  return moduleType === ABSORBANCE_READER_TYPE
-    ? _getLabwareCompatibleWithAbsorbanceReader(def)
-    : COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
+  switch (moduleType) {
+    case FLEX_STACKER_MODULE_TYPE:
+      return _getLabwareCompatibleWithFlexStacker(def)
+    case ABSORBANCE_READER_TYPE:
+      return _getLabwareCompatibleWithAbsorbanceReader(def)
+    default:
+      return COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
         def.parameters.loadName
       )
+  }
 }
