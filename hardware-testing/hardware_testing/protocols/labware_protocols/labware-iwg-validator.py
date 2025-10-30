@@ -19,7 +19,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "example_labware" # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]

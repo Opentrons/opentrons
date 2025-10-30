@@ -472,25 +472,24 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     # Add one more frustum to reach full depth
     if frusta_data:
         last = frusta_data[-1]
-        bottom_height = last["topHeight"]
 
         if geoID == "cuboidalWell":
             final_section = {
                 "shape": "cuboidal",
                 "topXDimension": well_side_length,
                 "topYDimension": well_side_length,
-                "bottomXDimension": well_side_length,
-                "bottomYDimension": well_side_length,
+                "bottomXDimension": last["bottomXDimension"],
+                "bottomYDimension": last["bottomYDimension"],
                 "topHeight": depth,
-                "bottomHeight": bottom_height,
+                "bottomHeight": last["topHeight"]
             }
         elif geoID == "conicalWell":
             final_section = {
                 "shape": "conical",
                 "topDiameter": well_diameter,
-                "bottomDiameter": well_diameter,
+                "bottomDiameter": last["bottomDiameter"],
                 "topHeight": depth,
-                "bottomHeight": bottom_height,
+                "bottomHeight": last["topHeight"]
             }
         else:
             final_section = {}
