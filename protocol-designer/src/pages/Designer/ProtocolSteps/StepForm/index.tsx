@@ -9,7 +9,6 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-  DELETE_STEP_FORM,
 } from '/protocol-designer/components/organisms'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import {
@@ -28,7 +27,6 @@ import type { InvariantContext } from '@opentrons/step-generation'
 import type {
   FormData,
   StepFieldName,
-  StepIdType,
 } from '/protocol-designer/form-types'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
