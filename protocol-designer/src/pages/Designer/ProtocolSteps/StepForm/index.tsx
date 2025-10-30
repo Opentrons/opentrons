@@ -24,10 +24,7 @@ import { getDirtyFields } from './utils'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
-import type {
-  FormData,
-  StepFieldName,
-} from '/protocol-designer/form-types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
 interface StateProps {
