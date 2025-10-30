@@ -24,8 +24,12 @@ describe('ProtocolSetupCamera', () => {
 
   beforeEach(() => {
     mockProps = {
-      confirmCameraPreferences: vi.fn(),
-      isConfirmed: false,
+      cameraSettings: { cameraEnabled: true } as any,
+      runId: 'MOCK-RUN-ID',
+      isCameraRequired: true,
+      confirmCameraSettings: vi.fn(),
+      robotName: 'MOCK-ROBOT-NAME',
+      cameraConfirmed: false,
       setSetupScreen: vi.fn(),
       storageInfo: {} as any,
     }
@@ -62,23 +66,23 @@ describe('ProtocolSetupCamera', () => {
     const confirmButton = screen.getByText('Confirm preferences')
     fireEvent.click(confirmButton)
 
-    expect(mockProps.confirmCameraPreferences).toHaveBeenCalledTimes(1)
+    expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
   })
 
   it('renders enabled chip when confirmed', () => {
     const propsWithConfirmed = {
       ...mockProps,
-      isConfirmed: true,
+      cameraConfirmed: true,
     }
     render(propsWithConfirmed)
 
-    screen.getByText('Enabled')
+    screen.getByText('Camera enabled')
   })
 
   it('does not render confirm button when confirmed', () => {
     const propsWithConfirmed = {
       ...mockProps,
-      isConfirmed: true,
+      cameraConfirmed: true,
     }
     render(propsWithConfirmed)
 
