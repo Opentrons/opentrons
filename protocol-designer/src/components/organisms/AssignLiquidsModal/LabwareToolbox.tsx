@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 
 import {
-  createContainerAndSelectLabware,
+  createContainer,
   multipleIngredientsSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
@@ -25,12 +25,12 @@ import {
   getLabwareEntities,
 } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import type { ThunkDispatch } from '/protocol-designer/types'
 
 import { LabwareButtonBasket } from '../../molecules'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareEntities } from '@opentrons/step-generation'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export interface LiquidInfo {
   name: string
@@ -69,11 +69,12 @@ export function LabwareStackToolbox({
 
   const handleAddAnotherLabware = (): void => {
     dispatch(
-      createContainerAndSelectLabware({
+      createContainer({
         labwareDefURIStack: [
           labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
         ],
         slot: labwareId ?? '',
+        updateSelectedLabwareId: true,
       })
     )
   }

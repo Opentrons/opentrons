@@ -30,9 +30,7 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
-import {
-  removeWellsContents,
-} from '/protocol-designer/labware-ingred/actions'
+import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'

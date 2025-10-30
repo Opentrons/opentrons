@@ -20,7 +20,6 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { type LiquidEntities } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
@@ -41,6 +40,7 @@ import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DropdownOption, WellGroup } from '@opentrons/components'
+import type { LiquidEntities } from '@opentrons/step-generation'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 export interface LiquidInfo {
@@ -520,8 +520,12 @@ export function LiquidToolboxContainer({
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const liquids = useSelector(getLiquidEntities)
-  const multipleSelectedLabwareIds = useSelector(labwareIngredSelectors.getSelectedLabwareIds)
-  const selectedLabwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
+  const multipleSelectedLabwareIds = useSelector(
+    labwareIngredSelectors.getSelectedLabwareIds
+  )
+  const selectedLabwareId = useSelector(
+    labwareIngredSelectors.getSelectedLabwareId
+  )
   const labwareId = multipleSelectedLabwareIds?.[0] ?? selectedLabwareId
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)

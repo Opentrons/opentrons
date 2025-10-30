@@ -96,7 +96,7 @@ const selectedMultipleContainerIds: Reducer<
     case 'CLOSE_INGREDIENT_SELECTOR':
       return null
     default:
-      return state
+      return null
   }
 }
 
