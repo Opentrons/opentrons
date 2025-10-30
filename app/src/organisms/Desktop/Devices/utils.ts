@@ -1,13 +1,9 @@
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-
 import type { PipetteOffsetCalibration } from '@opentrons/api-client'
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
 } from '/app/redux/pipettes/types'
-
-const { reportPhotoAccessUsage } = useCameraAnalytics({})
 
 export function downloadFile(
   data: Blob | object | string,
@@ -35,10 +31,6 @@ export function downloadFile(
 
   a.remove()
   window.URL.revokeObjectURL(url)
-  reportPhotoAccessUsage({
-    action: 'download',
-    amount: 1,
-  })
 }
 
 export function getIs96ChannelPipetteAttached(

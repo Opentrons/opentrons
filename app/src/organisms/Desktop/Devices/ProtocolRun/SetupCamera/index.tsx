@@ -10,10 +10,13 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
@@ -30,7 +33,18 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    robotType: robotType,
+  })
   const storageInfo = useRobotStorageInfo()
+  if (storageInfo.isImageStorageLow) {
+    reportPhotoAccessUsage({
+      action: 'storageWarning',
+      amount: storageInfo.imageDirSizeMb,
+    })
+  }
 
   return (
     <div className={styles.container}>

@@ -72,14 +72,14 @@ export function HistoricalProtocolRunDrawer(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) ?? []
-  const totalOutputFileCount =
-    outputFileIds.jpeg.length + outputFileIds.csv.length
+  const totalImageFileCount = outputFileIds.jpeg.length
+  const totalOutputFileCount = totalImageFileCount + outputFileIds.csv.length
   const { reportImageCaptureUsage } = useCameraAnalytics({
     robotType: robotType,
     runId: run.id,
   })
   reportImageCaptureUsage({
-    amount: outputFileIds.jpeg.length,
+    amount: totalImageFileCount,
   })
   const runCsvFileIds =
     'runTimeParameters' in run
@@ -391,6 +391,13 @@ function ImagesFileDataRow({
   robotName: string
 }): JSX.Element {
   const { t } = useTranslation('run_details')
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    runId: run.id,
+    robotType: robotType,
+  })
+  const outputFileIds = useRunGeneratedDataFiles(run.id)
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
   const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
   const buildImagesZipName = (): string =>
@@ -430,6 +437,10 @@ function ImagesFileDataRow({
           onClick={() => {
             if (imagesZipFile != null) {
               downloadFile(imagesZipFile, buildImagesZipName())
+              reportPhotoAccessUsage({
+                amount: outputFileIds.jpeg.length,
+                action: 'downloadZip',
+              })
             }
           }}
         >

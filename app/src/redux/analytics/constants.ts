@@ -136,8 +136,11 @@ export const ANALYTICS_MODULE_COMMAND_ERROR = 'moduleCommandError'
  * Camera Action Analytics
  */
 
+export const ANALYTICS_CAMERA_ENABLEMENT_KIND: 'cameraEnablementType' =
+  'cameraEnablementType'
 export const ANALYTICS_CAMERA_SETTINGS_KIND: 'cameraSettingsKind' =
   'cameraSettingsKind'
+
 export const ANALYTICS_IMAGE_CAPTURE_KIND: 'imageCaptureKind' =
   'imageCaptureKind'
 export const ANALYTICS_LIVE_FEED_KIND: 'liveFeedKind' = 'liveFeedKind'

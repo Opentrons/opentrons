@@ -9,7 +9,6 @@ import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
 
-
 export function LaunchLivestreamBtn({ runId }: { runId: string }): JSX.Element {
   const { t } = useTranslation('run_details')
   const dispatch = useDispatch()

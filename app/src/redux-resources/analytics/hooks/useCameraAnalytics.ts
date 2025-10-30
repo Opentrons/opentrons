@@ -1,4 +1,5 @@
 import {
+  ANALYTICS_CAMERA_ENABLEMENT_KIND,
   ANALYTICS_CAMERA_SETTINGS_KIND,
   ANALYTICS_IMAGE_CAPTURE_KIND,
   ANALYTICS_LIVE_FEED_KIND,
@@ -21,6 +22,10 @@ interface cameraUsageParams extends cameraAnalyticsParams {
   enabled: boolean
   enablementType: 'camera' | 'liveFeed' | 'recoveryCapture'
 }
+interface cameraSettingsParams extends cameraAnalyticsParams {
+  settingsType: 'zoom' | 'saturation' | 'brightness' | 'contrast'
+  value: number | string
+}
 
 interface captureParams extends cameraAnalyticsParams {
   amount: number
@@ -29,12 +34,14 @@ interface captureParams extends cameraAnalyticsParams {
 
 interface photoAccessParams extends cameraAnalyticsParams {
   amount: number
-  action: 'download' | 'delete' | 'storageWarning'
+  action: 'download' | 'downloadZip' | 'delete' | 'storageWarning'
 }
 
 export interface UseCameraUsageAnalyticsResult {
   /* Reports when camera enablement settings change. */
   reportCameraEnablementSettings: (data: cameraUsageParams) => void
+  /* Reports when camera view settings change. */
+  reportCameraSettings: (data: cameraSettingsParams) => void
   /* Reports image capture rate and sources. */
   reportImageCaptureUsage: (data: captureParams) => void
   /* Reports live feed usage. */
@@ -51,15 +58,28 @@ export function useCameraAnalytics({
   const doTrackEvent = useTrackEvent()
 
   const reportCameraEnablementSettings = (data: cameraUsageParams): void => {
-    const cameraSettingToggleId = `camera-settings-toggle-${runId}-${Date.now()}`
+    const cameraEnablementToggleId = `camera-enablement-toggle-${runId}-${Date.now()}`
+    doTrackEvent({
+      name: ANALYTICS_CAMERA_ENABLEMENT_KIND,
+      properties: {
+        robotType,
+        source: data.source,
+        session: cameraEnablementToggleId,
+        enabled: data.enabled,
+        enablementType: data.enablementType,
+      },
+    })
+  }
+  const reportCameraSettings = (data: cameraSettingsParams): void => {
+    const cameraSettingsToggleId = `camera-settings-toggle-${runId}-${Date.now()}`
     doTrackEvent({
       name: ANALYTICS_CAMERA_SETTINGS_KIND,
       properties: {
         robotType,
         source: data.source,
-        session: cameraSettingToggleId,
-        enabled: data.enabled,
-        enablementType: data.enablementType,
+        session: cameraSettingsToggleId,
+        value: data.value,
+        settingsType: data.settingsType,
       },
     })
   }
@@ -103,6 +123,7 @@ export function useCameraAnalytics({
   }
   return {
     reportCameraEnablementSettings,
+    reportCameraSettings,
     reportImageCaptureUsage,
     reportLiveFeedUsage,
     reportPhotoAccessUsage,
