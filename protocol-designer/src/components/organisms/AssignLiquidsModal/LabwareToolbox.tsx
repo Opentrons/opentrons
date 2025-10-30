@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -27,6 +26,7 @@ import {
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 import { LabwareButtonBasket } from '../../molecules'
+import styles from './labwareToolbox.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -113,15 +113,10 @@ export function LabwareStackToolbox({
     }
   }
 
-  const CSSStyle = css`
-    flex-direction: ${DIRECTION_COLUMN};
-    width: 224px;
-  `
-
   return (
     <>
       <Toolbox
-        width="235px"
+        width="14.6875rem"
         title={
           <StyledText desktopStyle="bodyLargeSemiBold">
             Stacker Labware
@@ -158,7 +153,7 @@ export function LabwareStackToolbox({
         }
       >
         {labwareStack.length > 0 ? (
-          <div css={CSSStyle}>
+          <div className={styles.container}>
             <LabwareButtonBasket
               stackOfLabware={labwareStack}
               labware={labware}

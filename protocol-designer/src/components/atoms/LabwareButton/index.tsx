@@ -5,6 +5,8 @@ import { StyledText, Tag } from '@opentrons/components'
 
 import styles from './labwarebutton.module.css'
 
+import type { MouseEvent } from 'react'
+
 interface LabwareButtonProps {
   numberInStack: number
   displayName: string
@@ -24,7 +26,6 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   return (
     <button
       data-testid={`LabwareButton-${numberInStack}`}
-      import type { MouseEvent } from 'react'
       onClick={(event: MouseEvent<HTMLButtonElement>) => {
         onClick(id, event)
       }}

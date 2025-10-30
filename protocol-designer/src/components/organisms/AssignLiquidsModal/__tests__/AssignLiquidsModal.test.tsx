@@ -66,7 +66,7 @@ describe('AssignLiquidsModal', () => {
     props = {
       showLiquidOverflowMenu: vi.fn(),
       setDefineLiquidModal: vi.fn(),
-      data: {
+      assignLiquidsModalData: {
         selectedLabwareIds: [],
         nickNames: {},
         labwareId: 'mockLabwareId',
@@ -100,8 +100,11 @@ describe('AssignLiquidsModal', () => {
   })
 
   it('loads the modal with selectable labware', () => {
-    props.data.labware.mockLabwareId.stack = ['mockLabwareId', 'labware2']
-    props.data.labware.labware2 = {
+    props.assignLiquidsModalData.labware.mockLabwareId.stack = [
+      'mockLabwareId',
+      'labware2',
+    ]
+    props.assignLiquidsModalData.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
     }
     render(props)

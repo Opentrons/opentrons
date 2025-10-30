@@ -68,12 +68,16 @@ interface AssignLiquidsModalData {
 interface AssignLiquidsModalProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
-  data: AssignLiquidsModalData
+  assignLiquidsModalData: AssignLiquidsModalData
 }
 export function AssignLiquidsModal(
   props: AssignLiquidsModalProps
 ): JSX.Element | null {
-  const { showLiquidOverflowMenu, setDefineLiquidModal, data } = props
+  const {
+    showLiquidOverflowMenu,
+    setDefineLiquidModal,
+    assignLiquidsModalData: data,
+  } = props
   const { t } = useTranslation('liquids')
   const [highlightedWells, setHighlightedWells] = useState<WellGroup | {}>({})
   const [showBadFormState, setShowBadFormState] = useState(false)
@@ -104,6 +108,22 @@ export function AssignLiquidsModal(
   const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
+  const selectableLabwareProps: {
+    wellLabelOption: typeof WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
+    definition: typeof labwareDef
+    positioningMode: 'offsetInSlot'
+    highlightedWells: WellGroup
+    wellFill: Record<string, string>
+  } = {
+    wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
+    definition: labwareDef,
+    positioningMode: 'offsetInSlot',
+    highlightedWells,
+    wellFill: wellFillFromWellContents(
+      wellContents as ContentsByWell,
+      liquidDisplayColors
+    ),
+  }
 
   return (
     <Flex
@@ -112,12 +132,7 @@ export function AssignLiquidsModal(
       gridGap={SPACING.spacing12}
       position={POSITION_RELATIVE}
     >
-      <Flex
-        width="100%"
-        flexDirection={DIRECTION_ROW}
-        overflow={OVERFLOW_AUTO}
-        padding={SPACING.spacing16}
-      >
+      <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
         {labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
@@ -198,16 +213,7 @@ export function AssignLiquidsModal(
                   </Flex>
                   <SelectableLabware
                     showBorder={false}
-                    labwareProps={{
-                      wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
-                      definition: labwareDef,
-                      positioningMode: 'offsetInSlot',
-                      highlightedWells,
-                      wellFill: wellFillFromWellContents(
-                        wellContents as ContentsByWell,
-                        liquidDisplayColors
-                      ),
-                    }}
+                    labwareProps={selectableLabwareProps}
                     selectedPrimaryWells={selectedWells}
                     selectWells={(wells: WellGroup) =>
                       dispatch(selectWells(wells))
@@ -330,7 +336,7 @@ export function AssignLiquidsModalContainer(
     <AssignLiquidsModal
       showLiquidOverflowMenu={showLiquidOverflowMenu}
       setDefineLiquidModal={setDefineLiquidModal}
-      data={data}
+      assignLiquidsModalData={data}
     />
   )
 }

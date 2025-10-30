@@ -5,6 +5,7 @@ import { StyledText } from '@opentrons/components'
 import { LabwareButton } from '../../atoms'
 import styles from './labwarebuttonbasket.module.css'
 
+import type { MouseEvent } from 'react'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 interface LabwareButtonBasketProps {
@@ -12,7 +13,7 @@ interface LabwareButtonBasketProps {
   labware: AllTemporalPropertiesForTimelineFrame['labware']
   setSelectedLabware: (
     selectedLabwareId: string,
-    event: React.MouseEvent<HTMLButtonElement>
+    event: MouseEvent<HTMLButtonElement>
   ) => void
   selectedLabware: string[]
 }
