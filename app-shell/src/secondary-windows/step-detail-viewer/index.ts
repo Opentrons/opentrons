@@ -75,8 +75,6 @@ const stepDetailDataStore = new Map<
   Omit<OpenStepDetailViewerParams, 'log'>
 >()
 
-let stepDetailViewerWindow: BrowserWindow | null = null
-
 export function createStepDetailViewerUi({
   log,
   protocolKey,
@@ -100,7 +98,7 @@ export function createStepDetailViewerUi({
     liquids,
   })
 
-  stepDetailViewerWindow = new BrowserWindow({
+  const stepDetailViewerWindow = new BrowserWindow({
     ...SECONDARY_WINDOW_OPTS,
     width: 400,
     height: 300,
@@ -110,8 +108,8 @@ export function createStepDetailViewerUi({
 
   stepDetailViewerWindow.once('ready-to-show', () => {
     log.debug('Step detail viewer window ready to show')
-    stepDetailViewerWindow?.setTitle('Slot Spotlight')
-    stepDetailViewerWindow?.show()
+    stepDetailViewerWindow.setTitle('Slot Spotlight')
+    stepDetailViewerWindow.show()
   })
 
   const url = STEP_DETAIL_VIEWER_URL(protocolKey)
@@ -125,11 +123,6 @@ export function createStepDetailViewerUi({
     return { action: 'deny' }
   })
 
-  // rest this variable once the window is closed
-  stepDetailViewerWindow.on('closed', () => {
-    stepDetailViewerWindow = null
-  })
-
   return stepDetailViewerWindow
 }
 
@@ -140,5 +133,8 @@ ipcMain.handle('get-step-detail-data', (_event, protocolKey: string) => {
 })
 
 ipcMain.handle('is-step-detail-viewer-open', () => {
-  return stepDetailViewerWindow != null && !stepDetailViewerWindow.isDestroyed()
+  // Check if any step-detail-viewer window exists in BrowserWindow
+  return BrowserWindow.getAllWindows().some(
+    win => !win.isDestroyed() && win.getTitle() === 'Slot Spotlight'
+  )
 })
