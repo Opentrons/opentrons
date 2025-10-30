@@ -270,9 +270,7 @@ export function LiquidLayoutOverlayModalContainer({
   const labwareId = useSelector(selectors.getSelectedLabwareId)
   const wellContents = allWellContents[labwareId ?? ''] ?? {}
   const wellContentsId = Object.keys(wellContents)
-  console.log('allWellContents: ', allWellContents)
-  console.log('selectedWells', selectedWells)
-  console.log('wellContentsId', wellContentsId)
+
   return (
     <OverlayModal
       header="Selected labware have different liquid layouts"
@@ -310,7 +308,6 @@ export function AssignLiquidsModalContainer(
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
-  console.log('selectedLabwareIds', selectedLabwareIds)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )

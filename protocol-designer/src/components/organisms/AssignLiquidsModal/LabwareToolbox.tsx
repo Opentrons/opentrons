@@ -98,7 +98,6 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    console.log('newItem', newItem)
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
@@ -198,9 +197,7 @@ export function LabwareStackToolboxContainer({
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const labwareIds =
     useSelector(labwareIngredSelectors.getSelectedLabwareIds) ?? []
-  console.log('labwareIds', labwareIds)
   const { labware } = useSelector(getInitialDeckSetup)
-  console.log('labware:', labware)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )

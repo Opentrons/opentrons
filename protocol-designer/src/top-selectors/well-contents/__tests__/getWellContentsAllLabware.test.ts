@@ -220,7 +220,6 @@ describe('getWellContentsForLabwareStack', () => {
       { A1: 'A1', B1: 'B1' }, // selected
       { A3: 'A3' } // highlighted
     )
-    console.log('singleIngredResultStack:', singleIngredResultStack)
 
     expect(singleIngredResultStack).toMatchObject({
       container1Id: {
