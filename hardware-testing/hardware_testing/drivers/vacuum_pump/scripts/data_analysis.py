@@ -54,8 +54,8 @@ def build_overlay_figure(file_paths: Sequence[str | Path]) -> go.Figure:
         print(f"  ✓ {label}")
         # Choose which series to overlay for this file; prefer *_FILTERED columns (case-insensitive)
         upper_cols = [c.upper() for c in df.columns]
-        # value_cols = [col for col, up in zip(df.columns, upper_cols) if up.endswith("_FILTERED")]
-        value_cols = [col for col, up in zip(df.columns, upper_cols) if up.endswith("_ROC")]
+        value_cols = [col for col, up in zip(df.columns, upper_cols) if up.endswith("_FILTERED")]
+        # value_cols = [col for col, up in zip(df.columns, upper_cols) if up.endswith("_ROC")]
 
         # Fallback: all numeric columns except common time columns
         if not value_cols:

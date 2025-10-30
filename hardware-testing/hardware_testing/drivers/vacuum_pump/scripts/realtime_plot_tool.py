@@ -45,7 +45,7 @@ def update_layout(n):
                 ],
                 'layout': {
                     'title': {'text': 'Vacuum Pressure RT'},
-                    'xaxis': {'title': {'text': 'Time (mins)'}, 'autorange': True},
+                    'xaxis': {'title': {'text': 'Time (seconds)'}, 'autorange': True},
                     'yaxis': {'title': {'text': 'Pressure (mbar)'}, 'autorange': True},
                     'uirevision': 'static'
                 }
@@ -88,7 +88,7 @@ if __name__ == "__main__":
                     ],
                     'layout': {
                         'title': {'text': 'Vacuum Pressure RT'},
-                        'xaxis': {'title': {'text': 'Time (mins)'}, 'autorange': True},
+                        'xaxis': {'title': {'text': 'Time (seconds)'}, 'autorange': True},
                         'yaxis': {'title': {'text': 'Pressure (mbar)'}, 'autorange': True},
                         'uirevision': 'static'
                     }
