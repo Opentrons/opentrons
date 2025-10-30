@@ -84,6 +84,8 @@ plugins:
   - search
   - autorefs
   - parent-css
+  - print-site:
+      enumerate_headings: false
 
 markdown_extensions:
   - admonition
@@ -103,7 +105,7 @@ markdown_extensions:
       permalink: true
 
 extra_css:
-  - manual.css
-  - ../opentrons-theme.css
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
