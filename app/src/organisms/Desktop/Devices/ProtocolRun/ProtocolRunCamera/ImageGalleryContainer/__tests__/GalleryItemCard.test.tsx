@@ -11,11 +11,21 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 vi.mock('/app/resources/dataFiles/useImage')
+vi.mock('../GalleryItemOverflowMenu')
 
 const render = (props: UseImageGalleryDataProps) => {
-  return renderWithProviders(<GalleryItemCard {...props} />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <GalleryItemCard
+      {...props}
+      protocolName="MOCK-PROTOCOL"
+      runId="MOCK-RUN-ID"
+      runTimestamp="MOCK-RUN-TIMESTAMP"
+      robotName="MOCK-ROBOT-NAME"
+    />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 const mockProtocolAnalysis = {
