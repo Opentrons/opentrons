@@ -1102,7 +1102,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_breakable_strips_adapter"
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "allowedRoles": ["adapter"],
