@@ -112,9 +112,9 @@ describe('mix step form -> command creator args', () => {
       nozzles: undefined,
       xOffset: 0,
       yOffset: 0,
-      tip_tracking: AUTOMATIC,
-      tips_selected: [],
-      tiprack_selected: null,
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     })
   })
 

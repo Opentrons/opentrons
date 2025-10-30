@@ -350,7 +350,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
   liquidClass?: string | null // a liquid class name like "water" or "none" or null
-  tips_selected?: string[] | null
+  tips_selected?: string[][] | null
   tip_tracking?: TipTrackingOption | null
   tiprack_selected?: string | null
 }
@@ -406,7 +406,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   pushOut_checkbox: boolean
   times?: number | null
   liquidClass?: string | null
-  tips_selected?: string[] | null
+  tips_selected?: string[][] | null
   tip_tracking?: TipTrackingOption | null
   tiprack_selected?: string | null
 }
