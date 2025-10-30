@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain, shell } from 'electron'
 
+import { isSecondaryWindowOpen } from '../index'
 import {
   SECONDARY_WINDOW_CONFIG,
   SECONDARY_WINDOW_OPTS,
@@ -132,9 +133,8 @@ ipcMain.handle('get-step-detail-data', (_event, protocolKey: string) => {
   return stepDetailDataStore.get(protocolKey)
 })
 
-ipcMain.handle('is-step-detail-viewer-open', () => {
-  // Check if any step-detail-viewer window exists in BrowserWindow
-  return BrowserWindow.getAllWindows().some(
-    win => !win.isDestroyed() && win.getTitle() === 'Slot Spotlight'
-  )
+ipcMain.handle('is-step-detail-viewer-open', (_event, protocolKey: string) => {
+  // Use the secondaryWindows map to reliably check if window exists
+  const windowId = `step-detail-viewer-${protocolKey}`
+  return isSecondaryWindowOpen(windowId)
 })

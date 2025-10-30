@@ -40,6 +40,11 @@ export function closeSecondaryWindows(): void {
   secondaryWindows.clear()
 }
 
+export function isSecondaryWindowOpen(windowId: string): boolean {
+  const window = secondaryWindows.get(windowId)
+  return window != null && !window.isDestroyed()
+}
+
 export function registerCameraStream(
   dispatch: Dispatch
 ): (action: Action) => unknown {
