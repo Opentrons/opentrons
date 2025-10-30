@@ -52,6 +52,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoadingRef,
     runHeaderModalContainerUtils,
     isClosingCurrentRun,
+    runRecord,
   } = props
   const { missingStepsModalUtils, HSConfirmationModalUtils } =
     runHeaderModalContainerUtils
@@ -75,10 +76,18 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
+  const isCameraConfirmed = runRecord?.data.cameraSettings != null
+  const isCameraRequired =
+    protocolData != null &&
+    'commandPreconditions' in protocolData &&
+    protocolData.commandPreconditions?.isCameraUsed
+  const isCameraReadyToRun = isCameraRequired ? isCameraConfirmed : true
+
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+    missingModuleIds.length === 0 &&
+    isCameraReadyToRun
   const isRobotTypeSetupComplete = isFlex
     ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
@@ -95,6 +104,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
+    isCameraReadyToRun,
     ...props,
   })
 
