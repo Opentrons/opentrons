@@ -24,7 +24,8 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   return (
     <button
       data-testid={`LabwareButton-${numberInStack}`}
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      import type { MouseEvent } from 'react'
+      onClick={(event: MouseEvent<HTMLButtonElement>) => {
         onClick(id, event)
       }}
       className={clsx(styles.button, { [styles.button_active]: isSelected })}
