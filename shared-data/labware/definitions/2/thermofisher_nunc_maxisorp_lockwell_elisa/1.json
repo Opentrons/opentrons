@@ -1098,7 +1098,8 @@
   "schemaVersion": 2,
   "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 },
   "stackingOffsetWithLabware": {
-    "opentrons_breakable_strips_adapter": { "x": 0, "y": 0, "z": 10.95 }
+    "opentrons_breakable_strips_adapter": { "x": 0, "y": 0, "z": 10.95 },
+    "opentrons_universal_flat_adapter_type_b": { "x": 0, "y": 0, "z": 3.3 }
   },
   "stackingOffsetWithModule": {},
   "allowedRoles": [],
