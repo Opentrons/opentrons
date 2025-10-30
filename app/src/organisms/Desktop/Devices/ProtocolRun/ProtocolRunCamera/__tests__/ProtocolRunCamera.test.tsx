@@ -20,6 +20,9 @@ const render = () => {
       runId={RUN_ID}
       robotType={robotType}
       runStatus={'MOCK-RUN-STATUS' as any}
+      protocolName="MOCK-PROTOCOL"
+      runTimestamp="MOCK-RUN-TIMESTAMP"
+      robotName="MOCK-ROBOT-NAME"
     />,
     {
       i18nInstance: i18n,

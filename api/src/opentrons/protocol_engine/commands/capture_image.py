@@ -8,6 +8,13 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
 from opentrons_shared_data.data_files import MimeType
+from opentrons.system.camera import (
+    CONTRAST_DEFAULT,
+    BRIGHTNESS_DEFAULT,
+    SATURATION_DEFAULT,
+    ZOOM_DEFAULT,
+    RESOLUTION_DEFAULT,
+)
 from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
@@ -48,7 +55,7 @@ class CaptureImageParams(BaseModel):
     )
     zoom: Optional[float] = Field(
         None,
-        description="Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.",
+        description="Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.",
     )
     pan: Optional[Tuple[int, int]] = Field(
         None,
@@ -75,6 +82,30 @@ class CaptureImageResult(BaseModel):
         ...,
         description="File ID for image files output as a result of an image capture action.",
     )
+    resolution: Tuple[int, int] = Field(
+        ...,
+        description="Width by height resolution in pixels the image was captured with.",
+    )
+    zoom: float = Field(
+        ...,
+        description="Multiplier used when cropping and scaling the captured image. Scale is 1.0 to 2.0.",
+    )
+    pan: Optional[Tuple[int, int]] = Field(
+        ...,
+        description="X/Y (pixels) position panned to.",
+    )
+    contrast: float = Field(
+        ...,
+        description="The contrast used when processing the image. Scale is 0% to 100%.",
+    )
+    brightness: float = Field(
+        ...,
+        description="The brightness used when processing the image. Scale is 0% to 100%.",
+    )
+    saturation: float = Field(
+        ...,
+        description="The saturation used when processing the image. Scale is 0% to 100%.",
+    )
 
 
 def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
@@ -93,6 +124,37 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
         saturation=(
             (params.saturation / 100) * 2.0 if params.saturation is not None else None
         ),
+    )
+
+
+def _revert_image_parameters(
+    file_id: Optional[str], image_params: ImageParameters
+) -> CaptureImageResult:
+    contrast = (
+        image_params.contrast if image_params.contrast is not None else CONTRAST_DEFAULT
+    )
+    brightness = (
+        image_params.brightness
+        if image_params.brightness is not None
+        else BRIGHTNESS_DEFAULT
+    )
+    saturation = (
+        image_params.saturation
+        if image_params.saturation is not None
+        else SATURATION_DEFAULT
+    )
+    # todo (chb, 2025-10-29): Eventually we will have override defaults that can be passed into the Camera state, load those if they exist
+
+    return CaptureImageResult(
+        fileId=file_id,
+        resolution=image_params.resolution
+        if image_params.resolution is not None
+        else RESOLUTION_DEFAULT,
+        zoom=image_params.zoom if image_params.zoom is not None else ZOOM_DEFAULT,
+        pan=image_params.pan,
+        contrast=(contrast / 2) * 100.0,
+        brightness=round((((brightness * -1) + 128) * 100) / 256),
+        saturation=(saturation / 2) * 100.0,
     )
 
 
@@ -160,10 +222,10 @@ class CaptureImageImpl(
             file_id = file_info.id
             state_update.files_added = update_types.FilesAddedUpdate(file_ids=[file_id])
 
+        result = _revert_image_parameters(file_id=file_id, image_params=parameters)
+
         return SuccessData(
-            public=CaptureImageResult(
-                fileId=file_id,
-            ),
+            public=result,
             state_update=state_update,
         )
 

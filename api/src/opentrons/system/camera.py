@@ -38,6 +38,7 @@ STREAM_CONF_FILE_KEYS = [
 ]
 
 # Camera Parameter Globals
+RESOLUTION_DEFAULT = (1920, 1080)
 ZOOM_MIN = 1.0
 ZOOM_MAX = 2.0
 ZOOM_DEFAULT = 1.0
@@ -323,7 +324,9 @@ async def image_capture(
             else SATURATION_DEFAULT
         )
         resolution = (
-            parameters.resolution if parameters.resolution is not None else (1920, 1080)
+            parameters.resolution
+            if parameters.resolution is not None
+            else RESOLUTION_DEFAULT
         )
 
         result = await ffmpeg.ffmpeg_capture_image_bytes(
