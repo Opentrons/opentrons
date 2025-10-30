@@ -163,8 +163,8 @@ export const createContainerAndSelectLabware: (
         // Tipracks cannot be named, but should auto-increment.
         // We can't rely on reducers to do that themselves bc they don't have access
         // to both the nickname state and the isTiprack condition
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        dispatch(renameLabware({ labwareId: id } as RenameLabwareAction['payload']) as ThunkAction<CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction | OpenIngredientSelectorAction>)
+       const payload: RenameLabwareAction['payload'] = { labwareId: id }
+       dispatch(renameLabware(payload))
       }
 
       if (availableSlot === 'offDeck') {
