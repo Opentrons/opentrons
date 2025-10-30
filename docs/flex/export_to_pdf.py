@@ -33,10 +33,8 @@ async def export_pdf(url, pdf_path, title):
         # Generate the PDF with options matching the puppeteer script
         await page.pdf(
             path=pdf_path,
-            format="A4",
-            display_header_footer=True,
-            header_template=header_html,
-            footer_template=footer_html,
+            format="letter",
+            display_header_footer=False,
             print_background=True,
             landscape=False,
             scale=1,

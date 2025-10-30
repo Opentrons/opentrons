@@ -85,6 +85,11 @@ plugins:
   - autorefs
   - parent-css
   - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
       enumerate_headings: false
 
 markdown_extensions:
@@ -107,5 +112,6 @@ markdown_extensions:
 extra_css:
   - ../shared/instruction-manuals.css
   - ../shared/opentrons-theme.css
+  - print-pdf.css
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
