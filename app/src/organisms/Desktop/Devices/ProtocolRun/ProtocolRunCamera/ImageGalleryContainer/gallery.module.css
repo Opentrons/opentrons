@@ -49,6 +49,7 @@
 }
 
 .gallery_card {
+  position: relative;
   display: flex;
   padding: var(--spacing-12);
   border-radius: var(--border-radius-4);
@@ -111,4 +112,25 @@
 
 .gallery_cmd_txt_subtext {
   color: var(--grey-60);
+}
+
+.overflow_container {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow_menu_container {
+  position: absolute;
+  z-index: 10;
+  top: 2.3rem;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
 }

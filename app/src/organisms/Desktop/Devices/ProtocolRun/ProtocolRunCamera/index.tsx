@@ -17,12 +17,18 @@ export interface ProtocolRunCameraProps {
   runId: string
   runStatus: RunStatus | null
   robotType: RobotType
+  robotName: string
+  runTimestamp: string
+  protocolName: string
 }
 
 export function ProtocolRunCamera({
   runStatus,
   runId,
   robotType,
+  robotName,
+  runTimestamp,
+  protocolName,
 }: ProtocolRunCameraProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const { isCameraEnabled } = useCameraUsageSettings()
@@ -50,7 +56,13 @@ export function ProtocolRunCamera({
         ) : null}
       </div>
       <Divider width="100%" />
-      <ImageGalleryContainer runId={runId} robotType={robotType} />
+      <ImageGalleryContainer
+        runId={runId}
+        robotType={robotType}
+        runTimestamp={runTimestamp}
+        robotName={robotName}
+        protocolName={protocolName}
+      />
     </div>
   )
 }

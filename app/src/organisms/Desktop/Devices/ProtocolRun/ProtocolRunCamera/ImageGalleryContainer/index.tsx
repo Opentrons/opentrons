@@ -13,9 +13,15 @@ import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks
 export function ImageGalleryContainer({
   runId,
   robotType,
+  robotName,
+  runTimestamp,
+  protocolName,
 }: {
   runId: string
   robotType: RobotType
+  robotName: string
+  runTimestamp: string
+  protocolName: string
 }): JSX.Element {
   const { t } = useTranslation('run_details')
   const { items, protocolAnalysis, allRunDefs } = useImageInfo(runId)
@@ -35,7 +41,10 @@ export function ImageGalleryContainer({
                 protocolAnalysis={protocolAnalysis}
                 runId={runId}
                 robotType={robotType}
+                robotName={robotName}
+                runTimestamp={runTimestamp}
                 allRunDefs={allRunDefs}
+                protocolName={protocolName}
               />
             ))}
           </div>
@@ -70,7 +79,13 @@ function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
   )
 }
 
-function GalleryContent(props: UseImageGalleryDataProps): JSX.Element {
+interface GalleryContentProps extends UseImageGalleryDataProps {
+  runTimestamp: string
+  robotName: string
+  protocolName: string
+}
+
+function GalleryContent(props: GalleryContentProps): JSX.Element {
   return (
     <div className={styles.gallery_content_container}>
       <GalleryItemCard {...props} />
