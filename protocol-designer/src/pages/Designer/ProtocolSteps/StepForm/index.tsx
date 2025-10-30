@@ -43,7 +43,6 @@ interface StateProps {
   formData?: FormData | null
 }
 interface DispatchProps {
-  deleteStep: (stepId: string) => void
   handleClose: () => void
   saveSetTempFormWithAddedPauseUntilTemp: () => void
   saveHeaterShakerFormWithAddedPauseUntilTemp: () => void
@@ -54,7 +53,6 @@ type StepFormManagerProps = StateProps & DispatchProps
 function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   const {
     canSave,
-    deleteStep,
     formData,
     formHasChanges,
     handleClose,
@@ -82,21 +80,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       return prevDirtyFields
     })
   }
-  const stepId = formData?.id
-  const handleDelete = (): void => {
-    if (stepId != null) {
-      deleteStep(stepId)
-    } else {
-      console.error(
-        `StepEditForm: tried to delete step with no step id, this should not happen`
-      )
-    }
-  }
-  const {
-    confirm: confirmDelete,
-    showConfirmation: showConfirmDeleteModal,
-    cancel: cancelDelete,
-  } = useConditionalConfirm(handleDelete, true)
   const {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
@@ -139,13 +122,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
 
   return (
     <>
-      {showConfirmDeleteModal && (
-        <ConfirmDeleteModal
-          modalType={DELETE_STEP_FORM}
-          onCancelClick={cancelDelete}
-          onContinueClick={confirmDelete}
-        />
-      )}
       {showConfirmCancelModal && (
         <ConfirmDeleteModal
           modalType={
@@ -233,8 +209,6 @@ const mapStateToProps = (state: BaseState): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
-  const deleteStep = (stepId: StepIdType): void =>
-    dispatch(actions.deleteStep(stepId))
   const handleClose = (): void => dispatch(actions.cancelStepForm())
   const saveHeaterShakerFormWithAddedPauseUntilTemp = (): void =>
     dispatch(stepsActions.saveHeaterShakerFormWithAddedPauseUntilTemp())
@@ -243,7 +217,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
   const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
   return {
-    deleteStep,
     handleClose,
     saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,
