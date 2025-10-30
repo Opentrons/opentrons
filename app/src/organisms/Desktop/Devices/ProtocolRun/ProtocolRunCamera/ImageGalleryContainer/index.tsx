@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
 
+import { GalleryContainerOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryContainerOverflowMenu'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
@@ -9,6 +10,7 @@ import { GalleryItemCard } from './GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
+import type { GalleryContainerOverflowMenuProps } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryContainerOverflowMenu'
 
 export function ImageGalleryContainer({
   runId,
@@ -30,7 +32,13 @@ export function ImageGalleryContainer({
 
   return (
     <div className={styles.gallery_container}>
-      <GalleryHeader imagesCount={imagesLength} />
+      <GalleryHeader
+        imagesCount={imagesLength}
+        runId={runId}
+        robotName={robotName}
+        runTimestamp={runTimestamp}
+        protocolName={protocolName}
+      />
       {imagesLength > 0 ? (
         <ListTable headers={[<GalleryTableHeaders key="1" />]}>
           <div className={styles.gallery_content_wrapper}>
@@ -56,7 +64,14 @@ export function ImageGalleryContainer({
   )
 }
 
-function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
+interface GalleryHeaderProps extends GalleryContainerOverflowMenuProps {
+  imagesCount: number
+}
+
+function GalleryHeader({
+  imagesCount,
+  ...rest
+}: GalleryHeaderProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
   return (
@@ -75,6 +90,7 @@ function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
       <StyledText desktopStyle="bodyDefaultRegular">
         {t('protocol_images_viewable')}
       </StyledText>
+      <GalleryContainerOverflowMenu {...rest} />
     </div>
   )
 }
