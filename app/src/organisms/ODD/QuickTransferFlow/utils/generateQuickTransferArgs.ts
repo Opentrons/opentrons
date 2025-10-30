@@ -308,8 +308,9 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } =
-    getInvariantContextAndRobotState(quickTransferState)
+  const { invariantContext, robotState } = getInvariantContextAndRobotState(
+    quickTransferState
+  )
 
   let blowoutLocation: string | undefined
   if (
@@ -358,11 +359,18 @@ export function generateQuickTransferArgs(
     quickTransferState.dropTipLocation ===
       getLabwareDefURI(quickTransferState.tipRack)
 
-  const dropTipLocation = dropTipIsTiprack
-    ? (quickTransferState.dropTipLocation as string)
-    : (dropTipTrashBinLocationEntity?.id ??
-      dropTipWasteChuteLocationEntity?.id ??
-      '')
+  const dropTipLocation = (() => {
+    if (dropTipIsTiprack) {
+      return quickTransferState.dropTipLocation as string
+    }
+    if (dropTipTrashBinLocationEntity?.id != null) {
+      return dropTipTrashBinLocationEntity.id
+    }
+    if (dropTipWasteChuteLocationEntity?.id != null) {
+      return dropTipWasteChuteLocationEntity.id
+    }
+    return ''
+  })()
 
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
   const sourceLabwareId = Object.keys(robotState.labware).find(
