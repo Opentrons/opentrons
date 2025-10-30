@@ -58,7 +58,7 @@ check-dependency-drift:
 
 .PHONY: setup
 setup:
-	$(UV) sync --frozen --all-groups
+	$(UV) sync --frozen
 
 .PHONY: format
 format: setup
