@@ -46,6 +46,7 @@
   "calibration_required_calibrate_pipette_first": "Calibration required Calibrate pipette first",
   "calibration_status": "calibration status",
   "camera": "Camera",
+  "camera_disabled": "Camera disabled",
   "camera_enabled": "Camera enabled",
   "camera_settings": "camera settings",
   "camera_setup_step_description": "Set your camera preferences for this protocol run.",

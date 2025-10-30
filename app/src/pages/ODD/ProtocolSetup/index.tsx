@@ -23,6 +23,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import {
+  useCamera,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -84,6 +85,7 @@ import {
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -92,6 +94,7 @@ import { useAttachedModules } from '/app/resources/modules'
 import {
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
   useRunStatus,
@@ -713,13 +716,20 @@ function PrepareToRun({
 }
 
 const MAINTENANCE_RUN_POLL_MS = 5000
+const RUN_RECORD_REFETCH_MS = 5000
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: RUN_RECORD_REFETCH_MS,
+  })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const robotSerialNumber =
@@ -751,10 +761,6 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   const isCameraEnabled = useFeatureFlag('camera')
-  const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const confirmCameraSettings = (): void => {
-    setCameraSettingsConfirmed(!cameraSettingsConfirmed)
-  }
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(
@@ -807,6 +813,20 @@ export function ProtocolSetup(): JSX.Element {
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+
+  const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
+  const { data: cameraSettings } = useCamera()
+  const runCameraSettings = runRecord?.data.cameraSettings ?? null
+  const isCameraRequired =
+    protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
+  const cameraSettingsApplied = runRecord?.data.cameraSettings != null
+  const confirmCameraSettings = (): void => {
+    setCameraSettingsConfirmed(!cameraSettingsConfirmed)
+  }
+  if (cameraSettingsApplied && !cameraSettingsConfirmed) {
+    setCameraSettingsConfirmed(true)
+  }
+
   const proceedToRun = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -908,9 +928,14 @@ export function ProtocolSetup(): JSX.Element {
     ),
     camera: (
       <ProtocolSetupCamera
+        runId={runId}
+        runCameraSettings={runCameraSettings}
+        cameraSettings={cameraSettings ?? null}
+        isCameraRequired={isCameraRequired}
+        cameraConfirmed={cameraSettingsConfirmed}
+        robotName={robotName}
+        confirmCameraSettings={confirmCameraSettings}
         setSetupScreen={setSetupScreen}
-        isConfirmed={cameraSettingsConfirmed}
-        confirmCameraPreferences={confirmCameraSettings}
         storageInfo={storageInfo}
       />
     ),

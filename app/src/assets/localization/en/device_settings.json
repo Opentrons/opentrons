@@ -40,7 +40,7 @@
   "camera_controls": "Camera Controls",
   "camera_preferences": "Camera Preferences",
   "camera_preferences_description": "Choose how to use the deck camera during runs.",
-  "camera_preferences_description_long": "The camera provides live video during runs, allows automated or manual image capture, and records images automatically when errors occur.",
+  "camera_preferences_description_long": "The deck camera offers live video monitoring during protocol runs and supports image capture.",
   "camera_required": "Camera is required",
   "camera_status": "Camera Status",
   "camera_status_description": "The deck camera provides live video during protocol runs, allows manual or automated image capture of the deck, and records images automatically when errors occur for easier troubleshooting.",
