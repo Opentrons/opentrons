@@ -94,7 +94,6 @@ const selectedMultipleContainerIds: Reducer<
     case 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR':
       return action.payload
     case 'CLOSE_INGREDIENT_SELECTOR':
-      return null
     default:
       return null
   }
