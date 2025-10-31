@@ -2,7 +2,7 @@ import * as Constants from '../constants'
 
 import type { CameraState, ProtocolRunAction } from '../types'
 
-const INITIAL_CAMERA_STATE: CameraState = {
+export const INITIAL_CAMERA_STATE: CameraState = {
   enabled: false,
   liveStreamEnabled: false,
   recoveryEnabled: false,
