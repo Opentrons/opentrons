@@ -49,14 +49,16 @@ export function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
   )
   return (
     <Flex alignItems={ALIGN_CENTER}>
-      <Chip
-        text={statusText}
-        type={chipType}
-        hasIcon={icon}
-        pulseIcon={pulse}
-        iconName={iconName}
-        chipSize={'small'}
-      />
+      {props.runStatus != null && (
+        <Chip
+          text={statusText}
+          type={chipType}
+          hasIcon={icon}
+          pulseIcon={pulse}
+          iconName={iconName}
+          chipSize={'small'}
+        />
+      )}
     </Flex>
   )
 }
