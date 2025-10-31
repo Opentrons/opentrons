@@ -123,4 +123,11 @@ describe('ImageGalleryList', () => {
     const captureButton = screen.getByText('Image capture')
     await user.click(captureButton)
   })
+
+  it('renders no images copy when no images are present', () => {
+    vi.mocked(useImageInfo).mockReturnValue({ items: [] } as any)
+    render(mockProps)
+
+    screen.getByText('No images available')
+  })
 })

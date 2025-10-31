@@ -651,19 +651,31 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         // path is in ['always', 'once', 'never']
         changeTip === 'always' || (changeTip === 'once' && isFirstChunk)
 
-      const tipCommands = changeTipNow
-        ? [
-            curryCommandCreator(replaceTip, {
-              pipette,
-              dropTipLocation:
-                isReturnTip && fallBackTrashLikeId != null
-                  ? fallBackTrashLikeId
-                  : dropTipLocation,
-              tipRack,
-              ...(nozzles != null ? { nozzles } : {}),
-            }),
-          ]
-        : []
+      let tipCommands: CurriedCommandCreator[] = []
+      if (changeTipNow) {
+        const nextTip = targetTips?.shift()
+        tipCommands = [
+          curryCommandCreator(replaceTip, {
+            pipette,
+            dropTipLocation:
+              isReturnTip && fallBackTrashLikeId != null
+                ? fallBackTrashLikeId
+                : dropTipLocation,
+            tipRack,
+            ...(nozzles != null ? { nozzles } : {}),
+            ...(tipTracking === MANUAL &&
+            nextTip != null &&
+            tiprackSelected != null
+              ? {
+                  tipSelectionArgs: {
+                    tipRackId: tiprackSelected,
+                    tipWell: nextTip,
+                  },
+                }
+              : {}),
+          }),
+        ]
+      }
 
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(

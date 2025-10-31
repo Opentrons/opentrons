@@ -83,7 +83,6 @@ const selectedItem: Reducer<SelectedItemState, any> = handleActions(
       state: SelectedItemState,
       action: SelectTerminalItemAction
     ) => terminalItemIdHelper(action.payload),
-    DELETE_STEP: () => null,
     CLEAR_SELECTED_ITEM: () => null,
     SELECT_MULTIPLE_STEPS: (
       state: SelectedItemState,

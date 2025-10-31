@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Chip, SPACING } from '@opentrons/components'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
@@ -7,12 +8,19 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
+import {
+  getCameraUsageState,
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraStreamEnablement,
+} from '/app/redux/protocol-runs'
 
 import styles from './setupcamera.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { CameraData } from '@opentrons/api-client'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
+import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 export interface ProtocolSetupCameraProps {
@@ -38,19 +46,16 @@ export function ProtocolSetupCamera(
     runCameraSettings,
   } = props
   const { t } = useTranslation('protocol_setup')
+  const dispatch = useDispatch()
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
   const initialSettingsLoaded = cameraSettings != null
   const runSettingsLoaded = runCameraSettings != null
 
-  const [cameraEnabled, setIsCameraEnabled] = useState(
-    cameraSettings?.cameraEnabled ?? false
-  )
-  const [liveStreamEnabled, setLiveStreamEnabled] = useState(
-    cameraSettings?.liveStreamEnabled ?? false
-  )
-  const [recoveryEnabled, setRecoveryEnabled] = useState(
-    cameraSettings?.errorRecoveryCameraEnabled ?? false
-  )
+  const {
+    liveStreamEnabled,
+    enabled: cameraEnabled,
+    recoveryEnabled,
+  } = useSelector((state: State) => getCameraUsageState(state, runId))
 
   // Populate the toggles with the run settings if they have been set,
   //  otherwise, populate the toggles with the camera settings once the network
@@ -59,33 +64,39 @@ export function ProtocolSetupCamera(
     if (runCameraSettings != null) {
       const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
         runCameraSettings
-      setIsCameraEnabled(cameraEnabled)
-      setLiveStreamEnabled(liveStreamEnabled)
-      setRecoveryEnabled(errorRecoveryCameraEnabled)
+
+      dispatch(updateCameraEnablement(runId, cameraEnabled))
+      dispatch(updateCameraStreamEnablement(runId, liveStreamEnabled))
+      dispatch(
+        updateCameraRecoveryEnablement(runId, errorRecoveryCameraEnabled)
+      )
     } else if (cameraSettings != null) {
       const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
         cameraSettings
-      setIsCameraEnabled(cameraEnabled)
-      setLiveStreamEnabled(liveStreamEnabled)
-      setRecoveryEnabled(errorRecoveryCameraEnabled)
+
+      dispatch(updateCameraEnablement(runId, cameraEnabled))
+      dispatch(updateCameraStreamEnablement(runId, liveStreamEnabled))
+      dispatch(
+        updateCameraRecoveryEnablement(runId, errorRecoveryCameraEnabled)
+      )
     }
   }, [initialSettingsLoaded, runSettingsLoaded])
 
   const toggleCameraEnabled = (): void => {
     if (!cameraConfirmed) {
-      setIsCameraEnabled(!cameraEnabled)
+      dispatch(updateCameraEnablement(runId, !cameraEnabled))
     }
   }
 
   const toggleRecoveryEnabled = (): void => {
     if (!cameraConfirmed) {
-      setRecoveryEnabled(!recoveryEnabled)
+      dispatch(updateCameraRecoveryEnablement(runId, !recoveryEnabled))
     }
   }
 
   const toggleLiveStreamEnabled = (): void => {
     if (!cameraConfirmed) {
-      setLiveStreamEnabled(!liveStreamEnabled)
+      dispatch(updateCameraStreamEnablement(runId, !liveStreamEnabled))
     }
   }
 

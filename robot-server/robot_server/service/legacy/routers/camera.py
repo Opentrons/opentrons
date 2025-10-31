@@ -23,6 +23,8 @@ from robot_server.service.json_api import RequestModel
 from opentrons.config import IS_ROBOT
 from robot_server.runs.dependencies import get_run_data_manager
 from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.hardware import get_robot_type
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.protocol_engine import EngineStatus
 from robot_server.camera.settings.store import (
     CameraSettingStore,
@@ -54,6 +56,7 @@ async def post_camera(
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> CameraEnable:
     """
     Sets the Opentrons Camera enablement statuses.
@@ -83,31 +86,32 @@ async def post_camera(
         camera_settings_store.get_error_recovery_camera_enabled()
     )
 
-    stream_settings = _get_stream_settings()
-    if (
-        camera_enabled
-        and live_stream_enabled
-        and (
-            run_data_manager.current_run_id is not None
+    if camera.robot_supports_livestream(robot_type):
+        stream_settings = _get_stream_settings()
+        if (
+            camera_enabled
+            and live_stream_enabled
             and (
-                True
-                if run_data_manager.get(run_data_manager.current_run_id).status
-                not in [
-                    EngineStatus.IDLE,
-                    EngineStatus.STOPPED,
-                    EngineStatus.FAILED,
-                    EngineStatus.SUCCEEDED,
-                ]
-                else False
+                run_data_manager.current_run_id is not None
+                and (
+                    True
+                    if run_data_manager.get(run_data_manager.current_run_id).status
+                    not in [
+                        EngineStatus.IDLE,
+                        EngineStatus.STOPPED,
+                        EngineStatus.FAILED,
+                        EngineStatus.SUCCEEDED,
+                    ]
+                    else False
+                )
             )
-        )
-    ):
-        stream_status = StreamStatusType.ON
-    else:
-        stream_status = StreamStatusType.OFF
+        ):
+            stream_status = StreamStatusType.ON
+        else:
+            stream_status = StreamStatusType.OFF
 
-    _live_stream_settings_to_configuration_file(stream_settings, stream_status)
-    await camera.restart_live_stream()
+        _live_stream_settings_to_configuration_file(stream_settings, stream_status)
+        await camera.restart_live_stream(robot_type)
 
     return CameraEnable(
         cameraEnabled=camera_enabled,
@@ -238,6 +242,7 @@ async def post_live_stream_settings(
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> LiveStreamSettings:
     """
     Configure the Live Stream and restart it.
@@ -247,6 +252,12 @@ async def post_live_stream_settings(
     Arguments:
         request_body: Input payload from the request body.
     """
+    if camera.robot_supports_livestream(robot_type) is False:
+        raise LegacyErrorResponse(
+            message="Opentrons Live Stream service is not available on OT-2.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_400_BAD_REQUEST)
+
     formatted_source = request_body.data.source
     # Source device names must be enclosed in quotations for FFMPEG to identify the device
     if formatted_source[0] != '"':
@@ -309,7 +320,7 @@ async def post_live_stream_settings(
     # write changes to the configuration file
     _live_stream_settings_to_configuration_file(updated_settings, stream_status)
 
-    await camera.restart_live_stream()
+    await camera.restart_live_stream(robot_type)
 
     return updated_settings
 
@@ -321,10 +332,17 @@ async def post_live_stream_settings(
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
     },
 )
-async def get_live_stream_settings() -> LiveStreamSettings:
+async def get_live_stream_settings(
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+) -> LiveStreamSettings:
     """
     Request the Opentrons Live Stream settings.
     """
+    if camera.robot_supports_livestream(robot_type) is False:
+        raise LegacyErrorResponse(
+            message="Opentrons Live Stream service is not available on OT-2.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_400_BAD_REQUEST)
     return _get_stream_settings()
 
 

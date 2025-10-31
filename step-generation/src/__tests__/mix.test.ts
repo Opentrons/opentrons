@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { mix } from '../commandCreators/compound/mix'
+import { MANUAL } from '../constants'
 import {
   blowoutHelper,
   DEFAULT_PIPETTE,
@@ -872,6 +873,94 @@ mock_pipette.mix(
     dispense_flow_rate=2.2,
 )
 mock_pipette.drop_tip(location=mock_tip_rack_1["C1"])`
+    )
+  })
+  it('should return tip if changeTip is once', () => {
+    args.dropTipLocation = 'fixture/fixture_tiprack_300_ul/1'
+    args.wells = ['A1', 'B1', 'C1']
+    args.changeTip = 'once'
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["A1"])`
+    )
+  })
+})
+
+describe('mix: select tip', () => {
+  let args: MixArgs
+  beforeEach(() => {
+    args = {
+      ...mixinArgs,
+      volume: 8,
+      times: 2,
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      wells: ['A1', 'B1', 'C1'],
+      changeTip: 'always',
+    } as MixArgs
+  })
+  it('should select tips if tipTracking is manual', () => {
+    args = {
+      ...args,
+      dropTipLocation: 'fixture/fixture_tiprack_300_ul/1',
+      wells: ['A1', 'B1', 'C1'],
+      changeTip: 'always',
+      tipTracking: MANUAL,
+      tipsSelected: [['E5'], ['F5'], ['G5']],
+      tiprackSelected: 'tiprack1Id',
+    }
+    const result = mix(args, invariantContext, robotStateWithTip)
+    expect(getSuccessResult(result).python).toBe(
+      `mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1["E5"])
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["A1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["E5"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1["F5"])
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["B1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["F5"])
+mock_pipette.pick_up_tip(location=mock_tip_rack_1["G5"])
+mock_pipette.mix(
+    repetitions=2,
+    volume=8,
+    location=mock_source_plate["C1"].bottom(z=3.2),
+    aspirate_flow_rate=2.1,
+    dispense_flow_rate=2.2,
+)
+mock_pipette.drop_tip(location=mock_tip_rack_1["G5"])`
     )
   })
   it('should return tip if changeTip is once', () => {

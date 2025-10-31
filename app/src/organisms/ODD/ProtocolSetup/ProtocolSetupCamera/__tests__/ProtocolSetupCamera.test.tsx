@@ -14,8 +14,21 @@ vi.mock('/app/organisms/ODD/CameraSettings')
 vi.mock('/app/molecules/ODDBackButton')
 
 const render = (props: ProtocolSetupCameraProps) => {
+  const mockState = {
+    protocolRuns: {
+      'MOCK-RUN-ID': {
+        camera: {
+          enabled: props.cameraSettings?.cameraEnabled,
+          liveStreamEnabled: props.cameraSettings?.liveStreamEnabled,
+          recoveryEnabled: props.cameraSettings?.errorRecoveryCameraEnabled,
+        },
+      },
+    },
+  }
+
   return renderWithProviders(<ProtocolSetupCamera {...props} />, {
     i18nInstance: i18n,
+    initialState: mockState,
   })
 }
 
@@ -24,8 +37,16 @@ describe('ProtocolSetupCamera', () => {
 
   beforeEach(() => {
     mockProps = {
-      cameraSettings: { cameraEnabled: true } as any,
-      runCameraSettings: { cameraEnabled: true } as any,
+      cameraSettings: {
+        cameraEnabled: true,
+        liveStreamEnabled: true,
+        errorRecoveryCameraEnabled: true,
+      },
+      runCameraSettings: {
+        cameraEnabled: true,
+        liveStreamEnabled: true,
+        errorRecoveryCameraEnabled: true,
+      },
       runId: 'MOCK-RUN-ID',
       isCameraRequired: true,
       confirmCameraSettings: vi.fn(),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
@@ -23,6 +23,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import {
+  useAddCameraSettingsToRunMutation,
   useCamera,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -76,6 +77,7 @@ import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   CAMERA_SETUP_STEP_KEY,
+  getCameraUsageState,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   OFFSETS_CONFLICT,
@@ -84,6 +86,7 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
+  updateCameraEnablement,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
@@ -121,6 +124,7 @@ import type {
   SetupScreens,
 } from '/app/organisms/ODD/ProtocolSetup'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
   ProtocolFixture,
@@ -363,7 +367,12 @@ function PrepareToRun({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
-  const isCameraReadyToRun = cameraSettingsConfirmed && isCameraRequired
+  const { enabled: isCameraEnabledForRun } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  const isCameraReadyToRun = isCameraRequired
+    ? isCameraEnabledForRun || cameraSettingsConfirmed
+    : true
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
@@ -724,6 +733,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -734,6 +744,7 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
   const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
     useState<boolean>(true)
   const robotType = useRobotType(robotName)
@@ -811,7 +822,20 @@ export function ProtocolSetup(): JSX.Element {
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const { data: cameraSettings } = useCamera()
+  const { data: initialRobotCameraSettings } = useCamera()
+
+  // The initial app-internal camera state should match the server state.
+  useEffect(() => {
+    if (initialRobotCameraSettings != null) {
+      dispatch(
+        updateCameraEnablement(runId, initialRobotCameraSettings.cameraEnabled)
+      )
+    }
+  }, [initialRobotCameraSettings])
+
+  const appCameraSettings = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
   const runCameraSettings = runRecord?.data.cameraSettings ?? null
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
@@ -824,6 +848,27 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   const proceedToRun = (): void => {
+    // Camera settings do not require explicit confirmation by *any* user,
+    // so if the settings haven't been confirmed, use this user's settings
+    // before starting the run.
+    if (!cameraSettingsApplied) {
+      addCameraSettingsToRun(
+        {
+          runId,
+          settings: {
+            errorRecoveryCameraEnabled: appCameraSettings.recoveryEnabled,
+            liveStreamEnabled: appCameraSettings.liveStreamEnabled,
+            cameraEnabled: appCameraSettings.enabled,
+          },
+        },
+        { onSettled: onPlay }
+      )
+    } else {
+      onPlay()
+    }
+  }
+
+  const onPlay = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { robotSerialNumber },
@@ -927,7 +972,7 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupCamera
         runId={runId}
         runCameraSettings={runCameraSettings}
-        cameraSettings={cameraSettings ?? null}
+        cameraSettings={initialRobotCameraSettings ?? null}
         isCameraRequired={isCameraRequired}
         cameraConfirmed={cameraSettingsConfirmed}
         robotName={robotName}
