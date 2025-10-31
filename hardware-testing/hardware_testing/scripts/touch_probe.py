@@ -56,6 +56,49 @@ async def get_deck_z(api: OT3API, mount: OT3Mount, probe_point: Point) -> Point:
     return z_deck_pos
 
 
+async def search_deck_square(
+    api: OT3API, mount: OT3Mount, slot: int, z_deck_pos: Point
+) -> Optional[tuple[Point, float]]:
+    """
+    Search for a hole in the deck calibration square for the given slot.
+    If a hole is detected, refine its center and radius using search_hole_center
+    and return (center_point, radius). Returns None if no hole is present.
+    """
+    slot_center = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+
+    # Move to safe XY above the square
+    start_point = Point(x=slot_center.x, y=slot_center.y, z=SAFE_Z)
+    await api.move_to(mount, start_point)
+
+    z_target = z_deck_pos.z + 10.0
+    await api.move_to(mount, Point(x=start_point.x, y=start_point.y, z=z_target))
+    try:
+        await api.touch_probe(
+            mount, axis=Axis.Z, speed=PROBE_SPEED, distance=(z_target - z_deck_pos.z)
+        )
+        print("no square found")
+        await api.move_to(mount, start_point)  # return to safe
+        return None
+    except Exception:
+        print("square found")
+        current_pos = await api.current_position_ot3(
+            mount=mount, critical_point=None, refresh=True
+        )
+        search_start = Point(x=current_pos[Axis.X], y=current_pos[Axis.Y], z=current_pos[Axis.Z] - 1.0)
+        try:
+            result = await search_hole_center(api, mount, search_start)
+            if result:
+                center, radius = result
+                print(f"Deck square hole center: {center}, radius: {radius:.3f} mm")
+                return center, radius
+            else:
+                print("Unable to refine hole center for deck square.")
+                return None
+        except Exception:
+            print(f"Error getting center")
+            return None
+
+
 async def calibrate_labware_simple(
     api: OT3API, mount: OT3Mount
 ) -> Optional[list[Point]]:
@@ -78,6 +121,10 @@ async def calibrate_labware_simple(
     z_deck_pos = await get_deck_z(
         api, mount, Point(x=slot_center.x + slot_size.x, y=slot_center.y + 17.5, z=250)
     )
+    await search_deck_square(api, mount, 6, z_deck_pos)
+    current_pos = await api.current_position_ot3(mount)
+    await api.move_to(mount, Point(x=current_pos[Axis.X], y=current_pos[Axis.Y], z=SAFE_Z))
+                      
     probe_results.append(z_deck_pos)
 
     # Positions for probing (Z first so we can compute z_safe and probe_offset)
@@ -214,7 +261,7 @@ async def search_hole(api, mount, probe_results: list[Point], num_wells: int) ->
     well_found: bool = False
 
     if num_wells == 96:
-        x_offset, y_offset = 14, 11
+        x_offset, y_offset = 14.0, 11.0
     elif num_wells == 384:
         x_offset, y_offset = 11.3, 8.5
     else:
@@ -301,7 +348,7 @@ async def search_hole_center(
         f"radius_x: {radius_x:.3f} mm, radius_y: {radius_y:.3f} mm, "
         f"true radius: {radius:.3f} mm"
     )
-    await asyncio.sleep(5)
+    await asyncio.sleep(2)
 
     radius_test = await api.touch_probe(
         mount, axis=Axis.X, speed=PROBE_SPEED, distance=max_radius
@@ -309,7 +356,7 @@ async def search_hole_center(
     radius_confirm = abs((radius_test.x - BALL_RADIUS) - center.x)
     print(f"radius confirm: {radius_confirm}")
     await api.move_to(mount, center)
-    await asyncio.sleep(5)
+    await asyncio.sleep(2)
     return center, radius
 
 
