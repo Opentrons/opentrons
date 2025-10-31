@@ -147,7 +147,6 @@ def _setup(
         )
 
     # Connect dial indicator and create data sheet
-
     if not ctx.is_simulating() and DIAL_PORT is None:
         from hardware_testing.data import create_file_name, create_run_id
         from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
