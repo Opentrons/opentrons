@@ -42,6 +42,11 @@ describe('SetupCamera', () => {
         errorRecoveryCameraEnabled: true,
         liveStreamEnabled: true,
       },
+      runCameraSettings: {
+        cameraEnabled: true,
+        errorRecoveryCameraEnabled: true,
+        liveStreamEnabled: true,
+      },
       runId: 'MOCK-RUN-ID',
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
@@ -85,6 +90,10 @@ describe('SetupCamera', () => {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
       } as any,
+      runCameraSettings: {
+        ...mockProps.cameraSettings,
+        cameraEnabled: false,
+      } as any,
     }
     render(propsWithCameraDisabled)
 
@@ -104,6 +113,10 @@ describe('SetupCamera', () => {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
       } as any,
+      runCameraSettings: {
+        ...mockProps.cameraSettings,
+        cameraEnabled: false,
+      } as any,
     }
     render(propsWithCameraDisabled)
 
@@ -115,6 +128,10 @@ describe('SetupCamera', () => {
     const propsWithCameraDisabled = {
       ...mockProps,
       cameraSettings: {
+        ...mockProps.cameraSettings,
+        cameraEnabled: false,
+      } as any,
+      runCameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
       } as any,
@@ -136,6 +153,10 @@ describe('SetupCamera', () => {
     const propsWithCameraDisabled = {
       ...mockProps,
       cameraSettings: {
+        ...mockProps.cameraSettings,
+        cameraEnabled: false,
+      } as any,
+      runCameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
       } as any,

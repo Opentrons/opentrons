@@ -25,6 +25,7 @@ describe('ProtocolSetupCamera', () => {
   beforeEach(() => {
     mockProps = {
       cameraSettings: { cameraEnabled: true } as any,
+      runCameraSettings: { cameraEnabled: true } as any,
       runId: 'MOCK-RUN-ID',
       isCameraRequired: true,
       confirmCameraSettings: vi.fn(),
