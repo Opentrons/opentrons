@@ -37,8 +37,8 @@ async def ffmpeg_capture_image_bytes(
     """Execute an FFMPEG command to capture an image based on various image parameters."""
     if robot_type == "OT-2 Standard":
         ot2_brightness: float = (
-            (brightness / 128) * -1
-        )  # OT-2's equilizer field takes a value of -1.0 to 1.0 for brightness
+            brightness / 128
+        ) * -1  # OT-2's equilizer field takes a value of -1.0 to 1.0 for brightness
         command = [
             "ffmpeg",
             "-hwaccel",
