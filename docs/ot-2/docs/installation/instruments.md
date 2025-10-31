@@ -16,7 +16,10 @@ The OT-2 accepts GEN1 and GEN2 pipettes. The installation process is different d
 
 OT-2 GEN1 single- and multi-channel pipettes are black marked by a white Opentrons drop logo. They do not include any printed text or markings to identify them as GEN1 pipettes.
 
-![OT2 GEN1 pipettes](../images/OT2-gen1.png)
+<figure class="side-by-side" markdown>
+![OT2 GEN1 single channel pipette](../images/OT2-gen1-single.png)
+![OT2 GEN1 multi channel pipette](../images/OT2-gen1-multi.png)
+</figure>
 
 ### GEN2 pipettes
 
