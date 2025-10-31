@@ -35,24 +35,26 @@ import type { Selection } from './actions/types'
 import type { HoverableItem, SelectableItem, StepsState } from './reducers'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
-// ======= Selectors ===============================================
-// NOTE: when the selected step is deleted, we need to fall back to the last step
-// (or the initial selected item, if there are no more saved steps).
-// Ideally this would happen in the selectedItem reducer itself,
-// but it's not easy to feed orderedStepIds into that reducer.
 
-// @ts-expect-error(sa, 2021-6-15): lodash/last might return undefined, change line 55 to pull out the last element directly
 const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (orderedStepIds.length > 0)
-      return {
-        selectionType: SINGLE_STEP_SELECTION_TYPE,
-        id: last(orderedStepIds),
-      }
-    return initialSelectedItemState
+    else {
+      // NOTE: when the selected step is deleted, we need to fall back to the last step
+      // (or the initial selected item, if there are no more saved steps).
+      // Ideally this would happen in the selectedItem reducer itself,
+      // but it's not easy to feed orderedStepIds into that reducer.
+      if (orderedStepIds.length > 0)
+        return {
+          selectionType: SINGLE_STEP_SELECTION_TYPE,
+          // This non-null assertion is safe because the length is checked above.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          id: last(orderedStepIds)!,
+        }
+      else return initialSelectedItemState
+    }
   }
 )
 export const getSelectedStepId: Selector<StepIdType | null> = createSelector(
