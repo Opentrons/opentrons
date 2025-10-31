@@ -610,6 +610,12 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
+    if (
+        fixture_settings.pipette_channels == 8
+        and len(fixture_settings.channels) == 1
+        and fixture_settings.channels[0] == 0
+    ):
+        return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
