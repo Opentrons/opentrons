@@ -6,7 +6,6 @@ import {
   LegacyStyledText,
   Link,
   Modal,
-  ModalProps,
   PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -17,6 +16,7 @@ import { useDownloadRunLog } from '/app/organisms/Desktop/Devices/hooks'
 import styles from './gallery.module.css'
 
 import type { MouseEventHandler } from 'react'
+import type { ModalProps } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export interface GalleryItemErrorModalProps {
