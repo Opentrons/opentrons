@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 import {
@@ -21,8 +21,6 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
-import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
 import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
 import { removeOpentronsPhrases } from '/protocol-designer/utils'
 
@@ -40,6 +38,8 @@ interface SelectPipetteTipsProps {
   pipetteVolume: string | null
   setIncompatibleTip: Dispatch<SetStateAction<boolean>>
   setSelectedTipracks: Dispatch<SetStateAction<string[]>>
+  setAllowAllTipracks: Dispatch<SetStateAction<boolean>>
+  allowAllTipracks: boolean
 }
 
 const MAX_TIPRACKS_ALLOWED = 3
@@ -52,10 +52,11 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
     pipetteVolume,
     setIncompatibleTip,
     setSelectedTipracks,
+    setAllowAllTipracks,
+    allowAllTipracks,
   } = props
   const { t } = useTranslation('onboarding')
   const { makeSnackbar } = useKitchen()
-  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const handleSelectTips = (value: string): void => {
@@ -74,11 +75,7 @@ export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
 
   const handleAllowAllTips = (): void => {
     if (allowAllTipracks) {
-      dispatch(
-        setFeatureFlags({
-          OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-        })
-      )
+      setAllowAllTipracks(prev => !prev)
     } else {
       setIncompatibleTip(true)
     }
