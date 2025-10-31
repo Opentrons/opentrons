@@ -3,6 +3,7 @@ import asyncio
 import logging
 from typing import Tuple
 from opentrons.protocol_engine.resources.camera_provider import CameraError
+from opentrons_shared_data.robot.types import RobotType
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ log = logging.getLogger(__name__)
 
 
 async def ffmpeg_capture_image_bytes(
+    robot_type: RobotType,
     resolution: Tuple[int, int],
     camera: str,
     zoom: float,
@@ -33,27 +35,52 @@ async def ffmpeg_capture_image_bytes(
     saturation: float,
 ) -> bytes | CameraError:
     """Execute an FFMPEG command to capture an image based on various image parameters."""
-    command = [
-        "ffmpeg",
-        "-hwaccel",
-        "auto",
-        "-video_size",
-        f"{resolution[0]}x{resolution[1]}",
-        "-i",
-        f"{camera}",
-        "-vf",
-        f"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
-        f"scale={resolution[0]}:{resolution[1]},"
-        f"lut=y=(val-128)*{contrast}+128-{brightness},"
-        f"hue=s={saturation},format=nv12",
-        "-frames:v",
-        "1",
-        "-f",
-        "image2pipe",
-        "-vcodec",
-        "mjpeg",
-        "-",
-    ]
+    if robot_type == "OT-2 Standard":
+        ot2_brightness: float = (
+            brightness / 128
+        )  # OT-2's equilizer field takes a value of -1.0 to 1.0 for brightness
+        command = [
+            "ffmpeg",
+            "-hwaccel",
+            "auto",
+            "-video_size",
+            f"{resolution[0]}x{resolution[1]}",
+            "-i",
+            f"{camera}",
+            "-vf",
+            f"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
+            f"scale={resolution[0]}:{resolution[1]},"
+            f"eq=brightness={ot2_brightness}:contrast={contrast}:saturation={saturation}",
+            "-frames:v",
+            "1",
+            "-f",
+            "image2pipe",
+            "-vcodec",
+            "mjpeg",
+            "-",
+        ]
+    else:
+        command = [
+            "ffmpeg",
+            "-hwaccel",
+            "auto",
+            "-video_size",
+            f"{resolution[0]}x{resolution[1]}",
+            "-i",
+            f"{camera}",
+            "-vf",
+            f"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})/{zoom}:(ih-ih/{zoom})/{zoom},"
+            f"scale={resolution[0]}:{resolution[1]},"
+            f"lut=y=(val-128)*{contrast}+128-{brightness},"
+            f"hue=s={saturation},format=nv12",
+            "-frames:v",
+            "1",
+            "-f",
+            "image2pipe",
+            "-vcodec",
+            "mjpeg",
+            "-",
+        ]
 
     subprocess = await asyncio.create_subprocess_exec(
         *command,
