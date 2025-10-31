@@ -182,6 +182,11 @@ export const addAndSelectStep: (arg: {
     }
   }
 }
+
+// todo(mm, 2025-10-27): This action, currently only used for moving steps via keyboard,
+// needs to be updated to correctly handle the selected step being the root of a nested
+// group.  Currently, it lets you reorder the root of a group after the paired step
+// that closes the group, which causes all manner of timeline breakage.
 export interface ReorderSelectedStepAction {
   type: 'REORDER_SELECTED_STEP'
   payload: {
@@ -204,6 +209,7 @@ export const reorderSelectedStep: (
     })
   }
 }
+
 export const duplicateStep: (
   stepId: StepIdType
 ) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {

@@ -197,6 +197,7 @@ class RunOrchestrator:
         """Start the run."""
         if self._camera_provider:
             await camera.update_live_stream_status(
+                self.get_robot_type(),
                 True,
                 self._camera_provider,
                 self._protocol_engine.state_view.camera.get_enablement_settings(),
