@@ -34,6 +34,7 @@ import {
 } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellRequestor } from '/app/redux/shell/remote'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 
@@ -47,7 +48,12 @@ export function RobotSettings(): JSX.Element | null {
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
+  const doesRunExist = useCurrentRunId() != null
   const isCameraEnabled = useFeatureFlag('camera')
+
+  if (!showRobotBusyBanner && doesRunExist) {
+    setShowRobotBusyBanner(true)
+  }
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
