@@ -51,6 +51,7 @@ interface ActionButtonProps extends BaseActionButtonProps {
 export function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
+    runRecord,
     robotName,
     runStatus,
     isResetRunLoadingRef,
@@ -87,6 +88,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     'commandPreconditions' in protocolData &&
     protocolData.commandPreconditions?.isCameraUsed
   const isCameraReadyToRun = isCameraRequiredForRun ? isCameraEnabled : true
+  const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
 
   const isSetupComplete =
     isCalibrationComplete &&
@@ -133,6 +135,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       isValidRunAgain,
       isOtherRunCurrent,
       isRobotOnWrongVersionOfSoftware,
+      areCameraPreferencesConfirmed,
       ...props,
     })
 
