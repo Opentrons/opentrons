@@ -36,6 +36,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import {
   NOT_CONFIGURED,
@@ -836,7 +837,6 @@ export function ProtocolSetup(): JSX.Element {
   const appCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
-  const runCameraSettings = runRecord?.data.cameraSettings ?? null
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
   const cameraSettingsApplied = runRecord?.data.cameraSettings != null
@@ -920,6 +920,7 @@ export function ProtocolSetup(): JSX.Element {
   })
   const offsetSource = useSelector(selectOffsetSource(runId))
   const storageInfo = useRobotStorageInfo()
+  useInitializeCameraState(runId)
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -971,8 +972,6 @@ export function ProtocolSetup(): JSX.Element {
     camera: (
       <ProtocolSetupCamera
         runId={runId}
-        runCameraSettings={runCameraSettings}
-        cameraSettings={initialRobotCameraSettings ?? null}
         isCameraRequired={isCameraRequired}
         cameraConfirmed={cameraSettingsConfirmed}
         robotName={robotName}

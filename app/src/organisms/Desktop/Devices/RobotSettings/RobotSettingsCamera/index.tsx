@@ -1,11 +1,11 @@
 import { Divider } from '@opentrons/components'
 
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
-import { useCameraUsageSettings } from './hooks/useCameraUsageSettings'
 import { RobotSettingsCameraControls } from './RobotSettingsCameraControls'
 import { RobotSettingsCameraUsage } from './RobotSettingsCameraUsage'
 

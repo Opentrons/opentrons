@@ -8,6 +8,7 @@ import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useFeatureFlag } from '/app/redux/config'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
@@ -24,23 +25,11 @@ vi.mock(
 )
 vi.mock('/app/resources/health/useIsImageStorageLow')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux/protocol-runs')
 
 const render = (props: SetupCameraProps) => {
-  const mockState = {
-    protocolRuns: {
-      'MOCK-RUN-ID': {
-        camera: {
-          enabled: props.cameraSettings?.cameraEnabled,
-          liveStreamEnabled: props.cameraSettings?.liveStreamEnabled,
-          recoveryEnabled: props.cameraSettings?.errorRecoveryCameraEnabled,
-        },
-      },
-    },
-  }
-
   return renderWithProviders(<SetupCamera {...props} />, {
     i18nInstance: i18n,
-    initialState: mockState,
   })
 }
 
@@ -52,16 +41,6 @@ describe('SetupCamera', () => {
     mockNavigate = vi.fn()
     mockProps = {
       isCameraRequired: true,
-      cameraSettings: {
-        cameraEnabled: true,
-        errorRecoveryCameraEnabled: true,
-        liveStreamEnabled: true,
-      },
-      runCameraSettings: {
-        cameraEnabled: true,
-        errorRecoveryCameraEnabled: true,
-        liveStreamEnabled: true,
-      },
       runId: 'MOCK-RUN-ID',
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
@@ -82,6 +61,11 @@ describe('SetupCamera', () => {
     })
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
     vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: true,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
   })
 
   it('renders camera status section', () => {
@@ -100,18 +84,13 @@ describe('SetupCamera', () => {
   })
 
   it('renders disabled status when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      cameraSettings: {
-        ...mockProps.cameraSettings,
-        cameraEnabled: false,
-      },
-      runCameraSettings: {
-        ...mockProps.runCameraSettings,
-        cameraEnabled: false,
-      },
-    }
-    render(propsWithCameraDisabled as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     screen.getByText('Disabled')
   })
@@ -123,36 +102,26 @@ describe('SetupCamera', () => {
   })
 
   it('renders camera required notification when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      cameraSettings: {
-        ...mockProps.cameraSettings,
-        cameraEnabled: false,
-      },
-      runCameraSettings: {
-        ...mockProps.runCameraSettings,
-        cameraEnabled: false,
-      },
-    }
-    render(propsWithCameraDisabled as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     screen.getByText('Camera is required.')
     screen.getByText('Enable the camera to run this protocol.')
   })
 
   it('does not render SetupRunCameraUsage when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      cameraSettings: {
-        ...mockProps.cameraSettings,
-        cameraEnabled: false,
-      },
-      runCameraSettings: {
-        ...mockProps.runCameraSettings,
-        cameraEnabled: false,
-      },
-    }
-    render(propsWithCameraDisabled as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_USAGE')
@@ -166,18 +135,13 @@ describe('SetupCamera', () => {
   })
 
   it('does not render SetupRunCameraControls when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      cameraSettings: {
-        ...mockProps.cameraSettings,
-        cameraEnabled: false,
-      },
-      runCameraSettings: {
-        ...mockProps.runCameraSettings,
-        cameraEnabled: false,
-      },
-    }
-    render(propsWithCameraDisabled as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_CONTROLS')

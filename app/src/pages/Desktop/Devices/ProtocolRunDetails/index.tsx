@@ -98,6 +98,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
+  const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
   const runTimestamp = run.data?.data.createdAt ?? ''
   const runStatus = run?.data?.data.status ?? null
   const { displayName: protocolName } = useProtocolDetailsForRun(runId)
@@ -178,6 +179,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       content: (
         <ProtocolRunCamera
           runStatus={runStatus}
+          runRecordCameraSettings={runRecordCameraSettings}
           runId={runId}
           robotType={robotType}
           robotName={robotName}
