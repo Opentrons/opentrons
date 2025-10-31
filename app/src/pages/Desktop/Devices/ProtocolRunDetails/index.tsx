@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_PAUSED } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
@@ -261,7 +261,8 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
     if (
       currentRunStatus !== RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'run-preview'
+      protocolRunDetailsTab !== 'run-preview' &&
+      protocolRunDetailsTab !== 'camera'
     ) {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }

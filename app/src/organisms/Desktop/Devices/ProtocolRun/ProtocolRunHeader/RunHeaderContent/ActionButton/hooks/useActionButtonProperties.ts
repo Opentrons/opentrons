@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -71,7 +70,6 @@ export function useActionButtonProperties({
   buttonIconName: IconName | null
 } {
   const { t } = useTranslation(['run_details', 'shared'])
-  const navigate = useNavigate()
   const { play, pause, reset } = protocolRunControls
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
@@ -91,7 +89,6 @@ export function useActionButtonProperties({
 
   const handlePlay = (): void => {
     play()
-    navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackProtocolRunEvent({
       name:
         runStatus === RUN_STATUS_IDLE
