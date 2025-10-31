@@ -80,8 +80,6 @@ module.exports = {
           'lost-unit',
           'lost-utility',
           'lost-waffle',
-          'container-name',
-          'container-type',
         ],
       },
     ],
