@@ -5,8 +5,8 @@ import { useHost } from '@opentrons/react-api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 
 import { ImageGalleryContainer } from './ImageGalleryContainer'
