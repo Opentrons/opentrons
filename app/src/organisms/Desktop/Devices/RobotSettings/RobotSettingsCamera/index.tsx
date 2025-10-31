@@ -1,7 +1,7 @@
 import { Divider } from '@opentrons/components'
 
-import { useCameraAnalytics } from '/app/redux-resources/analytics'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
+import { useCameraAnalytics } from '/app/redux-resources/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 

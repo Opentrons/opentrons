@@ -220,7 +220,6 @@ export function ProtocolRunSetup({
     runID: runId,
   }
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-  const { data: cameraSettings } = useCamera()
   const runCameraSettings = runRecord?.data.cameraSettings ?? null
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
@@ -239,9 +238,9 @@ export function ProtocolRunSetup({
 
   reportCameraEnablementSettings({
     ...baseParams,
-    cameraEnabled: cameraSettings?.cameraEnabled,
-    liveFeedEnabled: cameraSettings?.liveStreamEnabled,
-    recoveryCaptureEnabled: cameraSettings?.errorRecoveryCameraEnabled,
+    cameraEnabled: runCameraSettings?.cameraEnabled,
+    liveFeedEnabled: runCameraSettings?.liveStreamEnabled,
+    recoveryCaptureEnabled: runCameraSettings?.errorRecoveryCameraEnabled,
   })
   if (robot == null) {
     return null

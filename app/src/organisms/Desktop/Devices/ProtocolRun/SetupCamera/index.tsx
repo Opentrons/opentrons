@@ -25,9 +25,7 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
-import type { CameraData } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 

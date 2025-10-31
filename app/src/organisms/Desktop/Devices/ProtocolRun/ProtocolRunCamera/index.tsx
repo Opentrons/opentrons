@@ -72,7 +72,6 @@ export function ProtocolRunCamera({
         isCameraEnabled &&
         showLivestreamBtn ? (
           <LaunchLivestreamBtn runId={runId} robotType={robotType} />
-
         ) : null}
       </div>
       <Divider width="100%" />
