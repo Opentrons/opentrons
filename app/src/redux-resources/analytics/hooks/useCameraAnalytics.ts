@@ -19,9 +19,9 @@ export interface cameraAnalyticsParams {
 export type CameraAnalyticKind = 'protocolCommand' | 'liveCommand'
 
 interface cameraUsageParams extends cameraAnalyticsParams {
-  cameraEnabled: boolean
-  liveFeedEnabled: boolean
-  recoveryCaptureEnabled: boolean
+  cameraEnabled?: boolean
+  liveFeedEnabled?: boolean
+  recoveryCaptureEnabled?: boolean
 }
 interface cameraSettingsParams extends cameraAnalyticsParams {
   settingsType: 'zoom' | 'saturation' | 'brightness' | 'contrast'
@@ -60,9 +60,7 @@ export function useCameraAnalytics({
 
   const reportCameraEnablementSettings = (data: cameraUsageParams): void => {
     const cameraEnablementToggleId = `camera-enablement-toggle-${runId}-${Date.now()}`
-    console.log(
-      `rc logging camera enablement ${cameraEnablementToggleId} ${data.cameraEnabled} ${data.source}`
-    )
+
     doTrackEvent({
       name: ANALYTICS_CAMERA_ENABLEMENT_KIND,
       properties: {
@@ -77,7 +75,6 @@ export function useCameraAnalytics({
   }
   const reportCameraSettings = (data: cameraSettingsParams): void => {
     const cameraSettingsToggleId = `camera-settings-toggle-${runId}-${Date.now()}`
-    console.log(`rc logging camera settings ${cameraSettingsToggleId}`)
     doTrackEvent({
       name: ANALYTICS_CAMERA_SETTINGS_KIND,
       properties: {
@@ -92,7 +89,6 @@ export function useCameraAnalytics({
 
   const reportImageCaptureUsage = (data: captureParams): void => {
     const imageCaptureId = `image-capture-${runId}-${Date.now()}`
-    console.log(`rc logging image capture ${imageCaptureId} ${data.amount}`)
     doTrackEvent({
       name: ANALYTICS_IMAGE_CAPTURE_KIND,
       properties: {
@@ -106,7 +102,6 @@ export function useCameraAnalytics({
 
   const reportLiveFeedUsage = (data: captureParams): void => {
     const liveFeedId = `live-feed-${runId}-${Date.now()}`
-    console.log(`rc logging live feed usage ${liveFeedId}`)
     doTrackEvent({
       name: ANALYTICS_LIVE_FEED_KIND,
       properties: {
@@ -118,7 +113,6 @@ export function useCameraAnalytics({
 
   const reportPhotoAccessUsage = (data: photoAccessParams): void => {
     const photoAccessId = `photo-access-${runId}-${Date.now()}`
-    console.log(`rc logging camera access ${photoAccessId} ${data.action}`)
     doTrackEvent({
       name: ANALYTICS_PHOTO_ACCESS,
       properties: {

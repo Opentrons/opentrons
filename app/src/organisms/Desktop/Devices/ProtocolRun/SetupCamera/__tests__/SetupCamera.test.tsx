@@ -67,7 +67,6 @@ describe('SetupCamera', () => {
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
       robotName: 'test-robot',
-      runId: 'runid123',
     }
     vi.mocked(SetupRunCameraControls).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_CONTROLS</div>

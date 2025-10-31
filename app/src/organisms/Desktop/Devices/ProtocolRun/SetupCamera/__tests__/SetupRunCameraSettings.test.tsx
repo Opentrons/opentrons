@@ -22,6 +22,7 @@ describe('SetupRunCameraUsage', () => {
     mockProps = {
       robotType: 'OT-3 Standard',
       runId: 'run123',
+      cameraEnabled: true,
       liveStreamEnabled: true,
       recoveryEnabled: true,
       cameraConfirmed: false,

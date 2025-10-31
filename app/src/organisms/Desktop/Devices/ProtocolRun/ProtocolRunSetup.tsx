@@ -237,12 +237,12 @@ export function ProtocolRunSetup({
       )
     }
   }, [cameraSettingsApplied, dispatch, isCameraConfirmed, runId])
-  
+
   reportCameraEnablementSettings({
     ...baseParams,
-    cameraEnabled: cameraSettings.cameraEnabled,
-    liveFeedEnabled: cameraSettings.liveVideoEnabled,
-    recoveryCaptureEnabled: cameraSettings.recoveryCaptureEnabled,
+    cameraEnabled: cameraSettings?.cameraEnabled,
+    liveFeedEnabled: cameraSettings?.liveStreamEnabled,
+    recoveryCaptureEnabled: cameraSettings?.errorRecoveryCameraEnabled,
   })
   if (robot == null) {
     return null

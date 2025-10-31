@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
@@ -12,6 +14,7 @@ import styles from './preferences.module.css'
 import { UsagePreferencesSettings } from './UsagePreferencesSettings'
 
 import type { ReactNode } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 export interface CameraSettingsProps {
@@ -21,6 +24,7 @@ export interface CameraSettingsProps {
   isCameraEnabled: boolean
   isLiveVideoEnabled: boolean
   isRecoveryCaptureEnabled: boolean
+  robotName: string
   toggleCameraEnabled: () => void
   toggleRecoveryEnabled: () => void
   toggleLiveStreamEnabled: () => void
@@ -36,6 +40,7 @@ export function CameraSettings({
   storageInfo,
   isCameraRequired,
   isCameraEnabled,
+  robotName,
   toggleCameraEnabled,
   toggleRecoveryEnabled,
   toggleLiveStreamEnabled,
@@ -47,8 +52,22 @@ export function CameraSettings({
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
   }
+  console.log('here')
   console.log('=>(index.tsx:50) isCameraRequired', isCameraRequired)
-
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const baseProps = {
+    source: 'ODD' as const,
+    robotType: robotType,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
+  if (storageInfo?.isImageStorageLow) {
+    reportPhotoAccessUsage({
+      ...baseProps,
+      action: 'storageWarning',
+      amount: storageInfo.imageDirSizeMb,
+    })
+  }
   if (showControls) {
     return <CameraControls toggleShowControls={toggleShowControls} />
   } else {

@@ -12,6 +12,7 @@ import type { RobotType } from '@opentrons/shared-data'
 export interface SetupCameraProps {
   robotType: RobotType
   runId: string
+  cameraEnabled: boolean
   liveStreamEnabled: boolean
   recoveryEnabled: boolean
   cameraConfirmed: boolean
@@ -22,6 +23,7 @@ export interface SetupCameraProps {
 export function SetupRunCameraUsage({
   robotType,
   runId,
+  cameraEnabled,
   liveStreamEnabled,
   recoveryEnabled,
   cameraConfirmed,
@@ -37,9 +39,9 @@ export function SetupRunCameraUsage({
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
   reportCameraEnablementSettings({
     ...baseParams,
-    cameraEnabled: settings.isCameraEnabled,
-    liveFeedEnabled: settings.isLiveVideoEnabled,
-    recoveryCaptureEnabled: settings.isRecoveryCaptureEnabled,
+    cameraEnabled: cameraEnabled,
+    liveFeedEnabled: liveStreamEnabled,
+    recoveryCaptureEnabled: recoveryEnabled,
   })
   return (
     <div className={styles.usage_settings_container}>

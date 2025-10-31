@@ -90,9 +90,8 @@ export function ProtocolRunHeader(
   if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
     isResetRunLoadingRef.current = false
   }
+  useRunAnalytics({ runId, robotName, enteredER })
   const outputFileIds = useRunGeneratedDataFiles(runId)
-  const numberOfImages = outputFileIds.jpeg.length
-  useRunAnalytics({ runId, robotName, enteredER, numberOfImages })
 
   return (
     <>

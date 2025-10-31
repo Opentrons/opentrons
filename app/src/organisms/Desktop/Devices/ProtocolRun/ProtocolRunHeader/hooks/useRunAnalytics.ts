@@ -8,6 +8,7 @@ import {
 } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useIsRunCurrent, useRunStatus } from '/app/resources/runs'
 
 import { isTerminalRunStatus } from '../utils'
@@ -15,10 +16,9 @@ import { isTerminalRunStatus } from '../utils'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface UseRunAnalyticsProps {
-  runId: string | null
+  runId: string
   robotName: string
   enteredER: boolean
-  numberOfImages: number
 }
 
 // Implicitly send reports related to the run when the current run is terminal.
@@ -26,10 +26,11 @@ export function useRunAnalytics({
   runId,
   robotName,
   enteredER,
-  numberOfImages,
 }: UseRunAnalyticsProps): void {
   const isFlex = useIsFlex(robotName)
   const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const outputFileIds = useRunGeneratedDataFiles(runId)
+  const numberOfImages = outputFileIds.jpeg.length
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const runStatus = useRunStatus(runId)

@@ -26,15 +26,14 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { CameraData } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 
 export interface SetupCameraProps {
   runId: string
   robotName: string
-  runId: string
   isCameraRequired: boolean
   cameraSettings: CameraData | null
   runCameraSettings: CameraData | null
@@ -45,7 +44,6 @@ export interface SetupCameraProps {
 export function SetupCamera({
   runId,
   robotName,
-  runId,
   cameraSettings,
   runCameraSettings,
   isCameraRequired,
@@ -55,19 +53,6 @@ export function SetupCamera({
   const { t } = useTranslation('protocol_setup')
   const isFlex = useIsFlex(robotName)
   const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
-  const baseProps = {
-    source: 'protocolRunRecord' as const,
-    robotType: robotType,
-    runId,
-  }
-  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
-  const storageInfo = useRobotStorageInfo()
-  if (storageInfo.isImageStorageLow) {
-    reportPhotoAccessUsage({
-      ...baseProps,
-      action: 'storageWarning',
-      amount: storageInfo.imageDirSizeMb,
-    })
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
@@ -129,7 +114,19 @@ export function SetupCamera({
     })
     confirmCameraSettings()
   }
-
+  const baseProps = {
+    source: 'protocolRunRecord' as const,
+    robotType: robotType,
+    runId,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
+  if (storageInfo.isImageStorageLow) {
+    reportPhotoAccessUsage({
+      ...baseProps,
+      action: 'storageWarning',
+      amount: storageInfo.imageDirSizeMb,
+    })
+  }
   return (
     <div className={styles.container}>
       {!cameraEnabled && isCameraRequired && <CameraRequiredNotification />}
@@ -143,10 +140,10 @@ export function SetupCamera({
       />
       {cameraEnabled && (
         <>
-          <SetupRunCameraControls />
-            settings={settings}
+          <SetupRunCameraUsage
             robotType={robotType}
             runId={runId}
+            cameraEnabled={cameraEnabled}
             liveStreamEnabled={liveStreamEnabled}
             recoveryEnabled={recoveryEnabled}
             toggleRecoveryEnabled={toggleRecoveryEnabled}
