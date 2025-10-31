@@ -34,6 +34,7 @@ const render = (robotType: RobotType = 'OT-3 Standard') => {
       protocolName="MOCK-PROTOCOL"
       runTimestamp="MOCK-RUN-TIMESTAMP"
       robotName="MOCK-ROBOT-NAME"
+      runRecordCameraSettings={null}
     />,
     {
       i18nInstance: i18n,
