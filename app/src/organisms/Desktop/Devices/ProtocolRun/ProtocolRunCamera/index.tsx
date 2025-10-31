@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
 
 import { Chip, Flex, SPACING, StyledText } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
 import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import { OPENTRONS_USB } from '/app/redux/discovery'
 
 import { ImageGalleryContainer } from './ImageGalleryContainer'
 import { LaunchLivestreamBtn } from './LaunchLivestreamBtn'
@@ -31,7 +34,11 @@ export function ProtocolRunCamera({
   protocolName,
 }: ProtocolRunCameraProps): JSX.Element {
   const { t } = useTranslation('run_details')
+  const host = useHost()
   const { isCameraEnabled } = useCameraUsageSettings()
+
+  const showLivestreamBtn =
+    host?.hostname !== OPENTRONS_USB && robotType !== OT2_ROBOT_TYPE
 
   return (
     <div className={styles.content_container}>
@@ -51,7 +58,9 @@ export function ProtocolRunCamera({
             )}
           </Flex>
         </div>
-        {!isTerminalRunStatus(runStatus) && isCameraEnabled ? (
+        {!isTerminalRunStatus(runStatus) &&
+        isCameraEnabled &&
+        showLivestreamBtn ? (
           <LaunchLivestreamBtn runId={runId} />
         ) : null}
       </div>
