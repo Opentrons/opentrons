@@ -21,6 +21,7 @@ import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Device
 
 export interface SetupCameraProps {
   robotName: string
+  runId: string
   settings: UseCameraUsageSettingsResult
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
@@ -28,6 +29,7 @@ export interface SetupCameraProps {
 
 export function SetupCamera({
   robotName,
+  runId,
   settings,
   cameraConfirmed,
   confirmCameraSettings,
@@ -35,12 +37,16 @@ export function SetupCamera({
   const { t } = useTranslation('protocol_setup')
   const isFlex = useIsFlex(robotName)
   const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
-  const { reportPhotoAccessUsage } = useCameraAnalytics({
+  const baseProps = {
+    source: 'protocolRunRecord' as const,
     robotType: robotType,
-  })
+    runId,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
   const storageInfo = useRobotStorageInfo()
   if (storageInfo.isImageStorageLow) {
     reportPhotoAccessUsage({
+      ...baseProps,
       action: 'storageWarning',
       amount: storageInfo.imageDirSizeMb,
     })
@@ -57,7 +63,11 @@ export function SetupCamera({
       <CameraStatus {...settings} />
       {settings.isCameraEnabled && (
         <>
-          <SetupRunCameraUsage settings={settings} />
+          <SetupRunCameraUsage
+            settings={settings}
+            robotType={robotType}
+            runId={runId}
+          />
           <SetupRunCameraControls />
         </>
       )}

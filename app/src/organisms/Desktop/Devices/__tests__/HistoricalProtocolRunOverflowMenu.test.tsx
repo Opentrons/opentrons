@@ -117,6 +117,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       robotName: ROBOT_NAME,
       robotIsBusy: false,
       runHasImages: true,
+      numberOfImages: 14,
     }
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)

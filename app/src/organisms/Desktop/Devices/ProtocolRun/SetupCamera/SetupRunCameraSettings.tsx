@@ -3,20 +3,37 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 
 import styles from './setupcamera.module.css'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
   settings: UseCameraUsageSettingsResult
+  robotType: RobotType
+  runId: string
 }
 
 export function SetupRunCameraUsage({
   settings,
+  robotType,
+  runId,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
+  const baseParams = {
+    source: 'protocolRunRecord' as const,
+    robotType: robotType,
+    runId: runId,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  reportCameraEnablementSettings({
+    ...baseParams,
+    cameraEnabled: settings.isCameraEnabled,
+    liveFeedEnabled: settings.isLiveVideoEnabled,
+    recoveryCaptureEnabled: settings.isRecoveryCaptureEnabled,
+  })
   return (
     <div className={styles.usage_settings_container}>
       <StyledText desktopStyle="bodyDefaultSemiBold">

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ListButton, StyledText } from '@opentrons/components'
 
 import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 
 import styles from './preferences.module.css'
 
@@ -23,7 +24,16 @@ export function UsagePreferencesSettings({
   toggleLiveVideoEnabled,
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
+  const baseParams = {
+    source: 'ODD' as const,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  reportCameraEnablementSettings({
+    ...baseParams,
+    cameraEnabled: true,
+    liveFeedEnabled: isLiveVideoEnabled,
+    recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+  })
   return (
     <div className={styles.usage_preferences_container}>
       <StyledText oddStyle="level4HeaderSemiBold">

@@ -45,7 +45,7 @@ export function ProtocolRunCamera({
           </Flex>
         </div>
         {!isTerminalRunStatus(runStatus) && isCameraEnabled ? (
-          <LaunchLivestreamBtn runId={runId} />
+          <LaunchLivestreamBtn runId={runId} robotType={robotType} />
         ) : null}
       </div>
       <Divider width="100%" />

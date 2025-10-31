@@ -24,7 +24,7 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { useRobot } from '/app/redux-resources/robots'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
 import {
   CONNECTABLE,
@@ -35,6 +35,7 @@ import {
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellRequestor } from '/app/redux/shell/remote'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 
 export function RobotSettings(): JSX.Element | null {
@@ -43,6 +44,8 @@ export function RobotSettings(): JSX.Element | null {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
@@ -68,7 +71,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    camera: <RobotSettingsCamera />,
+    camera: <RobotSettingsCamera robotType={robotType} />,
     advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}

@@ -32,6 +32,7 @@ import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useFeatureFlag } from '/app/redux/config'
@@ -213,7 +214,19 @@ export function ProtocolRunSetup({
     : t('no_deck_hardware_specified')
 
   const cameraSettings = useCameraUsageSettings()
+  const baseParams = {
+    source: 'protocolRunRecord' as const,
+    robotType: robotType,
+    runID: runId,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
 
+  reportCameraEnablementSettings({
+    ...baseParams,
+    cameraEnabled: cameraSettings.isCameraEnabled,
+    liveFeedEnabled: cameraSettings.isLiveVideoEnabled,
+    recoveryCaptureEnabled: cameraSettings.isRecoveryCaptureEnabled,
+  })
   if (robot == null) {
     return null
   }
@@ -369,6 +382,7 @@ export function ProtocolRunSetup({
       stepInternals: (
         <SetupCamera
           robotName={robotName}
+          runId={runId}
           settings={cameraSettings}
           cameraConfirmed={!missingSteps.includes(CAMERA_SETUP_STEP_KEY)}
           confirmCameraSettings={() => {

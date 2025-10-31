@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 
 import { useCamera, useUpdateCamera } from '@opentrons/react-api-client'
 
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-
 const CAMERA_POLLING_INTERVAL_MS = 5000
 
 export interface UseCameraUsageSettingsResult {
@@ -19,7 +17,6 @@ export interface UseCameraUsageSettingsResult {
 
 // general camera usage settings.
 export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
-  const { reportCameraEnablementSettings } = useCameraAnalytics({})
   const { data: cameraData } = useCamera({
     refetchInterval: CAMERA_POLLING_INTERVAL_MS,
   })
@@ -52,10 +49,6 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
         },
       }
     )
-    reportCameraEnablementSettings({
-      enabled: newValue,
-      enablementType: 'camera',
-    })
   }
 
   const toggleLiveVideoEnabled = (): void => {
@@ -73,10 +66,6 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
         },
       }
     )
-    reportCameraEnablementSettings({
-      enabled: newValue,
-      enablementType: 'liveFeed',
-    })
   }
 
   const toggleRecoveryCaptureEnabled = (): void => {
@@ -95,10 +84,6 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
         },
       }
     )
-    reportCameraEnablementSettings({
-      enabled: newValue,
-      enablementType: 'recoveryCapture',
-    })
   }
 
   return {

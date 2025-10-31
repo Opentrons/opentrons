@@ -30,6 +30,7 @@ export type RobotAnalyticsData = {
   robotLeftPipette: string
   robotRightPipette: string
   robotSerialNumber: string
+  runId?: string
 } & {
   // feature flags
   // e.g. robotFF_settingName

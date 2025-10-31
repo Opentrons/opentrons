@@ -23,6 +23,7 @@ vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
 vi.mock('/app/resources/health/useIsImageStorageLow')
+vi.mock('/app/redux/discovery/selectors')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -50,6 +51,7 @@ describe('SetupCamera', () => {
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
       robotName: 'test-robot',
+      runId: 'runid123',
     }
     vi.mocked(SetupRunCameraControls).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_CONTROLS</div>

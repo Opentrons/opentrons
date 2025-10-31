@@ -53,6 +53,7 @@ export function ProtocolRunHeader(
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
@@ -89,9 +90,9 @@ export function ProtocolRunHeader(
   if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
     isResetRunLoadingRef.current = false
   }
-
-  useRunAnalytics({ runId, robotName, enteredER })
   const outputFileIds = useRunGeneratedDataFiles(runId)
+  const numberOfImages = outputFileIds.jpeg.length
+  useRunAnalytics({ runId, robotName, enteredER, numberOfImages })
 
   return (
     <>

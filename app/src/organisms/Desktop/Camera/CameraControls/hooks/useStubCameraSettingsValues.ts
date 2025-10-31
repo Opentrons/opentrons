@@ -1,7 +1,5 @@
 import { useState } from 'react'
 
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-
 export type CameraZoomSetting = '1x' | '1.5x' | '2x'
 
 export interface UseStubCameraSettingsValuesResult {
@@ -22,38 +20,21 @@ export function useStubCameraSettingsValues(): UseStubCameraSettingsValuesResult
   const [brightness, setBrightness] = useState(50)
   const [contrast, setContrast] = useState(50)
   const [saturation, setSaturation] = useState(50)
-  const { reportCameraSettings } = useCameraAnalytics({})
 
   const adjustZoom = (value: CameraZoomSetting): void => {
     setZoom(value)
-    reportCameraSettings({
-      settingsType: 'zoom',
-      value: value,
-    })
   }
 
   const adjustBrightness = (value: number): void => {
     setBrightness(value)
-    reportCameraSettings({
-      settingsType: 'brightness',
-      value: value,
-    })
   }
 
   const adjustContrast = (value: number): void => {
     setContrast(value)
-    reportCameraSettings({
-      settingsType: 'contrast',
-      value: value,
-    })
   }
 
   const adjustSaturation = (value: number): void => {
     setSaturation(value)
-    reportCameraSettings({
-      settingsType: 'saturation',
-      value: value,
-    })
   }
 
   const restoreToDefault = (): void => {
@@ -61,22 +42,6 @@ export function useStubCameraSettingsValues(): UseStubCameraSettingsValuesResult
     setContrast(50)
     setSaturation(50)
     setZoom('1x')
-    reportCameraSettings({
-      settingsType: 'zoom',
-      value: '1x',
-    })
-    reportCameraSettings({
-      settingsType: 'contrast',
-      value: 50,
-    })
-    reportCameraSettings({
-      settingsType: 'saturation',
-      value: 50,
-    })
-    reportCameraSettings({
-      settingsType: 'brightness',
-      value: 50,
-    })
   }
 
   return {

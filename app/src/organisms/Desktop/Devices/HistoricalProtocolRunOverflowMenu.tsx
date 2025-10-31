@@ -42,7 +42,8 @@ import { getModalPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRobot } from '/app/redux-resources/robots'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -56,12 +57,14 @@ import { useDownloadRunLog } from './hooks'
 import type { MouseEventHandler } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
+import type { RobotType } from '@opentrons/shared-data'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
   robotName: string
   robotIsBusy: boolean
   runHasImages: boolean
+  numberOfImages: number
 }
 
 export function HistoricalProtocolRunOverflowMenu(
@@ -133,6 +136,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     downloadRunLog,
     isRunLogLoading,
     runHasImages,
+    numberOfImages,
   } = props
 
   const isRobotOnWrongVersionOfSoftware =
@@ -159,9 +163,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   )
   const { deleteRun, isLoading: isDeletingImages } = useDeleteRunMutation()
   const robot = useRobot(robotName)
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+
   const robotSerialNumber =
     robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
-
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     e.stopPropagation()
@@ -196,7 +202,17 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.stopPropagation()
     closeOverflowMenu(e)
   }
-
+  const baseParams = {
+    source: 'protocolRunRecord' as const,
+    runId: runId,
+    robotType: robotType,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseParams)
+  reportPhotoAccessUsage({
+    ...baseParams,
+    amount: numberOfImages,
+    action: 'delete',
+  })
   return (
     <Flex
       whiteSpace={NO_WRAP}

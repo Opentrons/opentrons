@@ -9,13 +9,26 @@ import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
 
-export function LaunchLivestreamBtn({ runId }: { runId: string }): JSX.Element {
+import type { RobotType } from '@opentrons/shared-data'
+
+export function LaunchLivestreamBtn({
+  runId,
+  robotType,
+}: {
+  runId: string
+  robotType: RobotType
+}): JSX.Element {
   const { t } = useTranslation('run_details')
   const dispatch = useDispatch()
   const host = useHost()
   const isLaunchCameraEnabled =
     host?.robotName != null && host?.hostname != null
-  const { reportLiveFeedUsage } = useCameraAnalytics({})
+  const baseParams = {
+    source: 'protocolRunRecord' as const,
+    runId: runId,
+    robotType,
+  }
+  const { reportLiveFeedUsage } = useCameraAnalytics(baseParams)
   const handleOpenCameraStream = (): void => {
     dispatch(
       cameraStreamOpenAction(
@@ -25,7 +38,12 @@ export function LaunchLivestreamBtn({ runId }: { runId: string }): JSX.Element {
       )
     )
     // how to get if there was an error or if it actually loaded?
-    reportLiveFeedUsage({ amount: 1, errorDetails: '', runId: runId })
+    reportLiveFeedUsage({
+      ...baseParams,
+      amount: 1,
+      errorDetails: '',
+      runId: runId,
+    })
   }
 
   return (
