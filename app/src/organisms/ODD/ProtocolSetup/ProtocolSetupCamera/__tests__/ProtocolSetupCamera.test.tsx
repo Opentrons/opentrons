@@ -5,6 +5,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolSetupCamera } from '..'
 
@@ -12,23 +13,11 @@ import type { ProtocolSetupCameraProps } from '..'
 
 vi.mock('/app/organisms/ODD/CameraSettings')
 vi.mock('/app/molecules/ODDBackButton')
+vi.mock('/app/redux/protocol-runs')
 
 const render = (props: ProtocolSetupCameraProps) => {
-  const mockState = {
-    protocolRuns: {
-      'MOCK-RUN-ID': {
-        camera: {
-          enabled: props.cameraSettings?.cameraEnabled,
-          liveStreamEnabled: props.cameraSettings?.liveStreamEnabled,
-          recoveryEnabled: props.cameraSettings?.errorRecoveryCameraEnabled,
-        },
-      },
-    },
-  }
-
   return renderWithProviders(<ProtocolSetupCamera {...props} />, {
     i18nInstance: i18n,
-    initialState: mockState,
   })
 }
 
@@ -37,16 +26,6 @@ describe('ProtocolSetupCamera', () => {
 
   beforeEach(() => {
     mockProps = {
-      cameraSettings: {
-        cameraEnabled: true,
-        liveStreamEnabled: true,
-        errorRecoveryCameraEnabled: true,
-      },
-      runCameraSettings: {
-        cameraEnabled: true,
-        liveStreamEnabled: true,
-        errorRecoveryCameraEnabled: true,
-      },
       runId: 'MOCK-RUN-ID',
       isCameraRequired: true,
       confirmCameraSettings: vi.fn(),
@@ -62,6 +41,11 @@ describe('ProtocolSetupCamera', () => {
       </div>
     ))
     vi.mocked(ODDBackButton).mockReturnValue(<div>MOCK_ODD_BACK_BUTTON</div>)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: true,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
   })
 
   it('renders CameraSettings with correct section heading', () => {

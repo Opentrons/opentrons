@@ -1,17 +1,22 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { Chip, Flex, SPACING, StyledText } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ImageGalleryContainer } from './ImageGalleryContainer'
 import { LaunchLivestreamBtn } from './LaunchLivestreamBtn'
 import styles from './runcamera.module.css'
 
-import type { RunStatus } from '@opentrons/api-client'
+import type { CameraData, RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
+import type { State } from '/app/redux/types'
 
 export interface ProtocolRunCameraProps {
   runId: string
@@ -20,6 +25,7 @@ export interface ProtocolRunCameraProps {
   robotName: string
   runTimestamp: string
   protocolName: string
+  runRecordCameraSettings: CameraData | null
 }
 
 export function ProtocolRunCamera({
@@ -29,9 +35,20 @@ export function ProtocolRunCamera({
   robotName,
   runTimestamp,
   protocolName,
+  runRecordCameraSettings,
 }: ProtocolRunCameraProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const { isCameraEnabled } = useCameraUsageSettings()
+  const host = useHost()
+  const { enabled: runCameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  // Prefer the finalized camera enablement status if available, otherwise use the
+  //  local user's state.
+  const isCameraEnabled =
+    runRecordCameraSettings?.cameraEnabled ?? runCameraEnabled
+
+  const showLivestreamBtn =
+    host?.hostname !== OPENTRONS_USB && robotType !== OT2_ROBOT_TYPE
 
   return (
     <div className={styles.content_container}>
@@ -51,8 +68,11 @@ export function ProtocolRunCamera({
             )}
           </Flex>
         </div>
-        {!isTerminalRunStatus(runStatus) && isCameraEnabled ? (
+        {!isTerminalRunStatus(runStatus) &&
+        isCameraEnabled &&
+        showLivestreamBtn ? (
           <LaunchLivestreamBtn runId={runId} robotType={robotType} />
+
         ) : null}
       </div>
       <Divider width="100%" />

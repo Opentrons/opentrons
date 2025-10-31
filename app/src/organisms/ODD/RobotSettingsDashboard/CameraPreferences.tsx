@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 

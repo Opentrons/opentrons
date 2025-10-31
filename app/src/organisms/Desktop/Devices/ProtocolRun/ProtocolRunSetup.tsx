@@ -18,7 +18,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useCamera,
   useInstrumentsQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
@@ -400,9 +399,7 @@ export function ProtocolRunSetup({
         <SetupCamera
           runId={runId}
           robotName={robotName}
-          runCameraSettings={runCameraSettings}
           isCameraRequired={isCameraRequired}
-          cameraSettings={cameraSettings ?? null}
           cameraConfirmed={isCameraConfirmed}
           confirmCameraSettings={() => {
             dispatch(

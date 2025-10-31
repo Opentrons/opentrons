@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
+import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -90,6 +91,8 @@ export function ProtocolRunHeader(
   if (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_RUNNING) {
     isResetRunLoadingRef.current = false
   }
+
+  useInitializeCameraState(runId)
   useRunAnalytics({ runId, robotName, enteredER })
   const outputFileIds = useRunGeneratedDataFiles(runId)
 
