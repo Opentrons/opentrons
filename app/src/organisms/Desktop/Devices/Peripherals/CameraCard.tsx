@@ -16,8 +16,8 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
