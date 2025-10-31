@@ -39,7 +39,11 @@ export function ProtocolDesignerAppFallback({
 
   useEffect(() => {
     if (error != null) {
-      captureException(error, { extra: { errorId }, level: LOG_LEVEL })
+      captureException(error, {
+        extra: { errorId },
+        tags: { errorId },
+        level: LOG_LEVEL,
+      })
     }
   }, [error, errorId])
 
