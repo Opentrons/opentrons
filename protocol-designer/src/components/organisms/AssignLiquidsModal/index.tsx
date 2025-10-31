@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  ALIGN_END,
   ALIGN_NORMAL,
-  ALIGN_START,
   BORDERS,
   Box,
   COLORS,
@@ -275,7 +273,9 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds) ?? [
+    labwareId,
+  ]
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )

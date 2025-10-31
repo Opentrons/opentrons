@@ -7,6 +7,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Overlay,
+  POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
   SPACING,
@@ -32,7 +33,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
     <Overlay
       width="100%"
       height="100%"
-      position="absolute"
+      position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.transparentBlack90}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}

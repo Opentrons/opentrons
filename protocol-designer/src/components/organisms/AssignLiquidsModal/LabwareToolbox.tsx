@@ -53,7 +53,7 @@ interface LabwareStackToolboxProps {
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
 }
-function LabwareStackToolbox({
+export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
   selectedLabwareIds,
