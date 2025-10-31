@@ -4,15 +4,21 @@ import { getDataFileRaw } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
+import type { AxiosRequestConfig } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   DownloadedDataFileResponse,
   HostConfig,
 } from '@opentrons/api-client'
 
+// TODO(jh, 10-28-25): Split this into two hooks, perhaps in /app, that
+//  parses the return data via axiosConfig based on known metadata about the
+//  the data file id. The data file id metadata is always known through various
+//  /dataFile endpoints.
 export function useDataFileRawQuery(
   fileId: string,
-  options?: UseQueryOptions<DownloadedDataFileResponse>
+  options?: UseQueryOptions<DownloadedDataFileResponse>,
+  axiosConfig?: AxiosRequestConfig
 ): UseQueryResult<DownloadedDataFileResponse> {
   const host = useHost()
   const allOptions: UseQueryOptions<DownloadedDataFileResponse> = {
@@ -23,7 +29,7 @@ export function useDataFileRawQuery(
   const query = useQuery<DownloadedDataFileResponse>(
     [host, 'dataFiles', fileId, 'download'],
     () =>
-      getDataFileRaw(host as HostConfig, fileId).then(
+      getDataFileRaw(host as HostConfig, fileId, axiosConfig).then(
         response => response.data
       ),
     allOptions

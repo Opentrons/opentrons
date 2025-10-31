@@ -18,6 +18,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
@@ -29,7 +30,6 @@ import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/Pro
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
@@ -38,6 +38,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
+  useProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -96,10 +97,15 @@ interface PageContentsProps {
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
-  const runStatus = useNotifyRunQuery(runId)?.data?.data.status ?? null
+  const run = useNotifyRunQuery(runId)
+  const runTimestamp = run.data?.data.createdAt ?? ''
+  const runStatus = run?.data?.data.status ?? null
+  const { displayName: protocolName } = useProtocolDetailsForRun(runId)
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
+
+  useToastOnErrorImage(runId)
 
   useEffect(() => {
     if (jumpedIndex != null) {
@@ -174,6 +180,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
           runStatus={runStatus}
           runId={runId}
           robotType={robotType}
+          robotName={robotName}
+          runTimestamp={runTimestamp}
+          protocolName={protocolName ?? ''}
         />
       ),
       backToTop: null,
@@ -362,11 +371,6 @@ const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
 const CameraTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
-  const enableCamera = useFeatureFlag('camera')
-
-  if (!enableCamera) {
-    return null
-  }
 
   return (
     <RoundTab

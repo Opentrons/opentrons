@@ -8,7 +8,6 @@ import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
-
 import type { RobotType } from '@opentrons/shared-data'
 
 export function LaunchLivestreamBtn({
@@ -34,7 +33,8 @@ export function LaunchLivestreamBtn({
       cameraStreamOpenAction(
         host?.hostname ?? 'UNKNOWN',
         host?.robotName ?? 'UNKNOWN',
-        runId
+        runId,
+        t('branded:livestream_window_title') as string
       )
     )
     // how to get if there was an error or if it actually loaded?

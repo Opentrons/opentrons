@@ -60,6 +60,7 @@ describe('LaunchLivestreamBtn', () => {
         hostname: 'test-hostname',
         robotName: 'test-robot',
         runId: 'MOCK-RUN-ID',
+        windowTitle: 'Opentrons Live Camera',
       },
       meta: { shell: true },
     })

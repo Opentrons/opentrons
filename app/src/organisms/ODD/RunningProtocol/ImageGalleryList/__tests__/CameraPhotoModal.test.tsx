@@ -11,7 +11,7 @@ import type { CameraPhotoModalProps } from '../CameraPhotoModal'
 
 const MOCK_IMG_PATH = '/path/to/test-image.jpg'
 const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
-const MOCK_CMD_TEXT = 'Test step command'
+const MOCK_CMD_TEXT = '1 / 100'
 
 const render = (props: CameraPhotoModalProps) => {
   return renderWithProviders(
@@ -33,7 +33,7 @@ describe('CameraPhotoModal', () => {
   beforeEach(() => {
     mockProps = {
       imagePath: MOCK_IMG_PATH,
-      stepCommandText: MOCK_CMD_TEXT,
+      stepCountStr: MOCK_CMD_TEXT,
       timestamp: MOCK_TIMESTAMP,
     }
   })

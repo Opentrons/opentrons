@@ -8,6 +8,7 @@ module.exports = {
     '**/venv/**',
     'docs/**',
     'components/lib/**',
+    'components-testing/pack/**',
   ],
 
   rules: {

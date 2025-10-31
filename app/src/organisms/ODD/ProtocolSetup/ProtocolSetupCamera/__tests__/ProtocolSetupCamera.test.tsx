@@ -14,8 +14,21 @@ vi.mock('/app/organisms/ODD/CameraSettings')
 vi.mock('/app/molecules/ODDBackButton')
 
 const render = (props: ProtocolSetupCameraProps) => {
+  const mockState = {
+    protocolRuns: {
+      'MOCK-RUN-ID': {
+        camera: {
+          enabled: props.cameraSettings?.cameraEnabled,
+          liveStreamEnabled: props.cameraSettings?.liveStreamEnabled,
+          recoveryEnabled: props.cameraSettings?.errorRecoveryCameraEnabled,
+        },
+      },
+    },
+  }
+
   return renderWithProviders(<ProtocolSetupCamera {...props} />, {
     i18nInstance: i18n,
+    initialState: mockState,
   })
 }
 
@@ -24,8 +37,21 @@ describe('ProtocolSetupCamera', () => {
 
   beforeEach(() => {
     mockProps = {
-      confirmCameraPreferences: vi.fn(),
-      isConfirmed: false,
+      cameraSettings: {
+        cameraEnabled: true,
+        liveStreamEnabled: true,
+        errorRecoveryCameraEnabled: true,
+      },
+      runCameraSettings: {
+        cameraEnabled: true,
+        liveStreamEnabled: true,
+        errorRecoveryCameraEnabled: true,
+      },
+      runId: 'MOCK-RUN-ID',
+      isCameraRequired: true,
+      confirmCameraSettings: vi.fn(),
+      robotName: 'MOCK-ROBOT-NAME',
+      cameraConfirmed: false,
       setSetupScreen: vi.fn(),
       storageInfo: {} as any,
     }
@@ -62,23 +88,23 @@ describe('ProtocolSetupCamera', () => {
     const confirmButton = screen.getByText('Confirm preferences')
     fireEvent.click(confirmButton)
 
-    expect(mockProps.confirmCameraPreferences).toHaveBeenCalledTimes(1)
+    expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
   })
 
   it('renders enabled chip when confirmed', () => {
     const propsWithConfirmed = {
       ...mockProps,
-      isConfirmed: true,
+      cameraConfirmed: true,
     }
     render(propsWithConfirmed)
 
-    screen.getByText('Enabled')
+    screen.getByText('Camera enabled')
   })
 
   it('does not render confirm button when confirmed', () => {
     const propsWithConfirmed = {
       ...mockProps,
-      isConfirmed: true,
+      cameraConfirmed: true,
     }
     render(propsWithConfirmed)
 

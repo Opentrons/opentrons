@@ -15,6 +15,7 @@ interface CameraStreamDetails extends SecondaryWindowDetails {
 
 interface OpenCameraStreamParams {
   runId: string
+  windowTitle: string
   robotIp: string
   robotName: string
   log: Logger
@@ -43,6 +44,7 @@ const STREAM_URL = (robotName: string, runId: string): string =>
 function createCameraStreamUi({
   log,
   robotName,
+  windowTitle,
   robotIp,
   runId,
 }: OpenCameraStreamParams): BrowserWindow {
@@ -56,6 +58,7 @@ function createCameraStreamUi({
     'ready-to-show',
     () => {
       log.debug('Camera stream window ready to show')
+      cameraStreamWindow.setTitle(windowTitle)
       cameraStreamWindow.show()
     }
   )

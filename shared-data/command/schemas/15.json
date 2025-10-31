@@ -881,7 +881,7 @@
             }
           ],
           "default": null,
-          "description": "Multiplier to use when cropping and scaling a captured Image. Scale is 1.0 to 2.0.",
+          "description": "Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.",
           "title": "Zoom"
         }
       },

@@ -46,9 +46,9 @@ export function useRobotStorageInfo(): RobotStorageInfo {
   const healthData = useHealth()
   const isLoading = healthData == null
   const imageDirSizeMb =
-    healthData?.disk_details.imagesDirectorySizeMb ?? Infinity
+    healthData?.disk_details?.imagesDirectorySizeMb ?? Infinity
   const robotDiskAvailableMb =
-    healthData?.disk_details.systemAvailableMb ?? Infinity
+    healthData?.disk_details?.systemAvailableMb ?? Infinity
 
   const lowImageDirSpace =
     imageDirSizeMb >= DEFAULT_IMAGE_DIRECTORY_MAX_SIZE_MB - WARNING_BUFFER_MB

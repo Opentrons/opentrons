@@ -56,7 +56,11 @@ nav:
       - Instrument Management: touchscreen/instruments.md
       - Robot Settings: touchscreen/settings.md
   - Opentrons App: opentrons-app.md
-  - Advanced Operation: advanced-operation.md
+  - Advanced Operations:
+      - Advanced Operations: advanced-operation/index.md
+      - Flex Log Files: advanced-operation/log-files.md
+      - Command Line Operation Over SSH: advanced-operation/command-line.md
+      - Jupyter Notebook: advanced-operation/jupyter-notebook.md
   - Maintenance: 
       - Maintenance and Service: maintenance/index.md
       - Cleaning Flex: maintenance/cleaning.md

@@ -5,7 +5,9 @@ import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
+  useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
+  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -58,6 +60,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
+  getCameraUsageState,
   selectAreOffsetsApplied,
   selectCountMissingLSOffsetsWithoutDefault,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -288,16 +291,15 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
       .thenReturn(flexDeckDefV5 as any)
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
-      .thenReturn({
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
         data: {
-          data: {
-            protocolId: PROTOCOL_ID,
-            labwareOffsets: [mockOffset],
-          },
+          protocolId: PROTOCOL_ID,
+          labwareOffsets: [mockOffset],
         },
-      } as any)
+      },
+    } as any)
+    vi.mocked(useCamera).mockReturnValue({ data: {} } as any)
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
@@ -357,6 +359,10 @@ describe('ProtocolSetup', () => {
       applyOffsets: vi.fn(),
     })
     when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
+    vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
+      addCameraSettingsToRun: vi.fn(),
+    } as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({ enabled: true } as any)
   })
 
   it('should render text, image, and buttons', () => {

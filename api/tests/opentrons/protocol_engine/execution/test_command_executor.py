@@ -588,11 +588,17 @@ async def test_execute_undefined_error(
 
     if use_camera:
         decoy.verify(
-            await subject._camera_provider.capture_image(ImageParameters()), times=1
+            await subject._camera_provider.capture_image(
+                subject._state_store.config.robot_type, ImageParameters()
+            ),
+            times=1,
         )
     else:
         decoy.verify(
-            await subject._camera_provider.capture_image(ImageParameters()), times=0
+            await subject._camera_provider.capture_image(
+                subject._state_store.config.robot_type, ImageParameters()
+            ),
+            times=0,
         )
 
 
@@ -759,9 +765,15 @@ async def test_execute_defined_error(
 
     if use_camera:
         decoy.verify(
-            await subject._camera_provider.capture_image(ImageParameters()), times=1
+            await subject._camera_provider.capture_image(
+                subject._state_store.config.robot_type, ImageParameters()
+            ),
+            times=1,
         )
     else:
         decoy.verify(
-            await subject._camera_provider.capture_image(ImageParameters()), times=0
+            await subject._camera_provider.capture_image(
+                subject._state_store.config.robot_type, ImageParameters()
+            ),
+            times=0,
         )
