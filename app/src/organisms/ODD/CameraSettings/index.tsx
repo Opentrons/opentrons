@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
+import { useFeatureFlag } from '/app/redux/config'
+
 import { CameraControls } from './CameraControls'
 import { CameraEnableSetting } from './CameraEnableSetting'
 import { ControlPreferencesSettings } from './ControlPreferencesSettings'
@@ -40,6 +42,7 @@ export function CameraSettings({
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
 }: CameraSettingsProps): JSX.Element {
+  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
@@ -80,9 +83,11 @@ export function CameraSettings({
                 isLiveVideoEnabled={isLiveVideoEnabled}
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
               />
-              <ControlPreferencesSettings
-                toggleShowControls={toggleShowControls}
-              />
+              {isCameraSettingsEnabled && (
+                <ControlPreferencesSettings
+                  toggleShowControls={toggleShowControls}
+                />
+              )}
             </>
           )}
         </div>

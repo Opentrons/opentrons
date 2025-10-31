@@ -34,7 +34,6 @@ import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCam
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
-import { useFeatureFlag } from '/app/redux/config'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
@@ -176,8 +175,6 @@ export function ProtocolRunSetup({
       return isFlex ? t('offsets_applied') : t('offsets_ready')
     }
   }
-
-  const isCameraEnabled = useFeatureFlag('camera')
 
   const isMissingPipette =
     (runPipetteInfoByMount.left != null &&
@@ -417,10 +414,6 @@ export function ProtocolRunSetup({
     },
   }
 
-  const stepsToRender = isCameraEnabled
-    ? orderedSteps
-    : orderedSteps.filter(step => step !== CAMERA_SETUP_STEP_KEY)
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -437,7 +430,7 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </LegacyStyledText>
           ) : (
-            stepsToRender.map((stepKey, index) => {
+            orderedSteps.map((stepKey, index) => {
               const setupStepTitle = t(`${stepKey}_title`)
               const showEmptySetupStep =
                 (stepKey === 'module_setup_step' &&
@@ -478,7 +471,7 @@ export function ProtocolRunSetup({
                       {StepDetailMap[stepKey].stepInternals}
                     </SetupStep>
                   )}
-                  {index !== stepsToRender.length - 1 ? (
+                  {index !== orderedSteps.length - 1 ? (
                     <Divider marginTop={SPACING.spacing24} marginBottom={0} />
                   ) : null}
                 </Flex>
