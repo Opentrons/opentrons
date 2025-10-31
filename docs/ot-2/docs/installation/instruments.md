@@ -10,3 +10,19 @@ The OT-2 has two pipette mounts. Each pipette mount can hold a single 1-channel 
 
 ## Determining pipette type
 
+The OT-2 accepts GEN1 and GEN2 pipettes. The installation process is different depending on pipette generation so you'll need to know which pipettes you have to mount them properly to the robot.
+
+### GEN1 pipettes
+
+OT-2 GEN1 single- and multi-channel pipettes are black marked by a white Opentrons drop logo. They do not include any printed text or markings to identify them as GEN1 pipettes.
+
+![OT2 GEN1 pipettes](../images/OT2-gen1.png)
+
+### GEN2 pipettes
+
+OT-2 GEN2 single- and multi-channel pipettes are easier to identify compared to their GEN1 predecessors. The GEN 2 pipettes are longer than the GEN1, the housing is black and sliver (instead of all black), and exterior markings identify these instruments as a GEN2 pipettes.
+
+<figure class="side-by-side" markdown>
+![OT2 GEN2 single channel pipette](../images/gen2-p300-single.png)
+![OT2 GEN2 multi channel pipette](../images/GEN2-p300-multi.png)
+</figure>
