@@ -1,6 +1,6 @@
-@import '@opentrons/components/styles';
-@import '../../styles/breakpoints.module.css';
-@import '../../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../../styles/breakpoints.module.css');
+@import url('../../styles/spacing.module.css');
 
 .analytics_modal {
   /* NOTE: this z-index must beat the Nav z-index! */

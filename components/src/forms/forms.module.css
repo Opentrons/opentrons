@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 .accessibly_hidden {
   position: absolute;
@@ -8,7 +8,7 @@
   padding: 0;
   border: 0;
   margin: -1px;
-  clip: rect(0 0 0 0);
+  clip-path: rect(0 0 0 0);
 }
 
 .form_field {

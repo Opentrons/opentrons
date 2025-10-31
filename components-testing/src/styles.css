@@ -1,5 +1,5 @@
 /* Import bundled styles from components package */
-@import '@opentrons/components/styles';
+@import url('@opentrons/components/styles');
 
 .app_container {
   padding: 1rem;

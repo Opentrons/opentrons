@@ -1,8 +1,8 @@
 /* opentrons style library */
 
-@import './styles/colors.module.css';
-@import './styles/typography.module.css';
-@import './styles/borders.module.css';
+@import url('./styles/colors.module.css');
+@import url('./styles/typography.module.css');
+@import url('./styles/borders.module.css');
 
 :global(*) {
   box-sizing: border-box;

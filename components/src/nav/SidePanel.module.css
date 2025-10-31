@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 :root {
   --sidebar-width: 18.25rem;
@@ -27,8 +27,7 @@
 }
 
 .panel_contents {
+  overflow: hidden auto;
   width: var(--sidebar-width);
   height: calc(100vh - 3.5rem);
-  overflow-x: hidden;
-  overflow-y: auto;
 }

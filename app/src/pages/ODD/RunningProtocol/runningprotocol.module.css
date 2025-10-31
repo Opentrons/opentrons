@@ -47,6 +47,6 @@
   height: 20.25rem;
   align-self: flex-end;
   margin-top: 9.25rem;
-  background: linear-gradient(rgba(255, 0, 0, 0) 85%, #fff);
+  background: linear-gradient(rgb(255 0 0 / 0%) 85%, #fff);
   pointer-events: none;
 }

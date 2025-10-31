@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 :root {
   --list-padding-large: 1rem;
@@ -27,7 +27,7 @@
 }
 
 .panel_group {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 33%);
 }
 
 .hover_border {

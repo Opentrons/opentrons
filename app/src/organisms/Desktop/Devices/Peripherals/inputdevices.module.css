@@ -57,6 +57,6 @@
   flex-direction: column;
   border-radius: var(--border-radius-4);
   background-color: var(--white);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   white-space: nowrap;
 }

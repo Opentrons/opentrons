@@ -1,6 +1,6 @@
-@import '@opentrons/components/styles';
-@import '../styles/breakpoints.module.css';
-@import '../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../styles/breakpoints.module.css');
+@import url('../styles/spacing.module.css');
 
 :root {
   --link-btn-blue: {
@@ -9,20 +9,20 @@
     padding: 1rem 2rem;
     border-radius: 3px;
     margin: 1.5rem 0 0.5rem;
-    background-color: var(--c-blue);
-    color: white;
-    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
-    font-size: var(--fs-body-2);
-    text-transform: uppercase;
-
     &:visited {
-      color: white;
+      &:hover {
+        background-color: var(--c-blue);
+        background-color: #00f;
+      }
     }
 
-    &:hover {
-      background-color: #00f;
-    }
+    color: white;
+    color: white;
   }
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
+
+  font-size: var(--fs-body-2);
+  text-transform: uppercase;
 }
 
 .labware_creator {
@@ -70,7 +70,7 @@
   margin: 1.5rem 0 0.5rem;
   background-color: var(--c-blue);
   color: white;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-2);
   text-transform: uppercase;
 
@@ -119,8 +119,7 @@
 
 .flex_row_no_columns {
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   margin: 1rem 0 2rem;
 }
 

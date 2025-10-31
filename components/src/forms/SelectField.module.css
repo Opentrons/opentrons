@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 .select_field.error {
   & :global(.ot_select__control) {

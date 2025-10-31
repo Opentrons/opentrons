@@ -30,7 +30,7 @@
   min-height: 1.25rem;
 }
 
-@media (height: 600px) and (width: 1024px) {
+@media (height = 600px) and (width = 1024px) {
   .label {
     min-height: var(--spacing-32);
     padding: var(--spacing-4) var(--spacing-6);

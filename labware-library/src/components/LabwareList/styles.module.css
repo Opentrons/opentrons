@@ -1,20 +1,21 @@
 /* LabwareList styles */
-@import '@opentrons/components/styles';
-@import '../../styles/breakpoints.module.css';
-@import '../../styles/shadows.module.css';
-@import '../../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../../styles/breakpoints.module.css');
+@import url('../../styles/shadows.module.css');
+@import url('../../styles/spacing.module.css');
 
 :root {
-  --link-btn: {
-    display: block;
-    width: 100%;
-    padding: 1rem;
-    border-radius: 3px;
-    margin: 1.5rem 0 0.5rem;
-    cursor: pointer;
-    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
-    font-size: var(--fs-body-2);
-    text-align: center;
+  --link-btn: {;;;
+
+    display: block;;;;
+    width: 100%;;;;
+    padding: 1rem;;;;
+    border-radius: 3px;;;;
+    margin: 1.5rem 0 0.5rem;;;;
+    cursor: pointer;;;;
+    font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', "sans-serif;"";"";";
+    font-size: var(--fs-body-2);;;;
+    text-align: center;;;;
     text-transform: uppercase;
   }
 }
@@ -65,8 +66,8 @@
   font-weight: var(--fw-semibold);
   -webkit-line-clamp: 2; /* stylelint-disable-line value-no-vendor-prefix */
   line-height: var(--lh-title);
+  overflow-wrap: break-word;
   text-overflow: ellipsis;
-  word-wrap: break-word;
 }
 
 .title_icon {
@@ -125,7 +126,7 @@
   background-color: var(--c-blue);
   color: white;
   cursor: pointer;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-2);
   text-align: center;
   text-transform: uppercase;
@@ -150,7 +151,7 @@
   margin: 1.5rem 0 0.5rem;
   color: var(--c-blue);
   cursor: pointer;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-2);
   text-align: center;
   text-transform: uppercase;

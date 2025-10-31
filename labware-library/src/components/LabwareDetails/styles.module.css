@@ -1,6 +1,6 @@
-@import '@opentrons/components/styles';
-@import '../../styles/breakpoints.module.css';
-@import '../../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../../styles/breakpoints.module.css');
+@import url('../../styles/spacing.module.css');
 
 .gallery_container {
   width: 100%;
@@ -81,6 +81,6 @@
   }
 
   .well_group_title {
-    margin-left: -var(--spacing-5);
+    margin-left: var(--spacing-5);
   }
 }

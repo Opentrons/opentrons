@@ -54,6 +54,7 @@
 }
 
 .contact_text {
+  overflow-wrap: break-word;
   text-align: left;
-  word-break: break-word;
+  word-break: normal;
 }

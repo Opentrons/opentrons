@@ -6,6 +6,6 @@
   font-size: var(--font-size-p);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
+  overflow-wrap: break-word;
   overflow-y: auto;
-  word-wrap: break-word;
 }
