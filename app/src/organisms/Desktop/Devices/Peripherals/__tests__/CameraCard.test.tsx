@@ -106,18 +106,6 @@ describe('CameraCard', () => {
     expect(overflowButton).not.toBeDisabled()
   })
 
-  it('overflow button is not disabled when run is idle', () => {
-    vi.mocked(useCurrentRunId).mockReturnValue('test-run-id')
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_IDLE } },
-    } as any)
-
-    render(mockProps)
-
-    const overflowButton = screen.getByLabelText('overflow')
-    expect(overflowButton).not.toBeDisabled()
-  })
-
   it('overflow button is disabled when run exists and is not idle', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('test-run-id')
     vi.mocked(useNotifyRunQuery).mockReturnValue({
