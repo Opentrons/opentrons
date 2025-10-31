@@ -12,7 +12,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.6.3!**
 
-This hotfix release fixes issues with upload a protocol with custom labware
+This hotfix release fixes issues with uploading a protocol with custom labware
 
 ## Opentrons Protocol Designer Changes in 8.6.1
 
@@ -80,7 +80,6 @@ This hotfix release addresses several bugs.
 
 - Crashes and protocol loss no longer occur when:
 - Crashes and protocol loss no longer occur when:
-
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
