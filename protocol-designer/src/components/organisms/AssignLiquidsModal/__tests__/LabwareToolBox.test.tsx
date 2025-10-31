@@ -15,6 +15,7 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
+const mockDispatch = vi.fn()
 
 vi.mock('/protocol-designer/step-forms/selectors', async importOriginal => {
   const actual = (await importOriginal()) as any
@@ -49,11 +50,9 @@ const render = (props: ComponentProps<typeof LabwareStackToolbox>) => {
 describe('LabwareStackToolboxContainer liquids dont match', () => {
   let props: ComponentProps<typeof LabwareStackToolbox>
   let setShowLiquidLayoutOverlay: Mock
-  let mockDispatch: Mock
 
   beforeEach(() => {
     setShowLiquidLayoutOverlay = vi.fn()
-    mockDispatch = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     props = {
       showBadFormState: false,

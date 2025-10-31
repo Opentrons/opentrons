@@ -266,6 +266,14 @@ function LiquidToolbox({
     })
     .filter(Boolean)
 
+  const hasLiquids =
+    wellContents != null
+      ? Object.values(wellContents).flatMap(content => content.groupIds)
+          .length > 0
+      : false
+  const hasSelection = selectedWells.length > 0
+  const canEdit = !showLiquidLayoutOverlay && (hasLiquids || hasSelection)
+
   const handleConfirmClick = (): void => {
     if (selectedWells.length > 0) {
       setShowBadFormState(true)
@@ -294,10 +302,7 @@ function LiquidToolbox({
           </StyledText>
         }
       >
-        {(!showLiquidLayoutOverlay &&
-          liquidsInLabware != null &&
-          liquidsInLabware.length > 0) ||
-        selectedWells.length > 0 ? (
+        {canEdit ? (
           <form onSubmit={handleSubmit(handleSaveSubmit)}>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
               {selectedWells.length > 0 ? (

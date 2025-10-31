@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -8,11 +7,13 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 
 import { OverlayModal } from '.'
 
+import type { Dispatch, SetStateAction } from 'react'
+
 export function LiquidLayoutOverlayModalContainer({
   showLiquidOverflowMenu,
 }: {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
-}): JSX.Element | null {
+}): JSX.Element {
   const { t } = useTranslation('liquids')
 
   const dispatch = useDispatch()
