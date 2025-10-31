@@ -7,7 +7,12 @@ import {
   getActiveInterfaces,
 } from '../network-interfaces'
 
-vi.mock('os')
+vi.mock('os', () => ({
+  default: {
+    networkInterfaces: vi.fn(),
+  },
+  networkInterfaces: vi.fn(),
+}))
 
 const mockV4: os.NetworkInterfaceInfoIPv4 = {
   address: '192.168.1.17',
@@ -78,7 +83,7 @@ describe('system-info::network-interfaces', () => {
   it('should be able to signal interface changes', () => {
     const handleInterfaceChange = vi.fn()
 
-    vi.mocked(os.networkInterfaces).mockReturnValue({})
+    vi.mocked(os.networkInterfaces).mockReturnValueOnce({} as any)
 
     createNetworkInterfaceMonitor({
       pollInterval: 30000,

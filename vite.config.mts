@@ -77,6 +77,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // More specific patterns first to prevent incorrect matching of test file paths
+      '/protocol-designer/src/': path.resolve('./protocol-designer/src') + '/',
+      '/app/src/': path.resolve('./app/src') + '/',
+      '/ai-client/src/': path.resolve('./opentrons-ai-client/src') + '/',
+      // Then the general patterns for imports
+      '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
+      '/app/': path.resolve('./app/src/') + '/',
+      '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
       // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
       // files being processed with the wrong config (the config from the
       // consuming project vs. the config from the source project).
@@ -101,9 +109,6 @@ export default defineConfig({
       '@opentrons/step-generation': path.resolve(
         './step-generation/src/index.ts'
       ),
-      '/app/': path.resolve('./app/src/') + '/',
-      '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
-      '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
     },
   },
 })

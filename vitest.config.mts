@@ -17,7 +17,13 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       allowOnly: true,
-      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**', '**/lib/**'],
+      include: ['**/__tests__/**/*.test.{ts,tsx}', '**/*.test.{ts,tsx}'],
+      exclude: [
+        ...configDefaults.exclude,
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/lib/**',
+      ],
       setupFiles: ['./setup-vitest.mts'],
       coverage: {
         exclude: [
@@ -35,6 +41,9 @@ export default mergeConfig(
     },
     resolve: {
       alias: {
+        '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
+        '/app/': path.resolve('./app/src/') + '/',
+        '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
         // consuming project vs. the config from the source project).
@@ -72,11 +81,6 @@ export default mergeConfig(
         '@opentrons/labware-library': path.resolve(
           './labware-library/src/labware-creator/index.tsx'
         ),
-        // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
-        // https://nodejs.org/api/path.html#pathresolvepaths
-        '/app/': path.resolve('./app/src/') + '/',
-        '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
-        '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
       },
     },
   })
