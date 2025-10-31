@@ -573,15 +573,13 @@ export const getInvariantContext: Selector<BaseState, InvariantContext> =
     getLiquidEntities,
     getAdditionalEquipmentEntities,
     featureFlagSelectors.getDisableModuleRestrictions,
-    featureFlagSelectors.getAllowAllTipracks,
     (
       labwareEntities,
       moduleEntities,
       pipetteEntities,
       liquidEntities,
       additionalEquipmentEntities,
-      disableModuleRestrictions,
-      allowAllTipracks
+      disableModuleRestrictions
     ) => {
       const stagingAreaEntities = Object.values(
         additionalEquipmentEntities
@@ -648,7 +646,6 @@ export const getInvariantContext: Selector<BaseState, InvariantContext> =
         stagingAreaEntities,
         gripperEntities,
         config: {
-          OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
           OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
         },
       }
