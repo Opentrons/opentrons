@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -18,7 +17,6 @@ import {
 import styles from './setupcamera.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { CameraData } from '@opentrons/api-client'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -27,8 +25,6 @@ export interface ProtocolSetupCameraProps {
   runId: string
   robotName: string
   isCameraRequired: boolean
-  cameraSettings: CameraData | null
-  runCameraSettings: CameraData | null
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
   storageInfo: RobotStorageInfo | null
@@ -38,49 +34,16 @@ export interface ProtocolSetupCameraProps {
 export function ProtocolSetupCamera(
   props: ProtocolSetupCameraProps
 ): JSX.Element {
-  const {
-    runId,
-    confirmCameraSettings,
-    cameraSettings,
-    cameraConfirmed,
-    runCameraSettings,
-  } = props
+  const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
-  const initialSettingsLoaded = cameraSettings != null
-  const runSettingsLoaded = runCameraSettings != null
 
   const {
     liveStreamEnabled,
     enabled: cameraEnabled,
     recoveryEnabled,
   } = useSelector((state: State) => getCameraUsageState(state, runId))
-
-  // Populate the toggles with the run settings if they have been set,
-  //  otherwise, populate the toggles with the camera settings once the network
-  //  request completes.
-  useEffect(() => {
-    if (runCameraSettings != null) {
-      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
-        runCameraSettings
-
-      dispatch(updateCameraEnablement(runId, cameraEnabled))
-      dispatch(updateCameraStreamEnablement(runId, liveStreamEnabled))
-      dispatch(
-        updateCameraRecoveryEnablement(runId, errorRecoveryCameraEnabled)
-      )
-    } else if (cameraSettings != null) {
-      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
-        cameraSettings
-
-      dispatch(updateCameraEnablement(runId, cameraEnabled))
-      dispatch(updateCameraStreamEnablement(runId, liveStreamEnabled))
-      dispatch(
-        updateCameraRecoveryEnablement(runId, errorRecoveryCameraEnabled)
-      )
-    }
-  }, [initialSettingsLoaded, runSettingsLoaded])
 
   const toggleCameraEnabled = (): void => {
     if (!cameraConfirmed) {
