@@ -18,6 +18,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useCamera,
   useInstrumentsQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
@@ -30,7 +31,6 @@ import {
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
@@ -79,6 +79,8 @@ import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
 
+const RUN_RECORD_REFETCH_MS = 5000
+
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null
   robotName: string
@@ -113,7 +115,10 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: RUN_RECORD_REFETCH_MS,
+  })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -212,7 +217,22 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
-  const cameraSettings = useCameraUsageSettings()
+  const { data: cameraSettings } = useCamera()
+  const runCameraSettings = runRecord?.data.cameraSettings ?? null
+  const isCameraRequired =
+    protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
+  const isCameraConfirmed =
+    !missingSteps.includes(CAMERA_SETUP_STEP_KEY) || runHasStarted
+  const cameraSettingsApplied = runRecord?.data.cameraSettings != null
+  // A separate app can apply camera settings.
+  // We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (cameraSettingsApplied && !isCameraConfirmed) {
+      dispatch(
+        updateRunSetupStepsComplete(runId, { [CAMERA_SETUP_STEP_KEY]: true })
+      )
+    }
+  }, [cameraSettingsApplied, dispatch, isCameraConfirmed, runId])
 
   if (robot == null) {
     return null
@@ -368,9 +388,12 @@ export function ProtocolRunSetup({
     [CAMERA_SETUP_STEP_KEY]: {
       stepInternals: (
         <SetupCamera
+          runId={runId}
           robotName={robotName}
-          settings={cameraSettings}
-          cameraConfirmed={!missingSteps.includes(CAMERA_SETUP_STEP_KEY)}
+          runCameraSettings={runCameraSettings}
+          isCameraRequired={isCameraRequired}
+          cameraSettings={cameraSettings ?? null}
+          cameraConfirmed={isCameraConfirmed}
           confirmCameraSettings={() => {
             dispatch(
               updateRunSetupStepsComplete(runId, {

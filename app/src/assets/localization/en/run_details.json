@@ -55,6 +55,7 @@
   "downloading_run_log": "Downloading run log",
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}} in {{labware_location}}",
   "duration": "Duration",
+  "enable_camera": "Enable the camera to proceed",
   "enabled": "Enabled",
   "end": "End",
   "end_of_protocol": "End of protocol",
