@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -6,6 +7,7 @@ import {
   PrimaryButton,
   StyledText,
 } from '@opentrons/components'
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
@@ -14,43 +16,114 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
+import type { CameraData } from '@opentrons/api-client'
 import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 
 export interface SetupCameraProps {
+  runId: string
   robotName: string
-  settings: UseCameraUsageSettingsResult
+  isCameraRequired: boolean
+  cameraSettings: CameraData | null
+  runCameraSettings: CameraData | null
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
 }
 
 export function SetupCamera({
+  runId,
   robotName,
-  settings,
+  cameraSettings,
+  runCameraSettings,
+  isCameraRequired,
   cameraConfirmed,
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const storageInfo = useRobotStorageInfo()
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const initialSettingsLoaded = cameraSettings != null
+  const runSettingsLoaded = runCameraSettings != null
+
+  const [cameraEnabled, setIsCameraEnabled] = useState(
+    cameraSettings?.cameraEnabled ?? false
+  )
+  const [liveStreamEnabled, setLiveStreamEnabled] = useState(
+    cameraSettings?.liveStreamEnabled ?? false
+  )
+  const [recoveryEnabled, setRecoveryEnabled] = useState(
+    cameraSettings?.errorRecoveryCameraEnabled ?? false
+  )
+
+  // Populate the toggles with the run settings if they have been set,
+  //  otherwise, populate the toggles with the camera settings once the network
+  //  request completes.
+  useEffect(() => {
+    if (runCameraSettings != null) {
+      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
+        runCameraSettings
+      setIsCameraEnabled(cameraEnabled)
+      setLiveStreamEnabled(liveStreamEnabled)
+      setRecoveryEnabled(errorRecoveryCameraEnabled)
+    } else if (cameraSettings != null) {
+      const { cameraEnabled, errorRecoveryCameraEnabled, liveStreamEnabled } =
+        cameraSettings
+      setIsCameraEnabled(cameraEnabled)
+      setLiveStreamEnabled(liveStreamEnabled)
+      setRecoveryEnabled(errorRecoveryCameraEnabled)
+    }
+  }, [initialSettingsLoaded, runSettingsLoaded])
+
+  const toggleCameraEnabled = (): void => {
+    setIsCameraEnabled(!cameraEnabled)
+  }
+
+  const toggleRecoveryEnabled = (): void => {
+    setRecoveryEnabled(!recoveryEnabled)
+  }
+
+  const toggleLiveStreamEnabled = (): void => {
+    setLiveStreamEnabled(!liveStreamEnabled)
+  }
+
+  const onConfirmPreferences = (): void => {
+    addCameraSettingsToRun({
+      runId,
+      settings: {
+        cameraEnabled,
+        liveStreamEnabled,
+        errorRecoveryCameraEnabled: recoveryEnabled,
+      },
+    })
+    confirmCameraSettings()
+  }
 
   return (
     <div className={styles.container}>
-      {/* TODO(jh, 09-29-25): Only show this noti if the camera is required to run this protocol.
-       Update the confirm preferences btn, too. */}
-      {!settings.isCameraEnabled && <CameraRequiredNotification />}
+      {!cameraEnabled && isCameraRequired && <CameraRequiredNotification />}
       {!storageInfo.isLoading && storageInfo.isImageStorageLow && (
         <StorageAlmostFullNotification robotName={robotName} />
       )}
-      <CameraStatus {...settings} />
-      {settings.isCameraEnabled && (
+      <CameraStatus
+        toggleCameraEnabled={toggleCameraEnabled}
+        isCameraEnabled={cameraEnabled}
+        cameraConfirmed={cameraConfirmed}
+      />
+      {cameraEnabled && (
         <>
-          <SetupRunCameraUsage settings={settings} />
+          <SetupRunCameraUsage
+            liveStreamEnabled={liveStreamEnabled}
+            recoveryEnabled={recoveryEnabled}
+            toggleRecoveryEnabled={toggleRecoveryEnabled}
+            toggleLiveStreamEnabled={toggleLiveStreamEnabled}
+            cameraConfirmed={cameraConfirmed}
+          />
           <SetupRunCameraControls />
         </>
       )}
       <div className={styles.camera_btn_container}>
         <PrimaryButton
-          onClick={confirmCameraSettings}
-          disabled={cameraConfirmed || !settings.isCameraEnabled}
+          onClick={onConfirmPreferences}
+          disabled={cameraConfirmed || !cameraEnabled}
         >
           {t('confirm_preferences')}
         </PrimaryButton>
@@ -97,11 +170,13 @@ function CameraRequiredNotification(): JSX.Element {
 interface CameraStatusProps {
   toggleCameraEnabled: UseCameraUsageSettingsResult['toggleCameraEnabled']
   isCameraEnabled: UseCameraUsageSettingsResult['isCameraEnabled']
+  cameraConfirmed: boolean
 }
 
 function CameraStatus({
   toggleCameraEnabled,
   isCameraEnabled,
+  cameraConfirmed,
 }: CameraStatusProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -137,6 +212,7 @@ function CameraStatus({
           label={t('camera_status')}
           toggledOn={isCameraEnabled}
           onClick={toggleCameraEnabled}
+          disabled={cameraConfirmed}
         />
       </div>
     </div>

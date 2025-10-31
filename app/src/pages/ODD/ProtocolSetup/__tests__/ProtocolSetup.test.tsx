@@ -6,6 +6,7 @@ import { when } from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
+  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -288,16 +289,15 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
       .thenReturn(flexDeckDefV5 as any)
-    when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
-      .thenReturn({
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
         data: {
-          data: {
-            protocolId: PROTOCOL_ID,
-            labwareOffsets: [mockOffset],
-          },
+          protocolId: PROTOCOL_ID,
+          labwareOffsets: [mockOffset],
         },
-      } as any)
+      },
+    } as any)
+    vi.mocked(useCamera).mockReturnValue({ data: {} } as any)
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
