@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Icon,
   InfoScreen,
@@ -119,7 +118,7 @@ export function LabwareStackToolbox({
         width="14.6875rem"
         title={
           <StyledText desktopStyle="bodyLargeSemiBold">
-            Stacker Labware
+            {t('stacker_labware')}
           </StyledText>
         }
         onCloseClick={handleSelectAllLabware}
@@ -139,7 +138,7 @@ export function LabwareStackToolbox({
               desktopStyle="bodyDefaultSemiBold"
               display="inline-block"
             >
-              Add another labware
+              {t('add_another_labware')}
             </StyledText>
           </SecondaryButton>
         }
@@ -148,7 +147,7 @@ export function LabwareStackToolbox({
             desktopStyle="bodyDefaultRegular"
             onClick={handleSelectAllLabware}
           >
-            Select all
+            {t('select_all')}
           </StyledText>
         }
       >

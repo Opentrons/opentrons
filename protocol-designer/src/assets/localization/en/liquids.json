@@ -36,5 +36,12 @@
   "save": "Save",
   "select_wells_to_add": "Select wells to add liquid",
   "transfer": "transfer",
-  "well": "Well"
+  "well": "Well",
+  "stacker_labware": "Stacker Labware",
+  "add_another_labware": "Add another labware",
+  "select_all": "Select all",
+  "clear_liquids": "Clear liquids",
+  "cancel": "Cancel",
+  "selected_labware_have_different_liquid_layouts": "Selected labware have different liquid layouts",
+  "clear_liquids_in_labware_to_edit_together": "Clear liquids in labware to edit them together"
 }

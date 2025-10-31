@@ -30,7 +30,6 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
-import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -43,7 +42,7 @@ import {
 import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 
 import { SelectableLabware } from '../Labware/SelectableLabware'
-import { OverlayModal } from '../OverlayModal'
+import { LiquidLayoutOverlayModalContainer } from '../OverlayModal/LiquidsOverlayModal'
 import { LabwareStackToolboxContainer } from './LabwareToolbox'
 import { LiquidToolboxContainer } from './LiquidToolbox'
 
@@ -261,44 +260,6 @@ export function AssignLiquidsModal(
 interface AssignLiquidsModalContainerProps {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
-}
-
-export function LiquidLayoutOverlayModalContainer({
-  showLiquidOverflowMenu,
-}: {
-  showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
-}): JSX.Element | null {
-  const dispatch = useDispatch()
-  const allWellContents = useSelector(
-    wellContentsSelectors.getWellContentsForLabwareStack
-  )
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
-  const wellContents = allWellContents[labwareId ?? ''] ?? {}
-  const wellContentsId = Object.keys(wellContents)
-
-  return (
-    <OverlayModal
-      header="Selected labware have different liquid layouts"
-      subText="Clear liquids in labware to edit them together"
-      primaryButtonProps={{
-        text: 'Clear liquids',
-        onClick: () => {
-          dispatch(
-            removeWellsContents({
-              labwareId: labwareId ?? '',
-              wells: wellContentsId,
-            })
-          )
-        },
-      }}
-      secondaryButtonProps={{
-        text: 'Cancel',
-        onClick: () => {
-          showLiquidOverflowMenu(false)
-        },
-      }}
-    />
-  )
 }
 
 export function AssignLiquidsModalContainer(
