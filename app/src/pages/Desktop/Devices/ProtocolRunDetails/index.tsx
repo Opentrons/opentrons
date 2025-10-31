@@ -261,7 +261,8 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
     if (
       currentRunStatus !== RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'run-preview'
+      protocolRunDetailsTab !== 'run-preview' &&
+      protocolRunDetailsTab !== 'camera'
     ) {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
