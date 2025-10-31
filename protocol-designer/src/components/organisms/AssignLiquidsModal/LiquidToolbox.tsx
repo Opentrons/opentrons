@@ -569,7 +569,7 @@ export function LiquidToolboxContainer({
       setDefineLiquidModal={setDefineLiquidModal}
       showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
-      selectedLabwareIds={multipleSelectedLabwareIds ?? []}
+      selectedLabwareIds={multipleSelectedLabwareIds ?? [selectedLabwareId]}
     />
   )
 }
