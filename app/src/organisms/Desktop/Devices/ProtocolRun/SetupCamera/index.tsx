@@ -12,6 +12,7 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useFeatureFlag } from '/app/redux/config'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
@@ -39,6 +40,7 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const storageInfo = useRobotStorageInfo()
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
   const initialSettingsLoaded = cameraSettings != null
@@ -117,7 +119,7 @@ export function SetupCamera({
             toggleLiveStreamEnabled={toggleLiveStreamEnabled}
             cameraConfirmed={cameraConfirmed}
           />
-          <SetupRunCameraControls />
+          {isCameraSettingsEnabled && <SetupRunCameraControls />}
         </>
       )}
       <div className={styles.camera_btn_container}>

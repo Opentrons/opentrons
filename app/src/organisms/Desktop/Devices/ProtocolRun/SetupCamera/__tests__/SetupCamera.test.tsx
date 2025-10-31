@@ -7,6 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useFeatureFlag } from '/app/redux/config'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
@@ -22,6 +23,7 @@ vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
 vi.mock('/app/resources/health/useIsImageStorageLow')
+vi.mock('/app/redux/config')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -66,6 +68,7 @@ describe('SetupCamera', () => {
       isLoading: false,
     })
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
   })
 
   it('renders camera status section', () => {

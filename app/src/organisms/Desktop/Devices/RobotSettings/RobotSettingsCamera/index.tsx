@@ -1,5 +1,7 @@
 import { Divider } from '@opentrons/components'
 
+import { useFeatureFlag } from '/app/redux/config'
+
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
 import { useCameraUsageSettings } from './hooks/useCameraUsageSettings'
@@ -17,6 +19,7 @@ export function RobotSettingsCamera(): JSX.Element {
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
   } = useCameraUsageSettings()
+  const isCameraSettingsEnabled = useFeatureFlag('camera')
 
   return (
     <div className={styles.container}>
@@ -32,8 +35,12 @@ export function RobotSettingsCamera(): JSX.Element {
             toggleLiveVideoEnabled={toggleLiveVideoEnabled}
             toggleRecoveryCaptureEnabled={toggleRecoveryCaptureEnabled}
           />
-          <Divider />
-          <RobotSettingsCameraControls />
+          {isCameraSettingsEnabled && (
+            <>
+              <Divider />
+              <RobotSettingsCameraControls />
+            </>
+          )}
         </>
       )}
     </div>
