@@ -40,7 +40,10 @@ import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DropdownOption, WellGroup } from '@opentrons/components'
-import type { LiquidEntities } from '@opentrons/step-generation'
+import type {
+  LabwareLiquidState,
+  LiquidEntities,
+} from '@opentrons/step-generation'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 export interface LiquidInfo {
@@ -65,11 +68,11 @@ interface LiquidToolboxData {
   labwareId: string | null
   selectedWellGroups: WellGroup
   nickNames: Record<string, string>
-  liquidLocations: any
+  liquidLocations: LabwareLiquidState
   commonSelectedLiquidId: string | null
   commonSelectedVolume: number | null
   selectedWellsMaxVolume: number | null
-  liquidSelectionOptions: any[]
+  liquidSelectionOptions: DropdownOption[]
   allWellContentsForActiveItem: wellContentsSelectors.WellContentsByLabware | null
 }
 
@@ -81,7 +84,7 @@ interface LiquidToolboxProps {
   data: LiquidToolboxData
   selectedLabwareIds: string[]
 }
-export function LiquidToolbox({
+function LiquidToolbox({
   showBadFormState,
   setShowBadFormState,
   setDefineLiquidModal,

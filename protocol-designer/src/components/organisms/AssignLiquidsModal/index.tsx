@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
+  ALIGN_END,
+  ALIGN_NORMAL,
+  ALIGN_START,
   BORDERS,
   Box,
   COLORS,
@@ -158,9 +161,8 @@ export function AssignLiquidsModal(
           >
             <Flex
               height="100%"
-              alignItems={ALIGN_CENTER}
+              alignItems={ALIGN_NORMAL}
               gap={SPACING.spacing10}
-              marginLeft="auto"
             >
               <RobotInfoLabel
                 size="large"

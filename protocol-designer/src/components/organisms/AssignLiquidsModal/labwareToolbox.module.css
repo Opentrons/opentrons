@@ -1,4 +1,4 @@
 .container {
-  flex-direction: column;
   width: 14rem;
+  flex-direction: column;
 }

@@ -53,7 +53,7 @@ interface LabwareStackToolboxProps {
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
 }
-export function LabwareStackToolbox({
+function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
   selectedLabwareIds,
@@ -171,7 +171,7 @@ export function LabwareStackToolbox({
   )
 }
 
-interface LiquidToolboxContainerProps {
+interface LabwareStackToolboxContainerProps {
   showBadFormState: boolean
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
@@ -185,7 +185,7 @@ export function LabwareStackToolboxContainer({
   setDefineLiquidModal,
   selectedLabwareIds,
   setShowLiquidLayoutOverlay,
-}: LiquidToolboxContainerProps): JSX.Element {
+}: LabwareStackToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
