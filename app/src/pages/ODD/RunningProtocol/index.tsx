@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
@@ -290,6 +291,8 @@ function CurrentOptionView({
   currentOption,
   ...rest
 }: CurrentOptionViewProps): JSX.Element {
+  useToastOnErrorImage(rest.runId)
+
   switch (currentOption) {
     case 'CurrentRunningProtocolCommand':
       return <CurrentRunningProtocolCommand {...rest} />
