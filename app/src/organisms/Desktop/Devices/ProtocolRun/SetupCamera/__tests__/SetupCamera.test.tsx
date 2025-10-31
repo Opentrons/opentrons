@@ -24,8 +24,21 @@ vi.mock(
 vi.mock('/app/resources/health/useIsImageStorageLow')
 
 const render = (props: SetupCameraProps) => {
+  const mockState = {
+    protocolRuns: {
+      'MOCK-RUN-ID': {
+        camera: {
+          enabled: props.cameraSettings?.cameraEnabled,
+          liveStreamEnabled: props.cameraSettings?.liveStreamEnabled,
+          recoveryEnabled: props.cameraSettings?.errorRecoveryCameraEnabled,
+        },
+      },
+    },
+  }
+
   return renderWithProviders(<SetupCamera {...props} />, {
     i18nInstance: i18n,
+    initialState: mockState,
   })
 }
 
@@ -89,13 +102,13 @@ describe('SetupCamera', () => {
       cameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
       runCameraSettings: {
-        ...mockProps.cameraSettings,
+        ...mockProps.runCameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
     }
-    render(propsWithCameraDisabled)
+    render(propsWithCameraDisabled as any)
 
     screen.getByText('Disabled')
   })
@@ -112,13 +125,13 @@ describe('SetupCamera', () => {
       cameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
       runCameraSettings: {
-        ...mockProps.cameraSettings,
+        ...mockProps.runCameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
     }
-    render(propsWithCameraDisabled)
+    render(propsWithCameraDisabled as any)
 
     screen.getByText('Camera is required.')
     screen.getByText('Enable the camera to run this protocol.')
@@ -130,13 +143,13 @@ describe('SetupCamera', () => {
       cameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
       runCameraSettings: {
-        ...mockProps.cameraSettings,
+        ...mockProps.runCameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
     }
-    render(propsWithCameraDisabled)
+    render(propsWithCameraDisabled as any)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_USAGE')
@@ -155,13 +168,13 @@ describe('SetupCamera', () => {
       cameraSettings: {
         ...mockProps.cameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
       runCameraSettings: {
-        ...mockProps.cameraSettings,
+        ...mockProps.runCameraSettings,
         cameraEnabled: false,
-      } as any,
+      },
     }
-    render(propsWithCameraDisabled)
+    render(propsWithCameraDisabled as any)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_CONTROLS')

@@ -5,6 +5,7 @@ import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
+  useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useCamera,
   useInstrumentsQuery,
@@ -59,6 +60,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
+  getCameraUsageState,
   selectAreOffsetsApplied,
   selectCountMissingLSOffsetsWithoutDefault,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -357,6 +359,10 @@ describe('ProtocolSetup', () => {
       applyOffsets: vi.fn(),
     })
     when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
+    vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
+      addCameraSettingsToRun: vi.fn(),
+    } as any)
+    vi.mocked(getCameraUsageState).mockReturnValue({ enabled: true } as any)
   })
 
   it('should render text, image, and buttons', () => {
