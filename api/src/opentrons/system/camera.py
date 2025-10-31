@@ -120,6 +120,15 @@ def get_stream_configuration_filepath() -> Path:
     return filepath
 
 
+def robot_supports_livestream(robot_type: RobotType) -> bool:
+    """Validate whether or not robot supports live streaming service."""
+    robot = RobotTypeEnum.robot_literal_to_enum(robot_type)
+    if robot == RobotTypeEnum.OT2:
+        # If we are on an OT-2 we do not support live streams
+        return False
+    return True
+
+
 async def update_live_stream_status(
     robot_type: RobotType,
     stream_status: bool,
@@ -127,8 +136,7 @@ async def update_live_stream_status(
     override_settings: Optional[CameraSettings] = None,
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
-    robot = RobotTypeEnum.robot_literal_to_enum(robot_type)
-    if not IS_ROBOT or robot == RobotTypeEnum.OT2:
+    if not IS_ROBOT or robot_supports_livestream(robot_type) is False:
         # If we are not on a robot we simply no-op updating the stream
         return None
 
@@ -165,8 +173,7 @@ async def update_live_stream_status(
 
 async def stop_live_stream(robot_type: RobotType) -> None:
     """Attempt to stop the Opentrons Live Stream service."""
-    robot = RobotTypeEnum.robot_literal_to_enum(robot_type)
-    if robot == RobotTypeEnum.OT2:
+    if robot_supports_livestream(robot_type) is False:
         # No-op on OT-2 since we don't have a live stream service there
         return None
 
@@ -187,8 +194,7 @@ async def stop_live_stream(robot_type: RobotType) -> None:
 
 async def restart_live_stream(robot_type: RobotType) -> None:
     """Attempt to restart the Opentrons Live Stream service."""
-    robot = RobotTypeEnum.robot_literal_to_enum(robot_type)
-    if robot == RobotTypeEnum.OT2:
+    if robot_supports_livestream(robot_type) is False:
         # No-op on OT-2 since we don't have a live stream service there
         return None
 

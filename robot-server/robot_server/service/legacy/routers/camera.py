@@ -86,7 +86,7 @@ async def post_camera(
         camera_settings_store.get_error_recovery_camera_enabled()
     )
 
-    if robot_type == "OT-3 Standard":
+    if camera.robot_supports_livestream(robot_type):
         stream_settings = _get_stream_settings()
         if (
             camera_enabled
@@ -252,7 +252,7 @@ async def post_live_stream_settings(
     Arguments:
         request_body: Input payload from the request body.
     """
-    if robot_type == "OT-2 Standard":
+    if camera.robot_supports_livestream(robot_type) is False:
         raise LegacyErrorResponse(
             message="Opentrons Live Stream service is not available on OT-2.",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
@@ -338,7 +338,7 @@ async def get_live_stream_settings(
     """
     Request the Opentrons Live Stream settings.
     """
-    if robot_type == "OT-2 Standard":
+    if camera.robot_supports_livestream(robot_type) is False:
         raise LegacyErrorResponse(
             message="Opentrons Live Stream service is not available on OT-2.",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
