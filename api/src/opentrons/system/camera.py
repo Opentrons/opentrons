@@ -336,6 +336,7 @@ async def image_capture(
         )
 
         result = await ffmpeg.ffmpeg_capture_image_bytes(
+            robot_type=robot_type,
             resolution=resolution,
             camera=camera,
             zoom=zoom,
