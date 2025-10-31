@@ -18,7 +18,10 @@ import {
 
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { selectIsAnyNecessaryDefaultOffsetMissing } from '/app/redux/protocol-runs'
+import {
+  getCameraUsageState,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+} from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
@@ -35,6 +38,7 @@ import {
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
+import type { State } from '/app/redux/types'
 import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
@@ -52,7 +56,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoadingRef,
     runHeaderModalContainerUtils,
     isClosingCurrentRun,
-    runRecord,
   } = props
   const { missingStepsModalUtils, HSConfirmationModalUtils } =
     runHeaderModalContainerUtils
@@ -76,12 +79,14 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
-  const isCameraConfirmed = runRecord?.data.cameraSettings != null
-  const isCameraRequired =
+  const { enabled: isCameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  const isCameraRequiredForRun =
     protocolData != null &&
     'commandPreconditions' in protocolData &&
     protocolData.commandPreconditions?.isCameraUsed
-  const isCameraReadyToRun = isCameraRequired ? isCameraConfirmed : true
+  const isCameraReadyToRun = isCameraRequiredForRun ? isCameraEnabled : true
 
   const isSetupComplete =
     isCalibrationComplete &&

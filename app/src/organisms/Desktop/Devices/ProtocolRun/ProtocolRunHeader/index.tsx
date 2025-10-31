@@ -115,7 +115,6 @@ export function ProtocolRunHeader(
           {...props}
         />
         <RunHeaderContent
-          runRecord={runRecord ?? null}
           runStatus={runStatus}
           isResetRunLoadingRef={isResetRunLoadingRef}
           attachedModules={attachedModules}

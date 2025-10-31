@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
@@ -76,6 +76,7 @@ import { getIsHeaterShakerAttached, useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   CAMERA_SETUP_STEP_KEY,
+  getCameraUsageState,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   OFFSETS_CONFLICT,
@@ -84,6 +85,7 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
+  updateCameraEnablement,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
@@ -121,6 +123,7 @@ import type {
   SetupScreens,
 } from '/app/organisms/ODD/ProtocolSetup'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
   ProtocolFixture,
@@ -364,7 +367,12 @@ function PrepareToRun({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
-  const isCameraReadyToRun = cameraSettingsConfirmed && isCameraRequired
+  const { enabled: isCameraEnabledForRun } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  const isCameraReadyToRun = isCameraRequired
+    ? isCameraEnabledForRun || cameraSettingsConfirmed
+    : true
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
@@ -728,6 +736,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -818,6 +827,14 @@ export function ProtocolSetup(): JSX.Element {
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: cameraSettings } = useCamera()
+
+  // The initial app-internal camera state should match the server state.
+  useEffect(() => {
+    if (cameraSettings != null) {
+      dispatch(updateCameraEnablement(runId, cameraSettings.cameraEnabled))
+    }
+  }, [cameraSettings])
+
   const runCameraSettings = runRecord?.data.cameraSettings ?? null
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
