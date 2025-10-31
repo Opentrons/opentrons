@@ -1,5 +1,7 @@
 import { Divider } from '@opentrons/components'
 
+import { useCurrentRunId } from '/app/resources/runs'
+
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
 import { useCameraUsageSettings } from './hooks/useCameraUsageSettings'
@@ -17,12 +19,15 @@ export function RobotSettingsCamera(): JSX.Element {
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
   } = useCameraUsageSettings()
+  const runId = useCurrentRunId()
+  const doesRunExist = runId != null
 
   return (
     <div className={styles.container}>
       <CameraStatusContainer
         toggleCameraEnabled={toggleCameraEnabled}
         isCameraEnabled={isCameraEnabled}
+        toggleDisabled={doesRunExist}
       />
       {isCameraEnabled && (
         <>
@@ -31,6 +36,7 @@ export function RobotSettingsCamera(): JSX.Element {
             isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
             toggleLiveVideoEnabled={toggleLiveVideoEnabled}
             toggleRecoveryCaptureEnabled={toggleRecoveryCaptureEnabled}
+            toggleDisabled={doesRunExist}
           />
           <Divider />
           <RobotSettingsCameraControls />

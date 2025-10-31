@@ -12,6 +12,7 @@ export interface CameraUsageSettingsProps {
   isLiveVideoEnabled: boolean
   toggleRecoveryCaptureEnabled: () => void
   isRecoveryCaptureEnabled: boolean
+  toggleDisabled: boolean
 }
 
 export function RobotSettingsCameraUsage({
@@ -19,6 +20,7 @@ export function RobotSettingsCameraUsage({
   toggleRecoveryCaptureEnabled,
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
+  toggleDisabled,
 }: CameraUsageSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -40,6 +42,7 @@ export function RobotSettingsCameraUsage({
           label={t('live_video')}
           toggledOn={isLiveVideoEnabled}
           onClick={toggleLiveVideoEnabled}
+          disabled={toggleDisabled}
         />
       </div>
       <Divider />
@@ -56,6 +59,7 @@ export function RobotSettingsCameraUsage({
           label={t('live_video')}
           toggledOn={isRecoveryCaptureEnabled}
           onClick={toggleRecoveryCaptureEnabled}
+          disabled={toggleDisabled}
         />
       </div>
     </div>
