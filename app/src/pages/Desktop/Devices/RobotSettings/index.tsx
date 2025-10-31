@@ -25,7 +25,7 @@ import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotS
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
-import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
+import { getDevtoolsEnabled } from '/app/redux/config'
 import {
   CONNECTABLE,
   OPENTRONS_USB,
@@ -49,7 +49,6 @@ export function RobotSettings(): JSX.Element | null {
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
   const doesRunExist = useCurrentRunId() != null
-  const isCameraEnabled = useFeatureFlag('camera')
 
   if (!showRobotBusyBanner && doesRunExist) {
     setShowRobotBusyBanner(true)
@@ -143,13 +142,11 @@ export function RobotSettings(): JSX.Element | null {
             tabName={t('networking')}
             disabled={isNetworkingDisabled}
           />
-          {isCameraEnabled ? (
-            <RoundTab
-              to={`/devices/${robotName}/robot-settings/camera`}
-              tabName={t('camera')}
-              disabled={false}
-            />
-          ) : null}
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/camera`}
+            tabName={t('camera')}
+            disabled={false}
+          />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/advanced`}
             tabName={t('advanced')}

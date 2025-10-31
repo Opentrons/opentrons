@@ -30,7 +30,6 @@ import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/Pro
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
 import { appShellRequestor } from '/app/redux/shell/remote'
@@ -372,11 +371,6 @@ const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
 const CameraTab = (props: SetupTabProps): JSX.Element | null => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
-  const enableCamera = useFeatureFlag('camera')
-
-  if (!enableCamera) {
-    return null
-  }
 
   return (
     <RoundTab

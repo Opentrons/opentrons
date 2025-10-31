@@ -1,5 +1,6 @@
 import { Divider } from '@opentrons/components'
 
+import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './camerasettings.module.css'
@@ -21,6 +22,7 @@ export function RobotSettingsCamera(): JSX.Element {
   } = useCameraUsageSettings()
   const runId = useCurrentRunId()
   const doesRunExist = runId != null
+  const isCameraSettingsEnabled = useFeatureFlag('camera')
 
   return (
     <div className={styles.container}>
@@ -38,8 +40,12 @@ export function RobotSettingsCamera(): JSX.Element {
             toggleRecoveryCaptureEnabled={toggleRecoveryCaptureEnabled}
             toggleDisabled={doesRunExist}
           />
-          <Divider />
-          <RobotSettingsCameraControls />
+          {isCameraSettingsEnabled && (
+            <>
+              <Divider />
+              <RobotSettingsCameraControls />
+            </>
+          )}
         </>
       )}
     </div>

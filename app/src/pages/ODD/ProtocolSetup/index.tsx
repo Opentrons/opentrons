@@ -73,7 +73,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getIsHeaterShakerAttached, useFeatureFlag } from '/app/redux/config'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import {
   CAMERA_SETUP_STEP_KEY,
@@ -173,7 +173,6 @@ function PrepareToRun({
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
-  const isCameraEnabled = useFeatureFlag('camera')
 
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
@@ -380,7 +379,7 @@ function PrepareToRun({
     areModulesReady &&
     areFixturesReady &&
     !isAnyNecessaryDefaultOffsetMissing &&
-    (isCameraReadyToRun || !isCameraEnabled)
+    isCameraReadyToRun
   const onPlay = (): void => {
     if (doorStatus.isDoorOpen) {
       if (
@@ -695,17 +694,14 @@ function PrepareToRun({
               status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
             />
-            {isCameraEnabled && (
-              <ProtocolSetupStep
-                onClickSetupStep={() => {
-                  setSetupScreen('camera')
-                }}
-                title={t('camera_setup_step_title')}
-                // TODO(jh, 10-01-25): Handle disabled state, too.
-                detail={t('protocol_setup:enabled')}
-                status={cameraSettingsConfirmed ? 'ready' : 'general'}
-              />
-            )}
+            <ProtocolSetupStep
+              onClickSetupStep={() => {
+                setSetupScreen('camera')
+              }}
+              title={t('camera_setup_step_title')}
+              detail={t('protocol_setup:enabled')}
+              status={cameraSettingsConfirmed ? 'ready' : 'general'}
+            />
           </>
         ) : (
           <ProtocolSetupStepSkeleton />
@@ -772,8 +768,6 @@ export function ProtocolSetup(): JSX.Element {
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }
-
-  const isCameraEnabled = useFeatureFlag('camera')
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(
@@ -911,7 +905,7 @@ export function ProtocolSetup(): JSX.Element {
   const missingSteps = [
     !labwareConfirmed ? LABWARE_SETUP_STEP_KEY : null,
     !offsetsConfirmed ? LPC_STEP_KEY : null,
-    !cameraSettingsConfirmed && isCameraEnabled ? CAMERA_SETUP_STEP_KEY : null,
+    !cameraSettingsConfirmed ? CAMERA_SETUP_STEP_KEY : null,
   ].filter(s => s != null) as StepKey[]
   const {
     confirm: confirmMissingSteps,
