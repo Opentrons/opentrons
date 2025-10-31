@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_PAUSED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   BORDERS,
   Box,
