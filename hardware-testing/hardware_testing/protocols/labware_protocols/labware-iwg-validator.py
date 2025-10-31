@@ -19,7 +19,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "example_labware" # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
@@ -114,7 +114,7 @@ def _setup(
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
-    labware_type = "thermofisher_nunc_maxisorp_lockwell_elisa"
+    labware_type = "example_labware"
 
     # LOAD LABWARE AND DIAL
     labware = ctx.load_labware(labware_type, SLOT_LABWARE)
@@ -174,11 +174,7 @@ def _setup(
     max_height = extract_float(labware["A1"].height_from_volume(max_vol))
     if n_regions == 3:
         # special case: 3.0mm, 50%, 100%
-        region_heights = [
-            3.0,
-            max_height * 0.5,
-            max_height
-        ]
+        region_heights = [3.0, max_height * 0.5, max_height]
     else:
         # divide by volume for general case
         segment_vol = max_vol / float(n_regions)
@@ -458,17 +454,25 @@ def run(ctx: ProtocolContext) -> None:
             errors = [abs(c - expected_val) for c in corrected]
             avg_error = sum(errors) / len(errors) if errors else 0.0
 
-            # Add corrected heights
             region_results.extend(str(round(c, 3)) for c in corrected)
-            # Add expected value
             region_results.append(str(round(expected_val, 3)))
-            # Add average error
             region_results.append(str(round(avg_error, 3)))
 
         from hardware_testing.data import append_data_to_file
 
+        region_headers = []
+        for i in range(n_regions):
+            for k in range(region_len):
+                region_headers.append(f"region{i+1}_trial{k+1}")
+            region_headers.append(f"region{i+1}_expected")
+            region_headers.append(f"region{i+1}_avg_error")
+
+        header = ["labware_type"] + region_headers
+        header_str = ",".join(header) + "\n"
         line = [labware_type] + region_results
         line_str = ",".join(line) + "\n"
+
+        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, header_str)
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
         ctx.pause(f"Results:\n{line_str}")
 

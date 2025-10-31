@@ -433,13 +433,24 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     frustum_diameter = 0.0
 
     for i in range(1, len(data)):
+
+        if len(data) < 2:
+            raise ValueError("data must contain at least two (volume, height) points")
+
         vol1, h1 = data[i - 1]
         vol2, h2 = data[i]
 
         delta_volume = vol2 - vol1
         delta_height = h2 - h1
-        if delta_height == 0:
-            continue
+
+        if delta_height <= 0:
+            raise ValueError(
+                f"Invalid geometry at segment {i}: change in height={delta_height:.4f} must be > 0"
+            )
+        if delta_volume <= 0:
+            raise ValueError(
+                f"Invalid geometry at segment {i}: change in volume={delta_volume:.4f} must be > 0"
+            )
 
         if geoID == "cuboidalWell":
             if not ctx.is_simulating():
@@ -481,7 +492,7 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
                 "bottomXDimension": last["bottomXDimension"],
                 "bottomYDimension": last["bottomYDimension"],
                 "topHeight": depth,
-                "bottomHeight": last["topHeight"]
+                "bottomHeight": last["topHeight"],
             }
         elif geoID == "conicalWell":
             final_section = {
@@ -489,7 +500,7 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
                 "topDiameter": well_diameter,
                 "bottomDiameter": last["bottomDiameter"],
                 "topHeight": depth,
-                "bottomHeight": last["topHeight"]
+                "bottomHeight": last["topHeight"],
             }
         else:
             final_section = {}
