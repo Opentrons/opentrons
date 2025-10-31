@@ -148,7 +148,9 @@ export const getMigratedLabwareId = (
   )?.[0]
   const labwareIdString = oldLabwareId.split(':')[0]
   const latestLabwareId =
-    latestURI != null ? `${labwareIdString}:${latestURI}` : oldLabwareId // fallback to original labwareId for custom labware
+    latestURI != null
+      ? `${labwareIdString}:${latestURI}`
+      : `${labwareIdString}:${defURI}` // fallback to original labwareId & defURI for custom labware
 
   return latestLabwareId
 }
