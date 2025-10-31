@@ -6,6 +6,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { OPENTRONS_USB } from '/app/redux/discovery'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolRunCamera } from '..'
 import { ImageGalleryContainer } from '../ImageGalleryContainer'
@@ -50,6 +51,11 @@ describe('ProtocolRunCamera', () => {
     vi.mocked(ImageGalleryContainer).mockReturnValue(
       <div>MOCK_IMAGE_GALLERY_CONTAINER</div>
     )
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: true,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
   })
 
   it('renders camera text', () => {
