@@ -1,9 +1,10 @@
-import { COLUMN_4_SLOTS } from '../../constants'
+import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
 import {
   pipettingIntoColumn4,
   possiblePipetteCollision,
 } from '../../errorCreators'
 import {
+  formatPyStr,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   uuid,
@@ -13,10 +14,15 @@ import type {
   NozzleConfigurationStyle,
   PickUpTipParams,
 } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  TipTrackingOption,
+} from '../../types'
 
 interface PickUpTipAtomicParams extends PickUpTipParams {
   nozzles?: NozzleConfigurationStyle
+  tipTrackingOption?: TipTrackingOption
 }
 
 export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
@@ -24,7 +30,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, labwareId, wellName } = args
+  const { pipetteId, labwareId, wellName, tipTrackingOption = AUTOMATIC } = args
   const errors: CommandCreatorError[] = []
 
   const isMultiChannelPipette =
@@ -66,7 +72,7 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   // We don't specify the tip well because it would make it hard for users to modify
   // the Python protocol. We do specify the tip rack because multiple tip racks could be
   // assigned to the pipette, and the UI makes the user choose which tip rack to use.
-  const python = `${pipettePythonName}.pick_up_tip(location=${tiprackPythonName})`
+  const python = `${pipettePythonName}.pick_up_tip(location=${tiprackPythonName}${tipTrackingOption === MANUAL ? `[${formatPyStr(wellName)}]` : ''})`
 
   if (errors.length > 0) {
     return { errors }
