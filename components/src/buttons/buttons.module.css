@@ -1,7 +1,6 @@
 /* button styling */
 @import '../index.module.css';
 
-/* ルート変数: 無効だった --button-inverted ブロックは削除 */
 :root {
   --button-pad: 0.5rem;
 }
@@ -37,7 +36,6 @@
   text-transform: uppercase;
 }
 
-/* ネスト展開 */
 .button_primary:focus {
   background-color: color-mod(var(--c-bg-dark) shade(30%));
 }
