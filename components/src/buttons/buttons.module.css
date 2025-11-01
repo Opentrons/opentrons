@@ -13,6 +13,7 @@
 
   /* VVV from legacy --button-default VVV */
   display: inline-block;
+
   /* ^^^ from legacy --button-default ^^^ */
 
   width: 100%;
@@ -51,6 +52,7 @@
 
 .button_primary:active {
   background-color: color-mod(var(--c-bg-dark) tint(30%));
+
   /* TODO(mc, 2017-12-07): pull shadows out to central file */
   box-shadow:
     0 0 8px rgba(0, 0, 0, 0.12),
@@ -83,10 +85,13 @@
 
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
 }
@@ -96,6 +101,7 @@
 
   /* VVV from legacy --button-default VVV */
   display: inline-block;
+
   /* ^^^ from legacy --button-default ^^^ */
 
   width: 9rem;
@@ -123,16 +129,22 @@
   /* from legacy --button-disabled */
   border-color: var(--c-font-disabled);
   background-color: transparent;
+
   /* from legacy --button-disabled */
   color: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
+
   /* from legacy --button-disabled */
 }
 
@@ -150,6 +162,7 @@
 
 .button_flat.inverted {
   border-color: var(--c-font-light);
+
   /* VVV from legacy --button-inverted VVV */
   color: var(--c-font-light);
 }
@@ -164,16 +177,22 @@
   /* from legacy --button-disabled */
   border-color: var(--c-font-disabled);
   background-color: transparent;
+
   /* from legacy --button-disabled */
   color: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
+
   /* from legacy --button-disabled */
 }
 
@@ -196,6 +215,7 @@
 
   /* VVV from legacy --button-default VVV */
   display: inline-block;
+
   /* ^^^ from legacy --button-default ^^^ */
 
   width: 9rem;
@@ -223,16 +243,22 @@
   /* from legacy --button-disabled */
   border-color: var(--c-font-disabled);
   background-color: transparent;
+
   /* from legacy --button-disabled */
   color: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
+
   /* from legacy --button-disabled */
 }
 
@@ -250,6 +276,7 @@
 
 .button_outline.inverted {
   border-color: var(--c-font-light);
+
   /* VVV from legacy --button-inverted VVV */
   color: var(--c-font-light);
 }
@@ -264,16 +291,22 @@
   /* from legacy --button-disabled */
   border-color: var(--c-font-disabled);
   background-color: transparent;
+
   /* from legacy --button-disabled */
   color: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
+
   /* from legacy --button-disabled */
 }
 
@@ -305,6 +338,7 @@
 .button_icon.inverted {
   color: white;
   fill: white;
+
   /* TODO(mc, 2019-03-29): Is this correct? Our icons use only fill */
   stroke: white;
 }
@@ -314,14 +348,19 @@
   /* from legacy --button-disabled */
   border-color: var(--c-font-disabled);
   background-color: transparent;
+
   /* from legacy --button-disabled */
   color: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   cursor: default;
+
   /* from legacy --button-disabled */
   fill: var(--c-font-disabled);
+
   /* from legacy --button-disabled */
   font-weight: normal;
+
   /* from legacy --button-disabled */
   pointer-events: none;
 }
