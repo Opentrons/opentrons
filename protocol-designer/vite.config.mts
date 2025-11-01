@@ -9,138 +9,151 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
-import { latestLabwareVersions } from '../scripts/git-version.mjs'
-
 import {
-  getVersion,
   generateBuildInfoHtml,
+  getVersion,
 } from '../scripts/git-version-protocol-designer.mjs'
-
+import { latestLabwareVersions } from '../scripts/git-version.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
 const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or higher
 
+// Sentry and sourcemaps are disabled in local development
+const isCI = process.env.CI === 'true'
+const enableSentry =
+  isCI &&
+  !!process.env.SENTRY_AUTH_TOKEN &&
+  !!process.env.SENTRY_ORG &&
+  !!process.env.SENTRY_PROJECT
+
 // eslint-disable-next-line import/no-default-export
-export default defineConfig(
-  async (): Promise<UserConfig> => {
-    const OT_PD_VERSION = await getVersion()
-    const OT_PD_BUILD_DATE = new Date().toUTCString()
-    const OT_PD_LATEST_LABWARE_VERSIONS = await latestLabwareVersions(
-      REQUIRED_APP_VERSION
-    )
-    const mode = process.env.NODE_ENV ?? 'development'
-    return {
-      // this makes imports relative rather than absolute
-      base: '',
-      build: {
-        // Relative to the root
-        outDir: 'dist',
-        // sourcemap for Sentry
-        sourcemap: true,
-      },
-      plugins: [
-        react({
-          include: '**/*.tsx',
-          babel: {
-            // Use babel.config.js files
-            configFile: true,
-          },
-        }),
-        cssModuleSideEffect(),
-        {
-          name: 'markdown-loader',
-          transform(code, id) {
-            if (id.endsWith('.md')) {
-              return `export default ${JSON.stringify(code)}`
-            }
-          },
+export default defineConfig(async (): Promise<UserConfig> => {
+  const OT_PD_VERSION = await getVersion()
+  const OT_PD_BUILD_DATE = new Date().toUTCString()
+  const OT_PD_LATEST_LABWARE_VERSIONS =
+    await latestLabwareVersions(REQUIRED_APP_VERSION)
+  const mode = process.env.NODE_ENV ?? 'development'
+  return {
+    // this makes imports relative rather than absolute
+    base: '',
+    build: {
+      // Relative to the root
+      outDir: 'dist',
+      // sourcemap is only enabled in CI
+      sourcemap: enableSentry ? 'hidden' : false,
+    },
+    plugins: [
+      react({
+        include: '**/*.tsx',
+        babel: {
+          // Use babel.config.js files
+          configFile: true,
         },
-        sentryVitePlugin({
-          org: 'opentrons-76',
-          project: 'protocol-designer',
-          // Don't provide authToken - we don't want to upload during build
-          // Uploads happen in dedicated workflow steps in GitHub Actions
-          telemetry: false,
-          reactComponentAnnotation: {
-            enabled: true,
-            ignoredComponents: [], // (kk:08/15/2025) ToDo add later
-          },
-          sourcemaps: {
-            assets: ['./dist/**'],
-            ignore: ['./node_modules/**'],
-          },
-        }),
-        {
-          name: 'build-info-generator',
-          closeBundle: async () => {
-            const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
-            await generateBuildInfoHtml(outputPath)
-          },
-        },
-        ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
-      ],
-      optimizeDeps: {
-        esbuildOptions: {
-          target: 'es2020',
+      }),
+      cssModuleSideEffect(),
+      {
+        name: 'markdown-loader',
+        transform(code, id) {
+          if (id.endsWith('.md')) {
+            return `export default ${JSON.stringify(code)}`
+          }
         },
       },
-      css: {
-        postcss: {
-          plugins: [
-            postCssImport({ root: 'src/' }),
-            postCssApply(),
-            postColorModFunction(),
-            postCssPresetEnv({ stage: 0 }),
-            lostCss(),
-          ],
+      ...(enableSentry
+        ? [
+            sentryVitePlugin({
+              org: process.env.SENTRY_ORG!,
+              project: process.env.SENTRY_PROJECT!,
+              authToken: process.env.SENTRY_AUTH_TOKEN!,
+              telemetry: false,
+              reactComponentAnnotation: { enabled: true },
+              sourcemaps: {
+                assets: ['./dist/**'],
+                ignore: ['./node_modules/**'],
+                // optional: rewrite paths if needed
+              },
+              // optional: release detection (match Sentry release to app version/commit)
+              release: {
+                name: process.env.SENTRY_RELEASE || process.env.GIT_COMMIT_SHA,
+                // set commit SHA environment in CI
+              },
+            }),
+          ]
+        : []),
+
+      {
+        name: 'build-info-generator',
+        closeBundle: async () => {
+          const outputPath = path.resolve(
+            __dirname,
+            'dist',
+            'info',
+            'index.html'
+          )
+          await generateBuildInfoHtml(outputPath)
         },
       },
-      define: {
-        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
-        _FF_ENV_VARS_: getFeatureFlagEnvVars(),
-        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
-        _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
-        _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
-        _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
-          process.env.OT_PD_MIXPANEL_DEV_ID
+      ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
+    ],
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'es2020',
+      },
+    },
+    css: {
+      postcss: {
+        plugins: [
+          postCssImport({ root: 'src/' }),
+          postCssApply(),
+          postColorModFunction(),
+          postCssPresetEnv({ stage: 0 }),
+          lostCss(),
+        ],
+      },
+    },
+    define: {
+      // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+      _FF_ENV_VARS_: getFeatureFlagEnvVars(),
+      _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+      _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
+      _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
+      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
+        process.env.OT_PD_MIXPANEL_DEV_ID
+      ),
+      _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
+      _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
+      _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+      _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
+      _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
+      global: 'globalThis',
+    },
+    resolve: {
+      alias: {
+        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+        // files being processed with the wrong config (the config from the
+        // consuming project vs. the config from the source project).
+        // Can these be replaced with regular package.json dependencies?
+        '@opentrons/components/styles/global': path.resolve(
+          '../components/src/styles/global.css'
         ),
-        _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
-        _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
-        _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(
-          process.env.OT_PD_SENTRY_DEV_DSN
+        '@opentrons/components': path.resolve('../components/src/index.ts'),
+        '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
+        '@opentrons/step-generation': path.resolve(
+          '../step-generation/src/index.ts'
         ),
-        _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
-        _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
-        global: 'globalThis',
+        '/protocol-designer/': path.resolve('./src/') + '/',
       },
-      resolve: {
-        alias: {
-          // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
-          // files being processed with the wrong config (the config from the
-          // consuming project vs. the config from the source project).
-          // Can these be replaced with regular package.json dependencies?
-          '@opentrons/components/styles/global': path.resolve(
-            '../components/src/styles/global.css'
-          ),
-          '@opentrons/components': path.resolve('../components/src/index.ts'),
-          '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-          '@opentrons/step-generation': path.resolve(
-            '../step-generation/src/index.ts'
-          ),
-          '/protocol-designer/': path.resolve('./src/') + '/',
-        },
+    },
+    server: {
+      port: 5178,
+      watch: {
+        ignored: ['**/cypress/downloads/**'],
       },
-      server: {
-        port: 5178,
-        watch: {
-          ignored: ['**/cypress/downloads/**'],
-        },
-      },
-    }
+    },
   }
-)
+})
 
 function getFeatureFlagEnvVars(): Record<string, string | undefined> {
   // If we change the prefix to something like "OT_PD_FF_...", we could automatically
@@ -163,7 +176,7 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_JSON_EXPORT',
     'OT_PD_ENABLE_BY_VOLUME_BUILDER',
     'OT_PD_ENABLE_TIP_SELCTION',
-    'OT_PD_ENABLE_CAMERA_SUPPORT'
+    'OT_PD_ENABLE_CAMERA_SUPPORT',
   ])
   return Object.fromEntries(
     Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
