@@ -28,7 +28,7 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -433,9 +433,9 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     """Read geometry creator results and generate frustum dimensions for the IWG."""
     inner_well_json = labware._core.get_definition()
     depth = inner_well_json["wells"]["A1"]["depth"]
-    well_diameter = inner_well_json["wells"]["A1"].get("diameter")
-    well_side_length = inner_well_json["wells"]["A1"].get("xDimension")
     well_shape = inner_well_json["wells"]["A1"].get("shape")
+    nominal_diameter = inner_well_json["wells"]["A1"].get("diameter")
+    nominal_side_length = inner_well_json["wells"]["A1"].get("xDimension")
 
     if well_shape == "circular":
         geoID = "conicalWell"
@@ -452,13 +452,24 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     frustum_diameter = 0.0
 
     for i in range(1, len(data)):
+
+        if len(data) < 2:
+            raise ValueError("data must contain at least two (volume, height) points")
+
         vol1, h1 = data[i - 1]
         vol2, h2 = data[i]
 
         delta_volume = vol2 - vol1
         delta_height = h2 - h1
-        if delta_height == 0:
-            continue
+
+        if delta_height <= 0:
+            raise ValueError(
+                f"Invalid geometry at segment {i}: change in height={delta_height:.4f} must be > 0"
+            )
+        if delta_volume <= 0:
+            raise ValueError(
+                f"Invalid geometry at segment {i}: change in volume={delta_volume:.4f} must be > 0"
+            )
 
         if geoID == "cuboidalWell":
             if not ctx.is_simulating():
@@ -491,25 +502,24 @@ def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
     # Add one more frustum to reach full depth
     if frusta_data:
         last = frusta_data[-1]
-        bottom_height = last["topHeight"]
 
         if geoID == "cuboidalWell":
             final_section = {
                 "shape": "cuboidal",
-                "topXDimension": well_side_length,
-                "topYDimension": well_side_length,
-                "bottomXDimension": well_side_length,
-                "bottomYDimension": well_side_length,
+                "topXDimension": nominal_side_length,
+                "topYDimension": nominal_side_length,
+                "bottomXDimension": last["bottomXDimension"],
+                "bottomYDimension": last["bottomYDimension"],
                 "topHeight": depth,
-                "bottomHeight": bottom_height,
+                "bottomHeight": last["topHeight"],
             }
         elif geoID == "conicalWell":
             final_section = {
                 "shape": "conical",
-                "topDiameter": well_diameter,
-                "bottomDiameter": well_diameter,
+                "topDiameter": nominal_diameter,
+                "bottomDiameter": last["bottomDiameter"],
                 "topHeight": depth,
-                "bottomHeight": bottom_height,
+                "bottomHeight": last["topHeight"],
             }
         else:
             final_section = {}
@@ -566,7 +576,7 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
         ethanol_props.dispense.dispense_position.offset.z = dispense_offset
         ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)
-        ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
+        ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(80)
         ethanol_props.dispense.retract.blowout.flow_rate = (
             state.liq_pipette.flow_rate.blow_out
         )
@@ -575,7 +585,7 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         )
         ethanol_props.dispense.retract.end_position.offset.z = 10
         ethanol_props.dispense.retract.blowout.enabled = (
-            False  # disabled because it was causing bubbles
+            False  # disable if causing bubbles
         )
 
 
@@ -753,7 +763,6 @@ def run(ctx: ProtocolContext) -> None:
     trial_results = geometry_creator(ctx, state, ts)
     drop_tips(state.liq_pipette, state.probe_pipette)
 
-    # Save results and generate IWG .json
     passed_trials = [trial for trial in trial_results if trial.status == "pass"]
     frusta_data = np.array(
         [(trial.dispense_volume, trial.height) for trial in passed_trials]
@@ -773,4 +782,4 @@ def run(ctx: ProtocolContext) -> None:
         with open(file_path, "w") as f:
             json.dump(new_inner_well_json, f, indent=2)
 
-        ctx.pause(f"User Defined Definition file: {file_path}")
+        ctx.pause(f"Labware Definition file: {file_path}")

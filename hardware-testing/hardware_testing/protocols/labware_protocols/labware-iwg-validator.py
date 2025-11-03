@@ -19,7 +19,7 @@ from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 # LABWARE TYPE
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
 
 # SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
@@ -99,7 +99,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_bool(
         variable_name="dial_indicator_used",
         display_name="Dial Indicator Use",
-        description="Used to calibrate tip overlap",
+        description="Used to calibrate tip overlap.",
         default=True,
     )
 
@@ -176,7 +176,7 @@ def _setup(
         ]
         _write_line_to_csv(ctx, heading_for_csv)
 
-        if dial is not None:
+        if dial and DIAL_PORT is None:
             from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
                 Mitutoyo_Digimatic_Indicator,
             )
@@ -184,26 +184,18 @@ def _setup(
             DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
             DIAL_PORT.connect()
 
-    depth = labware["A1"].depth
-
-    # Calculate region heights based on n_regions
-    region_heights: List[float]
+    # Calculate region heights
+    max_vol = labware["A1"].max_volume
+    max_height = extract_float(labware["A1"].height_from_volume(max_vol))
     if n_regions == 3:
-        region_heights = [3, depth / 2, depth * 9 / 10]
+        # special case: 3.0mm, 50%, 100%
+        region_heights = [3.0, max_height * 0.5, max_height]
     else:
-        region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
-
-    if region_heights:
-        max_vol = labware["A1"].max_volume
-        max_height = extract_float(labware["A1"].height_from_volume(max_vol))
-        for i, h in enumerate(region_heights):
-            if h > max_height:
-                region_heights[
-                    i
-                ] = max_height  # must be lower than height at max volume
-            if h < 1.5:
-                region_heights[i] = 1.5  # must be 1.5mm or higher
-
+        segment_vol = max_vol / float(n_regions)
+        region_heights = [
+            extract_float(labware["A1"].height_from_volume(segment_vol * (i + 1)))
+            for i in range(n_regions)
+        ]
     expected_heights = []
     for h in region_heights:
         expected_heights.extend([h] * number_of_trials)
@@ -356,19 +348,18 @@ def aspirate_dispense_measure(
             ethanol_props.dispense.dispense_position.position_reference = (
                 PositionReference.LIQUID_MENISCUS
             )  # type: ignore [attr-defined]
-            # Flow rates and speeds (example values, can be parameterized)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)  # type: ignore [attr-defined]
-            ethanol_props.dispense.submerge.speed = 50  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.speed = 50  # type: ignore [attr-defined]
-            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)  # type: ignore [attr-defined]
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
+            ethanol_props.dispense.submerge.speed = 50
+            ethanol_props.dispense.retract.speed = 50
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)
             ethanol_props.dispense.retract.blowout.flow_rate = (
                 liq_pipette.flow_rate.blow_out
-            )  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.blowout.enabled = False  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.end_position.position_reference = (  # type: ignore [attr-defined]
+            )
+            ethanol_props.dispense.retract.blowout.enabled = False
+            ethanol_props.dispense.retract.end_position.position_reference = (
                 PositionReference.WELL_TOP
-            )  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.end_position.offset.z = 10  # type: ignore [attr-defined]
+            )
+            ethanol_props.dispense.retract.end_position.offset.z = 10
 
         liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
@@ -489,9 +480,20 @@ def run(ctx: ProtocolContext) -> None:
 
         from hardware_testing.data import append_data_to_file
 
+        region_headers = []
+        for i in range(n_regions):
+            for k in range(region_len):
+                region_headers.append(f"region{i+1}_trial{k+1}")
+            region_headers.append(f"region{i+1}_expected")
+            region_headers.append(f"region{i+1}_avg_error")
+
+        header = ["labware_type"] + region_headers
+        header_str = ",".join(header) + "\n"
         line = [labware_type] + region_results
         line_str = ",".join(line) + "\n"
+
+        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, header_str)
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
-        ctx.pause(f"Results:\n{line_str}")
+        ctx.pause(f"{header_str}\n{line_str}")
 
     drop_tips(probe_pipette, liq_pipette)
