@@ -1,5 +1,7 @@
-import { getOrderedStepIds } from '../../step-forms/selectors'
-import { getNextNonTerminalItemId } from '../utils/getNextNonTerminalItemId'
+import { getSavedStepHierarchy } from '/protocol-designer/step-forms/selectors'
+
+import { getStepToSelectAfterDeletion } from '../utils/getStepToSelectAfterDeletion'
+import { getPairedSteps } from '../utils/stepHierarchy'
 
 import type { FormData, StepIdType } from '../../form-types'
 import type { ThunkAction } from '../../types'
@@ -50,36 +52,41 @@ export const deleteMultipleSteps =
     | SelectMultipleStepsAction
   > =>
   (dispatch, getState) => {
-    const orderedStepIds = getOrderedStepIds(getState())
+    const stepIdsSet = new Set(stepIds)
+    const stepHierarchy = getSavedStepHierarchy(getState())
+
+    // If the user is trying to delete a Thermocycler profile step, we need to also
+    // delete the internal "wait for profile to complete" step that's paired with it.
+    const expandedStepIds = getUnionOfSets(
+      stepIdsSet,
+      getPairedSteps(stepHierarchy, stepIdsSet)
+    )
+
+    const nextSelection = getStepToSelectAfterDeletion(
+      stepHierarchy,
+      expandedStepIds
+    )
+
     const deleteMultipleStepsAction: DeleteMultipleStepsAction = {
       type: 'DELETE_MULTIPLE_STEPS',
-      payload: stepIds,
+      payload: [...expandedStepIds],
     }
     dispatch(deleteMultipleStepsAction)
 
-    if (stepIds.length === orderedStepIds.length) {
-      // if we are deleting all the steps we need to clear out the selected item
+    if (nextSelection == null) {
       const clearSelectedItemAction: ClearSelectedItemAction = {
         type: 'CLEAR_SELECTED_ITEM',
       }
       dispatch(clearSelectedItemAction)
     } else {
-      const nextStepId = getNextNonTerminalItemId(orderedStepIds, stepIds)
-
-      if (nextStepId) {
-        const selectMultipleStepsAction: SelectMultipleStepsAction = {
-          type: 'SELECT_MULTIPLE_STEPS',
-          payload: {
-            stepIds: [nextStepId],
-            lastSelected: nextStepId,
-          },
-        }
-        dispatch(selectMultipleStepsAction)
-      } else {
-        console.warn(
-          'something went wrong, could not find the next non terminal item'
-        )
+      const selectMultipleStepsAction: SelectMultipleStepsAction = {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: {
+          stepIds: [nextSelection],
+          lastSelected: nextSelection,
+        },
       }
+      dispatch(selectMultipleStepsAction)
     }
   }
 
@@ -104,3 +111,8 @@ export const reorderSteps = (stepIds: StepIdType[]): ReorderStepsAction => ({
     stepIds,
   },
 })
+
+// todo(mm, 2025-11-03): Replace with JS's native Set.union() when our JS version is new enough.
+function getUnionOfSets<T>(a: Set<T>, b: Set<T>): Set<T> {
+  return new Set([...a, ...b])
+}
