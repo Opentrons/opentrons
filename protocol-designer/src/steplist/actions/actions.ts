@@ -19,6 +19,7 @@ export const changeSavedStepForm = (
   type: 'CHANGE_SAVED_STEP_FORM',
   payload,
 })
+
 export interface ChangeFormInputAction {
   type: 'CHANGE_FORM_INPUT'
   payload: ChangeFormPayload
@@ -29,11 +30,13 @@ export const changeFormInput = (
   type: 'CHANGE_FORM_INPUT',
   payload,
 })
+
 // Populate form with selected action (only used in thunks)
 export interface PopulateFormAction {
   type: 'POPULATE_FORM'
   payload: FormData
 }
+
 export interface DeleteMultipleStepsAction {
   type: 'DELETE_MULTIPLE_STEPS'
   payload: StepIdType[]
@@ -79,6 +82,7 @@ export const deleteMultipleSteps =
       }
     }
   }
+
 export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null
@@ -87,6 +91,7 @@ export const cancelStepForm = (): CancelStepFormAction => ({
   type: 'CANCEL_STEP_FORM',
   payload: null,
 })
+
 export interface ReorderStepsAction {
   type: 'REORDER_STEPS'
   payload: {
