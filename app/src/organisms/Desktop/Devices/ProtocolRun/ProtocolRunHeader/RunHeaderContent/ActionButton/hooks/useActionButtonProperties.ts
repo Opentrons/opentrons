@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 
 import {
   RUN_STATUS_IDLE,
@@ -8,6 +7,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -16,7 +16,10 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getMissingSetupSteps } from '/app/redux/protocol-runs'
+import {
+  getCameraUsageState,
+  getMissingSetupSteps,
+} from '/app/redux/protocol-runs'
 
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import {
@@ -41,6 +44,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
   isClosingCurrentRun: boolean
+  areCameraPreferencesConfirmed: boolean
 }
 
 // Returns ActionButton properties.
@@ -59,13 +63,13 @@ export function useActionButtonProperties({
   runHeaderModalContainerUtils,
   isResetRunLoadingRef,
   isClosingCurrentRun,
+  areCameraPreferencesConfirmed,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
   buttonIconName: IconName | null
 } {
   const { t } = useTranslation(['run_details', 'shared'])
-  const navigate = useNavigate()
   const { play, pause, reset } = protocolRunControls
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
@@ -74,10 +78,28 @@ export function useActionButtonProperties({
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
     getMissingSetupSteps(state, runId)
   )
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const runCameraSettings = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
 
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
+
+  const handlePlay = (): void => {
+    play()
+    trackProtocolRunEvent({
+      name:
+        runStatus === RUN_STATUS_IDLE
+          ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+          : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
+      properties:
+        runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+          ? robotAnalyticsData
+          : {},
+    })
+  }
 
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
@@ -113,19 +135,26 @@ export function useActionButtonProperties({
         (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
       ) {
         confirmAttachment()
+      }
+      // Camera settings do not require explicit confirmation by *any* user,
+      // so if the settings haven't been confirmed, use this user's settings
+      // before starting the run.
+      else if (!areCameraPreferencesConfirmed) {
+        const { enabled, recoveryEnabled, liveStreamEnabled } =
+          runCameraSettings
+        addCameraSettingsToRun(
+          {
+            runId,
+            settings: {
+              liveStreamEnabled,
+              cameraEnabled: enabled,
+              errorRecoveryCameraEnabled: recoveryEnabled,
+            },
+          },
+          { onSettled: handlePlay }
+        )
       } else {
-        play()
-        navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
-        trackProtocolRunEvent({
-          name:
-            runStatus === RUN_STATUS_IDLE
-              ? ANALYTICS_PROTOCOL_RUN_ACTION.START
-              : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
-          properties:
-            runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
-              ? robotAnalyticsData
-              : {},
-        })
+        handlePlay()
       }
     }
   } else if (isRunAgainStatus(runStatus)) {

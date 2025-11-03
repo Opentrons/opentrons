@@ -214,6 +214,10 @@
       "block": "<text>Set thermocycler block to</text><tag/>",
       "lid_position": "<text>Lid position</text><tag/>",
       "lid_temperature": "<text>Set thermocycler lid to</text><tag/>"
+    },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
     }
   },
   "time": "Time",

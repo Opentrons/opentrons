@@ -344,6 +344,36 @@ describe('replaceTip', () => {
         type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
       })
     })
+    it('Single-channel: manual tip selection', () => {
+      invariantContext = {
+        ...invariantContext,
+        wasteChuteEntities: {},
+        trashBinEntities: {},
+      }
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprackURI1,
+          tipSelectionArgs: {
+            tipRackId: tiprack1Id,
+            tipWell: 'C5',
+          },
+        },
+        (invariantContext = {
+          ...invariantContext,
+          wasteChuteEntities: {},
+          trashBinEntities: {},
+        }),
+        initialRobotState
+      )
+      expect(getSuccessResult(result).commands).toEqual([
+        pickUpTipHelper('C5', {
+          pipetteId: p300SingleId,
+          labwareId: tiprack1Id,
+        }),
+      ])
+    })
   })
   describe('replaceTip: multi-channel', () => {
     it('multi-channel, all tipracks have tips', () => {

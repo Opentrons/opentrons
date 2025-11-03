@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
 
 import { IncompatibleTipsModal } from '..'
 
@@ -23,6 +22,7 @@ describe('IncompatibleTipsModal', () => {
   beforeEach(() => {
     props = {
       onClose: vi.fn(),
+      setAllowAllTipracks: vi.fn(),
     }
   })
   it('renders the text and ctas', () => {
@@ -32,7 +32,7 @@ describe('IncompatibleTipsModal', () => {
       'Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.'
     )
     fireEvent.click(screen.getByText('Show more tip types'))
-    expect(vi.mocked(setFeatureFlags)).toHaveBeenCalled()
+    expect(props.setAllowAllTipracks).toHaveBeenCalled()
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
   })

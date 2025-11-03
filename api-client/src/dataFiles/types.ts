@@ -48,5 +48,5 @@ export interface RunDataFileMetadataResponse {
   meta: { cursor: number; totalLength: number }
 }
 
-export type DownloadedDataFileResponse = MediaSource
+export type DownloadedDataFileResponse = Blob | string
 export type DownloadedImageFileResponse = Blob

@@ -24,12 +24,21 @@ export const PATCH = 'PATCH'
 export const DELETE = 'DELETE'
 export const PUT = 'PUT'
 
+export type BrandedAxiosConfig = AxiosRequestConfig & {
+  readonly __axiosConfigBrand: unique symbol
+}
+export function createAxiosConfig(
+  config: AxiosRequestConfig
+): BrandedAxiosConfig {
+  return config as BrandedAxiosConfig
+}
+
 export function request<ResData, ReqData = null>(
   method: Method,
   url: string,
   data: ReqData,
   config: HostConfig,
-  axiosConfig?: AxiosRequestConfig
+  axiosConfig?: BrandedAxiosConfig
 ): ResponsePromise<ResData> {
   const {
     hostname,
