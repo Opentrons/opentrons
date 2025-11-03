@@ -19,7 +19,7 @@ import {
 
 import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
-import { useFeatureFlag } from '/app/redux/config'
+// import { useFeatureFlag } from '/app/redux/config'
 import {
   useProtocolDetailsForRun,
   useRunCreatedAtTimestamp,
@@ -39,20 +39,20 @@ export function RunHeaderSectionUpper(
 ): JSX.Element {
   const { runId, runStatus, robotName, runHeaderModalContainerUtils } = props
   const { t } = useTranslation('run_details')
-  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
-  const navigate = useNavigate()
+  // const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
+  // const navigate = useNavigate()
   const { pause } = useRunControls(runId)
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { protocolKey } = useProtocolDetailsForRun(runId)
+  // const { protocolKey } = useProtocolDetailsForRun(runId)
 
-  const handleVisualizeClick = (): void => {
-    // need to encode URL to avoid spaces and slashes
-    const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
-    const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
-    navigate(targetPath)
-  }
+  // const handleVisualizeClick = (): void => {
+  //   // need to encode URL to avoid spaces and slashes
+  //   const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
+  //   const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
+  //   navigate(targetPath)
+  // }
   const handleCancelRunClick = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pause()
@@ -80,13 +80,13 @@ export function RunHeaderSectionUpper(
       />
       <Flex
         justifyContent={JUSTIFY_FLEX_END}
-        gridGap={enableProtocolTimeline ? SPACING.spacing4 : 0}
+        // gridGap={enableProtocolTimeline ? SPACING.spacing4 : 0}
       >
-        {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
+        {/* {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
           <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}
           </SecondaryButton>
-        ) : null}
+        ) : null} */}
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           {isCancellableStatus(runStatus) && (
             <AlertPrimaryButton
