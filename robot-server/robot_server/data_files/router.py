@@ -393,6 +393,7 @@ async def get_data_files_by_run_id(
         response_data.append(
             DataFileMetadataResponse(
                 id=file_info.id,
+                filename=file_info.name,
                 stored=file_info.stored,
                 generated=file_info.generated,
                 mimeType=file_info.mime_type,
@@ -403,6 +404,7 @@ async def get_data_files_by_run_id(
         response_data.append(
             DataFileMetadataResponse(
                 id=file_info.id,
+                filename=file_info.name,
                 stored=file_info.stored,
                 generated=file_info.generated,
                 mimeType=file_info.mime_type,

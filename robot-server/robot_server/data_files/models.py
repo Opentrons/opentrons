@@ -113,6 +113,7 @@ class DataFileMetadataResponse(BaseModel):
     """Response model for data file metadata without command information."""
 
     id: str = Field(..., description="A unique identifier for this file.")
+    filename: str = Field(..., description="The name of the data file.")
     stored: bool = Field(..., description="Whether the file is currently stored.")
     generated: bool = Field(
         ..., description="Whether the file was generated as output during a run."
