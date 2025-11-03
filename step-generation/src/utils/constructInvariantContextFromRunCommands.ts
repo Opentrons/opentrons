@@ -26,12 +26,41 @@ export function constructInvariantContextFromRunCommands(
 ): InvariantContext {
   return commands.reduce(
     (acc: InvariantContext, command: RunTimeCommand) => {
-      if (command.commandType === 'loadLabware' && command.result != null) {
+      let labwareEntities: LabwareEntities = { ...acc.labwareEntities }
+      if (command.commandType === 'loadLidStack' && command.result != null) {
         const result = command.result
-
+        if (result.lidStackDefinition.schemaVersion === 2) {
+          const labwareDefURI = getLabwareDefURI(result.lidStackDefinition)
+          const lidId = `${uuid()}:${labwareDefURI}`
+          labwareEntities = {
+            ...labwareEntities,
+            [lidId]: {
+              id: lidId,
+              labwareDefURI,
+              def: result.lidStackDefinition,
+              //  ProtocolTimelineScrubber won't need access to pythonNames
+              pythonName: 'n/a',
+            },
+          }
+          return {
+            ...acc,
+            labwareEntities,
+          }
+        } else {
+          // loadLabware commands from the backend can have schema 3 labware definitions.
+          // step-generation, and this function by extension, are not prepared to handle
+          // schema 3 yet.
+          return acc
+        }
+      } else if (
+        (command.commandType === 'loadLabware' ||
+          command.commandType === 'loadLid') &&
+        command.result != null
+      ) {
+        const { result } = command
         if (result.definition.schemaVersion === 2) {
-          const labwareEntities: LabwareEntities = {
-            ...acc.labwareEntities,
+          labwareEntities = {
+            ...labwareEntities,
             [result.labwareId]: {
               id: result.labwareId,
               labwareDefURI: getLabwareDefURI(result.definition),
