@@ -33,10 +33,13 @@ runs:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
         enable-cache: true
         cache-dependency-glob: '${{ inputs.project }}/uv.lock'
-    - shell: bash
+    - name: Setup Python Environment
+      shell: bash
       run: |
         # Try UV first, fall back to pipenv
         if command -v uv >/dev/null 2>&1; then
+          echo "::notice::Using UV for dependency management"
+          START_TIME=$(date +%s)
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             cd ${{ inputs.project }} && uv sync --frozen --extra dev
           elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
@@ -46,10 +49,17 @@ runs:
           else
             make -C ${{ inputs.project }} setup
           fi
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
+          echo "::notice::UV setup completed in ${DURATION} seconds"
         else
-          # Fall back to pipenv
+          echo "::notice::Falling back to pipenv for dependency management"
+          START_TIME=$(date +%s)
           $OT_PYTHON -m pip install --upgrade pip
           $OT_PYTHON -m pip install --user pipenv==2023.12.1
           $OT_PYTHON -m pip install --user virtualenv==20.30.0
           make -C ${{ inputs.project }} setup
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
+          echo "::notice::Pipenv setup completed in ${DURATION} seconds"
         fi
