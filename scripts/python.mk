@@ -9,11 +9,24 @@ OT_PYTHON ?= python
 # https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
 OT_VIRTUALENV_VERSION ?= 3.10
 
+# UV support - prefer UV if available, fall back to pipenv
+UV ?= uv
+USE_UV ?= $(shell command -v uv >/dev/null 2>&1 && echo "true" || echo "false")
+
+# Pipenv support (legacy)
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
+
+# Choose python/pip/pytest based on UV availability
+ifeq ($(USE_UV),true)
+python := $(UV) run python
+pip := $(UV) pip
+pytest := $(UV) run pytest
+else
 python := $(pipenv) run python
 pip := $(pipenv) run pip
 pytest := $(pipenv) run py.test
+endif
 
 pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
 pipenv_opts += $(and $(CI),--clear)

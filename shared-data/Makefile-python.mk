@@ -57,15 +57,24 @@ setup: setup-py
 
 .PHONY: setup-py
 setup-py:
+ifeq ($(USE_UV),true)
+	uv sync --frozen
+	uv pip list
+else
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
+endif
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
+ifeq ($(USE_UV),true)
+	rm -rf .venv
+else
 	-$(pipenv) --rm
+endif
 
 
 .PHONY: clean

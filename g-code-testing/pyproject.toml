@@ -22,8 +22,35 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "opentrons==0.0.0",
-    "robot-server==0.0.0",
+    "anyio==4.9.0",
+    "pydantic==2.9.0",
+    "systemd-python==234; sys_platform == 'linux'",
+    "g-code-testing @ .",
+    "opentrons @ ../api",
+    "opentrons-shared-data @ ../shared-data",
+    "opentrons_hardware @ ../hardware",
+    "robot-server @ ../robot-server",
+    "server-utils @ ../server-utils",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black==22.3.0",
+    "build~=1.2.0",
+    "diff-match-patch==20230430",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "mock~=5.1.0",
+    "mypy==1.8.0",
+    "pytest-aiohttp==1.0.5",
+    "pytest-asyncio>=1,<2",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "pytest>=8,<9",
+    "pyusb==1.2.1",
+    "types-mock~=5.1.0",
 ]
 dynamic = ["version", "hatch-dependency-coversion"]
 

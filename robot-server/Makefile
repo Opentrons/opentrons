@@ -71,14 +71,25 @@ all: clean wheel
 
 .PHONY: setup
 setup:
+ifeq ($(USE_UV),true)
+	uv sync --frozen
+	uv pip list
+else
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
+endif
 
 .PHONY: setup-ot2
 setup-ot2:
+ifeq ($(USE_UV),true)
+	uv sync --frozen
+	uv pip uninstall python-can
+	uv pip list
+else
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
+endif
 
 .PHONY: clean
 clean:
@@ -87,7 +98,11 @@ clean:
 
 .PHONY: teardown
 teardown:
+ifeq ($(USE_UV),true)
+	rm -rf .venv
+else
 	-$(pipenv) --rm
+endif
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

@@ -21,7 +21,43 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
-dependencies = []
+dependencies = [
+    "abr-testing @ .",
+    "google-api-python-client",
+    "gspread==6.0.2",
+    "hardware-testing @ ../hardware-testing",
+    "httplib2==0.22.0",
+    "oauth2client==4.1.3",
+    "pandas",
+    "pandas-stubs",
+    "paramiko",
+    "pydantic==2.9.0",
+    "slack-sdk",
+    "slackclient",
+    "opentrons-shared-data @ ../shared-data",
+    "opentrons-hardware[FLEX] @ ../hardware",
+    "opentrons[flex-hardware] @ ../api",
+    "prettier",
+]
+
+[project.optional-dependencies]
+dev = [
+    "atomicwrites==1.4.1",
+    "black==22.3.0",
+    "build~=1.2.0",
+    "colorama==0.4.4",
+    "flake8~=3.9.0",
+    "flake8-annotations~=2.6.2",
+    "flake8-docstrings~=1.6.0",
+    "flake8-noqa~=1.2.1",
+    "google-api-python-client-stubs",
+    "mypy==1.8.0",
+    "pytest-cov==2.10.1",
+    "pytest==7.1.1",
+    "requests==2.27.1",
+    "types-httplib2",
+    "types-requests==2.25.6",
+]
 dynamic = ["version"]
 
 [project.urls]

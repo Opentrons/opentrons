@@ -18,10 +18,44 @@ keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server to provide an external interface to the robot."
 
 dependencies = [
-    "pyjwt==2.6.0",
-    "systemd-python==234; sys_platform=='linux'",
-    "sqlalchemy==1.4.51",
+    "fastapi==0.100.0",
+    "filetype==1.2.0",
+    "importlib-metadata>=4.13.0,<5",
+    "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
+    "pyjwt==2.6.0",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "sqlalchemy==1.4.51",
+    "systemd-python==234; sys_platform == 'linux'",
+    "uvicorn==0.27.0.post1",
+    "zipp==3.21.0",
+    "server-utils @ ../server-utils",
+    "system_server @ .",
+]
+
+[project.optional-dependencies]
+dev = [
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "black==22.3.0",
+    "build~=1.2.0",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "coverage==7.4.0",
+    "decoy>=2.2.0,<3",
+    "flake8==7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "mypy==1.11.0",
+    "pytest-asyncio>=0.23.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-lazy-fixtures>=1.1.4,<2",
+    "pytest-xdist~=2.5.0",
+    "pytest>=7.2.2,<8",
+    "requests==2.27.1",
+    "sqlalchemy2-stubs==0.0.2a21",
+    "tavern>=2.9.1,<3",
+    "types-requests==2.27.1",
 ]
 
 dynamic = ['version']

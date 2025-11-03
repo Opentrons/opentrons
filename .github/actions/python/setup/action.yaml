@@ -28,11 +28,26 @@ runs:
       run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: npm install --global shx@0.3.3
+    - uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
+        enable-cache: true
+        cache-dependency-glob: '${{ inputs.project }}/uv.lock'
     - shell: bash
-      run: $OT_PYTHON -m pip install --upgrade pip
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user pipenv==2023.12.1
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user virtualenv==20.30.0
-    - shell: bash
-      run: 'make -C ${{ inputs.project }} setup || make -C ${{ inputs.project }} setup'
+      run: |
+        # Try UV first, fall back to pipenv
+        if command -v uv >/dev/null 2>&1; then
+          if [ -f "${{ inputs.project }}/uv.lock" ]; then
+            cd ${{ inputs.project }} && uv sync --frozen
+          elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
+            cd ${{ inputs.project }} && uv sync
+          else
+            make -C ${{ inputs.project }} setup
+          fi
+        else
+          # Fall back to pipenv
+          $OT_PYTHON -m pip install --upgrade pip
+          $OT_PYTHON -m pip install --user pipenv==2023.12.1
+          $OT_PYTHON -m pip install --user virtualenv==20.30.0
+          make -C ${{ inputs.project }} setup
+        fi

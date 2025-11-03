@@ -22,7 +22,33 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
+    "pyudev==0.23.2",
     "pyserial==3.5",
+    "typing-extensions>=4.0.0,<5",
+    "ot3usb @ .",
+]
+
+[project.optional-dependencies]
+dev = [
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "black==22.3.0",
+    "build~=1.2.0",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "coverage==7.4.1",
+    "decoy>=2.2.0,<3",
+    "flake8==7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "mock~=5.1.0",
+    "mypy==1.11.0",
+    "pytest-aiohttp==1.0.5",
+    "pytest-asyncio>=1,<2",
+    "pytest-cov==4.1.0",
+    "pytest-watch~=4.2.0",
+    "pytest-xdist~=2.5.0",
+    "pytest>=8,<9",
+    "types-mock~=5.1.0",
 ]
 dynamic = ["version"]
 readme = "README.md"

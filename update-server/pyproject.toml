@@ -23,7 +23,27 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "aiohttp==3.9.3",
+    "typing-extensions>=4.0.0,<5",
+    "otupdate @ .",
+]
+
+[project.optional-dependencies]
+dev = [
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "black==22.3.0",
+    "build~=1.2.0",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "coverage==7.4.1",
+    "decoy>=2.2.0,<3",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "mypy==1.11.0",
+    "pytest-aiohttp==1.0.5",
+    "pytest-cov==4.1.0",
+    "pytest-watch~=4.2.0",
+    "pytest>=8,<9",
 ]
 dynamic = ['version']
 

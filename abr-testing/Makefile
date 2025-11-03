@@ -35,12 +35,21 @@ all: clean wheel
 
 .PHONY: setup
 setup:
+ifeq ($(USE_UV),true)
+	uv sync --frozen
+	uv pip list
+else
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
+endif
 
 .PHONY: teardown
 teardown:
+ifeq ($(USE_UV),true)
+	rm -rf .venv
+else
 	-$(pipenv) --rm
+endif
 
 .PHONY: clean
 clean:
