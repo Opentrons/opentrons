@@ -699,11 +699,14 @@ export const getHydratedUnsavedForm: Selector<
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, invariantContext) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, invariantContext, allLabwareDefs) => {
     if (unsavedForm == null) return null
-
-    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      invariantContext,
+      allLabwareDefs
+    )
     return hydratedForm ?? null
   }
 )
@@ -759,12 +762,16 @@ export const getArgsAndErrorsByStepId: Selector<
 > = createSelector(
   getOrderedSavedForms,
   getInvariantContext,
-  (stepForms, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (stepForms, contextualState, allLabwareDefs) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
-        const hydratedForm = getHydratedForm(stepForm, contextualState)
-
+        const hydratedForm = getHydratedForm(
+          stepForm,
+          contextualState,
+          allLabwareDefs
+        )
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
@@ -817,11 +824,14 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, contextualState, allLabwareDefs) => {
     if (!unsavedForm) return []
-
-    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      contextualState,
+      allLabwareDefs
+    )
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
@@ -831,12 +841,15 @@ export const getFormLevelWarningsPerStep: Selector<
 > = createSelector(
   getSavedStepForms,
   getInvariantContext,
-  (forms, contextualState) =>
+  labwareDefSelectors.getLabwareDefsByURI,
+  (forms, contextualState, allLabwareDefs) =>
     mapValues(forms, (form, stepId) => {
       if (!form) return []
-
-      const hydratedForm = getHydratedForm(form, contextualState)
-
+      const hydratedForm = getHydratedForm(
+        form,
+        contextualState,
+        allLabwareDefs
+      )
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )

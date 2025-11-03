@@ -22,6 +22,7 @@ import type {
   LabwareEntities,
   PipetteEntity,
   StagingAreaEntities,
+  TipRackWithDef,
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
@@ -29,6 +30,7 @@ import type {
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { ValueCaster, ValueMasker } from './processing'
 
 export type { StepFieldName }
@@ -155,10 +157,22 @@ const getPipetteEntity = (
   return state.pipetteEntities[id] || null
 }
 
+const getTipRackDefinition = (
+  state: InvariantContext,
+  tiprackDefURI: string,
+  allLabwareDefs: LabwareDefByDefURI
+): TipRackWithDef => {
+  return { tiprackDefURI: tiprackDefURI, ...allLabwareDefs[tiprackDefURI] }
+}
+
 interface StepFieldHelpers {
   maskValue?: ValueMasker
   castValue?: ValueCaster
-  hydrate?: (state: InvariantContext, id: string) => unknown
+  hydrate?: (
+    state: InvariantContext,
+    id: string,
+    allLabwareDefs: LabwareDefByDefURI
+  ) => unknown
 }
 const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   aspirate_airGap_volume: {
@@ -287,6 +301,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   pipette: {
     hydrate: getPipetteEntity,
   },
+  tipRack: { hydrate: getTipRackDefinition },
   times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
@@ -430,8 +445,9 @@ export const maskField = (name: StepFieldName, value: unknown): unknown => {
 export const hydrateField = (
   state: InvariantContext,
   name: StepFieldName,
-  value: string
+  value: string,
+  allLabwareDefs: LabwareDefByDefURI
 ): unknown => {
   const hydrator = stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
-  return hydrator ? hydrator(state, value) : value
+  return hydrator ? hydrator(state, value, allLabwareDefs) : value
 }

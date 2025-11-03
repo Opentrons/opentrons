@@ -185,7 +185,9 @@ describe('liquid class compatibility', () => {
       pipette: {
         spec: { channels: 1, liquids: { default: { maxVolume: 1000 } } },
       },
-      tipRack: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      tipRack: {
+        tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      },
       liquidClass: 'glycerol_50',
       path: 'singleDispense',
     }
@@ -234,7 +236,7 @@ describe('liquid class compatibility', () => {
   it('should return liquid classes incompatible with the pipette warning if tiprack incompatible with all liquid classes', () => {
     fields = {
       ...fields,
-      tipRack: 'badTiprack',
+      tipRack: { tiprackDefURI: 'badTiprack' },
     }
     expect(incompatibleLiquidClass(fields)?.type).toBe(
       'INCOMPATIBLE_TIP_RACK_ALL'

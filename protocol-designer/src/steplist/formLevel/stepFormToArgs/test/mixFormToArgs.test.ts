@@ -23,6 +23,16 @@ const labwareType = getLabwareDefURI(labwareDef)
 beforeEach(() => {
   vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
+  const tiprackLabwareDef = {
+    parameters: {
+      tipLength: 10,
+      loadName: 'mockTiprack',
+    },
+    metadata: {
+      displayName: 'mock display name',
+    },
+  } as LabwareDefinition2
+
   hydratedForm = {
     id: 'stepId',
     stepType: 'mix',
@@ -40,21 +50,11 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
-    tipRack: 'mockTiprack',
+    tipRack: { tiprackDefURI: 'mockTiprack', ...tiprackLabwareDef },
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10SingleV2Specs,
-      tiprackLabwareDef: [
-        {
-          parameters: {
-            tipLength: 10,
-            loadName: 'mockTiprack',
-          },
-          metadata: {
-            displayName: 'mock display name',
-          },
-        },
-      ] as any,
+      tiprackLabwareDef: [tiprackLabwareDef] as any,
     } as any,
     // @ts-expect-error(sa, 2021-6-15): volume should be a number
     volume: '12',
