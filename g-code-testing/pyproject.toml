@@ -25,7 +25,7 @@ dynamic = ["version", "hatch-dependency-coversion"]
 
 dependencies = [
     "anyio==4.9.0",
-    "pydantic==2.9.0",
+    "pydantic==2.11.7",
     "systemd-python==234; sys_platform == 'linux'",
     "g-code-testing",
     "opentrons",

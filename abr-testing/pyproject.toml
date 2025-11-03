@@ -42,7 +42,7 @@ dependencies = [
     "pandas",
     "pandas-stubs",
     "paramiko",
-    "pydantic==2.9.0",
+    "pydantic==2.11.7",
     "slack-sdk",
     "slackclient",
     "opentrons-shared-data",
