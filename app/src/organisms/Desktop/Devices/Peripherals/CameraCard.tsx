@@ -18,6 +18,7 @@ import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
+import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
@@ -129,6 +130,7 @@ function CameraCardOverflowMenu({
   navigateToUsageSettings: () => void
 }): JSX.Element {
   const { t } = useTranslation('device_details')
+  const cameraControlsEnabled = useFeatureFlag('camera')
 
   return (
     <div className={styles.card_overflow_menu_container}>
@@ -136,7 +138,9 @@ function CameraCardOverflowMenu({
         <MenuItem onClick={toggleCameraEnabled}>
           {cameraEnabled ? t('disable_camera') : t('enable_camera')}
         </MenuItem>
-        <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
+        {cameraControlsEnabled && (
+          <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
+        )}
         <Divider />
         <MenuItem onClick={navigateToUsageSettings}>
           {t('usage_settings')}
