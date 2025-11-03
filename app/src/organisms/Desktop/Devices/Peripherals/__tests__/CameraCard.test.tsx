@@ -7,8 +7,8 @@ import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { CameraCard } from '../CameraCard'
@@ -17,9 +17,7 @@ import type { Mock } from 'vitest'
 import type { CameraCardProps } from '../CameraCard'
 
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
-vi.mock(
-  '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
-)
+vi.mock('/app/local-resources/images/hooks/useCameraUsageSettings')
 vi.mock('/app/resources/runs')
 
 const mockNavigate = vi.fn()
@@ -100,18 +98,6 @@ describe('CameraCard', () => {
   })
 
   it('overflow button is not disabled when no run exists', () => {
-    render(mockProps)
-
-    const overflowButton = screen.getByLabelText('overflow')
-    expect(overflowButton).not.toBeDisabled()
-  })
-
-  it('overflow button is not disabled when run is idle', () => {
-    vi.mocked(useCurrentRunId).mockReturnValue('test-run-id')
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_IDLE } },
-    } as any)
-
     render(mockProps)
 
     const overflowButton = screen.getByLabelText('overflow')

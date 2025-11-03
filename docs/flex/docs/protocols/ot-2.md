@@ -4,9 +4,29 @@ title: "Opentrons Flex: OT-2 Protocols"
 
 There are hundreds of OT-2 protocols in the Protocol Library, and you may have created your own OT-2 protocols for your lab. Opentrons Flex can perform all the basic actions that the OT-2 can, but OT-2 protocols aren't directly compatible with Flex. However, with a little effort, you can adapt an OT-2 protocol so it will run on Flex. This lets you have parity across different Opentrons robots in your lab, or you can extend older protocols to take advantage of new features only offered on Flex.
 
-## OT-2 Python protocols
+Follow the steps below. Start by making sure you're working with a Python protocol. Then, you can convert your protocol using OpentronsAI or make the changes yourself. 
 
-Using the Python Protocol API, you only have to change a few aspects of an OT-2 protocol for it to run on Flex.
+When you're finished, import your new protocol into the Opentrons App. Check the run preview to see that it performs the same steps as your original OT-2 protocol. 
+
+## Converting to Python
+
+To begin, you'll need to make sure your OT-2 protocol is a Python protocol. Older protocols created in Protocol Designer may be JSON files. 
+
+Currently, Protocol Designer can't convert an OT-2 protocol to a Flex protocol. You have to choose which robot the protocol will run on when you create it. Instead, use Protocol Designer to convert your JSON file to a Python file. 
+
+Launch Protocol Designer and import your OT-2 protocol. Protocol Designer will update your file to the latest version. Here, you can make small changes to your protocol steps, but you won't be able to change the robot type. When you're ready, export your updated protocol from Protocol Designer as a Python file. 
+
+## Updating with OpentronsAI
+
+OpentronsAI makes it easy to convert your OT-2 Python protocol to run on Flex. 
+
+Launch OpentronsAI and select **Update an existing protocol** on the home page. Upload your Python file to OpentronsAI. From the dropdown menu, choose **Adapt Python protocol from OT-2 to Flex**. Be sure to include details of the changes you'd like in the text field. You can request that OpentronsAI include Flex-exclusive modules and features, like a 96-channel pipette or the Flex Stacker Module, in your updated protocol. 
+ 
+Submit your prompt and wait for OpentronsAI to generate your updated protocol. Before downloading your new protocol, you can ask OpentronsAI to simulate for errors.
+
+## Updating with the Python Protocol API
+
+Using the Python Protocol API, you can make a few changes to an OT-2 protocol for it to run on Flex.
 
 ### Metadata and requirements
 
@@ -97,26 +117,6 @@ with Flex and OT-2.
 
 For protocols that load `magnetic module`, `magdeck`, or `magnetic module
 gen2`, see [Magnetic Module Protocols][magnetic-module-protocols] below.
-
-## OT-2 JSON protocols
-
-Currently, Protocol Designer can't convert an OT-2 protocol to a Flex protocol. You have to choose which robot the protocol will run on when you create it.
-
-Since Flex protocols support nearly all the features of OT-2 protocols, you can create a new protocol that performs all the same steps, but is designed to run on Flex. The simplest way to do this is:
-
-1.  Launch Protocol Designer and import your OT-2 protocol.
-
-2.  Open a second browser window and launch Protocol Designer there.
-
-3.  Create a new Flex protocol in the second browser window.
-
-4.  Set up the Flex hardware as similarly as possible as the OT-2 hardware. For example, choose pipettes of the same capacity or larger, and choose modules of the same type.
-
-5.  Replicate the liquid setup and steps from the OT-2 protocol.
-
-6.  Export your Flex protocol. Import it into the Opentrons App and check the run preview to see that it performs the same steps as your OT-2 protocol.
-
-You can make bigger changes if your Flex configuration differs significantly from your OT-2 configuration, but you may need to re-verify your protocol.
 
 ## Magnetic Module protocols
 

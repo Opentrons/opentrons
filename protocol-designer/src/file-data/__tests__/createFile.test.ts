@@ -15,6 +15,7 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import { formatPyStr, PAPI_VERSION } from '@opentrons/step-generation'
 
 import {
   dismissedWarnings,
@@ -152,7 +153,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.26"}
+requirements = {"robotType": "OT-2", "apiLevel": ${formatPyStr(PAPI_VERSION)}}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:

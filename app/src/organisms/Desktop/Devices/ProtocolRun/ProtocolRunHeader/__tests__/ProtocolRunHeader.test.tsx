@@ -42,6 +42,7 @@ vi.mock('../../../../RunProgressMeter')
 vi.mock('../RunHeaderProtocolName')
 vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
+vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
 
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'

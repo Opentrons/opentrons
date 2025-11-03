@@ -10,6 +10,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
     ImageParameters,
     CameraError,
 )
+from opentrons_shared_data.robot.types import RobotType
 from opentrons.system import camera
 
 
@@ -38,7 +39,7 @@ class CameraProviderWrapper:
         )
 
     async def process_image_capture(
-        self, parameters: ImageParameters
+        self, robot_type: RobotType, parameters: ImageParameters
     ) -> bytes | CameraError:
         """Process and image capture request for a Camera utilizing a given set of parameters. Returns None if an error occurred."""
-        return await camera.image_capture(parameters=parameters)
+        return await camera.image_capture(robot_type=robot_type, parameters=parameters)

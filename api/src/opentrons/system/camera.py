@@ -9,6 +9,7 @@ from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_pat
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons.config import IS_ROBOT
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     ImageParameters,
@@ -119,13 +120,23 @@ def get_stream_configuration_filepath() -> Path:
     return filepath
 
 
+def robot_supports_livestream(robot_type: RobotType) -> bool:
+    """Validate whether or not robot supports live streaming service."""
+    robot = RobotTypeEnum.robot_literal_to_enum(robot_type)
+    if robot == RobotTypeEnum.OT2:
+        # If we are on an OT-2 we do not support live streams
+        return False
+    return True
+
+
 async def update_live_stream_status(
+    robot_type: RobotType,
     stream_status: bool,
     camera_provider: CameraProvider,
     override_settings: Optional[CameraSettings] = None,
 ) -> None:
     """Update and handle a change in the Opentrons Live Stream status."""
-    if not IS_ROBOT:
+    if not IS_ROBOT or robot_supports_livestream(robot_type) is False:
         # If we are not on a robot we simply no-op updating the stream
         return None
 
@@ -157,11 +168,15 @@ async def update_live_stream_status(
     contents["BOOT_ID"] = get_boot_id()
     contents["STATUS"] = status
     write_stream_configuration_file_data(contents)
-    await restart_live_stream()
+    await restart_live_stream(robot_type)
 
 
-async def stop_live_stream() -> None:
+async def stop_live_stream(robot_type: RobotType) -> None:
     """Attempt to stop the Opentrons Live Stream service."""
+    if robot_supports_livestream(robot_type) is False:
+        # No-op on OT-2 since we don't have a live stream service there
+        return None
+
     command = ["systemctl", "stop", "opentrons-live-stream"]
     subprocess = await asyncio.create_subprocess_exec(
         *command,
@@ -177,8 +192,12 @@ async def stop_live_stream() -> None:
         )
 
 
-async def restart_live_stream() -> None:
+async def restart_live_stream(robot_type: RobotType) -> None:
     """Attempt to restart the Opentrons Live Stream service."""
+    if robot_supports_livestream(robot_type) is False:
+        # No-op on OT-2 since we don't have a live stream service there
+        return None
+
     command = ["systemctl", "restart", "opentrons-live-stream"]
     subprocess = await asyncio.create_subprocess_exec(
         *command,
@@ -255,7 +274,9 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
         fd.writelines(file_lines)
 
 
-async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
+async def image_capture(
+    robot_type: RobotType, parameters: ImageParameters
+) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
     camera = (
         FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA
@@ -292,7 +313,7 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         )
     try:
         # Always stop the live stream service to ensure the Camera is always free when attempting an image capture
-        await stop_live_stream()
+        await stop_live_stream(robot_type)
 
         zoom = parameters.zoom if parameters.zoom is not None else ZOOM_DEFAULT
         contrast = (
@@ -315,6 +336,7 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         )
 
         result = await ffmpeg.ffmpeg_capture_image_bytes(
+            robot_type=robot_type,
             resolution=resolution,
             camera=camera,
             zoom=zoom,
@@ -330,7 +352,7 @@ async def image_capture(parameters: ImageParameters) -> bytes | CameraError:
         )
     finally:
         # Restart the live stream service
-        await restart_live_stream()
+        await restart_live_stream(robot_type)
     return result
 
 
