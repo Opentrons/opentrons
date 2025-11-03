@@ -17,6 +17,7 @@ export interface CsvFileData {
 
 export interface ImageFileData {
   id: string
+  filename: string
   createdAt: string
   cameraId: string
   commandId?: string
