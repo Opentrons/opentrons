@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
@@ -12,7 +11,6 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   NO_WRAP,
-  SecondaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -20,11 +18,7 @@ import {
 import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 // import { useFeatureFlag } from '/app/redux/config'
-import {
-  useProtocolDetailsForRun,
-  useRunCreatedAtTimestamp,
-  useRunTimestamps,
-} from '/app/resources/runs'
+import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
 
 import { DisplayRunStatus } from '../DisplayRunStatus'
 import { isCancellableStatus } from '../utils'
@@ -37,7 +31,7 @@ import type { RunHeaderContentProps } from '.'
 export function RunHeaderSectionUpper(
   props: RunHeaderContentProps
 ): JSX.Element {
-  const { runId, runStatus, robotName, runHeaderModalContainerUtils } = props
+  const { runId, runStatus, runHeaderModalContainerUtils } = props
   const { t } = useTranslation('run_details')
   // const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   // const navigate = useNavigate()
@@ -45,14 +39,6 @@ export function RunHeaderSectionUpper(
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  // const { protocolKey } = useProtocolDetailsForRun(runId)
-
-  // const handleVisualizeClick = (): void => {
-  //   // need to encode URL to avoid spaces and slashes
-  //   const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
-  //   const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
-  //   navigate(targetPath)
-  // }
   const handleCancelRunClick = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pause()
@@ -78,15 +64,7 @@ export function RunHeaderSectionUpper(
           />
         }
       />
-      <Flex
-        justifyContent={JUSTIFY_FLEX_END}
-        // gridGap={enableProtocolTimeline ? SPACING.spacing4 : 0}
-      >
-        {/* {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
-          <SecondaryButton onClick={handleVisualizeClick}>
-            {t('visualize')}
-          </SecondaryButton>
-        ) : null} */}
+      <Flex justifyContent={JUSTIFY_FLEX_END}>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
           {isCancellableStatus(runStatus) && (
             <AlertPrimaryButton
