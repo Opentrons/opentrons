@@ -18,10 +18,12 @@ from typing import List, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
-# LABWARE TYPE
-LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
+###########################################
+#  GLOBAL VARIABLES - START
+###########################################
 
-# SLOTS
+LABWARE = "example_labware"  # change to desired labware
+
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
 SLOT_PROBING_TIPRACK = "D2"
 SLOT_LABWARE = "D1"
@@ -33,6 +35,10 @@ FILE_NAME = ""
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
+
+###########################################
+#  GLOBAL VARIABLES - END
+###########################################
 
 metadata = {"protocolName": "volume-validator", "author": "hovan.ngo@opentrons.com"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
@@ -335,7 +341,7 @@ def aspirate_dispense_measure(
             ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
             ethanol_props.dispense.submerge.speed = 50
             ethanol_props.dispense.retract.speed = 50
-            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(5)
             ethanol_props.dispense.retract.blowout.flow_rate = (
                 liq_pipette.flow_rate.blow_out
             )

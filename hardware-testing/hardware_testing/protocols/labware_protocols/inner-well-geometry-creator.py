@@ -28,24 +28,19 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
-
 LIQUID_MOUNT = "right"
 LIQUID_PIPETTE_SIZE = 1000
-
 PROBING_MOUNT = "left"
 PROBING_TIP_SIZE = 50
 PROBING_PIPETTE_SIZE = 50
-
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
 SLOT_PROBING_TIPRACK = "D2"
-
 SLOT_LABWARE = "D1"
 SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B2"
-
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
@@ -541,7 +536,7 @@ def get_dispense_props(state: SetupState, ts: TrialState) -> None:
         ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
         ethanol_props.dispense.dispense_position.position_reference = wb  # type: ignore[assignment]
         ethanol_props.dispense.dispense_position.offset.z = dispense_offset
-        ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)
+        ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(5)
         ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(80)
         ethanol_props.dispense.retract.blowout.flow_rate = (
             state.liq_pipette.flow_rate.blow_out
