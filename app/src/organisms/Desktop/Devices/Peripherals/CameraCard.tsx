@@ -18,6 +18,8 @@ import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
@@ -42,7 +44,7 @@ export function CameraCard({
   }
 
   const runId = useCurrentRunId()
-
+  const robotType = useRobotType(robotName)
   const doesRunExist = runId != null
 
   const cardOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
@@ -51,12 +53,32 @@ export function CameraCard({
     },
   })
 
-  const { isCameraEnabled, toggleCameraEnabled } = useCameraUsageSettings()
+  const {
+    isCameraEnabled,
+    toggleCameraEnabled,
+    isLiveVideoEnabled,
+    isRecoveryCaptureEnabled,
+  } = useCameraUsageSettings()
 
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
 
+  const baseParams = {
+    source: 'robotSettings' as const,
+    robotType,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  const handleToggleCamera = (): void => {
+    toggleCameraEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      transactionId: `robot-card-${Date.now()}`,
+      cameraEnabled: isCameraEnabled,
+      liveFeedEnabled: isLiveVideoEnabled,
+      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+    })
+  }
   const navigateToUsageSettings = (): void => {
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
@@ -102,7 +124,7 @@ export function CameraCard({
         >
           <CameraCardOverflowMenu
             cameraEnabled={isCameraEnabled}
-            toggleCameraEnabled={toggleCameraEnabled}
+            handleToggleCamera={handleToggleCamera}
             toggleControls={toggleControls}
             navigateToUsageSettings={navigateToUsageSettings}
           />
@@ -119,12 +141,12 @@ export function CameraCard({
 
 function CameraCardOverflowMenu({
   cameraEnabled,
-  toggleCameraEnabled,
+  handleToggleCamera,
   toggleControls,
   navigateToUsageSettings,
 }: {
   cameraEnabled: boolean
-  toggleCameraEnabled: () => void
+  handleToggleCamera: () => void
   toggleControls: () => void
   navigateToUsageSettings: () => void
 }): JSX.Element {
@@ -133,7 +155,7 @@ function CameraCardOverflowMenu({
   return (
     <div className={styles.card_overflow_menu_container}>
       <div className={styles.card_overflow_menu_content_container}>
-        <MenuItem onClick={toggleCameraEnabled}>
+        <MenuItem onClick={handleToggleCamera}>
           {cameraEnabled ? t('disable_camera') : t('enable_camera')}
         </MenuItem>
         <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
