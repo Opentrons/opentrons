@@ -8,14 +8,14 @@ SHX := npx shx
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 
-# python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+# python and sphinx config
+sphinx_build := $(python) -m sphinx -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(pipenv) run sphinx-build
+sphinx_build_allow_warnings := $(python) -m sphinx
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
