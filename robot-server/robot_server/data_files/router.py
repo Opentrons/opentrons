@@ -481,6 +481,7 @@ async def get_run_image_metadata(
     data = [
         ImageFileMetadata.model_construct(
             id=file.id,
+            filename=file.name,
             cameraId=DEFAULT_CAMERA_ID,
             commandId=file.command_info.command_id,
             prevCommandId=file.command_info.prev_command_id,

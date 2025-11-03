@@ -92,6 +92,7 @@ class ImageFileMetadata(BaseModel):
         description="The id of the camera image file."
         " This id is identical to the filename of the camera image file.",
     )
+    filename: str = Field(..., description="The name of the data file.")
     cameraId: str = Field(
         ..., description="The ID of the camera used to capture the image file."
     )
