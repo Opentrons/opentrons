@@ -62,7 +62,9 @@ dev = [
 allow-direct-references = true
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of=['robot-server', 'opentrons']
+# Note: Packages using direct path references (@) are not listed here
+# as they don't need version coordination - they're editable installs
+override-versions-of=[]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "g_code_parsing/_version.py"
