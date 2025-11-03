@@ -44,6 +44,7 @@ export function SubStepsToolbox(
   const substeps = useSelector(getSubsteps)[stepId]
   const formData = useSelector(getSavedStepForms)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
+  console.log('hoveredSubstep', hoveredSubstep)
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(hoverOnSubstep(payload))
 

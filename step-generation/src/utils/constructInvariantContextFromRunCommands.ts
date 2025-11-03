@@ -28,20 +28,26 @@ export function constructInvariantContextFromRunCommands(
     (acc: InvariantContext, command: RunTimeCommand) => {
       let labwareEntities: LabwareEntities = { ...acc.labwareEntities }
       if (command.commandType === 'loadLidStack' && command.result != null) {
-        const result = command.result
-        if (result.lidStackDefinition.schemaVersion === 2) {
-          const labwareDefURI = getLabwareDefURI(result.lidStackDefinition)
-          const lidId = `${uuid()}:${labwareDefURI}`
-          labwareEntities = {
-            ...labwareEntities,
-            [lidId]: {
-              id: lidId,
-              labwareDefURI,
-              def: result.lidStackDefinition,
-              //  ProtocolTimelineScrubber won't need access to pythonNames
-              pythonName: 'n/a',
-            },
+        const { result, params } = command
+        const amount = params.quantity
+        if (
+          result.definition?.schemaVersion === 2 &&
+          result.definition != null
+        ) {
+          const labwareDefURI = getLabwareDefURI(result.definition)
+          for (let i = 0; i < amount; i++) {
+            const labwareId = result.labwareIds[i]
+            labwareEntities = {
+              ...labwareEntities,
+              [labwareId]: {
+                id: labwareId,
+                labwareDefURI,
+                def: result.definition,
+                pythonName: 'n/a',
+              },
+            }
           }
+
           return {
             ...acc,
             labwareEntities,

@@ -2,9 +2,12 @@ import { getModuleDef, locationIsOffDeck } from '@opentrons/shared-data'
 
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
-import { makeInitialRobotState } from './misc'
+import { getStackForLabwareLocation, makeInitialRobotState } from './misc'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LabwareLocationSequence,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -56,7 +59,44 @@ export function getResultingTimelineFrameFromRunCommands(
 
   const labwareLocations = commands.reduce<RobotState['labware']>(
     (acc, command) => {
-      if (command.commandType === 'loadLabware' && command.result != null) {
+      if (command.commandType === 'loadLidStack' && command.result != null) {
+        const { result } = command
+        const locationSequences = result.locationSequences
+        const labwareIds = result.labwareIds
+
+        if (locationSequences != null) {
+          const sequenceMap = locationSequences.reduce(
+            (acc: Record<string, LabwareLocationSequence>, subArray) => {
+              const firstLabware = subArray.find(
+                item => item.kind === 'onLabware'
+              )
+              if (firstLabware?.labwareId) {
+                acc[firstLabware.labwareId] = subArray
+              }
+              return acc
+            },
+            {}
+          )
+          const labwareStacks = labwareIds.reduce(
+            (acc: Record<string, { stack: string[] }>, id) => {
+              const sequence = sequenceMap[id]
+              if (sequence != null) {
+                acc[id] = { stack: getStackForLabwareLocation(sequence) }
+              }
+              return acc
+            },
+            {}
+          )
+          return {
+            ...acc,
+            ...labwareStacks,
+          }
+        }
+      } else if (
+        (command.commandType === 'loadLabware' ||
+          command.commandType === 'loadLid') &&
+        command.result != null
+      ) {
         const stack = [command.result.labwareId]
         if (locationIsOffDeck(command.params.location)) {
           stack.push(command.params.location)
@@ -85,7 +125,6 @@ export function getResultingTimelineFrameFromRunCommands(
     },
     {}
   )
-
   const initialRobotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,
