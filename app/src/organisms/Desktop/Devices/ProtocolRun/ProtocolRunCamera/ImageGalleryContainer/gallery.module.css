@@ -165,7 +165,7 @@
 .error_icon_container {
   display: flex;
   align-items: center;
-  grid-gap: var(--spacing-2);
+  gap: var(--spacing-2);
 }
 
 .error_content_container {
