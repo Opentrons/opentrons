@@ -2226,7 +2226,9 @@ def test_aspirate_liquid_class_using_volume_config(
         )
     ).then_return((LiquidHandlingWellLocation(origin=WellOrigin.BOTTOM), True))
     decoy.when(
-        mock_engine_client.state.pipettes.get_will_volume_mode_change(pipette_id="abc123", volume=123)
+        mock_engine_client.state.pipettes.get_will_volume_mode_change(
+            pipette_id="abc123", volume=123
+        )
     ).then_return(True)
     decoy.when(
         transfer_components_executor.absolute_point_from_position_reference_and_offset(
