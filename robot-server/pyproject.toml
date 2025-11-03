@@ -25,6 +25,7 @@ dependencies = [
     "fastapi==0.100.0",
     "idna==3.3",
     "numpy==1.22.3",
+    "paho-mqtt==1.6.1",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "python-dotenv==1.0.1",
