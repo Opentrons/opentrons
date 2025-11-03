@@ -10,6 +10,7 @@ import {
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -99,6 +100,11 @@ export function useRunHeaderModalContainer({
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
+  const baseParams = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
@@ -138,8 +144,15 @@ export function useRunHeaderModalContainer({
     // Camera settings do not require explicit confirmation by *any* user,
     // so if the settings haven't been confirmed, use this user's settings
     // before starting the run.
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
     if (!areCameraPreferencesConfirmed) {
-      const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+      reportCameraEnablementSettings({
+        ...baseParams,
+        runId: runId,
+        cameraEnabled: enabled,
+        liveFeedEnabled: liveStreamEnabled,
+        recoveryCaptureEnabled: recoveryEnabled,
+      })
       return addCameraSettingsToRun({
         runId,
         settings: {
@@ -149,6 +162,13 @@ export function useRunHeaderModalContainer({
         },
       }).then(() => handlePlay())
     } else {
+      reportCameraEnablementSettings({
+        ...baseParams,
+        runId: runId,
+        cameraEnabled: enabled,
+        liveFeedEnabled: liveStreamEnabled,
+        recoveryCaptureEnabled: recoveryEnabled,
+      })
       return handlePlay()
     }
   }

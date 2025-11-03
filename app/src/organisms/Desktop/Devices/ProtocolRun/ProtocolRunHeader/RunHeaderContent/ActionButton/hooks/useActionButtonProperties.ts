@@ -11,6 +11,8 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -72,6 +74,12 @@ export function useActionButtonProperties({
   const { t } = useTranslation(['run_details', 'shared'])
   const { play, pause, reset } = protocolRunControls
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
+  const robotType = useRobotType(robotName)
+  const baseParams = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const trackEvent = useTrackEvent()
@@ -142,6 +150,7 @@ export function useActionButtonProperties({
       else if (!areCameraPreferencesConfirmed) {
         const { enabled, recoveryEnabled, liveStreamEnabled } =
           runCameraSettings
+
         addCameraSettingsToRun(
           {
             runId,
@@ -153,8 +162,25 @@ export function useActionButtonProperties({
           },
           { onSettled: handlePlay }
         )
+
+        reportCameraEnablementSettings({
+          ...baseParams,
+          runId: runId,
+          cameraEnabled: enabled,
+          liveFeedEnabled: liveStreamEnabled,
+          recoveryCaptureEnabled: recoveryEnabled,
+        })
       } else {
         handlePlay()
+        const { enabled, recoveryEnabled, liveStreamEnabled } =
+          runCameraSettings
+        reportCameraEnablementSettings({
+          ...baseParams,
+          runId: runId,
+          cameraEnabled: enabled,
+          liveFeedEnabled: liveStreamEnabled,
+          recoveryCaptureEnabled: recoveryEnabled,
+        })
       }
     }
   } else if (isRunAgainStatus(runStatus)) {

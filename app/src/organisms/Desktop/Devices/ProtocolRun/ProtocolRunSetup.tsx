@@ -31,7 +31,6 @@ import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
@@ -214,13 +213,6 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
-  const baseParams = {
-    source: 'protocolRunRecord' as const,
-    robotType: robotType,
-    runID: runId,
-  }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-  const runCameraSettings = runRecord?.data.cameraSettings ?? null
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
   const isCameraConfirmed =
@@ -236,12 +228,6 @@ export function ProtocolRunSetup({
     }
   }, [cameraSettingsApplied, dispatch, isCameraConfirmed, runId])
 
-  reportCameraEnablementSettings({
-    ...baseParams,
-    cameraEnabled: runCameraSettings?.cameraEnabled,
-    liveFeedEnabled: runCameraSettings?.liveStreamEnabled,
-    recoveryCaptureEnabled: runCameraSettings?.errorRecoveryCameraEnabled,
-  })
   if (robot == null) {
     return null
   }
