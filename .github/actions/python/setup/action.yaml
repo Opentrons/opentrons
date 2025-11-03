@@ -40,7 +40,7 @@ runs:
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             cd ${{ inputs.project }} && uv sync --frozen
           elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
-            cd ${{ inputs.project }} && uv sync
+            cd ${{ inputs.project }} && uv sync --refresh
           else
             make -C ${{ inputs.project }} setup
           fi
