@@ -2,6 +2,9 @@
 requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project]
 name = "ot3usb"
 description = "A daemon to provide a bridge between the OT-3 USB port and the internal TCP server"

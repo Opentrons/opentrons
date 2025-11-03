@@ -58,6 +58,9 @@ dev = [
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/g-code-testing"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['robot-server', 'opentrons']
 

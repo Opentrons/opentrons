@@ -2,6 +2,9 @@
 requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project]
 name = "abr_testing"
 description = "Tools for running application-based reliability tests."

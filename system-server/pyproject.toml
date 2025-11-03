@@ -66,6 +66,9 @@ dev = [
 requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3']
 build-backend = 'hatchling.build'
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"
 tag-pattern='v(?P<version>.*)'
