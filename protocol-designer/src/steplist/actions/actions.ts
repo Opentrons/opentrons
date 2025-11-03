@@ -1,5 +1,5 @@
 import { getOrderedStepIds } from '../../step-forms/selectors'
-import { getNextNonTerminalItemId } from '../utils'
+import { getNextNonTerminalItemId } from '../utils/getNextNonTerminalItemId'
 
 import type { FormData, StepIdType } from '../../form-types'
 import type { ThunkAction } from '../../types'

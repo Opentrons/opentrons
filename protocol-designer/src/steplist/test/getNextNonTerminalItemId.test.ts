@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getNextNonTerminalItemId } from '../utils'
+import { getNextNonTerminalItemId } from '../utils/getNextNonTerminalItemId'
 
 describe('getNextNonTerminalItemId', () => {
   const orderedStepIds = ['1', '2', '3', '4', '5']
