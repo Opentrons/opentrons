@@ -58,7 +58,11 @@ setup: setup-py
 .PHONY: setup-py
 setup-py:
 ifeq ($(USE_UV),true)
-	uv sync --frozen --extra dev
+	@if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)

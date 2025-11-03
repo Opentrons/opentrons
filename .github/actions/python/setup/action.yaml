@@ -41,6 +41,8 @@ runs:
             cd ${{ inputs.project }} && uv sync --frozen --extra dev
           elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
             cd ${{ inputs.project }} && uv sync --extra dev
+            # Verify dev dependencies are installed
+            uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
           else
             make -C ${{ inputs.project }} setup
           fi
