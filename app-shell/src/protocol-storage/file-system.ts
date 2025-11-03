@@ -165,13 +165,13 @@ export function analyzeProtocolByKey(
     PROTOCOL_ANALYSIS_DIRECTORY_NAME
   )
   const destFilePath = makeAnalysisFilePath(analysisDirPath)
-  return readFilesWithinDirectory(srcDirPath).then(protocolFiles => {
-    if (protocolFiles.length === 0) {
+  return readFilesWithinDirectory(srcDirPath).then(dirsContainingProtocol => {
+    if (dirsContainingProtocol.length === 0) {
       throw new Error(
         `No valid protocol files (.py, .json) found in directory: ${srcDirPath}`
       )
     }
-    return analyzeProtocolSource(protocolFiles[0], destFilePath)
+    return analyzeProtocolSource(dirsContainingProtocol[0], destFilePath)
   })
 }
 
