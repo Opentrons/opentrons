@@ -37,6 +37,7 @@ export function LiquidLayoutOverlayModalContainer({
               wells: wellContentsId,
             })
           )
+          showLiquidOverflowMenu(false)
         },
       }}
       secondaryButtonProps={{
