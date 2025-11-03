@@ -315,8 +315,7 @@ class FixtureSettings:
 
         test_report = report.create_csv_test_report(
             volumes=volumes_flat,
-            pipette_channels=pipette_channels,
-            increment=increment,
+            pipette_channels=channels,
             trials=trials,
             name=name,
             run_id=run_id,
