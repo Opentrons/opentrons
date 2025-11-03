@@ -1,6 +1,10 @@
 import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { DropTipWellLocation, WellLocation } from './support'
+import type {
+  DropTipWellLocation,
+  KnownWellLocation,
+  WellLocation,
+} from './support'
 
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
@@ -327,8 +331,8 @@ export type AspDispAirgapParams = FlowRateParams &
 export type AspDispWhileTrackingParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams & {
-    trackFromLocation: WellLocation
-    trackToLocation: WellLocation
+    trackFromLocation: KnownWellLocation
+    trackToLocation: KnownWellLocation
   }
 
 export type BlowoutParams = FlowRateParams &

@@ -75,20 +75,14 @@ export const getPipettingCommandText = ({
     case 'aspirateWhileTracking': {
       const trackFromLocation = command.params.trackFromLocation
       const trackToLocation = command.params.trackToLocation
-      const from_origin_str =
-        trackFromLocation.origin == 'meniscus' ? 'meniscus+' : ''
-      const to_origin_str =
-        trackToLocation.origin == 'meniscus' ? 'meniscus+' : ''
-      const from_offset =
-        'offset' in trackFromLocation
-          ? `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
-          : ''
-      const to_offset =
-        'offset' in trackToLocation
-          ? `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
-          : ''
-      const trackFromString = `${from_origin_str}${from_offset}`
-      const trackToString = `${to_origin_str}${to_offset}`
+      const fromOriginStr =
+        trackFromLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const toOriginStr =
+        trackToLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const fromOffset = `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
+      const toOffset = `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
+      const trackFromString = `${fromOriginStr}${fromOffset}`
+      const trackToString = `${toOriginStr}${toOffset}`
       return t('aspirate_while_tracking', {
         well_name: wellName,
         track_from_location: trackFromString,
@@ -102,20 +96,14 @@ export const getPipettingCommandText = ({
     case 'dispenseWhileTracking': {
       const trackFromLocation = command.params.trackFromLocation
       const trackToLocation = command.params.trackToLocation
-      const from_origin_str =
-        trackFromLocation.origin == 'meniscus' ? 'meniscus+' : ''
-      const to_origin_str =
-        trackToLocation.origin == 'meniscus' ? 'meniscus+' : ''
-      const from_offset =
-        'offset' in trackFromLocation
-          ? `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
-          : ''
-      const to_offset =
-        'offset' in trackToLocation
-          ? `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
-          : ''
-      const trackFromString = `${from_origin_str}${from_offset}`
-      const trackToString = `${to_origin_str}${to_offset}`
+      const fromOriginStr =
+        trackFromLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const toOriginStr =
+        trackToLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const fromOffset = `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
+      const toOffset = `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
+      const trackFromString = `${fromOriginStr}${fromOffset}`
+      const trackToString = `${toOriginStr}${toOffset}`
       return t('dispense_while_tracking', {
         well_name: wellName,
         track_from_location: trackFromString,
