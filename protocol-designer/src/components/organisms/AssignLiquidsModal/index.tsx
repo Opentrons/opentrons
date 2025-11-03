@@ -96,7 +96,8 @@ export function AssignLiquidsModal(
     selectedLabwareIds,
   } = data
 
-  const enableStacking = useSelector(getEnableStacking)
+  const enableStacking = useSelector(getEnableStacking) ?? false
+  console.log('enableStacking', enableStacking)
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 
@@ -278,7 +279,7 @@ export function AssignLiquidsModalContainer(
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds) ?? [
     labwareId,
-  ]
+  ] as string[]
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
