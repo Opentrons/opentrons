@@ -91,7 +91,7 @@ class CaptureImageResult(BaseModel):
         description="Multiplier used when cropping and scaling the captured image. Scale is 1.0 to 2.0.",
     )
     pan: Optional[Tuple[int, int]] = Field(
-        ...,
+        None,
         description="X/Y (pixels) position panned to.",
     )
     contrast: float = Field(
@@ -112,7 +112,7 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
     return ImageParameters(
         resolution=params.resolution,
         zoom=params.zoom,
-        pan=params.pan if params.pan is not None else None,
+        pan=params.pan,
         contrast=(
             (params.contrast / 100) * 2.0 if params.contrast is not None else None
         ),
