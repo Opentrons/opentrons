@@ -30,7 +30,7 @@ dependencies = [
     "pyudev==0.23.2",
     "pyserial==3.5",
     "typing-extensions>=4.0.0,<5",
-    "ot3usb @ .",
+    "ot3usb @ file://.",
 ]
 
 [project.optional-dependencies]

@@ -28,10 +28,10 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "pyusb==1.2.1",
     "zipp==3.21.0",
-    "opentrons-shared-data @ ../shared-data",
-    "opentrons @ .",
-    "opentrons-hardware[FLEX] @ ../hardware",
-    "performance-metrics @ ../performance-metrics",
+    "opentrons-shared-data @ file://../shared-data",
+    "opentrons @ file://.",
+    "opentrons-hardware[FLEX] @ file://../hardware",
+    "performance-metrics @ file://../performance-metrics",
 ]
 
 [project.optional-dependencies]

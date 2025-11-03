@@ -36,12 +36,12 @@ dependencies = [
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "zipp==3.21.0",
-    "opentrons-hardware[FLEX] @ ../hardware",
-    "opentrons @ ../api",
-    "opentrons-shared-data @ ../shared-data",
-    "performance-metrics @ ../performance-metrics",
-    "robot-server @ .",
-    "server-utils @ ../server-utils",
+    "opentrons-hardware[FLEX] @ file://../hardware",
+    "opentrons @ file://../api",
+    "opentrons-shared-data @ file://../shared-data",
+    "performance-metrics @ file://../performance-metrics",
+    "robot-server @ file://.",
+    "server-utils @ file://../server-utils",
 ]
 
 [project.optional-dependencies]

@@ -27,12 +27,12 @@ dependencies = [
     "anyio==4.9.0",
     "pydantic==2.9.0",
     "systemd-python==234; sys_platform == 'linux'",
-    "g-code-testing @ .",
-    "opentrons @ ../api",
-    "opentrons-shared-data @ ../shared-data",
-    "opentrons_hardware @ ../hardware",
-    "robot-server @ ../robot-server",
-    "server-utils @ ../server-utils",
+    "g-code-testing @ file://.",
+    "opentrons @ file://../api",
+    "opentrons-shared-data @ file://../shared-data",
+    "opentrons_hardware @ file://../hardware",
+    "robot-server @ file://../robot-server",
+    "server-utils @ file://../server-utils",
 ]
 
 [project.optional-dependencies]

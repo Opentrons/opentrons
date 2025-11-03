@@ -31,8 +31,8 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "uvicorn==0.27.0.post1",
     "zipp==3.21.0",
-    "server-utils @ ../server-utils",
-    "system_server @ .",
+    "server-utils @ file://../server-utils",
+    "system_server @ file://.",
 ]
 
 [project.optional-dependencies]

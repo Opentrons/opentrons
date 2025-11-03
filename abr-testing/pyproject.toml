@@ -27,10 +27,10 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
-    "abr-testing @ .",
+    "abr-testing @ file://.",
     "google-api-python-client",
     "gspread==6.0.2",
-    "hardware-testing @ ../hardware-testing",
+    "hardware-testing @ file://../hardware-testing",
     "httplib2==0.22.0",
     "oauth2client==4.1.3",
     "pandas",
@@ -39,9 +39,9 @@ dependencies = [
     "pydantic==2.9.0",
     "slack-sdk",
     "slackclient",
-    "opentrons-shared-data @ ../shared-data",
-    "opentrons-hardware[FLEX] @ ../hardware",
-    "opentrons[flex-hardware] @ ../api",
+    "opentrons-shared-data @ file://../shared-data",
+    "opentrons-hardware[FLEX] @ file://../hardware",
+    "opentrons[flex-hardware] @ file://../api",
     "prettier",
 ]
 
