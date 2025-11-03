@@ -79,7 +79,7 @@ class CaptureImageResult(BaseModel):
     """Result data from running an image capture."""
 
     fileId: Optional[str] = Field(
-        ...,
+        None,
         description="File ID for image files output as a result of an image capture action.",
     )
     resolution: Tuple[int, int] = Field(
