@@ -68,6 +68,7 @@ import {
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -125,6 +126,7 @@ import type {
   SetupScreens,
 } from '/app/organisms/ODD/ProtocolSetup'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { CameraState } from '/app/redux/protocol-runs/types'
 import type { State } from '/app/redux/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
@@ -149,6 +151,7 @@ interface PrepareToRunProps {
   cameraSettingsConfirmed: boolean
   isLPCInitializing: boolean
   isCameraRequired: boolean
+  appCameraSettings: CameraState
 }
 
 function PrepareToRun({
@@ -165,6 +168,7 @@ function PrepareToRun({
   offsetsConfirmed,
   cameraSettingsConfirmed,
   isCameraRequired,
+  appCameraSettings,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -185,6 +189,12 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
+  const robotType = useRobotType(robotName)
+  const baseParams = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
 
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
@@ -207,8 +217,6 @@ function PrepareToRun({
       setIsPollingForCompletedAnalysis(true)
     }
   }, [mostRecentAnalysis?.status])
-
-  const robotType = useRobotType(robotName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -411,6 +419,13 @@ function PrepareToRun({
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData ?? {},
+          })
+          reportCameraEnablementSettings({
+            ...baseParams,
+            runId,
+            cameraEnabled: appCameraSettings.enabled,
+            liveFeedEnabled: appCameraSettings.liveStreamEnabled,
+            recoveryCaptureEnabled: appCameraSettings.recoveryEnabled,
           })
         }
       } else if (!isCameraReadyToRun) {
@@ -940,6 +955,7 @@ export function ProtocolSetup(): JSX.Element {
         offsetsConfirmed={offsetsConfirmed}
         cameraSettingsConfirmed={cameraSettingsConfirmed}
         isCameraRequired={isCameraRequired}
+        appCameraSettings={appCameraSettings}
       />
     ),
     instruments: (
