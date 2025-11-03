@@ -17,7 +17,7 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
   - Enable or disable the camera. The camera can capture images of the deck during a protocol or take an image when an error occurs.
   - Turn on a live view of the Flex or OT-2 deck during your protocol run.
   - View, download, or delete images after a protocol run.
-- Choose to return tips to the tip rack in a Quick Transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol. 
+- Choose to return tips to the tip rack in a Quick Transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
 
 ### Bug Fixes
 
