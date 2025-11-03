@@ -27,12 +27,12 @@ dependencies = [
     "anyio==4.9.0",
     "pydantic==2.9.0",
     "systemd-python==234; sys_platform == 'linux'",
-    "g-code-testing @ file://.",
-    "opentrons @ file://../api",
-    "opentrons-shared-data @ file://../shared-data",
-    "opentrons_hardware @ file://../hardware",
-    "robot-server @ file://../robot-server",
-    "server-utils @ file://../server-utils",
+    "g-code-testing",
+    "opentrons",
+    "opentrons-shared-data",
+    "opentrons_hardware",
+    "robot-server",
+    "server-utils",
 ]
 
 [project.optional-dependencies]
@@ -60,6 +60,13 @@ dev = [
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv.sources]
+opentrons = { path = "../api", editable = true }
+"opentrons-shared-data" = { path = "../shared-data", editable = true }
+"opentrons_hardware" = { path = "../hardware", editable = true }
+"robot-server" = { path = "../robot-server", editable = true }
+"server-utils" = { path = "../server-utils", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 # Note: Packages using direct path references (@) are not listed here

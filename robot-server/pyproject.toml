@@ -36,12 +36,11 @@ dependencies = [
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "zipp==3.21.0",
-    "opentrons-hardware[FLEX] @ file://../hardware",
-    "opentrons @ file://../api",
-    "opentrons-shared-data @ file://../shared-data",
-    "performance-metrics @ file://../performance-metrics",
-    "robot-server @ file://.",
-    "server-utils @ file://../server-utils",
+    "opentrons-hardware[FLEX]",
+    "opentrons",
+    "opentrons-shared-data",
+    "performance-metrics",
+    "server-utils",
 ]
 
 [project.optional-dependencies]
@@ -83,6 +82,13 @@ build-backend = 'hatchling.build'
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv.sources]
+opentrons = { path = "../api", editable = true }
+"opentrons-shared-data" = { path = "../shared-data", editable = true }
+"opentrons-hardware" = { path = "../hardware", editable = true }
+"performance-metrics" = { path = "../performance-metrics", editable = true }
+"server-utils" = { path = "../server-utils", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 # Note: Packages using direct path references (@) are not listed here

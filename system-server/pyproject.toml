@@ -31,8 +31,7 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "uvicorn==0.27.0.post1",
     "zipp==3.21.0",
-    "server-utils @ file://../server-utils",
-    "system_server @ file://.",
+    "server-utils",
 ]
 
 [project.optional-dependencies]
@@ -68,6 +67,9 @@ build-backend = 'hatchling.build'
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv.sources]
+"server-utils" = { path = "../server-utils", editable = true }
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"

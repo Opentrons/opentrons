@@ -5,6 +5,12 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.uv.sources]
+"hardware-testing" = { path = "../hardware-testing", editable = true }
+"opentrons-shared-data" = { path = "../shared-data", editable = true }
+"opentrons-hardware" = { path = "../hardware", editable = true }
+opentrons = { path = "../api", editable = true }
+
 [project]
 name = "abr_testing"
 description = "Tools for running application-based reliability tests."
@@ -27,10 +33,10 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
-    "abr-testing @ file://.",
+    "abr-testing",
     "google-api-python-client",
     "gspread==6.0.2",
-    "hardware-testing @ file://../hardware-testing",
+    "hardware-testing",
     "httplib2==0.22.0",
     "oauth2client==4.1.3",
     "pandas",
@@ -39,9 +45,9 @@ dependencies = [
     "pydantic==2.9.0",
     "slack-sdk",
     "slackclient",
-    "opentrons-shared-data @ file://../shared-data",
-    "opentrons-hardware[FLEX] @ file://../hardware",
-    "opentrons[flex-hardware] @ file://../api",
+    "opentrons-shared-data",
+    "opentrons-hardware[FLEX]",
+    "opentrons[flex-hardware]",
     "prettier",
 ]
 

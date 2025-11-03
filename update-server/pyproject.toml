@@ -29,7 +29,6 @@ dynamic = ['version']
 
 dependencies = [
     "typing-extensions>=4.0.0,<5",
-    "otupdate @ file://.",
 ]
 
 [project.optional-dependencies]
