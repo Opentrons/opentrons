@@ -1,7 +1,10 @@
 import { getLabwareDefURI } from '.'
-import { LabwareDefinitionsByURI } from '../types'
 
-import type { LabwareDefinition, RunTimeCommand } from '..'
+import type {
+  LabwareDefinition,
+  LabwareDefinitionsByURI,
+  RunTimeCommand,
+} from '..'
 
 export function getLoadedLabwareDefinitionsByUri(
   commands: RunTimeCommand[]
