@@ -28,7 +28,7 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
