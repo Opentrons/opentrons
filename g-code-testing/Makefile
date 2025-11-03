@@ -22,7 +22,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 .PHONY: setup
 setup:
 ifeq ($(USE_UV),true)
-	uv sync --frozen --all-extras
+	uv sync --frozen --extra dev
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)

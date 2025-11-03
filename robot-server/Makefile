@@ -72,7 +72,7 @@ all: clean wheel
 .PHONY: setup
 setup:
 ifeq ($(USE_UV),true)
-	uv sync --frozen --all-extras
+	uv sync --frozen --extra dev
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)
@@ -82,7 +82,7 @@ endif
 .PHONY: setup-ot2
 setup-ot2:
 ifeq ($(USE_UV),true)
-	uv sync --frozen --all-extras
+	uv sync --frozen --extra dev
 	uv pip uninstall python-can
 	uv pip list
 else

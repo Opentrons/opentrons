@@ -25,7 +25,7 @@ ssh_opts ?= $(default_ssh_opts)
 .PHONY: setup
 setup:
 ifeq ($(USE_UV),true)
-	uv sync --frozen --all-extras
+	uv sync --frozen --extra dev
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)

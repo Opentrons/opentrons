@@ -38,9 +38,9 @@ runs:
         # Try UV first, fall back to pipenv
         if command -v uv >/dev/null 2>&1; then
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
-            cd ${{ inputs.project }} && uv sync --frozen --all-extras
+            cd ${{ inputs.project }} && uv sync --frozen --extra dev
           elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
-            cd ${{ inputs.project }} && uv sync --all-extras
+            cd ${{ inputs.project }} && uv sync --extra dev
           else
             make -C ${{ inputs.project }} setup
           fi
