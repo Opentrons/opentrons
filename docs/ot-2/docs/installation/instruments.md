@@ -25,3 +25,4 @@ OT-2 GEN2 single- and multi-channel pipettes are easier to identify compared to 
 ![OT2 GEN2 single channel pipette](../images/gen2-p300-single.png)
 ![OT2 GEN2 multi channel pipette](../images/GEN2-p300-multi.png)
 </figure>
+
