@@ -1,11 +1,8 @@
-import {
-  COLORS,
-  StyledText,
-} from '@opentrons/components'
-
-import type { ReactNode } from 'react'
+import { COLORS, StyledText } from '@opentrons/components'
 
 import styles from './labeledvalue.module.css'
+
+import type { ReactNode } from 'react'
 
 interface LabeledValueProps {
   label: string
@@ -15,7 +12,7 @@ interface LabeledValueProps {
 export function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <div className={styles.container}>
-      <StyledText desktopStyle='bodyDefaultRegular' color={COLORS.grey60}>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {props.label}
       </StyledText>
       {typeof props.value === 'string' ? (
