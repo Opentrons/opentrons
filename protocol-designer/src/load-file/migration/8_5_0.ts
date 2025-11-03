@@ -89,7 +89,10 @@ const getClippedFlowRateForMoveLiquid = (args: {
     ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
   // TODO: this won't find the definition for a custom tiprack
   const tiprackDef = getAllDefinitions()[tiprack]
-  console.assert(tiprackDef != null, `could not find labware definition for ${tiprack}`)
+  console.assert(
+    tiprackDef != null,
+    `could not find labware definition for ${tiprack}`
+  )
   let correctionVolume: number = 0
   if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
     const liquidClassLookup =
