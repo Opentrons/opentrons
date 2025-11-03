@@ -1,14 +1,11 @@
 import { getLabwareDefURI } from '.'
+import { LabwareDefinitionsByURI } from '../types'
 
 import type { LabwareDefinition, RunTimeCommand } from '..'
 
-export interface LabwareDefinitionsByUri {
-  [defURI: string]: LabwareDefinition
-}
-
 export function getLoadedLabwareDefinitionsByUri(
   commands: RunTimeCommand[]
-): LabwareDefinitionsByUri {
+): LabwareDefinitionsByURI {
   return commands.reduce((acc, command) => {
     if (
       command.commandType === 'loadLabware' ||

@@ -7,7 +7,7 @@ import {
 import type { RunData } from '@opentrons/api-client'
 import type {
   LabwareDefinition,
-  LabwareDefinitionsByUri,
+  LabwareDefinitionsByURI,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -171,7 +171,7 @@ export const mockLabwareDefinition = ({
 
 export const mockLabwareDefinitionsByUri = {
   'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockLabwareDefinition,
-} as LabwareDefinitionsByUri
+} as LabwareDefinitionsByURI
 
 export const mockModule: LoadedModule = {
   id: 'mockModuleID',
