@@ -5,11 +5,24 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
----
 
 ## Opentrons App Changes in 8.8.0
 
-### TODO
+Welcome to the v8.8.0 release of the Opentrons App! This release includes concurrent module actions and other new features, and addresses several bugs.
+
+### New Features
+
+- Choose to run module actions like setting temperatures, setting shake speed, or running a Thermocycler Module profile without pausing other protocol steps until they're complete. You can run these concurrent module actions with multiple Temperature, Heater-Shaker, or Thermocycler Modules, or simultaneously perform pipetting actions.
+- Use the Flex and OT-2's cameras to capture images. Manage camera use, images, and live view from the Opentrons App:
+  - Enable or disable the camera. The camera can capture images of the deck during a protocol or take an image when an error occurs.
+  - Turn on a live view of the Flex or OT-2 deck during your protocol run.
+  - View, download, or delete images after a protocol run.
+- Choose to return tips to the tip rack in a Quick Transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
+
+### Bug Fixes
+
+- An attached pipette no longer descends to attach a calibration probe for Labware Position Check, creating more clearance on the deck.
+- Changed runtime parameters no longer revert to their default values.
 
 ---
 
