@@ -6,6 +6,7 @@ import type {
   LabwareDefinition,
   ProtocolAnalysisOutput,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
@@ -18,9 +19,9 @@ export interface UseImageGalleryDataProps {
 }
 
 export interface UseImageGalleryDataResult {
+  currentCommand: RunTimeCommand | null
   currentCommandString: string
   previousCommandString: string
-  stubStepFraction: string
   isLoading: boolean
 }
 
@@ -55,12 +56,10 @@ export function useImageGalleryData({
     robotType,
   })
 
-  const stubTotalSteps = '100'
-  const stubCurrentStep = '1'
-  const stubStepFraction = `${stubCurrentStep}/${stubTotalSteps}`
   const isLoading = currentLoading || previousLoading
 
   return {
+    currentCommand: currentCommand ?? null,
     currentCommandString:
       currentCommandString.commandText.length === 0
         ? '?'
@@ -69,7 +68,6 @@ export function useImageGalleryData({
       previousCommandString.commandText.length === 0
         ? '?'
         : previousCommandString.commandText,
-    stubStepFraction,
     isLoading,
   }
 }

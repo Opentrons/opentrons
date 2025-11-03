@@ -34,15 +34,6 @@ export interface PopulateFormAction {
   type: 'POPULATE_FORM'
   payload: FormData
 }
-// Create new step
-export interface DeleteStepAction {
-  type: 'DELETE_STEP'
-  payload: StepIdType
-}
-export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
-  type: 'DELETE_STEP',
-  payload: stepId,
-})
 export interface DeleteMultipleStepsAction {
   type: 'DELETE_MULTIPLE_STEPS'
   payload: StepIdType[]

@@ -14,12 +14,19 @@ import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 vi.mock('../GalleryItemCard')
 vi.mock('/app/resources/dataFiles/useImageInfo')
 vi.mock('/app/redux/protocol-runs')
+vi.mock('../GalleryContainerOverflowMenu')
 
 const render = () => {
   const RUN_ID = 'run123'
   const robotType = 'OT-3 Standard' as RobotType
   return renderWithProviders(
-    <ImageGalleryContainer runId={RUN_ID} robotType={robotType} />,
+    <ImageGalleryContainer
+      runId={RUN_ID}
+      robotType={robotType}
+      protocolName="MOCK-PROTOCOL"
+      runTimestamp="MOCK-RUN-TIMESTAMP"
+      robotName="MOCK-ROBOT-NAME"
+    />,
     {
       i18nInstance: i18n,
     }

@@ -39,57 +39,55 @@ export type ModulePrepCommandsType =
 export function getModulePrepCommands(
   module: AttachedModule
 ): ModulePrepCommandsType[] {
-  let modulePrepCommands: ModulePrepCommandsType[] = []
-  if (module.id != null && module.moduleType === THERMOCYCLER_MODULE_TYPE) {
-    modulePrepCommands = [
-      {
-        commandType: 'thermocycler/deactivateLid',
-        params: { moduleId: module.id },
-      },
-      {
-        commandType: 'thermocycler/deactivateBlock',
-        params: { moduleId: module.id },
-      },
-      {
-        commandType: 'thermocycler/openLid',
-        params: { moduleId: module.id },
-      },
-    ]
-  } else if (
-    module.id != null &&
-    module.moduleType === HEATERSHAKER_MODULE_TYPE
-  ) {
-    modulePrepCommands = [
-      {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: { moduleId: module.id },
-      },
-      {
-        commandType: 'heaterShaker/deactivateHeater',
-        params: { moduleId: module.id },
-      },
-      {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: { moduleId: module.id },
-      },
-      {
-        commandType: 'heaterShaker/openLabwareLatch',
-        params: { moduleId: module.id },
-      },
-    ]
-  } else if (
-    module.id != null &&
-    module.moduleType === TEMPERATURE_MODULE_TYPE
-  ) {
-    modulePrepCommands = [
-      {
-        commandType: 'temperatureModule/deactivate',
-        params: { moduleId: module.id },
-      },
-    ]
+  if (module.id == null) {
+    console.error('No module id for module prep commands', module)
+    return []
   }
-
-  return modulePrepCommands
+  switch (module.moduleType) {
+    case THERMOCYCLER_MODULE_TYPE:
+      return [
+        {
+          commandType: 'thermocycler/deactivateLid',
+          params: { moduleId: module.id },
+        },
+        {
+          commandType: 'thermocycler/deactivateBlock',
+          params: { moduleId: module.id },
+        },
+        {
+          commandType: 'thermocycler/openLid',
+          params: { moduleId: module.id },
+        },
+      ]
+    case HEATERSHAKER_MODULE_TYPE:
+      return [
+        {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: module.id },
+        },
+        {
+          commandType: 'heaterShaker/deactivateHeater',
+          params: { moduleId: module.id },
+        },
+        {
+          commandType: 'heaterShaker/deactivateShaker',
+          params: { moduleId: module.id },
+        },
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          params: { moduleId: module.id },
+        },
+      ]
+    case TEMPERATURE_MODULE_TYPE:
+      return [
+        {
+          commandType: 'temperatureModule/deactivate',
+          params: { moduleId: module.id },
+        },
+      ]
+    default:
+      return []
+  }
 }
 
 export function getFlexStackerPrepCommands(

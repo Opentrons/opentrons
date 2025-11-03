@@ -123,3 +123,7 @@ test:
 .PHONY: test-cov
 test-cov:
 	$(MAKE) -C .. test-js-shared-data tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+
+.PHONY: pack
+pack: build-ts lib-js
+	yarn pack
