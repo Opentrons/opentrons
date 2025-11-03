@@ -21,6 +21,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
+dynamic = ["version"]
+
 dependencies = [
     "pyudev==0.23.2",
     "pyserial==3.5",
@@ -50,7 +52,6 @@ dev = [
     "pytest>=8,<9",
     "types-mock~=5.1.0",
 ]
-dynamic = ["version"]
 readme = "README.md"
 
 [project.urls]

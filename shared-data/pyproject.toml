@@ -9,6 +9,8 @@ license='Apache-2.0'
 requires-python='>=3.10'
 authors=[{name = 'Opentrons', email = 'engineering@opentrons.com'}]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
+dynamic = ['version']
+
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -48,7 +50,6 @@ dev = [
     "typing-extensions>=4.0.0,<5",
     "wheel==0.37.1",
 ]
-dynamic = ['version']
 
 [project.urls]
 "Source Code" = "https://github.com/Opentrons/opentrons"

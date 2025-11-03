@@ -16,6 +16,7 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy."
+dynamic = ['version', 'hatch-dependency-coversion']
 
 dependencies = [
     "aionotify==0.3.1",
@@ -67,8 +68,6 @@ dev = [
     "typing-extensions>=4.0.0,<5",
     "wheel==0.37.0",
 ]
-
-dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]

@@ -21,6 +21,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
+dynamic = ["version"]
+
 dependencies = [
     "abr-testing @ .",
     "google-api-python-client",
@@ -58,7 +60,6 @@ dev = [
     "types-httplib2",
     "types-requests==2.25.6",
 ]
-dynamic = ["version"]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/abr-testing"

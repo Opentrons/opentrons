@@ -22,6 +22,8 @@ classifiers = [
     "Programming Language :: Python :: 3.6",
     "Topic :: Scientific/Engineering",
 ]
+dynamic = ['version']
+
 dependencies = [
     "typing-extensions>=4.0.0,<5",
     "otupdate @ .",
@@ -45,7 +47,6 @@ dev = [
     "pytest-watch~=4.2.0",
     "pytest>=8,<9",
 ]
-dynamic = ['version']
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/update-server"

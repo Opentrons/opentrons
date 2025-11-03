@@ -16,6 +16,7 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "Common utilities for various Opentrons Python servers."
+dynamic = ['version']
 
 dependencies = [
     "idna==3.3",
@@ -44,8 +45,6 @@ dev = [
     "types-mock~=5.1.0",
     "types-requests~=2.31.0",
 ]
-
-dynamic = ['version']
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/server-utils"

@@ -16,6 +16,7 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server providing access to the Opentrons API"
+dynamic = ['version', 'hatch-dependency-coversion']
 
 dependencies = [
     "anyio==4.9.0",
@@ -72,8 +73,6 @@ dev = [
     "types-paho-mqtt==1.6.0.20240106",
     "types-requests~=2.27.1",
 ]
-
-dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/robot-server"
