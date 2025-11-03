@@ -38,6 +38,7 @@ export interface ImageFilesDataResponse {
 }
 export interface RunDataFileMetadata {
   id: string
+  filename: string
   stored: boolean
   generated: boolean
   mimeType: MimeType
