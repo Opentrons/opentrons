@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain, shell } from 'electron'
 
+import { isSecondaryWindowOpen } from '../index'
 import {
   SECONDARY_WINDOW_CONFIG,
   SECONDARY_WINDOW_OPTS,
@@ -59,7 +60,7 @@ export function updateStepDetailViewerData(
   })
 }
 
-function getWindowIdStepDetailViewer(protocolKey: string): string {
+export function getWindowIdStepDetailViewer(protocolKey: string): string {
   return `step-detail-viewer-${protocolKey}`
 }
 
@@ -74,8 +75,6 @@ const stepDetailDataStore = new Map<
   string,
   Omit<OpenStepDetailViewerParams, 'log'>
 >()
-
-let stepDetailViewerWindow: BrowserWindow | null = null
 
 export function createStepDetailViewerUi({
   log,
@@ -100,18 +99,18 @@ export function createStepDetailViewerUi({
     liquids,
   })
 
-  stepDetailViewerWindow = new BrowserWindow({
+  const stepDetailViewerWindow = new BrowserWindow({
     ...SECONDARY_WINDOW_OPTS,
-    width: 400,
-    height: 300,
-    minWidth: 300,
-    minHeight: 200,
+    width: 500,
+    height: 450,
+    minWidth: 500,
+    minHeight: 450,
   })
 
   stepDetailViewerWindow.once('ready-to-show', () => {
     log.debug('Step detail viewer window ready to show')
-    stepDetailViewerWindow?.setTitle('Slot Spotlight')
-    stepDetailViewerWindow?.show()
+    stepDetailViewerWindow.setTitle('Slot Spotlight')
+    stepDetailViewerWindow.show()
   })
 
   const url = STEP_DETAIL_VIEWER_URL(protocolKey)
@@ -125,11 +124,6 @@ export function createStepDetailViewerUi({
     return { action: 'deny' }
   })
 
-  // rest this variable once the window is closed
-  stepDetailViewerWindow.on('closed', () => {
-    stepDetailViewerWindow = null
-  })
-
   return stepDetailViewerWindow
 }
 
@@ -139,6 +133,8 @@ ipcMain.handle('get-step-detail-data', (_event, protocolKey: string) => {
   return stepDetailDataStore.get(protocolKey)
 })
 
-ipcMain.handle('is-step-detail-viewer-open', () => {
-  return stepDetailViewerWindow != null && !stepDetailViewerWindow.isDestroyed()
+ipcMain.handle('is-step-detail-viewer-open', (_event, protocolKey: string) => {
+  // Use the secondaryWindows map to reliably check if window exists
+  const windowId = getWindowIdStepDetailViewer(protocolKey)
+  return isSecondaryWindowOpen(windowId)
 })

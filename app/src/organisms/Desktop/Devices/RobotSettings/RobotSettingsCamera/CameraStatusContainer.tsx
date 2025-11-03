@@ -10,11 +10,13 @@ import type { JSX } from 'react'
 export interface CameraStatusContainerProps {
   toggleCameraEnabled: () => void
   isCameraEnabled: boolean
+  toggleDisabled: boolean
 }
 
 export function CameraStatusContainer({
   toggleCameraEnabled,
   isCameraEnabled,
+  toggleDisabled,
 }: CameraStatusContainerProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -40,6 +42,7 @@ export function CameraStatusContainer({
           label={t('camera_status')}
           toggledOn={isCameraEnabled}
           onClick={toggleCameraEnabled}
+          disabled={toggleDisabled}
         />
       </div>
     </div>

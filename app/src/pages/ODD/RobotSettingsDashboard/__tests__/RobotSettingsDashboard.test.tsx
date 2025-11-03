@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -17,11 +16,7 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
-import {
-  getAppLanguage,
-  toggleDevtools,
-  useFeatureFlag,
-} from '/app/redux/config'
+import { getAppLanguage, toggleDevtools } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotSettings } from '/app/redux/robot-settings'
@@ -100,7 +95,6 @@ describe('RobotSettingsDashboard', () => {
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
-    when(useFeatureFlag).calledWith('camera').thenReturn(true)
   })
 
   afterEach(() => {

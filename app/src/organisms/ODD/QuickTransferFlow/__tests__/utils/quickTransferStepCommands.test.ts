@@ -193,9 +193,9 @@ describe('quickTransferStepCommands', () => {
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
-      tip_tracking: AUTOMATIC,
-      tips_selected: [],
-      tiprack_selected: null,
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     }
     expect(
       quickTransferStepCommands({
@@ -350,9 +350,9 @@ pipette.drop_tip()`.trimStart()
       name: 'transfer',
       description: 'transferring from 1 well to another',
       pushOut: null,
-      tip_tracking: AUTOMATIC,
-      tips_selected: [],
-      tiprack_selected: null,
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     }
     expect(
       quickTransferStepCommands({
@@ -508,9 +508,9 @@ pipette.drop_tip()`.trimStart()
       description: 'transferring from 1 well to another',
       disposalVolume: null,
       pushOut: null,
-      tip_tracking: AUTOMATIC,
-      tips_selected: [],
-      tiprack_selected: null,
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     }
     expect(
       quickTransferStepCommands({

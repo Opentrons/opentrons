@@ -21,7 +21,6 @@ import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
 import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -32,7 +31,6 @@ export function DeviceDetailsComponent({
 }: DeviceDetailsComponentProps): JSX.Element {
   const location = useLocation()
   const isFlex = useIsFlex(robotName)
-  const isCameraEnabled = useFeatureFlag('camera')
   const { data: estopStatus, error: estopError } = useEstopQuery({
     enabled: isFlex,
   })
@@ -81,7 +79,7 @@ export function DeviceDetailsComponent({
           robotName={robotName}
           isRobotViewable={isRobotViewable}
         />
-        {isCameraEnabled && isRobotViewable && (
+        {isRobotViewable && (
           <>
             <Divider width="100%" />
             <Peripherals isFlex={isFlex} robotName={robotName} />

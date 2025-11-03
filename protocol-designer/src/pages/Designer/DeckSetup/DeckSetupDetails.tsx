@@ -4,6 +4,7 @@ import values from 'lodash/values'
 
 import { DeckLabelSet, Module } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getModuleDef,
   getPositionFromSlotId,
@@ -292,7 +293,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               innerProps={innerProps}
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode="offsetToSlot"
+              childrenPositioningMode={
+                moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+                  ? 'passThrough'
+                  : 'offsetToSlot'
+              }
             >
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (

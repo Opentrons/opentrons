@@ -1,6 +1,13 @@
-.container {
+.container_run {
   display: flex;
   flex-direction: column;
+  padding-bottom: var(--spacing-40);
+}
+
+.container_settings {
+  display: flex;
+  flex-direction: column;
+  padding-top: 7.75rem;
   padding-bottom: var(--spacing-40);
 }
 

@@ -1,17 +1,20 @@
-import { GET, request } from '../request'
+import { createAxiosConfig, GET, request } from '../request'
 
+import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { DownloadedDataFileResponse } from './types'
 
 export function getDataFileRaw(
   config: HostConfig,
-  fileId: string
+  fileId: string,
+  axiosConfig?: AxiosRequestConfig
 ): ResponsePromise<DownloadedDataFileResponse> {
   return request<DownloadedDataFileResponse>(
     GET,
     `/dataFiles/${fileId}/download`,
     null,
-    config
+    config,
+    axiosConfig && createAxiosConfig(axiosConfig)
   )
 }

@@ -9,6 +9,7 @@ import {
   NO_WRAP,
   StyledText,
   TertiaryButton,
+  TimelineScrubber,
 } from '@opentrons/components'
 
 import { stepDetailViewerUpdateAction } from '/app/redux/shell'
@@ -102,6 +103,49 @@ export function Controls(props: ControlsProps): JSX.Element {
       showPerStepOverflowMenu => !showPerStepOverflowMenu
     )
   }
+
+  const handleTrackChange = (updatedTrack: {
+    id: string
+    value: number
+  }): void => {
+    const normalizedValue = updatedTrack.value / 100
+    const nextIndex = Math.min(
+      Math.max(Math.round(normalizedValue * (numCommandLength - 1)), 0),
+      numCommandLength - 1
+    )
+
+    setSelectedCommand(commands[nextIndex].id)
+
+    if (
+      spotlightWindowData.slot != null &&
+      spotlightWindowData.command != null
+    ) {
+      dispatch(
+        stepDetailViewerUpdateAction({
+          protocolKey: spotlightWindowData.protocolKey,
+          slot: spotlightWindowData.slot,
+          command: spotlightWindowData.command,
+          robotState: spotlightWindowData.robotState,
+          invariantContext: spotlightWindowData.invariantContext,
+          analysis: spotlightWindowData.analysis,
+          liquids: spotlightWindowData.liquids,
+        })
+      )
+    }
+  }
+
+  const currentProgress =
+    numCommandLength > 0
+      ? (currentCommandIndex / (numCommandLength - 1)) * 100
+      : 0
+
+  const tracks = [
+    {
+      id: 'protocol-timeline',
+      value: currentProgress,
+    },
+  ]
+
   return (
     <>
       <div className={styles.container}>
@@ -150,40 +194,7 @@ export function Controls(props: ControlsProps): JSX.Element {
             </div>
           </div>
         </div>
-        <input
-          type="range"
-          min={1}
-          max={numCommandLength}
-          value={currentCommandIndex + 1}
-          className={styles.range_input}
-          style={{
-            //  @ts-expect-error: TODO figure out how to fix this - seems like
-            //  an issue with thinking i'm using styled-components?
-            '--progress': `${
-              ((currentCommandIndex + 1) / numCommandLength) * 100
-            }%`,
-          }}
-          onChange={e => {
-            const nextIndex = Number(e.target.value) - 1
-            setSelectedCommand(commands[nextIndex].id)
-            if (
-              spotlightWindowData.slot != null &&
-              spotlightWindowData.command != null
-            ) {
-              dispatch(
-                stepDetailViewerUpdateAction({
-                  protocolKey: spotlightWindowData.protocolKey,
-                  slot: spotlightWindowData.slot,
-                  command: spotlightWindowData.command,
-                  robotState: spotlightWindowData.robotState,
-                  invariantContext: spotlightWindowData.invariantContext,
-                  analysis: spotlightWindowData.analysis,
-                  liquids: spotlightWindowData.liquids,
-                })
-              )
-            }
-          }}
-        />
+        <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
       </div>
     </>
   )

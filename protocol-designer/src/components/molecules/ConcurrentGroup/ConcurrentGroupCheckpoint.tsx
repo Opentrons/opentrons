@@ -1,8 +1,4 @@
-import clsx from 'clsx'
-
 import { COLORS, Flex, SPACING, StyledText } from '@opentrons/components'
-
-import styles from './childrencommon.module.css'
 
 interface ConcurrentGroupCheckpointProps {
   text: string
@@ -14,22 +10,20 @@ export function ConcurrentGroupCheckpoint(
 ): JSX.Element {
   const { text } = props
   return (
-    <li className={clsx(styles.checkpoint_spacing, styles.no_li_bullet)}>
+    <Flex
+      gap={SPACING.spacing4}
+      paddingY={SPACING.spacing2}
+      color={COLORS.grey60}
+    >
       <Flex
-        gap={SPACING.spacing4}
-        paddingY={SPACING.spacing2}
-        color={COLORS.grey60}
+        paddingX={SPACING.spacing2}
+        paddingTop={SPACING.spacing6}
+        flexDirection="column"
       >
-        <Flex
-          paddingX={SPACING.spacing2}
-          paddingTop={SPACING.spacing6}
-          flexDirection="column"
-        >
-          <Bullet />
-        </Flex>
-        <StyledText desktopStyle="captionSemiBold">{text}</StyledText>
+        <Bullet />
       </Flex>
-    </li>
+      <StyledText desktopStyle="captionSemiBold">{text}</StyledText>
+    </Flex>
   )
 }
 

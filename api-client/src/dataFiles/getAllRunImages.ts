@@ -1,4 +1,4 @@
-import { GET, request } from '../request'
+import { createAxiosConfig, GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -13,6 +13,6 @@ export function getAllRunImages(
     `/dataFiles/${runId}/images/download`,
     null,
     config,
-    { responseType: 'blob' }
+    createAxiosConfig({ responseType: 'blob' })
   )
 }
