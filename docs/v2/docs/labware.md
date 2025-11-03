@@ -19,7 +19,7 @@ After you've created your labware, save it as a `.json` file and add it to the O
 
 If other people need to use your custom labware definition, they must also add it to their Opentrons App.
 
-## Loading Labware
+## Loading Labware {#loading-labware-api}
 
 Throughout this section, we'll use the labware listed in the following table.
 
