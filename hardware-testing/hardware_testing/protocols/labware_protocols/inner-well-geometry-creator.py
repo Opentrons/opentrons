@@ -28,7 +28,7 @@ from collections import OrderedDict
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "nunc_96_wellplate_450ul"  # change to desired labware
 
 RESERVOIR = "nest_1_reservoir_290ml"
 
@@ -200,8 +200,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Step Height Target",
         description="Specify the desired target step height, i.e 1mm",
         default=1.0,
-        maximum=10,
-        minimum=0.1,
+        maximum=3.0,
+        minimum=0.5,
     )
 
     parameters.add_str(
@@ -226,9 +226,9 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     """Sets up the static data for the protocol."""
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
+    labware_type = LABWARE
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
     target_height = ctx.params.target_height  # type: ignore[attr-defined]
-    labware_type = LABWARE
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
@@ -263,17 +263,17 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     wells = list(labware.wells_by_name().keys())
     src = ctx.load_labware(RESERVOIR, SLOT_RESERVOIR)
     ctx.load_trash_bin("A3")
+    max_volume = labware["A1"].max_volume
 
     dial: Optional[Labware] = None
     if dial_indicator_used:
         dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
 
-    # below threshold, alpha low. above threshold, alpha high
+    # uses a slightly lower sensitivity value underneath this height threshold
     threshold = 4.5
-    delta_tolerance = 0.2
 
     # if within these bounds, then feedback loop doesnt make any changes
-    max_volume = labware["A1"].max_volume
+    delta_tolerance = 0.2
     lower_bound = target_height - delta_tolerance
     upper_bound = target_height + delta_tolerance
 
@@ -330,9 +330,6 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         liquid_tip=liq_tip_size,
         ethanol=ethanol,
     )
-
-
-# Helper Functions
 
 
 def _read_dial_indicator(
@@ -429,107 +426,76 @@ def _get_height_of_liquid_in_well(
         return 0.01
 
 
-def generate_frusta(ctx: ProtocolContext, data: List, labware: Labware) -> dict:
+def generate_frusta(data: List, labware: Labware) -> dict:
     """Read geometry creator results and generate frustum dimensions for the IWG."""
     inner_well_json = labware._core.get_definition()
-    depth = inner_well_json["wells"]["A1"]["depth"]
-    well_shape = inner_well_json["wells"]["A1"].get("shape")
-    nominal_diameter = inner_well_json["wells"]["A1"].get("diameter")
-    nominal_side_length = inner_well_json["wells"]["A1"].get("xDimension")
+    well_A1 = inner_well_json["wells"]["A1"]
+    nominal_depth = well_A1["depth"]
+    well_shape = well_A1.get("shape")
 
     if well_shape == "circular":
         geoID = "conicalWell"
     elif well_shape == "rectangular":
         geoID = "cuboidalWell"
-    else:
-        geoID = "defaultWell"
 
-    for well_name in inner_well_json["wells"]:
-        inner_well_json["wells"][well_name]["geometryDefinitionId"] = geoID
+    for well in inner_well_json["wells"].values():
+        well["geometryDefinitionId"] = geoID
 
-    frusta_data = []
-    frustum_side_length = 0.0
-    frustum_diameter = 0.0
+    frusta_data: List = []
 
     for i in range(1, len(data)):
-
-        if len(data) < 2:
-            raise ValueError("data must contain at least two (volume, height) points")
-
         vol1, h1 = data[i - 1]
         vol2, h2 = data[i]
-
-        delta_volume = vol2 - vol1
-        delta_height = h2 - h1
-
-        if delta_height <= 0:
+        delta_volume, delta_height = vol2 - vol1, h2 - h1
+        if delta_volume <= 0 or delta_height <= 0:
             raise ValueError(
-                f"Invalid geometry at segment {i}: change in height={delta_height:.4f} must be > 0"
-            )
-        if delta_volume <= 0:
-            raise ValueError(
-                f"Invalid geometry at segment {i}: change in volume={delta_volume:.4f} must be > 0"
+                f"Invalid segment {i}: dV={delta_volume:.4f}, dH={delta_height:.4f} must be > 0"
             )
 
         if geoID == "cuboidalWell":
-            if not ctx.is_simulating():
-                frustum_side_length = round(np.sqrt(delta_volume / delta_height), 2)
+            side_len = round(np.sqrt(delta_volume / delta_height), 2)
             section = {
                 "shape": "cuboidal",
-                "bottomXDimension": frustum_side_length,
-                "bottomYDimension": frustum_side_length,
-                "topXDimension": frustum_side_length,
-                "topYDimension": frustum_side_length,
-                "topHeight": round(h2, 2),
-                "bottomHeight": round(h1, 2),
+                "bottomXDimension": side_len,
+                "bottomYDimension": side_len,
+                "topXDimension": side_len,
+                "topYDimension": side_len,
             }
         elif geoID == "conicalWell":
-            if not ctx.is_simulating():
-                radius = round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
-                frustum_diameter = 2 * radius
+            diameter = 2 * round(np.sqrt(delta_volume / (np.pi * delta_height)), 2)
             section = {
                 "shape": "conical",
-                "bottomDiameter": frustum_diameter,
-                "topDiameter": frustum_diameter,
-                "topHeight": round(h2, 2),
-                "bottomHeight": round(h1, 2),
+                "bottomDiameter": diameter,
+                "topDiameter": diameter,
             }
-        else:
-            continue
-
+        section.update({"bottomHeight": round(h1, 2), "topHeight": round(h2, 2)})
         frusta_data.append(section)
 
     # Add one more frustum to reach full depth
     if frusta_data:
         last = frusta_data[-1]
-
-        if geoID == "cuboidalWell":
+        if well_shape == "rectangular":
+            nominal_side_length = well_A1.get("xDimension")
             final_section = {
                 "shape": "cuboidal",
                 "topXDimension": nominal_side_length,
                 "topYDimension": nominal_side_length,
                 "bottomXDimension": last["bottomXDimension"],
                 "bottomYDimension": last["bottomYDimension"],
-                "topHeight": depth,
-                "bottomHeight": last["topHeight"],
             }
-        elif geoID == "conicalWell":
+        elif well_shape == "circular":
+            nominal_diameter = well_A1.get("diameter")
             final_section = {
                 "shape": "conical",
                 "topDiameter": nominal_diameter,
                 "bottomDiameter": last["bottomDiameter"],
-                "topHeight": depth,
-                "bottomHeight": last["topHeight"],
             }
-        else:
-            final_section = {}
-
-        if final_section:
-            frusta_data.append(final_section)
-
+        final_section.update(
+            {"bottomHeight": last["topHeight"], "topHeight": nominal_depth}
+        )
+        frusta_data.append(final_section)
         frusta_data.reverse()
-
-    inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
+        inner_well_json["innerLabwareGeometry"] = {geoID: {"sections": frusta_data}}
 
     key_order = [
         "ordering",
@@ -609,6 +575,9 @@ def get_alpha_for_height(state: SetupState, ts: TrialState) -> float:
 # Proportional Controller
 def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
     """Return a new step volume based on the hdelta error from target."""
+    max_increase_multiplier = 2.0  # means at most double of previous step volume
+    max_decrease_multiplier = 0.5  # means at least half of previous step volume
+
     alpha = get_alpha_for_height(state, ts)
 
     if state.lower_bound <= ts.hdelta <= state.upper_bound:
@@ -616,15 +585,11 @@ def adaptive_volume_step(ts: TrialState, state: SetupState) -> float:
 
     elif ts.hdelta < state.lower_bound and ts.hdelta > 0:
         error = state.target_height - ts.hdelta
-        new_volume = ts.step_volume * min(
-            1.5, 1 + alpha * error
-        )  # increase clamped to 150% of previous step volume
+        new_volume = ts.step_volume * min(max_increase_multiplier, 1 + alpha * error)
 
     elif ts.hdelta > state.upper_bound:
         error = ts.hdelta - state.target_height
-        new_volume = ts.step_volume * max(
-            0.5, 1 - alpha * error
-        )  # decrease clamped to 50% of previous step volume
+        new_volume = ts.step_volume * max(max_decrease_multiplier, 1 - alpha * error)
     else:
         new_volume = ts.step_volume
 
@@ -667,8 +632,7 @@ def geometry_creator(
     ctx: ProtocolContext, state: SetupState, ts: TrialState
 ) -> List[TrialResult]:
     """Run liquid dispense + measure loop and return trial results."""
-    # initial protocol steps
-    if state.dial is not None:
+    if state.dial:
         _store_dial_baseline(ctx, state.probe_pipette, state.dial)
     _write_line_to_csv(ctx, CSV_HEADER)  # log 0th step as a baseline
     write_trial_log(ctx, ts)
@@ -687,13 +651,10 @@ def geometry_creator(
         # check if out of available wells
         no_more_wells = ts.step > 0 and ts.step % len(state.wells) == 0
         if no_more_wells:
-            if not ctx.is_simulating():
-                ctx.pause("Dump the labware and replace it.")
-                _get_height_of_liquid_in_well(
-                    state.liq_pipette, state.src["A1"], ctx.is_simulating()
-                )
-            else:
-                break
+            ctx.pause("Dump the labware and replace it.")
+            _get_height_of_liquid_in_well(
+                state.liq_pipette, state.src["A1"], ctx.is_simulating()
+            )
 
         # prepare for dispense
         ts.dispense_volume += ts.step_volume
@@ -713,11 +674,10 @@ def geometry_creator(
             return_tip=False,
         )
 
-        # Check if there's clearance for touch tip
+        # Precheck if there's clearance for touch tip
         if ts.corrected_height + state.target_height <= state.labware["A1"].depth - 4:
             state.liq_pipette.touch_tip()
 
-        # Measure liquid height
         height = _get_height_of_liquid_in_well(
             state.probe_pipette, state.labware[ts.current_well], ctx.is_simulating()
         )
@@ -726,8 +686,6 @@ def geometry_creator(
 
         # Compute change in height from last liquid probe
         ts.compute_hdelta()
-
-        # Check if liquid level is successfully raised by the target height
         ts.status = check_hdelta(ctx, state, ts)
 
         if ts.status == "fail":
@@ -763,16 +721,14 @@ def run(ctx: ProtocolContext) -> None:
     trial_results = geometry_creator(ctx, state, ts)
     drop_tips(state.liq_pipette, state.probe_pipette)
 
-    passed_trials = [trial for trial in trial_results if trial.status == "pass"]
-    frusta_data = np.array(
-        [(trial.dispense_volume, trial.height) for trial in passed_trials]
-    )
-    if len(frusta_data) > 1:
-        new_inner_well_json = generate_frusta(ctx, frusta_data.tolist(), state.labware)
-    else:
-        return
-
     if not ctx.is_simulating():
+        passed_trials = [trial for trial in trial_results if trial.status == "pass"]
+        frusta_data = np.array(
+            [(trial.dispense_volume, trial.height) for trial in passed_trials]
+        )
+        if len(frusta_data) > 2:
+            new_inner_well_json = generate_frusta(frusta_data.tolist(), state.labware)
+
         from hardware_testing import data
 
         user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
