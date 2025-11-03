@@ -14,16 +14,10 @@ Welcome to the v8.8.0 release of the Opentrons robot software! This release incl
 
 ### New Features
 
-- Use new non-blocking commands to control multiple modules and complete pipetting actions simultaneously: 
-    - `set_shake_speed` to control the Heater-Shaker Module's shake speed
-    - `start_set_temperature` to set a temperature for the Temperature Module 
-    - `start_set_lid_temperature` and ``start_set_block_temperature`` to control the Thermocycler Module's lid and block temperature
-    - `start_execute_profile` to run a profile on the Thermocycler Module. 
-
-    Each non-blocking command returns a task. Use the new `wait_for_tasks` method to control when your protocol moves to the next step. 
+- Use new non-blocking commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously. 
 -  Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action. 
-- Capture images of the Flex or OT-2 deck during a protocol using the new `capture_image` command. 
-- Choose where your Flex pipette will select a new tip in a `transfer_with_liquid_class` command. 
+- Capture images of the Flex or OT-2 deck during a protocol. 
+- Choose where your Flex pipette will select a new tip when perfomring a transfer with a liquid class.
 
 ---
 
