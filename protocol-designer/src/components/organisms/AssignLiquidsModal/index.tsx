@@ -31,6 +31,7 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -95,6 +96,8 @@ export function AssignLiquidsModal(
     selectedLabwareIds,
   } = data
 
+  const enableStacking = useSelector(getEnableStacking)
+
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 
   if (labwareId === null) {
@@ -133,7 +136,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 ? (
+        {labwareStack.length > 1 && enableStacking ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
