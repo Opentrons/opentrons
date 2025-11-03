@@ -112,7 +112,7 @@ def _converted_image_params(params: CaptureImageParams) -> ImageParameters:
     return ImageParameters(
         resolution=params.resolution,
         zoom=params.zoom,
-        pan=params.pan,
+        pan=params.pan if params.pan is not None else None,
         contrast=(
             (params.contrast / 100) * 2.0 if params.contrast is not None else None
         ),
