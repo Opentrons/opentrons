@@ -67,8 +67,6 @@ dev = [
     "typing-extensions>=4.0.0,<5",
     "wheel==0.37.0",
 ]
-
-[project.optional-dependencies]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]
 "flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
 
