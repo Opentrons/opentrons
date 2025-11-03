@@ -3,7 +3,6 @@
 
 :root {
   --button-pad: 0.5rem;
-
   --button-inverted: {
     border-color: var(--c-font-light);
 
@@ -74,8 +73,8 @@
 
   /* TODO(mc, 2017-12-07): pull shadows out to central file */
   box-shadow:
-    0 0 2px rgba(0, 0, 0, 0.12),
-    0 2px 2px rgba(0, 0, 0, 0.24);
+    0 0 2px rgb(0 0 0 / 12%),
+    0 2px 2px rgb(0 0 0 / 24%);
   color: var(--c-font-light);
   cursor: pointer;
   font-size: var(--fs-body-2);
@@ -102,8 +101,8 @@
 
     /* TODO(mc, 2017-12-07): pull shadows out to central file */
     box-shadow:
-      0 0 8px rgba(0, 0, 0, 0.12),
-      0 8px 8px rgba(0, 0, 0, 0.24);
+      0 0 8px rgb(0 0 0 / 12%),
+      0 8px 8px rgb(0 0 0 / 24%);
     font-weight: var(--fw-regular);
   }
 
