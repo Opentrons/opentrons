@@ -2180,6 +2180,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             self.configure_for_volume(volume_for_pipette_mode_configuration)
             self.prepare_to_aspirate()
 
+        elif not self._engine_client.state.pipettes.get_ready_to_aspirate(
+            self._pipette_id
+        ):
+            self.prepare_to_aspirate()
+
         aspirate_point = (
             tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=source_well,
