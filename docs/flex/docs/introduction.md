@@ -27,8 +27,4 @@ Both Flex and OT-2 robots run on our open-source software, and the Opentrons App
 
 ## Flex workstations
 
-Opentrons Flex workstations include the Flex robot, accessories, pipettes and gripper, on-deck modules, and labware needed to automate a particular application. All workstation components are modular. If you need to change applications, you can add or swap in other Flex hardware and compatible consumables.
-
-Check our [available workstations](https://opentrons.com/products/categories/workstations) and get set up to automate steps in next-generation sequencing, proteomics, nucleic acid extraction, and other workflows. 
-
-
+Opentrons Flex workstations are pre-configured bundles that include the Flex robot, accessories, pipettes and gripper, on-deck modules, and labware needed to automate a particular application. Because Flex is a modular system, you can easily add or swap hardware and compatible consumables to change applications. See the [workstations section](https://opentrons.com/products/categories/workstations) of the Opentrons website to get started automating steps in next-generation sequencing, proteomics, nucleic acid extraction, and other workflows.
