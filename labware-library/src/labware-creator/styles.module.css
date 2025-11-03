@@ -70,7 +70,7 @@
   margin: 1.5rem 0 0.5rem;
   background-color: var(--c-blue);
   color: white;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
   font-size: var(--fs-body-2);
   text-transform: uppercase;
 
@@ -119,8 +119,7 @@
 
 .flex_row_no_columns {
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   margin: 1rem 0 2rem;
 }
 

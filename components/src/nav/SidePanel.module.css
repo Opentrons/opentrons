@@ -27,8 +27,7 @@
 }
 
 .panel_contents {
+  overflow: auto hidden; /* y: auto, x: hidden */
   width: var(--sidebar-width);
   height: calc(100vh - 3.5rem);
-  overflow-x: hidden;
-  overflow-y: auto;
 }
