@@ -177,10 +177,12 @@ async def _test_ethernet(api: OT3API, report: CSVReport, section: str) -> None:
         ui.get_user_ready("connect ethernet cable")
         ethernet_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL)
         eth_ip = ethernet_status["ipAddress"]
+        eth_mac = ethernet_status["macAddress"]
     else:
         eth_ip = "0.0.0.0"
+        eth_mac = "AA:AA:AA:AA:AA:AA"
     result = CSVResult.from_bool(bool(eth_ip))
-    report(section, "ethernet", [eth_ip, result])
+    report(section, "ethernet", [eth_ip, eth_mac, result])
 
 
 async def _test_wifi(report: CSVReport, section: str) -> None:
@@ -188,14 +190,16 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     password: Optional[str] = None
     result: Optional[CSVResult] = CSVResult.FAIL
     wifi_ip: Optional[str] = None
+    wifi_mac: Optional[str] = None
 
     def _finish() -> None:
-        report(section, "wifi", [ssid, password, wifi_ip, result])
+        report(section, "wifi", [ssid, password, wifi_ip, wifi_mac, result])
 
     LOG.info(f"System Architecture: {config.ARCHITECTURE}")
     try:
         wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
         wifi_ip = wifi_status["ipAddress"]
+        wifi_mac = wifi_status["macAddress"]
         if wifi_ip:
             result = CSVResult.PASS
             return _finish()
@@ -366,8 +370,8 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
     can_tests = [CSVLine(t, [CSVResult]) for t in AUX_CAN_TESTS]
     other_tests = [
-        CSVLine("ethernet", [str, CSVResult]),
-        CSVLine("wifi", [str, str, str, CSVResult]),
+        CSVLine("ethernet", [str, str, CSVResult]),
+        CSVLine("wifi", [str, str, str, str, CSVResult]),
         CSVLine("usb-b-rear", [CSVResult]),
     ]
     return other_tests + usb_a_tests + aux_tests + can_tests  # type: ignore[return-value]
@@ -384,7 +388,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
         await _test_wifi(report, section)
     else:
-        report(section, "wifi", ["", "", "0.0.0.0", CSVResult.PASS])
+        report(
+            section, "wifi", ["", "", "0.0.0.0", "AA:AA:AA:AA:AA:AA", CSVResult.PASS]
+        )
         assert nmcli.iface_info is not None
         assert nmcli.configure is not None
         assert nmcli.wifi_disconnect is not None
