@@ -31,6 +31,7 @@ export function RobotSettingsCamera({
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
   reportCameraEnablementSettings({
     ...baseParams,
+    transactionId: `camera-settings ${Date.now()}`,
     cameraEnabled: isCameraEnabled,
     liveFeedEnabled: isLiveVideoEnabled,
     recoveryCaptureEnabled: isRecoveryCaptureEnabled,

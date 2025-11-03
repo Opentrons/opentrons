@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { InlineNotification, StyledText } from '@opentrons/components'
 
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
@@ -14,7 +14,6 @@ import styles from './preferences.module.css'
 import { UsagePreferencesSettings } from './UsagePreferencesSettings'
 
 import type { ReactNode } from 'react'
-import type { RobotType } from '@opentrons/shared-data'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 export interface CameraSettingsProps {
@@ -52,20 +51,17 @@ export function CameraSettings({
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
   }
-  console.log('here')
-  console.log('=>(index.tsx:50) isCameraRequired', isCameraRequired)
-  const isFlex = useIsFlex(robotName)
-  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const robotType = useRobotType(robotName)
   const baseProps = {
-    source: 'ODD' as const,
+    source: 'robotSettings' as const,
     robotType: robotType,
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
   if (storageInfo?.isImageStorageLow) {
     reportPhotoAccessUsage({
       ...baseProps,
+      transactionId: `camera-settings-${Date.now()}`,
       action: 'storageWarning',
-      amount: storageInfo.imageDirSizeMb,
     })
   }
   if (showControls) {

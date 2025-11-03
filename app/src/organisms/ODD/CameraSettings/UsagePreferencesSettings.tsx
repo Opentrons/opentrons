@@ -24,11 +24,12 @@ export function UsagePreferencesSettings({
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const baseParams = {
-    source: 'ODD' as const,
+    source: 'robotSettings' as const,
   }
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
   reportCameraEnablementSettings({
     ...baseParams,
+    transactionId: `camera-settings-${Date.now()}`,
     cameraEnabled: true,
     liveFeedEnabled: isLiveVideoEnabled,
     recoveryCaptureEnabled: isRecoveryCaptureEnabled,

@@ -12,7 +12,10 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRunControls } from '/app/organisms/RunTimeControl'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import {
+  useCameraAnalytics,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
 import { useRobot } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -117,7 +120,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       robotName: ROBOT_NAME,
       robotIsBusy: false,
       runHasImages: true,
-      numberOfImages: 14,
     }
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
@@ -125,6 +127,9 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
 
     vi.mocked(useDeleteRunImages).mockReturnValue({
       mutateAsync: mockDeleteRunImages,
+    } as any)
+    vi.mocked(useCameraAnalytics).mockReturnValue({
+      reportPhotoAccessUsage: vi.fn(),
     } as any)
   })
 

@@ -24,7 +24,7 @@ export function LaunchLivestreamBtn({
   const isLaunchCameraEnabled =
     host?.robotName != null && host?.hostname != null
   const baseParams = {
-    source: 'protocolRunRecord' as const,
+    source: 'runRecord' as const,
     runId: runId,
     robotType,
   }

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +14,7 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   getCameraUsageState,
@@ -25,7 +26,6 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
-import type { RobotType } from '@opentrons/shared-data'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 
@@ -45,8 +45,7 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const isFlex = useIsFlex(robotName)
-  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const robotType = useRobotType(robotName)
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
@@ -82,18 +81,20 @@ export function SetupCamera({
     confirmCameraSettings()
   }
   const baseProps = {
-    source: 'protocolRunRecord' as const,
+    source: 'runRecord' as const,
     robotType: robotType,
-    runId,
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
-  if (storageInfo.isImageStorageLow) {
-    reportPhotoAccessUsage({
-      ...baseProps,
-      action: 'storageWarning',
-      amount: storageInfo.imageDirSizeMb,
-    })
-  }
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        ...baseProps,
+        runId: runId,
+        action: 'storageWarning',
+      })
+    }
+  })
+
   return (
     <div className={styles.container}>
       {!cameraEnabled && isCameraRequired && <CameraRequiredNotification />}

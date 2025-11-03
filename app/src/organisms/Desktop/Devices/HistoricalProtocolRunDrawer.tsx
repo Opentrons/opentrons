@@ -40,7 +40,7 @@ import {
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
@@ -48,10 +48,8 @@ import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { RunGeneratedDataFileIdsByType } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
@@ -64,8 +62,8 @@ export function HistoricalProtocolRunDrawer(
 ): JSX.Element | null {
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
+  const robotType = useRobotType(robotName)
   const isFlex = useIsFlex(robotName)
-  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const allLabwareOffsets: LabwareOffset[] =
     run.labwareOffsets?.sort(
@@ -76,14 +74,14 @@ export function HistoricalProtocolRunDrawer(
   const totalOutputFileCount = totalImageFileCount + outputFileIds.csv.length
   // TODO: move this to run header or protocol finishing/run stopped
   const baseParams = {
-    source: 'protocolRunRecord' as const,
-    runId: run.id,
+    source: 'runRecord' as const,
     robotType: robotType,
   }
   const { reportImageCaptureUsage } = useCameraAnalytics(baseParams)
   reportImageCaptureUsage({
     ...baseParams,
     amount: totalImageFileCount,
+    runId: run.id,
   })
   const runCsvFileIds =
     'runTimeParameters' in run
@@ -202,6 +200,7 @@ export function HistoricalProtocolRunDrawer(
               run={run}
               robotName={robotName}
               protocolName={props.protocolName}
+              outputFileIds={outputFileIds}
             />
           )}
           {runCsvFileIds.map((fileId, index) => {
@@ -389,21 +388,20 @@ function ImagesFileDataRow({
   run,
   protocolName,
   robotName,
+  outputFileIds,
 }: {
   run: RunData
   protocolName: string
   robotName: string
+  outputFileIds: RunGeneratedDataFileIdsByType
 }): JSX.Element {
   const { t } = useTranslation('run_details')
-  const isFlex = useIsFlex(robotName)
-  const robotType = isFlex ? 'OT-3 Standard' : ('OT-2 Standard' as RobotType)
+  const robotType = useRobotType(robotName)
   const baseParams = {
-    source: 'protocolRunRecord' as const,
-    runId: run.id,
+    source: 'runRecord' as const,
     robotType: robotType,
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics(baseParams)
-  const outputFileIds = useRunGeneratedDataFiles(run.id)
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
   const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
   const buildImagesZipName = (): string =>
@@ -445,8 +443,8 @@ function ImagesFileDataRow({
               downloadFile(imagesZipFile, buildImagesZipName())
               reportPhotoAccessUsage({
                 ...baseParams,
-                amount: outputFileIds.jpeg.length,
                 action: 'downloadZip',
+                runId: run.id,
               })
             }
           }}

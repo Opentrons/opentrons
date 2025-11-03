@@ -145,7 +145,6 @@ export function HistoricalProtocolRun(
             robotName={robotName}
             robotIsBusy={robotIsBusy}
             runHasImages={imageFileCount > 0}
-            numberOfImages={imageFileCount}
           />
         </Flex>
       </Flex>

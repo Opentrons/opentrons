@@ -32,17 +32,33 @@ export function SetupRunCameraUsage({
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const baseParams = {
-    source: 'protocolRunRecord' as const,
-    robotType: robotType,
-    runId: runId,
+    source: 'runRecord' as const,
+    robotType,
+    runId,
   }
+
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-  reportCameraEnablementSettings({
-    ...baseParams,
-    cameraEnabled: cameraEnabled,
-    liveFeedEnabled: liveStreamEnabled,
-    recoveryCaptureEnabled: recoveryEnabled,
-  })
+
+  const handleToggleLiveStream = (): void => {
+    toggleLiveStreamEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled,
+      liveFeedEnabled: !liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
+  }
+
+  const handleToggleRecovery = (): void => {
+    toggleRecoveryEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: !recoveryEnabled,
+    })
+  }
+
   return (
     <div className={styles.usage_settings_container}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -54,7 +70,7 @@ export function SetupRunCameraUsage({
           subtext={t('view_realtime_video')}
           toggleLabelText={t('live_video')}
           enabled={liveStreamEnabled}
-          onToggle={toggleLiveStreamEnabled}
+          onToggle={handleToggleLiveStream}
           isToggleDisabled={cameraConfirmed}
         />
         <SettingCard
@@ -62,7 +78,7 @@ export function SetupRunCameraUsage({
           subtext={t('automatically_capture_image')}
           toggleLabelText={t('error_recovery')}
           enabled={recoveryEnabled}
-          onToggle={toggleRecoveryEnabled}
+          onToggle={handleToggleRecovery}
           isToggleDisabled={cameraConfirmed}
         />
       </div>

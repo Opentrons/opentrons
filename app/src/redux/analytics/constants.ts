@@ -143,5 +143,7 @@ export const ANALYTICS_CAMERA_SETTINGS_KIND: 'cameraSettingsKind' =
 
 export const ANALYTICS_IMAGE_CAPTURE_KIND: 'imageCaptureKind' =
   'imageCaptureKind'
-export const ANALYTICS_LIVE_FEED_KIND: 'liveFeedKind' = 'liveFeedKind'
-export const ANALYTICS_PHOTO_ACCESS: 'photoAccess' = 'photoAccess'
+export const ANALYTICS_LIVE_FEED_KIND: 'liveFeed' = 'liveFeed'
+export const ANALYTICS_PHOTO_ACCESS: 'photoAccessKind' = 'photoAccessKind'
+export const SOURCE_RUN_RECORD: 'runRecord' = 'runRecord'
+export const SOURCE_ROBOT_SETTINGS: 'robotSettings' = 'robotSettings'
