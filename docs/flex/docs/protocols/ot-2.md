@@ -16,7 +16,7 @@ Currently, Protocol Designer can't convert an OT-2 protocol to a Flex protocol. 
 
 Launch Protocol Designer and import your OT-2 protocol. Protocol Designer will update your file to the latest version. Here, you can make small changes to your protocol steps, but you won't be able to change the robot type. When you're ready, export your updated protocol from Protocol Designer as a Python file. 
 
-## Updating to run on Flex
+## Updating with OpentronsAI
 
 OpentronsAI makes it easy to convert your OT-2 Python protocol to run on Flex. 
 
@@ -24,11 +24,11 @@ Launch OpentronsAI and select **Update an existing protocol** on the home page. 
  
 Submit your prompt and wait for OpentronsAI to generate your updated protocol. Before downloading your new protocol, you can ask OpentronsAI to simulate for errors.
 
-### Using the Python Protocol API
+## Updating with the Python Protocol API
 
 Using the Python Protocol API, you can make a few changes to an OT-2 protocol for it to run on Flex.
 
-#### Metadata and requirements
+### Metadata and requirements
 
 The API requires you to declare that a protocol is designed to run on Flex. Use the `robotType` key in the new `requirements` dictionary. You should also specify an `apiLevel` of 2.15 or higher. You can specify `apiLevel` either in the `metadata` dictionary or the `requirements`
 dictionary.
@@ -38,7 +38,7 @@ from opentrons import protocol_api
 requirements = {'robotType': 'Flex', 'apiLevel': '2.15'}
 ```
 
-#### Pipettes and tip racks
+### Pipettes and tip racks
 
 Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. Choose pipettes of the same capacity or larger (or whatever you've outfitted your Flex with).
 
@@ -65,7 +65,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 The only necessary changes are the new arguments of `load_labware()` and `load_instrument()`. Keep in mind that if you use smaller capacity tips than the original protocol, you may need to make further adjustments to avoid running out of tips, and the protocol may take longer to execute.
 
-#### Deck slots
+### Deck slots
 
 The API accepts OT-2 and Flex deck slot names interchangeably. It's good practice to use the coordinate deck slot format in Flex protocols (as in the example in the previous subsection), but it's not required. The correspondence between deck slot numbers is as follows:
 
@@ -104,7 +104,7 @@ The API accepts OT-2 and Flex deck slot names interchangeably. It's good practic
 
 A protocol that calls `#!python protocol.load_labware("opentrons_flex_96_tiprack_200ul", "1")` would require you to place that tip rack in slot D1 on Flex.
 
-#### Modules
+### Modules
 
 Update module load names for the Temperature Module and Thermocycler Module to ones that are compatible with Flex, if necessary. Flex supports:
 
