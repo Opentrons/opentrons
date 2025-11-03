@@ -21,7 +21,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 dependencies = [
     "aionotify==0.3.1",
     "anyio==4.9.0",
-    "jsonschema==4.17.3",
+    "jsonschema==4.21.1",
     "numpy==1.22.3",
     "packaging==22.0",
     "pydantic==2.11.7",
