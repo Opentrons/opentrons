@@ -1817,48 +1817,65 @@ class InstrumentContext(publisher.CommandPublisher):
         keep_last_tip: Optional[bool] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> InstrumentContext:
-        """Move a particular type of liquid from one well or group of wells to another.
+        """
+        Move a particular type of liquid from one well or group of wells to another.
 
-        :param liquid_class: The type of liquid to move. You must specify the liquid class,
-            even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
-            source contains.
-        :type liquid_class: :py:class:`.LiquidClass`
+        Args:
+            liquid_class (LiquidClass): The type of liquid to move. You must specify the
+                liquid class, even if you have used
+                [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]
+                to indicate what liquid the source contains.
 
-        :param volume: The amount, in µL, to aspirate from each source and dispense to
-                       each destination.
-        :param source: A single well or a list of wells to aspirate liquid from.
-        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
-        :param new_tip: When to pick up and drop tips during the command.
-            Defaults to ``"once"``.
+            volume (float): The amount, in µL, to aspirate from each source and dispense
+                to each destination.
 
-              - ``"once"``: Use one tip for the entire command.
-              - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
-              - ``"per source"``: Use one tip for each source well, even if
-                :ref:`tip refilling <complex-tip-refilling>` is required.
-              - ``"per destination"``: Use one tip for each destination well, even if
-                :ref:`tip refilling <complex-tip-refilling>` is required.
-              - ``"never"``: Do not pick up or drop tips at all.
+            source (Union[labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]]):
+                A single well or a list of wells to aspirate liquid from.
 
-            See :ref:`param-tip-handling` for details.
+            dest (Union[labware.Well, Sequence[labware.Well], TrashBin, WasteChute]):
+                A single well, list of wells, trash bin, or waste chute to dispense
+                liquid into.
 
-        :param trash_location: A trash container, well, or other location to dispose of
-            tips. Depending on the liquid class, the pipette may also blow out liquid here.
-            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
-        :param return_tip: Whether to drop used tips in their original locations
-            in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If ``False``, target
-            each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the transfer attached. When
-            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
-            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
-            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
-            value of ``InstrumentContext.tip_racks``.
+            new_tip (str, optional): When to pick up and drop tips during the command.
+                Defaults to `"once"`.
 
-            .. versionchanged:: 2.25
-                Added the ``tip_racks`` parameter.
+                - `"once"`: Use one tip for the entire command.
+                - `"always"`: Use a new tip for each set of aspirate and dispense steps.
+                - `"per source"`: Use one tip for each source well, even if
+                [tip refilling][tip-refilling] is required.
+                - `"per destination"`: Use one tip for each destination well, even if
+                [tip refilling][tip-refilling] is required.
+                - `"never"`: Do not pick up or drop tips at all.
 
+                See [Tip Handling][tip-handling] for details.
+
+            trash_location (Union[types.Location, labware.Well, TrashBin, WasteChute], optional):
+                A trash container, well, or other location to dispose of tips. Depending
+                on the liquid class, the pipette may also blow out liquid here. If not
+                specified, the pipette will dispose of tips in its
+                [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container].
+
+            return_tip (bool, optional): Whether to drop used tips in their original
+                locations in the tip rack, instead of the trash.
+
+            group_wells (bool, optional): For multi-channel transfers only. If set to
+                `True`, group together contiguous wells given into a single transfer
+                step, taking into account the tip configuration. If `False`, target each
+                well given with the primary nozzle. Defaults to `True`.
+
+            keep_last_tip (bool, optional): When `True`, the pipette keeps the last tip
+                used in the transfer attached. When `False`, the last tip will be dropped
+                or returned. If not set, behavior depends on the value of `new_tip`.
+                `new_tip="never"` keeps the tip, and all other values of `new_tip` drop
+                or return the tip.
+
+            tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
+                from for this command. If not provided, the pipette will pick up from its
+                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                Providing this argument does not change the value of
+                `InstrumentContext.tip_racks`.
+
+        *Changed in version 2.25*: Added the `tip_racks` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -1968,42 +1985,57 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Distribute a particular type of liquid from one well to a group of wells.
 
-        :param liquid_class: The type of liquid to move. You must specify the liquid class,
-            even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
-            source contains.
-        :type liquid_class: :py:class:`.LiquidClass`
+        Args:
+            liquid_class (LiquidClass): The type of liquid to move. You must specify the
+                liquid class, even if you have used
+                [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]
+                to indicate what liquid the source contains.
 
-        :param volume: The amount, in µL, to dispense to each destination.
-        :param source: A single well for the pipette to target, or a group of wells to
-                       target in a single aspirate for a multi-channel pipette.
-        :param dest: A list of wells to dispense liquid into.
-        :param new_tip: When to pick up and drop tips during the command.
-            Defaults to ``"once"``.
+            volume (float): The amount, in µL, to dispense to each destination.
 
-              - ``"once"``: Use one tip for the entire command.
-              - ``"always"``: Use a new tip before each aspirate.
-              - ``"never"``: Do not pick up or drop tips at all.
+            source (Union[labware.Well, Sequence[labware.Well]]): A single well for the
+                pipette to target, or a group of wells to target in a single aspirate for
+                a multi-channel pipette.
 
-            See :ref:`param-tip-handling` for details.
+            dest (Union[labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]]):
+                A list of wells to dispense liquid into.
 
-        :param trash_location: A trash container, well, or other location to dispose of
-            tips. Depending on the liquid class, the pipette may also blow out liquid here.
-            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
-        :param return_tip: Whether to drop used tips in their original locations
-            in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If ``False``, target
-            each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the distribute attached. When
-            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
-            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
-            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
-            value of ``InstrumentContext.tip_racks``.
+            new_tip (str, optional): When to pick up and drop tips during the command.
+                Defaults to `"once"`.
 
-            .. versionchanged:: 2.25
-                Added the ``tip_racks`` parameter.
+                - `"once"`: Use one tip for the entire command.
+                - `"always"`: Use a new tip before each aspirate.
+                - `"never"`: Do not pick up or drop tips at all.
 
+                See [Tip Handling][tip-handling] for details.
+
+            trash_location (Union[types.Location, labware.Well, TrashBin, WasteChute], optional):
+                A trash container, well, or other location to dispose of tips. Depending
+                on the liquid class, the pipette may also blow out liquid here. If not
+                specified, the pipette will dispose of tips in its
+                [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container].
+
+            return_tip (bool, optional): Whether to drop used tips in their original
+                locations in the tip rack, instead of the trash.
+
+            group_wells (bool, optional): For multi-channel transfers only. If set to
+                `True`, group together contiguous wells given into a single transfer step,
+                taking into account the tip configuration. If `False`, target each well
+                given with the primary nozzle. Defaults to `True`.
+
+            keep_last_tip (bool, optional): When `True`, the pipette keeps the last tip
+                used in the distribute attached. When `False`, the last tip will be
+                dropped or returned. If not set, behavior depends on the value of
+                `new_tip`. `new_tip="never"` keeps the tip, and all other values of
+                `new_tip` drop or return the tip.
+
+            tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
+                from for this command. If not provided, the pipette will pick up from its
+                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                Providing this argument does not change the value of
+                `InstrumentContext.tip_racks`.
+
+        *Changed in version 2.25*: Added the `tip_racks` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -2121,43 +2153,59 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Consolidate a particular type of liquid from a group of wells to one well.
 
-        :param liquid_class: The type of liquid to move. You must specify the liquid class,
-            even if you have used :py:meth:`.Labware.load_liquid` to indicate what liquid the
-            source contains.
-        :type liquid_class: :py:class:`.LiquidClass`
+        Args:
+            liquid_class (LiquidClass): The type of liquid to move. You must specify the
+                liquid class, even if you have used
+                [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]
+                to indicate what liquid the source contains.
 
-        :param volume: The amount, in µL, to aspirate from each source well.
-        :param source: A list of wells to aspirate liquid from.
-        :param dest: A single well, list of wells, trash bin, or waste chute to dispense liquid into.
-                     Multiple wells can only be given for multi-channel pipette configurations, and
-                     must be able to be dispensed to in a single dispense.
-        :param new_tip: When to pick up and drop tips during the command.
-            Defaults to ``"once"``.
+            volume (float): The amount, in µL, to aspirate from each source well.
 
-              - ``"once"``: Use one tip for the entire command.
-              - ``"always"``: Use a new tip after each aspirate and dispense, even when visiting the same source again.
-              - ``"never"``: Do not pick up or drop tips at all.
+            source (Union[labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]]):
+                A list of wells to aspirate liquid from.
 
-            See :ref:`param-tip-handling` for details.
+            dest (Union[labware.Well, Sequence[labware.Well], TrashBin, WasteChute]):
+                A single well, list of wells, trash bin, or waste chute to dispense
+                liquid into. Multiple wells can only be given for multi-channel pipette
+                configurations, and must be able to be dispensed to in a single dispense.
 
-        :param trash_location: A trash container, well, or other location to dispose of
-            tips. Depending on the liquid class, the pipette may also blow out liquid here.
-            If not specified, the pipette will dispose of tips in its :py:obj:`~.InstrumentContext.trash_container`.
-        :param return_tip: Whether to drop used tips in their original locations
-            in the tip rack, instead of the trash.
-        :param group_wells: For multi-channel transfers only. If set to ``True``, group together contiguous wells
-            given into a single transfer step, taking into account the tip configuration. If ``False``, target
-            each well given with the primary nozzle. Defaults to ``True``.
-        :param keep_last_tip: When ``True``, the pipette keeps the last tip used in the consolidate attached. When
-            ``False``, the last tip will be dropped or returned. If not set, behavior depends on the value of
-            ``new_tip``. ``new_tip="never"`` keeps the tip, and all other values of ``new_tip`` drop or return the tip.
-        :param tip_racks: A list of tip racks to pick up from for this command. If not provided, the pipette will pick
-            up from its associated :py:obj:`.InstrumentContext.tip_racks`. Providing this argument does not change the
-            value of ``InstrumentContext.tip_racks``.
+            new_tip (str, optional): When to pick up and drop tips during the command.
+                Defaults to `"once"`.
 
-            .. versionchanged:: 2.25
-                Added the ``tip_racks`` parameter.
+                - `"once"`: Use one tip for the entire command.
+                - `"always"`: Use a new tip after each aspirate and dispense, even when
+                visiting the same source again.
+                - `"never"`: Do not pick up or drop tips at all.
 
+                See [Tip Handling][tip-handling] for details.
+
+            trash_location (Union[types.Location, labware.Well, TrashBin, WasteChute], optional):
+                A trash container, well, or other location to dispose of tips. Depending
+                on the liquid class, the pipette may also blow out liquid here. If not
+                specified, the pipette will dispose of tips in its
+                [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container].
+
+            return_tip (bool, optional): Whether to drop used tips in their original
+                locations in the tip rack, instead of the trash.
+
+            group_wells (bool, optional): For multi-channel transfers only. If set to
+                `True`, group together contiguous wells given into a single transfer step,
+                taking into account the tip configuration. If `False`, target each well
+                given with the primary nozzle. Defaults to `True`.
+
+            keep_last_tip (bool, optional): When `True`, the pipette keeps the last tip
+                used in the consolidate attached. When `False`, the last tip will be
+                dropped or returned. If not set, behavior depends on the value of
+                `new_tip`. `new_tip="never"` keeps the tip, and all other values of
+                `new_tip` drop or return the tip.
+
+            tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
+                from for this command. If not provided, the pipette will pick up from its
+                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                Providing this argument does not change the value of
+                `InstrumentContext.tip_racks`.
+
+        *Changed in version 2.25*: Added the `tip_racks` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -2256,10 +2304,9 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def delay(self, *args: Any, **kwargs: Any) -> None:
         """
-        .. deprecated:: 2.0
-           Use :py:obj:`ProtocolContext.delay` instead.
-           This method does nothing.
-           It will be removed from a future version of the Python Protocol API.
+        *Deprecated in version 2.0*: Use [`ProtocolContext.delay`][opentrons.protocol_api.ProtocolContext.delay]
+        instead. This method does nothing. It will be removed from a future version of
+        the Python Protocol API.
         """
         if args or kwargs:
             # Former implementations of this method did not take any args, so users
@@ -2286,32 +2333,36 @@ class InstrumentContext(publisher.CommandPublisher):
         speed: Optional[float] = None,
         publish: bool = True,
     ) -> InstrumentContext:
-        """Move the instrument.
+        """
+        Move the instrument.
 
-        See :ref:`move-to` for examples.
+        See [Move To][move-to] for examples.
 
-        :param location: Where to move to.
+        Args:
+            location (Union[`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin],
+                [`WasteChute`][opentrons.protocol_api.WasteChute]):
+                Where to move to.
 
-          .. versionchanged:: 2.16
-               Accepts ``TrashBin`` and ``WasteChute`` values.
+                *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
 
-        :type location: :py:class:`~.types.Location`
-        :param force_direct: If ``True``, move directly to the destination without arc
-                             motion.
+            force_direct (bool): If `True`, move directly to the destination without arc
+                motion.
 
-                             .. warning::
-                                Forcing direct motion can cause the pipette to crash
-                                into labware, modules, or other objects on the deck.
+                !!! warning
+                    Forcing direct motion can cause the pipette to crash into labware,
+                    modules, or other objects on the deck.
 
-        :param minimum_z_height: An amount, measured in mm, to raise the mid-arc height.
-                                 The mid-arc height can't be lowered.
-        :param speed: The speed at which to move. By default,
-                      :py:attr:`InstrumentContext.default_speed`. This controls the
-                      straight linear speed of the motion. To limit individual axis
-                      speeds, use :py:obj:`.ProtocolContext.max_speeds`.
+            minimum_z_height (float, optional): An amount, measured in mm, to raise the
+                mid-arc height. The mid-arc height can't be lowered.
 
-        :param publish: Whether to list this function call in the run preview.
-                        Default is ``True``.
+            speed (float, optional): The speed at which to move. By default,
+                [`InstrumentContext.default_speed`][opentrons.protocol_api.InstrumentContext.default_speed].
+                This controls the straight linear speed of the motion. To limit
+                individual axis speeds, use
+                [`ProtocolContext.max_speeds`][opentrons.protocol_api.ProtocolContext.max_speeds].
+
+            publish (bool, optional): Whether to list this function call in the run
+                preview. Default is `True`.
         """
         with ExitStack() as contexts:
             if isinstance(location, (TrashBin, WasteChute)):
@@ -2360,15 +2411,18 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         location: Union[labware.Well, labware.Labware],
     ) -> InstrumentContext:
-        """Seal resin tips onto the pipette.
+        """
+        Seal resin tips onto the pipette.
 
         The location provided should contain resin tips. The pipette will attach itself
         to the resin tips but does not check any tip presence sensors. Before the pipette
         seals to the tips, the plunger will rise to the top of its working range so that
-        it can perform a :py:func:`resin_tip_dispense` immediately.
+        it can perform a [`resin_tip_dispense()`][opentrons.protocol_api.InstrumentContext.resin_tip_dispense]
+        immediately.
 
-        :param location: A location containing resin tips, must be a Labware or a Well.
-        :type location: :py:class:`~.types.Location`
+        Args:
+            location (types.Location): A location containing resin tips, must be a
+                Labware or a Well.
         """
         if isinstance(location, labware.Labware):
             well = location.wells()[0]
@@ -2392,22 +2446,21 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         location: Union[labware.Well, labware.Labware],
     ) -> InstrumentContext:
-        """Release resin tips from the pipette.
+        """
+        Release resin tips from the pipette.
 
         The location provided should be a valid location to drop resin tips.
 
-        :param location: A location containing that can accept tips.
+        Args:
+            location (types.Location): A location that can accept tips.
 
-        :type location: :py:class:`~.types.Location`
+            home_after (bool, optional): Whether to home the pipette after dropping the
+                tip. If not specified, defaults to `True` on a Flex. The plunger will not
+                home on an unseal.
 
-        :param home_after:
-            Whether to home the pipette after dropping the tip. If not specified
-            defaults to ``True`` on a Flex. The plunger will not home on an unseal.
-
-            When ``False``, the pipette does not home its plunger. This can save a few
-            seconds, but is not recommended. Homing helps the robot track the pipette's
-            position.
-
+                When `False`, the pipette does not home its plunger. This can save a few
+                seconds, but is not recommended. Homing helps the robot track the
+                pipette's position.
         """
         if isinstance(location, labware.Labware):
             well = location.wells()[0]
@@ -2432,7 +2485,8 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Optional[float] = None,
         rate: Optional[float] = None,
     ) -> InstrumentContext:
-        """Push liquid out of resin tips that are currently sealed to a pipette.
+        """
+        Push liquid out of resin tips that are currently sealed to a pipette.
 
         The volume and rate parameters for this function control the motion of the plunger
         to create a desired pressure profile inside the pipette chamber. Unlike a regular
@@ -2442,43 +2496,41 @@ class InstrumentContext(publisher.CommandPublisher):
 
         The common way to use this function is as follows:
 
-        #. Seal resin tips to the pipette using :py:meth:`InstrumentContext.resin_tip_seal`.
+        1. Seal resin tips to the pipette using
+           [`resin_tip_seal()`][opentrons.protocol_api.InstrumentContext.resin_tip_seal].
 
-        #. Use :py:meth:`InstrumentContext.resin_tip_dispense` to displace an experimentally
-           derived volume at an experimentally derived rate to create an experimentally derived
-           target pressure inside the pipette.
+        2. Use [`resin_tip_dispense()`][opentrons.protocol_api.InstrumentContext.resin_tip_dispense]
+           to displace an experimentally derived volume at an experimentally derived rate to
+           create an experimentally derived target pressure inside the pipette.
 
-        #. Use :py:meth:`ProtocolContext.delay` to wait an experimentally derived amount of
-           time for the pressure inside the pipette to push liquid into and through the resin tip
-           and out the other side.
+        3. Use [`delay()`][opentrons.protocol_api.ProtocolContext.delay] to wait an experimentally
+           derived amount of time for the pressure inside the pipette to push liquid into and
+           through the resin tip and out the other side.
 
-        #. As liquid passes through the resin tip, the pressure inside the pipette will
+        4. As liquid passes through the resin tip, the pressure inside the pipette will
            fall. If not all liquid has been dispensed from the resin tip, repeat steps 2
            and 3.
 
-        #. Unseal resin tips from the pipette using :py:meth:`InstrumentContext.resin_tip_unseal`.
+        5. Unseal resin tips from the pipette using
+           [`resin_tip_unseal()`][opentrons.protocol_api.InstrumentContext.resin_tip_unseal].
 
         Flex pipette pressure sensors will raise an overpressure when a differential pressure
         inside the pipette chamber above sensor limits is detected. You may need to disable the
         pressure sensor to create the required pressure profile.
 
-        .. warning::
+        !!! warning
             Building excessive pressure inside the pipette chamber (significantly above the sensor
             limit) with the pressure sensors disabled can damage the pipette.
 
+        Args:
+            location (opentrons.types.Location): Tells the robot where to dispense.
 
-        :param location: Tells the robot where to dispense.
-        :type location: :py:class:`~.types.Location`
+            volume (float): The volume that the plunger should displace, in µL. Does not directly
+                relate to the volume of liquid that will be dispensed.
 
-        :param volume: The volume that the plunger should displace, in µL. Does not directly relate
-                       to the volume of liquid that will be dispensed.
-        :type volume: float
-
-        :param rate: How quickly the plunger moves to displace the commanded volume, in µL/s. This rate does not directly relate to
-                     the flow rate of liquid out of the resin tip.
-
-                     Defaults to ``10.0`` µL/s.
-        :type rate: float
+            rate (float): How quickly the plunger moves to displace the commanded volume, in µL/s.
+                This rate does not directly relate to the flow rate of liquid out of the resin tip.
+                Defaults to `10.0` µL/s.
         """
         well: Optional[labware.Well] = None
         last_location = self._get_last_location_by_api_version()
@@ -2537,26 +2589,27 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Return the name of the mount the pipette is attached to.
 
-        The possible names are ``"left"`` and ``"right"``.
+        The possible names are `"left"` and `"right"`.
         """
         return self._core.get_mount().name.lower()
 
     @property
     @requires_version(2, 0)
     def speed(self) -> "PlungerSpeeds":
-        """The speeds (in mm/s) configured for the pipette plunger.
+        """
+        The speeds (in mm/s) configured for the pipette plunger.
 
-        This is an object with attributes ``aspirate``, ``dispense``, and ``blow_out``
+        This is an object with attributes `aspirate`, `dispense`, and `blow_out`
         holding the plunger speeds for the corresponding operation.
 
-        .. note::
-          Setting values of :py:attr:`flow_rate` will override the values in
-          :py:attr:`speed`.
+        !!! note
+            Setting values of [`flow_rate`][opentrons.protocol_api.InstrumentContext.flow_rate]
+            will override the values in `speed`.
 
-        .. versionchanged:: 2.14
-            This property has been removed because it's fundamentally misaligned with
-            the step-wise nature of a pipette's plunger speed configuration. Use
-            :py:attr:`.flow_rate` instead.
+        *Removed in version 2.14*: This property has been removed because it's
+        fundamentally misaligned with the step-wise nature of a pipette's plunger
+        speed configuration. Use [`flow_rate`][opentrons.protocol_api.InstrumentContext.flow_rate]
+        instead.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             raise UnsupportedAPIError(
@@ -2571,27 +2624,29 @@ class InstrumentContext(publisher.CommandPublisher):
     @property
     @requires_version(2, 0)
     def flow_rate(self) -> "FlowRates":
-        """The speeds, in µL/s, configured for the pipette.
+        """
+        The speeds, in µL/s, configured for the pipette.
 
-        See :ref:`new-plunger-flow-rates`.
+        See [Pipette Flow Rates][pipette-flow-rates].
 
-        This is an object with attributes ``aspirate``, ``dispense``, and ``blow_out``
+        This is an object with attributes `aspirate`, `dispense`, and `blow_out`
         holding the flow rate for the corresponding operation.
 
-        .. note::
-          Setting values of :py:attr:`speed`, which is deprecated, will override the
-          values in :py:attr:`flow_rate`.
-
+        !!! note
+            Setting values of [`speed`][opentrons.protocol_api.InstrumentContext.speed],
+            which is deprecated, will override the values in
+            [`flow_rate`][opentrons.protocol_api.InstrumentContext.flow_rate].
         """
         return self._core.get_flow_rate()
 
     @property
     @requires_version(2, 0)
     def type(self) -> str:
-        """``'single'`` if this is a 1-channel pipette, or ``'multi'`` otherwise.
+        """
+        `'single'` if this is a 1-channel pipette, or `'multi'` otherwise.
 
-        See also :py:obj:`.channels`, which can distinguish between 8-channel and 96-channel
-        pipettes.
+        See also [`channels`][opentrons.protocol_api.InstrumentContext.channels], which
+        can distinguish between 8-channel and 96-channel pipettes.
         """
         if self.channels == 1:
             return "single"
@@ -2605,7 +2660,8 @@ class InstrumentContext(publisher.CommandPublisher):
         The tip racks that have been linked to this pipette.
 
         This is the property used to determine which tips to pick up next when calling
-        :py:meth:`pick_up_tip` without arguments. See :ref:`basic-tip-pickup`.
+        [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] without
+        arguments. See [Picking Up a Tip][picking-up-a-tip].
         """
         return self._tip_racks
 
@@ -2619,8 +2675,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Whether the pipette will perform automatic liquid presence detection.
 
-        When ``True``, the pipette will check for liquid on every aspiration.
-        Defaults to ``False``. See :ref:`lpd`.
+        When `True`, the pipette will check for liquid on every aspiration.
+        Defaults to `False`. See [Liquid Presence Detection][liquid-presence-detection].
         """
         return self._core.get_liquid_presence_detection()
 
@@ -2637,19 +2693,25 @@ class InstrumentContext(publisher.CommandPublisher):
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
-        when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
+        when calling [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip]
+        or [`blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out] without
+        arguments.
 
-        You can set this to a :py:obj:`Labware`, :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
+        You can set this to a [`Labware`][opentrons.protocol_api.labware.Labware],
+        [`TrashBin`][opentrons.protocol_api.TrashBin], or
+        [`WasteChute`][opentrons.protocol_api.WasteChute].
 
         The default value depends on the robot type and API version:
 
-        - :py:obj:`ProtocolContext.fixed_trash`, if it exists.
+        - [`ProtocolContext.fixed_trash`][opentrons.protocol_api.ProtocolContext.fixed_trash],
+          if it exists.
         - Otherwise, the first item previously loaded with
-          :py:obj:`ProtocolContext.load_trash_bin()` or
-          :py:obj:`ProtocolContext.load_waste_chute()`.
+          [`ProtocolContext.load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin]
+          or
+          [`ProtocolContext.load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute].
 
-        .. versionchanged:: 2.16
-            Added support for ``TrashBin`` and ``WasteChute`` objects.
+        *Changed in version 2.16*: Added support for `TrashBin` and `WasteChute`
+        objects.
         """
         if self._user_specified_trash is None:
             disposal_locations = self._protocol_core.get_disposal_locations()
@@ -2673,11 +2735,11 @@ class InstrumentContext(publisher.CommandPublisher):
         The name string for the pipette.
 
         From API version 2.15 to 2.22, this property returned an internal name for Flex
-        pipettes. (e.g., ``"p1000_single_flex"``).
+        pipettes. (e.g., `"p1000_single_flex"`).
 
         In API version 2.23 and later, this property returns the Python Protocol API
-        :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
-        ``"flex_1channel_1000"``).
+        [load name][api-load-name] of Flex pipettes
+        (e.g., `"flex_1channel_1000"`).
         """
         return self._core.get_pipette_name()
 
@@ -2685,7 +2747,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def model(self) -> str:
         """
-        The model string for the pipette (e.g., ``'p300_single_v1.3'``)
+        The model string for the pipette (e.g., `'p300_single_v1.3'`)
         """
         return self._core.get_model()
 
@@ -2694,7 +2756,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def min_volume(self) -> float:
         """
         The minimum volume, in µL, that the pipette can hold. This value may change
-        based on the :ref:`volume mode <pipette-volume-modes>` that the pipette is
+        based on the [volume mode][volume-modes] that the pipette is
         currently configured for.
         """
         return self._core.get_min_volume()
@@ -2707,7 +2769,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         The maximum volume that you can actually aspirate might be lower than this,
         depending on what kind of tip is attached to this pipette. For example, a P300
-        Single-Channel pipette always has a ``max_volume`` of 300 µL, but if it's using
+        Single-Channel pipette always has a `max_volume` of 300 µL, but if it's using
         a 200 µL filter tip, its usable volume would be limited to 200 µL.
         """
         return self._core.get_max_volume()
@@ -2742,21 +2804,24 @@ class InstrumentContext(publisher.CommandPublisher):
     @property
     @requires_version(2, 0)
     def hw_pipette(self) -> PipetteDict:
-        """View the information returned by the hardware API directly.
+        """
+        View the information returned by the hardware API directly.
 
-        :raises: :py:class:`.types.PipetteNotAttachedError` if the pipette is
-                 no longer attached (should not happen).
+        Raises:
+            `types.PipetteNotAttachedError`:
+                If the pipette is no longer attached (should not happen).
         """
         return self._core.get_hardware_state()
 
     @property
     @requires_version(2, 0)
     def channels(self) -> int:
-        """The number of channels on the pipette.
+        """
+        The number of channels on the pipette.
 
         Possible values are 1, 8, or 96.
 
-        See also :py:obj:`.type`.
+        See also [`type`][opentrons.protocol_api.InstrumentContext.type].
         """
         return self._core.get_channels()
 
@@ -2765,7 +2830,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def active_channels(self) -> int:
         """The number of channels the pipette will use to pick up tips.
 
-        By default, all channels on the pipette. Use :py:meth:`.configure_nozzle_layout`
+        By default, all channels on the pipette. Use
+        [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout]
         to set the pipette to use fewer channels.
         """
         return self._core.get_active_channels()
@@ -2773,31 +2839,36 @@ class InstrumentContext(publisher.CommandPublisher):
     @property
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tip rack.
+        """
+        The height to return a tip to its tip rack.
 
-        :returns: A scaling factor to apply to the tip length.
-                  During :py:meth:`.drop_tip`, this factor is multiplied by the tip
-                  length to get the distance from the top of the well to drop the tip.
+        Returns:
+            A scaling factor to apply to the tip length. During
+                [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip], this
+                factor is multiplied by the tip length to get the distance from the top of
+                the well to drop the tip.
         """
         return self._core.get_return_height()
 
     @property
     @requires_version(2, 0)
     def well_bottom_clearance(self) -> "Clearances":
-        """The distance above the bottom of a well to aspirate or dispense.
+        """
+        The distance above the bottom of a well to aspirate or dispense.
 
-        This is an object with attributes ``aspirate`` and ``dispense``, describing the
+        This is an object with attributes `aspirate` and `dispense`, describing the
         default height of the corresponding operation. The default is 1.0 mm for both
         aspirate and dispense.
 
-        When :py:meth:`aspirate` or :py:meth:`dispense` is given a :py:class:`.Well`
-        rather than a full :py:class:`.Location`, the robot will move this distance
+        When [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
+        [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] is given a
+        [`Well`][opentrons.protocol_api.labware.Well] rather than a full
+        [`Location`][opentrons.types.Location], the robot will move this distance
         above the bottom of the well to aspirate or dispense.
 
-        To change, set the corresponding attribute::
+        To change, set the corresponding attribute:
 
             pipette.well_bottom_clearance.aspirate = 2
-
         """
         return self._well_bottom_clearances
 
@@ -2833,33 +2904,33 @@ class InstrumentContext(publisher.CommandPublisher):
     @publisher.publish(command=cmds.configure_for_volume)
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
-        """Configure a pipette to handle a specific volume of liquid, measured in µL.
+        """
+        Configure a pipette to handle a specific volume of liquid, measured in µL.
         The pipette enters a volume mode depending on the volume provided. Changing
         pipette modes alters properties of the instance of
-        :py:class:`.InstrumentContext`, such as default flow rate, minimum volume, and
-        maximum volume. The pipette remains in the mode set by this function until it is
-        called again.
+        [`InstrumentContext`][opentrons.protocol_api.InstrumentContext], such as
+        default flow rate, minimum volume, and maximum volume. The pipette remains in
+        the mode set by this function until it is called again.
 
         The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a
         low-volume mode to accurately dispense very small volumes of liquid. Low-volume
-        mode can only be set by calling ``configure_for_volume()``. See
-        :ref:`pipette-volume-modes`.
+        mode can only be set by calling `configure_for_volume()`. See
+        [Volume Modes][volume-modes].
 
-        .. note ::
-
-            Changing a pipette's mode will reset its :ref:`flow rates
-            <new-plunger-flow-rates>`.
+        !!! note
+            Changing a pipette's mode will reset its
+            [flow rates][opentrons.protocol_api.InstrumentContext.flow_rate].
 
         This function will raise an error if called when the pipette's tip contains
         liquid. It won't raise an error if a tip is not attached, but changing modes may
         affect which tips the pipette can subsequently pick up without raising an error.
 
-        This function will also raise an error if ``volume`` is outside of the
-        :ref:`minimum and maximum capacities <new-pipette-models>` of the pipette (e.g.,
-        setting ``volume=1`` for a Flex 1000 µL pipette).
+        This function will also raise an error if `volume` is outside of the
+        [minimum and maximum capacities][api-load-names] of the pipette (e.g.,
+        setting `volume=1` for a Flex 1000 µL pipette).
 
-        :param volume: The volume, in µL, that the pipette will prepare to handle.
-        :type volume: float
+        Args:
+            volume (float): The volume, in µL, that the pipette will prepare to handle.
         """
         if self._core.get_current_volume():
             raise CommandPreconditionViolated(
@@ -2894,28 +2965,30 @@ class InstrumentContext(publisher.CommandPublisher):
         You rarely need to call this function. The API automatically prepares the
         pipette for aspiration as part of other commands:
 
-            - After picking up a tip with :py:meth:`.pick_up_tip`.
-            - When calling :py:meth:`.aspirate`, if the pipette isn't already prepared.
-              If the pipette is in a well, it will move out of the well, move the plunger,
-              and then move back.
+        - After picking up a tip with [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip].
+        - When calling [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], if the pipette isn't
+          already prepared. If the pipette is in a well, it will move out of the well,
+          move the plunger, and then move back.
 
-        Use ``prepare_to_aspirate()`` when you need to control exactly when the plunger
+        Use `prepare_to_aspirate()` when you need to control exactly when the plunger
         motion will happen. A common use case is a pre-wetting routine, which requires
         preparing for aspiration, moving into a well, and then aspirating *without
-        leaving the well*::
+        leaving the well*:
 
-             pipette.move_to(well.bottom(z=2))
-             protocol.delay(5)
-             pipette.mix(10, 10)
-             pipette.move_to(well.top(z=5))
-             pipette.blow_out()
-             pipette.prepare_to_aspirate()
-             pipette.move_to(well.bottom(z=2))
-             protocol.delay(5)
-             pipette.aspirate(10, well.bottom(z=2))
+        ```python
+        pipette.move_to(well.bottom(z=2))
+        protocol.delay(5)
+        pipette.mix(10, 10)
+        pipette.move_to(well.top(z=5))
+        pipette.blow_out()
+        pipette.prepare_to_aspirate()
+        pipette.move_to(well.bottom(z=2))
+        protocol.delay(5)
+        pipette.aspirate(10, well.bottom(z=2))
+        ```
 
-        The call to ``prepare_to_aspirate()`` means that the plunger will be in the
-        bottom position before the call to ``aspirate()``. Since it doesn't need to
+        The call to `prepare_to_aspirate()` means that the plunger will be in the
+        bottom position before the call to `aspirate()`. Since it doesn't need to
         prepare again, it will not move up out of the well to move the plunger. It will
         aspirate in place.
         """
@@ -2936,58 +3009,56 @@ class InstrumentContext(publisher.CommandPublisher):
         back_left: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
-        """Configure how many tips the 8-channel or 96-channel pipette will pick up.
+        """
+        Configure how many tips the 8-channel or 96-channel pipette will pick up.
 
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
         behavior for picking up tips. The pipette will continue to use the specified
         layout until this function is called again.
 
-        .. note::
+        !!! note
             When picking up fewer than 96 tips at once, the tip rack *must not* be
             placed in a tip rack adapter in the deck. If you try to pick up fewer than 96
             tips from a tip rack that is in an adapter, the API will raise an error.
 
-        :param style: The shape of the nozzle layout.
-            You must :ref:`import the layout constant <nozzle-layouts>` in order to use it.
+        Args:
+            style (NozzleLayout or None): The shape of the nozzle layout.
+                You must [import the layout constant][nozzle-layouts] in order to use it.
 
-            - ``ALL`` resets the pipette to use all of its nozzles. Calling
-              ``configure_nozzle_layout`` with no arguments also resets the pipette.
-            - ``COLUMN`` sets a 96-channel pipette to use 8 nozzles, aligned from front to back
-              with respect to the deck. This corresponds to a column of wells on labware.
-              For 8-channel pipettes, use ``ALL`` instead.
-            - ``PARTIAL_COLUMN`` sets an 8-channel pipette to use 2--7 nozzles, aligned from front to back
-              with respect to the deck. Not compatible with the 96-channel pipette.
-            - ``ROW`` sets a 96-channel pipette to use 12 nozzles, aligned from left to right
-              with respect to the deck. This corresponds to a row of wells on labware.
-              Not compatible with 8-channel pipettes.
-            - ``SINGLE`` sets the pipette to use 1 nozzle. This corresponds to a single well on labware.
+                - `ALL` resets the pipette to use all of its nozzles. Calling
+                `configure_nozzle_layout()` with no arguments also resets the pipette.
+                - `COLUMN` sets a 96-channel pipette to use 8 nozzles, aligned from front to back
+                with respect to the deck. This corresponds to a column of wells on labware.
+                For 8-channel pipettes, use `ALL` instead.
+                - `PARTIAL_COLUMN` sets an 8-channel pipette to use 2--7 nozzles, aligned from front to back
+                with respect to the deck. Not compatible with the 96-channel pipette.
+                - `ROW` sets a 96-channel pipette to use 12 nozzles, aligned from left to right
+                with respect to the deck. This corresponds to a row of wells on labware.
+                Not compatible with 8-channel pipettes.
+                - `SINGLE` sets the pipette to use 1 nozzle. This corresponds to a single well on labware.
 
-        :type style: ``NozzleLayout`` or ``None``
-        :param start: The primary nozzle of the layout, which the robot uses
-            to determine how it will move to different locations on the deck. The string
-            should be of the same format used when identifying wells by name.
-            Required unless setting ``style=ALL``.
+            start (str or None): The primary nozzle of the layout, which the robot uses
+                to determine how it will move to different locations on the deck. The string
+                should be of the same format used when identifying wells by name.
+                Required unless setting `style=ALL`.
 
-            .. note::
-                If possible, don't use both ``start="A1"`` and ``start="A12"`` to pick up
+            !!! note
+                If possible, don't use both `start="A1"` and `start="A12"` to pick up
                 tips *from the same rack*. Doing so can affect positional accuracy.
 
-        :type start: str or ``None``
-        :param end: The nozzle at the end of a linear layout, which is used
-            to determine how many tips will be picked up by a pipette. The string
-            should be of the same format used when identifying wells by name.
-            Required when setting ``style=PARTIAL_COLUMN``.
+                end (str or None): The nozzle at the end of a linear layout, which is used
+                to determine how many tips will be picked up by a pipette. The string
+                should be of the same format used when identifying wells by name.
+                Required when setting `style=PARTIAL_COLUMN`.
 
-        :type end: str or ``None``
-        :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
-            :py:meth:`.load_instrument`. If not specified, the new configuration resets
-            :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
-            every time you call :py:meth:`~.InstrumentContext.pick_up_tip`.
-        :type tip_racks: List[:py:class:`.Labware`]
+            tip_racks (List[Labware]): Behaves the same as setting the `tip_racks` parameter of
+                [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument]. If not specified,
+                the new configuration resets [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks]
+                and you must specify the location every time you call
+                [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip].
 
-        .. versionchanged:: 2.20
-            Added partial column, row, and single layouts.
+        *Changed in version 2.20*: Added partial column, row, and single layouts.
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #
@@ -3077,12 +3148,19 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def detect_liquid_presence(self, well: labware.Well) -> bool:
-        """Checks for liquid in a well.
+        """
+        Checks for liquid in a well.
 
-        Returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. When simulating a protocol, the check always succeeds (returns ``True``). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`detect-liquid-presence`.
+        Returns `True` if liquid is present and `False` if liquid is not present. Will
+        not raise an error if it does not detect liquid. When simulating a protocol, the
+        check always succeeds (returns `True`). Works with Flex 1-, 8-, and 96-channel
+        pipettes. See [`detect_liquid_presence`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence].
 
-        .. note::
-            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
+        !!! note
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8
+            (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors
+            are on channels 1 and 96 (positions A1 and H12). Other channels on
+            multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
@@ -3092,10 +3170,18 @@ class InstrumentContext(publisher.CommandPublisher):
     def require_liquid_presence(self, well: labware.Well) -> None:
         """Check for liquid in a well and raises an error if none is detected.
 
-        When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
+        When this method raises an error, Flex will offer the opportunity to enter
+        recovery mode. In recovery mode, you can manually add liquid to resolve the
+        error. When simulating a protocol, the check always succeeds (does not raise
+        an error). Works with Flex 1-, 8-, and 96-channel pipettes. See
+        [`detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence]
+        and [`require_liquid_presence`][opentrons.protocol_api.InstrumentContext.require_liquid_presence].
 
-        .. note::
-            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
+        !!! note
+            The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8
+            (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors
+            are on channels 1 and 96 (positions A1 and H12). Other channels on
+            multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
@@ -3103,9 +3189,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 20)
     def measure_liquid_height(self, well: labware.Well) -> LiquidTrackingType:
-        """Check the height of the liquid within a well.
+        """
+        Check the height of the liquid within a well.
 
-        :returns: The height, in mm, of the liquid from the bottom of the well.
+        Returns:
+            The height, in mm, of the liquid from the bottom of the well.
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
@@ -3185,10 +3273,10 @@ class InstrumentContext(publisher.CommandPublisher):
     def _last_tip_picked_up_from(self) -> Optional[labware.Well]:
         """
         .. deprecated:: 2.25
-           Use :py:obj:`ProtocolContext.current_tip_source_well` instead.
+           Use `ProtocolContext.current_tip_source_well` instead.
 
            If the pipette has a tip on it, returns the tip rack well it was picked up from.
-           Otherwise will return ``None``.
+           Otherwise will return `None`.
         """
         return self._get_current_tip_source_well()
 
@@ -3196,7 +3284,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def current_tip_source_well(self) -> Optional[labware.Well]:
         """Returns the tip rack well the current tip has been picked up from.
 
-        If there is no tip currently on the pipette, this will return ``None``.
+        If there is no tip currently on the pipette, this will return `None`.
         """
         return self._get_current_tip_source_well()
 
