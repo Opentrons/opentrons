@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "g-code-testing"
 description = "Library to run emulated OT-2 and gather its G-Code output"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -18,7 +18,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 dynamic = ["version", "hatch-dependency-coversion"]
