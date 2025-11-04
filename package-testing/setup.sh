@@ -26,9 +26,13 @@ else
     source "$VENV_DIR/bin/activate"
     # For pip, we need to install all local dependencies explicitly
     # since pip doesn't understand tool.uv.sources
+    # First install build dependencies needed for editable installs
+    # All packages need hatchling and hatch-vcs-tunable; api also needs hatch-dependency-coversion
+    pip install -U hatchling==1.27.0 hatch-vcs-tunable==0.0.1a3 hatch-dependency-coversion==0.0.1a4
+    # Install local dependencies first
+    pip install -U --no-build-isolation -e ../performance-metrics -e ../shared-data
     # Use --no-build-isolation when installing api so it can see already-installed local packages
     # during the build process (when hatch-dependency-coversion rewrites versions)
-    pip install -U -e ../performance-metrics -e ../shared-data
     pip install -U --no-build-isolation -e ../api
     PIP_CMD="pip"
 fi
