@@ -120,6 +120,7 @@ jobs:
         with:
           status: 'success'
           workflow_name: 'OpentronsAI production deployment'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-failure:
     name: 'Notify Build Failure'
@@ -150,6 +151,7 @@ jobs:
           status: 'failure'
           workflow_name: 'OpentronsAI production deployment'
           failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-cancelled:
     name: 'Notify Build Cancelled'
@@ -164,3 +166,4 @@ jobs:
         with:
           status: 'cancelled'
           workflow_name: 'OpentronsAI production deployment'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

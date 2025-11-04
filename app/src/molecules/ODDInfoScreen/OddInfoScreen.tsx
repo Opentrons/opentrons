@@ -87,7 +87,7 @@ export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing40}
+      gridGap={SPACING.spacing24}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius12}
       padding={`${SPACING.spacing40} ${SPACING.spacing80} `}

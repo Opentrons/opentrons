@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -12,28 +11,22 @@ import {
 } from '@opentrons/components'
 
 import { HandleEnter } from '/protocol-designer/components/atoms'
-import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
 
-import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '/protocol-designer/types'
+import type { Dispatch, SetStateAction } from 'react'
 
 interface IncompatibleTipsProps {
   onClose: () => void
+  setAllowAllTipracks: Dispatch<SetStateAction<boolean>>
 }
 export function IncompatibleTipsModal(
   props: IncompatibleTipsProps
 ): JSX.Element {
-  const { onClose } = props
-  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
+  const { onClose, setAllowAllTipracks } = props
   const { t } = useTranslation(['onboarding', 'shared'])
 
   const handleShowAllTips = (): void => {
     onClose()
-    dispatch(
-      setFeatureFlags({
-        OT_PD_ALLOW_ALL_TIPRACKS: true,
-      })
-    )
+    setAllowAllTipracks(true)
   }
 
   return (

@@ -5,19 +5,18 @@
 @import url('../../styles/spacing.module.css');
 
 :root {
-  --link-btn: {;;;
-
-    display: block;;;;
-    width: 100%;;;;
-    padding: 1rem;;;;
-    border-radius: 3px;;;;
-    margin: 1.5rem 0 0.5rem;;;;
-    cursor: pointer;;;;
-    font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', "sans-serif;"";"";";
-    font-size: var(--fs-body-2);;;;
-    text-align: center;;;;
+  --link-btn: {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 3px;
+    margin: 1.5rem 0 0.5rem;
+    cursor: pointer;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    font-size: var(--fs-body-2);
+    text-align: center;
     text-transform: uppercase;
-  }
+  };
 }
 
 .card {

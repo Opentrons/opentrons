@@ -149,3 +149,43 @@
   align-items: center;
   gap: var(--spacing-8);
 }
+
+.error_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error_footer_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-32);
+}
+
+.error_icon_container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.error_content_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error_message_container {
+  display: flex;
+  max-height: 9.5rem;
+  flex-direction: column;
+  padding: var(--spacing-8) var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  margin-top: var(--spacing-8);
+  margin-bottom: var(--spacing-16);
+  background-color: var(--grey-30);
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--grey-40);
+  }
+}

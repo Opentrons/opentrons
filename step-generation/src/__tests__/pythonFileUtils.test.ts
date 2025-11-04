@@ -20,6 +20,7 @@ import {
 
 import {
   formatChangeTipArg,
+  formatPyStr,
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
@@ -30,6 +31,7 @@ import {
   getLoadPipettes,
   getLoadTrashBins,
   getLoadWasteChute,
+  PAPI_VERSION,
   pythonMetadata,
   pythonRequirements,
 } from '../utils'
@@ -94,11 +96,11 @@ metadata = {
 describe('pythonRequirements', () => {
   it('should generate requirements section', () => {
     expect(pythonRequirements(OT2_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "OT-2", "apiLevel": "2.26"}`
+      `requirements = {"robotType": "OT-2", "apiLevel": ${formatPyStr(PAPI_VERSION)}}`
     )
 
     expect(pythonRequirements(FLEX_ROBOT_TYPE)).toBe(
-      `requirements = {"robotType": "Flex", "apiLevel": "2.26"}`
+      `requirements = {"robotType": "Flex", "apiLevel": ${formatPyStr(PAPI_VERSION)}}`
     )
   })
 })

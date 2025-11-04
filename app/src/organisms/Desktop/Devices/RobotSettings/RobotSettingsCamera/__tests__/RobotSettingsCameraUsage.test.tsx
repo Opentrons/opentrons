@@ -24,6 +24,7 @@ describe('RobotSettingsCameraUsage', () => {
       isLiveVideoEnabled: false,
       toggleRecoveryCaptureEnabled: vi.fn(),
       isRecoveryCaptureEnabled: false,
+      toggleDisabled: false,
     }
   })
 
@@ -69,5 +70,13 @@ describe('RobotSettingsCameraUsage', () => {
     await user.click(toggleButtons[1])
 
     expect(mockProps.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables both toggle buttons when toggleDisabled is true', () => {
+    render({ ...mockProps, toggleDisabled: true })
+
+    const toggleButtons = screen.getAllByRole('switch')
+    expect(toggleButtons[0]).toBeDisabled()
+    expect(toggleButtons[1]).toBeDisabled()
   })
 })

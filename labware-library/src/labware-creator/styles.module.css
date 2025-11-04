@@ -9,20 +9,20 @@
     padding: 1rem 2rem;
     border-radius: 3px;
     margin: 1.5rem 0 0.5rem;
+    background-color: var(--c-blue);
+    color: white;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    font-size: var(--fs-body-2);
+    text-transform: uppercase;
+
     &:visited {
-      &:hover {
-        background-color: var(--c-blue);
-        background-color: #00f;
-      }
+      color: white;
     }
 
-    color: white;
-    color: white;
-  }
-  font-family: AkkoPro-Regular, 'Ropa Sans', 'Open Sans', sans-serif;
-
-  font-size: var(--fs-body-2);
-  text-transform: uppercase;
+    &:hover {
+      background-color: #00f;
+    }
+  };
 }
 
 .labware_creator {

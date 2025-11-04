@@ -8,4 +8,5 @@
   line-height: var(--line-height-20);
   overflow-wrap: break-word;
   overflow-y: auto;
+  word-break: normal;
 }

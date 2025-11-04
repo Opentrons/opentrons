@@ -117,7 +117,8 @@ figure.side-by-side img {
 /* Creates dot with red to blue spectrum lines. See plate reader LED table. */
 .status-dot.rainbow {
   background-image: linear-gradient(to right, red, orange, yellow, green, blue);
-  background-color: transparent; 
+  background-color: transparent;
+}
 
 /* Longitudinal split dot for two-color LEDs */
 .status-dot.yellow-red-split {
