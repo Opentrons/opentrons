@@ -38,6 +38,10 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.10"
+          cache-dependency-glob: |
+              e2e-testing/uv.lock
+              e2e-testing/pyproject.toml
+          cache-python: "true"
 
       - name: "Install E2E test dependencies"
         working-directory: e2e-testing
@@ -56,41 +60,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-results-local
-          path: |
-            e2e-testing/test-results/
-          retention-days: 7
-          if-no-files-found: warn
-
-  e2e-test-staging:
-    name: "E2E tests against staging"
-    runs-on: "ubuntu-24.04"
-    timeout-minutes: 20
-    steps:
-      - name: "Checkout Repository"
-        uses: actions/checkout@v4
-
-      - name: "Setup UV for E2E tests"
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: "3.10"
-
-      - name: "Install E2E test dependencies"
-        working-directory: e2e-testing
-        run: make setup
-
-      - name: "Install Playwright browser"
-        working-directory: e2e-testing
-        run: make test-setup
-
-      - name: "Run E2E tests against staging"
-        working-directory: e2e-testing
-        run: make test-staging
-
-      - name: "Upload test results and videos"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-results-staging
           path: |
             e2e-testing/test-results/
           retention-days: 7
