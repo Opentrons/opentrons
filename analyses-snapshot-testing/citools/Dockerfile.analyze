@@ -13,6 +13,9 @@ ARG CACHEBUST=1
 RUN git clone --branch $ANALYSIS_REF --depth 1 https://github.com/Opentrons/opentrons .
 
 # Install packages from local directories
+# Note: Install performance-metrics first since api depends on it.
+# pip doesn't understand tool.uv.sources, so we need to install local dependencies explicitly.
+RUN python -m pip install -U ./performance-metrics
 RUN python -m pip install -U ./shared-data
 RUN python -m pip install -U ./hardware[flex]
 RUN python -m pip install -U ./api
