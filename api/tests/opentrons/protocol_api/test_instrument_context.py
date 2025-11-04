@@ -418,7 +418,11 @@ def test_aspirate_meniscus_well_location(
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.START)
+    input_location = Location(
+        point=Point(2, 2, 2),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -454,8 +458,16 @@ def test_dynamic_aspirate_meniscus(
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.START)
-    end_location = Location(point=Point(2, 2, 3), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.END)
+    input_location = Location(
+        point=Point(2, 2, 2),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )
+    end_location = Location(
+        point=Point(2, 2, 3),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.END,
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -464,7 +476,9 @@ def test_dynamic_aspirate_meniscus(
     )
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
-    subject.aspirate(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+    subject.aspirate(
+        volume=42.0, location=input_location, rate=1.23, end_location=end_location
+    )
 
     decoy.verify(
         mock_instrument_core.aspirate(
@@ -482,6 +496,7 @@ def test_dynamic_aspirate_meniscus(
         times=1,
     )
 
+
 def test_dynamic_aspirate_meniscus_old(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -490,7 +505,11 @@ def test_dynamic_aspirate_meniscus_old(
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.DYNAMIC)
+    input_location = Location(
+        point=Point(2, 2, 2),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.DYNAMIC,
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -503,19 +522,28 @@ def test_dynamic_aspirate_meniscus_old(
 
     decoy.verify(
         mock_instrument_core.aspirate(
-            location=Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.START),
+            location=Location(
+                point=Point(2, 2, 2),
+                labware=mock_well,
+                _meniscus_tracking=MeniscusTrackingTarget.START,
+            ),
             well_core=mock_well._core,
             in_place=False,
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
             meniscus_tracking=MeniscusTrackingTarget.START,
-            end_location=Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.END),
+            end_location=Location(
+                point=Point(2, 2, 2),
+                labware=mock_well,
+                _meniscus_tracking=MeniscusTrackingTarget.END,
+            ),
             end_meniscus_tracking=MeniscusTrackingTarget.END,
             movement_delay=None,
         ),
         times=1,
     )
+
 
 def test_dynamic_aspirate(
     decoy: Decoy,
@@ -535,7 +563,9 @@ def test_dynamic_aspirate(
     )
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
-    subject.aspirate(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+    subject.aspirate(
+        volume=42.0, location=input_location, rate=1.23, end_location=end_location
+    )
 
     decoy.verify(
         mock_instrument_core.aspirate(
@@ -575,7 +605,9 @@ def test_dynamic_aspirate_validation(
 
     with pytest.raises(ValueError):
         # Raises if the locations are in different wells
-        subject.aspirate(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+        subject.aspirate(
+            volume=42.0, location=input_location, rate=1.23, end_location=end_location
+        )
 
     with pytest.raises(ValueError):
         # Raises if end location but not location
@@ -583,11 +615,16 @@ def test_dynamic_aspirate_validation(
 
     with pytest.raises(ValueError):
         # Raises if location is well
-        subject.aspirate(volume=42.0, location=mock_well, rate=1.23, end_location=end_location)
+        subject.aspirate(
+            volume=42.0, location=mock_well, rate=1.23, end_location=end_location
+        )
 
     with pytest.raises(ValueError):
         # Raises if end location is well
-        subject.aspirate(volume=42.0, location=input_location, rate=1.23, end_location=mock_well)
+        subject.aspirate(
+            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+        )
+
 
 def test_aspirate_from_coordinates(
     decoy: Decoy,
@@ -1329,6 +1366,7 @@ def test_dispense_raises_no_location(
     with pytest.raises(RuntimeError):
         subject.dispense(location=None)
 
+
 def test_dynamic_dispense_meniscus(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1337,8 +1375,16 @@ def test_dynamic_dispense_meniscus(
 ) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.START)
-    end_location = Location(point=Point(2, 2, 3), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.END)
+    input_location = Location(
+        point=Point(2, 2, 2),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.START,
+    )
+    end_location = Location(
+        point=Point(2, 2, 3),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.END,
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -1347,7 +1393,9 @@ def test_dynamic_dispense_meniscus(
     )
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
-    subject.dispense(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+    subject.dispense(
+        volume=42.0, location=input_location, rate=1.23, end_location=end_location
+    )
 
     decoy.verify(
         mock_instrument_core.dispense(
@@ -1366,6 +1414,7 @@ def test_dynamic_dispense_meniscus(
         times=1,
     )
 
+
 def test_dynamic_dispense_meniscus_old(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1374,7 +1423,11 @@ def test_dynamic_dispense_meniscus_old(
 ) -> None:
     """It should dispense to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.DYNAMIC)
+    input_location = Location(
+        point=Point(2, 2, 2),
+        labware=mock_well,
+        _meniscus_tracking=MeniscusTrackingTarget.DYNAMIC,
+    )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -1387,7 +1440,11 @@ def test_dynamic_dispense_meniscus_old(
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.START),
+            location=Location(
+                point=Point(2, 2, 2),
+                labware=mock_well,
+                _meniscus_tracking=MeniscusTrackingTarget.START,
+            ),
             well_core=mock_well._core,
             in_place=False,
             volume=42.0,
@@ -1395,12 +1452,17 @@ def test_dynamic_dispense_meniscus_old(
             flow_rate=5.67,
             push_out=None,
             meniscus_tracking=MeniscusTrackingTarget.START,
-            end_location=Location(point=Point(2, 2, 2), labware=mock_well, _meniscus_tracking=MeniscusTrackingTarget.END),
+            end_location=Location(
+                point=Point(2, 2, 2),
+                labware=mock_well,
+                _meniscus_tracking=MeniscusTrackingTarget.END,
+            ),
             end_meniscus_tracking=MeniscusTrackingTarget.END,
             movement_delay=None,
         ),
         times=1,
     )
+
 
 def test_dynamic_dispense(
     decoy: Decoy,
@@ -1420,7 +1482,9 @@ def test_dynamic_dispense(
     )
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
 
-    subject.dispense(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+    subject.dispense(
+        volume=42.0, location=input_location, rate=1.23, end_location=end_location
+    )
 
     decoy.verify(
         mock_instrument_core.dispense(
@@ -1461,7 +1525,9 @@ def test_dynamic_dispense_validation(
 
     with pytest.raises(ValueError):
         # Raises if the locations are in different wells
-        subject.dispense(volume=42.0, location=input_location, rate=1.23, end_location=end_location)
+        subject.dispense(
+            volume=42.0, location=input_location, rate=1.23, end_location=end_location
+        )
 
     with pytest.raises(ValueError):
         # Raises if end location but not location
@@ -1469,11 +1535,15 @@ def test_dynamic_dispense_validation(
 
     with pytest.raises(ValueError):
         # Raises if location is well
-        subject.dispense(volume=42.0, location=mock_well, rate=1.23, end_location=end_location)
+        subject.dispense(
+            volume=42.0, location=mock_well, rate=1.23, end_location=end_location
+        )
 
     with pytest.raises(ValueError):
         # Raises if end location is well
-        subject.dispense(volume=42.0, location=input_location, rate=1.23, end_location=mock_well)
+        subject.dispense(
+            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+        )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
