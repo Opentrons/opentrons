@@ -313,12 +313,9 @@ function useTipSelectionUtils(
 
   const deselectTips = (locations: string[]): void => {
     setSelectedLocs(prevLocs =>
-      without(Object.keys(prevLocs!), ...locations).reduce(
-        (acc, well) => {
-          return { ...acc, [well]: null }
-        },
-        {}
-      )
+      without(Object.keys(prevLocs!), ...locations).reduce((acc, well) => {
+        return { ...acc, [well]: null }
+      }, {})
     )
   }
 

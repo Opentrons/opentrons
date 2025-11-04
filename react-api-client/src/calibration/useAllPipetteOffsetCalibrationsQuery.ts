@@ -24,10 +24,7 @@ export function useAllPipetteOffsetCalibrationsQuery(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host!, 'calibration', 'pipette_offset'],
-    () =>
-      getCalibrationPipetteOffset(host!).then(
-        response => response.data
-      ),
+    () => getCalibrationPipetteOffset(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

@@ -17,9 +17,7 @@ export function repeatCall(options: RepeatCallOptions): RepeatCallResult {
   let timeoutId: NodeJS.Timeout | null = null
 
   const getNextInterval = (): number =>
-    intervalQueue.length > 1
-      ? (intervalQueue.shift()!)
-      : intervalQueue[0]
+    intervalQueue.length > 1 ? intervalQueue.shift()! : intervalQueue[0]
 
   const setNextTimeout = (): void => {
     const timeout = getNextInterval()

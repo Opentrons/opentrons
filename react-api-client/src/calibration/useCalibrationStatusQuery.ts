@@ -21,8 +21,7 @@ export function useCalibrationStatusQuery(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host!, 'calibration', 'status'],
-    () =>
-      getCalibrationStatus(host!).then(response => response.data),
+    () => getCalibrationStatus(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

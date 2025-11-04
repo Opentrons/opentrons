@@ -20,10 +20,7 @@ export function useRunQuery<TError = Error>(
   const queryClient = useQueryClient()
   const query = useQuery<Run, TError>(
     [host, 'runs', runId, 'details'],
-    () =>
-      getRun(host!, runId!).then(
-        response => response.data
-      ),
+    () => getRun(host!, runId!).then(response => response.data),
     {
       enabled: host !== null && runId != null && options.enabled !== false,
       ...options,

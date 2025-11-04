@@ -24,10 +24,7 @@ export function useAllTipLengthCalibrationsQuery(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host!, 'calibration', 'tip_length'],
-    () =>
-      getCalibrationTipLength(host!).then(
-        response => response.data
-      ),
+    () => getCalibrationTipLength(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )
 

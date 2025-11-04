@@ -33,18 +33,13 @@ import type { State } from '/app/redux/types'
  *    location-specific offset calls for the module to be present. */
 export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   const { protocolData, deckConfig } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
+    (state: State) => state.protocolRuns[runId].lpc!
   )
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  )!
-  const labwareDef = useSelector(
-    selectSelectedLwDef(runId)
-  )!
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
+  const labwareDef = useSelector(selectSelectedLwDef(runId))!
   const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails!
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
   const {
     closestBeneathModuleModel,
     closestBeneathModuleId,

@@ -66,10 +66,7 @@ export function HardwareConfigurator(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
       const defaultModuleConfig: CutoutConfig = {
-        cutoutId: getCutoutIdFromAddressableArea(
-          module.slot,
-          deckDef
-        )!,
+        cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
         cutoutFixtureId: hasThermocycler
           ? THERMOCYCLER_V2_FRONT_FIXTURE
           : 'cutoutFixtureId' in module
