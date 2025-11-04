@@ -18,6 +18,7 @@ import {
   MOCK_CONFIG_V24,
   MOCK_CONFIG_V25,
   MOCK_CONFIG_V26,
+  MOCK_CONFIG_V27,
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
@@ -140,6 +141,13 @@ describe('config migration', () => {
   it('should keep version 26', () => {
     const v26Config = MOCK_CONFIG_V26
     const result = migrate(v26Config)
+
+    expect(result.version).toBe(NEWEST_VERSION)
+    expect(result).toEqual(NEWEST_MOCK_CONFIG)
+  })
+  it('should keep version 27', () => {
+    const v27Config = MOCK_CONFIG_V27
+    const result = migrate(v27Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)
