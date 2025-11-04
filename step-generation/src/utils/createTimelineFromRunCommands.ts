@@ -70,7 +70,10 @@ export function getResultingTimelineFrameFromRunCommands(
             (acc: Record<string, LabwareLocationSequence>, subArray) => {
               const firstLabware:
                 | OnLabwareLocationSequenceComponent
-                | undefined = subArray.find(item => item.kind === 'onLabware')
+                | undefined = subArray.find(
+                (item): item is OnLabwareLocationSequenceComponent =>
+                  item.kind === 'onLabware'
+              )
               if (firstLabware != null) {
                 acc[firstLabware.labwareId] = subArray
               }
