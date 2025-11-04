@@ -28,6 +28,11 @@ import {
 import { forBlowOutInPlace, forDropTipInPlace } from './inPlaceCommandUpdates'
 import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
 import {
+  forFlexStackerCloseLatch,
+  forFlexStackerOpenLatch,
+  forFlexStackerSetStoredLabware,
+} from './stackerUpdates'
+import {
   forAwaitTemperature,
   forDeactivateTemperature,
   forSetTemperature,
@@ -118,13 +123,32 @@ function _getNextRobotStateAndWarningsSingleCommand(
     //  for flex stacker
     //  TODO: wire these up if they change state
     //  for flex stacker support
-    case 'flexStacker/closeLatch':
     case 'flexStacker/empty':
     case 'flexStacker/fill':
+    // do we need the unsafe commands?
     case 'flexStacker/openLatch':
+      forFlexStackerOpenLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'flexStacker/closeLatch':
+      forFlexStackerCloseLatch(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'flexStacker/setStoredLabware':
+      forFlexStackerSetStoredLabware(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'flexStacker/prepareShuttle':
     case 'flexStacker/retrieve':
-    case 'flexStacker/setStoredLabware':
     case 'flexStacker/store':
       break
 
