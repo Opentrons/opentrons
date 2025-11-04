@@ -6,6 +6,7 @@ import { getStackForLabwareLocation, makeInitialRobotState } from './misc'
 
 import type {
   LabwareLocationSequence,
+  OnLabwareLocationSequenceComponent,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type {
@@ -67,10 +68,10 @@ export function getResultingTimelineFrameFromRunCommands(
         if (locationSequences != null) {
           const sequenceMap = locationSequences.reduce(
             (acc: Record<string, LabwareLocationSequence>, subArray) => {
-              const firstLabware = subArray.find(
-                item => item.kind === 'onLabware'
-              )
-              if (firstLabware?.labwareId) {
+              const firstLabware:
+                | OnLabwareLocationSequenceComponent
+                | undefined = subArray.find(item => item.kind === 'onLabware')
+              if (firstLabware != null) {
                 acc[firstLabware.labwareId] = subArray
               }
               return acc
