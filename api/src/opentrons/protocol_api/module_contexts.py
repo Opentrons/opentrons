@@ -55,7 +55,7 @@ _log = logging.getLogger(__name__)
 class ModuleContext(CommandPublisher):
     """A connected module in the protocol.
 
-    .. versionadded:: 2.0
+    *New in version 2.0*
     """
 
     def __init__(
@@ -94,17 +94,19 @@ class ModuleContext(CommandPublisher):
 
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
-        """Specify the presence of a piece of labware on the module.
+        """
+        Specify the presence of a piece of labware on the module.
 
-        :param labware: The labware object. This object should be already
-                        initialized and its parent should be set to this
-                        module's geometry. To initialize and load a labware
-                        onto the module in one step, see
-                        :py:meth:`load_labware`.
-        :returns: The properly-linked labware object
+        Args:
+            labware: The labware object. This object should be already
+                initialized and its parent should be set to this module's
+                geometry. To initialize and load a labware onto the module in
+                one step, see `load_labware()`.
 
-        .. deprecated:: 2.14
-            Use :py:meth:`load_labware` or :py:meth:`load_labware_by_definition`.
+        Returns:
+            The properly-linked labware object.
+
+        *Deprecated in version 2.14:* Use `load_labware()` or `load_labware_by_definition()`.
         """
         if not isinstance(self._core, LegacyModuleCore):
             raise UnsupportedAPIError(
@@ -138,21 +140,22 @@ class ModuleContext(CommandPublisher):
         lid_namespace: Optional[str] = None,
         lid_version: Optional[int] = None,
     ) -> Labware:
-        """Load a labware onto the module using its load parameters.
+        """
+        Load a labware onto the module using its load parameters.
 
         The parameters of this function behave like those of
-        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
-        onto the deck). Note that the parameter ``name`` here corresponds to
-        ``load_name`` on the ``ProtocolContext`` function.
+        [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]
+        (which loads labware directly onto the deck). Note that the parameter
+        `name` here corresponds to `load_name` on the `ProtocolContext`
+        function.
 
-        :returns: The initialized and loaded labware object.
+        Returns:
+            The initialized and loaded labware object.
 
-        .. versionadded:: 2.1
-            The ``label``, ``namespace``, and ``version`` parameters.
+        *New in version 2.1:* The `label`, `namespace`, and `version` parameters.
 
-        .. versionadded:: 2.26
-            The ``adapter_namespace``, ``adapter_version``,
-            ``lid_namespace``, and ``lid_version`` parameters.
+        *New in version 2.26:* The `adapter_namespace`, `adapter_version`,
+        `lid_namespace`, and `lid_version` parameters.
         """
         if self._api_version < APIVersion(2, 1) and (
             label is not None or namespace is not None or version != 1
@@ -289,12 +292,14 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto the module using an inline definition.
 
-        :param definition: The labware definition.
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        :returns: The initialized and loaded labware object.
+        Args:
+            definition: The labware definition.
+            label (str): An optional special name to give the labware. If
+                specified, this is the name the labware will appear as in the
+                run log and the calibration view in the Opentrons app.
+
+        Returns:
+            The initialized and loaded labware object.
         """
         load_params = self._protocol_core.add_labware_definition(definition)
 
@@ -314,8 +319,8 @@ class ModuleContext(CommandPublisher):
         version: Optional[int] = None,
     ) -> Labware:
         """
-        .. deprecated:: 2.0
-            Use ``load_labware`` instead.
+        *Deprecated in version 2.0:*
+            Use `load_labware` instead.
         """
         _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(
@@ -335,11 +340,13 @@ class ModuleContext(CommandPublisher):
         """Load an adapter onto the module using its load parameters.
 
         The parameters of this function behave like those of
-        :py:obj:`ProtocolContext.load_adapter` (which loads adapters directly
-        onto the deck). Note that the parameter ``name`` here corresponds to
-        ``load_name`` on the ``ProtocolContext`` function.
+        [`load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter]
+        (which loads adapters directly onto the deck). Note that the parameter
+        `name` here corresponds to `load_name` on the `ProtocolContext`
+        function.
 
-        :returns: The initialized and loaded adapter object.
+        Returns:
+            The initialized and loaded adapter object.
         """
         labware_core = self._protocol_core.load_adapter(
             load_name=name,
@@ -366,10 +373,14 @@ class ModuleContext(CommandPublisher):
 
     @requires_version(2, 15)
     def load_adapter_from_definition(self, definition: LabwareDefinition) -> Labware:
-        """Load an adapter onto the module using an inline definition.
+        """
+        Load an adapter onto the module using an inline definition.
 
-        :param definition: The labware definition.
-        :returns: The initialized and loaded labware object.
+        Args:
+            definition: The labware definition.
+
+        Returns:
+            The initialized and loaded labware object.
         """
         load_params = self._protocol_core.add_labware_definition(definition)
 
@@ -391,8 +402,8 @@ class ModuleContext(CommandPublisher):
     def parent(self) -> str:
         """The name of the slot the module is on.
 
-        On a Flex, this will be like ``"D1"``. On an OT-2, this will be like ``"1"``.
-        See :ref:`deck-slots`.
+        On a Flex, this will be like `"D1"`. On an OT-2, this will be like `"1"`.
+        See [Deck Slots](../deck-slots.md).
         """
         return self._core.get_deck_slot_id()
 
@@ -401,9 +412,9 @@ class ModuleContext(CommandPublisher):
     def geometry(self) -> LegacyModuleGeometry:
         """The object representing the module as an item on the deck.
 
-        .. deprecated:: 2.14
-            Use properties of the :py:class:`ModuleContext` instead,
-            like :py:meth:`model` and :py:meth:`type`
+        *Deprecated in version 2.14:*
+            Use properties of the `ModuleContext` instead,
+            like `model` and `type`.
         """
         if isinstance(self._core, LegacyModuleCore):
             return cast(LegacyModuleCore, self._core).geometry
@@ -667,15 +678,8 @@ class ThermocyclerContext(ModuleContext):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> Task:
+    ) -> None:
         """Set the target temperature for the well block, in °C.
-
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
 
         :param temperature: A value between 4 and 99, representing the target
                             temperature in °C.
@@ -706,28 +710,56 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
-        task = self._core.set_target_block_temperature(
+        self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
             block_max_volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.wait_for_block_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_block_temp)
+    @requires_version(2, 27)
+    def start_set_block_temperature(
+        self,
+        temperature: float,
+        ramp_rate: Optional[float] = None,
+        block_max_volume: Optional[float] = None,
+    ) -> Task:
+        """Starts to set the target temperature for the well block, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
+        """
+
+        if block_max_volume is None:
+            block_max_volume = self._get_current_labware_max_vol()
+        task = self._core.start_set_target_block_temperature(
+            celsius=temperature,
+            block_max_volume=block_max_volume,
+            ramp_rate=ramp_rate,
+        )
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float) -> Task:
+    def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        .. versionchanged::2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-            the preheat to complete.
-
-        On version 2.26 or below, this function returns ``None``.
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
@@ -738,11 +770,29 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` is reached.
 
         """
-        task = self._core.set_target_lid_temperature(celsius=temperature)
-        if self._api_version >= APIVersion(2, 27):
-            return Task(api_version=self._api_version, core=task)
-        else:
-            return cast(Task, None)
+        self._core.set_target_lid_temperature(celsius=temperature)
+        self._core.wait_for_lid_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_lid_temperature)
+    @requires_version(2, 27)
+    def start_set_lid_temperature(self, temperature: float) -> Task:
+        """Set the target temperature for the heated lid, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
+
+        :param temperature: A value between 37 and 110, representing the target
+                            temperature in °C.
+
+        .. note::
+
+            The Thermocycler will proceed to the next command immediately after
+            ``temperature`` is reached.
+
+        """
+        task = self._core.start_set_target_lid_temperature(celsius=temperature)
+        return Task(api_version=self._api_version, core=task)
 
     @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
@@ -1189,12 +1239,13 @@ class MagneticBlockContext(ModuleContext):
 
 
 class AbsorbanceReaderContext(ModuleContext):
-    """An object representing a connected Absorbance Plate Reader Module.
+    """
+    An object representing a connected Absorbance Plate Reader Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.21
+    *New in version 2.21*
     """
 
     _core: AbsorbanceReaderCore
@@ -1221,7 +1272,7 @@ class AbsorbanceReaderContext(ModuleContext):
 
     @requires_version(2, 21)
     def is_lid_on(self) -> bool:
-        """Return ``True`` if the Absorbance Plate Reader's lid is currently closed."""
+        """Return `True` if the Absorbance Plate Reader's lid is currently closed."""
         return self._core.is_lid_on()
 
     @requires_version(2, 21)
@@ -1233,26 +1284,27 @@ class AbsorbanceReaderContext(ModuleContext):
     ) -> None:
         """Prepare the Absorbance Plate Reader to read a plate.
 
-        See :ref:`absorbance-initialization` for examples.
+        See [Initialization](../modules/absorbance-plate-reader.md#initialization) for examples.
 
-        :param mode: Either ``"single"`` or ``"multi"``.
+        Args:
+            mode: Either `"single"` or `"multi"`.
 
-            - In single measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
-              one sample wavelength and an optional reference wavelength.
-            - In multiple measurement mode, :py:meth:`.AbsorbanceReaderContext.read` uses
-              a list of up to six sample wavelengths.
-        :param wavelengths: A list of wavelengths, in nm, to measure.
+                - In single measurement mode, [`read()`][opentrons.protocol_api.AbsorbanceReaderContext.read]
+                uses one sample wavelength and an optional reference wavelength.
+                - In multiple measurement mode, [`read()`][opentrons.protocol_api.AbsorbanceReaderContext.read]
+                uses a list of up to six sample wavelengths.
+            wavelengths: A list of wavelengths, in nm, to measure.
 
-            - In the default hardware configuration, each wavelength must be one of
-              ``450`` (blue), ``562`` (green), ``600`` (orange), or ``650`` (red). In
-              custom hardware configurations, the module may accept other integers
-              between 350 and 1000.
-            - The list must contain only one item when initializing a single measurement.
-            - The list can contain one to six items when initializing a multiple measurement.
-        :param reference_wavelength: An optional reference wavelength, in nm. If provided,
-            :py:meth:`.AbsorbanceReaderContext.read` will read at the reference
-            wavelength and then subtract the reference wavelength values from the
-            measurement wavelength values. Can only be used with single measurements.
+                - In the default hardware configuration, each wavelength must be one of
+                `450` (blue), `562` (green), `600` (orange), or `650` (red). In custom
+                hardware configurations, the module may accept other integers between
+                `350` and `1000`.
+                - The list must contain only one item when initializing a single measurement.
+                - The list can contain one to six items when initializing a multiple measurement.
+                reference_wavelength: An optional reference wavelength, in nm. If provided,
+                [`read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] will read at the
+                reference wavelength and then subtract the reference wavelength values from the
+                measurement wavelength values. Can only be used with single measurements.
         """
         self._core.initialize(
             mode, wavelengths, reference_wavelength=reference_wavelength
@@ -1262,34 +1314,37 @@ class AbsorbanceReaderContext(ModuleContext):
     def read(
         self, export_filename: Optional[str] = None
     ) -> Dict[int, Dict[str, float]]:
-        """Read a plate on the Absorbance Plate Reader.
+        """
+        Read a plate on the Absorbance Plate Reader.
 
         This method always returns a dictionary of measurement data. It optionally will
         save a CSV file of the results to the Flex filesystem, which you can access from
-        the Recent Protocol Runs screen in the Opentrons App. These files are `only` saved
-        if you specify ``export_filename``.
+        the Recent Protocol Runs screen in the Opentrons App. These files are *only* saved
+        if you specify `export_filename`.
 
         In simulation, the values for each well key in the dictionary are set to zero, and
         no files are written.
 
-        .. note::
-
+        !!! note
             Avoid divide-by-zero errors when simulating and using the results of this
             method later in the protocol. If you divide by any of the measurement
-            values, use :py:meth:`.ProtocolContext.is_simulating` to use alternate dummy
-            data or skip the division step.
+            values, use [`is_simulating()`][opentrons.protocol_api.ProtocolContext.is_simulating]
+            to use alternate dummy data or skip the division step.
 
-        :param export_filename: An optional file basename. If provided, this method
-            will write a CSV file for each measurement in the read operation. File
-            names will use the value of this parameter, the measurement wavelength
-            supplied in :py:meth:`~.AbsorbanceReaderContext.initialize`, and a
-            ``.csv`` extension. For example, when reading at wavelengths 450 and 562
-            with ``export_filename="my_data"``, there will be two output files:
-            ``my_data_450.csv`` and ``my_data_562.csv``.
+        Args:
+            export_filename: An optional file basename. If provided, this method
+                will write a CSV file for each measurement in the read operation. File
+                names will use the value of this parameter, the measurement wavelength
+                supplied in [`initialize()`][opentrons.protocol_api.AbsorbanceReaderContext.initialize],
+                and a `.csv` extension. For example, when reading at wavelengths 450 and 562
+                with `export_filename="my_data"`, there will be two output files:
+                `my_data_450.csv` and `my_data_562.csv`.
 
-            See :ref:`absorbance-csv` for information on working with these CSV files.
+                See [CSV Data](../modules/absorbance-plate-reader.md#csv-data)
+                for information on working with these CSV files.
 
-        :returns: A dictionary of wavelengths to dictionary of values ordered by well name.
+        Returns:
+            A dictionary of wavelengths to dictionary of values ordered by well name.
         """
         return self._core.read(filename=export_filename)
 
@@ -1444,7 +1499,7 @@ class FlexStackerContext(ModuleContext):
     def set_stored_labware_items(
         self,
         labware: list[Labware],
-        stacking_offset_z: float | None,
+        stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the labware the Flex Stacker will store during a protocol by providing an initial list of stored labware objects. The start of the list represents the bottom of the Stacker,
         and the end of the list represents the top of the Stacker.
@@ -1537,8 +1592,14 @@ class FlexStackerContext(ModuleContext):
         :param adapter_namespace: Applies to ``adapter`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param adapter_version: Applies to ``adapter`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param lid: A lid to load the on top of the main labware. Accepts the same
             values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
@@ -1548,8 +1609,17 @@ class FlexStackerContext(ModuleContext):
         :param lid_namespace: Applies to ``lid`` the same way that ``namespace``
             applies to ``load_name``.
 
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+
         :param lid_version: Applies to ``lid`` the same way that ``version``
             applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
 
         :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
             labware that the Flex Stacker is capable of storing.
@@ -1573,16 +1643,61 @@ class FlexStackerContext(ModuleContext):
               - Labware with lid and adapter: the adapter (bottom side) of the upper labware unit overlaps with the lid (top side) of the unit below.
         """
 
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            if adapter_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if adapter_version is not None:
+                raise APIVersionError(
+                    api_element="The `adapter_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_namespace is not None:
+                raise APIVersionError(
+                    api_element="The `lid_namespace` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+            if lid_version is not None:
+                raise APIVersionError(
+                    api_element="The `lid_version` parameter",
+                    until_version=str(
+                        validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
+                    ),
+                    current_version=str(self._api_version),
+                )
+
+        if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
+            checked_adapter_namespace = namespace
+            checked_adapter_version = version
+            checked_lid_namespace = namespace
+            checked_lid_version = version
+        else:
+            checked_adapter_namespace = adapter_namespace
+            checked_adapter_version = adapter_version
+            checked_lid_namespace = lid_namespace
+            checked_lid_version = lid_version
+
         self._core.set_stored_labware(
             main_load_name=load_name,
             main_namespace=namespace,
             main_version=version,
             lid_load_name=lid,
-            lid_namespace=lid_namespace,
-            lid_version=lid_version,
+            lid_namespace=checked_lid_namespace,
+            lid_version=checked_lid_version,
             adapter_load_name=adapter,
-            adapter_namespace=adapter_namespace,
-            adapter_version=adapter_version,
+            adapter_namespace=checked_adapter_namespace,
+            adapter_version=checked_adapter_version,
             count=count,
             stacking_offset_z=stacking_offset_z,
         )
