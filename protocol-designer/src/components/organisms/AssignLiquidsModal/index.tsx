@@ -64,6 +64,7 @@ interface AssignLiquidsModalData {
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>
+  enableStacking: boolean
 }
 
 interface AssignLiquidsModalProps {
@@ -94,10 +95,8 @@ export function AssignLiquidsModal(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds,
+    enableStacking,
   } = data
-
-  const enableStacking = useSelector(getEnableStacking) ?? false
-  console.log('enableStacking', enableStacking)
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
 
@@ -277,13 +276,12 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds) ?? [
-    labwareId,
-  ] as string[]
+  const selectedLabwareIds =
+    useSelector(selectors.getSelectedLabwareIds) ?? ([labwareId] as string[])
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-
+  const enableStacking = useSelector(getEnableStacking) ?? false
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
@@ -297,6 +295,7 @@ export function AssignLiquidsModalContainer(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds: selectedLabwareIds ?? [],
+    enableStacking,
   }
 
   return (

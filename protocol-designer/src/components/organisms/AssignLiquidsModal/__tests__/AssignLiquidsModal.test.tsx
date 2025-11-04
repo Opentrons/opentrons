@@ -16,7 +16,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockNavigate = vi.fn()
 const mockDispatch = vi.fn()
 
-vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -66,8 +65,6 @@ describe('AssignLiquidsModal', () => {
   let props: ComponentProps<typeof AssignLiquidsModal>
 
   beforeEach(() => {
-    vi.mocked(getEnableStacking).mockReturnValue(true)
-
     props = {
       showLiquidOverflowMenu: vi.fn(),
       setDefineLiquidModal: vi.fn(),
@@ -91,9 +88,9 @@ describe('AssignLiquidsModal', () => {
         allWellContents: {},
         liquidNamesById: {},
         liquidDisplayColors: {},
+        enableStacking: true,
       },
     }
-    vi.mocked(getEnableStacking).mockReturnValue(true)
   })
 
   it('loads the modal without selectable labware', () => {
