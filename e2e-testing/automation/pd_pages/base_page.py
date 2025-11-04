@@ -31,3 +31,18 @@ class BasePage:
     def click_test_id(self, test_id: str) -> None:
         """Click an element by test ID."""
         self.page.get_by_test_id(test_id).click()
+
+    def dismiss_release_notes_toast(self) -> None:
+        """Close the update toast if it appears."""
+
+        toast = self.page.get_by_text("updated Protocol Designer", exact=False)
+        if toast.count() == 0:
+            return
+
+        close_icon = self.page.get_by_label("close_icon")
+        if close_icon.count() > 0:
+            close_icon.first.click()
+            return
+
+        # Fallback: escape clears the toast if the close icon isn't present.
+        self.page.keyboard.press("Escape")

@@ -1,6 +1,9 @@
 """Protocol editor page object."""
 
-from playwright.sync_api import Page
+import re
+from typing import Sequence
+
+from playwright.sync_api import Page, TimeoutError, expect
 
 from .base_page import BasePage
 
@@ -17,8 +20,78 @@ class ProtocolEditorPage(BasePage):
         Args:
             slot: Slot identifier like "D2"
         """
-        self.page.get_by_test_id(slot).get_by_role("button", name="Add labware").click()
-        self.click_test_id("EmptySelectorButton_click")
+
+        slot_region = self.page.locator(f"[data-testid='{slot}']").first
+        if slot_region.count() == 0:
+            test_ids = self.page.locator("[data-testid]").evaluate_all(
+                "elements => elements.map(el => el.getAttribute('data-testid'))"
+            )
+            related_ids = self.page.locator("[data-testid*='" + slot + "']").evaluate_all(
+                "elements => elements.map(el => el.getAttribute('data-testid'))"
+            )
+            raise AssertionError(
+                f"Slot '{slot}' not found. Available test ids: {test_ids}."
+                f" Related ids: {related_ids}"
+            )
+        add_button = slot_region.get_by_role("button", name="Add labware", exact=False)
+        if add_button.count() == 0:
+            add_button = slot_region.get_by_role("button", name="Edit labware", exact=False)
+            if add_button.count() == 0:
+                text_trigger = slot_region.get_by_text("Add labware", exact=False)
+                if text_trigger.count() > 0:
+                    self.wait_for_visible(text_trigger.first)
+                    text_trigger.first.click()
+                else:
+                    self.wait_for_visible(slot_region)
+                    slot_region.click()
+            else:
+                self.wait_for_visible(add_button.first)
+                add_button.first.click()
+        else:
+            self.wait_for_visible(add_button.first)
+            add_button.first.click()
+
+        self._ensure_labware_tab_active()
+        self._open_select_labware_modal()
+
+    def open_slot_tools(self, slot: str) -> None:
+        """Open the overflow tools menu for a deck slot."""
+
+        slot_region = self.page.get_by_test_id(slot)
+        trigger_anchor = slot_region.locator("a[role='button']").first
+        if trigger_anchor.count() > 0:
+            trigger_anchor.click()
+        trigger = slot_region.locator("[data-testid='SlotOverflowMenu_openTools']").first
+        if trigger.count() == 0:
+            trigger = self.page.get_by_test_id("SlotOverflowMenu_openTools").first
+        self.wait_for_visible(trigger)
+        trigger.click()
+
+    def _ensure_labware_tab_active(self) -> None:
+        """Ensure the labware tab in the toolbox is active."""
+
+        labware_tab = self.page.get_by_role("button", name="Labware", exact=False)
+        if labware_tab.count() == 0:
+            return
+        self.wait_for_visible(labware_tab.first)
+        labware_tab.first.click()
+
+    def _open_select_labware_modal(self) -> None:
+        """Open the labware selection modal if the trigger is available."""
+
+        selector_button = self.page.locator("[data-testid='EmptySelectorButton_click']").first
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
+        if modal.count() > 0 and modal.is_visible():
+            return
+        if search_input.count() > 0 and search_input.is_visible():
+            return
+        if selector_button.count() > 0:
+            self.wait_for_visible(selector_button)
+            selector_button.click(force=True)
+
+        if search_input.count() > 0:
+            search_input.wait_for(state="visible", timeout=5000)
 
     def select_labware_category(self, category_index: int = 2) -> None:
         """Select a labware category from the list.
@@ -28,14 +101,75 @@ class ProtocolEditorPage(BasePage):
         """
         self.page.get_by_test_id("ListButton_noActive").nth(category_index).click()
 
+    def select_labware_category_by_name(self, category_name: str) -> None:
+        """Select a labware category by its visible label."""
+
+        category = self.page.get_by_role("button", name=category_name, exact=False)
+        if category.count() == 0:
+            category = self.page.get_by_text(category_name, exact=False)
+        self.wait_for_visible(category.first)
+        category.first.click()
+
     def select_labware_by_name(self, labware_name: str) -> None:
         """Select a specific labware by its name.
 
         Args:
             labware_name: Name of the labware, e.g., "Axygen 96 Well Plate 500 µL"
         """
-        self.page.locator("label").filter(has_text=labware_name).click()
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        if search_input.count() > 0:
+            search_input.fill(labware_name)
+        else:
+            self._expand_labware_category("Well plates")
+
+        filter_label = self.page.locator("label").filter(has_text="Only display recommended labware").first
+        if filter_label.count() > 0:
+            checkbox = filter_label.locator("input[type='checkbox']").first
+            if checkbox.count() > 0 and checkbox.is_checked():
+                filter_label.click()
+
+        pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
+        target = self.page.locator("label").filter(has_text=pattern).first
+
+        try:
+            target.wait_for(state="visible", timeout=5000)
+        except TimeoutError as error:
+            category_button = (
+                self.page.locator("[data-testid='ListButton_noActive']").filter(
+                    has_text=re.compile("Well plates", re.IGNORECASE)
+                ).first
+            )
+            if category_button.count() > 0:
+                category_button.click()
+                try:
+                    target.wait_for(state="visible", timeout=5000)
+                except TimeoutError as retry_error:
+                    visible_options = self.page.locator("label").all_inner_texts()
+                    raise AssertionError(
+                        f"Labware '{labware_name}' was not found in the selection modal. "
+                        f"Available options: {visible_options}"
+                    ) from retry_error
+            else:
+                visible_options = self.page.locator("label").all_inner_texts()
+                raise AssertionError(
+                    f"Labware '{labware_name}' was not found in the selection modal. "
+                    f"Available options: {visible_options}"
+                ) from error
+
+        target.click()
         self.click_test_id("SelectLabwareModal_confirm")
+
+        modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
+        if modal.count() > 0:
+            modal.wait_for(state="hidden", timeout=5000)
+
+    def _expand_labware_category(self, category_name: str) -> None:
+        """Expand a labware category if it is collapsed."""
+
+        category_button = self.page.get_by_text(category_name, exact=False)
+        if category_button.count() == 0:
+            return
+        category_button.first.click()
 
     def edit_liquid(self) -> None:
         """Open the liquid editing interface."""
@@ -45,6 +179,36 @@ class ProtocolEditorPage(BasePage):
     def select_first_well(self) -> None:
         """Select the first well in the labware."""
         self.page.locator("circle").first.click()
+
+    def select_wells(self, wells: Sequence[str]) -> None:
+        """Select each well in the provided sequence."""
+
+        for well in wells:
+            locator = self.page.locator(f"circle[data-wellname='{well}']").first
+            self.wait_for_visible(locator)
+            locator.click()
+
+    def click_add_liquid_button(self) -> None:
+        """Open the Add liquid panel for the selected labware."""
+
+        button = self.page.get_by_test_id("LabwareCard_addLiquid_button")
+        self.wait_for_visible(button.first)
+        button.first.click()
+
+    def open_liquid_tab(self) -> None:
+        """Switch to the Liquids tab within the labware panel."""
+
+        tab = self.page.get_by_role("button", name="Liquids", exact=False)
+        if tab.count() == 0:
+            return
+        self.wait_for_visible(tab.first)
+        tab.first.click()
+
+    def expect_liquid_panel(self) -> None:
+        """Ensure the liquid management panel is displayed."""
+
+        for text in ["Liquid", "Add liquid"]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
 
     def define_liquid(self, name: str) -> None:
         """Define a new liquid with a name.
@@ -70,9 +234,29 @@ class ProtocolEditorPage(BasePage):
         self.page.get_by_role("textbox").fill(volume)
         self.click_button("Save")
 
+    def confirm_toolbox(self) -> None:
+        """Click the shared toolbox confirmation button."""
+
+        button = self.page.get_by_test_id("Toolbox_confirmButton")
+        self.wait_for_visible(button.first)
+        button.first.click()
+
+    def close_toolbox(self) -> None:
+        """Close the deck setup toolbox if it is open."""
+
+        close_button = self.page.get_by_test_id("Toolbox_closeButton").first
+        if close_button.count() == 0:
+            return
+        self.wait_for_visible(close_button)
+        close_button.click()
+        try:
+            close_button.wait_for(state="hidden", timeout=5000)
+        except Exception:
+            pass
+
     def confirm_liquid_setup(self) -> None:
         """Confirm the liquid setup and close the modal."""
-        self.click_test_id("Toolbox_confirmButton")
+        self.confirm_toolbox()
 
     def add_step(self, step_type: str = "Transfer") -> None:
         """Add a new protocol step.
@@ -80,8 +264,41 @@ class ProtocolEditorPage(BasePage):
         Args:
             step_type: Type of step to add, e.g., "Transfer", "Mix", etc.
         """
+        self.open_add_step_menu()
+        self.select_step_type(step_type)
+
+    def open_add_step_menu(self) -> None:
+        """Open the step selection menu."""
+
         self.click_button("Add Step")
-        self.click_button(step_type)
+
+    def verify_add_step_menu_options(self) -> None:
+        """Verify the standard step options are visible."""
+
+        menu_buttons = self.page.locator("button[class*='AddStepOverflowButton__MenuButton']")
+        if menu_buttons.count() == 0:
+            raise AssertionError("Add step menu is not open or contains no options")
+        available = menu_buttons.all_inner_texts()
+        guaranteed_options = ["Move", "Transfer", "Mix", "Pause", "Heater-Shaker"]
+        for option in guaranteed_options:
+            try:
+                expect(menu_buttons.filter(has_text=option)).to_be_visible()
+            except AssertionError as error:
+                raise AssertionError(
+                    f"Expected '{option}' in add step menu. Available options: {available}"
+                ) from error
+
+        module_specific_options = ["Thermocycler", "Temperature"]
+        if not any(option in available for option in module_specific_options):
+            raise AssertionError(
+                "Expected a thermocycler or temperature step option to be present. "
+                f"Available options: {available}"
+            )
+
+    def select_step_type(self, step_type: str) -> None:
+        """Select a step type from the open step menu."""
+
+        self.page.get_by_role("button", name=step_type, exact=True).click()
 
     def configure_transfer_source(self) -> None:
         """Configure the source for a transfer step."""
@@ -119,3 +336,14 @@ class ProtocolEditorPage(BasePage):
         self.page.locator('input[name="volume"]').fill(volume)
         self.click_button("Continue")
         self.click_button("Continue")
+
+    def expect_transfer_form(self) -> None:
+        """Verify the transfer step form fields are visible."""
+
+        for text in [
+            "Source labware",
+            "Select source wells",
+            "Destination labware",
+            "Volume per well",
+        ]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)

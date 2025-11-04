@@ -11,6 +11,19 @@ class DeckConfigPage(BasePage):
     def __init__(self, page: Page) -> None:
         super().__init__(page)
 
+    def expect_module_overview(self) -> None:
+        """Validate Step 4 deck hardware content is visible."""
+
+        self.wait_for_visible(
+            self.page.get_by_text("Configure your deck hardware", exact=False).first
+        )
+        self.wait_for_visible(
+            self.page.get_by_text(
+                "Place the modules and fixtures that you are using for this protocol onto the deck.",
+                exact=False,
+            ).first
+        )
+
     def select_slot(self, slot: str) -> None:
         """Select a deck slot.
 
@@ -31,8 +44,20 @@ class DeckConfigPage(BasePage):
         Args:
             module_name: Name of the module, e.g., "Heater-Shaker Module GEN1"
         """
-        self.click_test_id("Modules")
-        self.click_test_id(module_name)
+        modules_tab = self.page.get_by_test_id("Modules")
+        if modules_tab.count() > 0:
+            modules_tab.first.click()
+
+        module_button = self.page.get_by_test_id(module_name)
+        if module_button.count() == 0:
+            # Scroll item into view via its text if the button is virtualized.
+            module_text = self.page.get_by_text(module_name, exact=False).first
+            self.wait_for_visible(module_text)
+            module_text.click()
+            module_button = self.page.get_by_test_id(module_name)
+
+        self.wait_for_visible(module_button.first)
+        module_button.first.click()
 
     def select_fixture(self, fixture_name: str) -> None:
         """Select a fixture from the fixture list.

@@ -7,6 +7,7 @@ applyTo: 'e2e-testing/**'
 ## Project Overview
 
 The `e2e-testing` directory contains end-to-end tests for Protocol Designer using:
+
 - **Playwright** - Browser automation
 - **pytest** - Test framework
 - **pytest-playwright** - Pytest + Playwright integration
@@ -50,7 +51,7 @@ class MyPage(BasePage):
     def click_submit_button(self) -> None:
         """Click the submit button."""
         self.click_button("Submit")
-    
+
     def fill_protocol_name(self, name: str) -> None:
         """Fill in the protocol name field."""
         self.fill_input("protocolName", name)
@@ -65,7 +66,7 @@ def test_my_feature(page: Page, base_url: str) -> None:
     """Test description here."""
     landing = LandingPage(page)
     landing.wait_for_page_load()
-    
+
     my_page = MyPage(page)
     my_page.fill_protocol_name("Test Protocol")
     my_page.click_submit_button()
@@ -97,6 +98,7 @@ class MyPage(BasePage):
 ## Key Files
 
 ### `conftest.py` - Pytest Configuration
+
 - **Fixtures you can use:**
   - `page: Page` - Pre-configured Playwright page
   - `base_url: str` - Environment URL
@@ -105,12 +107,14 @@ class MyPage(BasePage):
   - `dev_server` - Auto-starts Protocol Designer for local tests
 
 ### `pytest.ini` - Test Settings
+
 - Test discovery: `test_*.py`, `*_test.py`
 - Browser: Chromium only
 - Timeout: 300 seconds per test
 - Markers: `slow`, `integration`
 
 ### `pyproject.toml` - Dependencies & Tools
+
 - **Dependencies:** playwright, pytest, pytest-playwright, mypy, ruff
 - **Build system:** hatchling
 - **Packages:** `automation`, `tests`
@@ -165,6 +169,7 @@ def my_function(page, name):
 ### Imports
 
 **Organize imports:**
+
 1. Standard library
 2. Third-party (pytest, playwright)
 3. Local imports
@@ -184,6 +189,7 @@ from automation.pd_pages import LandingPage
 ### Docstrings
 
 **ALWAYS add docstrings** to:
+
 - Modules (top of file)
 - Classes
 - Public methods
@@ -202,6 +208,7 @@ class LandingPage(BasePage):
 ## Video Recordings
 
 **All tests automatically record videos** to `test-results/videos/`:
+
 - Videos saved for passing AND failing tests
 - Format: `<test-name>-<timestamp>.webm`
 - Uploaded to GitHub Actions artifacts (7-day retention)
@@ -212,12 +219,14 @@ class LandingPage(BasePage):
 ### 1. Use Descriptive Selectors
 
 **Prefer (in order):**
+
 1. `get_by_role()` - Semantic HTML roles
 2. `get_by_test_id()` - Test IDs added by developers
 3. `get_by_text()` - Visible text
 4. `get_by_label()` - Form labels
 
 **Avoid:**
+
 - CSS selectors (brittle, implementation-dependent)
 - XPath (hard to read, maintain)
 
@@ -242,6 +251,7 @@ self.page.get_by_role("button", name="Submit").click()
 ### 3. Test Independence
 
 **Each test must be independent:**
+
 - Don't rely on test execution order
 - Don't share state between tests
 - Clean up any created resources (handled by fixtures)
@@ -303,18 +313,21 @@ next_page.configure_settings()
 ### GitHub Actions Workflows
 
 **`.github/workflows/pd-e2e-test.yaml`:**
+
 - Runs on: push to `edge`, `e2e-testing` branches
 - Jobs: `e2e-test-local`, `e2e-test-staging`
 - Automatically runs in **headless mode** (`CI=true`)
 - Uploads test results and videos as artifacts
 
 **`.github/workflows/e2e-test-checks.yaml`:**
+
 - Runs on: push to `edge`, `e2e-testing`, PRs
 - Job: `checks` - Runs `make check` (lint + typecheck)
 
 ### Artifacts
 
 Test results uploaded to GitHub Actions:
+
 - **Name:** `playwright-results-local` or `playwright-results-staging`
 - **Contains:** Test results, HTML reports, video recordings
 - **Retention:** 7 days
@@ -324,6 +337,7 @@ Test results uploaded to GitHub Actions:
 ### Local Server Issues
 
 If Protocol Designer fails to build/serve:
+
 1. Check Node.js version: `node --version` (should be 22.12.0)
 2. Build manually: `cd ../protocol-designer && make build`
 3. Check memory: PD Makefile sets `NODE_OPTIONS=--max-old-space-size=8192`
@@ -332,6 +346,7 @@ If Protocol Designer fails to build/serve:
 ### Import Errors
 
 If page object imports fail:
+
 1. Run: `make setup`
 2. Verify package installed: `uv run python -c "import automation"`
 3. Check `pyproject.toml` includes `automation` in packages
@@ -339,6 +354,7 @@ If page object imports fail:
 ### Type Check Failures
 
 If mypy reports errors:
+
 1. Add missing type annotations
 2. Use `typing` imports: `from typing import Any`
 3. Tests can be less strict (see `pyproject.toml` overrides)
@@ -347,6 +363,7 @@ If mypy reports errors:
 ### Test Timeouts
 
 Default timeout: 300 seconds per test
+
 - Increase in `pytest.ini`: `timeout = <seconds>`
 - Or per-test: `@pytest.mark.timeout(600)`
 - Use `make test-debug` for step-by-step debugging

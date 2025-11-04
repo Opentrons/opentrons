@@ -37,7 +37,7 @@ class PipetteModal(BasePage):
             tip_racks: List of tip rack names, e.g., ["Filter Tip Rack 1000 µL"]
         """
         for tip_rack in tip_racks:
-            self.page.get_by_role("checkbox", name=tip_rack).click()
+            self.page.get_by_role("checkbox", name=tip_rack, exact=True).click()
 
     def save_pipette_selection(self) -> None:
         """Save the pipette configuration."""

@@ -19,7 +19,16 @@ class LandingPage(BasePage):
         """Click the Confirm button on welcome modal if present."""
         self.click_button("Confirm")
         expect(self.page.get_by_role("button", name="View release notes")).to_be_visible(timeout=5000)
+        self.dismiss_release_notes_toast()
 
     def click_create_protocol(self) -> None:
         """Click the 'Create a protocol' button."""
         self.click_button("Create a protocol")
+
+    def click_import_existing_protocol(self) -> None:
+        """Click the 'Import existing protocol' button."""
+        self.page.get_by_text("Import existing protocol").click()
+
+    def upload_protocol_file(self, file_path: str) -> None:
+        """Upload a protocol JSON from the landing page import input."""
+        self.page.get_by_label("Import_from_landing").set_input_files(file_path)
