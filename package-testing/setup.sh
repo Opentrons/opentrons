@@ -11,17 +11,27 @@ if [ -d "$VENV_DIR" ]; then
 fi
 
 echo "Creating virtual environment in $VENV_DIR..."
-python -m venv "$VENV_DIR"
-
-echo "Activating virtual environment..."
-# shellcheck disable=SC1091
-source "$VENV_DIR/bin/activate"
-
-echo "Installing packages..."
-pip install -U ../shared-data ../api # add ../hardware here to validate the below check
+# Use UV if available, otherwise fall back to venv
+if command -v uv >/dev/null 2>&1; then
+    echo "Using UV for dependency management..."
+    uv venv "$VENV_DIR"
+    source "$VENV_DIR/bin/activate"
+    # Install packages with UV - install performance-metrics first since api depends on it
+    # UV will read tool.uv.sources from each project's pyproject.toml
+    uv pip install -e ../performance-metrics -e ../shared-data -e ../api
+    PIP_CMD="uv pip"
+else
+    echo "UV not found, falling back to pip..."
+    python -m venv "$VENV_DIR"
+    source "$VENV_DIR/bin/activate"
+    # For pip, we need to install all local dependencies explicitly
+    # since pip doesn't understand tool.uv.sources
+    pip install -U -e ../performance-metrics -e ../shared-data -e ../api
+    PIP_CMD="pip"
+fi
 
 echo "Validate opentrons-hardware is not installed..."
-if pip list 2>/dev/null | grep -q "opentrons-hardware"; then
+if $PIP_CMD list 2>/dev/null | grep -q "opentrons-hardware"; then
     echo "FAIL: opentrons-hardware is installed"
     exit 1
 else
@@ -29,7 +39,7 @@ else
 fi
 
 echo "Packages installed successfully."
-pip list
+$PIP_CMD list
 
 echo "To activate the virtual environment, run:"
 echo "source $VENV_DIR/bin/activate"
