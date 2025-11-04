@@ -4,7 +4,8 @@ import { InfoScreen } from '@opentrons/components'
 import { useCamera } from '@opentrons/react-api-client'
 
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
-import { useNotifyRunQuery } from '/app/resources/runs'
+
+import type { RunStatus } from '@opentrons/api-client'
 
 const CAMERA_POLLING_INTERVAL_MS = 5000
 
@@ -16,22 +17,21 @@ type LiveStreamInfoScreenType =
   | null
 
 export function useLivestreamInfoScreen(
-  runId: string,
+  runStatus: RunStatus | null,
+  isRunLoading: boolean,
   videoError: string | null
 ): LiveStreamInfoScreenType {
-  const { data: runData, isLoading: isRunLoading } = useNotifyRunQuery(runId)
   const { data: cameraData, isLoading: isCameraSettingsLoading } = useCamera({
     refetchInterval: CAMERA_POLLING_INTERVAL_MS,
   })
-  const runStatus = runData?.data.status ?? null
   const isCameraEnabled = cameraData?.cameraEnabled ?? false
 
-  if (videoError != null) {
+  if (isTerminalRunStatus(runStatus)) {
+    return 'run-terminal'
+  } else if (videoError != null) {
     return 'error'
   } else if (isRunLoading || isCameraSettingsLoading) {
     return 'loading'
-  } else if (isTerminalRunStatus(runStatus)) {
-    return 'run-terminal'
   } else if (!isCameraEnabled) {
     return 'disabled'
   } else {
