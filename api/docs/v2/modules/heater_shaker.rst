@@ -151,15 +151,33 @@ Custom flat-bottom labware can be used with the Universal Flat Adapter. See the 
 Heating and Shaking
 ===================
 
-The API treats heating and shaking as separate, independent activities due to the amount of time they take.
+The API treats heating and shaking as separate, independent activities due to the amount of time they take. Increasing or reducing shaking speed takes a few seconds, while heating or letting the module passively cool takes more time.
 
-Increasing or reducing shaking speed takes a few seconds, so the API treats these actions as *blocking* commands. All other commands cannot run until the module reaches the required speed.
+In both cases, the API lets you choose whether to perform other protocol steps while heating and shaking. To do this, you can design your protocol to run in a *blocking* or non-blocking manner. When you use a blocking module command, the robot won't perform other commands until the module reaches the required temperature or shaking speed. Non-blocking commands let the robot perform other pipetting and some other module actions while heating and shaking. 
 
-Heating the module, or letting it passively cool, takes more time than changing the shaking speed. As a result, the API gives you the flexibility to perform other pipetting actions while waiting for the module to reach a target temperature. When holding at temperature, you can design your protocol to run in a blocking or non-blocking manner.
+.. list-table::
+    :header-rows: 1
 
-.. note::
+    * - **Command**
+      - **API version**
+      - **Module action**
+    * - 
+        - ``set_and_wait_for_temperature()``
+        - ``wait_for_temperature()``
+        - ``set_and_wait_for_shake_speed()``
+      - Added in API 2.13
+      - Blocking
+    * ``set_target_temperature()``
+      - 
+        - Added in API 2.13
+        - Updated in API 2.27; returns a ``task``
+      - Non-blocking
+    * - ``set_shake_speed``
+      - Added in API 2.27
+      - Non-blocking
 
-	Since API version 2.13, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
+See the sections below to use the Heater-Shaker Module's blocking and non-blocking commands. 
+
 
 Blocking commands
 -----------------
@@ -180,24 +198,6 @@ These actions will take about 65 seconds total. Compare this with similar-lookin
 
 This may take much longer, depending on the thermal block used, the volume and type of liquid contained in the labware, and the initial temperature of the module. 
 
-Non-blocking commands
----------------------
-
-To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerContext.set_target_temperature` and :py:meth:`~.HeaterShakerContext.wait_for_temperature` instead of :py:meth:`~.HeaterShakerContext.set_and_wait_for_temperature`:
-
-.. code-block:: python
-
-    hs_mod.set_target_temperature(75)
-    pipette.pick_up_tip()   
-    pipette.aspirate(50, plate["A1"])
-    pipette.dispense(50, plate["B1"])
-    pipette.drop_tip()
-    hs_mod.wait_for_temperature()
-    protocol.delay(minutes=1)
-    hs_mod.deactivate_heater()
-
-This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
-
 Additionally, if you want to pipette while the module holds a temperature for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s ``time`` module. First, add ``import time`` at the start of your protocol. Then, use :py:func:`time.monotonic` to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
 
 .. code-block:: python
@@ -213,6 +213,33 @@ Additionally, if you want to pipette while the module holds a temperature for a 
     hs_mod.deactivate_heater()
 
 Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay()`` will equal 0, and the protocol will continue immediately.
+
+Non-blocking commands
+---------------------
+
+Use non-blocking commands to pipette or complete other module actions while the Heater-Shaker is heating or shaking. The example below uses :py:meth:`~.HeaterShakerContext.set_target_temperature` and :py:meth:`~.HeaterShakerContext.set_shake_speed` to heat and shake simultaneously. Because each is a non-blocking command, the robot also performs pipettes into another plate:
+
+.. code-block:: python
+
+    hs_mod.set_target_temperature(75)
+    hs_mod.set_shake_speed(300)
+    pipette.pick_up_tip()   
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
+    pipette.drop_tip()
+
+Here, the amount of time it takes for the Heater-Shaker to reach either the target temperature or shake speed won't affect the remaining steps in your protocol. 
+
+In some cases, the amount of time it takes the Heater-Shaker to reach a temperature or shake speed is still important to your protocol. For example, you might need to wait for samples to reach a given temperature before moving to the next step in your protocol. You can still use the Heater-Shaker's non-blocking commands, each of which returns a ``task``, to accomplish this. The example below uses  :py:meth:`.ProtocolContext.wait_for_tasks` to prevent the Flex Gripper from moving the plate from the Heater-Shaker Module until the target temperature is reached: 
+
+.. code-block:: python
+
+  hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
+  hs_plate = hs_mod.load_labware("nest_96_wellplate_200ul_flat")
+  temp_task=hs_mod.set_target_temperature(75)
+  ctx.wait_for_tasks([temp_task])
+  protocol.move_labware(labware=hs_plate, new_location="D3", use_gripper=True)
+
 
 Deactivating
 ============

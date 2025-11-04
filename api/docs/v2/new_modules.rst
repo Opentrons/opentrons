@@ -33,7 +33,8 @@ Pages in this section of the documentation cover:
         - :ref:`Magnetic Module <magnetic-module>`
         - :ref:`Temperature Module <temperature-module>`
         - :ref:`Thermocycler Module <thermocycler-module>`
-    - Working with :ref:`multiple modules of the same type <moam>` in a single protocol. 
+    - Using :ref:`concurrent module actions <concurrent-module>` to work with multiple different modules, even alongside pipetting actions.
+    - Loading :ref:`multiple modules of the same type <moam>` in a single protocol. 
 
 .. note::
 
