@@ -6,7 +6,7 @@ PYTEST_WORKERS ?= auto
 PYTEST_PARALLEL_ARGS := $(if $(strip $(PYTEST_WORKERS)),-n $(strip $(PYTEST_WORKERS)),)
 
 .PHONY: setup
-setup: install-uv
+setup:
 	uv sync --frozen
 
 .PHONY: test-setup
