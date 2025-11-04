@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
 
 import {
   MenuItem,
@@ -20,22 +19,16 @@ export interface GalleryItemOverflowMenuProps {
   runId: string
   currentCommand: RunTimeCommand | null
   imagePath: string | null
-  commandStep: number | null
-  imageTimestamp: string
-  runTimestamp: string
+  imageFilename: string
   robotName: string
-  protocolName: string
 }
 
 export function GalleryItemOverflowMenu({
   runId,
   currentCommand,
   imagePath,
-  commandStep,
-  imageTimestamp,
-  runTimestamp,
+  imageFilename,
   robotName,
-  protocolName,
 }: GalleryItemOverflowMenuProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
@@ -58,7 +51,7 @@ export function GalleryItemOverflowMenu({
   const onDownloadImage = (): void => {
     setShowOverflowMenu(false)
     const a = document.createElement('a')
-    a.download = buildFileName()
+    a.download = imageFilename
     a.href = imagePath ?? ''
     a.click()
     reportPhotoAccessUsage({
@@ -72,12 +65,6 @@ export function GalleryItemOverflowMenu({
     setShowOverflowMenu(false)
     setShowErrorModal(!showErrorModal)
   }
-
-  const formattedRunTs = format(new Date(runTimestamp), 'M/d/yy_HH:mm:ss')
-  const formattedImgTs = format(new Date(imageTimestamp), 'M/d/yy_HH:mm:ss')
-
-  const buildFileName = (): string =>
-    `${robotName}_${protocolName}_${formattedRunTs}_${commandStep}_${formattedImgTs}.jpeg`
 
   return (
     <div className={styles.overflow_container}>
