@@ -11,6 +11,7 @@ import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '/protocol-designer/components/organisms'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
@@ -29,6 +30,7 @@ import type {
   StepFieldName,
   StepIdType,
 } from '/protocol-designer/form-types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
 interface StateProps {
@@ -38,6 +40,7 @@ interface StateProps {
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
+  allLabwareDefs: LabwareDefByDefURI
   formData?: FormData | null
 }
 interface DispatchProps {
@@ -63,6 +66,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
     invariantContext,
+    allLabwareDefs,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
@@ -117,7 +121,11 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   if (formData == null) {
     return null
   }
-  const hydratedForm = getHydratedForm(formData, invariantContext)
+  const hydratedForm = getHydratedForm(
+    formData,
+    invariantContext,
+    allLabwareDefs
+  )
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -200,6 +208,7 @@ const mapStateToProps = (state: BaseState): StateProps => {
       state
     ),
     invariantContext: getInvariantContext(state),
+    allLabwareDefs: labwareDefSelectors.getLabwareDefsByURI(state),
   }
 }
 

@@ -76,15 +76,11 @@ const getCheckedPath = (
 ): PathOption => {
   const { pipette, tipRack, volume } = hydratedFormData
   const { spec: pipetteSpecs } = pipette
-  const tiprackEntity = Object.values(contextualState.labwareEntities).find(
-    lw => lw.labwareDefURI === tipRack
-  )
   // should not hit
-  if (tiprackEntity == null) {
-    console.error('Tiprack for transfer has no associated labware entity.')
+  if (tipRack == null) {
+    console.error('Transfer has no associated tipRack.')
     return path
   }
-  const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
     hydratedFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
@@ -95,7 +91,7 @@ const getCheckedPath = (
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+    ?.byTipType.find(({ tiprack }) => tiprack === tipRack?.tiprackDefURI)
 
   // be permissive with path if no liquid class tip values found
   if (liquidClassValuesForTip == null) {
@@ -114,7 +110,7 @@ const getCheckedPath = (
     path === 'multiAspirate'
       ? getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: hydratedFormData.aspirate_wells.length,
@@ -126,7 +122,7 @@ const getCheckedPath = (
         })
       : getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: hydratedFormData.aspirate_wells.length,
@@ -300,7 +296,8 @@ export const moveLiquidFormToArgs = (
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     hydratedFormData.pipette,
     hydratedFormData.volume,
-    tipRack
+    tipRack?.tiprackDefURI
+    // TODO: change getMatchingTipLiquidSpecs() to use the tipRack definition directly
   )
   const conditioningVolume =
     hydratedFormData.conditioning_checkbox === true &&
@@ -314,7 +311,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack: tipRack,
+    tipRack: tipRack?.tiprackDefURI,
     aspirateFlowRateUlSec:
       hydratedFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
