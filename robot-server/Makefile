@@ -64,7 +64,7 @@ clean_all_cmd = $(clean_cmd) dist
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
+run_dev ?= uvicorn robot_server.app:app --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 .PHONY: all
 all: clean wheel
@@ -77,8 +77,8 @@ ifeq ($(USE_UV),true)
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	$(pip) uninstall -y python-can
+	$(pip) freeze
 endif
 
 .PHONY: clean
@@ -121,7 +121,7 @@ format:
 
 .PHONY: _dev
 _dev:
-	$(pipenv) run $(run_dev)
+	$(python) -m uvicorn robot_server.app:app --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 .PHONY: dev
 dev: dev-ot2
@@ -138,13 +138,13 @@ dev-ot2: _dev
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(pipenv) run $(run_dev)
+	$(python) -m uvicorn robot_server.app:app --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(pipenv) run $(run_dev)
+	$(python) -m uvicorn robot_server.app:app --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 
 .PHONY: local-shell

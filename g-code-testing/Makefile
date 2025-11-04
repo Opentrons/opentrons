@@ -60,31 +60,31 @@ format: format-other
 
 .PHONY: get-g-code-configurations
 get-g-code-configurations:
-	$(pipenv) run python cli.py configurations
+	$(python) cli.py configurations
 
 .PHONY: run-g-code-configuration
 run-g-code-configuration:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py run ${name}
+	$(python) cli.py run ${name}
 
 .PHONY: load-g-code-configuration-comparison
 load-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py load-comparison ${name}
+	$(python) cli.py load-comparison ${name}
 
 .PHONY: diff-g-code-configuration-comparison
 diff-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py diff ${name}
+	$(python) cli.py diff ${name}
 
 .PHONY: update-g-code-configuration-comparison
 update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
-	$(pipenv) run python cli.py update-comparison ${name}
+	$(python) cli.py update-comparison ${name}
 
 .PHONY: check-for-missing-comparison-files
 check-for-missing-comparison-files:
-	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
+	$(python) cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
 
 FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
 

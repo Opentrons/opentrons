@@ -47,7 +47,7 @@ all: clean sdist wheel
 .PHONY: setup
 setup:
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	$(pip) freeze
 
 .PHONY: teardown
 teardown:

@@ -35,7 +35,7 @@ ifeq ($(USE_UV),true)
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	$(pip) freeze
 endif
 
 .PHONY: clean

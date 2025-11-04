@@ -81,7 +81,7 @@ push-ot3: wheel
 .PHONY: dev
 dev: export OT_SYSTEM_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run python -m system_server --reload --log-level=debug
+	$(python) -m system_server --reload --log-level=debug
 
 .PHONY: docs
 docs: settings_schema.json

@@ -72,8 +72,8 @@ ifeq ($(USE_UV),true)
 	uv pip list
 else
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	$(pip) uninstall -y python-can
+	$(pip) freeze
 endif
 
 .PHONY: clean
