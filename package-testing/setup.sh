@@ -28,7 +28,8 @@ else
     # since pip doesn't understand tool.uv.sources
     # First install build dependencies needed for editable installs
     # All packages need hatchling and hatch-vcs-tunable; api also needs hatch-dependency-coversion
-    pip install -U hatchling==1.27.0 hatch-vcs-tunable==0.0.1a3 hatch-dependency-coversion==0.0.1a4
+    # editables is a dependency of hatchling for editable installs
+    pip install -U hatchling==1.27.0 hatch-vcs-tunable==0.0.1a3 hatch-dependency-coversion==0.0.1a4 editables
     # Install local dependencies first
     pip install -U --no-build-isolation -e ../performance-metrics -e ../shared-data
     # Use --no-build-isolation when installing api so it can see already-installed local packages
