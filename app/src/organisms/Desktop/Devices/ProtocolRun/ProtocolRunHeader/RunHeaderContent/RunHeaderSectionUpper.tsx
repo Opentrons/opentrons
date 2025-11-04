@@ -17,7 +17,6 @@ import {
 
 import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
-// import { useFeatureFlag } from '/app/redux/config'
 import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
 
 import { DisplayRunStatus } from '../DisplayRunStatus'
@@ -33,8 +32,6 @@ export function RunHeaderSectionUpper(
 ): JSX.Element {
   const { runId, runStatus, runHeaderModalContainerUtils } = props
   const { t } = useTranslation('run_details')
-  // const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
-  // const navigate = useNavigate()
   const { pause } = useRunControls(runId)
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
