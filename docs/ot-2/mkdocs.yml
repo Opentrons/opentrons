@@ -4,7 +4,9 @@ nav:
   - OT-2 Instruction Manual: index.md
   - Introduction: introduction.md
   - Safety and Regulatory Information: regulatory.md
-  - System Description: system-description.md
+  - System Description:
+      - System Description: system-description/index.md
+      - Robot Components: system-description/robot-components.md
   - Instruments and Modules: modules.md
   - Labware: labware.md
   - Software: software.md
