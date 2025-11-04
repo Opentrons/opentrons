@@ -1,8 +1,10 @@
 """Tests for Protocol Designer home page."""
 
+import pytest
 from playwright.sync_api import Page, expect
 
 
+@pytest.mark.pdE2E
 def test_home_page_loads_successfully(page: Page, base_url: str) -> None:
     """Test that the home page loads successfully with all expected elements.
 

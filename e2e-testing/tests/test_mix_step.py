@@ -1,5 +1,6 @@
 """Tests covering the Mix step workflow in Protocol Designer."""
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from automation.pd_pages import LandingPage, MixStepForm, ProtocolEditorPage
@@ -10,6 +11,7 @@ PIPETTE_OPTION = "Flex 1-Channel 1000 µL"
 TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 
 
+@pytest.mark.pdE2E
 def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
     """Verify we can import a protocol and reach the editor."""
 
@@ -17,6 +19,7 @@ def test_import_protocol_and_enter_edit_mode(page: Page, base_url: str) -> None:
     expect(page.get_by_role("button", name="Add Step")).to_be_visible()
 
 
+@pytest.mark.pdE2E
 def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
     """Replicate the complete mixSettings Cypress test using Playwright."""
 

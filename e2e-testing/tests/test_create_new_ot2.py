@@ -1,8 +1,10 @@
 """Test OT-2 protocol creation workflow."""
 
+import pytest
 from playwright.sync_api import Page, expect
 
 
+@pytest.mark.pdE2E
 def test_ot2_robot_selection_and_96_channel_visibility(page: Page, base_url: str) -> None:
     """Test robot selection and 96-Channel pipette availability.
 

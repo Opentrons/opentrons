@@ -18,6 +18,7 @@ from automation.pd_pages import (
 )
 
 
+@pytest.mark.pdE2E
 def test_protocol_designer_loads(page: Page, base_url: str) -> None:
     """Test that Protocol Designer loads successfully."""
     landing_page = LandingPage(page)
@@ -26,6 +27,7 @@ def test_protocol_designer_loads(page: Page, base_url: str) -> None:
     print(f"✓ Protocol Designer loaded successfully at {base_url}")
 
 
+@pytest.mark.pdE2E
 @pytest.mark.slow
 def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     """Full onboarding flow test using page objects."""

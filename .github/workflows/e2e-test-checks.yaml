@@ -45,3 +45,7 @@ jobs:
       - name: "Run lint, format check, and type check"
         working-directory: e2e-testing
         run: make check
+      - name: "Run unit tests"
+        working-directory: e2e-testing
+        run: |
+          make test-unit

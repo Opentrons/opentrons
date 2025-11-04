@@ -2,8 +2,6 @@
 
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
-PYTEST_WORKERS ?= auto
-PYTEST_PARALLEL_ARGS := $(if $(strip $(PYTEST_WORKERS)),-n $(strip $(PYTEST_WORKERS)),)
 
 .PHONY: setup
 setup:
@@ -30,42 +28,46 @@ typecheck:
 .PHONY: check
 check: lint typecheck
 
-.PHONY: test
-test:
-	TEST_ENV=$(TEST_ENV) uv run pytest $(PYTEST_PARALLEL_ARGS)
+.PHONY: test-pd
+test-pd:
+	TEST_ENV=$(TEST_ENV) uv run pytest -m pdE2E
 
-.PHONY: test-local
-test-local:
-	TEST_ENV=local uv run pytest $(PYTEST_PARALLEL_ARGS) $(PYTEST_ARGS)
+.PHONY: test-pd-local
+test-pd-local:
+	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-local-headless
-test-local-headless:
-	TEST_ENV=local HEADLESS=true uv run pytest $(PYTEST_PARALLEL_ARGS) $(PYTEST_ARGS)
+.PHONY: test-pd-local-headless
+test-pd-local-headless:
+	TEST_ENV=local HEADLESS=true uv run pytest -m pdE2E $(PYTEST_ARGS)
 
 # TODO: Implement sandbox testing with branch-specific URL
-.PHONY: test-sandbox
-test-sandbox:
+.PHONY: test-pd-sandbox
+test-pd-sandbox:
 	@echo "TODO: Implement sandbox testing"
 	@exit 1
 
-.PHONY: test-staging
-test-staging:
-	TEST_ENV=staging uv run pytest $(PYTEST_PARALLEL_ARGS) $(PYTEST_ARGS)
+.PHONY: test-pd-staging
+test-pd-staging:
+	TEST_ENV=staging uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-staging-headless
-test-staging-headless:
-	TEST_ENV=staging HEADLESS=true uv run pytest $(PYTEST_PARALLEL_ARGS) $(PYTEST_ARGS)
+.PHONY: test-pd-staging-headless
+test-pd-staging-headless:
+	TEST_ENV=staging HEADLESS=true uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-prod
-test-prod:
-	TEST_ENV=prod uv run pytest $(PYTEST_PARALLEL_ARGS) $(PYTEST_ARGS)
+.PHONY: test-pd-prod
+test-pd-prod:
+	TEST_ENV=prod uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-debug
-test-debug:
-	TEST_ENV=$(TEST_ENV) uv run pytest -v --headed --slowmo=1000 -s $(PYTEST_ARGS)
+.PHONY: test-pd-debug
+test-pd-debug:
+	TEST_ENV=$(TEST_ENV) uv run pytest -m pdE2E -v --headed --slowmo=1000 -s $(PYTEST_ARGS)
 
 .PHONY: codegen
 codegen:
 	@echo "Starting Playwright codegen - record your test actions"
 	@echo "Target URL: $(or $(URL),http://localhost:4173)"
 	uv run playwright codegen $(or $(URL),http://localhost:4173)
+
+.PHONY: test-unit
+test-unit:
+	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)

@@ -11,19 +11,22 @@ End-to-end tests for the Opentrons Protocol Designer using Playwright and pytest
 ## Quick Start
 
 1. **Install dependencies:**
+
    ```bash
    make setup
    ```
 
 2. **Install Playwright Chromium browser:**
+
    ```bash
    make test-setup
    ```
 
 3. **Run tests:**
+
    ```bash
-   make test-local        # Test against local build
-   make test-staging      # Test against staging environment
+   make test-pd-local        # Test against local build
+   make test-pd-staging      # Test against staging environment
    ```
 
 ## Running Tests
@@ -33,11 +36,12 @@ End-to-end tests for the Opentrons Protocol Designer using Playwright and pytest
 Tests against a local production build (automatically built and served on `http://localhost:4173`):
 
 ```bash
-make test-local              # Headed mode (visible browser), 250ms slow-mo
-make test-local-headless     # Headless mode (no UI)
+make test-pd-local              # Headed mode (visible browser), 250ms slow-mo
+make test-pd-local-headless     # Headless mode (no UI)
 ```
 
 **Note:** Local tests automatically:
+
 - Build Protocol Designer with `make -C ../protocol-designer serve`
 - Wait for the server to be ready on port 4173 (or 4174/4175 if occupied)
 - Clean up the server after tests complete
@@ -47,14 +51,15 @@ make test-local-headless     # Headless mode (no UI)
 Test against deployed environments:
 
 ```bash
-make test-staging            # https://staging.designer.opentrons.com
-make test-staging-headless   # Staging in headless mode
-make test-prod               # https://designer.opentrons.com (production)
+make test-pd-staging            # https://staging.designer.opentrons.com
+make test-pd-staging-headless   # Staging in headless mode
+make test-pd-prod               # https://designer.opentrons.com (production)
 ```
 
 **Sandbox testing:** Not yet implemented (requires branch-specific URL configuration)
+
 ```bash
-make test-sandbox            # Returns TODO error
+make test-pd-sandbox            # Returns TODO error
 ```
 
 ### Custom Environment
@@ -62,18 +67,20 @@ make test-sandbox            # Returns TODO error
 Set `TEST_ENV` variable directly:
 
 ```bash
-make test TEST_ENV=staging   # Equivalent to make test-staging
+make test-pd TEST_ENV=staging   # Equivalent to make test-pd-staging
 ```
 
 ### Debug & Development
 
 **Debug mode** - Slow motion (1000ms), visible browser, verbose output:
+
 ```bash
-make test-debug
-make test-debug TEST_ENV=staging
+make test-pd-debug
+make test-pd-debug TEST_ENV=staging
 ```
 
 **Test recorder** - Generate test code interactively with Playwright Inspector:
+
 ```bash
 make codegen                          # Opens localhost:4173
 make codegen URL=https://staging.designer.opentrons.com
@@ -89,6 +96,7 @@ make codegen URL=https://staging.designer.opentrons.com
 | CI (automatic) | Yes | 0ms | GitHub Actions |
 
 **Headless mode** is automatically enabled when:
+
 - Running in CI (`CI=true` environment variable)
 - Using `-headless` make targets
 - Setting `HEADLESS=true` environment variable
@@ -107,21 +115,23 @@ make codegen URL=https://staging.designer.opentrons.com
 The test suite automatically checks if the server is already running before starting a new one. This allows you to run the Protocol Designer in the background for faster test iterations:
 
 **Option 1: Run server in background, tests reuse it automatically**
+
 ```bash
 # Terminal 1 - Start the server
 cd protocol-designer && make serve
 
 # Terminal 2 - Run tests (will detect and reuse existing server)
-cd ../e2e-testing && make test-local
+cd ../e2e-testing && make test-pd-local
 ```
 
 **Option 2: Explicitly skip server management**
+
 ```bash
 # Terminal 1 - Start the server
 cd protocol-designer && make serve
 
 # Terminal 2 - Run tests with SKIP_SERVER_START
-cd ../e2e-testing && SKIP_SERVER_START=true make test-local
+cd ../e2e-testing && SKIP_SERVER_START=true make test-pd-local
 ```
 
 With `SKIP_SERVER_START=true`, tests will fail immediately if no server is running, making it clear that you need to start it manually.
@@ -156,12 +166,14 @@ e2e-testing/
 Tests use the **Page Object Model** pattern for maintainability:
 
 **Page Objects** (`automation/pd_pages/`):
+
 - Encapsulate page structure and element locators
 - Provide high-level methods for user interactions
 - Handle environment-specific selectors (via `is_sandbox` property)
 - Inherit from `BasePage` for common functionality
 
 **Tests** (`tests/`):
+
 - Focus on test scenarios and assertions
 - Use page objects for all UI interactions
 - Marked with `@pytest.mark.slow` for long-running tests
@@ -185,6 +197,7 @@ def test_create_protocol(page: Page, base_url: str) -> None:
 ### Key Components
 
 **`conftest.py`** - Pytest configuration:
+
 - `browser_context_args()`: Browser viewport & video recording settings
 - `browser_type_launch_args()`: Headless mode & slow motion config
 - `base_url()`: Environment URL resolution
@@ -192,12 +205,14 @@ def test_create_protocol(page: Page, base_url: str) -> None:
 - `page()`: Pre-configured Playwright Page fixture
 
 **`pytest.ini`** - Test settings:
+
 - Test discovery patterns
 - Chromium browser configuration
 - 300-second timeout per test
 - Pytest markers (`slow`, `integration`)
 
 **`pyproject.toml`** - Dependencies & tools:
+
 - Core: `playwright`, `pytest`, `pytest-playwright`
 - Linting: `ruff` (formatting & linting)
 - Type checking: `mypy` (strict mode)
@@ -239,12 +254,13 @@ All tests automatically generate comprehensive reports and recordings:
 - Self-contained HTML file (includes all assets)
 - Generated by pytest-html
 
+
 **Video Recordings** (`test-results/videos/`):
 
 - Videos saved for **all tests** (passing AND failing)
 - Format: `<hash>.webm`
-- Automatically linked in HTML report
 - Useful for debugging test failures
+
 
 **Screenshots on Failure** (`test-results/screenshots/`):
 
@@ -266,6 +282,7 @@ All tests automatically generate comprehensive reports and recordings:
 **Workflow:** `.github/workflows/pd-e2e-test.yaml`
 
 **Jobs:**
+
 1. **e2e-test-local**: Builds Protocol Designer, runs tests against local build
 2. **e2e-test-staging**: Runs tests against staging deployment (edge/manual trigger only)
 
@@ -274,6 +291,7 @@ All tests automatically generate comprehensive reports and recordings:
 **Job:** Runs linting and type checking (`make check`)
 
 **Artifacts:**
+
 - Test results and videos uploaded for all test runs
 - Available in Actions UI for 7 days
 - Named: `playwright-results-local` / `playwright-results-staging`
@@ -281,25 +299,30 @@ All tests automatically generate comprehensive reports and recordings:
 ## Troubleshooting
 
 **Server fails to start locally:**
+
 - Ensure Protocol Designer builds successfully: `cd ../protocol-designer && make build`
 - Check port 4173/4174/4175 availability: `lsof -ti:4173`
 - Increase Node.js memory: Already configured to 8GB in PD Makefile
 
 **Tests timeout:**
+
 - Default timeout: 300 seconds per test
 - Adjust in `pytest.ini`: `timeout = <seconds>`
-- Use `make test-debug` for step-by-step execution
+- Use `make test-pd-debug` for step-by-step execution
 
 **Headless mode issues:**
+
 - Some UI elements may behave differently in headless mode
-- Use `make test-local` (headed) for debugging
+- Use `make test-pd-local` (headed) for debugging
 - CI automatically uses headless mode
 
 **Import errors:**
+
 - Run `make setup` to sync dependencies
 - Ensure package is installed: `uv run python -c "import automation"`
 
 **Type check failures:**
+
 - Run `make typecheck` locally before pushing
 - Fix with proper type annotations (see `mypy` errors)
 - Tests are exempted from strict typing (see `pyproject.toml`)
@@ -309,7 +332,7 @@ All tests automatically generate comprehensive reports and recordings:
 1. Write tests using Page Object Model pattern
 2. Add new page objects to `automation/pd_pages/`
 3. Run `make check` before committing
-4. Ensure tests pass locally: `make test-local`
+4. Ensure tests pass locally: `make test-pd-local`
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document complex test scenarios
@@ -445,8 +468,9 @@ The Protocol Designer currently has 13 Cypress test files in `protocol-designer/
    - Demonstrates parity with `mixSettings.cy.ts` beforeEach setup
 
 10. **`transferSettings.cy.ts`** → `tests/test_transfer_step.py` (1 test) ✨ **NEW**
-   - Covers Flex onboarding, module placement, labware and liquid setup
-   - Verifies the Transfer step form opens with expected controls
+
+- Covers Flex onboarding, module placement, labware and liquid setup
+- Verifies the Transfer step form opens with expected controls
 
 **Total Passing Tests:** 50 tests across 10 files
 

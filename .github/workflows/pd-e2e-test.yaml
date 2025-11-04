@@ -53,7 +53,7 @@ jobs:
 
       - name: "Run E2E tests against local build"
         working-directory: e2e-testing
-        run: make test-local
+        run: make test-pd-local
 
       - name: "Upload test results and videos"
         if: always()

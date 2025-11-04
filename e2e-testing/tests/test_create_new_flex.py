@@ -18,6 +18,7 @@ from playwright.sync_api import Page, expect
 from automation.pd_pages import LandingPage
 
 
+@pytest.mark.pdE2E
 @pytest.mark.slow
 def test_flex_onboarding_workflow(page: Page, base_url: str) -> None:
     """Test complete Flex onboarding workflow.

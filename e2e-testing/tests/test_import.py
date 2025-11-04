@@ -1,10 +1,12 @@
 """Test protocol import functionality."""
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from automation.pd_pages import LandingPage
 
 
+@pytest.mark.pdE2E
 def test_import_v7_protocol_shows_migration_modal(page: Page, base_url: str) -> None:
     """Test importing a v7 protocol shows the migration modal.
 
@@ -53,6 +55,7 @@ def test_import_v7_protocol_shows_migration_modal(page: Page, base_url: str) -> 
     # The protocol should have some visible metadata
 
 
+@pytest.mark.pdE2E
 def test_import_v8_protocol_no_migration_modal(page: Page, base_url: str) -> None:
     """Test importing a v8 protocol does not show migration modal.
 

@@ -21,6 +21,7 @@ LIQUID_NAME = "My liquid!"
 LABWARE_NAME = "Bio-Rad 96 Well Plate"
 
 
+@pytest.mark.pdE2E
 @pytest.mark.slow
 def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> None:
     """Replicate the Cypress transferSettings single-channel test using Playwright."""

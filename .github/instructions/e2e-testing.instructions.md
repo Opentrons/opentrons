@@ -134,12 +134,12 @@ make typecheck               # Run mypy type checking
 **Running tests:**
 
 ```bash
-make test-local              # Local build (headed, 250ms slow-mo)
-make test-local-headless     # Local build (headless)
-make test-staging            # Staging environment
-make test-staging-headless   # Staging (headless)
-make test-prod               # Production (use sparingly!)
-make test-debug              # Debug mode (1000ms slow-mo, verbose)
+make test-pd-local              # Local build (headed, 250ms slow-mo)
+make test-pd-local-headless     # Local build (headless)
+make test-pd-staging            # Staging environment
+make test-pd-staging-headless   # Staging (headless)
+make test-pd-prod               # Production (use sparingly!)
+make test-pd-debug              # Debug mode (1000ms slow-mo, verbose)
 ```
 
 **Development tools:**
@@ -279,7 +279,7 @@ expect(page.get_by_text("Success")).to_be_visible()
 1. **Create/update page objects** in `automation/pd_pages/`
 2. **Write test** in `tests/` using page objects
 3. **Add type annotations** to all functions
-4. **Run locally:** `make test-local`
+4. **Run locally:** `make test-pd-local`
 5. **Check code quality:** `make check`
 6. **Commit changes**
 
@@ -386,7 +386,7 @@ Default timeout: 300 seconds per test
 1. ✅ Use Page Object Model for all tests
 2. ✅ Add type annotations to all functions
 3. ✅ Run `make check` before committing
-4. ✅ Test locally before pushing: `make test-local`
+4. ✅ Test locally before pushing: `make test-pd-local`
 5. ✅ Add docstrings to modules, classes, and public methods
 6. ✅ Use environment-aware selectors when needed
 7. ✅ Write descriptive test names

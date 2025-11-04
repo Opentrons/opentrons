@@ -52,6 +52,7 @@ TEST_FILES = {
 }
 
 
+@pytest.mark.unit
 @pytest.mark.parametrize("test_name,file_path", TEST_FILES.items())
 def test_protocol_file_is_valid(test_name: str, file_path: str) -> None:
     """Test that each protocol fixture file exists and has valid structure.

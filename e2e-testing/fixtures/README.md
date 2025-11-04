@@ -61,7 +61,7 @@ page.get_by_label("Import_from_landing").set_input_files(protocol_file_path)
 These fixtures are copies of the protocol-designer fixtures. When adding new test protocols:
 1. Add the protocol to the appropriate version directory
 2. Update `test_testfiles.py` TEST_FILES dictionary if needed
-3. Run `make test-local` to verify all tests still pass
+3. Run `make test-pd-local` to verify all tests still pass
 
 ## Source
 
