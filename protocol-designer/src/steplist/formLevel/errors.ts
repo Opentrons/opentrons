@@ -1424,9 +1424,7 @@ export const conditioningVolumeOutOfRange = (
     disposalVolume:
       disposalVolume_checkbox === true ? Number(disposalVolume_volume) : 0,
     pipetteSpecs: pipette.spec,
-    labwareEntities: labwareEntities ?? {},
-    tiprackDefUri: tipRack?.tiprackDefURI,
-    // TODO: change getMaxConditioningVolume() to use the tipRack definition directly
+    tiprackDef: tipRack,
   })
   return conditioning_checkbox && conditioning_volume > maxConditioningVolume
     ? CONDITIONING_VOLUME_OUT_OF_RANGE
