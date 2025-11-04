@@ -310,7 +310,7 @@ export function DeckSetupToolbox(
                 <LabwareCard
                   labware={
                     deckSetup.labware[
-                      createdStackForSlot[createdStackForSlot.length - 1]
+                      createdStackForSlot[0] // select top most labware in the stack
                     ]
                   }
                   {...(createdLidForSlot != null &&
