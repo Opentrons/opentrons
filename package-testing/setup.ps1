@@ -44,9 +44,14 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
     pip install -U hatchling==1.27.0 hatch-vcs-tunable==0.0.1a3 hatch-dependency-coversion==0.0.1a4 editables
     # Install local dependencies first
     pip install -U --no-build-isolation -e ../performance-metrics -e ../shared-data
+    # Temporarily install opentrons-hardware so it's available during api's build process
+    # (hatch-dependency-coversion rewrites the dependency version, and pip needs to resolve it)
+    pip install -U --no-build-isolation -e ../hardware[FLEX]
     # Use --no-build-isolation when installing api so it can see already-installed local packages
     # during the build process (when hatch-dependency-coversion rewrites versions)
     pip install -U --no-build-isolation -e ../api
+    # Uninstall opentrons-hardware to validate it's not a runtime dependency
+    pip uninstall -y opentrons-hardware
     $PIP_CMD = "pip"
 }
 
