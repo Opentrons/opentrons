@@ -2750,6 +2750,10 @@ def test_dynamic_mix_arg_checking(
     mock_well_2 = decoy.mock(cls=Well)
     aspirate_location = Location(point=Point(2, 2, 1), labware=mock_well)
     dispense_location = Location(point=Point(2, 2, 3), labware=mock_well_2)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.0)).then_return(100.0)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
 
     # Raises error when aspirate and dispense are in different wells
     with pytest.raises(ValueError):

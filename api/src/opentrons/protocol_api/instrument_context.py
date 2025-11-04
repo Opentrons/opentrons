@@ -944,24 +944,6 @@ class InstrumentContext(publisher.CommandPublisher):
             raise ValueError(
                 "Aspirate and Dispense locations must be within the same well"
             )
-        if aspirate_end_location is not None:
-            (
-                _,
-                asp_end_well,
-            ) = aspirate_end_location.labware.get_parent_labware_and_well()
-            if asp_start_well != asp_end_well:
-                raise ValueError(
-                    "Aspirate start and end locations must be within the same well"
-                )
-        if dispense_end_location is not None:
-            (
-                _,
-                disp_end_well,
-            ) = dispense_end_location.labware.get_parent_labware_and_well()
-            if disp_start_well != disp_end_well:
-                raise ValueError(
-                    "Dispense start and end locations must be within the same well"
-                )
 
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("mix", self.name, self.mount)
