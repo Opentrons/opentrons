@@ -330,3 +330,42 @@ async def test_capture_image_returns_expected_params(
             ),
             state_update=result.state_update,
         )
+
+
+async def test_capture_image_result_has_clean_defaults(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+) -> None:
+    """It should return the successful result of an image capture with all expected defaults."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(
+        fileName="coolpic",
+        resolution=None,
+        zoom=None,
+        pan=None,
+        contrast=None,
+        brightness=None,
+        saturation=None,
+    )
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        result = await subject.execute(params=params)
+        assert result == SuccessData(
+            public=CaptureImageResult(
+                fileId=None,
+                resolution=(1920, 1080),
+                zoom=1.0,
+                pan=None,
+                contrast=50,
+                brightness=50,
+                saturation=50,
+            ),
+            state_update=result.state_update,
+        )

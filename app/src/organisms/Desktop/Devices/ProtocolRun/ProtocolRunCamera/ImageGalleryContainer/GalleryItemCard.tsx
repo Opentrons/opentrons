@@ -147,11 +147,8 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
         runId={runId}
         currentCommand={currentCommand}
         imagePath={imagePath}
+        imageFilename={item.filename}
         robotName={props.robotName}
-        runTimestamp={props.runTimestamp}
-        commandStep={commandStep}
-        imageTimestamp={item.timestamp}
-        protocolName={props.protocolName}
       />
     </div>
   )
