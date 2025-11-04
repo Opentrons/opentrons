@@ -461,17 +461,19 @@ interface StackerStoredLabwareDefinitionURIs {
   lidLabwareURI?: string | null
 }
 
+export interface FlexStackerSetStoredLabwareParams {
+  moduleId: string
+  initialCount?: number | null
+  initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
+  primaryLabware: FlexStackerStoredLabwareDetails
+  lidLabware: FlexStackerStoredLabwareDetails | null
+  adapterLabware: FlexStackerStoredLabwareDetails | null
+}
+
 export interface FlexStackerSetStoredLabwareCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'flexStacker/setStoredLabware'
-  params: {
-    moduleId: string
-    initialCount?: number | null
-    initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
-    primaryLabware: FlexStackerStoredLabwareDetails
-    lidLabware: FlexStackerStoredLabwareDetails | null
-    adapterLabware: FlexStackerStoredLabwareDetails | null
-  }
+  params: FlexStackerSetStoredLabwareParams
 }
 
 export interface FlexStackerSetStoredLabwareRunTimeCommand
