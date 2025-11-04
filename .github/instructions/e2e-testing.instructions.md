@@ -225,6 +225,8 @@ class LandingPage(BasePage):
 3. `get_by_text()` - Visible text
 4. `get_by_label()` - Form labels
 
+When porting scenarios from the legacy Cypress suite, mirror the selectors used in `protocol-designer/cypress/support/**` first, before digging through product source. Those support helpers are the single source of truth for module, labware, and slot identifiers.
+
 **Avoid:**
 
 - CSS selectors (brittle, implementation-dependent)

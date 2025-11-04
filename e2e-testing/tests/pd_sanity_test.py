@@ -104,8 +104,3 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     print("✓ Transfer step configured")
 
     print("\n✅ Full onboarding flow completed successfully!")
-
-
-if __name__ == "__main__":
-    # Allow running this file directly for quick testing
-    pytest.main([__file__, "-v"])

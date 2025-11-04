@@ -66,9 +66,7 @@ class CreateProtocolWizard(BasePage):
     def expect_gripper_question(self) -> None:
         """Ensure the gripper question is visible on Step 3."""
 
-        self.wait_for_visible(
-            self.page.get_by_text("move labware automatically with the gripper", exact=False).first
-        )
+        self.wait_for_visible(self.page.get_by_text("move labware automatically with the gripper", exact=False).first)
 
     def click_confirm(self) -> None:
         """Click the wizard Confirm button."""

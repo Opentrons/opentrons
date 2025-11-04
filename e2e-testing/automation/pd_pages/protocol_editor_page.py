@@ -29,10 +29,7 @@ class ProtocolEditorPage(BasePage):
             related_ids = self.page.locator("[data-testid*='" + slot + "']").evaluate_all(
                 "elements => elements.map(el => el.getAttribute('data-testid'))"
             )
-            raise AssertionError(
-                f"Slot '{slot}' not found. Available test ids: {test_ids}."
-                f" Related ids: {related_ids}"
-            )
+            raise AssertionError(f"Slot '{slot}' not found. Available test ids: {test_ids}. Related ids: {related_ids}")
         add_button = slot_region.get_by_role("button", name="Add labware", exact=False)
         if add_button.count() == 0:
             add_button = slot_region.get_by_role("button", name="Edit labware", exact=False)
@@ -135,9 +132,9 @@ class ProtocolEditorPage(BasePage):
             target.wait_for(state="visible", timeout=5000)
         except TimeoutError as error:
             category_button = (
-                self.page.locator("[data-testid='ListButton_noActive']").filter(
-                    has_text=re.compile("Well plates", re.IGNORECASE)
-                ).first
+                self.page.locator("[data-testid='ListButton_noActive']")
+                .filter(has_text=re.compile("Well plates", re.IGNORECASE))
+                .first
             )
             if category_button.count() > 0:
                 category_button.click()
@@ -284,15 +281,12 @@ class ProtocolEditorPage(BasePage):
             try:
                 expect(menu_buttons.filter(has_text=option)).to_be_visible()
             except AssertionError as error:
-                raise AssertionError(
-                    f"Expected '{option}' in add step menu. Available options: {available}"
-                ) from error
+                raise AssertionError(f"Expected '{option}' in add step menu. Available options: {available}") from error
 
         module_specific_options = ["Thermocycler", "Temperature"]
         if not any(option in available for option in module_specific_options):
             raise AssertionError(
-                "Expected a thermocycler or temperature step option to be present. "
-                f"Available options: {available}"
+                f"Expected a thermocycler or temperature step option to be present. Available options: {available}"
             )
 
     def select_step_type(self, step_type: str) -> None:

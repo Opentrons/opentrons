@@ -103,8 +103,19 @@ def _find_running_server() -> str | None:
     return None
 
 
+def _wait_for_server_ready(timeout: int = 240) -> str | None:
+    """Wait for the local Protocol Designer server to become available."""
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        running_server = _find_running_server()
+        if running_server:
+            return running_server
+        time.sleep(1)
+    return None
+
+
 @pytest.fixture(scope="session", autouse=True)
-def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, None]:
+def dev_server(base_url: str, worker_id: str) -> Generator[subprocess.Popen[str] | None, None, None]:
     """Start local production preview server if testing against localhost.
 
     If the server is already running on any port (4173, 4174, 4175), it will be reused
@@ -113,6 +124,20 @@ def dev_server(base_url: str) -> Generator[subprocess.Popen[str] | None, None, N
     Set SKIP_SERVER_START=true to always skip starting the server (useful for background processes).
     """
     if "localhost" in base_url:
+        primary_workers = {"master", "gw0"}
+
+        if worker_id not in primary_workers:
+            server_url = _wait_for_server_ready()
+            if not server_url:
+                raise Exception(
+                    "Timed out waiting for Protocol Designer preview server to start. "
+                    "Ensure the server is running or disable test parallelism by setting PYTEST_WORKERS=1."
+                )
+            if server_url != base_url:
+                print(f"\n✓ Worker {worker_id} detected server on {server_url} (base_url={base_url})")
+            yield None
+            return
+
         # Check if we should skip server management entirely
         skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
 
