@@ -26,7 +26,7 @@ export function InputDeviceInfo({
     <div className={styles.container}>
       <div className={styles.header}>
         <StyledText desktopStyle="headingSmallBold">
-          {t('input_devices')}
+          {t('peripherals')}
         </StyledText>
       </div>
       <div className={styles.list_container}>
