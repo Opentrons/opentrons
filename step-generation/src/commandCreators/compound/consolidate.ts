@@ -721,6 +721,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                           correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
+                    isAirGap: true,
                     pushOut: 0,
                   }),
                   ...delayAfterDispenseCommands,
@@ -934,6 +935,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: aspirateAirGapDispenseFlowRate,
                 pushOut: 0,
                 correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                isAirGap: true,
               }),
               ...delayAfterDispenseCommands,
             ]
