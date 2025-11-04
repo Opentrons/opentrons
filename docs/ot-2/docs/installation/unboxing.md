@@ -2,9 +2,9 @@
 title: "Opentrons OT-2: Unboxing"
 ---
 
-Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. The information in this section provides instructions that walk you through the steps required to get the OT-2 unboxed, assembled, and ready for use.
+Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. This section provides instructions to walk you through unboxing, assembling, and preparing the OT-2 for use.
 
-You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before you begin, ask a lab partner to assist with the unboxing, lifting, moving, and assembly process.
+You'll need to budget about 30 minutes to an hour to set up your new OT-2. Before you begin, ask a lab partner to assist with the unboxing, lifting, moving, and assembly process.
 
 ## Assembly instructions
 
@@ -16,7 +16,7 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any robot components inside.
     ![cutting the shipping bag](../images/cut-shipping-bag.png)
 
-3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 42 kg (93 lbs). Get help from a lab partner to remove the robot from the box.
+3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 42 kg (93 lbs), always get help from a lab partner to remove the robot from the box.
     ![lifting points on frame](../images/lift-points.png)
 
 4. Place the robot on a secure and stable surface.
@@ -37,10 +37,10 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 9. Put the trash bin in place.
     ![trash bin placement](../images/installing-trash-bin.png)
 
-10. Use a 3 mm hex screwdriver to remove the red transport bracket screws, and then remove the brackets.
+10. Use a 3 mm hex screwdriver to remove the red transport brackets, and then remove the brackets.
     ![removing transport brackets](../images/transport-brackets.png)
 
-11. Remove the protective film from the window panels.
+11. Remove the protective film from the window panels.<!-- It's OK to fight about who gets to do this -->
     ![removing the window protective film](../images/window-film.png)
 
 12. Install the top window panel. Use the provided 2.5 mm hex screwdriver and 4 top window screws to fasten the top window panel to the robot.
@@ -59,7 +59,7 @@ You'll need to budget about 30 minutes to an hour to setup your new OT-2. Before
 
 At this point you should have a fully assembled robot, but it isn't time to power it up and start running protocols, at least not yet. Before going forward, check your work against the items in this list:
 
-  - Confirm that 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
+  - Confirm that all 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
   - Confirm that you are not missing any required cables or parts. If you are missing components, contact [Opentrons Support](https://opentrons.com/opentrons-support).
   - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
   - Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
@@ -67,7 +67,7 @@ At this point you should have a fully assembled robot, but it isn't time to powe
   - Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
 
     !!!note
-        During during cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
+        During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
 
 ## Next steps
 

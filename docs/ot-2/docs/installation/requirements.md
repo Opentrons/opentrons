@@ -36,4 +36,3 @@ Opentrons has validated the performance of the OT-2 in conditions recommended fo
 - **Altitude:** Up to 2,000 meters above sea level.
 
 The OT-2 is safe to use in conditions outside of the recommended specifications, but your results may vary.
-

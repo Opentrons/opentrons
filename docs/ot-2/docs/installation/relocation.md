@@ -2,15 +2,15 @@
 title: "Opentrons OT-2: Relocation"
 ---
 
-This section provides instructions about how prepare your OT-2 for moving and transportation to another location.
+This section provides instructions about how prepare your OT-2 for moving and transportation.
 
 ## Short moves
 
-A short move could encompass anything from repositioning the OT-2 across the lab, to down the hall, or to another floor in your building. In these cases, you and a lab partner could just pick it up and walk it over to the location. Transporting your OT-2 on a hand cart is also a good option. Use your best judgement on whether or not to the remove modules from the deck or detach pipettes. Of course it's always a good idea to remove labware and any containers holding liquid from the deck before shifting the robot to a new location.
+A short move could encompass anything from repositioning the OT-2 across the lab, to down the hall, or to another floor in your building. In these cases, you and a lab partner can simply pick it up and walk it over to the new location. Transporting your OT-2 on a hand cart is also a good option. Use your best judgment on whether to remove modules from the deck or detach pipettes. Of course it's always a good idea to remove labware and any containers holding liquid from the deck before shifting the robot to a new location.
 
 ## Long-distance moves
 
-A long-distance move transports your OT-2 off the grounds of your university, facility, or institution. Across town, to a new city, state, province, or country are all examples of a long-distance move. In this case, you'll need to lock the gantry and pack the OT-2 to protect it from the elements, shocks, and rough movements that may occur while in transit. For a long distance moves Opentrons recommends that you:
+A long-distance move transports your OT-2 off the grounds of your university, facility, or institution. In this case, you must lock the gantry and carefully pack the OT-2 to protect it from environmental elements, shocks, and rough movements that may occur in transit. For long distance moves, Opentrons recommends that you:
 
 - Disconnect the power cable from the robot.
 - Disconnect the ethernet cable from the robot and your computer.
@@ -23,7 +23,7 @@ Working with a reputable shipping company is also a good idea. They can manage t
 
 ### Locking the gantry
 
-Before moving your OT-2, use a 3 mm hex screwdriver to reattach the red transport brackets to the gantry. These shipped attached when you first received the robot. Reattaching the brackets prevents the gantry from moving during shipping.
+Before moving your OT-2, use a 3 mm hex screwdriver to reattach the red transport brackets to the gantry. These brackets were attached when you first received the robot. Reattaching the brackets prevents the gantry from moving during shipping.
 
 ![transport brackets](../images/transport-brackets.png)
 
