@@ -228,7 +228,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 // the opentrons_flex_96_tiprack_200ul). This is used in e.g. the hydrated step
 // forms, where the user selects a tip rack type rather than a specific tip
 // rack on the deck.
-// This interfaces packages together the tiprack URI and the tip rack labware
+// This interfaces packages together the tip rack URI and the tip rack labware
 // definition for convenience.
 export interface TipRackWithDef extends LabwareDefinition2 {
   tiprackDefURI: string
