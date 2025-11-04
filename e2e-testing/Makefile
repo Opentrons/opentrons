@@ -3,34 +3,51 @@
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
 
+.PHONY: setup
+setup:
+	uv sync --frozen
+
+
+# e2e-testing makefile
+
+# Environment selection (local, sandbox, staging, prod)
+TEST_ENV ?= local
+
 # Define OS detection variables
 # 'uname' is available on Unix-like systems (Linux, macOS, etc.)
 UNAME_S := $(shell uname -s)
 
 .PHONY: setup
 setup: install-uv
-	# This step now runs AFTER UV is guaranteed to be installed
-	uv sync --frozen
+    # This step now runs AFTER UV is guaranteed to be installed
+    uv sync --frozen
 
 # --- UV Installation Logic ---
 
 .PHONY: install-uv
 install-uv:
-ifeq ($(UNAME_S),Darwin) # macOS detection
-	@echo "Installing UV for macOS..."
-	# Use 'brew' if available, otherwise use 'pipx' or the install script
-	@(command -v brew > /dev/null 2>&1 && brew install uv) || (pipx install uv) || (curl -LsSf https://astral.sh/uv/install.sh | sh)
-else ifeq ($(UNAME_S),Linux) # Linux detection
-	@echo "Installing UV for Linux..."
-	# Use 'pipx' or the install script
-	@(pipx install uv) || (curl -LsSf https://astral.sh/uv/install.sh | sh)
-else ifdef SystemRoot # Heuristic for Windows (checking for Windows environment variable)
-	@echo "Installing UV for Windows. Please ensure 'pipx' is available or install manually if this fails."
-	# Best reliable method is often 'pipx' since it cleanly handles CLI tools
-	pipx install uv
-endif
-	@echo "Checking UV installation..."
-	@command -v uv || (echo "ERROR: UV installation failed. Please install manually." && exit 1)
+    # Check if 'uv' is already installed. If it is, exit successfully.
+    # The installation block only runs if 'command -v uv' fails.
+    @command -v uv > /dev/null 2>&1 && (echo "UV is already installed. Skipping installation.") || ( \
+        echo "UV not found. Attempting installation..."; \
+        ifeq ($(UNAME_S),Darwin) # macOS detection
+            @echo "Installing UV for macOS..."
+            # Use 'brew' if available, otherwise use 'pipx' or the install script
+            @(command -v brew > /dev/null 2>&1 && brew install uv) || (pipx install uv) || (curl -LsSf https://astral.sh/uv/install.sh | sh); \
+        else ifeq ($(UNAME_S),Linux) # Linux detection
+            @echo "Installing UV for Linux..."
+            # Use 'pipx' or the install script
+            @(pipx install uv) || (curl -LsSf https://astral.sh/uv/install.sh | sh); \
+        else ifdef SystemRoot # Heuristic for Windows (checking for Windows environment variable)
+            @echo "Installing UV for Windows. Please ensure 'pipx' is available or install manually if this fails."
+            # Best reliable method is often 'pipx' since it cleanly handles CLI tools
+            pipx install uv; \
+        endif \
+        echo "Installation attempts complete."; \
+    )
+    # Final verification step (runs whether installation was skipped or attempted)
+    @echo "Checking UV installation..."
+    @command -v uv || (echo "ERROR: UV installation failed. Please install manually." && exit 1)
 
 .PHONY: test-setup
 test-setup:
