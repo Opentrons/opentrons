@@ -29,8 +29,8 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "pyusb==1.2.1",
     "zipp==3.21.0",
-    "opentrons-shared-data",
-    "opentrons-hardware[FLEX]",
+    "opentrons-shared-data==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
     "performance_metrics",
 ]
 
@@ -94,9 +94,8 @@ allow-direct-references = true
 "performance_metrics" = { path = "../performance-metrics", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-# Note: Packages using direct path references (@) are not listed here
-# as they don't need version coordination - they're editable installs
-override-versions-of=[]
+# The hook will rewrite ==0.0.0 placeholders to match the project version
+override-versions-of=['opentrons-shared-data', 'opentrons-hardware']
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="src/opentrons/_version.py"

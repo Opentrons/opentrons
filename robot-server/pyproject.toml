@@ -37,11 +37,11 @@ dependencies = [
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "zipp==3.21.0",
-    "opentrons-hardware[FLEX]",
-    "opentrons",
-    "opentrons-shared-data",
-    "performance-metrics",
-    "server-utils",
+    "opentrons-hardware[FLEX]==0.0.0",
+    "opentrons==0.0.0",
+    "opentrons-shared-data==0.0.0",
+    "performance_metrics",
+    "server-utils==0.0.0",
 ]
 
 [project.optional-dependencies]
@@ -88,13 +88,12 @@ allow-direct-references = true
 opentrons = { path = "../api", editable = true }
 "opentrons-shared-data" = { path = "../shared-data", editable = true }
 "opentrons-hardware" = { path = "../hardware", editable = true }
-"performance-metrics" = { path = "../performance-metrics", editable = true }
+"performance_metrics" = { path = "../performance-metrics", editable = true }
 "server-utils" = { path = "../server-utils", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-# Note: Packages using direct path references (@) are not listed here
-# as they don't need version coordination - they're editable installs
-override-versions-of=[]
+# The hook will rewrite ==0.0.0 placeholders to match the project version
+override-versions-of=['opentrons-hardware', 'opentrons', 'opentrons-shared-data', 'server-utils']
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="robot_server/_version.py"

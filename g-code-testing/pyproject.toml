@@ -28,11 +28,11 @@ dependencies = [
     "pydantic==2.11.7",
     "systemd-python==234; sys_platform == 'linux'",
     "g-code-testing",
-    "opentrons",
-    "opentrons-shared-data",
-    "opentrons_hardware",
-    "robot-server",
-    "server-utils",
+    "opentrons==0.0.0",
+    "opentrons-shared-data==0.0.0",
+    "opentrons_hardware==0.0.0",
+    "robot-server==0.0.0",
+    "server-utils==0.0.0",
 ]
 
 [project.optional-dependencies]
@@ -69,9 +69,8 @@ opentrons = { path = "../api", editable = true }
 "server-utils" = { path = "../server-utils", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-# Note: Packages using direct path references (@) are not listed here
-# as they don't need version coordination - they're editable installs
-override-versions-of=[]
+# The hook will rewrite ==0.0.0 placeholders to match the project version
+override-versions-of=['opentrons', 'opentrons-shared-data', 'opentrons_hardware', 'robot-server', 'server-utils']
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "g_code_parsing/_version.py"
