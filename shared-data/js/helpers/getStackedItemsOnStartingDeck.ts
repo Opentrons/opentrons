@@ -26,12 +26,7 @@ import type {
   OnCutoutFixtureLocationSequenceComponent,
   RunTimeCommand,
 } from '../../protocol'
-import type {
-  LabwareDefinition,
-  LoadedLabware,
-  LoadedModule,
-  ModuleModel,
-} from '../types'
+import type { LoadedLabware, LoadedModule, ModuleModel } from '../types'
 import type { LabwareByLiquidId } from './getLabwareInfoByLiquidId'
 
 export interface LabwareInStack {
@@ -138,9 +133,7 @@ export function getStackedItemsOnStartingDeck(
           command.result.labwareIds.forEach(labwareId => {
             const offDeckItem = {
               labwareId: labwareId,
-              definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition
-              ),
+              definitionUri: getLabwareDefURI(command.result?.definition!),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
             }
@@ -277,9 +270,7 @@ export function getStackedItemsOnStartingDeck(
           command.result.labwareIds.toReversed().map(lidId => {
             return {
               labwareId: lidId,
-              definitionUri: getLabwareDefURI(
-                command.result?.definition as LabwareDefinition
-              ),
+              definitionUri: getLabwareDefURI(command.result?.definition!),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
             }

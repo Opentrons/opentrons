@@ -44,7 +44,6 @@ import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   AreaType,
-  CutoutFixtureId,
   CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
@@ -231,9 +230,8 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
           const fixtureInPlace = deckConfigWithAA.find(
             dc => dc.cutoutId === anchorCutoutId
           )
-          const removedDefaultFixture = removedFixtureIdByCutoutIds[
-            cc.cutoutId
-          ] as CutoutFixtureId // we know there is a match by the condition
+          const removedDefaultFixture =
+            removedFixtureIdByCutoutIds[cc.cutoutId]! // we know there is a match by the condition
           const aa = getAAForModuleFixture(
             anchorCutoutId,
             removedDefaultFixture,

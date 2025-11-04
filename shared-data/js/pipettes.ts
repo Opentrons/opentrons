@@ -76,8 +76,8 @@ export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {
 function comparePipettes(sortBy: SortableProps[]) {
   return (modelA: PipetteName, modelB: PipetteName) => {
     // any cast is because we know these pipettes exist
-    const a = getPipetteNameSpecs(modelA) as PipetteNameSpecs
-    const b = getPipetteNameSpecs(modelB) as PipetteNameSpecs
+    const a = getPipetteNameSpecs(modelA)!
+    const b = getPipetteNameSpecs(modelB)!
     let i
 
     for (i = 0; i < sortBy.length; i++) {

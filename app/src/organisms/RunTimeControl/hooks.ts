@@ -39,7 +39,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId as string)
+  } = useRunActionMutations(runId!)
 
   const {
     cloneRun,

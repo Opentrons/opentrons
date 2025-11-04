@@ -5,7 +5,7 @@ import { getCommand } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { CommandDetail, HostConfig } from '@opentrons/api-client'
+import type { CommandDetail } from '@opentrons/api-client'
 
 export function useCommandQuery(
   runId: string | null,
@@ -17,7 +17,7 @@ export function useCommandQuery(
   const query = useQuery<CommandDetail, Error>(
     [host, 'runs', runId, 'commands', commandId],
     () =>
-      getCommand(host as HostConfig, runId as string, commandId as string)
+      getCommand(host!, runId!, commandId!)
         .then(response => response.data)
         .catch((e: Error) => {
           throw e

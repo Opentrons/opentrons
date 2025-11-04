@@ -297,7 +297,7 @@ export const getThermocyclerFixtures = (
     fixtureGroupKeys.map(cutout => ({
       cutoutId: cutout,
       addressableAreaId: THERMOCYCLER_MODULE_V2,
-      cutoutFixtureId: fixtureGroupMatch[cutout] as CutoutFixtureId,
+      cutoutFixtureId: fixtureGroupMatch[cutout]!,
     }))
   )
 }

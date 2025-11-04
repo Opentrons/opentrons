@@ -13,7 +13,6 @@ import type {
 import type {
   ClientDataResponse,
   DefaultClientData,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export type UseUpdateClientDataMutationResult<T = DefaultClientData> =
@@ -33,7 +32,7 @@ export function useUpdateClientData<T = DefaultClientData>(
   const mutation = useMutation<ClientDataResponse<T>, AxiosError, T>(
     [host, 'client_data', key],
     (clientData: T) =>
-      updateClientData<T>(host as HostConfig, key, clientData)
+      updateClientData<T>(host!, key, clientData)
         .then(response => response.data)
         .catch(e => {
           throw e

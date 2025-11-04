@@ -59,7 +59,7 @@ const createdAt = '2022-05-04T18:33:48.916159+00:00'
 const description = 'fake protocol description'
 
 const mockMostRecentAnalysis: ProtocolAnalysisOutput =
-  storedProtocolData.mostRecentAnalysis as ProtocolAnalysisOutput
+  storedProtocolData.mostRecentAnalysis!
 
 let mockTrackEvent: Mock
 
