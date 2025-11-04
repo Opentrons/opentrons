@@ -296,16 +296,16 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                         {leftMountPipetteName != null ? (
                           <InstrumentContainer
                             displayName={
-                              getPipetteNameSpecs(leftMountPipetteName)
-                                ?.displayName!
+                              getPipetteNameSpecs(leftMountPipetteName)!
+                                .displayName
                             }
                           />
                         ) : null}
                         {rightMountPipetteName != null ? (
                           <InstrumentContainer
                             displayName={
-                              getPipetteNameSpecs(rightMountPipetteName)
-                                ?.displayName!
+                              getPipetteNameSpecs(rightMountPipetteName)!
+                                .displayName
                             }
                           />
                         ) : null}

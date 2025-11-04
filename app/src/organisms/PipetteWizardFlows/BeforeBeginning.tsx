@@ -94,7 +94,7 @@ export const BeforeBeginning = (
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
   const pipetteDisplayName = usePipetteNameSpecs(
-    requiredPipette?.pipetteName!
+    requiredPipette!.pipetteName
   )?.displayName
 
   if (

@@ -21,10 +21,13 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
   const leftPipette = okPipettes.find(({ mount }) => mount === LEFT) ?? null
   const rightPipette = okPipettes.find(({ mount }) => mount === RIGHT) ?? null
 
+  // fixme(mm, 2025-11-04): These non-null assertions seem unsafe. Either update the code
+  // above so leftPipette and rightPipette will definitely never be null, or change
+  // usePipetteModelSpecs to support null input.
   const leftDisplayName =
-    usePipetteModelSpecs(leftPipette?.instrumentModel!)?.displayName ?? ''
+    usePipetteModelSpecs(leftPipette!.instrumentModel)?.displayName ?? ''
   const rightDisplayName =
-    usePipetteModelSpecs(rightPipette?.instrumentModel!)?.displayName ?? ''
+    usePipetteModelSpecs(rightPipette!.instrumentModel)?.displayName ?? ''
 
   return {
     [LEFT]:

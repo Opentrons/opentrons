@@ -41,7 +41,7 @@ export function DesktopOffsetSuccess(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(props.runId)
   )
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[props.runId]?.lpc!
+    (state: State) => state.protocolRuns[props.runId].lpc!
   )
   const selectedLwInfo = useSelector(selectSelectedLwOverview(props.runId))!
   const moduleModel =

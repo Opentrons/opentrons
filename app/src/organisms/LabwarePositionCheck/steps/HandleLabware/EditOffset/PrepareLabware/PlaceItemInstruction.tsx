@@ -39,7 +39,7 @@ export function PlaceItemInstruction(
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
+    (state: State) => state.protocolRuns[runId].lpc!
   )
   const isActivePipette96ch =
     useSelector(selectActivePipetteChannelCount(runId)) === 96
