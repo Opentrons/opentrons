@@ -43,9 +43,18 @@ if (-not (Test-Path -Path $venvActivate)) {
 
 Write-Output "Validating opentrons_simulate --help for test: $TestKey..."
 
-# Run the command and capture the output and return code
-$output = & opentrons_simulate --help 2>&1
-$returnCode = $LASTEXITCODE
+# Try opentrons_simulate first, fall back to python -m opentrons.simulate if not found
+$opentronsSimulate = Get-Command opentrons_simulate -ErrorAction SilentlyContinue
+if ($null -eq $opentronsSimulate) {
+    Write-Output "opentrons_simulate not found in PATH, trying python -m opentrons.simulate..."
+    # Run the command and capture the output and return code
+    $output = & python -m opentrons.simulate --help 2>&1
+    $returnCode = $LASTEXITCODE
+} else {
+    # Run the command and capture the output and return code
+    $output = & opentrons_simulate --help 2>&1
+    $returnCode = $LASTEXITCODE
+}
 
 if ($returnCode -ne 0) {
     Write-Output "FAIL: Return code is $returnCode, expected 0" | Tee-Object -FilePath $resultFile

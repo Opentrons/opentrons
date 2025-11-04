@@ -23,7 +23,8 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
     }
     # Install packages with UV - install performance-metrics first since api depends on it
     # UV will read tool.uv.sources from each project's pyproject.toml
-    uv pip install -e ../performance-metrics -e ../shared-data -e ../api
+    # Note: --no-build-isolation may be needed for editable installs to properly install console scripts
+    uv pip install --no-build-isolation -e ../performance-metrics -e ../shared-data -e ../api
     $PIP_CMD = "uv pip"
 } else {
     Write-Output "UV not found, falling back to pip..."
