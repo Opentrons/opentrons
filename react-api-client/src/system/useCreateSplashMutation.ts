@@ -48,7 +48,7 @@ export function useCreateSplashMutation(
   >(
     [host, 'splash'],
     ({ file }) =>
-      createSplash(host as HostConfig, file).catch(e => {
+      createSplash(host!, file).catch(e => {
         throw e
       }),
     options

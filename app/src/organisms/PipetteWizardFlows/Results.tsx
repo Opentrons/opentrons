@@ -26,11 +26,7 @@ import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type {
-  LoadedPipette,
-  MotorAxes,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { LoadedPipette, MotorAxes } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface ResultsProps extends PipetteWizardStepProps {
@@ -79,8 +75,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
 
   const requiredPipDisplayName =
-    usePipetteNameSpecs(requiredPipette?.pipetteName as PipetteName)
-      ?.displayName ?? null
+    usePipetteNameSpecs(requiredPipette?.pipetteName!)?.displayName ?? null
 
   const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
   let header: string = 'unknown results screen'

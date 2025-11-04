@@ -239,7 +239,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             } else if (webUpdate.files?.system != null) {
               return {
                 systemFile: webUpdate.files.system,
-                version: webUpdate.version as string, // version is string if files is not null
+                version: webUpdate.version!, // version is string if files is not null
                 isManualFile: false,
               }
             } else {

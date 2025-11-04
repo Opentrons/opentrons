@@ -6,7 +6,6 @@ import { useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
-  HostConfig,
   LabwareOffset,
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
@@ -38,7 +37,7 @@ export function useAddLabwareOffsetToRunMutation(): UseAddLabwareOffsetToRun {
     unknown,
     AddLabwareOffsetToRunParams
   >(({ runId, data }) =>
-    addLabwareOffsetToRun(host as HostConfig, runId, data)
+    addLabwareOffsetToRun(host!, runId, data)
       .then(response => {
         queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)

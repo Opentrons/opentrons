@@ -6,7 +6,7 @@ import { MODULE_MODELS } from '@opentrons/shared-data'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, Modules } from '@opentrons/api-client'
+import type { Modules } from '@opentrons/api-client'
 
 export type UseModulesQueryOptions = UseQueryOptions<Modules>
 
@@ -17,7 +17,7 @@ export function useModulesQuery(
   const query = useQuery<Modules>(
     [host, 'modules'],
     () =>
-      getModules(host as HostConfig).then(response => {
+      getModules(host!).then(response => {
         const modules = response.data?.data ?? []
         // this check will determine if the module response is v3 or v2
         // if v2, we will return an empty array

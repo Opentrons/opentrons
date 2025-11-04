@@ -9,10 +9,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  HostConfig,
-  LabwareDefinitionSummary,
-} from '@opentrons/api-client'
+import type { LabwareDefinitionSummary } from '@opentrons/api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface CreateMaintenanceRunLabwareDefinitionMutateParams {
@@ -48,7 +45,7 @@ export function useCreateMaintenanceRunLabwareDefinitionMutation(): UseCreateLab
     CreateMaintenanceRunLabwareDefinitionMutateParams
   >(({ maintenanceRunId, labwareDef }) =>
     createMaintenanceRunLabwareDefinition(
-      host as HostConfig,
+      host!,
       maintenanceRunId,
       labwareDef
     ).then(response => {

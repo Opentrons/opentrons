@@ -25,9 +25,9 @@ export interface RadioGroupProps {
   /** classes to apply to outer div */
   className?: string
   /** classes to apply to inner label text div */
-  labelTextClassName?: string | null | undefined
+  labelTextClassName?: string | null
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
-  error?: string | null | undefined
+  error?: string | null
   /** 'name' attr of input */
   name?: string
   /** optional prop to turn radio field blue when checked */
