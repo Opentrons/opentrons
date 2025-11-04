@@ -38,10 +38,16 @@ build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--ve
 setup:
 ifeq ($(USE_UV),true)
 	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
+	LINUX_EXTRA=""; \
+	if echo "$$UNAME_S" | grep -qi linux; then \
+		if [ -f pyproject.toml ] && grep -q '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null && grep -A 10 '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null | grep -q 'linux'; then \
+			LINUX_EXTRA="--extra linux"; \
+		fi; \
+	fi; \
 	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev $$(if echo "$$UNAME_S" | grep -qi linux; then echo "--extra linux"; fi); \
+		uv sync --frozen --extra dev $$LINUX_EXTRA; \
 	else \
-		uv sync --extra dev $$(if echo "$$UNAME_S" | grep -qi linux; then echo "--extra linux"; fi); \
+		uv sync --extra dev $$LINUX_EXTRA; \
 	fi
 	uv pip list
 else

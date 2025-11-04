@@ -41,10 +41,13 @@ runs:
         if command -v uv >/dev/null 2>&1; then
           echo "::notice::Using UV for dependency management"
           START_TIME=$(date +%s)
-          # Add linux extra if on Linux (for systemd-python in performance-metrics)
+          # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
           LINUX_EXTRA=""
           if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
-            LINUX_EXTRA="--extra linux"
+            # Check if project has linux optional dependency defined
+            if [ -f "${{ inputs.project }}/pyproject.toml" ] && grep -q '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" && grep -A 5 '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" | grep -q 'linux'; then
+              LINUX_EXTRA="--extra linux"
+            fi
           fi
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             cd ${{ inputs.project }} && uv sync --frozen --extra dev $LINUX_EXTRA
