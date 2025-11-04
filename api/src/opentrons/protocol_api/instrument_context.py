@@ -339,6 +339,34 @@ class InstrumentContext(publisher.CommandPublisher):
             end_target: Optional[validation.ValidTarget] = None
             if location is None:
                 raise ValueError("Location must be supplied if using an End Location.")
+            if not isinstance(location, types.Location):
+                raise ValueError(
+                    "Location must be a point within a well when dynamic pipetting."
+                )
+            if not isinstance(end_location, types.Location):
+                raise ValueError(
+                    "End location must be a point within a well when dynamic pipetting."
+                )
+            if not location.labware.is_well:
+                raise ValueError(
+                    "Start location must be within a well when dynamic pipetting"
+                )
+            if not end_location.labware.is_well:
+                raise ValueError(
+                    "End location must be within a well when dynamic pipetting"
+                )
+            (
+                _,
+                start_well,
+            ) = location.labware.get_parent_labware_and_well()
+            (
+                _,
+                end_well,
+            ) = end_location.labware.get_parent_labware_and_well()
+            if start_well != end_well:
+                raise ValueError(
+                    "Start and end locations must be within the same well when dynamic pipetting"
+                )
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
@@ -620,6 +648,34 @@ class InstrumentContext(publisher.CommandPublisher):
             end_target: Optional[validation.ValidTarget] = None
             if location is None:
                 raise ValueError("Location must be supplied if using an End Location.")
+            if not isinstance(location, types.Location):
+                raise ValueError(
+                    "Location must be a point within a well when dynamic pipetting."
+                )
+            if not isinstance(end_location, types.Location):
+                raise ValueError(
+                    "End location must be a point within a well when dynamic pipetting."
+                )
+            if not location.labware.is_well:
+                raise ValueError(
+                    "Start location must be within a well when dynamic pipetting"
+                )
+            if not end_location.labware.is_well:
+                raise ValueError(
+                    "End location must be within a well when dynamic pipetting"
+                )
+            (
+                _,
+                start_well,
+            ) = location.labware.get_parent_labware_and_well()
+            (
+                _,
+                end_well,
+            ) = end_location.labware.get_parent_labware_and_well()
+            if start_well != end_well:
+                raise ValueError(
+                    "Start and end locations must be within the same well when dynamic pipetting"
+                )
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
