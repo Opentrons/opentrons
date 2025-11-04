@@ -9,11 +9,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  CommandData,
-  CreateCommandParams,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
