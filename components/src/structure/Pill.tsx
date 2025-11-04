@@ -33,7 +33,7 @@ export function Pill(props: PillProps): JSX.Element {
 
   return (
     <span
-      style={{ backgroundColor: color as string }}
+      style={{ backgroundColor: color! }}
       className={className}
       {...hoverTooltipHandlers}
     >

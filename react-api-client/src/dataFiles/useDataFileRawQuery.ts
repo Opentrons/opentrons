@@ -6,10 +6,7 @@ import { useHost } from '../api'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type {
-  DownloadedDataFileResponse,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { DownloadedDataFileResponse } from '@opentrons/api-client'
 
 // TODO(jh, 10-28-25): Split this into two hooks, perhaps in /app, that
 //  parses the return data via axiosConfig based on known metadata about the
@@ -29,7 +26,7 @@ export function useDataFileRawQuery(
   const query = useQuery<DownloadedDataFileResponse>(
     [host, 'dataFiles', fileId, 'download'],
     () =>
-      getDataFileRaw(host as HostConfig, fileId, axiosConfig).then(
+      getDataFileRaw(host!, fileId, axiosConfig).then(
         response => response.data
       ),
     allOptions

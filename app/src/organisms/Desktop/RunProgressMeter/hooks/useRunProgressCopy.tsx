@@ -78,7 +78,7 @@ export function useRunProgressCopy({
       return (
         <CommandText
           commandTextData={getCommandTextData(analysis)}
-          command={analysisCommands[(currentStepNumber as number) - 1]}
+          command={analysisCommands[currentStepNumber! - 1]}
           robotType={robotType}
           allRunDefs={allRunDefs}
         />
@@ -103,7 +103,7 @@ export function useRunProgressCopy({
 
   const progressPercentage = runHasNotBeenStarted
     ? 0
-    : ((currentStepNumber as number) / analysisCommands.length) * 100
+    : (currentStepNumber! / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
     if (runStatus == null) {

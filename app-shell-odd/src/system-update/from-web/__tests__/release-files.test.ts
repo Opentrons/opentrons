@@ -266,7 +266,7 @@ describe('downloadReleaseFiles', () => {
               expect(contents).toEqual('this is the contents of the system.zip')
             ),
           fs
-            .readFile(files.releaseNotes as string, { encoding: 'utf-8' })
+            .readFile(files.releaseNotes!, { encoding: 'utf-8' })
             .then(contents =>
               expect(contents).toEqual(
                 'this is the contents of the release notes'

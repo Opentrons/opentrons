@@ -5,7 +5,7 @@ import { deleteLabwareOffset } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
-import type { HostConfig, StoredLabwareOffset } from '@opentrons/api-client'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 export type UseDeleteLabwareOffsetMutationResult = UseMutationResult<
   StoredLabwareOffset,
@@ -26,7 +26,7 @@ export function useDeleteLabwareOffsetMutation(): UseDeleteLabwareOffsetMutation
 
   const mutation = useMutation<StoredLabwareOffset, unknown, string>(
     (id: string) =>
-      deleteLabwareOffset(host as HostConfig, id).then(response => {
+      deleteLabwareOffset(host!, id).then(response => {
         queryClient
           .invalidateQueries([host, 'labwareOffsets'])
           .catch((e: Error) => {

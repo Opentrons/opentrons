@@ -59,7 +59,7 @@ export const getWifiKeys: (state: State, robotName: string) => Types.WifiKey[] =
     (
       ids: string[] = [],
       keysById: Partial<{ [id: string]: Types.WifiKey }> = {}
-    ) => ids.map(id => keysById[id] as Types.WifiKey)
+    ) => ids.map(id => keysById[id]!)
   )
 
 // NOTE: not memoized because used in several rendered components

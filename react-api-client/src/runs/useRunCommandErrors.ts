@@ -5,11 +5,7 @@ import { getRunCommandErrors } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type {
-  GetCommandsParams,
-  HostConfig,
-  RunCommandErrors,
-} from '@opentrons/api-client'
+import type { GetCommandsParams, RunCommandErrors } from '@opentrons/api-client'
 
 const DEFAULT_PAGE_LENGTH = 30
 
@@ -32,11 +28,9 @@ export function useRunCommandErrors<TError = Error>(
   const query = useQuery<RunCommandErrors, TError>(
     [host, 'runs', runId, 'commandErrors', cursor, pageLength],
     () => {
-      return getRunCommandErrors(
-        host as HostConfig,
-        runId as string,
-        finalizedParams
-      ).then(response => response.data)
+      return getRunCommandErrors(host!, runId!, finalizedParams).then(
+        response => response.data
+      )
     },
     allOptions
   )

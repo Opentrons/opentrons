@@ -42,13 +42,8 @@ import {
 
 import type { TFunction } from 'i18next'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { LoadedPipette, Vector3D } from '@opentrons/shared-data'
+import type { Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type {
-  LPCWizardState,
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
@@ -65,21 +60,18 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
 
   const isOnDevice = useSelector(getIsOnDevice)
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[runId]?.lpc!
   )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
-  )?.initialPosition as VectorOffset
+  )?.initialPosition!
   const mostRecentVector = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
+  const pipette = useSelector(selectActivePipette(runId))!
 
   const [joggedPosition, setJoggedPosition] =
     useState<VectorOffset>(workingInitialOffset)

@@ -5,7 +5,7 @@ import { getImageFiles } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, ImageFilesDataResponse } from '@opentrons/api-client'
+import type { ImageFilesDataResponse } from '@opentrons/api-client'
 
 export function useImageFileQuery(
   runId: string,
@@ -19,8 +19,7 @@ export function useImageFileQuery(
 
   const query = useQuery<ImageFilesDataResponse>(
     [host, '/dataFiles/', runId, '/images'],
-    () =>
-      getImageFiles(host as HostConfig, runId).then(response => response.data),
+    () => getImageFiles(host!, runId).then(response => response.data),
     allOptions
   )
   return query
