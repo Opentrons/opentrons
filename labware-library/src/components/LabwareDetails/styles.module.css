@@ -81,6 +81,6 @@
   }
 
   .well_group_title {
-    margin-left: var(--spacing-5);
+    margin-left: calc(-1 * var(--spacing-5));
   }
 }

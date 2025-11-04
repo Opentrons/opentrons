@@ -61,7 +61,7 @@
   width: calc(100% + 2 * var(--spacing-2));
   padding: var(--spacing-1) var(--spacing-2);
   border: var(--bd-light);
-  margin-left: var(--spacing-2);
+  margin-left: calc(-1 * var(--spacing-2));
   color: var(--c-font-dark);
   font-size: var(--fs-body-1);
   line-height: var(--lh-title);
