@@ -21,11 +21,17 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
-dependencies = []
+dependencies = [
+    "psutil==6.0.0",
+    "systemd-python==234; sys_platform == 'linux'",
+]
 dynamic = ["version"]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/performance-metrics"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "src/performance_metrics/_version.py"
@@ -57,3 +63,17 @@ include = ['src/performance_metrics', 'LICENSE', 'tests', 'mypy.ini', 'pytest.in
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'performance_metrics/LICENSE'
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0,<9",
+    "mypy==1.8.0",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "black==22.3.0",
+    "pytest-asyncio>=1,<2",
+    "types-psutil==6.0.0.20240621",
+    "build~=1.2.0",
+]

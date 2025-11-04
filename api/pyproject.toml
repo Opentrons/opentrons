@@ -31,7 +31,7 @@ dependencies = [
     "zipp==3.21.0",
     "opentrons-shared-data",
     "opentrons-hardware[FLEX]",
-    "performance-metrics",
+    "performance_metrics",
 ]
 
 [project.optional-dependencies]
@@ -91,7 +91,7 @@ allow-direct-references = true
 [tool.uv.sources]
 "opentrons-shared-data" = { path = "../shared-data", editable = true }
 "opentrons-hardware" = { path = "../hardware", editable = true }
-"performance-metrics" = { path = "../performance-metrics", editable = true }
+"performance_metrics" = { path = "../performance-metrics", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 # Note: Packages using direct path references (@) are not listed here

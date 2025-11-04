@@ -42,11 +42,20 @@ format:
 
 .PHONY: setup
 setup:
+ifeq ($(USE_UV),true)
+	uv sync --frozen --extra dev
+	uv pip list
+else
 	$(pipenv) sync --dev
+endif
 
 .PHONY: teardown
 teardown:
+ifeq ($(USE_UV),true)
+	rm -rf .venv
+else
 	-$(pipenv) --rm
+endif
 
 .PHONY: clean
 clean:
