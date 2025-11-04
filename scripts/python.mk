@@ -51,6 +51,7 @@ ifeq ($(USE_UV),true)
 	fi
 	uv pip list
 else
+	# pipenv reads from Pipfile which has local paths, so it should handle dependencies correctly
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 endif

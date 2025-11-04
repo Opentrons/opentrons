@@ -38,7 +38,10 @@ if (Get-Command uv -ErrorAction SilentlyContinue) {
     }
     # For pip, we need to install all local dependencies explicitly
     # since pip doesn't understand tool.uv.sources
-    pip install -U -e ../performance-metrics -e ../shared-data -e ../api
+    # Use --no-build-isolation when installing api so it can see already-installed local packages
+    # during the build process (when hatch-dependency-coversion rewrites versions)
+    pip install -U -e ../performance-metrics -e ../shared-data
+    pip install -U --no-build-isolation -e ../api
     $PIP_CMD = "pip"
 }
 

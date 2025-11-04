@@ -15,10 +15,12 @@ RUN git clone --branch $ANALYSIS_REF --depth 1 https://github.com/Opentrons/open
 # Install packages from local directories
 # Note: Install performance-metrics first since api depends on it.
 # pip doesn't understand tool.uv.sources, so we need to install local dependencies explicitly.
+# Use --no-build-isolation when installing api so it can see already-installed local packages
+# during the build process (when hatch-dependency-coversion rewrites versions)
 RUN python -m pip install -U ./performance-metrics
 RUN python -m pip install -U ./shared-data
 RUN python -m pip install -U ./hardware[flex]
-RUN python -m pip install -U ./api
+RUN python -m pip install -U --no-build-isolation ./api
 RUN python -m pip install -U pandas==1.4.3
 
 # The default command to run when starting the container
