@@ -64,16 +64,6 @@ plot_type ?=
 .PHONY: all
 all: clean wheel
 
-.PHONY: setup
-setup:
-ifeq ($(USE_UV),true)
-	uv sync --frozen --extra dev
-	uv pip list
-else
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-endif
-
 .PHONY: setup-ot2
 setup-ot2:
 ifeq ($(USE_UV),true)
@@ -91,13 +81,6 @@ clean: docs-clean
 	$(clean_all_cmd)
 	$(clean_cache_cmd)
 
-.PHONY: teardown
-teardown:
-ifeq ($(USE_UV),true)
-	rm -rf .venv
-else
-	-$(pipenv) --rm
-endif
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

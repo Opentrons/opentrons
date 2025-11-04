@@ -33,23 +33,6 @@ wheel_file = $(call python_get_wheelname,abr-testing,$(project_rs_default),abr_t
 .PHONY: all
 all: clean wheel
 
-.PHONY: setup
-setup:
-ifeq ($(USE_UV),true)
-	uv sync --frozen --extra dev
-	uv pip list
-else
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-endif
-
-.PHONY: teardown
-teardown:
-ifeq ($(USE_UV),true)
-	rm -rf .venv
-else
-	-$(pipenv) --rm
-endif
 
 .PHONY: clean
 clean:

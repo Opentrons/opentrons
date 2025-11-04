@@ -89,12 +89,16 @@ build-backend = 'hatchling.build'
 allow-direct-references = true
 
 [tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
 "opentrons-shared-data" = { path = "../shared-data", editable = true }
 "opentrons-hardware" = { path = "../hardware", editable = true }
 "performance_metrics" = { path = "../performance-metrics", editable = true }
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-# The hook will rewrite ==0.0.0 placeholders to match the project version
+# For PyPI builds: The hook rewrites ==0.0.0 placeholders to the actual project version
+# in the package metadata. This ensures correct version pinning in published packages.
+# Note: This only affects PyPI builds; tool.uv.sources takes precedence for local dev.
 override-versions-of=['opentrons-shared-data', 'opentrons-hardware']
 
 [tool.hatch.build.hooks.vcs-tunable]

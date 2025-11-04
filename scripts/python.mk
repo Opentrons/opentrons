@@ -33,6 +33,30 @@ pipenv_opts += $(and $(CI),--clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
+# Common setup target - can be overridden by individual Makefiles if needed
+.PHONY: setup
+setup:
+ifeq ($(USE_UV),true)
+	@if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
+	uv pip list
+else
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip freeze
+endif
+
+# Common teardown target - can be overridden by individual Makefiles if needed
+.PHONY: teardown
+teardown:
+ifeq ($(USE_UV),true)
+	rm -rf .venv
+else
+	-$(pipenv) --rm
+endif
+
 poetry := poetry
 poetry_run := $(poetry) run
 
