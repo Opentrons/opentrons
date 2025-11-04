@@ -6,8 +6,8 @@ export type RobotDevicesRunTimeCommand = CaptureImageRunTimeCommand
 
 export type RobotDevicesCreateCommand = CaptureImageCreateCommand
 
-type Width = number
-type Height = number
+export type Width = number
+export type Height = number
 
 export interface CaptureImageParams {
   homeBefore?: boolean

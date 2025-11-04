@@ -95,6 +95,7 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCameraFormData,
   HydratedCommentFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
@@ -135,6 +136,7 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
+  captureImage: HydratedCameraFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -285,6 +287,9 @@ const stepFormHelperMap: {
   comment: {
     getErrors: composeErrors(messageRequired),
   },
+  captureImage: {
+    getErrors: composeErrors(),
+  },
 }
 
 export const getFormErrors = (
@@ -366,6 +371,12 @@ export const getFormErrors = (
     case 'comment':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCommentFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'captureImage':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCameraFormData,
         moduleEntities,
         labwareEntities
       )

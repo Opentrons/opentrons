@@ -1,8 +1,10 @@
 import type { IconName } from '@opentrons/components'
 import type {
+  Height,
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  Width,
 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
@@ -158,6 +160,7 @@ export type StepFieldName = string
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'absorbanceReader'
+  | 'captureImage'
   | 'comment'
   | 'heaterShaker'
   | 'magnet'
@@ -171,6 +174,7 @@ export type StepType =
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
+  captureImage: 'photo-camera',
   comment: 'comment',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',
@@ -367,6 +371,18 @@ export interface HydratedCommentFormData extends AnnotationFields {
   id: string
   stepType: 'comment'
   message: string
+}
+
+export interface HydratedCameraFormData extends AnnotationFields {
+  id: string
+  stepType: 'captureImage'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
 }
 
 export interface HydratedMixFormData extends AnnotationFields {
@@ -588,6 +604,7 @@ export type CountPerStepType = Partial<Record<StepType, number>>
 
 export type HydratedFormData =
   | HydratedAbsorbanceReaderFormData
+  | HydratedCameraFormData
   | HydratedCommentFormData
   | HydratedHeaterShakerFormData
   | HydratedMagnetFormData

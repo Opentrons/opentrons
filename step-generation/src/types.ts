@@ -604,11 +604,26 @@ export interface CommentArgs extends CommonArgs {
   message: string
 }
 
+type Width = number
+type Height = number
+
+export interface CaptureImageArgs extends CommonArgs {
+  commandCreatorFnName: 'captureImage'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
+}
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
   | AbsorbanceReaderLidArgs
   | ConsolidateArgs
+  | CaptureImageArgs
   | DistributeArgs
   | MixArgs
   | PauseArgs

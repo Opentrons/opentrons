@@ -152,7 +152,8 @@ export const getHoveredStepLabware = createSelector(
     // step types that have no labware that gets highlighted
     if (
       !(stepArgs.commandCreatorFnName === 'delay') &&
-      !(stepArgs.commandCreatorFnName === 'comment')
+      !(stepArgs.commandCreatorFnName === 'comment') &&
+      !(stepArgs.commandCreatorFnName === 'captureImage')
     ) {
       console.warn(
         //  @ts-expect-error: should only reach this warning when new step is added and

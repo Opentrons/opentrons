@@ -59,6 +59,7 @@ import {
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
+  CameraTools,
   CommentTools,
   HeaterShakerTools,
   MagnetTools,
@@ -103,6 +104,7 @@ const STEP_FORM_MAP: StepFormMap = {
   thermocycler: ThermocyclerTools,
   heaterShaker: HeaterShakerTools,
   comment: CommentTools,
+  captureImage: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
 }
 

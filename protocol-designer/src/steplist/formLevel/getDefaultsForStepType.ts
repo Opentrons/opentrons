@@ -156,6 +156,16 @@ export function getDefaultsForStepType(
         volume: null,
       }
 
+    case 'captureImage':
+      return {
+        home_before: false,
+        filename: null,
+        resolution: null,
+        zoom: null,
+        contrast: null,
+        brightness: null,
+        saturation: null,
+      }
     case 'comment':
       return {
         message: null,
