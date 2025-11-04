@@ -23,9 +23,9 @@ export function useRunStatus(
     ...options,
   })
 
-  const runStatus = data?.data?.status
+  const runStatus = data?.data?.status!
 
-  const actions = data?.data?.actions
+  const actions = data?.data?.actions!
   const firstPlay = actions?.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
@@ -35,10 +35,10 @@ export function useRunStatus(
   // todo(mm, 2024-06-24): This may not be necessary anymore. It looks like it was
   // working around prior (?) server behavior where a run's status would briefly flicker
   // to idle in between commands.
-  const adjustedRunStatus: RunStatus | null | undefined =
+  const adjustedRunStatus: RunStatus | null =
     runStatus === RUN_STATUS_IDLE && runStartTime != null
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  return adjustedRunStatus ?? null
+  return adjustedRunStatus
 }

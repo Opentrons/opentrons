@@ -52,7 +52,8 @@ export const BeforeBeginning = ({
 
   const buildTopText = (): string => {
     if (issuedCommandsType === 'fixit') {
-      return fixitCommandTypeUtils!.copyOverrides.beforeBeginningTopText
+      return fixitCommandTypeUtils?.copyOverrides
+        .beforeBeginningTopText!
     } else {
       return t('before_you_begin_do_you_want_to_blowout')
     }

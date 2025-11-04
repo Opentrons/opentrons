@@ -123,7 +123,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOutDispense?.location ?? undefined)
   const [speed, setSpeed] = useState<number | null>(
-    state.blowOutDispense!.flowRate ?? null
+    (state.blowOutDispense?.flowRate!) ?? null
   )
   const enableBlowOutDisplayItems = [
     {

@@ -60,11 +60,11 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
 
   const isOnDevice = useSelector(getIsOnDevice)
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId].lpc!
+    (state: State) => state.protocolRuns[runId]?.lpc!
   )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
-  )!.initialPosition!
+  )?.initialPosition!
   const mostRecentVector = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )

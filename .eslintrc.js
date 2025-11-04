@@ -54,6 +54,7 @@ module.exports = {
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
     'react/jsx-curly-brace-presence': 'warn',
+    '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
 
     // Enforce notification hooks
     'no-restricted-imports': [

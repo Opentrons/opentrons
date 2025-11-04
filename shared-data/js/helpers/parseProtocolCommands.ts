@@ -178,7 +178,7 @@ export function getTopLabwareInfo(
     }
   } else {
     return getTopLabwareInfo(
-      nestedCommand.result!.labwareId,
+      nestedCommand?.result?.labwareId!,
       loadLabwareCommands,
       currentStackHeight + 1
     )

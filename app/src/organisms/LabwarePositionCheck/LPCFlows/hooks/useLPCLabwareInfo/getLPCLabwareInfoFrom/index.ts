@@ -101,7 +101,7 @@ function getDisplayNameFromUri({
   uri,
   labwareDefs,
 }: GetLPCLabwareInfoForURI): string {
-  const matchedDef = labwareDefs?.find(def => getLabwareDefURI(def) === uri)
+  const matchedDef = labwareDefs?.find(def => getLabwareDefURI(def) === uri)!
 
   if (!!!matchedDef) {
     console.warn(
@@ -111,5 +111,5 @@ function getDisplayNameFromUri({
     )
   }
 
-  return getLabwareDisplayName(matchedDef!)
+  return getLabwareDisplayName(matchedDef)
 }
