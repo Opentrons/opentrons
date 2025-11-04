@@ -31,8 +31,8 @@ export function constructInvariantContextFromRunCommands(
         const amount = params.quantity
 
         if (
-          result.definition?.schemaVersion === 2 &&
-          result.definition != null
+          result.definition != null &&
+          result.definition.schemaVersion === 2
         ) {
           const def = result.definition
           const labwareDefURI = getLabwareDefURI(def)
