@@ -5,6 +5,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getLabwareDefIsStandard,
   getLabwareDefURI,
@@ -20,6 +21,7 @@ import { getSlotInLocationStack } from './utils'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
+  FlexStackerState,
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
@@ -283,6 +285,16 @@ export const absorbanceReaderStateGetter = (
 ): AbsorbanceReaderState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === ABSORBANCE_READER_TYPE
+    ? hardwareModule
+    : null
+}
+
+export const flexStackerStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): FlexStackerState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === FLEX_STACKER_MODULE_TYPE
     ? hardwareModule
     : null
 }

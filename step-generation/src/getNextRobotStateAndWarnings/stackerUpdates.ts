@@ -53,7 +53,7 @@ export const forFlexStackerCloseLatch = (
   const moduleState = _getStackerModuleState(robotState, moduleId)
 
   if (moduleState != null) {
-    moduleState.latchClose = false
+    moduleState.latchOpen = false
   }
 }
 
@@ -74,12 +74,6 @@ export const forFlexStackerSetStoredLabware = (
 
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
-    moduleState.storedLabwareDetails = {
-      adapterLabware,
-      lidLabware,
-      primaryLabware,
-      initialCount,
-      initialStoredLabware,
-    }
+    moduleState.storedLabwareDetails = params
   }
 }

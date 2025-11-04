@@ -2,6 +2,7 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
+  FlexStackerSetStoredLabwareParams,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   LabwareLocation,
@@ -106,7 +107,13 @@ export interface AbsorbanceReaderState {
 
 export interface FlexStackerState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  //  TODO: extend this state
+  latchOpen: boolean | null
+  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  shuttlePosition: 'home' | 'retrieved' | 'stored'
+  labwareInStacker: number | null
+  labwareInShuttle: number | null
+  labwareRetrieved: number | null
+  labwareStored: number | null
 }
 
 export type ModuleState =
