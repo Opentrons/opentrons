@@ -17,6 +17,7 @@ runs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update
+
           sudo apt-get install -y --no-install-recommends libsystemd-dev pkg-config
         fi
     - name: Set the OT_PYTHON env variable
@@ -40,10 +41,15 @@ runs:
         if command -v uv >/dev/null 2>&1; then
           echo "::notice::Using UV for dependency management"
           START_TIME=$(date +%s)
+          # Add linux extra if on Linux (for systemd-python in performance-metrics)
+          LINUX_EXTRA=""
+          if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
+            LINUX_EXTRA="--extra linux"
+          fi
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
-            cd ${{ inputs.project }} && uv sync --frozen --extra dev
+            cd ${{ inputs.project }} && uv sync --frozen --extra dev $LINUX_EXTRA
           elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
-            cd ${{ inputs.project }} && uv sync --extra dev
+            cd ${{ inputs.project }} && uv sync --extra dev $LINUX_EXTRA
             # Verify dev dependencies are installed
             uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
           else

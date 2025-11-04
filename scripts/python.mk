@@ -37,10 +37,11 @@ build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--ve
 .PHONY: setup
 setup:
 ifeq ($(USE_UV),true)
-	@if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev; \
+	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev $$(if echo "$$UNAME_S" | grep -qi linux; then echo "--extra linux"; fi); \
 	else \
-		uv sync --extra dev; \
+		uv sync --extra dev $$(if echo "$$UNAME_S" | grep -qi linux; then echo "--extra linux"; fi); \
 	fi
 	uv pip list
 else
