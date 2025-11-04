@@ -230,6 +230,13 @@ const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
 }
 const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
+  latchOpen: null,
+  storedLabwareDetails: null,
+  shuttlePosition: 'home',
+  labwareInStacker: null,
+  labwareInShuttle: null,
+  labwareRetrieved: null,
+  labwareStored: null,
 }
 
 const MODULE_INITIAL_STATES_MAP: Record<

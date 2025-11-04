@@ -105,7 +105,7 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
-export interface FlexStackerState {
+export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   latchOpen: boolean | null
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
@@ -123,7 +123,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
-  | FlexStackerState
+  | FlexStackerModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState

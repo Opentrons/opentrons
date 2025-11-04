@@ -4,6 +4,7 @@ import type {
   CutoutId,
   FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
+  FlexStackerSetStoredLabwareParams,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -71,7 +72,13 @@ export interface MagneticBlockState {
 
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  // TODO: extend this state
+  latchOpen: boolean | null
+  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  shuttlePosition: 'home' | 'retrieved' | 'stored'
+  labwareInStacker: number | null
+  labwareInShuttle: number | null
+  labwareRetrieved: number | null
+  labwareStored: number | null
 }
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {

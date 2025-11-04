@@ -7,7 +7,7 @@ import type {
   ModuleOnlyParams,
 } from '@opentrons/shared-data'
 import type {
-  FlexStackerState,
+  FlexStackerModuleState,
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
@@ -16,7 +16,7 @@ import type {
 const _getStackerModuleState = (
   robotState: RobotState,
   module: string
-): FlexStackerState | null => {
+): FlexStackerModuleState | null => {
   const moduleState = getModuleState(robotState, module)
 
   if (moduleState.type === FLEX_STACKER_MODULE_TYPE) {
