@@ -7,11 +7,7 @@ import type {
   LoadLidStackRunTimeCommand,
   RunTimeCommand,
 } from '../../protocol'
-import type { LabwareDefinition } from '../types'
-
-export interface LabwareDefinitionsByURI {
-  [labwareDefURI: string]: LabwareDefinition
-}
+import type { LabwareDefinition, LabwareDefinitionsByURI } from '../types'
 
 const defPair = (
   maybeDef?: LabwareDefinition
