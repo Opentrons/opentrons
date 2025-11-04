@@ -8,6 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
+import { useFeatureFlag } from '/app/redux/config'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryList } from '..'
@@ -17,6 +18,7 @@ import type { ImageGalleryListProps } from '..'
 vi.mock('/app/resources/dataFiles/useImageInfo')
 vi.mock('/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem')
 vi.mock('/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader')
+vi.mock('/app/redux/config')
 
 const render = (props: ImageGalleryListProps) => {
   return renderWithProviders(<ImageGalleryList {...props} />, {
@@ -71,6 +73,7 @@ describe('ImageGalleryList', () => {
     vi.mocked(ProtocolPlayPauseHeader).mockImplementation(() => (
       <div>MOCK_PROTOCOL_PLAY_PAUSE_HEADER</div>
     ))
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
   })
 
   it('renders ProtocolPlayPauseHeader with correct props', () => {
@@ -119,5 +122,12 @@ describe('ImageGalleryList', () => {
 
     const captureButton = screen.getByText('Image capture')
     await user.click(captureButton)
+  })
+
+  it('renders no images copy when no images are present', () => {
+    vi.mocked(useImageInfo).mockReturnValue({ items: [] } as any)
+    render(mockProps)
+
+    screen.getByText('No images available')
   })
 })

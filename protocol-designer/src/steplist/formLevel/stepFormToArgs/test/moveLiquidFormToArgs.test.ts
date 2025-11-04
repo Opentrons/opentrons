@@ -188,9 +188,9 @@ describe('move liquid step form -> command creator args', () => {
       sourceWells: [ASPIRATE_WELL],
       destLabware: 'destLabwareId',
       destWells: [DISPENSE_WELL],
-      tip_tracking: AUTOMATIC,
-      tips_selected: [],
-      tiprack_selected: null,
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     })
 
     // no form-specific fields should be passed along

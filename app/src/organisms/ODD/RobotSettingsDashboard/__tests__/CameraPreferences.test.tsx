@@ -35,7 +35,7 @@ describe('CameraPreferences', () => {
     expect(vi.mocked(CameraSettings)).toHaveBeenCalledWith(
       expect.objectContaining({
         sectionHeadingText:
-          'The camera provides live video during runs, allows automated or manual image capture, and records images automatically when errors occur.',
+          'The deck camera offers live video monitoring during protocol runs and supports image capture.',
       }),
       {}
     )

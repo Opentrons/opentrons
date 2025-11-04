@@ -2,6 +2,7 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
+  ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
@@ -17,6 +18,7 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   getNextTiprack,
@@ -28,8 +30,10 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTrashOrLabware,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -150,6 +154,9 @@ export const transfer: CommandCreator<TransferArgs> = (
     nozzles,
     sourceWells,
     tipRack,
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -435,6 +442,33 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -455,6 +489,9 @@ export const transfer: CommandCreator<TransferArgs> = (
         ]
       : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
@@ -552,20 +589,31 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
               ]
             : []
-
-          const tipCommands = changeTipNow
-            ? [
-                curryCommandCreator(replaceTip, {
-                  pipette,
-                  dropTipLocation:
-                    isReturnTip && fallBackTrashLikeId != null
-                      ? fallBackTrashLikeId
-                      : dropTipLocation,
-                  tipRack,
-                  ...(nozzles != null ? { nozzles } : {}),
-                }),
-              ]
-            : []
+          let tipCommands: CurriedCommandCreator[] = []
+          if (changeTipNow) {
+            const nextTip = targetTips?.shift()
+            tipCommands = [
+              curryCommandCreator(replaceTip, {
+                pipette,
+                dropTipLocation:
+                  isReturnTip && fallBackTrashLikeId != null
+                    ? fallBackTrashLikeId
+                    : dropTipLocation,
+                tipRack,
+                ...(nozzles != null ? { nozzles } : {}),
+                ...(tipTracking === MANUAL &&
+                nextTip != null &&
+                tiprackSelected != null
+                  ? {
+                      tipSelectionArgs: {
+                        tipRackId: tiprackSelected,
+                        tipWell: nextTip,
+                      },
+                    }
+                  : {}),
+              }),
+            ]
+          }
 
           const aspirateWellDepth =
             labwareEntities[sourceLabware]?.def.wells[sourceWell]?.depth ?? null

@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Chip,
   Divider,
@@ -17,13 +16,11 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
-import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
-
-const RUN_REFETCH_INTERVAL_MS = 5000
 
 export interface CameraCardProps {
   isFlex: boolean
@@ -45,14 +42,8 @@ export function CameraCard({
   }
 
   const runId = useCurrentRunId()
-  const run = useNotifyRunQuery(runId, {
-    refetchInterval: RUN_REFETCH_INTERVAL_MS,
-  })
 
-  // TODO (jh, 09-26-25): This disabled check will eventually be replaced with
-  //  "have settings been confirmed during run setup" logic.
   const doesRunExist = runId != null
-  const isRunIdle = run?.data?.data.status === RUN_STATUS_IDLE
 
   const cardOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -99,7 +90,7 @@ export function CameraCard({
         <OverflowBtn
           aria-label="overflow"
           onClick={handleOverflowClick}
-          disabled={doesRunExist && !isRunIdle}
+          disabled={doesRunExist}
         />
       </div>
       {showOverflowMenu && (

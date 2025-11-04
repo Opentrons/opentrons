@@ -20,6 +20,8 @@ import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useProtocolDetailsForRun,
   useRunHasStarted,
   useRunStatuses,
 } from '/app/resources/runs'
@@ -121,6 +123,12 @@ describe('ProtocolRunDetails', () => {
     )
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: { data: { createdAt: '123' } },
+    } as any)
+    vi.mocked(useProtocolDetailsForRun).mockReturnValue({
+      displayName: 'MOCK-PROTOCOL-NAME',
+    } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()

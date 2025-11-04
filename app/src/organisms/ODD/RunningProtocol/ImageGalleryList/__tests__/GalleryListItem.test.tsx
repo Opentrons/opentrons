@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useImageGalleryData } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
@@ -17,14 +17,13 @@ vi.mock(
     handleCameraPhotoModal: vi.fn(),
   })
 )
-vi.mock('/app/local-resources/dataFiles/hooks/useImageGalleryData')
+vi.mock('/app/local-resources/images/hooks/useImageGalleryData')
 vi.mock('/app/resources/dataFiles/useImage')
 
 const MOCK_IMG_PATH = '/path/to/test-image.jpg'
 const MOCK_TIMESTAMP = '2024-01-01 12:00:00'
 const MOCK_CMD_TEXT = 'Test step command'
 const MOCK_PREV_CMD_TEXT = 'Previous test command'
-const MOCK_STEP = '1/100'
 
 const mockProtocolAnalysis = {
   commands: [],
@@ -51,9 +50,9 @@ describe('GalleryListItem', () => {
   beforeEach(() => {
     vi.mocked(useImage).mockReturnValue(MOCK_IMG_PATH)
     vi.mocked(useImageGalleryData).mockReturnValue({
+      currentCommand: {} as any,
       currentCommandString: MOCK_CMD_TEXT,
       previousCommandString: MOCK_PREV_CMD_TEXT,
-      stubStepFraction: MOCK_STEP,
       isLoading: false,
     })
     vi.mocked(handleCameraPhotoModal).mockResolvedValue(undefined)
@@ -63,7 +62,6 @@ describe('GalleryListItem', () => {
     render()
 
     expect(screen.getByText(MOCK_TIMESTAMP)).toBeInTheDocument()
-    expect(screen.getByText(MOCK_CMD_TEXT)).toBeInTheDocument()
     expect(screen.getByText(MOCK_PREV_CMD_TEXT)).toBeInTheDocument()
     expect(screen.getByText('View image')).toBeInTheDocument()
   })
@@ -78,7 +76,7 @@ describe('GalleryListItem', () => {
     expect(handleCameraPhotoModal).toHaveBeenCalledWith({
       imagePath: MOCK_IMG_PATH,
       timestamp: MOCK_TIMESTAMP,
-      stepCountStr: MOCK_STEP,
+      stepCountStr: 'step ? / ?',
     })
   })
 })

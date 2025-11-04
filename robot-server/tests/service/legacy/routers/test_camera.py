@@ -33,6 +33,18 @@ def mock_camera_configuration_filepath(
 
 
 @pytest.fixture(autouse=True)
+def mock_camera_live_stream_compatible(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock the robot supports live stream logics."""
+    monkeypatch.setattr(
+        camera,
+        "robot_supports_livestream",
+        decoy.mock(func=camera.robot_supports_livestream),
+    )
+
+
+@pytest.fixture(autouse=True)
 def mock_camera_restart_live_stream(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -141,7 +153,7 @@ async def test_camera_stream_enable(api_client_camera_overrides, decoy: Decoy):
         }
 
 
-async def test_camera_stream_settings(api_client_camera_overrides, decoy: Decoy):
+async def test_camera_stream_settings_flex(api_client_camera_overrides, decoy: Decoy):
     """
     Test that we can GET and POST settings to the Opentrons Live Stream.
     """
@@ -156,6 +168,7 @@ async def test_camera_stream_settings(api_client_camera_overrides, decoy: Decoy)
         )
         conf.flush()
         conf.seek(0)
+        decoy.when(camera.robot_supports_livestream("OT-3 Standard")).then_return(True)
         decoy.when(camera.get_stream_configuration_filepath()).then_return(
             Path(conf.name)
         )
@@ -193,4 +206,40 @@ async def test_camera_stream_settings(api_client_camera_overrides, decoy: Decoy)
             "resolution": {"height": 10, "width": 20},
             "framerate": 10,
             "bitrate_k": 2000,
+        }
+
+
+async def test_camera_stream_settings_ot2(api_client_camera_overrides, decoy: Decoy):
+    """
+    Test that we can GET and POST settings to the Opentrons Live Stream.
+    """
+    with tempfile.NamedTemporaryFile() as conf:
+        conf.write(
+            b"BOOT_ID=BANANAS\n"
+            b"STATUS=OFF\n"
+            b"SOURCE=ABC\n"
+            b"RESOLUTION=10x20\n"
+            b"FRAMERATE=1\n"
+            b"BITRATE=2000K\n"
+        )
+        conf.flush()
+        conf.seek(0)
+        decoy.when(camera.robot_supports_livestream("OT-2 Standard")).then_return(False)
+        decoy.when(camera.get_stream_configuration_filepath()).then_return(
+            Path(conf.name)
+        )
+        post_settings = api_client_camera_overrides.post(
+            "/camera/stream/settings",
+            json={
+                "data": {
+                    "source": "cookie-monster",
+                    "resolution": {"height": 10, "width": 20},
+                    "framerate": 10,
+                    "bitrate_k": 2000,
+                }
+            },
+        )
+        assert post_settings.json() == {
+            "errorCode": "4000",
+            "message": "Opentrons Live Stream service is not available on OT-2.",
         }

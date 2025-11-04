@@ -244,7 +244,7 @@ class CommandExecutor:
             ):
                 # todo(chb, 2025-10-25): Eventually we will need to pass in client provided global settings here
                 image_data = await self._camera_provider.capture_image(
-                    ImageParameters()
+                    self._state_store.config.robot_type, ImageParameters()
                 )
                 commands = self._state_store.commands.get_all()
                 prev_command_id = commands[-2].id if len(commands) > 1 else ""

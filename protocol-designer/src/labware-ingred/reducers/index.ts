@@ -84,6 +84,21 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   },
   null
 )
+export type SelectedMultipleContainerIds = string[] | null | undefined
+
+const selectedMultipleContainerIds: Reducer<
+  SelectedMultipleContainerIds,
+  any
+> = (state, action): SelectedMultipleContainerIds => {
+  switch (action.type) {
+    case 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR':
+      return action.payload
+    case 'CLOSE_INGREDIENT_SELECTOR':
+    default:
+      return null
+  }
+}
+
 export type DrillDownLabwareId = string | null | undefined
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
@@ -280,7 +295,17 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
         (acc, wellName) => ({ ...acc, [wellName]: newWellContents }),
         {}
       )
-      return { ...state, [labwareId]: { ...state[labwareId], ...updatedWells } }
+
+      // Handle single labwareId or array of labwareIds
+      const labwareIds = Array.isArray(labwareId) ? labwareId : [labwareId]
+
+      return labwareIds.reduce<LocationsState>(
+        (acc, id) => ({
+          ...acc,
+          [id]: { ...acc[id], ...updatedWells },
+        }),
+        state
+      )
     },
     DUPLICATE_LABWARE: (
       state: LocationsState,
@@ -458,6 +483,7 @@ export interface RootState {
   zoomedInSlotInfo: ZoomedIntoSlotInfoState
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
+  selectedMultipleContainerIds: SelectedMultipleContainerIds
   drillDownLabwareId: DrillDownLabwareId
   containers: ContainersState
   selectedLiquidGroup: SelectedLiquidGroupState
@@ -472,6 +498,7 @@ export const rootReducer = combineReducers({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,
+  selectedMultipleContainerIds,
   drillDownLabwareId,
   containers,
   ingredients,

@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.6.2
+
+**Welcome to Protocol Designer 8.6.2!**
+
+This hotfix release improves bug tracking for future software updates.
+
 ## Opentrons Protocol Designer Changes in 8.6.1
 
 **Welcome to Protocol Designer 8.6.1!**
@@ -76,7 +82,6 @@ This hotfix release addresses several bugs.
 
 ### Bug Fixes
 
-- Crashes and protocol loss no longer occur when:
 - Crashes and protocol loss no longer occur when:
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.

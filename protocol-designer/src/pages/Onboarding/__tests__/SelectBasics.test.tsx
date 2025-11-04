@@ -9,7 +9,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { IncompatibleTipsModal } from '/protocol-designer/components/organisms'
-import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import { SelectBasics } from '../SelectBasics'
@@ -21,7 +20,6 @@ import type { WizardFormState } from '/protocol-designer/components/organisms'
 import type { WizardTileProps } from '../types'
 
 vi.mock('/protocol-designer/labware-defs/selectors')
-vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/components/organisms')
 vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('../utils')
@@ -81,7 +79,6 @@ describe('SelectBasics', () => {
       <div>mock incompatible tips modal</div>
     )
     vi.mocked(getLabwareDefsByURI).mockReturnValue({})
-    vi.mocked(getAllowAllTipracks).mockReturnValue(false)
     vi.mocked(getTiprackOptions).mockReturnValue({
       'opentrons/opentrons_flex_96_tiprack_200ul/1': '200µL Flex tipracks',
       'opentrons/opentrons_flex_96_tiprack_1000ul/1': '1000µL Flex tipracks',

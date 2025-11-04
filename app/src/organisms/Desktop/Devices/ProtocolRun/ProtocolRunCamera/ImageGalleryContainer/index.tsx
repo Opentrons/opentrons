@@ -2,20 +2,28 @@ import { useTranslation } from 'react-i18next'
 
 import { InfoScreen, ListTable, StyledText } from '@opentrons/components'
 
+import { GalleryContainerOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryContainerOverflowMenu'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { UseImageGalleryDataProps } from '/app/local-resources/dataFiles/hooks/useImageGalleryData'
+import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
+import type { GalleryContainerOverflowMenuProps } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryContainerOverflowMenu'
 
 export function ImageGalleryContainer({
   runId,
   robotType,
+  robotName,
+  runTimestamp,
+  protocolName,
 }: {
   runId: string
   robotType: RobotType
+  robotName: string
+  runTimestamp: string
+  protocolName: string
 }): JSX.Element {
   const { t } = useTranslation('run_details')
   const { items, protocolAnalysis, allRunDefs } = useImageInfo(runId)
@@ -24,7 +32,13 @@ export function ImageGalleryContainer({
 
   return (
     <div className={styles.gallery_container}>
-      <GalleryHeader imagesCount={imagesLength} />
+      <GalleryHeader
+        imagesCount={imagesLength}
+        runId={runId}
+        robotName={robotName}
+        runTimestamp={runTimestamp}
+        protocolName={protocolName}
+      />
       {imagesLength > 0 ? (
         <ListTable headers={[<GalleryTableHeaders key="1" />]}>
           <div className={styles.gallery_content_wrapper}>
@@ -35,7 +49,10 @@ export function ImageGalleryContainer({
                 protocolAnalysis={protocolAnalysis}
                 runId={runId}
                 robotType={robotType}
+                robotName={robotName}
+                runTimestamp={runTimestamp}
                 allRunDefs={allRunDefs}
+                protocolName={protocolName}
               />
             ))}
           </div>
@@ -47,7 +64,14 @@ export function ImageGalleryContainer({
   )
 }
 
-function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
+interface GalleryHeaderProps extends GalleryContainerOverflowMenuProps {
+  imagesCount: number
+}
+
+function GalleryHeader({
+  imagesCount,
+  ...rest
+}: GalleryHeaderProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
   return (
@@ -66,11 +90,18 @@ function GalleryHeader({ imagesCount }: { imagesCount: number }): JSX.Element {
       <StyledText desktopStyle="bodyDefaultRegular">
         {t('protocol_images_viewable')}
       </StyledText>
+      <GalleryContainerOverflowMenu {...rest} />
     </div>
   )
 }
 
-function GalleryContent(props: UseImageGalleryDataProps): JSX.Element {
+interface GalleryContentProps extends UseImageGalleryDataProps {
+  runTimestamp: string
+  robotName: string
+  protocolName: string
+}
+
+function GalleryContent(props: GalleryContentProps): JSX.Element {
   return (
     <div className={styles.gallery_content_container}>
       <GalleryItemCard {...props} />
