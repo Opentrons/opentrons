@@ -43,6 +43,17 @@ export default defineConfig(async (): Promise<UserConfig> => {
       outDir: 'dist',
       // sourcemap is only enabled in CI
       sourcemap: enableSentry ? 'hidden' : false,
+      rollupOptions: {
+        external: ['react/compiler-runtime'],
+        output: {
+          // Manually split out vendor chunks
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
+          },
+        },
+      },
     },
     plugins: [
       react({
@@ -51,6 +62,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
           // Use babel.config.js files
           configFile: true,
         },
+        jsxRuntime: 'automatic',
       }),
       cssModuleSideEffect(),
       {
@@ -130,6 +142,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       global: 'globalThis',
     },
     resolve: {
+      conditions: ['browser'],
       alias: {
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
