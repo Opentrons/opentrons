@@ -113,11 +113,14 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'success' || needs.deploy-server.result == 'success')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'success'
           workflow_name: 'OpentronsAI production deployment'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-failure:
     name: 'Notify Build Failure'
@@ -125,6 +128,8 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'failure' || needs.deploy-server.result == 'failure')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -146,6 +151,7 @@ jobs:
           status: 'failure'
           workflow_name: 'OpentronsAI production deployment'
           failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-cancelled:
     name: 'Notify Build Cancelled'
@@ -153,8 +159,11 @@ jobs:
     needs: [deploy-client, deploy-server]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.deploy-client.result == 'cancelled' || needs.deploy-server.result == 'cancelled')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'cancelled'
           workflow_name: 'OpentronsAI production deployment'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

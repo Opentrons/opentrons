@@ -41,7 +41,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
     state.pipette?.liquids.default.defaultTipracks.filter(tiprackUri => {
       // "opentrons/opentrons_flex_96_tiprack_20ul/1" -> "opentrons_flex_96_tiprack_20ul"
       const loadName = tiprackUri.split('/')[1]
-      const isBlockedTiprack = LABWAREV2_DO_NOT_LIST.includes(loadName)
+      const isBlockedTiprack = LABWAREV2_DO_NOT_LIST.has(loadName)
       return !isBlockedTiprack
     }) ?? []
 

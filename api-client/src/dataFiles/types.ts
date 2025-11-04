@@ -7,20 +7,46 @@
 
 export type FileData = File | string
 
+export type MimeType = 'text/csv' | 'image/jpeg'
+
 export interface CsvFileData {
   id: string
   createdAt: string
   name: string
 }
 
-export interface CsvFileDataResponse {
+export interface ImageFileData {
+  id: string
+  createdAt: string
+  cameraId: string
+  commandId?: string
+  prevCommandId?: string
+}
+
+export interface DataFileDataResponse {
   data: CsvFileData
 }
 
-export type UploadedCsvFileResponse = CsvFileDataResponse
+export type UploadedCsvFileResponse = DataFileDataResponse
 
 export interface UploadedCsvFilesResponse {
   data: CsvFileData[]
 }
 
-export type DownloadedCsvFileResponse = string
+export interface ImageFilesDataResponse {
+  data: ImageFileData[]
+}
+export interface RunDataFileMetadata {
+  id: string
+  stored: boolean
+  generated: boolean
+  mimeType: MimeType
+}
+
+export interface RunDataFileMetadataResponse {
+  data: RunDataFileMetadata[]
+  meta: { cursor: number; totalLength: number }
+}
+
+export type DownloadedDataFileResponse = Blob | string
+export type DownloadedImageFileResponse = Blob

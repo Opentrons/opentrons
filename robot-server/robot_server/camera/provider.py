@@ -5,7 +5,13 @@ from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
 )
-from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraSettings,
+    ImageParameters,
+    CameraError,
+)
+from opentrons_shared_data.robot.types import RobotType
+from opentrons.system import camera
 
 
 class CameraProviderWrapper:
@@ -27,7 +33,13 @@ class CameraProviderWrapper:
     def get_camera_settings(self) -> CameraSettings:
         """Get the Camera Enablement Settings from the Boolean Settings Table."""
         return CameraSettings(
-            camera_enabled=self._camera_settings_store.get_camera_enabled(),
-            live_stream_enabled=self._camera_settings_store.get_live_stream_enabled(),
-            error_recovery_enabled=self._camera_settings_store.get_error_recovery_camera_enabled(),
+            cameraEnabled=self._camera_settings_store.get_camera_enabled(),
+            liveStreamEnabled=self._camera_settings_store.get_live_stream_enabled(),
+            errorRecoveryEnabled=self._camera_settings_store.get_error_recovery_camera_enabled(),
         )
+
+    async def process_image_capture(
+        self, robot_type: RobotType, parameters: ImageParameters
+    ) -> bytes | CameraError:
+        """Process and image capture request for a Camera utilizing a given set of parameters. Returns None if an error occurred."""
+        return await camera.image_capture(robot_type=robot_type, parameters=parameters)

@@ -14,14 +14,16 @@ from opentrons.protocol_api import (
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
 )
-from typing import List, Dict, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
-# LABWARE TYPE
+###########################################
+#  GLOBAL VARIABLES - START
+###########################################
+
 LABWARE = "example_labware"  # change to desired labware
 
-# SLOTS
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
 SLOT_PROBING_TIPRACK = "D2"
 SLOT_LABWARE = "D1"
@@ -33,6 +35,10 @@ FILE_NAME = ""
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
+
+###########################################
+#  GLOBAL VARIABLES - END
+###########################################
 
 metadata = {"protocolName": "volume-validator", "author": "hovan.ngo@opentrons.com"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
@@ -47,20 +53,22 @@ def add_parameters(parameters: ParameterContext) -> None:
         choices=[
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_50",
     )
-    # Right Mount
+
     parameters.add_str(
         variable_name="right_mount",
         display_name="Right Mount",
         description="Liquid Pipette Type on Right Mount.",
         choices=[
-            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
-            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "1ch 50ul", "value": "flex_1channel_50"},
             {"display_name": "1ch 1000ul", "value": "flex_1channel_1000"},
+            {"display_name": "8ch 50ul", "value": "flex_8channel_50"},
+            {"display_name": "8ch 1000ul", "value": "flex_8channel_1000"},
             {"display_name": "None", "value": "none"},
         ],
         default="flex_1channel_1000",
@@ -71,7 +79,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Number of Regions",
         description="Number of depth intervals to test. ",
         default=3,
-        minimum=1,
+        minimum=2,
         maximum=20,
     )
 
@@ -94,6 +102,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         default="1000",
     )
 
+    parameters.add_bool(
+        variable_name="dial_indicator_used",
+        display_name="Dial Indicator Use",
+        description="Used to calibrate tip overlap.",
+        default=True,
+    )
+
 
 def _setup(
     ctx: ProtocolContext,
@@ -103,7 +118,7 @@ def _setup(
     Labware,
     Labware,
     List[float],
-    Labware,
+    Optional[Labware],
     int,
     str,
     List[Labware],
@@ -114,22 +129,25 @@ def _setup(
 ]:
     global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
 
-    labware_type = LABWARE
-
-    # LOAD LABWARE AND DIAL
-    labware = ctx.load_labware(labware_type, SLOT_LABWARE)
-    number_of_trials = int(2)
-    labware.load_empty(labware.wells())
-    src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
-    ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
-    src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
-    ctx.load_trash_bin("A3")
-    dial = ctx.load_labware("dial_indicator", SLOT_DIAL)
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
     liq_tip_size = ctx.params.liq_tip_size  # type: ignore[attr-defined]
     n_regions = ctx.params.n_regions  # type: ignore[attr-defined]
     number_of_trials = ctx.params.number_of_trials  # type: ignore[attr-defined]
+    dial_indicator_used = ctx.params.dial_indicator_used  # type: ignore[attr-defined]
+
+    labware_type = LABWARE
+    labware = ctx.load_labware(labware_type, SLOT_LABWARE)
+    labware.load_empty(labware.wells())
+
+    src = ctx.load_labware("nest_1_reservoir_290ml", SLOT_RESERVOIR)
+    ethanol_liq = ctx.define_liquid("Ethanol", display_color="#FFFFC5")
+    src["A1"].load_liquid(ethanol_liq, src["A1"].max_volume - 1000)
+    ctx.load_trash_bin("A3")
+
+    dial = (
+        ctx.load_labware("dial_indicator", SLOT_DIAL) if dial_indicator_used else None
+    )
 
     liquid_racks = [
         ctx.load_labware(f"opentrons_flex_96_tiprack_{liq_tip_size}ul", slot)
@@ -138,7 +156,6 @@ def _setup(
     probe_tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_50ul", SLOT_PROBING_TIPRACK
     )
-
     probe_pipette = ctx.load_instrument(left_mount, "left", tip_racks=[probe_tip_rack])
     liq_pipette = ctx.load_instrument(right_mount, "right", tip_racks=liquid_racks)
     if liq_pipette.channels == 8:
@@ -146,16 +163,9 @@ def _setup(
             style=SINGLE, start="H1", tip_racks=liquid_racks
         )
 
-    # Connect dial indicator and create data sheet
-
-    if not ctx.is_simulating() and DIAL_PORT is None:
+    if not ctx.is_simulating():
         from hardware_testing.data import create_file_name, create_run_id
-        from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-            Mitutoyo_Digimatic_Indicator,
-        )
 
-        DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
-        DIAL_PORT.connect()
         RUN_ID = create_run_id()
         FILE_NAME = create_file_name(metadata["protocolName"], RUN_ID, labware_type)
         _write_line_to_csv(ctx, [RUN_ID])
@@ -169,29 +179,30 @@ def _setup(
         ]
         _write_line_to_csv(ctx, heading_for_csv)
 
-    depth = labware["A1"].depth
+        if dial and DIAL_PORT is None:
+            from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
+                Mitutoyo_Digimatic_Indicator,
+            )
 
-    # Calculate region heights based on n_regions
-    region_heights: List[float]
+            DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
+            DIAL_PORT.connect()
+
+    # Calculate region heights
+    max_vol = labware["A1"].max_volume
+    max_height = extract_float(labware["A1"].height_from_volume(max_vol))
     if n_regions == 3:
-        region_heights = [3, depth / 2, depth * 9 / 10]
+        # special case: 3.0mm, 50%, 100%
+        region_heights = [3.0, max_height * 0.5, max_height]
     else:
-        region_heights = [(depth * (i + 1) / n_regions) for i in range(n_regions)]
+        segment_vol = max_vol / float(n_regions)
+        region_heights = [
+            extract_float(labware["A1"].height_from_volume(segment_vol * (i + 1)))
+            for i in range(n_regions)
+        ]
 
-    if region_heights:
-        max_vol = labware["A1"].max_volume
-        max_height = extract_float(labware["A1"].height_from_volume(max_vol))
-        for i, h in enumerate(region_heights):
-            if h > max_height:
-                region_heights[
-                    i
-                ] = max_height  # must be lower than height at max volume
-            if h < 1.5:
-                region_heights[i] = 1.5  # must be 1.5mm or higher
-
-    expected_heights = []
-    for h in region_heights:
-        expected_heights.extend([h] * number_of_trials)
+    expected_heights: List = []
+    for height in region_heights:
+        expected_heights.extend([height] * number_of_trials)
 
     return (
         liq_pipette,
@@ -285,72 +296,60 @@ def _get_height_of_liquid_in_well(
 
 def aspirate_dispense_measure(
     ctx: ProtocolContext,
-    volumes_dict: Dict,
+    volumes_dict: dict,
     labware: Labware,
     src: Labware,
-    dial: Labware,
+    dial: Optional[Labware],
     probe_pipette: InstrumentContext,
     liq_pipette: InstrumentContext,
-    expected_heights: List[float],
-    liquid_racks: List[Labware],
+    expected_heights: list[float],
+    liquid_racks: list[Labware],
     right_mount: InstrumentContext,
     liq_tip_size: str,
-) -> List[float]:
-    """Aspirate from source, dispense into labware, measure height, record."""
-    all_corrected_heights: List[float] = []
-    i = 0
-    num_of_individual_wells = len(volumes_dict.keys())
+) -> list[float]:
+    """Aspirate from source, dispense into labware, measure height, and record results."""
+    all_corrected_heights: list[float] = []
+    num_wells = len(volumes_dict)
+    tip_z_error = 0.0
+    meniscus_z = -0.5
+    dispense_offset = 10
 
-    for well, expected_vol in volumes_dict.items():
-        expected_vol = expected_vol[0]
+    for trial, (well, vol_list) in enumerate(volumes_dict.items()):
+        expected_vol = float(vol_list[0])
         pick_up_tips(probe_pipette, liq_pipette)
 
-        if i != 0 and i % num_of_individual_wells == 0:
-            if not ctx.is_simulating():
-                ctx.pause("Dump the labware and resume.")
-                _get_height_of_liquid_in_well(
-                    liq_pipette, src["A1"], ctx.is_simulating()
-                )
-            else:
-                break
+        no_more_wells = trial != 0 and trial % num_wells == 0
+        if no_more_wells:
+            ctx.pause("Dump the labware and replace it.")
+            _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
 
-        tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
-        dispense_vol = float(expected_vol / liq_pipette.active_channels)
-        expected_height = expected_heights[i]
+        if dial:
+            tip_z_error = _get_tip_z_error(ctx, probe_pipette, dial)
 
-        if liq_tip_size == "1000":
-            liq_pipette.flow_rate.blow_out = 200
-        else:
-            liq_pipette.flow_rate.blow_out = 50
-
-        meniscus_z = -0.5
-        dispense_offset = 10  # type: ignore [attr-defined]
-        ethanol = ctx.get_liquid_class(name="ethanol_80")
+        dispense_vol = expected_vol / liq_pipette.active_channels
+        expected_height = expected_heights[trial]
 
         lm = "liquid-meniscus"
+        liq_pipette.flow_rate.blow_out = 200 if liq_tip_size == "1000" else 50
+        ethanol = ctx.get_liquid_class(name="ethanol_80")
         for rack in liquid_racks:
             ethanol_props = ethanol.get_for(right_mount, rack)
-            # Aspirate settings
             ethanol_props.aspirate.aspirate_position.position_reference = lm  # type: ignore[assignment]
-            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z  # type: ignore[assignment]
-            # Dispense settings
-            ethanol_props.dispense.dispense_position.offset.z = dispense_offset  # type: ignore [attr-defined]
-            ethanol_props.dispense.dispense_position.position_reference = (
-                PositionReference.LIQUID_MENISCUS
-            )  # type: ignore [attr-defined]
-            # Flow rates and speeds (example values, can be parameterized)
-            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)  # type: ignore [attr-defined]
-            ethanol_props.dispense.submerge.speed = 50  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.speed = 50  # type: ignore [attr-defined]
-            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(3.5)  # type: ignore [attr-defined]
+            ethanol_props.aspirate.aspirate_position.offset.z = meniscus_z
+            ethanol_props.dispense.dispense_position.position_reference = lm  # type: ignore[assignment]
+            ethanol_props.dispense.dispense_position.offset.z = dispense_offset
+            ethanol_props.dispense.flow_rate_by_volume.set_for_all_volumes(50)
+            ethanol_props.dispense.submerge.speed = 50
+            ethanol_props.dispense.retract.speed = 50
+            ethanol_props.dispense.push_out_by_volume.set_for_all_volumes(5)
             ethanol_props.dispense.retract.blowout.flow_rate = (
                 liq_pipette.flow_rate.blow_out
-            )  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.blowout.enabled = False  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.end_position.position_reference = (  # type: ignore [attr-defined]
+            )
+            ethanol_props.dispense.retract.blowout.enabled = False
+            ethanol_props.dispense.retract.end_position.position_reference = (
                 PositionReference.WELL_TOP
-            )  # type: ignore [attr-defined]
-            ethanol_props.dispense.retract.end_position.offset.z = 10  # type: ignore [attr-defined]
+            )
+            ethanol_props.dispense.retract.end_position.offset.z = 10
 
         liq_pipette.transfer_with_liquid_class(
             liquid_class=ethanol,
@@ -360,9 +359,9 @@ def aspirate_dispense_measure(
             new_tip="never",
             return_tip=False,
         )
-        if (
-            expected_heights[i] <= labware["A1"].depth - 4
-        ):  # checks if theres clearance for touch tip
+
+        # Touch tip if clearance allows
+        if expected_height <= labware["A1"].depth - 4:
             liq_pipette.touch_tip()
 
         height = _get_height_of_liquid_in_well(
@@ -370,17 +369,13 @@ def aspirate_dispense_measure(
         )
         corrected_height = height + tip_z_error
         all_corrected_heights.append(corrected_height)
+
         acc = (corrected_height - expected_height) / expected_height * 100
-        line_for_csv = [
-            well,
-            expected_vol,
-            corrected_height,
-            expected_height,
-            acc,
-        ]
-        i += 1
+        line_for_csv = [well, expected_vol, corrected_height, expected_height, acc]
         _write_line_to_csv(ctx, line_for_csv)
+
         drop_tips(probe_pipette, liq_pipette)
+
     return all_corrected_heights
 
 
@@ -423,17 +418,21 @@ def run(ctx: ProtocolContext) -> None:
         region_heights,
     ) = _setup(ctx)
 
-    wells = [str(w).split(" ")[0] for w in labware.wells()]
+    wells = [str(well).split(" ")[0] for well in labware.wells()]
     volumes: dict[str, List[float | SimulatedProbeResult]] = {}
+
+    # mapping expected heights to wells
     for i, height in enumerate(expected_heights):
         well = wells[i % len(wells)]
         volume = labware["A1"].volume_from_height(height)
         volumes.setdefault(well, []).append(volume)
 
-    _store_dial_baseline(ctx, probe_pipette, dial)
+    if dial is not None:
+        _store_dial_baseline(ctx, probe_pipette, dial)
     pick_up_tips(probe_pipette, liq_pipette)
     _get_height_of_liquid_in_well(liq_pipette, src["A1"], ctx.is_simulating())
     liq_pipette.blow_out()
+    liq_pipette.drop_tip()
 
     all_corrected_heights = aspirate_dispense_measure(
         ctx,
@@ -470,9 +469,20 @@ def run(ctx: ProtocolContext) -> None:
 
         from hardware_testing.data import append_data_to_file
 
+        region_headers = []
+        for i in range(n_regions):
+            for k in range(region_len):
+                region_headers.append(f"region{i+1}_trial{k+1}")
+            region_headers.append(f"region{i+1}_expected")
+            region_headers.append(f"region{i+1}_avg_error")
+
+        header = ["labware_type"] + region_headers
+        header_str = ",".join(header) + "\n"
         line = [labware_type] + region_results
         line_str = ",".join(line) + "\n"
+
+        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, header_str)
         append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
-        ctx.pause(f"Results:\n{line_str}")
+        ctx.pause(f"{header_str}\n{line_str}")
 
     drop_tips(probe_pipette, liq_pipette)

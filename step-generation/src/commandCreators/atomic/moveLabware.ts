@@ -4,6 +4,10 @@ import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getIsLid,
   HEATERSHAKER_MODULE_TYPE,
+  locationIsOnAddressableArea,
+  locationIsOnDeck,
+  locationIsOnLabware,
+  locationIsOnModule,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -75,9 +79,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const warnings: CommandCreatorWarning[] = []
 
   const newLocationInWasteChute =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'addressableAreaName' in newLocation &&
+    locationIsOnAddressableArea(newLocation) &&
     newLocation.addressableAreaName === 'gripperWasteChute'
 
   if (!labwareId || !prevRobotState.labware[labwareId]) {
@@ -174,18 +176,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     }
   }
   const destModuleId =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'moduleId' in newLocation
+    locationIsOnModule(newLocation) && 'moduleId' in newLocation
       ? newLocation.moduleId
       : null
 
-  const destAdapterId =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'labwareId' in newLocation
-      ? newLocation.labwareId
-      : null
+  const destAdapterId = locationIsOnLabware(newLocation)
+    ? newLocation.labwareId
+    : null
 
   const destModuleOrSlotUnderAdapterId =
     destAdapterId != null
@@ -231,8 +228,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   if (
     isLabwareIdATiprackLid &&
     newLocation != null &&
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
+    locationIsOnDeck(newLocation) &&
     ('slotName' in newLocation ||
       ('addressableAreaName' in newLocation &&
         FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
@@ -263,6 +259,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     location = OFF_DECK
   } else if (newLocation === 'systemLocation') {
     location = 'system_location' // NOTE: i think this is for LPC but shouldn't be used in PD
+  } else if (newLocation === 'wasteChuteLocation') {
+    location = OFF_DECK // NOTE: this should never happen; labware should only be here if moved
+    // to the waste chute
   } else if ('labwareId' in newLocation) {
     location = labwareEntities[newLocation.labwareId].pythonName
     const newLocationStack = prevRobotState.labware[newLocation.labwareId].stack

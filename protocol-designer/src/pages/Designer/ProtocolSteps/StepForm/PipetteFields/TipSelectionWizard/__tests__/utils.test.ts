@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getIsTiprack, getPositionFromSlotId } from '@opentrons/shared-data'
+import {
+  ALL,
+  getIsTiprack,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getIsTiprackSelectable, getViewboxFromSelectedLabware } from '../utils'
 
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 vi.mock(import('@opentrons/step-generation'), async importOriginal => {
@@ -30,9 +35,14 @@ const activeDeckSetup = {
     },
   },
 } as any
+const mockTiprackId = 'mockTiprackId'
+const MOCK_ADAPTER_ID = 'mockAdapterId'
+const MOCK_ADAPTER_URI = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 const labware = {
+  id: mockTiprackId,
   labwareDefURI: MOCK_TIPRACK_URI,
+  stack: ['A1'],
 } as LabwareOnDeck
 
 describe('getIsTiprackSelectable', () => {
@@ -46,21 +56,135 @@ describe('getIsTiprackSelectable', () => {
   })
 
   it('returns true when the labware is a matching tiprack and in a pipettable slot', () => {
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(true)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(true)
   })
 
   it('returns false when the labware is not a matching tiprack', () => {
-    expect(getIsTiprackSelectable(labware, MOCK_NON_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_NON_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(false)
   })
 
   it('returns false when the labware is matching but in a non-pipettable slot', () => {
     vi.mocked(getSlotInLocationStack).mockReturnValue('A4')
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(false)
   })
 
   it('returns false when the labware not a tiprack', () => {
     vi.mocked(getIsTiprack).mockReturnValue(false)
-    expect(getIsTiprackSelectable(labware, MOCK_TIPRACK_URI)).toBe(false)
+    expect(
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 1 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {},
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(false)
+  })
+
+  it('returns true if 96-channel is configured with ALL nozzles and adapter in stack', () => {
+    expect(
+      getIsTiprackSelectable({
+        labware: {
+          ...labware,
+          stack: [MOCK_ADAPTER_ID],
+        },
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 96 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {
+          [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
+        },
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(true)
+  })
+
+  it('returns false if 96-channel is configured with ALL nozzles and no adapter in stack', () => {
+    expect(
+      getIsTiprackSelectable({
+        labware: {
+          ...labware,
+          stack: [],
+        },
+        formTiprackUri: MOCK_TIPRACK_URI,
+        pipetteSpecs: { channels: 96 } as PipetteV2Specs,
+        nozzles: ALL,
+        labwareEntities: {
+          [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
+        },
+        validTiprackIds: [mockTiprackId],
+      })
+    ).toBe(false)
+  })
+
+  describe('1- or 8-channel adapter compatibility', () => {
+    const channels = [1, 8]
+
+    channels.forEach(channels => {
+      it('returns false if 1- or 8-channel with adapter in stack', () => {
+        expect(
+          getIsTiprackSelectable({
+            labware: {
+              ...labware,
+              stack: [MOCK_ADAPTER_ID],
+            },
+            formTiprackUri: MOCK_TIPRACK_URI,
+            pipetteSpecs: { channels } as PipetteV2Specs,
+            nozzles: ALL,
+            labwareEntities: {
+              [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
+            },
+            validTiprackIds: [mockTiprackId],
+          })
+        ).toBe(false)
+      })
+
+      it('returns true if 1- or 8-channel with no adapter in stack', () => {
+        expect(
+          getIsTiprackSelectable({
+            labware: {
+              ...labware,
+              stack: [],
+            },
+            formTiprackUri: MOCK_TIPRACK_URI,
+            pipetteSpecs: { channels } as PipetteV2Specs,
+            nozzles: ALL,
+            labwareEntities: {
+              [MOCK_ADAPTER_ID]: { labwareDefURI: MOCK_ADAPTER_URI } as any,
+            },
+            validTiprackIds: [mockTiprackId],
+          })
+        ).toBe(true)
+      })
+    })
   })
 })
 

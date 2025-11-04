@@ -21,7 +21,7 @@ Python protocols generally follow the same basic structure:
 
     - Locations of [modules](https://docs.opentrons.com/v2/new_modules.html), [labware](https://docs.opentrons.com/v2/new_labware.html), and [deck fixtures](https://docs.opentrons.com/v2/deck_slots.html#deck-configuration).
 
-    - [Liquid](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-labware) types and locations (optional).
+    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-labware) (optional).
 
     - Commands the system will physically execute (e.g., [simple](https://docs.opentrons.com/v2/new_atomic_commands.html) or [complex](https://docs.opentrons.com/v2/new_complex_commands.html) liquid
       handling commands, [module](https://docs.opentrons.com/v2/new_modules.html) commands, or [movement](https://docs.opentrons.com/v2/robot_position.html) commands).
@@ -55,7 +55,7 @@ def run(protocol):
 
 If you're running a protocol via the Opentrons App or the touchscreen, you don't need to call the `run()` function, because the robot software does it for you.
 
-However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called *cells*), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation chapter](../advanced-operation.md).
+However, one of the advanced features of the Python API is to control a robot outside of the usual flow for setting up and running a protocol. Opentrons Flex runs a Jupyter Notebook server, which can execute discrete blocks of code (called *cells*), rather than a complete protocol file. When organizing your code into cells, you can define a `run()` function (and then call it) or run commands without one. It's also possible to execute complete protocols in a Jupyter terminal session or when connected to Flex via SSH. For more information, see the [Advanced Operation chapter](../advanced-operation/index.md).
 
 ## Python-exclusive features
 
@@ -79,6 +79,16 @@ Starting in API version 2.18, you can define user-customizable variables in your
 
 Runtime parameters can customize Boolean, numerical, and string values in your protocol. And starting in API version 2.20, you can require a CSV file of data to be parsed and used in the protocol. See the [API documentation on runtime parameters](https://docs.opentrons.com/v2/runtime_parameters.html) for information on writing them into protocols, and see the [Runtime Parameters section](../touchscreen/protocol-setup.md#runtime-parameters) of the Touchscreen chapter for information on changing parameter values during run setup.
 
+### Robot motor control 
+
+Starting in API version 2.22, you can move individual robot motors like the gantry, pipette plunger, and gripper jaws with [robot motor control commands](https://docs.opentrons.com/v2/advanced_control/motor_control.html#motor-control). Use helper and movement commands to calculate and move robot axes to precise positions on the Flex deck, and gripper commands to open or close the Flex Gripper jaws. 
+
+Unlike other protocol commands, robot motor control commands execute movements independent of labware and hardware positions on the Flex. This lets you complete advanced tasks, like using 3D-printed labware in your protocols, moving the Flex's z-axis carriage without a pipette attached, or simultaneously pipetting and holding labware with the Flex Gripper. 
+
+###  Liquid level detection 
+
+Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
+
 ### Non-blocking commands
 
 Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
@@ -87,4 +97,4 @@ Some module commands that take a long time to complete (such as heating from amb
 
 Not only does the Python API support some features not included in Protocol Designer, but every Python protocol *is a Python script*, which means that it can perform any computation that relies on the Python standard libraries or the suite of libraries included in the Flex system software.
 
-You can even install additional Python packages on Flex. [Connect to your Flex via SSH][command-line-operation-over-ssh] and install the package with `pip`. To avoid analysis errors in the Opentrons App, install the packages on your computer as well. In the Opentrons App settings, go to **Advanced** and click **Add override path** in the Override Path to Python section. Choose the copy of `python` on your system that has access to the packages.
+You can even install additional Python packages on Flex. [Connect to your Flex via SSH](../advanced-operation/command-line.md) and install the package with `pip`. To avoid analysis errors in the Opentrons App, install the packages on your computer as well. In the Opentrons App settings, go to **Advanced** and click **Add override path** in the Override Path to Python section. Choose the copy of `python` on your system that has access to the packages.

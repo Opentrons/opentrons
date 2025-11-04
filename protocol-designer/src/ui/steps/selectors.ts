@@ -4,7 +4,6 @@ import { createSelector } from 'reselect'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { getLabwareOnModule } from '../modules/utils'
 import {
   initialSelectedItemState,
@@ -33,12 +32,7 @@ import type {
 import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 import type { Selection } from './actions/types'
-import type {
-  CollapsedStepsState,
-  HoverableItem,
-  SelectableItem,
-  StepsState,
-} from './reducers'
+import type { HoverableItem, SelectableItem, StepsState } from './reducers'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // ======= Selectors ===============================================
@@ -192,39 +186,7 @@ export const getActiveItem: Selector<HoverableItem | null> = createSelector(
     }
   }
 )
-// TODO: BC 2018-12-17 refactor as react state
-export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
-  rootSelector,
-  (state: StepsState) => state.collapsedSteps
-)
-interface StepTitleInfo {
-  stepName: string
-  stepType: StepType
-}
 
-const _stepToTitleInfo = (stepForm: FormData): StepTitleInfo => ({
-  stepName: stepForm.stepName,
-  stepType: stepForm.stepType,
-})
-
-export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> =
-  createSelector(
-    stepFormSelectors.getUnsavedForm,
-    stepFormSelectors.getSavedStepForms,
-    getSelectedStepId,
-    getSelectedTerminalItemId,
-    (unsavedForm, savedStepForms, selectedStepId, terminalItemId) => {
-      if (unsavedForm != null && terminalItemId === PRESAVED_STEP_ID) {
-        return _stepToTitleInfo(unsavedForm)
-      }
-
-      if (selectedStepId == null) {
-        return null
-      }
-
-      return _stepToTitleInfo(savedStepForms[selectedStepId])
-    }
-  )
 export const getWellSelectionLabwareKey: Selector<string | null> =
   createSelector(
     rootSelector,

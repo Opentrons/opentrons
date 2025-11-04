@@ -8,6 +8,8 @@ import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
+import type { CSSProperties } from 'react'
+import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
@@ -16,6 +18,14 @@ interface LabwareOnDeckProps {
   y: number
   highlight?: boolean
   showHighlightedWells?: boolean
+  handleClickWell?: (wellName: string) => void
+  tipStatusByWellName?: Record<string, TipType>
+  onMouseEnterWell?: (e: WellMouseEvent) => void
+  onMouseLeaveWell?: (e: WellMouseEvent) => void
+  selectedTipsByIndex?: Record<string, number>
+  fill?: CSSProperties['fill']
+  borderStroke?: CSSProperties['stroke']
+  ignoreMissingTips?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -25,6 +35,14 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     y,
     highlight = false,
     showHighlightedWells = true,
+    tipStatusByWellName,
+    handleClickWell,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+    selectedTipsByIndex,
+    fill,
+    borderStroke,
+    ignoreMissingTips = false,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -45,7 +63,6 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
-
   return (
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
@@ -55,9 +72,16 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
           wellContents,
           liquidDisplayColors
         )}
+        handleClickWell={handleClickWell}
         {...(showHighlightedWells ? { highlightedWells } : {})}
-        missingTips={missingTips}
+        {...(ignoreMissingTips ? {} : { missingTips })}
         highlight={highlight}
+        tipStatusByWellName={tipStatusByWellName}
+        onMouseEnterWell={onMouseEnterWell}
+        onMouseLeaveWell={onMouseLeaveWell}
+        selectedTipsByIndex={selectedTipsByIndex}
+        fill={fill}
+        labwareStroke={borderStroke}
       />
     </g>
   )

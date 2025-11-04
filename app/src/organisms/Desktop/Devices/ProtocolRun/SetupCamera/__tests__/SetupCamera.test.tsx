@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react'
+import { useNavigate } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -6,18 +7,25 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useFeatureFlag } from '/app/redux/config'
+import { getCameraUsageState } from '/app/redux/protocol-runs'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { Mock } from 'vitest'
 import type { SetupCameraProps } from '..'
 
+vi.mock('react-router-dom')
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 )
 vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
+vi.mock('/app/resources/health/useIsImageStorageLow')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/protocol-runs')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -26,22 +34,17 @@ const render = (props: SetupCameraProps) => {
 }
 
 describe('SetupCamera', () => {
-  let mockSettings: UseStubCameraUsageSettingsResult
   let mockProps: SetupCameraProps
+  let mockNavigate: Mock
 
   beforeEach(() => {
-    mockSettings = {
-      toggleCameraEnabled: vi.fn(),
-      isCameraEnabled: true,
-      toggleLiveVideoEnabled: vi.fn(),
-      isLiveVideoEnabled: true,
-      toggleRecoveryCaptureEnabled: vi.fn(),
-      isRecoveryCaptureEnabled: true,
-    }
+    mockNavigate = vi.fn()
     mockProps = {
-      settings: mockSettings,
+      isCameraRequired: true,
+      runId: 'MOCK-RUN-ID',
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
+      robotName: 'test-robot',
     }
     vi.mocked(SetupRunCameraControls).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_CONTROLS</div>
@@ -49,6 +52,20 @@ describe('SetupCamera', () => {
     vi.mocked(SetupRunCameraUsage).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_USAGE</div>
     )
+    vi.mocked(useRobotStorageInfo).mockReturnValue({
+      isImageStorageLow: true,
+      isSystemStorageLow: true,
+      imageDirSizeMb: 1000,
+      robotDiskAvailableMb: 1000,
+      isLoading: false,
+    })
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: true,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
   })
 
   it('renders camera status section', () => {
@@ -67,23 +84,15 @@ describe('SetupCamera', () => {
   })
 
   it('renders disabled status when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      settings: { ...mockSettings, isCameraEnabled: false },
-    }
-    render(propsWithCameraDisabled)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
 
-    screen.getByText('Disabled')
-  })
-
-  it('calls toggleCameraEnabled when toggle is clicked', async () => {
-    const user = userEvent.setup()
     render(mockProps)
 
-    const toggleButton = screen.getByRole('switch')
-    await user.click(toggleButton)
-
-    expect(mockSettings.toggleCameraEnabled).toHaveBeenCalledTimes(1)
+    screen.getByText('Disabled')
   })
 
   it('does not render camera required notification when camera is enabled', () => {
@@ -93,32 +102,26 @@ describe('SetupCamera', () => {
   })
 
   it('renders camera required notification when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      settings: { ...mockSettings, isCameraEnabled: false },
-    }
-    render(propsWithCameraDisabled)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     screen.getByText('Camera is required.')
     screen.getByText('Enable the camera to run this protocol.')
   })
 
-  it('renders SetupRunCameraUsage when camera is enabled', () => {
-    render(mockProps)
-
-    screen.getByText('MOCK_SETUP_RUN_CAMERA_USAGE')
-    expect(vi.mocked(SetupRunCameraUsage)).toHaveBeenCalledWith(
-      { settings: mockSettings },
-      {}
-    )
-  })
-
   it('does not render SetupRunCameraUsage when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      settings: { ...mockSettings, isCameraEnabled: false },
-    }
-    render(propsWithCameraDisabled)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_USAGE')
@@ -132,11 +135,13 @@ describe('SetupCamera', () => {
   })
 
   it('does not render SetupRunCameraControls when camera is disabled', () => {
-    const propsWithCameraDisabled = {
-      ...mockProps,
-      settings: { ...mockSettings, isCameraEnabled: false },
-    }
-    render(propsWithCameraDisabled)
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
+
+    render(mockProps)
 
     expect(
       screen.queryByText('MOCK_SETUP_RUN_CAMERA_CONTROLS')
@@ -175,5 +180,21 @@ describe('SetupCamera', () => {
     await user.click(confirmButton)
 
     expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders the image storage almost full notification if storage is almost full', () => {
+    render(mockProps)
+
+    screen.getByText('Image storage almost full.')
+    screen.getByText(
+      'The run may fail if storage space is not freed up by clearing images from a previous run record.'
+    )
+
+    const link = screen.getByText('View Recent Runs')
+    fireEvent.click(link)
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/devices/test-robot/#recent-protocol-runs'
+    )
   })
 })

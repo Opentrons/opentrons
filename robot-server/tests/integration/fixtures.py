@@ -39,6 +39,12 @@ def check_health_response(response: Response) -> None:
     }
     got = response.json()
 
+    # We avoid checking the disk details in `expected` due to testing environment variance.
+    assert "disk_details" in got
+    assert "systemAvailableMb" in got["disk_details"]
+    assert "imagesDirectorySizeMb" in got["disk_details"]
+    got.pop("disk_details", None)
+
     assert got == expected, f"health response failed:\n {got}"
 
 
@@ -71,6 +77,12 @@ def check_ot3_health_response(response: Response) -> None:
         "robot_serial": "simulator",
     }
     got = response.json()
+
+    # We avoid checking the disk details in `expected` due to testing environment variance.
+    assert "disk_details" in got
+    assert "systemAvailableMb" in got["disk_details"]
+    assert "imagesDirectorySizeMb" in got["disk_details"]
+    got.pop("disk_details", None)
 
     assert got == expected, f"health response failed:\n {got}"
 

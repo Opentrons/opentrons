@@ -372,48 +372,75 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   // For consistency and correct error rendering, we actually want the OT-2 mix/moveLiquid steps to contain 3 pages,
   // even though only 2 are shown to the user (liquid class selection omitted).
   // We will use this variable to determine the correct step stride and title page count.
+  const isLiquidHandlingStepType =
+    formData.stepType === 'moveLiquid' || formData.stepType === 'mix'
   const isToolboxIndexTransformNeeded =
-    robotType === OT2_ROBOT_TYPE &&
-    (formData.stepType === 'moveLiquid' || formData.stepType === 'mix')
+    robotType === OT2_ROBOT_TYPE && isLiquidHandlingStepType
 
   const strideForContinueOrBack = isToolboxIndexTransformNeeded ? 2 : 1
+  const pageIndexRequiringConfirmation = robotType === FLEX_ROBOT_TYPE ? 1 : 0
+
+  // Require confirmation for a liquid handling step, page 1 on OT-2 or page 2 on Flex
+  const isOnPageRequiringConfirmation =
+    toolboxStep === pageIndexRequiringConfirmation && isLiquidHandlingStepType
+
   const handleContinue = (): void => {
-    if (
-      // for OT-2, call continue logic after step 1 (pipette, tiprack, volume, etc.) rather than step 2 (liquid class selection)
-      toolboxStep === (robotType === FLEX_ROBOT_TYPE ? 1 : 0) &&
-      numStepFormPages > 2
-    ) {
-      if (isConfirmationRequired) {
-        setShowConfirmationModal(true)
+    // Early return for confirmation modal
+    if (isOnPageRequiringConfirmation && isConfirmationRequired) {
+      setShowConfirmationModal(true)
+      return
+    }
+
+    // Handle error cases
+    if (isErrorOnCurrentPage) {
+      setShowFormErrors(true)
+      handleScrollToTop()
+      return
+    }
+
+    // Handle page requiring confirmation (without modal)
+    if (isOnPageRequiringConfirmation) {
+      if (!hasSeenAdvancedSettings && currentFormIsPresaved) {
+        handleUpdateLiquidClassValues()
       } else {
-        if (!hasSeenAdvancedSettings && currentFormIsPresaved) {
-          // don't overwrite values for saved form
-          handleUpdateLiquidClassValues()
-        } else {
-          setToolboxStep(currentStep => currentStep + strideForContinueOrBack)
-        }
-      }
-    } else if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
-      if (!isErrorOnCurrentPage) {
         setToolboxStep(currentStep => currentStep + strideForContinueOrBack)
-        setShowFormErrors(false)
-      } else {
-        setShowFormErrors(true)
       }
       handleScrollToTop()
-    } else {
-      handleSaveClick()
+      return
     }
+
+    // Handle multi-step toolbox with more pages
+    if (isMultiStepToolbox && toolboxStep < numStepFormPages - 1) {
+      // need to skip past liquid class page on OT-2
+      const increment =
+        isLiquidHandlingStepType && toolboxStep === 0
+          ? strideForContinueOrBack
+          : 1
+      setToolboxStep(currentStep => currentStep + increment)
+      setShowFormErrors(false)
+      handleScrollToTop()
+      return
+    }
+
+    // Handle final page
+    handleSaveClick()
   }
 
   const handleBack = (): void => {
-    setToolboxStep(currStep => currStep - strideForContinueOrBack)
+    // need to skip past liquid class page on OT-2
+    const increment =
+      isLiquidHandlingStepType && toolboxStep === 2
+        ? strideForContinueOrBack
+        : 1
+    setToolboxStep(currStep => currStep - increment)
     setShowFormErrors(false)
     handleScrollToTop()
   }
 
   const transformedStepIndexForDisplay =
-    isToolboxIndexTransformNeeded && toolboxStep === 2 ? 1 : toolboxStep
+    isToolboxIndexTransformNeeded && toolboxStep >= 2
+      ? toolboxStep - 1
+      : toolboxStep
   const transformedStepTotalForDisplay = isToolboxIndexTransformNeeded
     ? numStepFormPages - 1
     : numStepFormPages
@@ -518,7 +545,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
           <FormAlerts
             focusedField={focusedField}
             dirtyFields={dirtyFields}
-            showFormErrors={!currentFormIsPresaved || showFormErrors}
+            showFormErrors={showFormErrors}
             page={toolboxStep}
           />
           <ToolsComponent

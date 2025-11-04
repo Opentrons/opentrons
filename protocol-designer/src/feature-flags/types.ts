@@ -30,12 +30,12 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_LIQUID_CLASSES',
   'OT_PD_ENABLE_RETURN_TIP',
   'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
+  'OT_PD_ALLOW_ALL_TIPRACKS',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-  | 'OT_PD_ALLOW_ALL_TIPRACKS'
   | 'OT_PD_ENABLE_COMMENT'
   | 'OT_PD_ENABLE_HOT_KEYS_DISPLAY'
   | 'OT_PD_ENABLE_REACT_SCAN'
@@ -52,7 +52,6 @@ export type FlagTypes =
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
-  'OT_PD_ALLOW_ALL_TIPRACKS',
   'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
   'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2',
 ]

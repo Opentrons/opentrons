@@ -1,4 +1,4 @@
-"""Command models to start heating a Thermocycler's block."""
+"""Command models for heating a Thermocycler's block."""
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
@@ -61,7 +61,7 @@ class SetTargetBlockTemperatureResult(BaseModel):
     )
     taskId: str | SkipJsonSchema[None] = Field(
         None,
-        description="The task id for the setTargetBlockTemperature",
+        description="Id for the background task that manages the temperature.",
         json_schema_extra=_remove_default,
     )
 
@@ -122,13 +122,16 @@ class SetTargetBlockTemperatureImpl(
 
         async def set_target_block_temperature(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
-                await thermocycler_hardware.set_target_block_temperature(
-                    target_temperature,
-                    volume=target_volume,
-                    hold_time_seconds=hold_time,
-                    ramp_rate=target_ramp_rate,
-                )
-                await thermocycler_hardware.wait_for_block_target()
+                async with task_handler.synchronize_cancel_latest(
+                    thermocycler_state.module_id + "-block"
+                ):
+                    await thermocycler_hardware.set_target_block_temperature(
+                        celsius=target_temperature,
+                        volume=target_volume,
+                        ramp_rate=target_ramp_rate,
+                        hold_time_seconds=hold_time,
+                    )
+                    await thermocycler_hardware.wait_for_block_target()
 
         task = await self._task_handler.create_task(
             task_function=set_target_block_temperature, id=params.taskId

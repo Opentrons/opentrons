@@ -6,6 +6,7 @@
 }
 
 .gallery_header_container {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-10);
@@ -44,14 +45,16 @@
 .gallery_content_container {
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-4);
   gap: var(--spacing-4);
 }
 
 .gallery_card {
+  position: relative;
   display: flex;
   padding: var(--spacing-12);
-  border: 1px solid var(--grey-30);
-  border-radius: var(--border-radius-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
   gap: var(--spacing-24);
 }
 
@@ -98,6 +101,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: var(--spacing-2);
 }
 
@@ -109,4 +113,79 @@
 
 .gallery_cmd_txt_subtext {
   color: var(--grey-60);
+}
+
+.images_container_overflow_container {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow_container {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow_menu_container {
+  position: absolute;
+  z-index: 10;
+  top: 2.3rem;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.overflow_menu_item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.error_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error_footer_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-32);
+}
+
+.error_icon_container {
+  display: flex;
+  align-items: center;
+  grid-gap: var(--spacing-2);
+}
+
+.error_content_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.error_message_container {
+  display: flex;
+  max-height: 9.5rem;
+  flex-direction: column;
+  padding: var(--spacing-8) var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  margin-top: var(--spacing-8);
+  margin-bottom: var(--spacing-16);
+  background-color: var(--grey-30);
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--grey-40);
+  }
 }

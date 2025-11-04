@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
@@ -29,8 +30,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
-import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
 import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
@@ -69,9 +68,9 @@ export function PipetteConfiguration({
   rightPipette,
 }: PipetteConfigurationProps): JSX.Element {
   const { t } = useTranslation(['onboarding', 'shared'])
+  const [allowAllTipracks, setAllowAllTipracks] = useState<boolean>(false)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const allLabware = useSelector(getLabwareDefsByURI)
-  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const {
     mount,
@@ -246,11 +245,7 @@ export function PipetteConfiguration({
                     robotType === FLEX_ROBOT_TYPE ? null : (
                       <Btn
                         onClick={() => {
-                          dispatch(
-                            setFeatureFlags({
-                              OT_PD_ALLOW_ALL_TIPRACKS: !allowAllTipracks,
-                            })
-                          )
+                          setAllowAllTipracks(prev => !prev)
                         }}
                         textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       >

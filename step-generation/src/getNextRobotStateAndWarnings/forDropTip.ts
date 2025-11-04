@@ -25,7 +25,7 @@ export function forDropTip(
   // add dirty tip to tiprack
   const tipState = robotState.tipState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
+  const nozzles = robotState.pipettes[pipetteId].nozzles
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
   assert(
     tiprackDef != null && getIsTiprack(tiprackDef),

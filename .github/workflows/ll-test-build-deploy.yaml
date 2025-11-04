@@ -142,7 +142,7 @@ jobs:
         with:
           aws-region: us-east-2
           audience: sts.amazonaws.com
-          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -166,11 +166,14 @@ jobs:
     needs: [js-unit-test, build-ll, deploy-ll]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && needs.build-ll.result == 'success' && needs.deploy-ll.result == 'success'
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'success'
           workflow_name: 'Labware Library test, build, and deploy'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-failure:
     name: 'Notify Build Failure'
@@ -178,6 +181,8 @@ jobs:
     needs: [js-unit-test, build-ll, deploy-ll]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'failure' || needs.build-ll.result == 'failure' || needs.deploy-ll.result == 'failure')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -202,6 +207,7 @@ jobs:
           status: 'failure'
           workflow_name: 'Labware Library test, build, and deploy'
           failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-cancelled:
     name: 'Notify Build Cancelled'
@@ -209,8 +215,11 @@ jobs:
     needs: [js-unit-test, build-ll, deploy-ll]
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'cancelled' || needs.build-ll.result == 'cancelled' || needs.deploy-ll.result == 'cancelled')
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:
           status: 'cancelled'
           workflow_name: 'Labware Library test, build, and deploy'
+          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

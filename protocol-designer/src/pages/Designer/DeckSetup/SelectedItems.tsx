@@ -2,8 +2,10 @@ import { useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
 import {
-  getAllLabwareDefs,
+  FLEX_STACKER_MODULE_TYPE,
+  getAllDefinitions,
   getModuleDef,
+  getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -40,7 +42,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getAllLabwareDefs()
+  const defs = getAllDefinitions()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
   const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
@@ -133,7 +135,11 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
             orientation={orientation}
             targetDeckId={null}
             targetSlotId={null}
-            childrenPositioningMode="offsetToSlot"
+            childrenPositioningMode={
+              getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+                ? 'passThrough'
+                : 'offsetToSlot'
+            }
           >
             <SelectedModuleLabwareRender
               topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}

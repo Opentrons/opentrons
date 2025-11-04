@@ -176,6 +176,7 @@ class FlexBackend(Protocol):
         speed: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         nodes_in_moves_only: bool = True,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Move to a position.
 

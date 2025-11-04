@@ -1,23 +1,30 @@
 """Tests for the DataFilesStore interface."""
 from pathlib import Path
+import sqlalchemy
 
 import pytest
 from datetime import datetime, timezone
 
 from decoy import Decoy
+
+from opentrons_shared_data.data_files import (
+    InputDataFileInfo,
+    OutputDataFileInfo,
+    CmdDataFileInfo,
+)
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from sqlalchemy.engine import Engine as SQLEngine
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from robot_server.deletion_planner import FileUsageInfo
 from robot_server.data_files.models import (
-    DataFileSource,
     FileIdNotFoundError,
     FileInUseError,
 )
+from robot_server.persistence.tables import run_table
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     CompletedAnalysis,
@@ -42,10 +49,22 @@ def data_files_directory(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def subject(sql_engine: SQLEngine, data_files_directory: Path) -> DataFilesStore:
+def images_directory(tmp_path: Path) -> Path:
+    """Return a directory for storing camera capture files."""
+    subdirectory = tmp_path / "images"
+    subdirectory.mkdir()
+    return subdirectory
+
+
+@pytest.fixture
+def subject(
+    sql_engine: SQLEngine, data_files_directory: Path, images_directory: Path
+) -> DataFilesStore:
     """Get a DataFilesStore test subject."""
     return DataFilesStore(
-        sql_engine=sql_engine, data_files_directory=data_files_directory
+        sql_engine=sql_engine,
+        data_files_directory=data_files_directory,
+        images_directory=images_directory,
     )
 
 
@@ -104,6 +123,18 @@ def _get_sample_analysis_resource(
     )
 
 
+def _create_run_in_db(sql_engine: SQLEngine, run_id: str) -> None:
+    """Helper to create a run directly in the database."""
+    with sql_engine.begin() as transaction:
+        transaction.execute(
+            sqlalchemy.insert(run_table).values(
+                id=run_id,
+                created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+                protocol_id=None,  # No protocol association needed for these tests
+            )
+        )
+
+
 async def test_insert_data_file_info_and_fetch_by_hash(
     subject: DataFilesStore,
 ) -> None:
@@ -112,8 +143,11 @@ async def test_insert_data_file_info_and_fetch_by_hash(
         id="file-id",
         name="file-name",
         file_hash="abc123",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        generated=False,
+        stored=True,
+        path="data_files/file-id/file-name",
     )
     assert subject.get_file_info_by_hash("abc123") is None
     await subject.insert(data_file_info)
@@ -128,15 +162,21 @@ async def test_insert_file_info_with_existing_id(
         id="file-id",
         name="file-name",
         file_hash="abc123",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,
+        stored=True,
     )
     data_file_info2 = DataFileInfo(
         id="file-id",
         name="file-name2",
         file_hash="abc1234",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name2",
+        generated=False,
+        stored=True,
     )
     await subject.insert(data_file_info1)
     with pytest.raises(Exception):
@@ -151,8 +191,11 @@ async def test_insert_data_file_info_and_get_by_id(
         id="file-id",
         name="file-name",
         file_hash="abc",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,
+        stored=True,
     )
     await subject.insert(data_file_info)
     assert subject.get("file-id") == data_file_info
@@ -185,15 +228,21 @@ async def test_get_usage_info(
         id="file-id-1",
         name="file-name",
         file_hash="abc",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id-1/file-name",
+        generated=False,
+        stored=True,
     )
     data_file_2 = DataFileInfo(
         id="file-id-2",
         name="file-name",
         file_hash="xyz",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=7, day=15, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id-2/file-name",
+        generated=False,
+        stored=True,
     )
     await subject.insert(data_file_1)
     await subject.insert(data_file_2)
@@ -207,34 +256,6 @@ async def test_get_usage_info(
         FileUsageInfo("file-id-1", used_by_run_or_analysis=True),
         FileUsageInfo("file-id-2", used_by_run_or_analysis=False),
     ]
-
-
-async def test_remove(
-    subject: DataFilesStore,
-    data_files_directory: Path,
-) -> None:
-    """It should remove the specified data file from database and store."""
-    file_dir = data_files_directory.joinpath("file-id")
-    file_dir.mkdir()
-    data_file = file_dir / "abc.csv"
-    data_file.touch()
-
-    data_file_info = DataFileInfo(
-        id="file-id",
-        name="file-name",
-        file_hash="abc123",
-        source=DataFileSource.UPLOADED,
-        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
-    )
-    await subject.insert(data_file_info)
-    subject.remove(file_id="file-id")
-
-    assert data_files_directory.exists() is True
-    assert file_dir.exists() is False
-    assert data_file.exists() is False
-
-    with pytest.raises(FileIdNotFoundError):
-        subject.get("file-id")
 
 
 async def test_remove_raises_in_file_in_use(
@@ -253,8 +274,11 @@ async def test_remove_raises_in_file_in_use(
         id="file-id",
         name="file-name",
         file_hash="abc123",
-        source=DataFileSource.UPLOADED,
         created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,
+        stored=True,
     )
 
     protocol_resource = _get_sample_protocol_resource("protocol-id")
@@ -277,10 +301,460 @@ async def test_remove_raises_in_file_in_use(
 
     expected_error_message = "Cannot remove file file-id as it is being used in existing analyses: {'analysis-id'}."
     with pytest.raises(FileInUseError, match=expected_error_message):
-        subject.remove(file_id="file-id")
+        subject.remove_stored(file_id="file-id")
 
 
 def test_remove_raise_for_nonexistent_id(subject: DataFilesStore) -> None:
     """It should raise FileIdNotFound error."""
     with pytest.raises(FileIdNotFoundError, match="Data file file-id was not found."):
-        subject.remove(file_id="file-id")
+        subject.remove_stored(file_id="file-id")
+
+
+async def test_insert_input_file(
+    subject: DataFilesStore,
+) -> None:
+    """It should insert input file info into the database."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    input_file_info = InputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id",
+        command_info=None,
+    )
+    await subject.insert_input_file(input_file_info)
+
+    retrieved = subject.get_io_file_info("file-id", "run-id")
+    assert isinstance(retrieved, InputDataFileInfo)
+    assert retrieved.file_id == "file-id"
+    assert retrieved.run_id == "run-id"
+    assert retrieved.command_info is None
+
+
+async def test_insert_output_file(
+    subject: DataFilesStore,
+) -> None:
+    """It should insert output file info into the database."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/file-id/file-name.jpeg",
+        generated=True,
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    output_file_info = OutputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id",
+        command_info=CmdDataFileInfo(
+            command_id="command-id",
+            prev_command_id="prev-command-id",
+        ),
+    )
+    await subject.insert_output_file(output_file_info)
+
+    retrieved = subject.get_io_file_info("file-id", "run-id")
+    assert isinstance(retrieved, OutputDataFileInfo)
+    assert retrieved.file_id == "file-id"
+    assert retrieved.run_id == "run-id"
+    assert retrieved.command_info.command_id == "command-id"
+    assert retrieved.command_info.prev_command_id == "prev-command-id"
+
+
+async def test_get_io_file_info_input_file(
+    subject: DataFilesStore,
+) -> None:
+    """It should retrieve an io file info by file_id and run_id."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    input_file_info = InputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id",
+        command_info=None,
+    )
+    await subject.insert_input_file(input_file_info)
+
+    retrieved = subject.get_io_file_info("file-id", "run-id")
+    assert isinstance(retrieved, InputDataFileInfo)
+    assert retrieved.file_id == "file-id"
+    assert retrieved.run_id == "run-id"
+
+
+async def test_remove_input_only_file_deletes_completely(
+    subject: DataFilesStore,
+    data_files_directory: Path,
+) -> None:
+    """It should completely delete input-only files from the database."""
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=False,  # Input file, not generated
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    subject.remove_stored(file_id="file-id")
+
+    with pytest.raises(FileIdNotFoundError):
+        subject.get("file-id")
+
+
+async def test_remove_output_file_marks_not_stored(
+    subject: DataFilesStore,
+    data_files_directory: Path,
+) -> None:
+    """It should mark output files as not stored but preserve them in the database."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name.jpeg",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/file-id/file-name.jpeg",
+        generated=True,  # Generated output file
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    output_file_info = OutputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id",
+        command_info=CmdDataFileInfo(
+            command_id="command-id",
+            prev_command_id="prev-command-id",
+        ),
+    )
+    await subject.insert_output_file(output_file_info)
+
+    subject.remove_stored(file_id="file-id")
+
+    retrieved = subject.get("file-id")
+    assert retrieved.id == "file-id"
+    assert retrieved.stored is False
+    assert retrieved.name == "file-name.jpeg"
+    assert retrieved.file_hash == "abc123"
+
+    output_info = subject.get_io_file_info("file-id", "run-id")
+    assert isinstance(output_info, OutputDataFileInfo)
+    assert output_info.file_id == "file-id"
+
+
+async def test_remove_file_with_input_and_output_associations(
+    subject: DataFilesStore,
+    data_files_directory: Path,
+) -> None:
+    """It should remove input associations but preserve output associations."""
+    _create_run_in_db(subject._sql_engine, "run-id-1")
+    _create_run_in_db(subject._sql_engine, "run-id-2")
+
+    data_file_info = DataFileInfo(
+        id="file-id",
+        name="file-name",
+        file_hash="abc123",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/file-id/file-name",
+        generated=True,
+        stored=True,
+    )
+    await subject.insert(data_file_info)
+
+    input_file_info = InputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id-1",
+        command_info=None,
+    )
+    await subject.insert_input_file(input_file_info)
+
+    output_file_info = OutputDataFileInfo(
+        file_id="file-id",
+        run_id="run-id-2",
+        command_info=CmdDataFileInfo(
+            command_id="command-id",
+            prev_command_id="prev-command-id",
+        ),
+    )
+    await subject.insert_output_file(output_file_info)
+
+    subject.remove_stored(file_id="file-id")
+
+    retrieved = subject.get("file-id")
+    assert retrieved.stored is False
+
+    with pytest.raises(FileIdNotFoundError):
+        subject.get_io_file_info("file-id", "run-id-1")
+
+    output_info = subject.get_io_file_info("file-id", "run-id-2")
+    assert isinstance(output_info, OutputDataFileInfo)
+
+
+async def test_get_files_info_by_run_mime_type(
+    subject: DataFilesStore,
+) -> None:
+    """It should filter files by run ID and mime type."""
+    _create_run_in_db(subject._sql_engine, "run-id-1")
+    _create_run_in_db(subject._sql_engine, "run-id-2")
+
+    jpeg_run1 = DataFileInfo(
+        id="jpeg-run1",
+        name="image1.jpeg",
+        file_hash="hash1",
+        created_at=datetime(year=2024, month=6, day=20, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/jpeg-run1/image1.jpeg",
+        generated=True,
+        stored=True,
+    )
+
+    csv_run1 = DataFileInfo(
+        id="csv-run1",
+        name="data1.csv",
+        file_hash="hash2",
+        created_at=datetime(year=2024, month=6, day=21, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/csv-run1/data1.csv",
+        generated=True,
+        stored=True,
+    )
+
+    jpeg_run2 = DataFileInfo(
+        id="jpeg-run2",
+        name="image2.jpeg",
+        file_hash="hash3",
+        created_at=datetime(year=2024, month=6, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.IMAGE_JPEG,
+        path="data_files/jpeg-run2/image2.jpeg",
+        generated=True,
+        stored=True,
+    )
+
+    await subject.insert(jpeg_run1)
+    await subject.insert(csv_run1)
+    await subject.insert(jpeg_run2)
+
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="jpeg-run1",
+            run_id="run-id-1",
+            command_info=CmdDataFileInfo(
+                command_id="command-1",
+                prev_command_id="prev-1",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="csv-run1",
+            run_id="run-id-1",
+            command_info=CmdDataFileInfo(
+                command_id="command-2",
+                prev_command_id="prev-2",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="jpeg-run2",
+            run_id="run-id-2",
+            command_info=CmdDataFileInfo(
+                command_id="command-3",
+                prev_command_id="prev-3",
+            ),
+        )
+    )
+
+    result = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        limit=10,
+        offset=0,
+    )
+
+    assert len(result.file_info) == 1
+    assert result.total_length == 1
+    assert result.file_info[0].id == "jpeg-run1"
+    assert result.file_info[0].command_info.command_id == "command-1"
+
+
+async def test_get_files_info_by_run_mime_type_no_limit(
+    subject: DataFilesStore,
+) -> None:
+    """It should retrieve all files when limit is None."""
+    _create_run_in_db(subject._sql_engine, "run-id-1")
+
+    for i in range(5):
+        jpeg = DataFileInfo(
+            id=f"jpeg-{i}",
+            name=f"image{i}.jpeg",
+            file_hash=f"hash{i}",
+            created_at=datetime(year=2024, month=6, day=20 + i, tzinfo=timezone.utc),
+            mime_type=MimeType.IMAGE_JPEG,
+            path=f"data_files/jpeg-{i}/image{i}.jpeg",
+            generated=True,
+            stored=True,
+        )
+        await subject.insert(jpeg)
+        await subject.insert_output_file(
+            OutputDataFileInfo(
+                file_id=f"jpeg-{i}",
+                run_id="run-id-1",
+                command_info=CmdDataFileInfo(
+                    command_id=f"command-{i}",
+                    prev_command_id=f"prev-{i}",
+                ),
+            )
+        )
+
+    result = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=None,
+    )
+
+    assert len(result.file_info) == 5
+    assert result.total_length == 5
+
+    result_with_limit = subject.get_files_info_by_run_mime_type(
+        run_id="run-id-1",
+        mime_type=MimeType.IMAGE_JPEG,
+        offset=0,
+        limit=2,
+    )
+
+    assert len(result_with_limit.file_info) == 2
+    assert result_with_limit.total_length == 5
+
+
+async def test_get_data_files_by_run_id(
+    subject: DataFilesStore,
+) -> None:
+    """It should retrieve all input and output files for a run, ordered by creation time."""
+    _create_run_in_db(subject._sql_engine, "run-id")
+
+    input_file_1 = DataFileInfo(
+        id="input-file-1",
+        name="input1.csv",
+        file_hash="hash-input-1",
+        created_at=datetime(year=2025, month=10, day=21, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/input-file-1/input1.csv",
+        generated=False,
+        stored=True,
+    )
+
+    input_file_2 = DataFileInfo(
+        id="input-file-2",
+        name="input2.csv",
+        file_hash="hash-input-2",
+        created_at=datetime(year=2025, month=10, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/input-file-2/input2.csv",
+        generated=False,
+        stored=True,
+    )
+
+    output_file_1 = DataFileInfo(
+        id="output-file-1",
+        name="output1.csv",
+        file_hash="hash-output-1",
+        created_at=datetime(year=2025, month=10, day=22, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/output-file-1/output1.csv",
+        generated=True,
+        stored=True,
+    )
+
+    output_file_2 = DataFileInfo(
+        id="output-file-2",
+        name="output2.csv",
+        file_hash="hash-output-2",
+        created_at=datetime(year=2025, month=10, day=23, tzinfo=timezone.utc),
+        mime_type=MimeType.TEXT_CSV,
+        path="data_files/output-file-2/output2.csv",
+        generated=True,
+        stored=True,
+    )
+
+    await subject.insert(input_file_1)
+    await subject.insert(input_file_2)
+    await subject.insert(output_file_1)
+    await subject.insert(output_file_2)
+
+    await subject.insert_input_file(
+        InputDataFileInfo(
+            file_id="input-file-1",
+            run_id="run-id",
+            command_info=None,
+        )
+    )
+    await subject.insert_input_file(
+        InputDataFileInfo(
+            file_id="input-file-2",
+            run_id="run-id",
+            command_info=None,
+        )
+    )
+
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="output-file-1",
+            run_id="run-id",
+            command_info=CmdDataFileInfo(
+                command_id="command-1",
+                prev_command_id="prev-1",
+            ),
+        )
+    )
+    await subject.insert_output_file(
+        OutputDataFileInfo(
+            file_id="output-file-2",
+            run_id="run-id",
+            command_info=CmdDataFileInfo(
+                command_id="command-2",
+                prev_command_id="prev-2",
+            ),
+        )
+    )
+
+    result = subject.get_data_files_by_run_id("run-id")
+
+    assert len(result.input_files) == 2
+    assert result.input_files[0] == input_file_2
+    assert result.input_files[1] == input_file_1
+
+    assert len(result.output_files) == 2
+    assert result.output_files[0] == output_file_2
+    assert result.output_files[1] == output_file_1

@@ -2229,6 +2229,34 @@ def test_customize_existing_liquid_class(
     )
 
 
+def test_capture_image(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should handle the core execution for capture image using the provided parameters or defaults."""
+    subject.capture_image(
+        home_before=True,
+        filename="coolpic",
+        resolution=(1920, 1080),
+        zoom=2,
+        contrast=50,
+        saturation=52,
+    )
+
+    decoy.verify(mock_core.home())
+    decoy.verify(
+        mock_core.capture_image(
+            filename="coolpic",
+            resolution=(1920, 1080),
+            zoom=2,
+            contrast=50,
+            brightness=None,
+            saturation=52,
+        )
+    )
+
+
 def test_bundled_data(
     mock_core_map: LoadedCoreMap, mock_deck: Deck, mock_core: ProtocolCore
 ) -> None:

@@ -7,7 +7,6 @@ import { i18n } from '/app/i18n'
 
 import { SetupRunCameraUsage } from '../SetupRunCameraSettings'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
 import type { SetupCameraProps } from '../SetupRunCameraSettings'
 
 const render = (props: SetupCameraProps) => {
@@ -17,20 +16,15 @@ const render = (props: SetupCameraProps) => {
 }
 
 describe('SetupRunCameraUsage', () => {
-  let mockSettings: UseStubCameraUsageSettingsResult
   let mockProps: SetupCameraProps
 
   beforeEach(() => {
-    mockSettings = {
-      toggleCameraEnabled: vi.fn(),
-      isCameraEnabled: true,
-      toggleLiveVideoEnabled: vi.fn(),
-      isLiveVideoEnabled: true,
-      toggleRecoveryCaptureEnabled: vi.fn(),
-      isRecoveryCaptureEnabled: true,
-    }
     mockProps = {
-      settings: mockSettings,
+      liveStreamEnabled: true,
+      recoveryEnabled: true,
+      cameraConfirmed: false,
+      toggleLiveStreamEnabled: vi.fn(),
+      toggleRecoveryEnabled: vi.fn(),
     }
   })
 
@@ -72,7 +66,7 @@ describe('SetupRunCameraUsage', () => {
     const toggleButtons = screen.getAllByRole('switch')
     await user.click(toggleButtons[0])
 
-    expect(mockSettings.toggleLiveVideoEnabled).toHaveBeenCalledTimes(1)
+    expect(mockProps.toggleLiveStreamEnabled).toHaveBeenCalledTimes(1)
   })
 
   it('calls toggleRecoveryCaptureEnabled when recovery capture toggle is clicked', async () => {
@@ -82,6 +76,6 @@ describe('SetupRunCameraUsage', () => {
     const toggleButtons = screen.getAllByRole('switch')
     await user.click(toggleButtons[1])
 
-    expect(mockSettings.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)
+    expect(mockProps.toggleRecoveryEnabled).toHaveBeenCalledTimes(1)
   })
 })

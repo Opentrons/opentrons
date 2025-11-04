@@ -31,7 +31,12 @@ module.exports = {
     'prefer-const': 'error',
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': [
+      'warn',
+      {
+        additionalHooks: '(useDrag|useDrop)',
+      },
+    ],
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
@@ -65,6 +70,7 @@ module.exports = {
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
               'useSearchLabwareOffsets',
+              'useImageFileQuery',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',

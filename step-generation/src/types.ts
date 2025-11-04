@@ -366,6 +366,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseRetractZOffset: number
   dispenseRetractPositionReference: PositionReference
   dispenseRetractDelay: InnerDelayArgs | null
+  tipTracking: TipTrackingOption
+  tipsSelected: string[][]
+  tiprackSelected: string | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -445,6 +448,9 @@ export type MixArgs = CommonArgs & {
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
   finalPushOut: number
+  tipTracking: TipTrackingOption
+  tipsSelected: string[][]
+  tiprackSelected: string | null
 }
 
 export type PauseArgs = CommonArgs & {

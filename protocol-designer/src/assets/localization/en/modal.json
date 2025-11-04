@@ -51,6 +51,11 @@
       "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
       "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
     },
+    "genericStartingFrom861": {
+      "heading": "{{version}} Announcements",
+      "body1": "All protocols created in Protocol Designer v{{version}} generate Python protocols using API version {{apiVersion}} and now require Opentrons App version {{appVersion}} or newer to run.",
+      "footer": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+    },
     "header": "We've updated the {{pd}}",
     "heaterShakerSupport": {
       "body1": "The {{opd}} now supports our Heater-Shaker Module!",
@@ -92,19 +97,32 @@
     }
   },
   "auto_add_pause_until_temp_step": {
-    "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
-    "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
-    "heater_shaker_pause_later": "Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module goes to {{temperature}}°C",
-    "heater_shaker_title": "Pause protocol until Heater-Shaker module reaches {{temperature}}°C",
-    "later_button": "I will build a pause later",
-    "now_button": "Pause protocol now",
-    "redesign": {
-      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}}°C. Click Skip to continue to the next protocol step without pausing.",
+    "heater_shaker": {
+      "body": "<p>A pause step to wait for the Heater-Shaker to reach {{temperature}}\u00a0˚C will automatically be added to the timeline.</p><p>You can insert steps before the pause to run them in-parallel while the module heats or cools.</p>",
+      "title": "Pause until Heater-Shaker reaches {{temperature}}\u00a0˚C"
+    },
+    "legacy": {
+      "body": "Add a pause step to wait until the {{module}} reaches {{temp}} °C. Click Skip to continue to the next protocol step without pausing.",
       "skip_pause_step": "Skip pause step",
       "add_pause_step": "Add pause step",
-      "title": "Pause protocol until {{module}} reaches {{temp}}°C?"
+      "title": "Pause protocol until {{module}} reaches {{temp}} °C?"
     },
-    "title": "Pause protocol until temperature module is at {{temperature}}°C?"
+    "temperature_module": {
+      "body": "<p>A pause step to wait for the Temperature Module to reach {{temperature}}\u00a0˚C will automatically be added to the timeline.</p><p>You can insert steps before the pause to run them in-parallel while the module heats or cools.</p>",
+      "title": "Pause until Temperature Module reaches {{temperature}}\u00a0˚C"
+    },
+    "thermocycler_block": {
+      "body": "<p>A pause step to wait for the Thermocycler Block to reach {{temperature}}\u00a0˚C will automatically be added to the timeline.</p><p>You can insert steps before the pause to run them in-parallel while the module heats or cools.</p>",
+      "title": "Pause until Thermocycler Block reaches {{temperature}}\u00a0˚C"
+    },
+    "thermocycler_lid": {
+      "body": "<p>A pause step to wait for the Thermocycler Lid to reach {{temperature}}\u00a0˚C will automatically be added to the timeline.</p><p>You can insert steps before the pause to run them in-parallel while the module heats or cools.</p>",
+      "title": "Pause until Thermocycler Lid reaches {{temperature}}\u00a0˚C"
+    },
+    "thermocycler_profile": {
+      "body": "<p>The protocol will wait for the Thermocycler profile to complete before continuing to the next step.</p><p>You can insert steps between the start profile and wait for profile to complete check points to run them in-parallel while the profile executes.</p>",
+      "title": "Wait until Thermocycler profile completes"
+    }
   },
   "browse_labware": {
     "instructions": "Hover on a well to see contents"

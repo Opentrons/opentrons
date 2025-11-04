@@ -136,9 +136,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 )
               }
             })
-          : filteredCommands.map((command, index) => {
+          : filteredCommands.map(command => {
               const currentCommandNumber = ++commandNumber
-
               return (
                 <IndividualCommand
                   scrollTargetId={scrollTargetId}
@@ -146,7 +145,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   key={`individual_${command.id}`}
                   command={command}
                   commandNumber={currentCommandNumber}
-                  isHighlighted={index === currentCommandIndex}
+                  isHighlighted={
+                    currentCommandIndex != null &&
+                    filteredCommands[currentCommandIndex]?.id === command.id
+                  }
                   analysis={analysis}
                   allRunDefs={allRunDefs}
                   setSelectedCommand={setSelectedCommand}

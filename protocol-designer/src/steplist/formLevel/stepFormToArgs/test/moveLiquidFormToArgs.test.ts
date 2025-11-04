@@ -9,6 +9,7 @@ import {
   fixture_96_plate,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import {
+  AUTOMATIC,
   DEST_WELL_BLOWOUT_DESTINATION,
   makeContext,
 } from '@opentrons/step-generation'
@@ -124,6 +125,9 @@ describe('move liquid step form -> command creator args', () => {
       disposalVolume_location: null,
       blowout_checkbox: false,
       blowout_location: null,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     }
   })
 
@@ -184,6 +188,9 @@ describe('move liquid step form -> command creator args', () => {
       sourceWells: [ASPIRATE_WELL],
       destLabware: 'destLabwareId',
       destWells: [DISPENSE_WELL],
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     })
 
     // no form-specific fields should be passed along

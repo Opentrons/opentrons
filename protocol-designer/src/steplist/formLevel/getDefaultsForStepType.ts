@@ -56,6 +56,8 @@ export function getDefaultsForStepType(
         times: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: undefined,
         wells: [],
       }
@@ -149,6 +151,8 @@ export function getDefaultsForStepType(
         pushOut_volume: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: null,
       }
 

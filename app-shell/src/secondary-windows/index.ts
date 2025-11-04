@@ -12,11 +12,16 @@ import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
   STEP_DETAIL_VIEWER_OPEN,
+  STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
 import { createLogger } from '../log'
 import { openCameraPhoto } from './camera-photo'
 import { openCameraStream } from './camera-stream'
-import { openStepDetailViewer } from './step-detail-viewer'
+import {
+  getWindowIdStepDetailViewer,
+  openStepDetailViewer,
+  updateStepDetailViewerData,
+} from './step-detail-viewer'
 
 import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
@@ -36,6 +41,11 @@ export function closeSecondaryWindows(): void {
   secondaryWindows.clear()
 }
 
+export function isSecondaryWindowOpen(windowId: string): boolean {
+  const window = secondaryWindows.get(windowId)
+  return window != null && !window.isDestroyed()
+}
+
 export function registerCameraStream(
   dispatch: Dispatch
 ): (action: Action) => unknown {
@@ -52,6 +62,8 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
       return openCameraStream({
+        runId: action.payload.runId,
+        windowTitle: action.payload.windowTitle,
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
         log,
@@ -61,14 +73,47 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         photoUrl: action.payload.photoUrl,
         robotName: action.payload.robotName,
         windowTitle: action.payload.windowTitle,
-        dimensions: action.payload.dimensions,
         log,
       })
-    case STEP_DETAIL_VIEWER_OPEN:
-      return openStepDetailViewer({
-        protocolKey: action.payload.protocolKey,
-        log,
+    case STEP_DETAIL_VIEWER_OPEN: {
+      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
+      const existingWindow = secondaryWindows.get(windowId)
+
+      if (existingWindow == null || existingWindow.isDestroyed()) {
+        // Window doesn't exist or was destroyed, create new one
+        return openStepDetailViewer({
+          protocolKey: action.payload.protocolKey,
+          slot: action.payload.slot,
+          command: action.payload.command,
+          robotState: action.payload.robotState,
+          invariantContext: action.payload.invariantContext,
+          analysis: action.payload.analysis,
+          liquids: action.payload.liquids,
+          log,
+        })
+      }
+
+      // Window exists, update its contents and focus it
+      updateStepDetailViewerData(action.payload.protocolKey, {
+        slot: action.payload.slot,
+        command: action.payload.command,
+        robotState: action.payload.robotState,
+        analysis: action.payload.analysis,
+        liquids: action.payload.liquids,
       })
+      existingWindow.focus()
+      existingWindow.show()
+      return null
+    }
+    case STEP_DETAIL_VIEWER_UPDATE:
+      updateStepDetailViewerData(action.payload.protocolKey, {
+        slot: action.payload.slot,
+        command: action.payload.command,
+        robotState: action.payload.robotState,
+        analysis: action.payload.analysis,
+        liquids: action.payload.liquids,
+      })
+      return null
     default:
       return null
   }

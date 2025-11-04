@@ -1,5 +1,5 @@
 {
-  "click_and_drag": "Click and drag to select tips in {{labwareName}}",
+  "click_to_select": "Click to select tips in {{labwareName}}",
   "continue": "Continue",
   "go_back": "Go back",
   "legend": {
@@ -10,6 +10,13 @@
     "used_tip": "Used tip"
   },
   "no_tiprack_selected": "Select a tiprack to continue",
+  "no_valid_tips_available": {
+    "title": "Not enough tips to complete action",
+    "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps."
+  },
+  "not_enough_tips_selected": "Not enough tips selected ({{count}} pickups remaining)",
+  "pickups_remaining": "{{count}} pickups remaining",
+  "reusing_tips_banner": "Selected tips have been reused. Pipetting accuracy may be reduced",
   "select": "Select",
   "selected": "Selected",
   "select_tiprack": "Select a tip rack to pick up tips from",

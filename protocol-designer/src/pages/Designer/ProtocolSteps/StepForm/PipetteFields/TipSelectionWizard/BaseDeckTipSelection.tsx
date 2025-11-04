@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 
 import {
   COLORS,
+  DeckFromLayers,
+  FixedTrashText,
   FlexTrash,
   Module,
   RobotCoordinateSpaceWithRef,
@@ -21,6 +23,7 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
+  OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -38,17 +41,36 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
+const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+  'fixedTrash',
+]
+
 interface BaseDeckTipSelectionProps {
   controls: JSX.Element
   hoveredId?: string | null
   showSlotLabels?: boolean
   viewBox?: string | null
+  // labware ID to hide since it will be injected via controls
+  labwareIdToHide?: string | null
 }
 
 export function BaseDeckTipSelection(
   props: BaseDeckTipSelectionProps
 ): JSX.Element {
-  const { controls, hoveredId, showSlotLabels = true, viewBox } = props
+  const {
+    controls,
+    hoveredId,
+    showSlotLabels = true,
+    viewBox,
+    labwareIdToHide,
+  } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const robotType = useSelector(getRobotType)
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -90,6 +112,76 @@ export function BaseDeckTipSelection(
   )
   const allLabware = Object.values(activeDeckSetup.labware)
   const allModules = Object.values(activeDeckSetup.modules)
+
+  const flexSpecificHardware = (
+    <>
+      {filteredAddressableAreas.map(addressableArea => {
+        const cutoutId = getCutoutIdForAddressableArea(
+          addressableArea.id,
+          deckDef.cutoutFixtures
+        )
+        return cutoutId != null ? (
+          <SingleSlotFixture
+            key={addressableArea.id}
+            cutoutId={cutoutId}
+            deckDefinition={deckDef}
+            slotClipColor={COLORS.grey60}
+            showExpansion={cutoutId === 'cutoutA1'}
+            fixtureBaseColor={COLORS.grey35}
+          />
+        ) : null
+      })}
+      {stagingAreaFixtures.map(fixture => {
+        return (
+          <StagingAreaFixture
+            key={fixture.id}
+            cutoutId={fixture.location as StagingAreaLocation}
+            deckDefinition={deckDef}
+            slotClipColor={COLORS.grey60}
+            fixtureBaseColor={COLORS.grey35}
+          />
+        )
+      })}
+      {trash != null
+        ? trashBinFixtures.map(({ cutoutId }) =>
+            cutoutId != null ? (
+              <Fragment key={cutoutId}>
+                <SingleSlotFixture
+                  cutoutId={cutoutId}
+                  deckDefinition={deckDef}
+                  slotClipColor={COLORS.transparent}
+                  fixtureBaseColor={COLORS.grey35}
+                />
+                <FlexTrash
+                  robotType={FLEX_ROBOT_TYPE}
+                  trashIconColor={COLORS.grey35}
+                  trashCutoutId={cutoutId as TrashCutoutId}
+                  backgroundColor={COLORS.grey50}
+                />
+              </Fragment>
+            ) : null
+          )
+        : null}
+      {wasteChuteFixtures.map(fixture => (
+        <WasteChuteFixture
+          key={fixture.id}
+          cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+          deckDefinition={deckDef}
+          fixtureBaseColor={COLORS.grey35}
+        />
+      ))}
+      {wasteChuteStagingAreaFixtures.map(fixture => (
+        <WasteChuteStagingAreaFixture
+          key={fixture.id}
+          cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+          deckDefinition={deckDef}
+          slotClipColor={COLORS.grey60}
+          fixtureBaseColor={COLORS.grey35}
+        />
+      ))}
+    </>
+  )
+
   return (
     <RobotCoordinateSpaceWithRef
       height="100%"
@@ -100,70 +192,17 @@ export function BaseDeckTipSelection(
     >
       {() => (
         <>
-          {filteredAddressableAreas.map(addressableArea => {
-            const cutoutId = getCutoutIdForAddressableArea(
-              addressableArea.id,
-              deckDef.cutoutFixtures
-            )
-            return cutoutId != null ? (
-              <SingleSlotFixture
-                key={addressableArea.id}
-                cutoutId={cutoutId}
-                deckDefinition={deckDef}
-                slotClipColor={COLORS.grey60}
-                showExpansion={cutoutId === 'cutoutA1'}
-                fixtureBaseColor={COLORS.grey35}
+          {robotType === OT2_ROBOT_TYPE ? (
+            <>
+              <DeckFromLayers
+                robotType={robotType}
+                layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
               />
-            ) : null
-          })}
-          {stagingAreaFixtures.map(fixture => {
-            return (
-              <StagingAreaFixture
-                key={fixture.id}
-                cutoutId={fixture.location as StagingAreaLocation}
-                deckDefinition={deckDef}
-                slotClipColor={COLORS.grey60}
-                fixtureBaseColor={COLORS.grey35}
-              />
-            )
-          })}
-          {trash != null
-            ? trashBinFixtures.map(({ cutoutId }) =>
-                cutoutId != null ? (
-                  <Fragment key={cutoutId}>
-                    <SingleSlotFixture
-                      cutoutId={cutoutId}
-                      deckDefinition={deckDef}
-                      slotClipColor={COLORS.transparent}
-                      fixtureBaseColor={COLORS.grey35}
-                    />
-                    <FlexTrash
-                      robotType={FLEX_ROBOT_TYPE}
-                      trashIconColor={COLORS.grey35}
-                      trashCutoutId={cutoutId as TrashCutoutId}
-                      backgroundColor={COLORS.grey50}
-                    />
-                  </Fragment>
-                ) : null
-              )
-            : null}
-          {wasteChuteFixtures.map(fixture => (
-            <WasteChuteFixture
-              key={fixture.id}
-              cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              fixtureBaseColor={COLORS.grey35}
-            />
-          ))}
-          {wasteChuteStagingAreaFixtures.map(fixture => (
-            <WasteChuteStagingAreaFixture
-              key={fixture.id}
-              cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              slotClipColor={COLORS.grey60}
-              fixtureBaseColor={COLORS.grey35}
-            />
-          ))}
+              <FixedTrashText />
+            </>
+          ) : (
+            flexSpecificHardware
+          )}
           {allModules.map(({ id, slot, model, moduleState }) => {
             const slotId = slot
             const slotPosition = getPositionFromSlotId(slotId, deckDef)
@@ -222,7 +261,8 @@ export function BaseDeckTipSelection(
             if (
               getSlotInLocationStack(labware.stack) === 'offDeck' ||
               labware.stack.includes('fixedTrash') ||
-              allModules.some(m => labware.stack.includes(m.id))
+              allModules.some(m => labware.stack.includes(m.id)) ||
+              labwareIdToHide === labware.id
             ) {
               return null
             }
