@@ -8,7 +8,7 @@ Temperature Module
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 and loading a well plate on top of it.
+The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 on the deck.
 
 .. code-block:: python
 
@@ -117,19 +117,51 @@ This command loads the same physical adapter and labware as the example in the S
 Temperature Control
 ===================
 
-The primary function of the module is to control the temperature of its deck, using :py:meth:`~.TemperatureModuleContext.set_temperature`, which takes one parameter: ``celsius``. For example, to set the Temperature Module to 4 °C:
+The primary function of the module is to control the temperature of its deck. As with the Heater-Shaker Module, the API lets you choose between *blocking* and non-blocking module commands. When you use a blocking command, the robot won't perform other protocol steps until the Temperature Module reaches the required temperature. 
+
+.. list-table::
+    :header-rows: 1
+
+    * - **Command**
+      - **API version**
+      - **Module action**
+    * - ``set_temperature()``
+      - Added in API 2.13
+      - Blocking
+    * ``start_set_temperature()``
+      - Added in API 2.27
+      - Non-blocking
+
+
+Let's take a look at a blocking command first. We'll use :py:meth:`~.TemperatureModuleContext.set_temperature`, which takes one parameter: ``celsius``. For example, to set the Temperature Module to 4 °C:
 
 .. code-block:: python
 
     temp_mod.set_temperature(celsius=4)
 
-When using ``set_temperature()``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
+When using ``set_temperature()``, your protocol will wait until the target temperature is reached before proceeding to further commands. Using this blocking command, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
+
+.. versionadded:: 2.0
+
+Beginning with API 2.27, you can use the non-blocking :py:meth:`~.TemperatureModuleContext.start_set_temperature` method to move onto further commands while the module reaches the target temperature. 
+
+.. code-block:: python
+
+  temp_mod.start_set_temperature()
+  pipette.pick_up_tip()
+  pipette.aspirate(50, temp_plate["A1"])
+  pipette.dispense(50, temp_plate["B1"])
+  pipette.drop_tip
+
+Here, the non-blocking ``start_set_temperature()`` lets you pipette in the ``temp_plate`` loaded on the Temperature Module. The method also allows other simultaneous pipetting actions and some other module actions. For more, see the :ref:`concurrent-module` section. 
+
+
 
 .. note::
 
     Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
 
-.. versionadded:: 2.0
+
 
 Temperature Status
 ==================

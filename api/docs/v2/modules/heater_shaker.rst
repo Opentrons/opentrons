@@ -217,7 +217,7 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 Non-blocking commands
 ---------------------
 
-Use non-blocking commands to pipette or complete other module actions while the Heater-Shaker is heating or shaking. The example below uses :py:meth:`~.HeaterShakerContext.set_target_temperature` and :py:meth:`~.HeaterShakerContext.set_shake_speed` to heat and shake simultaneously. Because each is a non-blocking command, the robot also performs pipettes into another plate:
+Use non-blocking commands to pipette or complete other module actions while the Heater-Shaker is heating or shaking. The example below uses :py:meth:`~.HeaterShakerContext.set_target_temperature` and :py:meth:`~.HeaterShakerContext.set_shake_speed` to heat and shake simultaneously. Because each is a non-blocking command, the robot also pipettes into another plate:
 
 .. code-block:: python
 
@@ -228,7 +228,7 @@ Use non-blocking commands to pipette or complete other module actions while the 
     pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
 
-Here, the amount of time it takes for the Heater-Shaker to reach either the target temperature or shake speed won't affect the remaining steps in your protocol. 
+Here, the amount of time it takes for the Heater-Shaker to reach either the target temperature or shake speed doesn't affect other steps in your protocol. The ``set_target_temperature()`` and ``set_shake_speed()`` methods also allow some other simulatenous module actions. For more, see the :ref:`concurrent-module` section. 
 
 In some cases, the amount of time it takes the Heater-Shaker to reach a temperature or shake speed is still important to your protocol. For example, you might need to wait for samples to reach a given temperature before moving to the next step in your protocol. You can still use the Heater-Shaker's non-blocking commands, each of which returns a ``task``, to accomplish this. The example below uses  :py:meth:`.ProtocolContext.wait_for_tasks` to prevent the Flex Gripper from moving the plate from the Heater-Shaker Module until the target temperature is reached: 
 
@@ -249,4 +249,3 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 .. note:: 
 
     The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
-
