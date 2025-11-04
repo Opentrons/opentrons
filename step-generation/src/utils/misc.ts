@@ -1290,24 +1290,20 @@ export const getIsRetractSafeForAirGap = (args: {
 
 export const getStackForLabwareLocation = (
   locationSequence: LabwareLocationSequence
-): string[] => {
-  const stack: string[] = []
-
-  locationSequence
-    .filter(item => item.kind !== 'onCutoutFixture')
-    .forEach(item => {
-      if (item.kind === 'onLabware') {
-        stack.push(item.labwareId)
-      } else if (item.kind === 'onModule') {
-        stack.push(item.moduleId)
-      } else if (item.kind === 'inStackerHopper') {
-        stack.push(item.moduleId)
-      } else if (item.kind === 'onAddressableArea') {
-        stack.push(item.addressableAreaName)
-      } else {
-        stack.push(item.logicalLocationName)
-      }
-    })
-
-  return stack
-}
+): string[] =>
+  locationSequence.reduce<string[]>((acc, item) => {
+    const { kind } = item
+    if (kind === 'onCutoutFixture') {
+      return acc
+    }
+    if (kind === 'onLabware') {
+      return [...acc, item.labwareId]
+    }
+    if (kind === 'onModule' || kind === 'inStackerHopper') {
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'onAddressableArea') {
+      return [...acc, item.addressableAreaName]
+    }
+    return [...acc, item.logicalLocationName]
+  }, [])

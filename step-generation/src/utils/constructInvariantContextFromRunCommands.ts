@@ -26,31 +26,35 @@ export function constructInvariantContextFromRunCommands(
 ): InvariantContext {
   return commands.reduce(
     (acc: InvariantContext, command: RunTimeCommand) => {
-      let labwareEntities: LabwareEntities = { ...acc.labwareEntities }
       if (command.commandType === 'loadLidStack' && command.result != null) {
         const { result, params } = command
         const amount = params.quantity
+
         if (
           result.definition?.schemaVersion === 2 &&
           result.definition != null
         ) {
-          const labwareDefURI = getLabwareDefURI(result.definition)
-          for (let i = 0; i < amount; i++) {
-            const labwareId = result.labwareIds[i]
-            labwareEntities = {
-              ...labwareEntities,
-              [labwareId]: {
-                id: labwareId,
-                labwareDefURI,
-                def: result.definition,
-                pythonName: 'n/a',
-              },
-            }
-          }
+          const def = result.definition
+          const labwareDefURI = getLabwareDefURI(def)
+
+          const stackLabwareEntities = result.labwareIds
+            .slice(0, amount)
+            .reduce(
+              (entities: LabwareEntities, labwareId) => ({
+                ...entities,
+                [labwareId]: {
+                  id: labwareId,
+                  labwareDefURI,
+                  def,
+                  pythonName: 'n/a',
+                },
+              }),
+              acc.labwareEntities
+            )
 
           return {
             ...acc,
-            labwareEntities,
+            labwareEntities: stackLabwareEntities,
           }
         } else {
           // loadLabware commands from the backend can have schema 3 labware definitions.
@@ -65,8 +69,8 @@ export function constructInvariantContextFromRunCommands(
       ) {
         const { result } = command
         if (result.definition.schemaVersion === 2) {
-          labwareEntities = {
-            ...labwareEntities,
+          const labwareEntities = {
+            ...acc.labwareEntities,
             [result.labwareId]: {
               id: result.labwareId,
               labwareDefURI: getLabwareDefURI(result.definition),
