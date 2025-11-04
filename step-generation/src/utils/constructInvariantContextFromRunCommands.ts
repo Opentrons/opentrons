@@ -26,11 +26,50 @@ export function constructInvariantContextFromRunCommands(
 ): InvariantContext {
   return commands.reduce(
     (acc: InvariantContext, command: RunTimeCommand) => {
-      if (command.commandType === 'loadLabware' && command.result != null) {
-        const result = command.result
+      if (command.commandType === 'loadLidStack' && command.result != null) {
+        const { result, params } = command
+        const amount = params.quantity
 
+        if (
+          result.definition != null &&
+          result.definition.schemaVersion === 2
+        ) {
+          const def = result.definition
+          const labwareDefURI = getLabwareDefURI(def)
+
+          const stackLabwareEntities = result.labwareIds
+            .slice(0, amount)
+            .reduce(
+              (entities: LabwareEntities, labwareId) => ({
+                ...entities,
+                [labwareId]: {
+                  id: labwareId,
+                  labwareDefURI,
+                  def,
+                  pythonName: 'n/a',
+                },
+              }),
+              acc.labwareEntities
+            )
+
+          return {
+            ...acc,
+            labwareEntities: stackLabwareEntities,
+          }
+        } else {
+          // loadLabware commands from the backend can have schema 3 labware definitions.
+          // step-generation, and this function by extension, are not prepared to handle
+          // schema 3 yet.
+          return acc
+        }
+      } else if (
+        (command.commandType === 'loadLabware' ||
+          command.commandType === 'loadLid') &&
+        command.result != null
+      ) {
+        const { result } = command
         if (result.definition.schemaVersion === 2) {
-          const labwareEntities: LabwareEntities = {
+          const labwareEntities = {
             ...acc.labwareEntities,
             [result.labwareId]: {
               id: result.labwareId,
