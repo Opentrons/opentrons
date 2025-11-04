@@ -5,7 +5,6 @@ import { fixture96Plate } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 
 import { AssignLiquidsModal } from '..'
 
