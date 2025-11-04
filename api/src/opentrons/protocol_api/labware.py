@@ -839,7 +839,7 @@ class Labware:
         <table>
             <thead>
             <tr>
-                <th>API level</th>
+                <th width="20%">API level</th>
                 <th>Offset behavior</th>
             </tr>
             </thead>
@@ -1369,21 +1369,29 @@ class Labware:
     def load_liquid(
         self, wells: Sequence[Union[str, Well]], volume: float, liquid: Liquid
     ) -> None:
-        """Mark several wells as containing the same amount of liquid.
+        """
+        Mark several wells as containing the same amount of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading labware and before
-        liquid handling operations begin. Loading liquids is required for liquid tracking functionality. If a well
-        hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+        This method should be called at the beginning of a protocol, soon after
+        loading labware and before liquid handling operations begin. Loading
+        liquids is required for liquid tracking functionality. If a well hasn't
+        been assigned a starting volume with
+        [`load_empty()`][opentrons.protocol_api.labware.Labware.load_empty],
+        [`load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid], or
+        [`load_liquid_by_well()`][opentrons.protocol_api.labware.Labware.load_liquid_by_well],
+        the volume it contains is unknown and the well's liquid will not be tracked
+        throughout the protocol.
 
-        :param wells: The wells to load the liquid into.
-        :type wells: List of string well names or list of :py:class:`.Well` objects (e.g., from :py:meth:`~Labware.wells`).
+        Args:
+            wells (List[Union[str, Well]]): The wells to load the liquid into. This can
+                be a list of string well names or a list of
+                [`Well`][opentrons.protocol_api.labware.Well] objects (e.g., from
+                [`wells()`][opentrons.protocol_api.labware.Labware.wells]).
 
-        :param volume: The volume of liquid to load into each well.
-        :type volume: float
+            volume (float): The volume of liquid to load into each well.
 
-        :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
-        :type liquid: Liquid
+            liquid (Liquid): The liquid to load into each well, previously defined by
+                [`define_liquid()`][opentrons.protocol_api.ProtocolContext.define_liquid].
         """
         well_names: List[str] = []
         for well in wells:
@@ -1413,17 +1421,25 @@ class Labware:
     def load_liquid_by_well(
         self, volumes: Mapping[Union[str, Well], float], liquid: Liquid
     ) -> None:
-        """Mark several wells as containing unique volumes of liquid.
+        """
+        Mark several wells as containing unique volumes of liquid.
 
-        This method should be called at the beginning of a protocol, soon after loading labware and before
-        liquid handling begins. Loading liquids is required for liquid tracking functionality. If a well hasn't been assigned a starting volume with :py:meth:`~Labware.load_empty`, :py:meth:`~Labware.load_liquid`, or
-        :py:meth:`~Labware.load_liquid_by_well`, the volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+        This method should be called at the beginning of a protocol, soon after
+        loading labware and before liquid handling begins. Loading liquids is
+        required for liquid tracking functionality. If a well hasn't been assigned
+        a starting volume with [`load_empty()`][opentrons.protocol_api.labware.Labware.load_empty],
+        [`load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid], or
+        [`load_liquid_by_well()`][opentrons.protocol_api.labware.Labware.load_liquid_by_well],
+        the volume it contains is unknown and the well's liquid will not be tracked
+        throughout the protocol.
 
-        :param volumes: A dictionary of well names (or :py:class:`Well` objects, for instance from ``labware['A1']``)
-        :type wells: Dict[Union[str, Well], float]
+        Args:
+            volumes (Dict[Union[str, Well], float]): A dictionary of well names (or
+                [`Well`][opentrons.protocol_api.labware.Well] objects, for instance
+                from `labware['A1']`) to their respective volumes.
 
-        :param liquid: The liquid to load into each well, previously defined by :py:meth:`~ProtocolContext.define_liquid`
-        :type liquid: Liquid
+            liquid (Liquid): The liquid to load into each well, previously defined by
+                [`define_liquid()`][opentrons.protocol_api.ProtocolContext.define_liquid].
         """
         verified_volumes: Dict[str, float] = {}
         for well, volume in volumes.items():
@@ -1451,15 +1467,23 @@ class Labware:
 
     @requires_version(2, 22)
     def load_empty(self, wells: Sequence[Union[Well, str]]) -> None:
-        """Mark several wells as empty.
+        """
+        Mark several wells as empty.
 
-        This method should be called at the beginning of a protocol, after loading the labware and before liquid handling
-        begins. Loading liquids is required for liquid tracking functionality. If a well in a labware hasn't been assigned a starting volume with :py:meth:`Labware.load_empty`, :py:meth:`Labware.load_liquid`, or :py:meth:`Labware.load_liquid_by_well`, the
-        volume it contains is unknown and the well's liquid will not be tracked throughout the protocol.
+        This method should be called at the beginning of a protocol, after loading
+        the labware and before liquid handling begins. Loading liquids is required
+        for liquid tracking functionality. If a well in a labware hasn't been
+        assigned a starting volume with
+        [`load_empty()`][opentrons.protocol_api.labware.Labware.load_empty],
+        [`load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid], or
+        [`load_liquid_by_well()`][opentrons.protocol_api.labware.Labware.load_liquid_by_well],
+        the volume it contains is unknown and the well's liquid will not be tracked
+        throughout the protocol.
 
-        :param wells: The list of wells to mark empty. To mark all wells as empty, pass ``labware.wells()``. You can also specify
-                      wells by their names (for instance, ``labware.load_empty(['A1', 'A2'])``).
-        :type wells: Union[List[Well], List[str]]
+        Args:
+            wells (Union[List[Well], List[str]]): The list of wells to mark empty. To
+                mark all wells as empty, pass `labware.wells()`. You can also specify
+                wells by their names (for instance, `labware.load_empty(['A1', 'A2'])`).
         """
         well_names: List[str] = []
         for well in wells:
