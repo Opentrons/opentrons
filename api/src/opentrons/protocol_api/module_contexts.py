@@ -518,11 +518,11 @@ class TemperatureModuleContext(ModuleContext):
     def status(self) -> str:
         """One of four possible temperature statuses:
 
-        - ``holding at target`` – The module has reached its target temperature
+        - ``holding at target``: The module has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling`` – The module is cooling to a target temperature.
-        - ``heating`` – The module is heating to a target temperature.
-        - ``idle`` – The module has been deactivated.
+        - ``cooling``: The module is cooling to a target temperature.
+        - ``heating``: The module is heating to a target temperature.
+        - ``idle``: The module has been deactivated.
         """
         return self._core.get_status().value
 
@@ -579,18 +579,18 @@ class MagneticModuleContext(ModuleContext):
              the loaded labware has no default, or if no labware is loaded, this will
              raise an error.
 
-           - ``height_from_base`` – Move this many millimeters above the bottom
+           - ``height_from_base``: Move this many millimeters above the bottom
              of the labware. Acceptable values are between ``0`` and ``25``.
 
              This is the recommended way to adjust the magnets' height.
 
              .. versionadded:: 2.2
 
-           - ``offset`` – Move this many millimeters above (positive value) or below
+           - ``offset``: Move this many millimeters above (positive value) or below
              (negative value) the default height for the loaded labware. The sum of
              the default height and ``offset`` must be between 0 and 25.
 
-           - ``height`` – Intended to move this many millimeters above the magnets'
+           - ``height``: Intended to move this many millimeters above the magnets'
              home position. However, depending on the generation of module and the loaded
              labware, this may produce unpredictable results. You should normally use
              ``height_from_base`` instead.
@@ -873,10 +873,10 @@ class ThermocyclerContext(ModuleContext):
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
 
-        - ``closed`` – The lid is closed.
-        - ``in_between`` – The lid is neither open nor closed.
-        - ``open`` – The lid is open.
-        - ``unknown`` – The lid position can't be determined.
+        - ``closed``: The lid is closed.
+        - ``in_between``: The lid is neither open nor closed.
+        - ``open``: The lid is open.
+        - ``unknown``: The lid position can't be determined.
         """
         status = self._core.get_lid_position()
         return status.value if status is not None else None
@@ -886,12 +886,12 @@ class ThermocyclerContext(ModuleContext):
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target`` – The block has reached its target temperature
+        - ``holding at target``: The block has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling`` – The block is cooling to a target temperature.
-        - ``heating`` – The block is heating to a target temperature.
-        - ``idle`` – The block is not currently heating or cooling.
-        - ``error`` – The temperature status can't be determined.
+        - ``cooling``: The block is cooling to a target temperature.
+        - ``heating``: The block is heating to a target temperature.
+        - ``idle``: The block is not currently heating or cooling.
+        - ``error``: The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status().value
 
@@ -900,13 +900,13 @@ class ThermocyclerContext(ModuleContext):
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
 
-        - ``holding at target`` – The lid has reached its target temperature
+        - ``holding at target``: The lid has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling`` – The lid has previously heated and is now passively cooling.
+        - ``cooling``: The lid has previously heated and is now passively cooling.
             `The Thermocycler lid does not have active cooling.`
-        - ``heating`` – The lid is heating to a target temperature.
-        - ``idle`` – The lid has not heated since the beginning of the protocol.
-        - ``error`` – The temperature status can't be determined.
+        - ``heating``: The lid is heating to a target temperature.
+        - ``idle``: The lid has not heated since the beginning of the protocol.
+        - ``error``: The temperature status can't be determined.
         """
         status = self._core.get_lid_temperature_status()
         return status.value if status is not None else None
@@ -993,9 +993,9 @@ class HeaterShakerContext(ModuleContext):
     """An object representing a connected Heater-Shaker Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.13
+    *New in version 2.13*
     """
 
     _core: HeaterShakerCore
@@ -1011,7 +1011,7 @@ class HeaterShakerContext(ModuleContext):
     def target_temperature(self) -> Optional[float]:
         """The target temperature of the Heater-Shaker's plate in °C.
 
-        Returns ``None`` if no target has been set.
+        Returns `None` if no target has been set.
         """
         return self._core.get_target_temperature()
 
@@ -1020,7 +1020,7 @@ class HeaterShakerContext(ModuleContext):
     def current_temperature(self) -> float:
         """The current temperature of the Heater-Shaker's plate in °C.
 
-        Returns ``23`` in simulation if no target temperature has been set.
+        Returns `23` in simulation if no target temperature has been set.
         """
         return self._core.get_current_temperature()
 
@@ -1039,15 +1039,16 @@ class HeaterShakerContext(ModuleContext):
     @property
     @requires_version(2, 13)
     def temperature_status(self) -> str:
-        """One of five possible temperature statuses:
+        """
+        One of five possible temperature statuses:
 
-        - ``holding at target`` – The module has reached its target temperature
+        - `holding at target`: The module has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling`` – The module has previously heated and is now passively cooling.
-          `The Heater-Shaker does not have active cooling.`
-        - ``heating`` – The module is heating to a target temperature.
-        - ``idle`` – The module has not heated since the beginning of the protocol.
-        - ``error`` – The temperature status can't be determined.
+        - `cooling`: The module has previously heated and is now passively cooling.
+          *The Heater-Shaker does not have active cooling.*
+        - `heating`: The module is heating to a target temperature.
+        - `idle`: The module has not heated since the beginning of the protocol.
+        - `error`: The temperature status can't be determined.
         """
         return self._core.get_temperature_status().value
 
@@ -1056,13 +1057,13 @@ class HeaterShakerContext(ModuleContext):
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
 
-        - ``holding at target`` – The module has reached its target shake speed
+        - `holding at target`: The module has reached its target shake speed
           and is actively maintaining that speed.
-        - ``speeding up`` – The module is increasing its shake speed towards a target.
-        - ``slowing down`` – The module was previously shaking at a faster speed
+        - `speeding up`: The module is increasing its shake speed towards a target.
+        - `slowing down`: The module was previously shaking at a faster speed
           and is currently reducing its speed to a lower target or to deactivate.
-        - ``idle`` – The module is not shaking.
-        - ``error`` – The shaking status can't be determined.
+        - `idle`: The module is not shaking.
+        - `error`: The shaking status can't be determined.
         """
         return self._core.get_speed_status().value
 
@@ -1071,14 +1072,14 @@ class HeaterShakerContext(ModuleContext):
     def labware_latch_status(self) -> str:
         """One of six possible latch statuses:
 
-        - ``opening`` – The latch is currently opening (in motion).
-        - ``idle_open`` – The latch is open and not moving.
-        - ``closing`` – The latch is currently closing (in motion).
-        - ``idle_closed`` – The latch is closed and not moving.
-        - ``idle_unknown`` – The default status upon reset, regardless of physical latch position.
-          Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands
+        - `opening`: The latch is currently opening (in motion).
+        - `idle_open`: The latch is open and not moving.
+        - `closing`: The latch is currently closing (in motion).
+        - `idle_closed`: The latch is closed and not moving.
+        - `idle_unknown`: The default status upon reset, regardless of physical latch position.
+          Use [`close_labware_latch`][opentrons.protocol_api.HeaterShakerContext.close_labware_latch] before other commands
           requiring confirmation that the latch is closed.
-        - ``unknown`` – The latch status can't be determined.
+        - `unknown`: The latch status can't be determined.
         """
         return self._core.get_labware_latch_status().value
 
@@ -1088,13 +1089,13 @@ class HeaterShakerContext(ModuleContext):
 
         No other protocol commands will execute while waiting for the temperature.
 
-        .. versionchanged:: 2.25
-            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
-            not achievable.
+        *Changed in version 2.25:* Removed the minimum temperature limit of 37 °C.
+        Note that temperatures under ambient are not achievable.
 
-        :param celsius: A value under 95, representing the target temperature in °C.
-                        Values are automatically truncated to two decimal places,
-                        and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
+        Args:
+            celsius: A value under 95, representing the target temperature in °C.
+                Values are automatically truncated to two decimal places, and the
+                Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         self.set_target_temperature(celsius=celsius)
         self.wait_for_temperature()
@@ -1102,24 +1103,27 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
     def set_target_temperature(self, celsius: float) -> Task:
-        """Set target temperature and return immediately.
+        """
+        Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Allows the protocol to proceed while the module
-        reaches the target temperature.
-        Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
-        protocol execution for API levels below 2.27.
+        waiting for the target to be reached. Does not delay the protocol until
+        target temperature has reached. Use 
+        [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
+        to delay protocol execution for API levels below 2.27.
 
-        .. versionchanged:: 2.25
-            Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
-            not achievable.
-        .. versionchanged:: 2.27
-            Returns a :py:class:`Task` object that represents concurrent heating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the module to reach the target temperature.
+        *Changed in version 2.25:* Removed the minimum temperature limit of 37 °C. 
+        Note that temperatures under ambient are not achievable.
 
-        :param celsius: A value under 95, representing the target temperature in °C.
-                        Values are automatically truncated to two decimal places,
-                        and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
+        *Changed in version 2.27:* Returns a task object that represents concurrent 
+        preheating. Pass the task object to 
+        [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] 
+        to wait for the preheat to complete.
+
+        Args:
+            celsius: A value under 95, representing the target temperature in °C.
+                Values are automatically truncated to two decimal places, and the 
+                Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         validated_temp = validate_heater_shaker_temperature(
             celsius=celsius, api_version=self.api_version
@@ -1147,11 +1151,13 @@ class HeaterShakerContext(ModuleContext):
 
         Reaching a target shake speed typically only takes a few seconds.
 
-        .. note::
+        !!! note
+            Before shaking, this command will retract the pipettes upward if they are parked
+            adjacent to the Heater-Shaker.
 
-            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
-
-        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
+        Args:
+            rpm: A value between 200 and 3000, representing the target shake speed in
+                revolutions per minute.
         """
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
@@ -1161,11 +1167,13 @@ class HeaterShakerContext(ModuleContext):
     def set_shake_speed(self, rpm: int) -> Task:
         """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking.
 
-        .. note::
+        !!! note
+            Before shaking, this command will retract the pipettes upward if they are
+            parked adjacent to the Heater-Shaker.
 
-            Before shaking, this command retracts pipettes upward if they are adjacent to the Heater-Shaker Module.
-
-        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
+        Args:
+            rpm: A value between 200 and 3000, representing the target shake speed in
+                revolutions per minute.
         """
         validated_speed = validate_heater_shaker_speed(rpm=rpm)
         task = self._core.set_shake_speed(rpm=validated_speed)
@@ -1177,14 +1185,14 @@ class HeaterShakerContext(ModuleContext):
         """Open the Heater-Shaker's labware latch.
 
         The labware latch needs to be closed before:
-            * Shaking
-            * Pipetting to or from the labware on the Heater-Shaker
-            * Pipetting to or from labware to the left or right of the Heater-Shaker
+
+        - Shaking
+        - Pipetting to or from the labware on the Heater-Shaker
+        - Pipetting to or from labware to the left or right of the Heater-Shaker
 
         Attempting to open the latch while the Heater-Shaker is shaking will raise an error.
 
-        .. note::
-
+        !!! note
             Before opening the latch, this command will retract the pipettes upward
             if they are parked adjacent to the left or right of the Heater-Shaker.
         """
