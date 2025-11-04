@@ -34,11 +34,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { TFunction } from 'i18next'
-import type {
-  AttachedModule,
-  CommandData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
