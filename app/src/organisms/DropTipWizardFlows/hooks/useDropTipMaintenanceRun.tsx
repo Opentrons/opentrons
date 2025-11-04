@@ -85,7 +85,7 @@ function useCreateDropTipMaintenanceRun({
         // The type assertions here are safe, since we only use this command after asserting these
         const loadPipetteCommand = buildLoadPipetteCommand(
           instrumentModelName!,
-          mount!.mount
+          mount!
         )
 
         chainRunCommands(response.data.id, [loadPipetteCommand], false)
