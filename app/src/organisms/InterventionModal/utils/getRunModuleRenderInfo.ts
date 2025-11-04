@@ -10,7 +10,7 @@ import type { Module } from '@opentrons/components'
 import type {
   DeckDefinition,
   LabwareDefinition,
-  LabwareDefinitionsByUri,
+  LabwareDefinitionsByURI,
   ModuleDefinition,
 } from '@opentrons/shared-data'
 
@@ -33,7 +33,7 @@ export interface RunModuleInfo {
 export function getRunModuleRenderInfo(
   runData: RunData,
   deckDef: DeckDefinition,
-  labwareDefs: LabwareDefinitionsByUri
+  labwareDefs: LabwareDefinitionsByURI
 ): RunModuleInfo[] {
   if (runData.modules.length > 0) {
     return runData.modules.reduce<RunModuleInfo[]>((acc, module) => {
