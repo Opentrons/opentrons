@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +12,6 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import {
@@ -80,20 +78,6 @@ export function SetupCamera({
     })
     confirmCameraSettings()
   }
-  const baseProps = {
-    source: 'runRecord' as const,
-    robotType: robotType,
-  }
-  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
-  useEffect(() => {
-    if (storageInfo.isImageStorageLow) {
-      reportPhotoAccessUsage({
-        ...baseProps,
-        runId: runId,
-        action: 'storageWarning',
-      })
-    }
-  })
 
   return (
     <div className={styles.container}>

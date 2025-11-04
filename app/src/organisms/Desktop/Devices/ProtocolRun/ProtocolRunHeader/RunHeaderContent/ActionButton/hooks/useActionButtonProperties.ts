@@ -107,6 +107,13 @@ export function useActionButtonProperties({
           ? robotAnalyticsData
           : {},
     })
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: enabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
   }
 
   if (isProtocolNotReady) {
@@ -162,25 +169,8 @@ export function useActionButtonProperties({
           },
           { onSettled: handlePlay }
         )
-
-        reportCameraEnablementSettings({
-          ...baseParams,
-          runId: runId,
-          cameraEnabled: enabled,
-          liveFeedEnabled: liveStreamEnabled,
-          recoveryCaptureEnabled: recoveryEnabled,
-        })
       } else {
         handlePlay()
-        const { enabled, recoveryEnabled, liveStreamEnabled } =
-          runCameraSettings
-        reportCameraEnablementSettings({
-          ...baseParams,
-          runId: runId,
-          cameraEnabled: enabled,
-          liveFeedEnabled: liveStreamEnabled,
-          recoveryCaptureEnabled: recoveryEnabled,
-        })
       }
     }
   } else if (isRunAgainStatus(runStatus)) {

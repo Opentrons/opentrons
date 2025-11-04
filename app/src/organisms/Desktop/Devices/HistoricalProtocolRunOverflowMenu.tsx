@@ -204,7 +204,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reportPhotoAccessUsage({
       ...baseParams,
-      runId: runId,
       action: 'delete',
     })
   }

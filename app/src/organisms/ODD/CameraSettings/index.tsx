@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
-import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
@@ -51,19 +49,7 @@ export function CameraSettings({
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
   }
-  const robotType = useRobotType(robotName)
-  const baseProps = {
-    source: 'robotSettings' as const,
-    robotType: robotType,
-  }
-  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
-  if (storageInfo?.isImageStorageLow) {
-    reportPhotoAccessUsage({
-      ...baseProps,
-      transactionId: `camera-settings-${Date.now()}`,
-      action: 'storageWarning',
-    })
-  }
+
   if (showControls) {
     return <CameraControls toggleShowControls={toggleShowControls} />
   } else {
@@ -97,6 +83,7 @@ export function CameraSettings({
                 toggleRecoveryCaptureEnabled={toggleRecoveryEnabled}
                 isLiveVideoEnabled={isLiveVideoEnabled}
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
+                robotName={robotName}
               />
               {isCameraSettingsEnabled && (
                 <ControlPreferencesSettings
@@ -113,6 +100,7 @@ export function CameraSettings({
 
 function StorageAlmostFullNotification(): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'branded'])
+
   return (
     <InlineNotification
       type="alert"

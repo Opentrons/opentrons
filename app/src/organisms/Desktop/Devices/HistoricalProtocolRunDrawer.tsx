@@ -62,7 +62,6 @@ export function HistoricalProtocolRunDrawer(
 ): JSX.Element | null {
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
-  const robotType = useRobotType(robotName)
   const isFlex = useIsFlex(robotName)
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const allLabwareOffsets: LabwareOffset[] =
@@ -73,16 +72,7 @@ export function HistoricalProtocolRunDrawer(
   const totalImageFileCount = outputFileIds.jpeg.length
   const totalOutputFileCount = totalImageFileCount + outputFileIds.csv.length
   // TODO: move this to run header or protocol finishing/run stopped
-  const baseParams = {
-    source: 'runRecord' as const,
-    robotType: robotType,
-  }
-  const { reportImageCaptureUsage } = useCameraAnalytics(baseParams)
-  reportImageCaptureUsage({
-    ...baseParams,
-    amount: totalImageFileCount,
-    runId: run.id,
-  })
+
   const runCsvFileIds =
     'runTimeParameters' in run
       ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
@@ -444,7 +434,6 @@ function ImagesFileDataRow({
               reportPhotoAccessUsage({
                 ...baseParams,
                 action: 'downloadZip',
-                runId: run.id,
               })
             }
           }}

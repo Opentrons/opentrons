@@ -194,8 +194,15 @@ function PrepareToRun({
     source: 'runRecord' as const,
     robotType: robotType,
   }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-
+  const { reportCameraEnablementSettings, reportPhotoAccessUsage } =
+    useCameraAnalytics(baseParams)
+  useEffect(() => {
+    reportPhotoAccessUsage({
+      ...baseParams,
+      action: 'storageWarning',
+      transactionId: runId,
+    })
+  })
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -422,7 +429,6 @@ function PrepareToRun({
           })
           reportCameraEnablementSettings({
             ...baseParams,
-            runId,
             cameraEnabled: appCameraSettings.enabled,
             liveFeedEnabled: appCameraSettings.liveStreamEnabled,
             recoveryCaptureEnabled: appCameraSettings.recoveryEnabled,

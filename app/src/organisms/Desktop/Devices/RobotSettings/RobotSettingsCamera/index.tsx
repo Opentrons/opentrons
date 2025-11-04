@@ -29,17 +29,28 @@ export function RobotSettingsCamera({
   } = useCameraUsageSettings()
   const baseParams = { source: 'robotSettings' as const, robotType: robotType }
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-  reportCameraEnablementSettings({
-    ...baseParams,
-    transactionId: `camera-settings ${Date.now()}`,
-    cameraEnabled: isCameraEnabled,
-    liveFeedEnabled: isLiveVideoEnabled,
-    recoveryCaptureEnabled: isRecoveryCaptureEnabled,
-  })
   const runId = useCurrentRunId()
   const doesRunExist = runId != null
   const isCameraSettingsEnabled = useFeatureFlag('camera')
+  const handleToggleLiveStream = (): void => {
+    toggleLiveVideoEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: true,
+      liveFeedEnabled: isLiveVideoEnabled,
+      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+    })
+  }
 
+  const handleToggleRecovery = (): void => {
+    toggleRecoveryCaptureEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: true,
+      liveFeedEnabled: isLiveVideoEnabled,
+      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+    })
+  }
   return (
     <div className={styles.container}>
       <CameraStatusContainer
@@ -52,8 +63,8 @@ export function RobotSettingsCamera({
           <RobotSettingsCameraUsage
             isLiveVideoEnabled={isLiveVideoEnabled}
             isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
-            toggleLiveVideoEnabled={toggleLiveVideoEnabled}
-            toggleRecoveryCaptureEnabled={toggleRecoveryCaptureEnabled}
+            toggleLiveVideoEnabled={handleToggleLiveStream}
+            toggleRecoveryCaptureEnabled={handleToggleRecovery}
             toggleDisabled={doesRunExist}
           />
           {isCameraSettingsEnabled && (

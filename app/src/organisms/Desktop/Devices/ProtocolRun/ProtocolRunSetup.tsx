@@ -31,6 +31,7 @@ import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
 import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
@@ -54,6 +55,7 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import {
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -218,6 +220,21 @@ export function ProtocolRunSetup({
   const isCameraConfirmed =
     !missingSteps.includes(CAMERA_SETUP_STEP_KEY) || runHasStarted
   const cameraSettingsApplied = runRecord?.data.cameraSettings != null
+  const storageInfo = useRobotStorageInfo()
+  const baseProps = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        ...baseProps,
+        transactionId: runId,
+        action: 'storageWarning',
+      })
+    }
+  }, [storageInfo.isImageStorageLow !== null])
   // A separate app can apply camera settings.
   // We need to update the missing steps as a side effect.
   useEffect(() => {

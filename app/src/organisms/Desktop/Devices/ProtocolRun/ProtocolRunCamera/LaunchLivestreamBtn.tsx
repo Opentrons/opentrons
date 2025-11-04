@@ -42,7 +42,6 @@ export function LaunchLivestreamBtn({
     reportLiveFeedUsage({
       ...baseParams,
       amount: 1,
-      errorDetails: '',
       runId: runId,
     })
   }

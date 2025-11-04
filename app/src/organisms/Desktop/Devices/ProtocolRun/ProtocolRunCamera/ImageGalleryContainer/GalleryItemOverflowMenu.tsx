@@ -63,7 +63,6 @@ export function GalleryItemOverflowMenu({
     a.click()
     reportPhotoAccessUsage({
       ...baseParams,
-      runId: runId,
       action: 'download',
     })
     a.remove()

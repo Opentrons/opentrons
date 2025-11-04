@@ -74,7 +74,6 @@ export function CameraCard({
     toggleCameraEnabled()
     reportCameraEnablementSettings({
       ...baseParams,
-      transactionId: `robot-card-${Date.now()}`,
       cameraEnabled: isCameraEnabled,
       liveFeedEnabled: isLiveVideoEnabled,
       recoveryCaptureEnabled: isRecoveryCaptureEnabled,

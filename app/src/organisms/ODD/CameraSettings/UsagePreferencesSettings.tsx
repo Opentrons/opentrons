@@ -4,6 +4,7 @@ import { ListButton, StyledText } from '@opentrons/components'
 
 import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './preferences.module.css'
 
@@ -14,6 +15,7 @@ export interface UsagePreferencesSettingsProps {
   toggleRecoveryCaptureEnabled: UseCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
   isLiveVideoEnabled: UseCameraUsageSettingsResult['isLiveVideoEnabled']
   isRecoveryCaptureEnabled: UseCameraUsageSettingsResult['isRecoveryCaptureEnabled']
+  robotName: string
 }
 
 export function UsagePreferencesSettings({
@@ -21,19 +23,35 @@ export function UsagePreferencesSettings({
   isRecoveryCaptureEnabled,
   toggleRecoveryCaptureEnabled,
   toggleLiveVideoEnabled,
+  robotName,
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const robotType = useRobotType(robotName)
   const baseParams = {
+    robotType: robotType,
     source: 'robotSettings' as const,
   }
   const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
-  reportCameraEnablementSettings({
-    ...baseParams,
-    transactionId: `camera-settings-${Date.now()}`,
-    cameraEnabled: true,
-    liveFeedEnabled: isLiveVideoEnabled,
-    recoveryCaptureEnabled: isRecoveryCaptureEnabled,
-  })
+
+  const handleToggleLiveStream = (): void => {
+    toggleLiveVideoEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: true,
+      liveFeedEnabled: !isLiveVideoEnabled,
+      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+    })
+  }
+
+  const handleToggleRecovery = (): void => {
+    toggleRecoveryCaptureEnabled()
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: true,
+      liveFeedEnabled: isLiveVideoEnabled,
+      recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
+    })
+  }
   return (
     <div className={styles.usage_preferences_container}>
       <StyledText oddStyle="level4HeaderSemiBold">
@@ -43,7 +61,7 @@ export function UsagePreferencesSettings({
         <ListButton
           type="noActive"
           className={styles.setting_card}
-          onClick={toggleLiveVideoEnabled}
+          onClick={handleToggleLiveStream}
         >
           <div className={styles.usage_text_container}>
             <StyledText oddStyle="level4HeaderSemiBold">
@@ -61,7 +79,7 @@ export function UsagePreferencesSettings({
         <ListButton
           type="noActive"
           className={styles.setting_card}
-          onClick={toggleRecoveryCaptureEnabled}
+          onClick={handleToggleRecovery}
         >
           <div className={styles.usage_text_container}>
             <StyledText oddStyle="level4HeaderSemiBold">

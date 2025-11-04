@@ -119,6 +119,14 @@ export function useRunHeaderModalContainer({
   )
 
   function proceedToRun(): void {
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    reportCameraEnablementSettings({
+      ...baseParams,
+      cameraEnabled: enabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
+
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -146,13 +154,6 @@ export function useRunHeaderModalContainer({
     // before starting the run.
     const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
     if (!areCameraPreferencesConfirmed) {
-      reportCameraEnablementSettings({
-        ...baseParams,
-        runId: runId,
-        cameraEnabled: enabled,
-        liveFeedEnabled: liveStreamEnabled,
-        recoveryCaptureEnabled: recoveryEnabled,
-      })
       return addCameraSettingsToRun({
         runId,
         settings: {
@@ -162,13 +163,6 @@ export function useRunHeaderModalContainer({
         },
       }).then(() => handlePlay())
     } else {
-      reportCameraEnablementSettings({
-        ...baseParams,
-        runId: runId,
-        cameraEnabled: enabled,
-        liveFeedEnabled: liveStreamEnabled,
-        recoveryCaptureEnabled: recoveryEnabled,
-      })
       return handlePlay()
     }
   }
