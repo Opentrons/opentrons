@@ -24,8 +24,8 @@ import { migrate } from '../migrate'
 
 vi.mock('uuid/v4')
 
-const NEWEST_VERSION = 26
-const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V26
+const NEWEST_VERSION = 27
+const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V27
 
 describe('config migration', () => {
   beforeEach(() => {
