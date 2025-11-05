@@ -19,6 +19,7 @@ description = "Common utilities for various Opentrons Python servers."
 dynamic = ['version']
 
 dependencies = [
+    "fastapi==0.100.0",
     "idna==3.3",
 ]
 
