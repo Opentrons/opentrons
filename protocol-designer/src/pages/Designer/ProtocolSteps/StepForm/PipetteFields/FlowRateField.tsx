@@ -67,7 +67,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
 
   const matchingTipLiquidSpecs =
     pipette != null && tiprack != null
-      ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprackDef)
+      ? getMatchingTipLiquidSpecs(pipette.spec, volume as number, tiprackDef)
       : null
 
   let airGapByVolume: Array<[number, number]> = []

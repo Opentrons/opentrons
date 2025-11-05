@@ -37,7 +37,7 @@ export const mixFormToArgs = (
     pushOut_volume,
   } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    pipette,
+    pipette?.spec,
     hydratedFormData.volume,
     hydratedFormData.tipRack
   )
