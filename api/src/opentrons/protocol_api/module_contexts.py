@@ -434,13 +434,13 @@ class ModuleContext(CommandPublisher):
 
 
 class TemperatureModuleContext(ModuleContext):
-    """An object representing a connected Temperature Module.
+    """
+    An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.0
-
+    *New in version 2.0*
     """
 
     _core: TemperatureModuleCore
@@ -458,8 +458,8 @@ class TemperatureModuleContext(ModuleContext):
 
         No other protocol commands will execute while waiting for the temperature.
 
-        :param celsius: A value between 4 and 95, representing the target temperature in °C.
-
+        Args:
+            celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         self._core.set_target_temperature(celsius)
         self._core.wait_for_target_temperature()
@@ -469,12 +469,16 @@ class TemperatureModuleContext(ModuleContext):
     def start_set_temperature(self, celsius: float) -> Task:
         """Set the target temperature without waiting for the target to be hit.
 
-        .. versionchanged:: 2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+        *Changed in version 2.27:* Returns a task object that represents
+        concurrent preheating. Pass the task object to
+        [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        On version 2.26 or below, this function returns ``None``.
-        :param celsius: A value between 4 and 95, representing the target temperature in °C.
+        On version 2.26 or below, this function returns `None`.
+
+        Args:
+            celsius: A value between 4 and 95, representing the target
+            temperature in °C.
         """
         task = self._core.set_target_temperature(celsius)
         if self._api_version >= APIVersion(2, 27):
@@ -487,7 +491,9 @@ class TemperatureModuleContext(ModuleContext):
     def await_temperature(self, celsius: float) -> None:
         """Wait until module reaches temperature.
 
-        :param celsius: A value between 4 and 95, representing the target temperature in °C.
+        Args:
+            celsius: A value between 4 and 95, representing the target temperature
+            in °C.
         """
         self._core.wait_for_target_temperature(celsius)
 
@@ -502,7 +508,7 @@ class TemperatureModuleContext(ModuleContext):
     def temperature(self) -> float:
         """The current temperature of the Temperature Module's deck in °C.
 
-        Returns ``0`` in simulation if no target temperature has been set.
+        Returns `0` in simulation if no target temperature has been set.
         """
         return self._core.get_current_temperature()
 
@@ -511,7 +517,7 @@ class TemperatureModuleContext(ModuleContext):
     def target(self) -> Optional[float]:
         """The target temperature of the Temperature Module's deck in °C.
 
-        Returns ``None`` if no target has been set.
+        Returns `None` if no target has been set.
         """
         return self._core.get_target_temperature()
 
@@ -520,22 +526,23 @@ class TemperatureModuleContext(ModuleContext):
     def status(self) -> str:
         """One of four possible temperature statuses:
 
-        - ``holding at target``: The module has reached its target temperature
+        - `holding at target`: The module has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling``: The module is cooling to a target temperature.
-        - ``heating``: The module is heating to a target temperature.
-        - ``idle``: The module has been deactivated.
+        - `cooling`: The module is cooling to a target temperature.
+        - `heating`: The module is heating to a target temperature.
+        - `idle`: The module has been deactivated.
         """
         return self._core.get_status().value
 
 
 class MagneticModuleContext(ModuleContext):
-    """An object representing a connected Magnetic Module.
+    """
+    An object representing a connected Magnetic Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.0
+    *New in version 2.0*
     """
 
     _core: MagneticModuleCore
@@ -551,8 +558,7 @@ class MagneticModuleContext(ModuleContext):
     def calibrate(self) -> None:
         """Calibrate the Magnetic Module.
 
-        .. deprecated:: 2.14
-            This method is unnecessary; remove any usage.
+        *Deprecated in version 2.14:* This method is unnecessary; remove any usage.
         """
         if self._api_version < ENGINE_CORE_API_VERSION:
             _log.warning(
@@ -574,34 +580,34 @@ class MagneticModuleContext(ModuleContext):
         offset: Optional[float] = None,
         height_from_base: Optional[float] = None,
     ) -> None:
-        """Raise the Magnetic Module's magnets.  You can specify how high the magnets
+        """
+        Raise the Magnetic Module's magnets. You can specify how high the magnets
         should move:
 
-           - No parameter: Move to the default height for the loaded labware. If
-             the loaded labware has no default, or if no labware is loaded, this will
-             raise an error.
+        - No parameter: Move to the default height for the loaded labware. If
+          the loaded labware has no default, or if no labware is loaded, this will
+          raise an error.
 
-           - ``height_from_base``: Move this many millimeters above the bottom
-             of the labware. Acceptable values are between ``0`` and ``25``.
+        - `height_from_base`: Move this many millimeters above the bottom
+          of the labware. Acceptable values are between `0` and `25`.
 
-             This is the recommended way to adjust the magnets' height.
+            This is the recommended way to adjust the magnets' height.
 
-             .. versionadded:: 2.2
+            *New in version 2.2*
 
-           - ``offset``: Move this many millimeters above (positive value) or below
-             (negative value) the default height for the loaded labware. The sum of
-             the default height and ``offset`` must be between 0 and 25.
+        - `offset`: Move this many millimeters above (positive value) or below
+          (negative value) the default height for the loaded labware. The sum of
+          the default height and `offset` must be between 0 and 25.
 
-           - ``height``: Intended to move this many millimeters above the magnets'
-             home position. However, depending on the generation of module and the loaded
-             labware, this may produce unpredictable results. You should normally use
-             ``height_from_base`` instead.
+        - `height`: Intended to move this many millimeters above the magnets'
+          home position. However, depending on the generation of module and the loaded
+          labware, this may produce unpredictable results. You should normally use
+          `height_from_base` instead.
 
-             .. versionchanged:: 2.14
-                This parameter has been removed.
+            *Removed in version 2.14*
 
         You shouldn't specify more than one of these parameters. However, if you do,
-        their order of precedence is ``height``, then ``height_from_base``, then ``offset``.
+        their order of precedence is `height`, then `height_from_base`, then `offset`.
         """
         if height is not None:
             if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
@@ -636,7 +642,7 @@ class MagneticModuleContext(ModuleContext):
     @property
     @requires_version(2, 0)
     def status(self) -> str:
-        """The status of the module, either ``engaged`` or ``disengaged``."""
+        """The status of the module, either `engaged` or `disengaged`."""
         return self._core.get_status().value
 
 
@@ -644,9 +650,9 @@ class ThermocyclerContext(ModuleContext):
     """An object representing a connected Thermocycler Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.0
+    *New in version 2.0*
     """
 
     _core: ThermocyclerCore
@@ -679,31 +685,31 @@ class ThermocyclerContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Set the target temperature for the well block, in °C.
+        """
+        Set the target temperature for the well block, in °C.
 
-        :param temperature: A value between 4 and 99, representing the target
-                            temperature in °C.
-        :param hold_time_minutes: The number of minutes to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_seconds`` is also
-                                  specified, the times are added together.
-        :param hold_time_seconds: The number of seconds to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_minutes`` is also
-                                  specified, the times are added together.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
-                                 After API version 2.27 it will attempt to use
-                                 the liquid tracking of the labware first and
-                                 then fall back to the 25 if there is no probed
-                                 or loaded liquid.
+        Args:
+            temperature: A value between 4 and 99, representing the target
+                temperature in °C.
+            hold_time_minutes: The number of minutes to hold, after reaching
+                `temperature`, before proceeding to the next command. If
+                `hold_time_seconds` is also specified, the times are added
+                together.
+            hold_time_seconds: The number of seconds to hold, after reaching
+                `temperature`, before proceeding to the next command. If
+                `hold_time_minutes` is also specified, the times are added
+                together.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified,
+                the default is 25 µL. *Changed in version 2.27:* After API
+                version 2.27 it will attempt to use the liquid tracking of the
+                labware first and then fall back to the 25 if there is no
+                probed or loaded liquid.
 
-        .. note::
-
-            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
-            specified, the Thermocycler will proceed to the next command
-            immediately after ``temperature`` is reached.
+        !!! note
+            If `hold_time_minutes` and `hold_time_seconds` are not specified,
+            the Thermocycler will proceed to the next command immediately after
+            `temperature` is reached.
         """
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
@@ -729,18 +735,20 @@ class ThermocyclerContext(ModuleContext):
         """Starts to set the target temperature for the well block, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param temperature: A value between 4 and 99, representing the target
-                            temperature in °C.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
-                                 After API version 2.27 it will attempt to use
-                                 the liquid tracking of the labware first and
-                                 then fall back to the 25 if there is no probed
-                                 or loaded liquid.
+        Args:
+            temperature: A value between 4 and 99, representing the target
+                temperature in °C.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified,
+                the default is 25 µL.
+                
+                *Changed in version 2.27:* After API version
+                2.27 it will attempt to use the liquid tracking of the labware
+                first and then fall back to the 25 if there is no probed or loaded
+                liquid.
         """
 
         if block_max_volume is None:
@@ -758,17 +766,16 @@ class ThermocyclerContext(ModuleContext):
         """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param temperature: A value between 37 and 110, representing the target
-                            temperature in °C.
+        Args:
+            temperature: A value between 37 and 110, representing the target
+                temperature in °C.
 
-        .. note::
-
+        !!! note
             The Thermocycler will proceed to the next command immediately after
-            ``temperature`` is reached.
-
+            `temperature` is reached.
         """
         self._core.set_target_lid_temperature(celsius=temperature)
         self._core.wait_for_lid_temperature()
@@ -779,17 +786,16 @@ class ThermocyclerContext(ModuleContext):
         """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param temperature: A value between 37 and 110, representing the target
-                            temperature in °C.
+        Args:
+            temperature: A value between 37 and 110, representing the target
+                temperature in °C.
 
-        .. note::
-
+        !!! note
             The Thermocycler will proceed to the next command immediately after
-            ``temperature`` is reached.
-
+            `temperature` is reached.
         """
         task = self._core.start_set_target_lid_temperature(celsius=temperature)
         return Task(api_version=self._api_version, core=task)
@@ -802,22 +808,23 @@ class ThermocyclerContext(ModuleContext):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """Execute a Thermocycler profile, defined as a cycle of
-        ``steps``, for a given number of ``repetitions``.
+        """
+        Execute a Thermocycler profile, defined as a cycle of
+        `steps`, for a given number of `repetitions`.
 
-        :param steps: List of steps that make up a single cycle.
-                      Each list item should be a dictionary that maps to the parameters
-                      of the :py:meth:`set_block_temperature` method. The dictionary's
-                      keys must be ``temperature`` and one or both of
-                      ``hold_time_seconds`` and ``hold_time_minutes``.
-        :param repetitions: The number of times to repeat the cycled steps.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
+        Args:
+            steps: List of steps that make up a single cycle.
+                Each list item should be a dictionary that maps to the parameters
+                of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature]
+                method. The dictionary's keys must be `temperature` and one or both of
+                `hold_time_seconds` and `hold_time_minutes`.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified,
+                the default is 25 µL.
 
-        .. versionchanged:: 2.21
-            Fixed run log listing number of steps instead of number of repetitions.
-
+        *Changed in version 2.21:* Fixed run log listing number of steps instead of
+        number of repetitions.
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
@@ -835,21 +842,24 @@ class ThermocyclerContext(ModuleContext):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> Task:
-        """Start a Thermocycler profile and return a :py:class:`Task` representing its execution.
-        Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
+        """
+        Start a Thermocycler profile and return a `Task` representing its execution.
+        Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
 
         Returns a task object that represents concurrent execution of the profile.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param steps: List of steps that make up a single cycle.
-                      Each list item should be a dictionary that maps to the parameters
-                      of the :py:meth:`set_block_temperature` method. The dictionary's
-                      keys must be ``temperature`` and one or both of
-                      ``hold_time_seconds`` and ``hold_time_minutes``.
-        :param repetitions: The number of times to repeat the cycled steps.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
+        Args:
+            steps: List of steps that make up a single cycle.
+                Each list item should be a dictionary that maps to the parameters
+                of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature]
+                method. The dictionary's keys must be `temperature` and one or both of
+                `hold_time_seconds` and `hold_time_minutes`.
+            repetitions: The number of times to repeat the cycled steps.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified, the
+                default is 25 µL.
         """
         repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
@@ -883,10 +893,10 @@ class ThermocyclerContext(ModuleContext):
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
 
-        - ``closed``: The lid is closed.
-        - ``in_between``: The lid is neither open nor closed.
-        - ``open``: The lid is open.
-        - ``unknown``: The lid position can't be determined.
+        - `closed`: The lid is closed.
+        - `in_between`: The lid is neither open nor closed.
+        - `open`: The lid is open.
+        - `unknown`: The lid position can't be determined.
         """
         status = self._core.get_lid_position()
         return status.value if status is not None else None
@@ -896,12 +906,12 @@ class ThermocyclerContext(ModuleContext):
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The block has reached its target temperature
+        - `holding at target`: The block has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling``: The block is cooling to a target temperature.
-        - ``heating``: The block is heating to a target temperature.
-        - ``idle``: The block is not currently heating or cooling.
-        - ``error``: The temperature status can't be determined.
+        - `cooling`: The block is cooling to a target temperature.
+        - `heating`: The block is heating to a target temperature.
+        - `idle`: The block is not currently heating or cooling.
+        - `error`: The temperature status can't be determined.
         """
         return self._core.get_block_temperature_status().value
 
@@ -910,13 +920,13 @@ class ThermocyclerContext(ModuleContext):
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
 
-        - ``holding at target``: The lid has reached its target temperature
+        - `holding at target`: The lid has reached its target temperature
           and is actively maintaining that temperature.
-        - ``cooling``: The lid has previously heated and is now passively cooling.
+        - `cooling`: The lid has previously heated and is now passively cooling.
             `The Thermocycler lid does not have active cooling.`
-        - ``heating``: The lid is heating to a target temperature.
-        - ``idle``: The lid has not heated since the beginning of the protocol.
-        - ``error``: The temperature status can't be determined.
+        - `heating`: The lid is heating to a target temperature.
+        - `idle`: The lid has not heated since the beginning of the protocol.
+        - `error`: The temperature status can't be determined.
         """
         status = self._core.get_lid_temperature_status()
         return status.value if status is not None else None
@@ -1235,12 +1245,13 @@ class HeaterShakerContext(ModuleContext):
 
 
 class MagneticBlockContext(ModuleContext):
-    """An object representing a Magnetic Block.
+    """
+    An object representing a Magnetic Block.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
-    .. versionadded:: 2.15
+    *New in version 2.15*
     """
 
     _core: MagneticBlockCore
