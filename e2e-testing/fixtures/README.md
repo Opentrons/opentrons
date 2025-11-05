@@ -4,7 +4,7 @@ This directory contains test fixtures for e2e testing of Protocol Designer.
 
 ## Directory Structure
 
-```
+```md
 fixtures/
 ├── protocol/           # Protocol Designer protocol files
 │   ├── 1/             # Protocol version 1 files
@@ -26,16 +26,17 @@ fixtures/
 ## Protocol Files
 
 Each protocol version directory contains test protocols used for:
+
 - **Migration testing** - Protocols from older versions that should migrate automatically
 - **Feature testing** - Protocols that test specific features (thermocycler, modules, etc.)
 - **Regression testing** - Known-good protocols to detect regressions
 
 ### Key Protocol Files
 
-- **doItAll*.json** - Comprehensive protocols testing multiple features
-- **mix_*.json** - Mix step testing protocols
-- **example_1_1_0*.json** - Example protocols from v1.1.0
-- **thermocycler*.json** - Thermocycler module testing
+- **doItAll\*.json** - Comprehensive protocols testing multiple features
+- **mix\_\*.json** - Mix step testing protocols
+- **example_1_1_0\*.json** - Example protocols from v1.1.0
+- **thermocycler\*.json** - Thermocycler module testing
 - **batchEdit.json** - Batch editing functionality
 - **mixSettings.json** - Mix step settings
 - **transferSettings.json** - Transfer step settings
@@ -46,6 +47,7 @@ Each protocol version directory contains test protocols used for:
 ## Usage in Tests
 
 Protocol fixtures are used in:
+
 - `test_import.py` - Protocol import and migration testing
 - `test_testfiles.py` - Validates all protocol files are valid JSON
 
@@ -59,6 +61,7 @@ page.get_by_label("Import_from_landing").set_input_files(protocol_file_path)
 ## Maintenance
 
 These fixtures are copies of the protocol-designer fixtures. When adding new test protocols:
+
 1. Add the protocol to the appropriate version directory
 2. Update `test_testfiles.py` TEST_FILES dictionary if needed
 3. Run `make test-pd-local` to verify all tests still pass
@@ -66,6 +69,7 @@ These fixtures are copies of the protocol-designer fixtures. When adding new tes
 ## Source
 
 These fixtures were copied from:
+
 - `protocol-designer/fixtures/` → `e2e-testing/fixtures/protocol/` and `e2e-testing/fixtures/state/`
 - `protocol-designer/cypress/fixtures/` → `e2e-testing/fixtures/cypress_fixtures/`
 

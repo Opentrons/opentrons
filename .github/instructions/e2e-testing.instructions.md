@@ -17,7 +17,7 @@ The `e2e-testing` directory contains end-to-end tests for Protocol Designer usin
 
 ### Page Object Model (POM) Pattern
 
-**ALWAYS use Page Object Model** when writing or modifying tests:
+**ALWAYS use Page Object Model and/or Screenplay Pattern** when writing or modifying tests:
 
 1. **Page Objects** (`automation/pd_pages/`):
    - Encapsulate all element locators and interactions
@@ -26,7 +26,12 @@ The `e2e-testing` directory contains end-to-end tests for Protocol Designer usin
    - Methods should return `None` or page objects (for chaining)
    - Add type annotations to all methods
 
-2. **Tests** (`tests/`):
+2. **Screenplay Pattern** (optional):
+   - Focus on user interactions and goals
+   - Use tasks and interactions to model user behavior
+   - Can be combined with POM for element locators
+
+3. **Tests** (`tests/`):
    - Import and use page objects, never direct Playwright selectors
    - Focus on test logic and assertions
    - Use descriptive test names: `test_<feature>_<scenario>`
@@ -81,53 +86,20 @@ Tests run against different environments via `TEST_ENV`:
 - **prod**: `https://designer.opentrons.com`
 - **sandbox**: TODO - Not implemented (requires branch-specific URLs)
 
-**Environment detection in page objects:**
-
-```python
-class MyPage(BasePage):
-    def select_slot(self, slot: str) -> None:
-        """Select a deck slot (environment-aware)."""
-        if self.is_sandbox:
-            # Sandbox uses different selectors
-            self.page.get_by_text(f"Slot {slot}").click()
-        else:
-            # Staging/prod use test-ids
-            self.page.get_by_test_id(f"slot-{slot}").click()
-```
-
 ## Key Files
 
 ### `conftest.py` - Pytest Configuration
 
-- **Fixtures you can use:**
-  - `page: Page` - Pre-configured Playwright page
-  - `base_url: str` - Environment URL
-  - `browser_context_args` - Browser viewport & video settings
-  - `browser_type_launch_args` - Headless/headed mode
-  - `dev_server` - Auto-starts Protocol Designer for local tests
-
 ### `pytest.ini` - Test Settings
 
-- Test discovery: `test_*.py`, `*_test.py`
-- Browser: Chromium only
-- Timeout: 300 seconds per test
-- Markers: `slow`, `integration`
-
 ### `pyproject.toml` - Dependencies & Tools
-
-- **Dependencies:** playwright, pytest, pytest-playwright, mypy, ruff
-- **Build system:** hatchling
-- **Packages:** `automation`, `tests`
-- **Type checking:** Strict mypy with test exemptions
 
 ## Development Commands
 
 **ALWAYS run these before committing:**
 
 ```bash
-make check                   # Runs lint + typecheck (required)
 make format                  # Auto-format code
-make lint                    # Check code style with ruff
 make typecheck               # Run mypy type checking
 ```
 
@@ -135,10 +107,6 @@ make typecheck               # Run mypy type checking
 
 ```bash
 make test-pd-local              # Local build (headed, 250ms slow-mo)
-make test-pd-local-headless     # Local build (headless)
-make test-pd-staging            # Staging environment
-make test-pd-staging-headless   # Staging (headless)
-make test-pd-prod               # Production (use sparingly!)
 make test-pd-debug              # Debug mode (1000ms slow-mo, verbose)
 ```
 
@@ -168,22 +136,10 @@ def my_function(page, name):
 
 ### Imports
 
-**Organize imports:**
+**Organize imports:** - ruff handles this automatically
 
-1. Standard library
-2. Third-party (pytest, playwright)
-3. Local imports
-
-```python
-"""Module docstring."""
-
-import os
-from typing import Any
-
-import pytest
-from playwright.sync_api import Page
-
-from automation.pd_pages import LandingPage
+```bash
+make format
 ```
 
 ### Docstrings
@@ -204,15 +160,6 @@ class LandingPage(BasePage):
         """Wait for the landing page to fully load."""
         pass
 ```
-
-## Video Recordings
-
-**All tests automatically record videos** to `test-results/videos/`:
-
-- Videos saved for passing AND failing tests
-- Format: `<test-name>-<timestamp>.webm`
-- Uploaded to GitHub Actions artifacts (7-day retention)
-- **DO NOT** commit videos to git (already in `.gitignore`)
 
 ## Testing Best Practices
 
@@ -280,21 +227,7 @@ expect(page.get_by_text("Success")).to_be_visible()
 2. **Write test** in `tests/` using page objects
 3. **Add type annotations** to all functions
 4. **Run locally:** `make test-pd-local`
-5. **Check code quality:** `make check`
-6. **Commit changes**
-
-### Environment-Aware Selectors
-
-```python
-def select_element(self, name: str) -> None:
-    """Select element (environment-aware)."""
-    if self.is_sandbox:
-        # Sandbox-specific selector
-        self.page.locator(f"[data-sandbox-id='{name}']").click()
-    else:
-        # Staging/prod selector
-        self.page.get_by_test_id(name).click()
-```
+5. **Check code quality:** `make format typecheck check`
 
 ### Chaining Page Objects
 
@@ -315,24 +248,7 @@ next_page.configure_settings()
 ### GitHub Actions Workflows
 
 **`.github/workflows/pd-e2e-test.yaml`:**
-
-- Runs on: push to `edge`, `e2e-testing` branches
-- Jobs: `e2e-test-local`, `e2e-test-staging`
-- Automatically runs in **headless mode** (`CI=true`)
-- Uploads test results and videos as artifacts
-
 **`.github/workflows/e2e-test-checks.yaml`:**
-
-- Runs on: push to `edge`, `e2e-testing`, PRs
-- Job: `checks` - Runs `make check` (lint + typecheck)
-
-### Artifacts
-
-Test results uploaded to GitHub Actions:
-
-- **Name:** `playwright-results-local` or `playwright-results-staging`
-- **Contains:** Test results, HTML reports, video recordings
-- **Retention:** 7 days
 
 ## Troubleshooting
 
@@ -376,14 +292,12 @@ Default timeout: 300 seconds per test
 2. ❌ Use CSS selectors without justification - USE semantic selectors
 3. ❌ Commit without running `make check` - ALWAYS check first
 4. ❌ Skip type annotations - REQUIRED by mypy
-5. ❌ Test against production frequently - Use staging
-6. ❌ Commit video files - Already in `.gitignore`
-7. ❌ Rely on test execution order - Tests must be independent
-8. ❌ Use `time.sleep()` - Use Playwright's waiting mechanisms
+5. ❌ Rely on test execution order - Tests must be independent
+6. ❌ Use `time.sleep()` - Use Playwright's waiting mechanisms
 
 ## DO
 
-1. ✅ Use Page Object Model for all tests
+1. ✅ Mostly use Page Object Model or screenplay pattern for all tests
 2. ✅ Add type annotations to all functions
 3. ✅ Run `make check` before committing
 4. ✅ Test locally before pushing: `make test-pd-local`

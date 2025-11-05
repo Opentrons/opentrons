@@ -13,13 +13,25 @@ from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page
 
 
-def pytest_configure(config: Any) -> None:
-    """Create test-results directory if it doesn't exist.
-
-    This runs before any tests and ensures the directory exists for
-    pytest-html to write the report.
-    """
+def _ensure_test_results_dir() -> None:
+    """Ensure the test-results directory exists."""
     os.makedirs("test-results", exist_ok=True)
+
+
+def pytest_configure(config: Any) -> None:
+    """Create test-results directory if it doesn't exist."""
+    _ensure_test_results_dir()
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Ensure artifacts directory exists before tests begin."""
+    _ensure_test_results_dir()
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """Guarantee artifacts directory exists before report generation."""
+    _ensure_test_results_dir()
 
 
 @pytest.fixture(scope="session")
@@ -58,10 +70,13 @@ def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
     }
 
 
-@pytest.fixture(scope="session")
-def base_url(dev_server: str) -> str:
-    """Return the resolved base URL for the Protocol Designer instance."""
-    return dev_server
+def _should_skip_dev_server(pytestconfig: pytest.Config) -> bool:
+    """Determine whether the dev server should be skipped (e.g., unit tests only)."""
+    markexpr = (pytestconfig.getoption("markexpr") or "").replace(" ", "").lower()
+    if not markexpr:
+        return False
+    # Skip when running exclusively with unit marker (like `-m unit`)
+    return "unit" in markexpr and "pde2e" not in markexpr
 
 
 def _is_server_running(url: str, timeout: int = 1) -> bool:
@@ -94,21 +109,8 @@ def _wait_for_server_ready(timeout: int = 240) -> str | None:
     return None
 
 
-@pytest.fixture(scope="session", autouse=True)
-def dev_server() -> Generator[str, None, None]:
-    """Start or reuse a Protocol Designer preview server for local testing."""
-    env = os.environ.get("TEST_ENV", "local")
-    environments = {
-        "staging": "https://staging.designer.opentrons.com",
-        "prod": "https://designer.opentrons.com",
-    }
-
-    if env != "local":
-        remote_url = environments.get(env, "http://localhost:4173")
-        os.environ["PD_SERVER_URL"] = remote_url
-        yield remote_url
-        return
-
+def _start_local_server() -> Generator[str, None, None]:
+    """Start or reuse a local Protocol Designer preview server."""
     skip_server = os.environ.get("SKIP_SERVER_START", "false").lower() == "true"
 
     existing_server = _find_running_server()
@@ -119,10 +121,13 @@ def dev_server() -> Generator[str, None, None]:
         return
 
     if skip_server:
-        raise Exception(
-            "SKIP_SERVER_START is set but server is not running on any port (4173-4175). "
-            "Please start the server manually with: cd protocol-designer && make serve"
+        fallback_url = os.environ.get("PD_SERVER_URL", "http://localhost:4173")
+        print(
+            "\n⚠️  SKIP_SERVER_START is set and no existing server detected; "
+            "returning fallback URL without starting preview server."
         )
+        yield fallback_url
+        return
 
     print("\nStarting protocol-designer preview server...")
     print("Building Protocol Designer (this may take 2-3 minutes)...")
@@ -204,6 +209,29 @@ def dev_server() -> Generator[str, None, None]:
                 server_process.wait(timeout=5)
             if server_process.stdout:
                 server_process.stdout.close()
+
+
+@pytest.fixture(scope="session")
+def base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
+    """Return the resolved base URL for the Protocol Designer instance."""
+    if _should_skip_dev_server(pytestconfig):
+        fallback_url = os.environ.get("PD_SERVER_URL", "http://localhost:4173")
+        yield fallback_url
+        return
+
+    env = os.environ.get("TEST_ENV", "local")
+    environments = {
+        "staging": "https://staging.designer.opentrons.com",
+        "prod": "https://designer.opentrons.com",
+    }
+
+    if env != "local":
+        remote_url = environments.get(env, "http://localhost:4173")
+        os.environ["PD_SERVER_URL"] = remote_url
+        yield remote_url
+        return
+
+    yield from _start_local_server()
 
 
 @pytest.fixture
