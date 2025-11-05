@@ -7,6 +7,7 @@ from functools import wraps
 import logging
 from copy import deepcopy
 from numpy import isclose
+import math
 from typing import (
     Any,
     Awaitable,
@@ -663,6 +664,16 @@ class OT3Controller(FlexBackend):
         if not target:
             return None, False
         move_target = MoveTarget.build(position=target, max_speed=speed)
+        move_info = self._move_manager._get_initial_moves_from_targets(
+            origin, [move_target]
+        )[1]
+        target_axes = move_info.unit_vector.keys()
+        if Axis.P_L in target_axes or Axis.P_R in target_axes:
+            pip_ax = Axis.P_L if Axis.P_L in target_axes else Axis.P_R
+            move_target = MoveTarget.build(
+                position=target,
+                max_speed=float(speed * (1 / move_info.unit_vector[Axis.P_L].item())),
+            )
         try:
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
@@ -692,7 +703,44 @@ class OT3Controller(FlexBackend):
             move_group = add_delay_to_move_group(
                 move_group, ordered_nodes, (delay_nodes, delay_time)
             )
-
+        if (
+            NodeId.pipette_left in ordered_nodes
+            or NodeId.pipette_right in ordered_nodes
+        ):
+            pip_ax = Axis.P_L if NodeId.pipette_left in ordered_nodes else Axis.P_R
+            pip_constraints = self._move_manager.get_constraints()[pip_ax]
+            max_speed = pip_constraints.max_speed
+            check_speed = speed
+            if speed > max_speed:
+                # if we've commanded an arbitrarily high speed drop it to the max speed.
+                check_speed = max_speed.item()
+            pip_distance = abs(target[pip_ax] - origin[pip_ax])
+            acceleration_time = (
+                pip_constraints.max_speed - pip_constraints.max_speed_discont
+            ) / pip_constraints.max_acceleration
+            acceleration_distance = (
+                pip_constraints.max_speed_discont * acceleration_time
+                + 0.5 * pip_constraints.max_acceleration * (acceleration_time**2)
+            )
+            if 2 * acceleration_distance > pip_distance:
+                # distance commanded is too short to achieve commanded speed drop the check speed to as fast as it can do in that distance
+                # V_max = sqrt(2 * Accel * d_accel_phase + discontinuity^2)
+                check_speed = math.sqrt(
+                    2 * pip_constraints.max_acceleration * pip_distance / 2
+                    + pip_constraints.max_speed_discont**2
+                )
+            pipette_speed = 0.0
+            plunger_node = (
+                NodeId.pipette_left
+                if NodeId.pipette_left in ordered_nodes
+                else NodeId.pipette_right
+            )
+            for step in move_group:
+                pipette_speed = max(pipette_speed, step[plunger_node].velocity_mm_sec.item())  # type: ignore [union-attr]
+            if not isclose(pipette_speed, check_speed):
+                raise RuntimeError(
+                    f"Slowing down the plunger flow rate commanded speed {check_speed} actual speed {pipette_speed}"
+                )
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
