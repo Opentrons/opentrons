@@ -100,13 +100,17 @@ class OutOfTipsError(Exception):
 
 class Well:
     """
-    The Well class represents a single well in a :py:class:`Labware`. It provides parameters and functions for three major uses:
+    The Well class represents a single well in a [`Labware`][opentrons.protocol_api.labware.Labware].
+    It provides parameters and functions for three major uses:
 
-        - Calculating positions relative to the well. See :ref:`position-relative-labware` for details.
+    - Calculating positions relative to the well. See [Position Relative to Labware][position-relative-to-labware]
+        for details.
 
-        - Returning well measurements. See :ref:`new-labware-well-properties` for details.
+    - Returning well measurements. See [Well Dimensions][well-dimensions]
+        for details.
 
-        - Specifying what liquid should be in the well at the beginning of a protocol. See :ref:`labeling-liquids` for details.
+    - Specifying what liquid should be in the well at the beginning of a protocol. See
+        [Labeling Liquids in Labware][labeling-liquids-in-labware] for details.
     """
 
     def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
@@ -125,7 +129,7 @@ class Well:
     @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
-        """The :py:class:`.Labware` object that the well is a part of."""
+        """The [`Labware`][opentrons.protocol_api.labware.Labware] object that the well is a part of."""
         return self._parent
 
     @property
@@ -135,18 +139,20 @@ class Well:
 
         From API v2.2 on:
 
-        - Returns ``False`` if:
+        - Returns `False` if:
 
           - the well has no tip present, or
           - the well has a tip that's been used by the protocol previously
 
-        - Returns ``True`` if the well has an unused tip.
+        - Returns `True` if the well has an unused tip.
 
         Before API v2.2:
 
-        - Returns ``True`` as long as the well has a tip, even if it is used.
+        - Returns `True` as long as the well has a tip, even if it is used.
 
-        Always ``False`` if the parent labware isn't a tip rack.
+        Always `False` if the parent labware isn't a tip rack.
+
+        *New in version 2.2*
         """
         return self._core.has_tip()
 
@@ -163,7 +169,7 @@ class Well:
     def max_volume(self) -> float:
         """The maximum volume, in µL, that the well can hold.
 
-        This amount is set by the JSON labware definition, specifically the ``totalLiquidVolume`` property of the particular well.
+        This amount is set by the JSON labware definition, specifically the `totalLiquidVolume` property of the particular well.
         """
         return self._core.get_max_volume()
 
@@ -177,7 +183,7 @@ class Well:
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         """
-        The diameter, in mm, of a circular well. Returns ``None``
+        The diameter, in mm, of a circular well. Returns `None`
         if the well is not circular.
         """
         return self._core.diameter
@@ -187,7 +193,7 @@ class Well:
     def length(self) -> Optional[float]:
         """
         The length, in mm, of a rectangular well along the x-axis (left to right).
-        Returns ``None`` if the well is not rectangular.
+        Returns `None` if the well is not rectangular.
         """
         return self._core.length
 
@@ -196,7 +202,7 @@ class Well:
     def width(self) -> Optional[float]:
         """
         The width, in mm, of a rectangular well along the y-axis (front to back).
-        Returns ``None`` if the well is not rectangular.
+        Returns `None` if the well is not rectangular.
         """
         return self._core.width
 
@@ -215,7 +221,7 @@ class Well:
 
         For example, "A1 of Corning 96 Well Plate 360 µL Flat on slot D1". Run log
         entries use this format for identifying wells. See
-        :py:meth:`.ProtocolContext.commands`.
+        [`commands()`][opentrons.protocol_api.ProtocolContext.commands].
         """
         return self._core.get_display_name()
 
@@ -227,39 +233,44 @@ class Well:
         For example, "A1" or "H12".
 
         The format of strings that this property returns is the same format as the key
-        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
+        for [accessing wells in a dictionary][dictionary-access].
         """
         return self._core.get_name()
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
         """
-        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-            negative offsets are lower.
+        Args:
+            z: An offset on the z-axis, in mm. Positive offsets are higher and
+                negative offsets are lower.
 
-        :return: A :py:class:`~opentrons.types.Location` corresponding to the
-            absolute position of the top-center of the well, plus the ``z`` offset
-            (if specified).
+        Returns:
+            A [`Location`][opentrons.types.Location] corresponding to the
+                absolute position of the top-center of the well, plus the `z` offset
+                (if specified).
         """
         return Location(self._core.get_top(z_offset=z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
         """
-        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-            negative offsets are lower.
+        Args:
+            z: An offset on the z-axis, in mm. Positive offsets are higher and
+                negative offsets are lower.
 
-        :return: A :py:class:`~opentrons.types.Location` corresponding to the
-            absolute position of the bottom-center of the well, plus the ``z`` offset
-            (if specified).
+        Returns:
+            A [`Location`][opentrons.types.Location] corresponding to the
+                absolute position of the bottom-center of the well, plus the `z`
+                offset (if specified).
         """
         return Location(self._core.get_bottom(z_offset=z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
         """
-        :return: A :py:class:`~opentrons.types.Location` corresponding to the
-            absolute position of the center of the well (in all three dimensions).
+        Returns:
+            A [`Location`][opentrons.types.Location] corresponding to the
+                absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
 
@@ -268,12 +279,15 @@ class Well:
         self, z: float = 0.0, target: Literal["start", "end", "dynamic"] = "end"
     ) -> Location:
         """
-        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
-            negative offsets are lower.
-        :param target: The relative position of the liquid meniscus inside the well to target when performing a liquid handling operation.
+        Args:
+            z (float): An offset on the z-axis, in mm. Positive offsets are higher and
+                negative offsets are lower.
+            target (str): The relative position of the liquid meniscus inside the well
+                to target when performing a liquid handling operation.
 
-        :return: A :py:class:`~opentrons.types.Location` corresponding to the liquid meniscus, plus a target position and ``z`` offset as specified.
-
+        Returns:
+            Location: A [`Location`][opentrons.types.Location] corresponding to the
+                liquid meniscus, plus a target position and `z` offset as specified.
         """
         return Location(
             point=Point(x=0, y=0, z=z),
@@ -284,39 +298,45 @@ class Well:
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
-        Specifies a :py:class:`~opentrons.types.Point` based on fractions of the
+        Specifies a [`Point`][opentrons.types.Point] based on fractions of the
         distance from the center of the well to the edge along each axis.
 
-        For example, ``from_center_cartesian(0, 0, 0.5)`` specifies a point at the
+        For example, `from_center_cartesian(0, 0, 0.5)` specifies a point at the
         well's center on the x- and y-axis, and half of the distance from the center of
         the well to its top along the z-axis. To move the pipette to that location,
-        construct a :py:class:`~opentrons.types.Location` relative to the same well::
+        construct a [`Location`][opentrons.types.Location] relative to the same well:
 
+        ```python
             location = types.Location(
                 plate["A1"].from_center_cartesian(0, 0, 0.5), plate["A1"]
             )
             pipette.move_to(location)
+        ```
 
-        See :ref:`points-locations` for more information.
+        See [Points and Locations][points-and-locations] for more information.
 
-        :param x: The fraction of the distance from the well's center to its edge
-            along the x-axis. Negative values are to the left, and positive values
-            are to the right.
-        :param y: The fraction of the distance from the well's center to its edge
-            along the y-axis. Negative values are to the front, and positive values
-            are to the back.
-        :param z: The fraction of the distance from the well's center to its edge
-            along the x-axis. Negative values are down, and positive values are up.
+        Args:
+            x: The fraction of the distance from the well's center to its edge
+                along the x-axis. Negative values are to the left, and positive values
+                are to the right.
+            y: The fraction of the distance from the well's center to its edge
+                along the y-axis. Negative values are to the front, and positive values
+                are to the back.
+            z: The fraction of the distance from the well's center to its edge
+                along the x-axis. Negative values are down, and positive values are up.
 
-        :return: A :py:class:`~opentrons.types.Point` representing the specified
-            position in absolute deck coordinates.
+        Returns:
+            A [`Point`][opentrons.types.Point] representing the specified
+                position in absolute deck coordinates.
 
-        .. note:: Even if the absolute values of ``x``, ``y``, and ``z`` are all less
+        !!! note
+            Even if the absolute values of `x`, `y`, and `z` are all less
             than 1, a location constructed from the well and the result of
-            ``from_center_cartesian`` may be outside of the physical well. For example,
-            ``from_center_cartesian(0.9, 0.9, 0)`` would be outside of a cylindrical
+            `from_center_cartesian` may be outside of the physical well. For example,
+            `from_center_cartesian(0.9, 0.9, 0)` would be outside of a cylindrical
             well, but inside a square well.
 
+        *New in version 2.8*
         """
         return self._core.from_center_cartesian(x, y, z)
 
@@ -325,12 +345,15 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param Liquid liquid: The liquid to load into the well.
-        :param float volume: The volume of liquid to load, in µL.
+        Args:
+            liquid (Liquid): The liquid to load into the well.
+            volume (float): The volume of liquid to load, in µL.
 
-        .. deprecated:: 2.22
-            Use :py:meth:`.Labware.load_liquid`, :py:meth:`.Labware.load_liquid_by_well`, or :py:meth:`.Labware.load_empty` instead.
-
+        *Deprecated in version 2.22:* Use
+        [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid],
+        [`Labware.load_liquid_by_well()`][opentrons.protocol_api.labware.Labware.load_liquid_by_well],
+        or [`Labware.load_empty()`][opentrons.protocol_api.labware.Labware.load_empty]
+        instead.
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -370,11 +393,11 @@ class Well:
     ) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
-        :returns: The height, in mm, of the liquid from the deck.
+        Returns:
+            The height, in mm, of the liquid from the deck.
 
-        :meta private:
-
-        This is intended for Opentrons internal use only and is not a guaranteed API.
+        !!! note
+            This is intended for Opentrons internal use only and is not a guaranteed API.
         """
 
         projected_final_height = self._core.estimate_liquid_height_after_pipetting(
