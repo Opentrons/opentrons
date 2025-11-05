@@ -9,7 +9,7 @@ allow-direct-references = true
 name = "otupdate"
 description = "A server to update software and firmware on Opentrons robots"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -22,7 +22,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 dynamic = ['version']
