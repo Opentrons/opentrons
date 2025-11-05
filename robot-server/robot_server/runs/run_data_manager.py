@@ -40,7 +40,7 @@ from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParame
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
-
+from opentrons.system import camera
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -281,6 +281,13 @@ class RunDataManager:
             get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
+        )
+
+        await camera.update_live_stream_status(
+            self._run_orchestrator_store._robot_type,
+            True,
+            camera_provider,
+            state_summary.cameraSettings,
         )
 
         return _build_run(
