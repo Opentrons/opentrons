@@ -125,7 +125,6 @@ export function CameraSettings({
                 isLiveVideoEnabled={isLiveVideoEnabled}
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
                 robotName={robotName}
-                isCameraRequired={isCameraRequired}
               />
               {isCameraSettingsEnabled && (
                 <ControlPreferencesSettings

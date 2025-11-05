@@ -41,7 +41,7 @@ export function LaunchLivestreamBtn({
     )
     // how to get if there was an error or if it actually loaded?
     reportLiveFeedUsage({
-      action: 'liveFeed',
+      runId: runId,
     })
   }
 

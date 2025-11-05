@@ -31,11 +31,14 @@ interface CameraSettingsParams {
 interface CaptureParams {
   amount: number
   transactionId: string
-  errorDetails?: string
 }
 
+interface LiveFeedParams {
+  runId: string
+}
+// seperate livefeed back into its own param
 interface MediaAccessParams {
-  action: 'download' | 'downloadZip' | 'delete' | 'storageWarning' | 'liveFeed'
+  action: 'download' | 'downloadZip' | 'delete' | 'storageWarning'
   transactionId?: string
 }
 
@@ -47,7 +50,7 @@ export interface UseCameraUsageAnalyticsResult {
   /* Reports image capture rate and sources. */
   reportImageCaptureUsage: (data: CaptureParams) => void
   /* Reports live feed usage. */
-  reportLiveFeedUsage: (data: MediaAccessParams) => void
+  reportLiveFeedUsage: (data: LiveFeedParams) => void
   /* Reports how often images are downloaded together, seperately, 
   how often images are deleted, and how often storage warnings appear. */
   reportPhotoAccessUsage: (data: MediaAccessParams) => void
@@ -95,13 +98,13 @@ export function useCameraAnalytics({
     })
   }
 
-  const reportLiveFeedUsage = (data: MediaAccessParams): void => {
+  const reportLiveFeedUsage = (data: LiveFeedParams): void => {
     doTrackEvent({
       name: ANALYTICS_LIVE_FEED_KIND,
       properties: {
         source,
         robotType,
-        transactionId: data.transactionId,
+        runId: data.runId,
       },
     })
   }
