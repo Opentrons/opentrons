@@ -22,12 +22,20 @@ class ConnectionStore {
 
   private robotNamesByIP: Record<string, string> = {}
 
-  private browserWindow: BrowserWindow | null = null
+  private readonly browserWindows = new Set<BrowserWindow>()
 
   private readonly knownPortBlockedIPs = new Set<string>()
 
-  public getBrowserWindow(): BrowserWindow | null {
-    return this.browserWindow
+  public getBrowserWindows(): Set<BrowserWindow> {
+    return this.browserWindows
+  }
+
+  public addBrowserWindow(window: BrowserWindow): void {
+    this.browserWindows.add(window)
+
+    window.once('closed', () => {
+      this.browserWindows.delete(window)
+    })
   }
 
   public getAllBrokersInStore(): string[] {
@@ -63,10 +71,6 @@ class ConnectionStore {
 
   public getRobotNameByIP(ip: string): string | null {
     return this.robotNamesByIP[ip] ?? null
-  }
-
-  public setBrowserWindow(window: BrowserWindow): void {
-    this.browserWindow = window
   }
 
   public setPendingConnection(robotName: string): Promise<void> {
@@ -194,7 +198,7 @@ class ConnectionStore {
   public clearStore(): void {
     this.hostsByRobotName = {}
     this.robotNamesByIP = {}
-    this.browserWindow = null
+    this.browserWindows.clear()
   }
 
   public isConnectedToBroker(robotName: string): boolean {
