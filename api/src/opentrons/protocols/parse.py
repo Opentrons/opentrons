@@ -626,7 +626,14 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # Check if this is actually a labware
     labware_schema_v2 = load_labware_schema()
     try:
-        jsonschema.validate(protocol_json, labware_schema_v2)
+        # Use RefResolver with base_uri=None for same-document JSON pointer resolution
+        # Labware schemas contain JSON pointer references like #/definitions/vector
+        labware_resolver = jsonschema.RefResolver(
+            base_uri=None,
+            referrer=labware_schema_v2,
+            store={},
+        )
+        jsonschema.validate(protocol_json, labware_schema_v2, resolver=labware_resolver)
     except jsonschema.ValidationError:
         pass
     else:
@@ -657,18 +664,15 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # should match the $id so that #/definitions/slot resolves correctly
     schema_id = protocol_schema.get("$id", "")
     store: Dict[str, Any] = {"opentronsLabwareSchemaV2": labware_schema_v2}
-    # Always add the protocol schema to the store, using $id as key
+    # Always add the protocol schema to the store, using $id as key if available
     # This ensures that references within the schema can be resolved
     if schema_id:
         store[schema_id] = protocol_schema
-        # Use the schema's $id as base_uri so that JSON pointers like #/definitions/slot
-        # resolve within this document (the $id becomes the document URI)
-        base_uri = schema_id
-    else:
-        # Fallback: if no $id, use empty string for same-document resolution
-        base_uri = ""
+    # Use None for base_uri to enable same-document JSON pointer resolution
+    # When base_uri is None, JSON pointers like #/definitions/slot resolve
+    # directly within the referrer document (protocol_schema)
     resolver = jsonschema.RefResolver(
-        base_uri=base_uri,
+        base_uri=None,
         referrer=protocol_schema,
         store=store,
     )

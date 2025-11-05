@@ -185,7 +185,14 @@ def verify_definition(  # noqa: C901
         raise NotALabwareError("bad-schema-id", [e]) from e
 
     try:
-        jsonschema.validate(parsed_json, schema)
+        # Use RefResolver with base_uri=None for same-document JSON pointer resolution
+        # Labware schemas contain JSON pointer references like #/definitions/vector
+        resolver = jsonschema.RefResolver(
+            base_uri=None,
+            referrer=schema,
+            store={},
+        )
+        jsonschema.validate(parsed_json, schema, resolver=resolver)
     except jsonschema.ValidationError as e:
         raise NotALabwareError("schema-mismatch", [e]) from e
 
