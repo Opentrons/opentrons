@@ -18,9 +18,27 @@ The deck is the machined aluminum surface on which automated science protocols a
 
 <font color="red">PLACEHOLDER FOR DECK MAP</font>
 
+## Rear and side panels
+
 ## Other features and components
 
 Some text here
+
+### User-accessible components
+
+### Status lights
+
+Status lights on the front and back of the OT-2 provide at-a-glance information about the robot.
+
+IMAGE
+
+| Status light | Description |
+|----|----|
+| :material-power: | Power light. Indicates if the robot is on or off. The light is solid when the OT-2 is turned on. |
+| :material-lan: | Ethernet connectivity light. |
+| :material-wifi: | |
+
+### Ethernet connection
 
 ### Serial number
 
