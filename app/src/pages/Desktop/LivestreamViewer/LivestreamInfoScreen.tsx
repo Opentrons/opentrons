@@ -1,38 +1,32 @@
 import { useTranslation } from 'react-i18next'
 
 import { InfoScreen } from '@opentrons/components'
-import { useCamera } from '@opentrons/react-api-client'
 
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
 
-import type { RunStatus } from '@opentrons/api-client'
-
-const CAMERA_POLLING_INTERVAL_MS = 5000
+import type { CameraData, RunStatus } from '@opentrons/api-client'
 
 type LiveStreamInfoScreenType =
   | 'loading'
   | 'error'
   | 'disabled'
+  | 'run-setup'
   | 'run-terminal'
   | null
 
 export function useLivestreamInfoScreen(
   runStatus: RunStatus | null,
+  cameraData: CameraData | null,
   isRunLoading: boolean,
   videoError: string | null
 ): LiveStreamInfoScreenType {
-  const { data: cameraData, isLoading: isCameraSettingsLoading } = useCamera({
-    refetchInterval: CAMERA_POLLING_INTERVAL_MS,
-  })
-  const isCameraEnabled = cameraData?.cameraEnabled ?? false
-
   if (isTerminalRunStatus(runStatus)) {
     return 'run-terminal'
   } else if (videoError != null) {
     return 'error'
-  } else if (isRunLoading || isCameraSettingsLoading) {
+  } else if (isRunLoading || cameraData == null) {
     return 'loading'
-  } else if (!isCameraEnabled) {
+  } else if (!cameraData.cameraEnabled) {
     return 'disabled'
   } else {
     return null

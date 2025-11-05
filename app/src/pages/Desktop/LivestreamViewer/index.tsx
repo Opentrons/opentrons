@@ -23,9 +23,11 @@ export function LivestreamViewer(): JSX.Element {
     refetchInterval: RUN_POLLING_INTERVAL_MS,
   })
   const runStatus = runData?.data.status ?? null
+  const cmaeraData = runData?.data.cameraSettings ?? null
   const { videoRef, videoError } = useHlsVideo(runStatus)
   const infoScreenType = useLivestreamInfoScreen(
     runStatus,
+    cmaeraData,
     isRunLoading,
     videoError
   )
