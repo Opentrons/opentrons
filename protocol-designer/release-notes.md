@@ -12,7 +12,10 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.6.3!**
 
-This hotfix release addresses issues when uploading protocols containing custom labware.
+This hotfix release addresses two bugs:
+
+- Protocol Designer no longer crashes when uploading protocols containing custom labware.
+- Protocol Designer allows scrolling to view details of a transfer step using a "consolidate" pipette path.
 
 ## Opentrons Protocol Designer Changes in 8.6.1
 
