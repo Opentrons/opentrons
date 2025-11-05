@@ -42,6 +42,8 @@ dev = [
     "pytest-cov==4.1.0",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest>=8.4.0,<9",
+    "python-can==4.2.2",
+    "setuptools",
     "types-mock~=5.1.0",
 ]
 
