@@ -27,16 +27,14 @@ export function getStepToSelectAfterDeletion(
   const stepIsSelectable = (step: Step): boolean =>
     step.isVisibleToUser && !stepsToDelete.has(step.stepId)
 
-  const selectableStepsFollowing = flatSteps
-    .slice(highestDeletedIndex, undefined)
-    .filter(stepIsSelectable)
-  const selectableStepsPreceding = flatSteps
-    .slice(undefined, highestDeletedIndex)
-    .filter(stepIsSelectable)
+  const nextSelectable = flatSteps
+    .slice(highestDeletedIndex + 1)
+    .find(stepIsSelectable)
+  const prevSelectable = flatSteps
+    .slice(0, highestDeletedIndex)
+    .findLast(stepIsSelectable)
 
-  const selection =
-    selectableStepsFollowing.at(0) ?? selectableStepsPreceding.at(-1) ?? null
-  return selection?.stepId ?? null
+  return nextSelectable?.stepId ?? prevSelectable?.stepId ?? null
 }
 
 interface Step {
