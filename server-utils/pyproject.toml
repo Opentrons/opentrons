@@ -42,6 +42,7 @@ dev = [
     "pytest-xdist~=2.5.0",
     "pytest>=8,<9",
     "requests==2.31.0",
+    "sqlalchemy==1.4.51",
     "sqlalchemy2-stubs==0.0.2a21",
     "types-mock~=5.1.0",
     "types-requests~=2.31.0",
