@@ -42,7 +42,7 @@ vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
 vi.mock('../StepsInfo')
 vi.mock('../StartingDeck')
-vi.mock('../InputDeviceInfo')
+vi.mock('../PeripheralsInfo')
 
 const mockNavigate = vi.fn()
 

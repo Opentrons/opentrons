@@ -24,10 +24,10 @@ describe('PeripheralsInfo', () => {
     }
   })
 
-  it('renders input devices header', () => {
+  it('renders peripherals header', () => {
     render(mockProps)
 
-    screen.getByText('Input Devices')
+    screen.getByText('Peripherals')
   })
 
   it('renders on deck description text', () => {

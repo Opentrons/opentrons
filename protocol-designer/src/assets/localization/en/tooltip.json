@@ -24,7 +24,6 @@
     "pause": "Enable pause within protocol.",
     "temperature": "Set temperature command for Temperature module.",
     "thermocycler": "Change Thermocycler state or program a profile."
-
   },
 
   "step_fields": {
