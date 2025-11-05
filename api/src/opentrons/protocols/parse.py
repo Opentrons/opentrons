@@ -655,7 +655,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # In jsonschema 4.21.1+, JSON pointer resolution within the same document
     # requires the schema to be in the store keyed by its $id
     schema_id = protocol_schema.get("$id", "")
-    store = {"opentronsLabwareSchemaV2": labware_schema_v2}
+    store: Dict[str, Any] = {"opentronsLabwareSchemaV2": labware_schema_v2}
     if schema_id:
         store[schema_id] = protocol_schema
     # Use the schema's $id as base_uri, or None if empty (for same-document refs)
