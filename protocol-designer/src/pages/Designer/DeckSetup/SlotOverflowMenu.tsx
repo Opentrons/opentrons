@@ -138,12 +138,7 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-
-    labwareStackOnSlot.forEach(labware => {
-      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
-        dispatch(duplicateLabware(deckSetupLabware[labware].id))
-      }
-    })
+    dispatch(duplicateLabware(labwareStackOnSlot))
     setShowMenuList(false)
   }
 
