@@ -159,7 +159,7 @@ export const duplicateLabware: (
       : getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
 
     //  ensure templateSlot is not null
-    if (templateSlot == null && !isOffDeck) {
+    if (templateSlot == null) {
       console.error('no slots available, cannot duplicate labware')
       return
     }
