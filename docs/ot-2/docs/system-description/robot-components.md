@@ -14,7 +14,7 @@ LED strips on the inside top edges of the frame provide software-controllable am
 
 ## Deck and working area
 
-The deck is the machined aluminum surface on which automated science protocols are executed. The deck has 11 main ANSI/SLAS-format slots that can hold labware, modules, and consumables. The deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck. It also slides out for easier access, cleaning, and other maintenance procedures.
+The deck is the machined aluminum surface on which automated science protocols are executed. The deck has 11 ANSI/SLAS-complaint slots that can hold labware, modules, and consumables. The deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck. The deck also slides out for easier access, cleaning, and for other procedures.
 
 <font color="red">PLACEHOLDER FOR DECK MAP</font>
 
@@ -32,11 +32,40 @@ Status lights on the front and back of the OT-2 provide at-a-glance information 
 
 IMAGE
 
-| Status light | Description |
-|----|----|
-| :material-power: | Power light. Indicates if the robot is on or off. The light is solid when the OT-2 is turned on. |
-| :material-lan: | Ethernet connectivity light. |
-| :material-wifi: | |
+### OT-2 Back Panel Status Lights
+
+The OT-2 has five (5) status indicator lights, known as LEDs, located on the side of its external electronics enclosure, which is on the upper left side of the back panel of the robot. These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
+
+<table>
+  <thead>
+    <tr>
+      <th>Status light icon</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="../../images/ot2-power.png" alt="power" width="50%"></td>
+      <td>Power light<br>Light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
+    </tr>
+    <tr>
+      <td><img src="../../images/ot2-network.png" alt="ethernet" width="50%"></td>
+      <td>Ethernet connection<br>The light is solid when the robot is connected to the network and has an IP address. It is normal for the light to remain dark for a few moments after turning the robot on. If the light stays off, that indicates the OT-2 cannot connect to the local network.</td>
+    </tr>
+    <tr>
+      <td><img src="../../images/ot2-wifi.png" alt="wifi" width="50%"></td>
+      <td>Wi-Fi<br>The light is solid when the OT-2 has connected to a Wi-Fi network.</td>
+    </tr>
+    <tr>
+      <td><img src="../../images/ot2-heartbeat.png" alt="OS heartbeat" width="50%"></td>
+      <td>Operating system heartbeat<br>The light flashes once every few seconds if the robot's operating system has successfully booted up and is operating normally.</td>
+    </tr>
+    <tr>
+      <td><img src="../../images/ot2-other.png" alt="not yet implemented" width="50%"></td>
+      <td>No function, reserved for future use.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Ethernet connection
 
@@ -46,7 +75,7 @@ IMAGE
 
 ## Power supply and consumption
 
-Somethingsomething
+Something something
 
 ### Power supply
 
