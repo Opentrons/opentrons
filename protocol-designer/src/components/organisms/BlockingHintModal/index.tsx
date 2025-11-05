@@ -11,6 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Modal,
   PrimaryButton,
+  AlertPrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -52,7 +53,7 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
   }
 
   const confirmButtonText =
-    hintKey === 'no_commands' ? 'continue_with_export' : 'confirm'
+    hintKey === 'no_commands' || hintKey === 'has_errors' ? 'continue_with_export' : 'confirm'
 
   return createPortal(
     <Modal
@@ -81,9 +82,14 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
             <SecondaryButton onClick={onCancelClick}>
               {t('shared:cancel')}
             </SecondaryButton>
+            {hintKey === 'has_errors' || hintKey === 'no_commands' ? (
+            <AlertPrimaryButton onClick={onContinueClick}>
+              {i18n.format(t(`shared:${confirmButtonText}`), 'capitalize')}
+            </AlertPrimaryButton>) : (
             <PrimaryButton onClick={onContinueClick}>
               {i18n.format(t(`shared:${confirmButtonText}`), 'capitalize')}
             </PrimaryButton>
+            )}
           </Flex>
         </Flex>
       }
