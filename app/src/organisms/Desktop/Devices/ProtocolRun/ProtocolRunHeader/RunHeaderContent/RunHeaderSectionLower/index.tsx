@@ -51,7 +51,7 @@ export function RunHeaderSectionLower({
         <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
       </div>
       {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
-        <div style={{ width: 'max-content', justifyContent: 'flex-end' }}>
+        <div className={styles.button_container}>
           <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}
           </SecondaryButton>

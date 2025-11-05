@@ -13,3 +13,9 @@
   width: 100%;
   gap: var(--spacing-16);
 }
+
+.button_container {
+  display: flex;
+  width: max-content;
+  justify-content: flex-end;
+}
