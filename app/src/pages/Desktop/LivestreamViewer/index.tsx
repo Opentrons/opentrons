@@ -8,14 +8,25 @@ import {
   LivestreamInfoScreen,
   useLivestreamInfoScreen,
 } from '/app/pages/Desktop/LivestreamViewer/LivestreamInfoScreen'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './livestream.module.css'
 
+const RUN_POLLING_INTERVAL_MS = 5000
+
 export function LivestreamViewer(): JSX.Element {
-  const { videoRef, videoError } = useHlsVideo()
   const [searchParams] = useSearchParams()
   const runId = searchParams.get('runId') ?? ''
-  const infoScreenType = useLivestreamInfoScreen(runId, videoError)
+  const { data: runData, isLoading: isRunLoading } = useNotifyRunQuery(runId, {
+    refetchInterval: RUN_POLLING_INTERVAL_MS,
+  })
+  const runStatus = runData?.data.status ?? null
+  const { videoRef, videoError } = useHlsVideo(runStatus)
+  const infoScreenType = useLivestreamInfoScreen(
+    runStatus,
+    isRunLoading,
+    videoError
+  )
 
   return (
     <div className={styles.container}>

@@ -99,10 +99,56 @@ export function SelectLabwareOnAdapter(
         {has96Channel && loadName === ADAPTER_96_CHANNEL
           ? permittedTipracks.map((tiprackDefUri, index) => {
               const nestedDef = defs[tiprackDefUri]
+              const stackingLabwareDefUris = getStackerDefinitions(
+                {
+                  ...defs,
+                  ...customLabwareDefs,
+                },
+                undefined,
+                nestedDef.parameters.loadName,
+                nestedDef.metadata.displayCategory
+              )
+
+              const stackingProps: StackingProps | null =
+                stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
+                  ? {
+                      inputTitle: t('labware_quantity'),
+                      errorMessage: t('unsupported_range'),
+                      checkboxCaption: t('with_lid', {
+                        name: defs[stackingLabwareDefUris[0]].metadata
+                          .displayName,
+                      }),
+                      checked: selectedLidLabware != null,
+                      onCheckboxChange: () => {
+                        dispatch(
+                          selectLid({
+                            labwareDefURI:
+                              selectedLidLabware === stackingLabwareDefUris[0]
+                                ? null
+                                : stackingLabwareDefUris[0],
+                          })
+                        )
+                      },
+                      inputCaption: t('valid_range', {
+                        max: defs[stackingLabwareDefUris[0]].stackLimit,
+                      }),
+                      definition: defs[stackingLabwareDefUris[0]],
+                      inputFieldValue: selectedTopLabware.amount ?? 1,
+                      onInputFieldChange: (e: ChangeEvent<any>) => {
+                        dispatch(
+                          selectTopLabwareAmount({
+                            amount: parseInt(e.target.value as string),
+                          })
+                        )
+                      },
+                    }
+                  : null
+
               return (
                 <CustomizeExpandButton
                   isNestedDefALid={false}
                   allowInputField={false}
+                  stackingProps={stackingProps ?? undefined}
                   key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   buttonText={nestedDef?.metadata.displayName ?? ''}

@@ -145,9 +145,18 @@ export const getMigratedLabwareId = (
   const latestURI = Object.entries(latestDefs).find(
     ([_, def]) => def.parameters.loadName === loadName
   )?.[0]
+
+  if (defURI == null) {
+    console.error(
+      `expected to find a matching defURI with labwareId ${oldLabwareId} but could not`
+    )
+  }
+
   const labwareIdString = oldLabwareId.split(':')[0]
   const latestLabwareId =
-    latestURI != null ? `${labwareIdString}:${latestURI}` : oldLabwareId // fallback to original labwareId for custom labware
+    latestURI != null
+      ? `${labwareIdString}:${latestURI}`
+      : `${labwareIdString}:${defURI}` // fallback to original labwareId & defURI for custom labware
 
   return latestLabwareId
 }

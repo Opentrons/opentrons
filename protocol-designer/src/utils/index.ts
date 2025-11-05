@@ -189,21 +189,14 @@ export const getStagingAreaAddressableAreas = (
 export function getMatchingTipLiquidSpecsFromSpec(
   pipetteSpecs: PipetteV2Specs,
   volume: number,
-  tiprackUri: string
+  tiprackDef: LabwareDefinition2
 ): SupportedTip {
-  const matchingLabwareDef = getAllDefinitions()[tiprackUri]
-
-  console.assert(
-    matchingLabwareDef,
-    `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
-  )
-
-  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+  const tipLength = tiprackDef?.parameters.tipLength ?? 0
 
   if (tipLength === 0) {
     console.error(
       `expected to find a tiplength with tiprack ${
-        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+        tiprackDef?.metadata.displayName ?? 'unknown displayName'
       } but could not`
     )
   }
@@ -229,7 +222,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   console.assert(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+      tiprackDef?.metadata.displayName ?? 'unknown displayname'
     }`
   )
 

@@ -38,12 +38,14 @@ const mockImagesInfo = {
       stepCommandId: 'commandId1',
       previousStepCommandId: 'previouscommandId1',
       timestamp: '2024-01-01 10:00:00',
+      filename: 'test-name',
     },
     {
       imageId: 'imageId2',
       stepCommandId: 'commandId2',
       previousStepCommandId: 'previouscommandId2',
       timestamp: '2024-01-01 11:00:00',
+      filename: 'test-name-2',
     },
   ],
   protocolAnalysis: mockProtocolAnalysis,
@@ -67,8 +69,8 @@ describe('ImageGalleryList', () => {
     }
 
     vi.mocked(useImageInfo).mockReturnValue(mockImagesInfo)
-    vi.mocked(GalleryListItem).mockImplementation(({ timestamp }) => (
-      <div>MOCK_GALLERY_LIST_ITEM_{timestamp}</div>
+    vi.mocked(GalleryListItem).mockImplementation(({ item }) => (
+      <div>MOCK_GALLERY_LIST_ITEM_{item.timestamp}</div>
     ))
     vi.mocked(ProtocolPlayPauseHeader).mockImplementation(() => (
       <div>MOCK_PROTOCOL_PLAY_PAUSE_HEADER</div>

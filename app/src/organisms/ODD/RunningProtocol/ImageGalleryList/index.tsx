@@ -96,7 +96,7 @@ function GalleryListContent({
       {imagesInfo.map(item => (
         <GalleryListItem
           key={item.timestamp}
-          {...item}
+          item={item}
           protocolAnalysis={protocolAnalysis}
           runId={runId}
           robotType={robotType}
