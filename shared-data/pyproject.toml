@@ -31,12 +31,11 @@ dependencies = [
 
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+# Note: Only includes packages not already in main dependencies. All packages from
+# Pipfile [packages] are already in main dependencies, so robot group is empty.
 robot = [
-    "opentrons-shared-data==0.0.0",
-    "jsonschema==4.21.1",
-    "pydantic==2.11.7",
-    "numpy==1.22.3",
-    "zipp==3.21.0",
+    # Note: All packages from Pipfile [packages] (opentrons-shared-data, jsonschema,
+    # pydantic, numpy, zipp) are already in main dependencies with matching versions.
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",

@@ -22,7 +22,7 @@ dependencies = [
     "aionotify==0.3.1",
     "anyio==4.9.0",
     "click==8.1.2",
-    "jsonschema==4.21.1",
+    "jsonschema>=4.17.3,<5",
     "numpy==1.22.3",
     "packaging==22.0",
     "pydantic==2.11.7",
@@ -36,19 +36,12 @@ dependencies = [
 
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+# These exact pins narrow the version ranges in main dependencies for robot deployment
 robot = [
     "jsonschema==4.17.3",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
-    "anyio==4.9.0",
-    "opentrons-shared-data==0.0.0",
-    "opentrons==0.0.0",
-    "opentrons-hardware[FLEX]==0.0.0",
-    "performance_metrics",
-    "numpy==1.22.3",
-    "packaging==22.0",
-    "pyusb==1.2.1",
-    "zipp==3.21.0",
+    # Note: Other packages from Pipfile [packages] (pydantic, pydantic-settings, anyio,
+    # numpy, packaging, pyusb, zipp, opentrons-shared-data, opentrons-hardware, performance_metrics)
+    # are already pinned to exact versions in main dependencies, so no need to duplicate here.
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
