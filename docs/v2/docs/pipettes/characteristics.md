@@ -1,4 +1,6 @@
-# Pipette Characteristics
+---
+title: "Python API: Pipette Characteristics"
+---
 
 Each Opentrons pipette has different capabilities, which you'll want to take advantage of in your protocols. This page covers some fundamental pipette characteristics.
 

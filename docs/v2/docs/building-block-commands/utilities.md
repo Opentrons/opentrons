@@ -1,8 +1,7 @@
 ---
+title: "Python API: Utility Commands"
 description: Basic commands for working with robot utility features.
 ---
-
-# Utility Commands
 
 With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
 

@@ -1,8 +1,7 @@
 ---
+title: "Python API: Pipette Tips"
 description: Basic commands for working with pipette tips.
 ---
-
-# Manipulating Pipette Tips
 
 Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are [`InstrumentContext.pick_up_tip`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.drop_tip`][opentrons.protocol_api.InstrumentContext.drop_tip], and [`InstrumentContext.return_tip`][opentrons.protocol_api.InstrumentContext.return_tip]. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
 

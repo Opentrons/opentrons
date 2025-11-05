@@ -1,8 +1,7 @@
 ---
+title: "Python API: Versioning"
 description: How to choose the right Python API version for your protocol.
 ---
-
-# Versioning
 
 The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows protocols to run on newer robot software versions without modification.
 

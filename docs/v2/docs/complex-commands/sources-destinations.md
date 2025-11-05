@@ -1,8 +1,7 @@
 ---
+title: "Python API: Complex Command Sources and Destinations"
 description: How the Opentrons Python API moves liquids between wells when using complex commands.
 ---
-
-# Sources and Destinations
 
 The legacy and liquid class transfer methods form the family of complex liquid handling commands. These methods require `source` and `dest` (destination) arguments to move liquid from one well, or group of wells, to another. In contrast, the [building block commands](../building-block-commands/liquids.md) `aspirate` and `dispense` only operate in a single location.
 

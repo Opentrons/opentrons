@@ -1,4 +1,6 @@
-# Partial Tip Pickup
+---
+title: "Python API: Partial Tip Pickup"
+---
 
 By default, multi-channel pipettes always use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. Partial tip pickup lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the Flex 96-Channel Pipette, which occupies both pipette mounts.
 

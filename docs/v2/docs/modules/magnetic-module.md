@@ -1,4 +1,6 @@
-# Magnetic Module
+---
+title: "Python API: Magnetic Module"
+---
 
 !!! note "OT-2 only"
     The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the [Magnetic Block](magnetic-block.md).

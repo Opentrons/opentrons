@@ -1,4 +1,6 @@
-# Parameter Use Case – Dry Run
+---
+title: "Python API: Runtime Parameters for Dry Runs"
+---
 
 When testing out a new protocol, it's common to perform a dry run to watch your robot go through all the steps without actually handling samples or reagents. This use case explores how to add a single Boolean parameter for whether you're performing a dry run.
 

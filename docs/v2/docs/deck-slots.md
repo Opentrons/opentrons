@@ -1,3 +1,7 @@
+---
+title: "Python API: Deck Slots"
+---
+
 <style>
 .no-min-width td {
   min-width: none;
@@ -5,8 +9,6 @@
   padding-right: 0.5 em;
 }
 </style>
-
-# Deck Slots
 
 Deck slots are where you place hardware items on the deck surface of your Opentrons robot. In the API, you load the corresponding items into your protocol with methods like [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware], [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_module], or [`ProtocolContext.load_trash_bin`][opentrons.protocol_api.ProtocolContext.load_trash_bin]. When you call these methods, you need to specify which slot to load the item in.
 

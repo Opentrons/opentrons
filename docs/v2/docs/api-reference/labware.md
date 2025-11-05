@@ -1,4 +1,6 @@
-# Labware and Trash Containers
+---
+title: "Python API Reference: Labware and Trash"
+---
 
 ::: opentrons.protocol_api.Labware
 

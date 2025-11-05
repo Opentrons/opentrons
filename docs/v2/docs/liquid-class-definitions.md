@@ -1,4 +1,6 @@
-# Liquid Class Definitions
+---
+title: "Python API: Liquid Class Definitions"
+---
 
 A *liquid class definition* specifies nearly all transfer behavior a Flex pipette will perform during a [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class], [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class], or [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class]. Properties, like aspirate flow rate, submerge speed, or dispense position, are required in every liquid class definition.
 

@@ -1,4 +1,6 @@
-# Loading Pipettes
+---
+title: "Python API: Loading Pipettes"
+---
 
 When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The [`ProtocolContext.load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] function provides this information and returns an [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] object.
 
