@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 
 import { Chip } from '@opentrons/components'
+// eslint-disable-next-line no-restricted-imports
+import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useHlsVideo } from '/app/pages/Desktop/LivestreamViewer/hooks/useHlsVideo'
 import {
@@ -11,11 +13,22 @@ import {
 
 import styles from './livestream.module.css'
 
+const RUN_POLLING_INTERVAL_MS = 5000
+
 export function LivestreamViewer(): JSX.Element {
-  const { videoRef, videoError } = useHlsVideo()
   const [searchParams] = useSearchParams()
   const runId = searchParams.get('runId') ?? ''
-  const infoScreenType = useLivestreamInfoScreen(runId, videoError)
+  // TODO(jh, 11-04-25): Notifications are not working in secondary windows. Investigate further.
+  const { data: runData, isLoading: isRunLoading } = useRunQuery(runId, {
+    refetchInterval: RUN_POLLING_INTERVAL_MS,
+  })
+  const runStatus = runData?.data.status ?? null
+  const { videoRef, videoError } = useHlsVideo(runStatus)
+  const infoScreenType = useLivestreamInfoScreen(
+    runStatus,
+    isRunLoading,
+    videoError
+  )
 
   return (
     <div className={styles.container}>
