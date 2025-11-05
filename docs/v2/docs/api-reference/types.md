@@ -2,7 +2,11 @@
 
 ::: opentrons.types
     options:
-      members: ["PipetteNotAttachedError", "Point", "Location", "Mount"]
+      members: ["Point", "Location", "Mount"]
+
+::: opentrons.protocols.api_support.types
+    options:
+      members: ["APIVersion"]
 
 ::: opentrons.protocol_api.CSVParameter
 
