@@ -65,7 +65,7 @@ export function useCreateProtocolAnalysisMutation(
       forceReAnalyze,
     }) =>
       createProtocolAnalysis(
-        host as HostConfig,
+        host!,
         protocolKey,
         runTimeParameterValues,
         runTimeParameterFiles,

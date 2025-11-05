@@ -3,55 +3,6 @@
 
 :root {
   --button-pad: 0.5rem;
-  --button-inverted: {
-    border-color: var(--c-font-light);
-
-    /* VVV from legacy --button-inverted VVV */
-    color: var(--c-font-light);
-
-    &:active {
-      background-color: color-mod(var(--c-bg-dark) tint(10%));
-      font-weight: var(--fw-regular);
-    }
-
-    &:focus {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &:hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &:disabled,
-    &.disabled {
-      /* from legacy --button-disabled */
-      border-color: var(--c-font-disabled);
-      background-color: transparent;
-
-      /* from legacy --button-disabled */
-      color: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      cursor: default;
-
-      /* from legacy --button-disabled */
-      fill: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      font-weight: normal;
-
-      /* from legacy --button-disabled */
-      pointer-events: none;
-
-      /* from legacy --button-disabled */
-    }
-
-    &.hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    /* ^^^ from legacy --button-default ^^^ */
-  };
 }
 
 /* TODO(ka, 2017-2-14): standardize primary button vars */
@@ -83,67 +34,64 @@
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
 
-  &:focus {
-    background-color: color-mod(var(--c-bg-dark) shade(30%));
-  }
+.button_primary:focus {
+  background-color: color-mod(var(--c-bg-dark) shade(30%));
+}
 
-  &:hover {
-    background-color: color-mod(var(--c-bg-dark) shade(30%));
-  }
+.button_primary:hover {
+  background-color: color-mod(var(--c-bg-dark) shade(30%));
+}
 
-  &.hover {
-    background-color: color-mod(var(--c-bg-dark) shade(30%));
-  }
+.button_primary.hover {
+  background-color: color-mod(var(--c-bg-dark) shade(30%));
+}
 
-  &:active {
-    background-color: color-mod(var(--c-bg-dark) tint(30%));
+.button_primary:active {
+  background-color: color-mod(var(--c-bg-dark) tint(30%));
 
-    /* TODO(mc, 2017-12-07): pull shadows out to central file */
-    box-shadow:
-      0 0 8px rgb(0 0 0 / 12%),
-      0 8px 8px rgb(0 0 0 / 24%);
-    font-weight: var(--fw-regular);
-  }
+  /* TODO(mc, 2017-12-07): pull shadows out to central file */
+  box-shadow:
+    0 0 8px rgb(0 0 0 / 12%),
+    0 8px 8px rgb(0 0 0 / 24%);
+  font-weight: var(--fw-regular);
+}
 
-  &.inverted {
-    background-color: var(--c-bg-light);
-    color: var(--c-font-dark);
+.button_primary.inverted {
+  background-color: var(--c-bg-light);
+  color: var(--c-font-dark);
+}
 
-    &:focus,
-    &:hover,
-    &.hover {
-      background-color: color-mod(var(--c-bg-light) shade(5%));
-    }
+.button_primary.inverted:focus,
+.button_primary.inverted:hover,
+.button_primary.inverted.hover {
+  background-color: color-mod(var(--c-bg-light) shade(5%));
+}
 
-    &:active {
-      background-color: color-mod(var(--c-bg-light) shade(10%));
-    }
-  }
+.button_primary.inverted:active {
+  background-color: color-mod(var(--c-bg-light) shade(10%));
+}
 
-  &:disabled,
-  &.disabled {
-    /* from legacy --button-disabled */
-    border-color: var(--c-font-disabled);
+.button_primary:disabled,
+.button_primary.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: color-mod(var(--c-bg-dark) tint(70%));
+  box-shadow: none;
+  color: var(--c-font-disabled);
 
-    /* from legacy --button-disabled */
+  /* from legacy --button-disabled */
+  cursor: default;
 
-    background-color: color-mod(var(--c-bg-dark) tint(70%));
-    box-shadow: none;
-    color: var(--c-font-disabled);
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
 
-    /* from legacy --button-disabled */
-    cursor: default;
+  /* from legacy --button-disabled */
+  font-weight: normal;
 
-    /* from legacy --button-disabled */
-    fill: var(--c-font-disabled);
-
-    /* from legacy --button-disabled */
-    font-weight: normal;
-
-    /* from legacy --button-disabled */
-    pointer-events: none;
-  }
+  /* from legacy --button-disabled */
+  pointer-events: none;
 }
 
 .button_flat {
@@ -167,98 +115,98 @@
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-
-  &:active {
-    background-color: color-mod(var(--c-bg-light) shade(10%));
-    font-weight: var(--fw-regular);
-  }
-
-  &:disabled,
-  &.disabled {
-    /* from legacy --button-disabled */
-    border-color: var(--c-font-disabled);
-    background-color: transparent;
-
-    /* from legacy --button-disabled */
-    color: var(--c-font-disabled);
-
-    /* from legacy --button-disabled */
-    cursor: default;
-
-    /* from legacy --button-disabled */
-    fill: var(--c-font-disabled);
-
-    /* from legacy --button-disabled */
-    font-weight: normal;
-
-    /* from legacy --button-disabled */
-    pointer-events: none;
-
-    /* from legacy --button-disabled */
-  }
-
-  &:focus {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &:hover {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &.hover {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &.inverted {
-    border-color: var(--c-font-light);
-
-    /* VVV from legacy --button-inverted VVV */
-    color: var(--c-font-light);
-
-    &:active {
-      background-color: color-mod(var(--c-bg-dark) tint(10%));
-      font-weight: var(--fw-regular);
-    }
-
-    &:disabled,
-    &.disabled {
-      /* from legacy --button-disabled */
-      border-color: var(--c-font-disabled);
-      background-color: transparent;
-
-      /* from legacy --button-disabled */
-      color: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      cursor: default;
-
-      /* from legacy --button-disabled */
-      fill: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      font-weight: normal;
-
-      /* from legacy --button-disabled */
-      pointer-events: none;
-
-      /* from legacy --button-disabled */
-    }
-
-    &:focus {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &:hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &.hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    /* ^^^ from legacy --button-default ^^^ */
-  }
 }
+
+.button_flat:active {
+  background-color: color-mod(var(--c-bg-light) shade(10%));
+  font-weight: var(--fw-regular);
+}
+
+.button_flat:disabled,
+.button_flat.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: transparent;
+
+  /* from legacy --button-disabled */
+  color: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  cursor: default;
+
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  font-weight: normal;
+
+  /* from legacy --button-disabled */
+  pointer-events: none;
+
+  /* from legacy --button-disabled */
+}
+
+.button_flat:focus {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_flat:hover {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_flat.hover {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_flat.inverted {
+  border-color: var(--c-font-light);
+
+  /* VVV from legacy --button-inverted VVV */
+  color: var(--c-font-light);
+}
+
+.button_flat.inverted:active {
+  background-color: color-mod(var(--c-bg-dark) tint(10%));
+  font-weight: var(--fw-regular);
+}
+
+.button_flat.inverted:disabled,
+.button_flat.inverted.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: transparent;
+
+  /* from legacy --button-disabled */
+  color: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  cursor: default;
+
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  font-weight: normal;
+
+  /* from legacy --button-disabled */
+  pointer-events: none;
+
+  /* from legacy --button-disabled */
+}
+
+.button_flat.inverted:focus {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+.button_flat.inverted:hover {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+.button_flat.inverted.hover {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+/* ^^^ from legacy --button-default ^^^ */
 
 .button_outline {
   position: relative;
@@ -281,141 +229,138 @@
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-
-  &:active {
-    background-color: color-mod(var(--c-bg-light) shade(10%));
-    font-weight: var(--fw-regular);
-  }
-
-  &:disabled,
-  &.disabled {
-    /* from legacy --button-disabled */
-    border-color: var(--c-font-disabled);
-    background-color: transparent;
-
-    /* from legacy --button-disabled */
-    color: var(--c-font-disabled);
-
-    /* from legacy --button-disabled */
-    cursor: default;
-
-    /* from legacy --button-disabled */
-    fill: var(--c-font-disabled);
-
-    /* from legacy --button-disabled */
-    font-weight: normal;
-
-    /* from legacy --button-disabled */
-    pointer-events: none;
-
-    /* from legacy --button-disabled */
-  }
-
-  &:focus {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &:hover {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &.hover {
-    background-color: color-mod(var(--c-med-gray) alpha(25%));
-  }
-
-  &.inverted {
-    border-color: var(--c-font-light);
-
-    /* VVV from legacy --button-inverted VVV */
-    color: var(--c-font-light);
-
-    &:active {
-      background-color: color-mod(var(--c-bg-dark) tint(10%));
-      font-weight: var(--fw-regular);
-    }
-
-    &:disabled,
-    &.disabled {
-      /* from legacy --button-disabled */
-      border-color: var(--c-font-disabled);
-      background-color: transparent;
-
-      /* from legacy --button-disabled */
-      color: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      cursor: default;
-
-      /* from legacy --button-disabled */
-      fill: var(--c-font-disabled);
-
-      /* from legacy --button-disabled */
-      font-weight: normal;
-
-      /* from legacy --button-disabled */
-      pointer-events: none;
-
-      /* from legacy --button-disabled */
-    }
-
-    &:focus {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &:hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    &.hover {
-      background-color: color-mod(var(--c-bg-dark) tint(5%));
-    }
-
-    /* ^^^ from legacy --button-default ^^^ */
-  }
 }
 
-/* style for IconButton */
+.button_outline:active {
+  background-color: color-mod(var(--c-bg-light) shade(10%));
+  font-weight: var(--fw-regular);
+}
 
+.button_outline:disabled,
+.button_outline.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: transparent;
+
+  /* from legacy --button-disabled */
+  color: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  cursor: default;
+
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  font-weight: normal;
+
+  /* from legacy --button-disabled */
+  pointer-events: none;
+
+  /* from legacy --button-disabled */
+}
+
+.button_outline:focus {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_outline:hover {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_outline.hover {
+  background-color: color-mod(var(--c-med-gray) alpha(25%));
+}
+
+.button_outline.inverted {
+  border-color: var(--c-font-light);
+
+  /* VVV from legacy --button-inverted VVV */
+  color: var(--c-font-light);
+}
+
+.button_outline.inverted:active {
+  background-color: color-mod(var(--c-bg-dark) tint(10%));
+  font-weight: var(--fw-regular);
+}
+
+.button_outline.inverted:disabled,
+.button_outline.inverted.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: transparent;
+
+  /* from legacy --button-disabled */
+  color: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  cursor: default;
+
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
+
+  /* from legacy --button-disabled */
+  font-weight: normal;
+
+  /* from legacy --button-disabled */
+  pointer-events: none;
+
+  /* from legacy --button-disabled */
+}
+
+.button_outline.inverted:focus {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+.button_outline.inverted:hover {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+.button_outline.inverted.hover {
+  background-color: color-mod(var(--c-bg-dark) tint(5%));
+}
+
+/* ^^^ from legacy --button-default ^^^ */
+
+/* style for IconButton */
 .button_icon {
   width: auto;
+}
 
-  & > * {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+.button_icon > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 
-  &.inverted {
-    color: white;
-    fill: white;
+.button_icon.inverted {
+  color: white;
+  fill: white;
 
-    /* TODO(mc, 2019-03-29): Is this correct? Our icons use only fill */
-    stroke: white;
+  /* TODO(mc, 2019-03-29): Is this correct? Our icons use only fill */
+  stroke: white;
+}
 
-    &:disabled,
-    &.disabled {
-      /* from legacy --button-disabled */
-      border-color: var(--c-font-disabled);
-      background-color: transparent;
+.button_icon.inverted:disabled,
+.button_icon.inverted.disabled {
+  /* from legacy --button-disabled */
+  border-color: var(--c-font-disabled);
+  background-color: transparent;
 
-      /* from legacy --button-disabled */
-      color: var(--c-font-disabled);
+  /* from legacy --button-disabled */
+  color: var(--c-font-disabled);
 
-      /* from legacy --button-disabled */
-      cursor: default;
+  /* from legacy --button-disabled */
+  cursor: default;
 
-      /* from legacy --button-disabled */
-      fill: var(--c-font-disabled);
+  /* from legacy --button-disabled */
+  fill: var(--c-font-disabled);
 
-      /* from legacy --button-disabled */
-      font-weight: normal;
+  /* from legacy --button-disabled */
+  font-weight: normal;
 
-      /* from legacy --button-disabled */
-      pointer-events: none;
-
-      /* from legacy --button-disabled */
-    }
-  }
+  /* from legacy --button-disabled */
+  pointer-events: none;
 }
 
 /* style for the supplementary icon displayed by Button */

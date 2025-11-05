@@ -19,10 +19,7 @@ export function useRunCurrentState(
 
   return useQuery<RunCurrentState, AxiosError>(
     [host, 'runs', runId, 'currentState'],
-    () =>
-      getRunCurrentState(host as HostConfig, runId as string).then(
-        response => response.data
-      ),
+    () => getRunCurrentState(host!, runId!).then(response => response.data),
     {
       enabled: host != null && runId != null && options.enabled !== false,
       ...options,

@@ -13,12 +13,7 @@ import {
 import { LPCDeck } from './LPCDeck'
 import { PlaceItemInstruction } from './PlaceItemInstruction'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type {
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 
 export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const { runId, commandUtils, proceedSubstep, goBackSubstep, contentHeader } =
@@ -27,16 +22,13 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const dispatch = useDispatch()
 
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const pipette = useSelector(selectActivePipette(runId))!
   const pipetteId = pipette.id
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(runId)
   )
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
 
   const handleConfirmPlacement = (): void => {
     void toggleRobotMoving(true)

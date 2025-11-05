@@ -13,7 +13,7 @@ export interface ToggleFieldProps {
   /** classes to apply */
   className?: string
   /** classes to apply to inner label text div */
-  labelTextClassName?: string | null | undefined
+  labelTextClassName?: string | null
   /** name of field in form */
   name?: string
   /** label text for toggled off */

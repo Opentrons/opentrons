@@ -26,12 +26,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { MouseEventHandler } from 'react'
-import type {
-  BadPipette,
-  HostConfig,
-  Mount,
-  PipetteData,
-} from '@opentrons/api-client'
+import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
@@ -66,7 +61,7 @@ export function FlexPipetteCard({
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =
     useState<boolean>(false)

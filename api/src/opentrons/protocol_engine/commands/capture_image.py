@@ -79,7 +79,7 @@ class CaptureImageResult(BaseModel):
     """Result data from running an image capture."""
 
     fileId: Optional[str] = Field(
-        ...,
+        None,
         description="File ID for image files output as a result of an image capture action.",
     )
     resolution: Tuple[int, int] = Field(
@@ -91,7 +91,7 @@ class CaptureImageResult(BaseModel):
         description="Multiplier used when cropping and scaling the captured image. Scale is 1.0 to 2.0.",
     )
     pan: Optional[Tuple[int, int]] = Field(
-        ...,
+        None,
         description="X/Y (pixels) position panned to.",
     )
     contrast: float = Field(

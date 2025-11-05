@@ -38,6 +38,7 @@ const MOCK_IMAGE_ITEM = {
   stepCommandId: 'step1',
   previousStepCommandId: 'step2',
   timestamp: '2024-01-01 12:00:00',
+  filename: 'test-filename',
 }
 const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {

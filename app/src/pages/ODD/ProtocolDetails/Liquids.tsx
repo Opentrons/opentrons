@@ -22,8 +22,6 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { EmptySection } from './EmptySection'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
@@ -67,8 +65,8 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
     { enabled: protocolData != null }
   )
   const liquidsInOrder = parseLiquidsInLoadOrder(
-    (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
-    (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []
+    mostRecentAnalysis!.liquids ?? [],
+    mostRecentAnalysis!.commands ?? []
   )
   const { t, i18n } = useTranslation('protocol_details')
 

@@ -1,16 +1,22 @@
 import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
-import type { DropTipWellLocation, WellLocation } from './support'
+import type {
+  DropTipWellLocation,
+  KnownWellLocation,
+  WellLocation,
+} from './support'
 
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
   | AspirateInPlaceRunTimeCommand
   | AspirateRunTimeCommand
+  | AspirateWhileTrackingRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
   | DispenseInPlaceRunTimeCommand
   | DispenseRunTimeCommand
+  | DispenseWhileTrackingRunTimeCommand
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
   | GetTipPresenceRunTimeCommand
@@ -30,11 +36,13 @@ export type PipettingRunTimeCommand =
 export type PipettingCreateCommand =
   | AspirateCreateCommand
   | AspirateInPlaceCreateCommand
+  | AspirateWhileTrackingCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
   | ConfigureForVolumeCreateCommand
   | DispenseCreateCommand
   | DispenseInPlaceCreateCommand
+  | DispenseWhileTrackingCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
   | GetTipPresenceCreateCommand
@@ -94,6 +102,17 @@ export interface AspirateRunTimeCommand
   result?: BasicLiquidHandlingResult
 }
 
+export interface AspirateWhileTrackingCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'aspirateWhileTracking'
+  params: AspDispWhileTrackingParams
+}
+export interface AspirateWhileTrackingRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AspirateWhileTrackingCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
 export interface AspirateInPlaceCreateCommand extends CommonCommandCreateInfo {
   commandType: 'aspirateInPlace'
   params: AspirateInPlaceParams
@@ -125,6 +144,19 @@ export interface DispenseInPlaceRunTimeCommand
   result?: BasicLiquidHandlingResult
 }
 
+export type DispenseWhileTrackingParams = AspDispWhileTrackingParams & {
+  pushOut?: number
+}
+export interface DispenseWhileTrackingCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'dispenseWhileTracking'
+  params: DispenseWhileTrackingParams
+}
+export interface DispenseWhileTrackingRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DispenseWhileTrackingCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
   params: BlowoutParams
@@ -295,6 +327,14 @@ export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
   WellLocationParam
+
+export type AspDispWhileTrackingParams = FlowRateParams &
+  PipetteAccessParams &
+  VolumeParams & {
+    trackFromLocation: KnownWellLocation
+    trackToLocation: KnownWellLocation
+  }
+
 export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
   WellLocationParam

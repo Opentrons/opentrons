@@ -38,7 +38,7 @@ describe('registerNotify', () => {
   it('should set browser window when connectionStore has no browser window', () => {
     registerNotify(dispatch, mainWindow as any)(MOCK_ACTION)
 
-    expect(connectionStore.setBrowserWindow).toHaveBeenCalledWith(mainWindow)
+    expect(connectionStore.addBrowserWindow).toHaveBeenCalledWith(mainWindow)
   })
 
   it('should subscribe when action type is shell:NOTIFY_SUBSCRIBE', () => {

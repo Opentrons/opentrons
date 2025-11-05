@@ -67,12 +67,7 @@ const getIsStackingLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
 ): boolean => {
-  if (labwareEntities[newLocation] == null) {
-    return false
-  }
-  return (
-    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return labwareEntities[newLocation] != null
 }
 
 const getIsAdditionalEquipmentLocation = (

@@ -23,7 +23,7 @@ export const LabwareButtonBasket: Story = (
 
 LabwareButtonBasket.args = {
   stackOfLabware: ['labware1', 'labware2', 'labware3'],
-  selectedLabware: 'labware3',
+  selectedLabware: ['labware3'],
   labware: {
     labware1: {
       def: {

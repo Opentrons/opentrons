@@ -14,6 +14,8 @@ An SSH key is required to perform these tasks and to issue commands from the ter
 
 Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
+<div class="instruction-list" markdown>
+
 1. Open a terminal window and type this command:
 
     ```
@@ -29,6 +31,8 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 4. Eject the USB drive.
 
+</div>
+
 ## Making a wireless SSH connection
 
 !!!note
@@ -36,9 +40,11 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 To make an SSH connection:
 
-1. Insert the USB drive that holds the SSH key created earlier into a USB port on your Flex.
+<div class="instruction-list" markdown>
 
-2. On your computer, open a terminal window and type the commands shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+5. Insert the USB drive that holds the SSH key created earlier into a USB port on your Flex.
+
+6. On your computer, open a terminal window and type the commands shown below. Replace `ROBOT_IP` with the IP address of your Flex.
 
     ```
     curl \
@@ -47,13 +53,15 @@ To make an SSH connection:
     ```
     The command is successful when you see a response message that indicates a new key was added.
 
-3. After adding the key, type the command shown below. Replace `ROBOT_IP` with the IP address of your Flex.
+7. After adding the key, type the command shown below. Replace `ROBOT_IP` with the IP address of your Flex.
 
     ```
     ssh -i robot_key root@ROBOT_IP
     ```
 
-4. Type the passphrase you set when creating the SSH key.
+8. Type the passphrase you set when creating the SSH key.
+
+</div>
 
 When an SSH connection is successful, the terminal command prompt changes to `root@` followed by the serial number of your robot (e.g., `root@FLXA1020231007001:~#`). You can now interact with the robot via the terminal window.
 
@@ -74,6 +82,8 @@ When disconnected from a network, your Flex will assign itself an IP address and
 
 You can get the IP address range and subnet mask from the robot by connecting it to your computer and checking the Opentrons App:
 
+<div class="instruction-list" markdown>
+
 1. If the robot is connected by Ethernet cable to a switch or wall jack, disconnect it. Then establish a physical Ethernet connection to your computer, as described above.
 
 2. Launch the Opentrons App.
@@ -84,6 +94,8 @@ You can get the IP address range and subnet mask from the robot by connecting it
         If your robot appears as inactive or inaccessible in the app, wait a few moments. Flex will configure itself and eventually become available again. If this does not happen, turn the robot's power off, wait a few seconds, turn the power back on, and check the app again after the robot boots up.
 
 4. After locating your robot in the app, click the three-dot menu (⋮), select **Robot settings**, and then click the **Networking** tab.
+
+</div>
 
 The Networking tab will show you the IP address and subnet mask of your robot. When disconnected from a network, Flex will assign itself a non-routing IP address. Here's an example of a self-assigned IP address on a Flex:
 

@@ -591,7 +591,7 @@ export const buildPickUpTips = (
   ) {
     return null
   } else {
-    const wellName = head(Object.keys(tipGroup)) as string
+    const wellName = head(Object.keys(tipGroup))!
 
     return {
       commandType: 'pickUpTip',

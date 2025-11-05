@@ -2,6 +2,8 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
@@ -10,7 +12,8 @@ import { useImage } from '/app/resources/dataFiles/useImage'
 
 import { GalleryListItem } from '../GalleryListItem'
 
-// Mock the modal handler
+import type { GalleryListItemProps } from '../GalleryListItem'
+
 vi.mock(
   '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal',
   () => ({
@@ -30,15 +33,18 @@ const mockProtocolAnalysis = {
   labware: [],
 } as any
 
-const mockProps = {
-  imageId: 'imageId',
-  stepCommandId: 'commandId',
-  previousStepCommandId: 'previouscommandId',
-  timestamp: MOCK_TIMESTAMP,
+const mockProps: GalleryListItemProps = {
   runId: 'run123',
   protocolAnalysis: mockProtocolAnalysis,
-  robotType: 'OT3-Standard',
+  robotType: FLEX_ROBOT_TYPE,
   allRunDefs: [],
+  item: {
+    imageId: 'imageId',
+    stepCommandId: 'commandId',
+    previousStepCommandId: 'previouscommandId',
+    timestamp: MOCK_TIMESTAMP,
+    filename: 'test-filename',
+  },
 }
 
 const render = (props = mockProps) =>

@@ -17,6 +17,7 @@ import type {
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  OpenIngredientSelectorAction,
   ZoomedIntoSlotAction,
 } from './actions'
 
@@ -30,7 +31,10 @@ export interface RenameLabwareAction {
 export const renameLabware: (
   args: RenameLabwareAction['payload']
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById =
@@ -54,9 +58,12 @@ export const renameLabware: (
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
-  const { labwareDefURIStack, slot } = args
+  const { labwareDefURIStack, slot, updateSelectedLabwareId } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -84,6 +91,15 @@ export const createContainer: (
         },
       })
 
+      // If the user wants to update the selected labware id,
+      // we do not have the option to return the created id, so we need to open the ingredient selector manually.
+      if (updateSelectedLabwareId) {
+        dispatch({
+          type: 'OPEN_INGREDIENT_SELECTOR',
+          payload: id,
+        })
+      }
+
       if (isTiprack) {
         // Tipracks cannot be named, but should auto-increment.
         // We can't rely on reducers to do that themselves bc they don't have access
@@ -92,6 +108,7 @@ export const createContainer: (
           labwareId: id,
         })(dispatch, getState)
       }
+
       if (availableSlot === 'offDeck') {
         dispatch({
           type: 'ZOOMED_INTO_SLOT',
