@@ -380,26 +380,16 @@ export const getDefaultPushOutVolume = (
 export const getMaxConditioningVolume = (args: {
   transferVolume: number
   disposalVolume: number
-  tiprackDefUri: string
-  labwareEntities: LabwareEntities
+  tiprackDef: LabwareDefinition2
   pipetteSpecs: PipetteV2Specs
 }): number => {
-  const {
-    transferVolume,
-    disposalVolume,
-    labwareEntities,
-    tiprackDefUri,
-    pipetteSpecs,
-  } = args
+  const { transferVolume, disposalVolume, tiprackDef, pipetteSpecs } = args
   const { liquids } = pipetteSpecs
   const minVolumeForMultiDispense = transferVolume * 2
   const isInLowVolumeMode =
     minVolumeForMultiDispense < liquids.default.minVolume &&
     'lowVolumeDefault' in liquids
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
-  )
-  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+  const tipMaxVolume = tiprackDef != null ? getTiprackVolume(tiprackDef) : null
 
   const maxWorkingVolume = Math.min(
     isInLowVolumeMode
