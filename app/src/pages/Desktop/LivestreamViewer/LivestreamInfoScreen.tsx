@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
+import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_IDLE,
+} from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
@@ -20,13 +24,22 @@ export function useLivestreamInfoScreen(
   isRunLoading: boolean,
   videoError: string | null
 ): LiveStreamInfoScreenType {
-  if (isTerminalRunStatus(runStatus)) {
+  // camera data can only undefined before a run starts unless actively being fetched.
+  const unconfirmedSettingsDuringRunSetup =
+    cameraData == null &&
+    !isRunLoading &&
+    (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+      runStatus === RUN_STATUS_IDLE)
+
+  if (unconfirmedSettingsDuringRunSetup) {
+    return 'run-setup'
+  } else if (isRunLoading) {
+    return 'loading'
+  } else if (isTerminalRunStatus(runStatus)) {
     return 'run-terminal'
   } else if (videoError != null) {
     return 'error'
-  } else if (isRunLoading || cameraData == null) {
-    return 'loading'
-  } else if (!cameraData.cameraEnabled) {
+  } else if (!cameraData?.liveStreamEnabled) {
     return 'disabled'
   } else {
     return null
@@ -52,6 +65,13 @@ export function LivestreamInfoScreen({
       )
     case 'disabled':
       return <InfoScreen content={t('camera_disabled')} />
+    case 'run-setup':
+      return (
+        <InfoScreen
+          content={t('confirm_camera_preferences')}
+          subContent={t('confirm_camera_preferences_desc')}
+        />
+      )
     case 'run-terminal':
       return <InfoScreen content={t('live_video_ended')} />
     default:
