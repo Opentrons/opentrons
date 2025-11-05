@@ -9,8 +9,8 @@ import {
 
 import type { RobotType } from '@opentrons/shared-data'
 
-export const SOURCE_RUN_RECORD = 'runRecord'
-export const SOURCE_ROBOT_SETTINGS = 'robotSettings'
+export const SOURCE_RUN_RECORD = 'runRecord' as const
+export const SOURCE_ROBOT_SETTINGS = 'robotSettings' as const
 
 export interface CameraAnalyticsParams {
   source: typeof SOURCE_RUN_RECORD | typeof SOURCE_ROBOT_SETTINGS
@@ -30,12 +30,12 @@ interface CameraSettingsParams {
 
 interface CaptureParams {
   amount: number
-  runId: string
+  transactionId: string
   errorDetails?: string
 }
 
-interface PhotoAccessParams {
-  action: 'download' | 'downloadZip' | 'delete' | 'storageWarning'
+interface MediaAccessParams {
+  action: 'download' | 'downloadZip' | 'delete' | 'storageWarning' | 'liveFeed'
   transactionId?: string
 }
 
@@ -47,10 +47,10 @@ export interface UseCameraUsageAnalyticsResult {
   /* Reports image capture rate and sources. */
   reportImageCaptureUsage: (data: CaptureParams) => void
   /* Reports live feed usage. */
-  reportLiveFeedUsage: (data: CaptureParams) => void
+  reportLiveFeedUsage: (data: MediaAccessParams) => void
   /* Reports how often images are downloaded together, seperately, 
   how often images are deleted, and how often storage warnings appear. */
-  reportPhotoAccessUsage: (data: PhotoAccessParams) => void
+  reportPhotoAccessUsage: (data: MediaAccessParams) => void
 }
 
 export function useCameraAnalytics({
@@ -89,32 +89,36 @@ export function useCameraAnalytics({
       properties: {
         robotType,
         source,
-        runId: data.runId,
+        transactionId: data.transactionId,
         amount: data.amount,
       },
     })
   }
 
-  const reportLiveFeedUsage = (data: CaptureParams): void => {
+  const reportLiveFeedUsage = (data: MediaAccessParams): void => {
     doTrackEvent({
       name: ANALYTICS_LIVE_FEED_KIND,
       properties: {
         source,
         robotType,
-        runId: data.runId,
+        transactionId: data.transactionId,
       },
     })
   }
 
-  const reportPhotoAccessUsage = (data: PhotoAccessParams): void => {
+  const reportPhotoAccessUsage = (data: MediaAccessParams): void => {
+    const baseProperties = {
+      robotType,
+      source,
+      action: data.action,
+    }
+    const finalProperties =
+      data.action === 'storageWarning'
+        ? { ...baseProperties, transactionId: data.transactionId }
+        : baseProperties
     doTrackEvent({
       name: ANALYTICS_PHOTO_ACCESS,
-      properties: {
-        robotType,
-        source,
-        action: data.action,
-        transactionId: data.transactionId,
-      },
+      properties: finalProperties,
     })
   }
   return {

@@ -11,7 +11,10 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -75,11 +78,10 @@ export function useActionButtonProperties({
   const { play, pause, reset } = protocolRunControls
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
-  const baseParams = {
-    source: 'runRecord' as const,
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
     robotType: robotType,
-  }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  })
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const trackEvent = useTrackEvent()
@@ -109,7 +111,6 @@ export function useActionButtonProperties({
     })
     const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
     reportCameraEnablementSettings({
-      ...baseParams,
       cameraEnabled: enabled,
       liveFeedEnabled: liveStreamEnabled,
       recoveryCaptureEnabled: recoveryEnabled,

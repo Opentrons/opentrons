@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
 import {
+  SOURCE_RUN_RECORD,
   useCameraAnalytics,
   useRecoveryAnalytics,
   useRobotAnalyticsData,
@@ -32,18 +33,16 @@ export function useRunAnalytics({
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const runStatus = useRunStatus(runId)
   const isRunCurrent = useIsRunCurrent(runId)
-  const baseParams = {
-    source: 'runRecord' as const,
+  const { reportImageCaptureUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
     robotType: robotType,
-  }
-  const { reportImageCaptureUsage } = useCameraAnalytics(baseParams)
+  })
   useEffect(() => {
     const areReportConditionsValid =
       isRunCurrent && runId != null && isTerminalRunStatus(runStatus)
     if (areReportConditionsValid) {
       reportImageCaptureUsage({
-        ...baseParams,
-        runId: runId,
+        transactionId: runId,
         amount: numberOfImages,
       })
       trackProtocolRunEvent({

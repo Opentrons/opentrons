@@ -48,11 +48,14 @@ import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
   useRecoveryAnalytics,
   useRobotAnalyticsData,
   useTrackEventWithRobotSerial,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -60,6 +63,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
   EMPTY_TIMESTAMP,
@@ -121,7 +125,7 @@ export function RunSummary(): JSX.Element {
   )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
-
+  const robotType = useRobotType(robotName)
   const onCloneRunSuccess = (): void => {
     if (isQuickTransfer) {
       deleteRun(runId)
@@ -330,11 +334,20 @@ export function RunSummary(): JSX.Element {
   const handleViewErrorDetails = (): void => {
     setShowRunFailedModal(true)
   }
-
+  const { reportImageCaptureUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
+  const outputFileIds = useRunGeneratedDataFiles(runId)
   const handleClickSplash = (): void => {
     trackProtocolRunEvent({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
+    })
+    const numberOfImages = outputFileIds.jpeg.length
+    reportImageCaptureUsage({
+      transactionId: runId,
+      amount: numberOfImages,
     })
     setShowSplash(false)
   }

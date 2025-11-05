@@ -18,7 +18,10 @@ import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
@@ -65,16 +68,14 @@ export function CameraCard({
     setShowControls(!showControls)
   }
 
-  const baseParams = {
-    source: 'robotSettings' as const,
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_ROBOT_SETTINGS,
     robotType,
-  }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  })
   const handleToggleCamera = (): void => {
     toggleCameraEnabled()
     reportCameraEnablementSettings({
-      ...baseParams,
-      cameraEnabled: isCameraEnabled,
+      cameraEnabled: !isCameraEnabled,
       liveFeedEnabled: isLiveVideoEnabled,
       recoveryCaptureEnabled: isRecoveryCaptureEnabled,
     })

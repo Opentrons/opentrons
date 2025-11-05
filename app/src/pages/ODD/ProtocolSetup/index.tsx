@@ -65,6 +65,7 @@ import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
+  SOURCE_RUN_RECORD,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
@@ -190,15 +191,13 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const robotType = useRobotType(robotName)
-  const baseParams = {
-    source: 'runRecord' as const,
-    robotType: robotType,
-  }
   const { reportCameraEnablementSettings, reportPhotoAccessUsage } =
-    useCameraAnalytics(baseParams)
+    useCameraAnalytics({
+      source: SOURCE_RUN_RECORD,
+      robotType: robotType,
+    })
   useEffect(() => {
     reportPhotoAccessUsage({
-      ...baseParams,
       action: 'storageWarning',
       transactionId: runId,
     })
@@ -428,7 +427,6 @@ function PrepareToRun({
             properties: robotAnalyticsData ?? {},
           })
           reportCameraEnablementSettings({
-            ...baseParams,
             cameraEnabled: appCameraSettings.enabled,
             liveFeedEnabled: appCameraSettings.liveStreamEnabled,
             recoveryCaptureEnabled: appCameraSettings.recoveryEnabled,

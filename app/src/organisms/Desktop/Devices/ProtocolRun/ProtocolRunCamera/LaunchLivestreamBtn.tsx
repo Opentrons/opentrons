@@ -4,7 +4,10 @@ import { useDispatch } from 'react-redux'
 import { Icon, SecondaryButton } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
 import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
@@ -23,12 +26,10 @@ export function LaunchLivestreamBtn({
   const host = useHost()
   const isLaunchCameraEnabled =
     host?.robotName != null && host?.hostname != null
-  const baseParams = {
-    source: 'runRecord' as const,
-    runId: runId,
+  const { reportLiveFeedUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
     robotType,
-  }
-  const { reportLiveFeedUsage } = useCameraAnalytics(baseParams)
+  })
   const handleOpenCameraStream = (): void => {
     dispatch(
       cameraStreamOpenAction(
@@ -40,9 +41,7 @@ export function LaunchLivestreamBtn({
     )
     // how to get if there was an error or if it actually loaded?
     reportLiveFeedUsage({
-      ...baseParams,
-      amount: 1,
-      runId: runId,
+      action: 'liveFeed',
     })
   }
 

@@ -27,6 +27,7 @@ describe('UsagePreferencesSettings', () => {
       toggleRecoveryCaptureEnabled: vi.fn(),
       isLiveVideoEnabled: true,
       isRecoveryCaptureEnabled: true,
+      isCameraRequired: true,
       robotName: 'robotName',
     }
     vi.mocked(OnOffToggle).mockImplementation(({ isOn }) => (

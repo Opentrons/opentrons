@@ -39,7 +39,10 @@ import {
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -49,7 +52,6 @@ import { useDeckCalibrationData } from './hooks'
 
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { RunGeneratedDataFileIdsByType } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
@@ -71,7 +73,6 @@ export function HistoricalProtocolRunDrawer(
     ) ?? []
   const totalImageFileCount = outputFileIds.jpeg.length
   const totalOutputFileCount = totalImageFileCount + outputFileIds.csv.length
-  // TODO: move this to run header or protocol finishing/run stopped
 
   const runCsvFileIds =
     'runTimeParameters' in run
@@ -190,7 +191,6 @@ export function HistoricalProtocolRunDrawer(
               run={run}
               robotName={robotName}
               protocolName={props.protocolName}
-              outputFileIds={outputFileIds}
             />
           )}
           {runCsvFileIds.map((fileId, index) => {
@@ -378,20 +378,17 @@ function ImagesFileDataRow({
   run,
   protocolName,
   robotName,
-  outputFileIds,
 }: {
   run: RunData
   protocolName: string
   robotName: string
-  outputFileIds: RunGeneratedDataFileIdsByType
 }): JSX.Element {
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
-  const baseParams = {
-    source: 'runRecord' as const,
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
     robotType: robotType,
-  }
-  const { reportPhotoAccessUsage } = useCameraAnalytics(baseParams)
+  })
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
   const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
   const buildImagesZipName = (): string =>
@@ -432,7 +429,6 @@ function ImagesFileDataRow({
             if (imagesZipFile != null) {
               downloadFile(imagesZipFile, buildImagesZipName())
               reportPhotoAccessUsage({
-                ...baseParams,
                 action: 'downloadZip',
               })
             }

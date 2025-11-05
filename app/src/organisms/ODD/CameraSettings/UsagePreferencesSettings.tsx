@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { ListButton, StyledText } from '@opentrons/components'
 
 import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './preferences.module.css'
@@ -16,6 +19,7 @@ export interface UsagePreferencesSettingsProps {
   isLiveVideoEnabled: UseCameraUsageSettingsResult['isLiveVideoEnabled']
   isRecoveryCaptureEnabled: UseCameraUsageSettingsResult['isRecoveryCaptureEnabled']
   robotName: string
+  isCameraRequired: boolean | null
 }
 
 export function UsagePreferencesSettings({
@@ -24,33 +28,35 @@ export function UsagePreferencesSettings({
   toggleRecoveryCaptureEnabled,
   toggleLiveVideoEnabled,
   robotName,
+  isCameraRequired,
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const robotType = useRobotType(robotName)
-  const baseParams = {
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
     robotType: robotType,
-    source: 'robotSettings' as const,
-  }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+    source: SOURCE_ROBOT_SETTINGS,
+  })
 
   const handleToggleLiveStream = (): void => {
     toggleLiveVideoEnabled()
-    reportCameraEnablementSettings({
-      ...baseParams,
-      cameraEnabled: true,
-      liveFeedEnabled: !isLiveVideoEnabled,
-      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
-    })
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: true,
+        liveFeedEnabled: !isLiveVideoEnabled,
+        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+      })
+    }
   }
 
   const handleToggleRecovery = (): void => {
     toggleRecoveryCaptureEnabled()
-    reportCameraEnablementSettings({
-      ...baseParams,
-      cameraEnabled: true,
-      liveFeedEnabled: isLiveVideoEnabled,
-      recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
-    })
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: true,
+        liveFeedEnabled: isLiveVideoEnabled,
+        recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
+      })
+    }
   }
   return (
     <div className={styles.usage_preferences_container}>

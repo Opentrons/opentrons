@@ -12,7 +12,6 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
-import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   getCameraUsageState,
@@ -43,7 +42,6 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const robotType = useRobotType(robotName)
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
@@ -93,9 +91,6 @@ export function SetupCamera({
       {cameraEnabled && (
         <>
           <SetupRunCameraUsage
-            robotType={robotType}
-            runId={runId}
-            cameraEnabled={cameraEnabled}
             liveStreamEnabled={liveStreamEnabled}
             recoveryEnabled={recoveryEnabled}
             toggleRecoveryEnabled={toggleRecoveryEnabled}

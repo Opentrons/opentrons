@@ -1,7 +1,10 @@
 import { Divider } from '@opentrons/components'
 
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
-import { useCameraAnalytics } from '/app/redux-resources/analytics'
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 
@@ -27,17 +30,18 @@ export function RobotSettingsCamera({
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
   } = useCameraUsageSettings()
-  const baseParams = { source: 'robotSettings' as const, robotType: robotType }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_ROBOT_SETTINGS,
+    robotType: robotType,
+  })
   const runId = useCurrentRunId()
   const doesRunExist = runId != null
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const handleToggleLiveStream = (): void => {
     toggleLiveVideoEnabled()
     reportCameraEnablementSettings({
-      ...baseParams,
       cameraEnabled: true,
-      liveFeedEnabled: isLiveVideoEnabled,
+      liveFeedEnabled: !isLiveVideoEnabled,
       recoveryCaptureEnabled: isRecoveryCaptureEnabled,
     })
   }
@@ -45,7 +49,6 @@ export function RobotSettingsCamera({
   const handleToggleRecovery = (): void => {
     toggleRecoveryCaptureEnabled()
     reportCameraEnablementSettings({
-      ...baseParams,
       cameraEnabled: true,
       liveFeedEnabled: isLiveVideoEnabled,
       recoveryCaptureEnabled: isRecoveryCaptureEnabled,

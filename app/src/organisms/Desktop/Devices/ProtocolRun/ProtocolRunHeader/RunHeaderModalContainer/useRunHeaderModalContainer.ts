@@ -7,10 +7,11 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
-import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -100,11 +101,10 @@ export function useRunHeaderModalContainer({
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
-  const baseParams = {
-    source: 'runRecord' as const,
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
     robotType: robotType,
-  }
-  const { reportCameraEnablementSettings } = useCameraAnalytics(baseParams)
+  })
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
@@ -121,7 +121,6 @@ export function useRunHeaderModalContainer({
   function proceedToRun(): void {
     const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
     reportCameraEnablementSettings({
-      ...baseParams,
       cameraEnabled: enabled,
       liveFeedEnabled: liveStreamEnabled,
       recoveryCaptureEnabled: recoveryEnabled,
