@@ -36,6 +36,7 @@ dev = [
     "httpx==0.26.0",
     "mock==5.1.0",
     "mypy==1.11.0",
+    "pydantic==2.11.7",
     "pytest-asyncio>=1,<2",
     "pytest-cov==4.1.0",
     "pytest-xdist~=2.5.0",
