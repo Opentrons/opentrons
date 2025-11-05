@@ -137,13 +137,11 @@ export const duplicateLabware: (
       id => labwareEntities[id]?.labwareDefURI
     )
 
-    if (templateLabwareDefURIs.some(uri => uri == null)) {
-      console.error(
-        'Missing labwareDefURI for one or more templateLabwareIds:',
-        templateLabwareIds
-      )
-      return
-    }
+    console.assert(
+      !templateLabwareDefURIs.some(uri => uri == null),
+      'Missing labwareDefURI for one or more templateLabwareIds:',
+      templateLabwareIds
+    )
 
     // determine if duplicating off-deck
     const firstTemplateId = templateLabwareIds[0]
