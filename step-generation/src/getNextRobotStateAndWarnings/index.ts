@@ -28,9 +28,10 @@ import {
 import { forBlowOutInPlace, forDropTipInPlace } from './inPlaceCommandUpdates'
 import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
 import {
-  forFlexStackerCloseLatch,
-  forFlexStackerOpenLatch,
-  forFlexStackerSetStoredLabware,
+  forFlexStackerEmpty,
+  forFlexStackerFill,
+  forFlexStackerRetrieve,
+  forFlexStackerStore,
 } from './stackerUpdates'
 import {
   forAwaitTemperature,
@@ -120,36 +121,39 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'waitForTasks':
       break
 
-    //  for flex stacker
-    //  TODO: wire these up if they change state
-    //  for flex stacker support
-    case 'flexStacker/empty':
-    case 'flexStacker/fill':
-    // do we need the unsafe commands?
-    case 'flexStacker/openLatch':
-      forFlexStackerOpenLatch(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
-    case 'flexStacker/closeLatch':
-      forFlexStackerCloseLatch(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
+    // unsafe commands, no need to update state
     case 'flexStacker/setStoredLabware':
-      forFlexStackerSetStoredLabware(
+    case 'flexStacker/prepareShuttle':
+    case 'flexStacker/closeLatch':
+    case 'flexStacker/openLatch':
+      break
+    case 'flexStacker/empty':
+      forFlexStackerEmpty(
         command.params,
         invariantContext,
         robotStateAndWarnings
       )
       break
-    case 'flexStacker/prepareShuttle':
+    case 'flexStacker/fill':
+      forFlexStackerFill(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'flexStacker/retrieve':
+      forFlexStackerRetrieve(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'flexStacker/store':
+      forFlexStackerStore(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     // the following commands currently don't effect tracked robot state

@@ -515,14 +515,16 @@ export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
   }
 }
 
+export interface FlexStackerEmptyParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
+}
+
 export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/empty'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-  }
+  params: FlexStackerEmptyParams
 }
 
 export interface FlexStackerPrepareShuttleCreateCommand

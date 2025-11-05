@@ -110,7 +110,7 @@ export interface FlexStackerModuleState {
   latchOpen: boolean | null
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
   shuttlePosition: 'home' | 'retrieved' | 'stored'
-  labwareInStacker: number | null
+  labwareInStacker: string[] | null
   labwareInShuttle: number | null
   labwareRetrieved: number | null
   labwareStored: number | null
@@ -759,6 +759,7 @@ export type ErrorType =
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
+  | 'FLEX_STACKER_NO_GRIPPER'
 
 export interface CommandCreatorError {
   message: string

@@ -3,6 +3,7 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { getModuleState } from '../robotStateSelectors'
 
 import type {
+  FlexStackerEmptyParams,
   FlexStackerSetStoredLabwareParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data'
@@ -29,21 +30,28 @@ const _getStackerModuleState = (
   }
 }
 
-export const forFlexStackerOpenLatch = (
-  params: ModuleOnlyParams,
+export const forFlexStackerEmpty = (
+  params: FlexStackerEmptyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
 
   if (moduleState != null) {
-    moduleState.latchOpen = true
+    if (count != null && count > 0) {
+      moduleState.labwareInStacker =
+        moduleState?.labwareInStacker?.splice(
+          moduleState?.labwareInStacker?.length - count
+        ) ?? null
+    } else {
+      moduleState.labwareInStacker = null
+    }
   }
 }
 
-export const forFlexStackerCloseLatch = (
+export const forFlexStackerFill = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
@@ -57,23 +65,28 @@ export const forFlexStackerCloseLatch = (
   }
 }
 
-export const forFlexStackerSetStoredLabware = (
-  params: FlexStackerSetStoredLabwareParams,
+export const forFlexStackerRetrieve = (
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const {
-    moduleId,
-    adapterLabware,
-    lidLabware,
-    primaryLabware,
-    initialCount,
-    initialStoredLabware,
-  } = params
-
+  const { moduleId } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
-    moduleState.storedLabwareDetails = params
+    moduleState.shuttlePosition = 'retrieved'
+  }
+}
+
+export const forFlexStackerStore = (
+  params: ModuleOnlyParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  const { robotState } = robotStateAndWarnings
+  const { moduleId } = params
+  const moduleState = _getStackerModuleState(robotState, moduleId)
+  if (moduleState != null) {
+    moduleState.shuttlePosition = 'stored'
   }
 }

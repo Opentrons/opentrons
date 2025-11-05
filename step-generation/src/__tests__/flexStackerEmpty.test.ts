@@ -5,7 +5,7 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerOpenLatch } from '../commandCreators/atomic/flexStackerOpenLatch'
+import { flexStackerEmpty } from '../commandCreators/atomic/flexStackerEmpty'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
@@ -57,9 +57,10 @@ describe('flexStackerOpenLatch', () => {
     )
   })
   it('creates absorbance reader open lid command', () => {
-    const result = flexStackerOpenLatch(
+    const result = flexStackerEmpty(
       {
         moduleId,
+        strategy: 'logical',
       },
       invariantContext,
       robotState
@@ -79,9 +80,10 @@ describe('flexStackerOpenLatch', () => {
   })
   it('creates returns error if bad module state', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue(null)
-    const result = flexStackerOpenLatch(
+    const result = flexStackerEmpty(
       {
         moduleId,
+        strategy: 'logical',
       },
       invariantContext,
       robotState
@@ -93,9 +95,10 @@ describe('flexStackerOpenLatch', () => {
   })
   it('creates returns error if no gripper', () => {
     invariantContext.gripperEntities = {}
-    const result = flexStackerOpenLatch(
+    const result = flexStackerEmpty(
       {
-        moduleId,
+        moduleId, 
+        strategy: 'logical',
       },
       invariantContext,
       robotState

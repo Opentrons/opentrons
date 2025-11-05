@@ -2,11 +2,11 @@ import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import { uuid } from '../../utils'
 
-import type { UnsafeFlexStackerOpenLatchCreateCommand } from '@opentrons/shared-data'
+import type { FlexStackerEmptyCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
-export const flexStackerOpenLatch: CommandCreator<
-  UnsafeFlexStackerOpenLatchCreateCommand['params']
+export const flexStackerEmpty: CommandCreator<
+  FlexStackerEmptyCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {
   const { gripperEntities, moduleEntities } = invariantContext
   const flexStackerState = flexStackerStateGetter(prevRobotState, args.moduleId)
@@ -28,13 +28,16 @@ export const flexStackerOpenLatch: CommandCreator<
   return {
     commands: [
       {
-        commandType: 'flexStacker/openLatch',
+        commandType: 'flexStacker/empty',
         key: uuid(),
         params: {
           moduleId: args.moduleId,
+          strategy: args.strategy,
+          message: args.message,
+          count: args.count,
         },
       },
     ],
-    python: `${pythonName}.open_latch()`,
+    python: `${pythonName}.empty()`,
   }
 }
