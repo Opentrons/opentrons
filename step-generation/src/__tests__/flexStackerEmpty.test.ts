@@ -23,7 +23,7 @@ const moduleId = 'flexStackerId'
 const gripperId = 'gripperId'
 vi.mock('../robotStateSelectors')
 
-describe('flexStackerOpenLatch', () => {
+describe('flexStackerEmpty', () => {
   let invariantContext: InvariantContext
   let robotState: RobotState
   beforeEach(() => {
@@ -56,7 +56,7 @@ describe('flexStackerOpenLatch', () => {
       {} as FlexStackerModuleState
     )
   })
-  it('creates absorbance reader open lid command', () => {
+  it('creates flex stacker empty command', () => {
     const result = flexStackerEmpty(
       {
         moduleId,
@@ -68,14 +68,17 @@ describe('flexStackerOpenLatch', () => {
     expect(result).toEqual({
       commands: [
         {
-          commandType: 'absorbanceReader/openLid',
+          commandType: 'flexStacker/empty',
           key: expect.any(String),
           params: {
             moduleId,
+            strategy: 'logical',
+            message: undefined,
+            count: undefined,
           },
         },
       ],
-      python: 'mock_absorbance_plate_reader_1.open_lid()',
+      python: 'mock_flex_stacker_1.empty()',
     })
   })
   it('creates returns error if bad module state', () => {
@@ -97,7 +100,7 @@ describe('flexStackerOpenLatch', () => {
     invariantContext.gripperEntities = {}
     const result = flexStackerEmpty(
       {
-        moduleId, 
+        moduleId,
         strategy: 'logical',
       },
       invariantContext,
