@@ -656,10 +656,15 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # requires the schema to be in the store keyed by its $id
     schema_id = protocol_schema.get("$id", "")
     store: Dict[str, Any] = {"opentronsLabwareSchemaV2": labware_schema_v2}
+    # Always add the protocol schema to the store, using $id as key if available
+    # If no $id, use a default key to ensure it's available for resolution
     if schema_id:
         store[schema_id] = protocol_schema
-    # Use the schema's $id as base_uri, or None if empty (for same-document refs)
-    base_uri = schema_id if schema_id else None
+    else:
+        # Fallback: if schema has no $id, still add it with a default key
+        store["protocol_schema"] = protocol_schema
+    # Use the schema's $id as base_uri, or empty string for same-document refs
+    base_uri = schema_id if schema_id else ""
     resolver = jsonschema.RefResolver(
         base_uri,
         protocol_schema,
