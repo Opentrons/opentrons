@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
 
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   getAdditionalEquipmentEntities,
-  getLabwareEntities,
   getPipetteEntities,
 } from '/protocol-designer/step-forms/selectors'
 import { getLiquidClassesValues } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
@@ -17,10 +17,10 @@ export function useDefaultPosition(
   prefix: MoveLiquidPrefixType
 ): WellLocation {
   const pipetteEntities = useSelector(getPipetteEntities)
-  const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
   const robotType = useSelector(getRobotType)
   if (formData == null) {
     return {}
@@ -28,8 +28,8 @@ export function useDefaultPosition(
   const liquidClassDefaultValues = getLiquidClassesValues({
     rawForm: formData,
     pipetteEntities,
-    labwareEntities,
     additionalEquipmentEntities,
+    allLabwareDefs,
     robotType,
   })
   return {

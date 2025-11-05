@@ -91,6 +91,7 @@ export const SecondStepsMoveLiquidTools = ({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
@@ -311,8 +312,8 @@ export const SecondStepsMoveLiquidTools = ({
               propsForFields,
               rawForm: formData,
               pipetteEntities,
-              labwareEntities,
               additionalEquipmentEntities,
+              allLabwareDefs,
               liquidHandlingAction: tab,
               robotType,
             })

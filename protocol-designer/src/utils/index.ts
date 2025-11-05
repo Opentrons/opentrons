@@ -3,7 +3,6 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllDefinitions,
   getDeckDefFromRobotType,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
@@ -232,30 +231,14 @@ export function getMatchingTipLiquidSpecsFromSpec(
 export function getMatchingTipLiquidSpecs(
   pipetteEntity: PipetteEntity,
   volume: number,
-  tiprack: string
+  tiprackDef: LabwareDefinition2
 ): SupportedTip {
-  const matchingLabwareDef =
-    Object.values(pipetteEntity.tiprackLabwareDef).find(def =>
-      tiprack.includes(def.parameters.loadName)
-    ) ||
-    // The `tiprack` from a step might not be in `pipetteEntity.tiprackLabwareDef`
-    // anymore because the user removed the tiprack from the pipette. So we can try
-    // looking up the `tiprack` in getAllDefinitions() as well.
-    // TODO: But getAllDefinitions() only contains standard labware, so this would still
-    // fail if `tiprack` is a custom tiprack.
-    getAllDefinitions()[tiprack]
-
-  console.assert(
-    matchingLabwareDef,
-    `expected to find a matching labware def with tiprack ${tiprack} but could not`
-  )
-
-  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+  const tipLength = tiprackDef?.parameters.tipLength ?? 0
 
   if (tipLength === 0) {
     console.error(
       `expected to find a tiplength with tiprack ${
-        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+        tiprackDef?.metadata.displayName ?? 'unknown displayName'
       } but could not`
     )
   }
@@ -278,7 +261,7 @@ export function getMatchingTipLiquidSpecs(
   console.assert(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+      tiprackDef?.metadata.displayName ?? 'unknown displayname'
     }`
   )
 
