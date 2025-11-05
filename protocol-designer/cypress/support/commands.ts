@@ -62,6 +62,7 @@ export const content = {
   pause: 'Pause',
   heaterShaker: 'Heater-Shaker',
   thermocyler: 'Thermocycler',
+  camera: 'Camera',
 }
 
 export const locators = {
@@ -191,6 +192,7 @@ Cypress.Commands.add('verifyOverflowBtn', () => {
   cy.contains(content.pause).should('exist').should('be.visible')
   cy.contains(content.heaterShaker).should('exist').should('be.visible')
   cy.contains(content.thermocyler).should('exist').should('be.visible')
+  cy.contains(content.camera).should('exist').should('be.visible')
 })
 
 Cypress.Commands.add('closeReleaseNotesModal', () => {

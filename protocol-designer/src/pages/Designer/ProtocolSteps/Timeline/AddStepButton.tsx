@@ -127,7 +127,7 @@ export function AddStepButton({
     Exclude<StepType, 'manualIntervention'>
   > => [
     'absorbanceReader',
-    'captureImage',
+    'camera',
     'comment',
     'moveLabware',
     'moveLiquid',
@@ -142,7 +142,7 @@ export function AddStepButton({
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
-    captureImage: enableCamera,
+    camera: enableCamera,
     comment: enableComment,
     moveLabware: true,
     moveLiquid: isLabwarePresentForLiquidHandling,

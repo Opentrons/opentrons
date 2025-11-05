@@ -136,7 +136,7 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
-  captureImage: HydratedCameraFormData
+  camera: HydratedCameraFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -287,7 +287,7 @@ const stepFormHelperMap: {
   comment: {
     getErrors: composeErrors(messageRequired),
   },
-  captureImage: {
+  camera: {
     getErrors: composeErrors(),
   },
 }
@@ -374,7 +374,7 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
-    case 'captureImage':
+    case 'camera':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCameraFormData,
         moduleEntities,

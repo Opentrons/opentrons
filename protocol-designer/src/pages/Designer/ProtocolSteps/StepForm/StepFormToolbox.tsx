@@ -104,7 +104,7 @@ const STEP_FORM_MAP: StepFormMap = {
   thermocycler: ThermocyclerTools,
   heaterShaker: HeaterShakerTools,
   comment: CommentTools,
-  captureImage: CameraTools,
+  camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
 }
 
@@ -138,6 +138,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dirtyFields,
     focusedField,
     hydratedForm,
+    
   } = props
   const { t, i18n } = useTranslation([
     'application',

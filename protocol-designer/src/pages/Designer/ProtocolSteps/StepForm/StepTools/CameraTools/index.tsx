@@ -3,36 +3,62 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
+  ListItem,
+  ListItemDescriptor,
+  RadioButton,
+  RobotInfoLabel,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { TextAreaField } from '/protocol-designer/components/molecules'
-
-import type { ChangeEvent } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 import type { StepFormProps } from '../../types'
 
-export function CameraTools(props: StepFormProps): JSX.Element {
-  const { t, i18n } = useTranslation('form')
-  const { propsForFields } = props
+export interface CameraToolsProps {
+  robotType: RobotType
+}
 
+export function CameraTools(props: StepFormProps): JSX.Element {
+  const { t, i18n } = useTranslation('protocol_overview')
+  const { robotType } = props
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-        {i18n.format(t('step_edit_form.field.camera.label'), 'capitalize')}
+        {i18n.format(t('camera'), 'capitalize')}
       </StyledText>
-      <TextAreaField
-        value={propsForFields.message.value as string}
-        onChange={(e: ChangeEvent<any>) => {
-          propsForFields.message.updateValue(e.currentTarget.value)
-        }}
-        height="7rem"
-        error={propsForFields.message.errorToShow}
+      <ListItem type="default" backgroundColor={COLORS.grey20}>
+        <ListItemDescriptor
+          type="large"
+          description={
+            <RobotInfoLabel
+              deckLabel={i18n.format(t('on_deck'), 'upperCase')}
+            ></RobotInfoLabel>
+          }
+          content={
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {isFlex ? t('flex_camera') : t('ot2_camera')}
+            </StyledText>
+          }
+        />
+      </ListItem>
+      <Divider marginY="0" />
+      <StyledText desktopStyle="bodyDefaultSemiBold">
+        {i18n.format(t('camera_controls'))}
+      </StyledText>
+      <RadioButton
+        buttonLabel={i18n.format(t('image_capture'))}
+        buttonValue="imageCapture"
+        largeDesktopBorderRadius
+        onChange={() => {}}
+        isSelected={true}
       />
     </Flex>
   )

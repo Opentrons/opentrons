@@ -24,7 +24,7 @@ export const captureImage: CommandCreator<CaptureImageParams> = (
       saturation: args.saturation,
     },
   }
-  const python = `${PROTOCOL_CONTEXT_NAME}.captureImage()`
+  const python = `${PROTOCOL_CONTEXT_NAME}.capture_image()`
   return {
     commands: [command],
     python: python,

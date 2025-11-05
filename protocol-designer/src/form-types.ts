@@ -160,7 +160,7 @@ export type StepFieldName = string
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'absorbanceReader'
-  | 'captureImage'
+  | 'camera'
   | 'comment'
   | 'heaterShaker'
   | 'magnet'
@@ -174,7 +174,7 @@ export type StepType =
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
-  captureImage: 'photo-camera',
+  camera: 'photo-camera',
   comment: 'comment',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',
@@ -375,7 +375,7 @@ export interface HydratedCommentFormData extends AnnotationFields {
 
 export interface HydratedCameraFormData extends AnnotationFields {
   id: string
-  stepType: 'captureImage'
+  stepType: 'camera'
   homeBefore: boolean
   fileName: string
   resolution: [Width, Height]

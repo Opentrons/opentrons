@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
+import type { RobotType } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 
 export interface FocusHandlers {
@@ -31,6 +32,7 @@ export interface StepFormProps {
   propsForFields: FieldPropsByName
   toolboxStep: number
   showFormErrors: boolean
+  robotType?: RobotType
   focusedField?: string | null
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
   tab: LiquidHandlingTab

@@ -156,7 +156,7 @@ export function getDefaultsForStepType(
         volume: null,
       }
 
-    case 'captureImage':
+    case 'camera':
       return {
         home_before: false,
         filename: null,
