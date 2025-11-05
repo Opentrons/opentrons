@@ -34,7 +34,7 @@ import {
 import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
 import { getEnableByVolumeBuilder } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
-import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import {
   getAdditionalEquipmentEntities,
@@ -120,9 +120,7 @@ export const SecondStepsMoveLiquidTools = ({
 
   const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
-  const tiprackDef = useSelector(labwareDefSelectors.getLabwareDefsByURI)[
-    formData.tipRack
-  ]
+  const tiprackDef = useSelector(getLabwareDefsByURI)[formData.tipRack]
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const [showChart, setShowChart] = useState<boolean>(false)
 
