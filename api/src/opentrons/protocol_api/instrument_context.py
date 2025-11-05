@@ -336,9 +336,7 @@ class InstrumentContext(publisher.CommandPublisher):
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
-            end_target: Optional[validation.ValidTarget] = None
-            if location is None:
-                raise ValueError("Location must be supplied if using an End Location.")
+            validation.validate_dynamic_locations(location, end_location)
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
@@ -351,14 +349,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_well,
                 end_meniscus_tracking,
             ) = self._handle_aspirate_target(target=end_target)
-        elif (
-            meniscus_tracking is not None
-            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
-        ):
-            # Preserve the old behavior
-            meniscus_tracking = types.MeniscusTrackingTarget.START
-            end_move_to_location = move_to_location
-            end_meniscus_tracking = types.MeniscusTrackingTarget.END
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -625,9 +615,7 @@ class InstrumentContext(publisher.CommandPublisher):
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
-            end_target: Optional[validation.ValidTarget] = None
-            if location is None:
-                raise ValueError("Location must be supplied if using an End Location.")
+            validation.validate_dynamic_locations(location, end_location)
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
@@ -640,14 +628,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_well,
                 end_meniscus_tracking,
             ) = self._handle_dispense_target(target=end_target)
-        elif (
-            meniscus_tracking is not None
-            and meniscus_tracking == types.MeniscusTrackingTarget.DYNAMIC
-        ):
-            # Preserve the old behavior
-            meniscus_tracking = types.MeniscusTrackingTarget.START
-            end_move_to_location = move_to_location
-            end_meniscus_tracking = types.MeniscusTrackingTarget.END
 
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -964,24 +944,6 @@ class InstrumentContext(publisher.CommandPublisher):
             raise ValueError(
                 "Aspirate and Dispense locations must be within the same well"
             )
-        if aspirate_end_location is not None:
-            (
-                _,
-                asp_end_well,
-            ) = aspirate_end_location.labware.get_parent_labware_and_well()
-            if asp_start_well != asp_end_well:
-                raise ValueError(
-                    "Aspirate start and end locations must be within the same well"
-                )
-        if dispense_end_location is not None:
-            (
-                _,
-                disp_end_well,
-            ) = dispense_end_location.labware.get_parent_labware_and_well()
-            if disp_start_well != disp_end_well:
-                raise ValueError(
-                    "Dispense start and end locations must be within the same well"
-                )
 
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("mix", self.name, self.mount)

@@ -577,6 +577,40 @@ class LocationTypeError(TypeError):
 ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
 
 
+def validate_dynamic_locations(
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
+    end_location: Location,
+) -> None:
+    """Given that we have an end_location we check that they're a vaild dynamic pair."""
+    if location is None:
+        raise ValueError("Location must be supplied if using an End Location.")
+    if not isinstance(location, Location):
+        raise ValueError(
+            "Location must be a point within a well when dynamic pipetting."
+        )
+    # Shouldn't be true ever if using typing but a customer protocol may not check
+    if not isinstance(end_location, Location):
+        raise ValueError(
+            "End location must be a point within a well when dynamic pipetting."
+        )
+    if not location.labware.is_well:
+        raise ValueError("Start location must be within a well when dynamic pipetting")
+    if not end_location.labware.is_well:
+        raise ValueError("End location must be within a well when dynamic pipetting")
+    (
+        _,
+        start_well,
+    ) = location.labware.get_parent_labware_and_well()
+    (
+        _,
+        end_well,
+    ) = end_location.labware.get_parent_labware_and_well()
+    if start_well != end_well:
+        raise ValueError(
+            "Start and end locations must be within the same well when dynamic pipetting"
+        )
+
+
 def validate_location(
     location: Optional[Union[Location, Well, TrashBin, WasteChute]],
     last_location: Optional[Union[Location, TrashBin, WasteChute]],
