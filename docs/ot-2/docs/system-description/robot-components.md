@@ -14,9 +14,13 @@ LED strips on the inside top edges of the frame provide software-controllable am
 
 ## Deck and working area
 
-The deck is the machined aluminum surface on which automated science protocols are executed. The deck has 11 ANSI/SLAS-complaint slots that can hold labware, modules, and consumables. The deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck. The deck also slides out for easier access, cleaning, and for other procedures.
+The deck is the machined aluminum surface on which automated science protocols are executed. It provides  11 ANSI/SLAS-complaint slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
 
-<font color="red">PLACEHOLDER FOR DECK MAP</font>
+![deck and working area](../images/ot2-deck-working-area.png)
+
+The working area is the physical space on and above the deck that is accessible for pipetting. Labware placed in slots 1–11 are in the working area.
+
+<font color="red">PLACEHOLDER FOR DECK SLIDE OUT</font>
 
 ## Rear and side panels
 
