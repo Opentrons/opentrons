@@ -14,6 +14,7 @@ import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
 
@@ -49,7 +50,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const [isPristine, setIsPristine] = useState<boolean>(true)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const tiprackDef = useSelector(getLabwareDefsByURI)[tiprack as string]
   const robotType = useSelector(getRobotType)
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef =
@@ -66,12 +67,8 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
 
   const matchingTipLiquidSpecs =
     pipette != null && tiprack != null
-      ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprack as string)
+      ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprackDef)
       : null
-  const tiprackDef =
-    Object.values(labwareEntities).find(
-      ({ labwareDefURI }) => labwareDefURI === tiprack
-    )?.def ?? null
 
   let airGapByVolume: Array<[number, number]> = []
   // no air gap included for mix step

@@ -34,6 +34,7 @@ import {
 import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
 import { getEnableByVolumeBuilder } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import {
   getAdditionalEquipmentEntities,
@@ -90,6 +91,7 @@ export const SecondStepsMoveLiquidTools = ({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
   )
@@ -310,8 +312,8 @@ export const SecondStepsMoveLiquidTools = ({
               propsForFields,
               rawForm: formData,
               pipetteEntities,
-              labwareEntities,
               additionalEquipmentEntities,
+              allLabwareDefs,
               liquidHandlingAction: tab,
               robotType,
             })

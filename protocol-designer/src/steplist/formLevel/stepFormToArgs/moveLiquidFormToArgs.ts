@@ -296,8 +296,7 @@ export const moveLiquidFormToArgs = (
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     hydratedFormData.pipette,
     hydratedFormData.volume,
-    tipRack?.tiprackDefURI
-    // TODO: change getMatchingTipLiquidSpecs() to use the tipRack definition directly
+    tipRack
   )
   const conditioningVolume =
     hydratedFormData.conditioning_checkbox === true &&

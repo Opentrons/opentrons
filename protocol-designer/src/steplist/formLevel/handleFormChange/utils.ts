@@ -56,6 +56,7 @@ import type {
   PipetteEntity,
   ReferenceVolumes,
 } from '@opentrons/step-generation'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { FormData, PathOption, StepFieldName } from '../../../form-types'
 import type {
   FieldPropsByName,
@@ -530,16 +531,16 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
   convertedPipetteName: string
   liquidHandlingAction: LiquidClassSettingsType
   robotType: RobotType
-  labwareEntities: LabwareEntities
   pipetteEntity: PipetteEntity
+  tiprackDef: LabwareDefinition2
 }): Record<string, any> => {
   const {
     rawForm,
     convertedPipetteName,
     liquidHandlingAction,
     robotType,
-    labwareEntities,
     pipetteEntity,
+    tiprackDef,
   } = args
   const { tipRack: tiprack, path, volume: rawVolume, stepType } = rawForm
   if (stepType !== 'moveLiquid') {
@@ -547,10 +548,6 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     return {}
   }
   const volume = Number(rawVolume)
-  const tiprackEntity =
-    Object.values(labwareEntities).find(
-      ({ labwareDefURI }) => labwareDefURI === tiprack
-    ) ?? null
   const referenceLiquidClass = getAllLiquidClassDefs()[WATER_LIQUID_CLASS_NAME]
   const liquidClassValuesForPipette = referenceLiquidClass.byPipette.find(
     ({ pipetteModel }) => convertedPipetteName === pipetteModel
@@ -573,11 +570,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     const allOT2Defaults = getDefaultsForStepType('moveLiquid')
     const matchingTipLiquidSpecs =
       pipetteEntity != null
-        ? getMatchingTipLiquidSpecs(
-            pipetteEntity,
-            volume,
-            rawForm.tipRack as string
-          )
+        ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
         : null
     const aspirateOT2Defaults = {
       aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
@@ -604,11 +597,11 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
         allOT2Defaults.aspirate_retract_delay_seconds,
     }
     const pushOutVolume =
-      tiprackEntity != null
+      tiprackDef != null
         ? getDefaultPushOutVolume(
             Number(rawForm.volume),
             pipetteSpecs,
-            tiprackEntity.def
+            tiprackDef
           )
         : 0
     const dispenseOT2Defaults = {
@@ -682,11 +675,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(
-          pipetteEntity,
-          volume,
-          rawForm.tipRack as string
-        )
+      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
@@ -853,6 +842,7 @@ const getNoLiquidClassValuesMix = (args: {
   convertedPipetteName: string
   liquidHandlingAction: LiquidClassSettingsType
   pipetteEntity: PipetteEntity
+  tiprackDef: LabwareDefinition2
   robotType: RobotType
 }): Record<string, any> => {
   const {
@@ -860,6 +850,7 @@ const getNoLiquidClassValuesMix = (args: {
     convertedPipetteName,
     liquidHandlingAction,
     pipetteEntity,
+    tiprackDef,
     robotType,
   } = args
   const { tipRack: tiprack, volume: rawVolume, stepType } = rawForm
@@ -879,11 +870,7 @@ const getNoLiquidClassValuesMix = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(
-          pipetteEntity,
-          volume,
-          rawForm.tipRack as string
-        )
+      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
       : null
   const aspirateCorrectionVolume =
     linearInterpolate(
@@ -1008,23 +995,23 @@ const getNoLiquidClassValuesMix = (args: {
 const getLiquidClassValuesMoveLiquid = (args: {
   rawForm: FormData
   liquidClassValuesForTip: ByTipTypeSetting
-  labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction: LiquidClassSettingsType
   pipetteEntity: PipetteEntity
+  tiprackDef: LabwareDefinition2
   robotType: RobotType
 }): Record<string, any> => {
   const {
     rawForm,
     liquidClassValuesForTip,
-    labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction,
     pipetteEntity,
+    tiprackDef,
     robotType,
   } = args
   const { aspirate, singleDispense, multiDispense } = liquidClassValuesForTip
-  const { path, tipRack, volume: rawVolume } = rawForm
+  const { path, volume: rawVolume } = rawForm
   const { spec: pipetteSpecs } = pipetteEntity
   const volume = Number(rawVolume)
   const {
@@ -1062,16 +1049,12 @@ const getLiquidClassValuesMoveLiquid = (args: {
     [number, number]
   >
   const disposalByVolume = rawDisposalByVolume as Array<[number, number]>
-  const tiprackDefinition =
-    Object.values(labwareEntities).find(
-      ({ labwareDefURI }) => labwareDefURI === tipRack
-    )?.def ?? null
   const {
     referenceVolumes: byVolumeLookup,
     multiWellHandling,
   } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
-    tiprackDefinition,
+    tiprackDefinition: tiprackDef,
     conditioningByVolume,
     disposalByVolume,
     volume,
@@ -1091,11 +1074,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const aspirateOffsetFields = getOffsetFields(aspirateOffset, 'aspirate')
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(
-          pipetteEntity,
-          volume,
-          rawForm.tipRack as string
-        )
+      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
@@ -1292,6 +1271,7 @@ const getLiquidClassValuesMix = (args: {
   additionalEquipmentEntities: AdditionalEquipmentEntities
   liquidHandlingAction: LiquidClassSettingsType
   pipetteEntity: PipetteEntity
+  tiprackDef: LabwareDefinition2
   robotType: RobotType
 }): Record<string, any> => {
   const {
@@ -1300,6 +1280,7 @@ const getLiquidClassValuesMix = (args: {
     additionalEquipmentEntities,
     liquidHandlingAction,
     pipetteEntity,
+    tiprackDef,
     robotType,
   } = args
   const { volume: rawVolume } = rawForm
@@ -1321,11 +1302,7 @@ const getLiquidClassValuesMix = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(
-          pipetteEntity,
-          volume,
-          rawForm.tipRack as string
-        )
+      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
@@ -1448,16 +1425,16 @@ const getLiquidClassValuesMix = (args: {
 export const getLiquidClassesValues = (args: {
   rawForm: FormData
   pipetteEntities: PipetteEntities
-  labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
+  allLabwareDefs: LabwareDefByDefURI
   liquidHandlingAction?: LiquidClassSettingsType
   robotType: RobotType
 }): Record<string, any> => {
   const {
     rawForm,
     pipetteEntities,
-    labwareEntities,
     additionalEquipmentEntities,
+    allLabwareDefs,
     liquidHandlingAction = 'all',
     robotType,
   } = args
@@ -1468,6 +1445,7 @@ export const getLiquidClassesValues = (args: {
   }
 
   const pipetteEntity = pipetteEntities[pipette]
+  const tiprackDef = allLabwareDefs[tipRack]
   const liquidClasses = getAllLiquidClassDefs()
   const liquidClassDef = liquidClasses[liquidClass]
   if (pipetteEntity == null) {
@@ -1482,14 +1460,15 @@ export const getLiquidClassesValues = (args: {
           convertedPipetteName,
           liquidHandlingAction,
           robotType,
-          labwareEntities,
           pipetteEntity,
+          tiprackDef,
         })
       : getNoLiquidClassValuesMix({
           rawForm,
           convertedPipetteName,
           liquidHandlingAction,
           pipetteEntity,
+          tiprackDef,
           robotType,
         })
   }
@@ -1512,16 +1491,17 @@ export const getLiquidClassesValues = (args: {
       additionalEquipmentEntities,
       liquidHandlingAction,
       pipetteEntity,
+      tiprackDef,
       robotType,
     })
   }
   return getLiquidClassValuesMoveLiquid({
     rawForm,
     liquidClassValuesForTip,
-    labwareEntities,
     additionalEquipmentEntities,
     liquidHandlingAction,
     pipetteEntity,
+    tiprackDef,
     robotType,
   })
 }
@@ -1530,8 +1510,8 @@ export const updateFieldsForLiquidClass = (args: {
   propsForFields: FieldPropsByName
   rawForm: FormData
   pipetteEntities: PipetteEntities
-  labwareEntities: LabwareEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
+  allLabwareDefs: LabwareDefByDefURI
   liquidHandlingAction?: LiquidClassSettingsType
   robotType: RobotType
 }): void => {
@@ -1539,16 +1519,16 @@ export const updateFieldsForLiquidClass = (args: {
     propsForFields,
     rawForm,
     pipetteEntities,
-    labwareEntities,
     additionalEquipmentEntities,
+    allLabwareDefs,
     liquidHandlingAction = 'all',
     robotType,
   } = args
   const fieldUpdates = getLiquidClassesValues({
     rawForm,
     pipetteEntities,
-    labwareEntities,
     additionalEquipmentEntities,
+    allLabwareDefs,
     liquidHandlingAction,
     robotType,
   })

@@ -39,8 +39,7 @@ export const mixFormToArgs = (
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
     hydratedFormData.volume,
-    // TODO: change getMatchingTipLiquidSpecs() to use tipRack definition directly
-    hydratedFormData.tipRack?.tiprackDefURI
+    hydratedFormData.tipRack
   )
   const unorderedWells = hydratedFormData.wells || []
   const orderedWells = getOrderedWells(
