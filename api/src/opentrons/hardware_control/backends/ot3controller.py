@@ -672,7 +672,7 @@ class OT3Controller(FlexBackend):
             pip_ax = Axis.P_L if Axis.P_L in target_axes else Axis.P_R
             move_target = MoveTarget.build(
                 position=target,
-                max_speed=float(speed * (1 / move_info.unit_vector[Axis.P_L].item())),
+                max_speed=float(speed * (1 / move_info.unit_vector[pip_ax].item())),
             )
         try:
             _, movelist = self._move_manager.plan_motion(
