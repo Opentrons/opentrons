@@ -8,7 +8,9 @@ Thermocycler Module
 
 The Thermocycler Module provides on-deck, fully automated thermocycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
-The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be repeated automatically. 
+The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be repeated automatically. As with the Heater-Shaker and Temperature Modules, the API lets you choose whether to perform other pipetting and some other module actions while controlling the Thermocycler or running a profile. 
+
+This section covers using the Thermocycler Module, including its *blocking* and non-blocking commands. During a blocking command, no other commands can run until the module reaches the required temperature or finishes running a profile. 
 
 The examples in this section will use a Thermocycler Module GEN2 loaded as follows:
 
@@ -24,15 +26,32 @@ Lid Control
 
 The Thermocycler can control the position and temperature of its lid. 
 
-To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`. When the lid is open, the pipettes can access the loaded labware. 
+To change the lid position, use :py:meth:`~.ThermocyclerContext.open_lid` and :py:meth:`~.ThermocyclerContext.close_lid`. Changes in lid position are blocking. While the Thermocycler Module's lid is opening or closing, the robot won't perform other steps in your protocol. Once the lid is open, pipettes are able to access the loaded labware. 
 
-You can also control the temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. Use :py:meth:`~.ThermocyclerContext.set_lid_temperature`, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
+You can also control the temperature of the lid. Acceptable target temperatures are between 37 and 110 °C. To set the lid temperature, choose between a blocking and non-blocking command: 
+
+    * - **Command**
+      - **API version**
+      - **Module action**
+    * - ``set_lid_temperature()``
+      - Added in API 2.13
+      - Blocking
+    * ``start_set_lid_temperature()``
+      - Added in API 2.27
+      - Non-blocking
+
+
+This example use the blocking :py:meth:`~.ThermocyclerContext.set_lid_temperature` method, which takes one parameter: the target ``temperature`` (in degrees Celsius) as an integer. For example, to set the lid to 50 °C:
 
 .. code-block:: python
 
     tc_mod.set_lid_temperature(temperature=50)
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
+
+And to allow your protocol to proceed while the lid heats, use the non-blocking :py:meth:`.ThermocyclerContext.start_set_lid_temperature` method::
+
+    [insert code example] 
 
 You can turn off the lid heater at any time with :py:meth:`~.ThermocyclerContext.deactivate_lid`.
 
@@ -41,6 +60,8 @@ You can turn off the lid heater at any time with :py:meth:`~.ThermocyclerContext
     Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See :ref:`thermocycler-profiles` for more information on defining and executing profiles.
 
 .. versionadded:: 2.0
+.. versionchanged:: 2.27
+    
 
 Block Control
 =============
