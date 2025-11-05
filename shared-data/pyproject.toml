@@ -30,6 +30,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "opentrons-shared-data==0.0.0",
+    "jsonschema==4.21.1",
+    "pydantic==2.11.7",
+    "numpy==1.22.3",
+    "zipp==3.21.0",
+]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "black==22.3.0",
