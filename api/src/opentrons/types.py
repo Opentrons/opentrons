@@ -115,31 +115,31 @@ class MeniscusTrackingTarget(enum.Enum):
 
 
 class Location:
-    """Location(point: Point, labware: Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"])
-
+    """
     A location to target as a motion.
 
-    The location contains a :py:class:`.Point` (in
-    :ref:`protocol-api-deck-coords`) and possibly an associated
-    :py:class:`.Labware` or :py:class:`.Well` instance.
+    The location contains a [`Point`][opentrons.types.Point] (in
+    [protocol-api-deck-coords](protocol-api-deck-coords)) and possibly an associated
+    [`Labware`][opentrons.protocol_api.labware.Labware] or 
+    [`Well`][opentrons.protocol_api.labware.Well] instance.
 
     It should rarely be constructed directly by the user; rather, it is the
-    return type of most :py:class:`.Well` accessors like :py:meth:`.Well.top`
-    and is passed directly into a method like ``InstrumentContext.aspirate()``.
+    return type of most [`Well`][opentrons.protocol_api.labware.Well] accessors like 
+    [`Well.top()`][opentrons.protocol_api.labware.Well.top] and is passed directly into 
+    a method like `InstrumentContext.aspirate()`.
 
-    .. warning::
-       The ``.labware`` attribute of this class is used by the protocol
-       API internals to, among other things, determine safe heights to retract
-       the instruments to when moving between locations. If constructing an
-       instance of this class manually, be sure to either specify ``None`` as the
-       labware (so the robot does its worst case retraction) or specify the
-       correct labware for the ``.point`` attribute.
+    !!! warning
+        The `.labware` attribute of this class is used by the protocol
+        API internals to, among other things, determine safe heights to retract
+        the instruments to when moving between locations. If constructing an
+        instance of this class manually, be sure to either specify `None` as the
+        labware (so the robot does its worst case retraction) or specify the
+        correct labware for the `.point` attribute.
 
-
-    .. warning::
-       The ``==`` operation compares both the position and associated labware.
-       If you only need to compare locations, compare the ``.point``
-       of each item.
+    !!! warning
+        The `==` operation compares both the position and associated labware.
+        If you only need to compare locations, compare the `.point`
+        of each item.
     """
 
     def __init__(
@@ -203,17 +203,16 @@ class Location:
         This returns a new Location and does not alter the current one. It
         should be used like
 
-        .. code-block:: python
-
-            >>> loc = Location(Point(1, 1, 1), None)
-            >>> new_loc = loc.move(Point(1, 1, 1))
-            >>>
-            >>> # The new point is the old one plus the given offset.
-            >>> assert new_loc.point == Point(2, 2, 2)  # True
-            >>>
-            >>> # The old point hasn't changed.
-            >>> assert loc.point == Point(1, 1, 1)  # True
-
+        ```python
+            loc = Location(Point(1, 1, 1), None)
+            new_loc = loc.move(Point(1, 1, 1))
+            
+            # The new point is the old one plus the given offset.
+            assert new_loc.point == Point(2, 2, 2)  # True
+            
+            # The old point hasn't changed.
+            assert loc.point == Point(1, 1, 1)  # True
+        ```
         """
 
         return Location(

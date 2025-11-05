@@ -48,24 +48,30 @@ class CSVParameter:
     def parse_as_csv(
         self, detect_dialect: bool = True, **kwargs: Any
     ) -> List[List[str]]:
-        """Parses the CSV data and returns a list of lists.
+        """
+        Parses the CSV data and returns a list of lists.
 
         Each item in the parent list corresponds to a row in the CSV file.
-        If the CSV has a header, that will be the first row in the list: ``.parse_as_csv()[0]``.
+        If the CSV has a header, that will be the first row in the list:
+        `.parse_as_csv()[0]`.
 
         Each item in the child lists corresponds to a single cell within its row.
-        The data for each cell is represented as a string. You may need to trim whitespace
-        or otherwise validate string contents before passing them as inputs to other API methods.
-        For numeric data, cast these strings to integers or floating point numbers,
-        as appropriate.
+        The data for each cell is represented as a string. You may need to trim
+        whitespace or otherwise validate string contents before passing them as
+        inputs to other API methods. For numeric data, cast these strings to
+        integers or floating point numbers, as appropriate.
 
-        :param detect_dialect: If ``True``, examine the file and try to assign it a
-            :py:class:`csv.Dialect` to improve parsing behavior. Set this to ``False``
-            when using the file output of :py:meth:`.AbsorbanceReaderContext.read` as
-            a runtime parameter.
-        :param kwargs: For advanced CSV handling, you can pass any of the
-            `formatting parameters <https://docs.python.org/3/library/csv.html#csv-fmt-params>`_
-            accepted by :py:func:`csv.reader` from the Python standard library.
+        Args:
+            detect_dialect (bool): If `True`, examine the file and try to assign it
+                a [`csv.Dialect`](https://docs.python.org/3/library/csv.html#csv.Dialect)
+                to improve parsing behavior. Set this
+                to `False` when using the file output of
+                [`AbsorbanceReaderContext.read()`][opentrons.protocol_api.AbsorbanceReaderContext.read]
+                as a runtime parameter.
+            **kwargs (Any): For advanced CSV handling, you can pass any of the
+                [*formatting parameters*](https://docs.python.org/3/library/csv.html#csv-fmt-params)
+                accepted by [`csv.reader()`](https://docs.python.org/3/library/csv.html#csv.reader)
+                from the Python standard library.
         """
         rows: List[List[str]] = []
         if detect_dialect:
