@@ -1,8 +1,7 @@
 ---
+title: "Python API: Volume Modes"
 description: How to work with very small volumes of liquid on Opentrons Flex.
 ---
-
-# Volume Modes
 
 The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense very small volumes of liquid. Set the volume mode by calling [`InstrumentContext.configure_for_volume()`][opentrons.protocol_api.InstrumentContext.configure_for_volume] with the amount of liquid you plan to aspirate, in µL:
 

@@ -1,8 +1,7 @@
 ---
+title: "Python API: Labware and Deck Positions"
 description: How to define positions within an Opentrons robot and alter its speed and trajectory.
 ---
-
-# Labware and Deck Positions
 
 The API automatically determines how the robot needs to move when working with the instruments and labware in your protocol. But sometimes you need direct control over these activities. The API lets you do just that. Specifically, you can control movements relative to labware and deck locations. You can also manage the gantry’s speed and trajectory as it traverses the working area. This document explains how to use API commands to take direct control of the robot and position it exactly where you need it.
 

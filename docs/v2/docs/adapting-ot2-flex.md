@@ -1,4 +1,6 @@
-# Adapting OT-2 Protocols for Flex
+---
+title: "Python API: Adapting from OT-2 to Flex"
+---
 
 Python protocols designed to run on the OT-2 can't be directly run on Flex without some modifications. This page describes the minimal steps that you need to take to get OT-2 protocols analyzing and running on Flex.
 

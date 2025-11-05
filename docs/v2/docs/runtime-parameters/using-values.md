@@ -1,4 +1,6 @@
-# Using Parameters
+---
+title: "Python API: Using Runtime Parameters"
+---
 
 Once you've [defined parameters](defining.md), their values are accessible anywhere within the `run()` function of your protocol.
 

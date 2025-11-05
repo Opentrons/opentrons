@@ -1,4 +1,6 @@
-# Runtime Parameters
+---
+title: "Python API: Runtime Parameters"
+---
 
 Runtime parameters let you define user-customizable variables in your Python protocols. This gives you greater flexibility and puts extra control in the hands of the technician running the protocol — without forcing them to switch between lots of protocol files or write code themselves.
 

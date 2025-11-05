@@ -1,4 +1,6 @@
-# Module Setup
+---
+title: "Python API: Module Setup"
+---
 
 ## Loading Modules onto the Deck
 

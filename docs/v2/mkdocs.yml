@@ -7,38 +7,38 @@ nav:
   - Versioning: versioning.md
   - Labware: labware.md
   - Moving Labware: moving-labware.md
-  - Modules:
-      - Overview: modules/index.md
+  - Hardware Modules:
+      - Hardware Modules: modules/index.md
       - Module Setup: modules/setup.md
-      - Absorbance Plate Reader: modules/absorbance-plate-reader.md
-      - Heater-Shaker: modules/heater-shaker.md
+      - Absorbance Plate Reader Module: modules/absorbance-plate-reader.md
+      - Heater-Shaker Module: modules/heater-shaker.md
       - Magnetic Block: modules/magnetic-block.md
       - Magnetic Module: modules/magnetic-module.md
       - Temperature Module: modules/temperature-module.md
-      - Thermocycler: modules/thermocycler.md
+      - Thermocycler Module: modules/thermocycler.md
       - Multiple Modules of the Same Type: modules/multiple-same-type.md
   - Deck Slots: deck-slots.md
   - Pipettes:
-      - Overview: pipettes/index.md
-      - Loading: pipettes/loading.md
-      - Characteristics: pipettes/characteristics.md
+      - Pipettes: pipettes/index.md
+      - Loading Pipettes: pipettes/loading.md
+      - Pipette Characteristics: pipettes/characteristics.md
       - Partial Tip Pickup: pipettes/partial-tip-pickup.md
       - Volume Modes: pipettes/volume-modes.md
   - Liquid Classes: liquid-classes.md
   - Liquid Class Definitions: liquid-class-definitions.md
   - Building Block Commands:
-      - Overview: building-block-commands/index.md
-      - Pipette Tips: building-block-commands/pipette-tips.md
-      - Liquids: building-block-commands/liquids.md
-      - Utilities: building-block-commands/utilities.md
+      - Building Block Commands: building-block-commands/index.md
+      - Manipulating Pipette Tips: building-block-commands/pipette-tips.md
+      - Liquid Control: building-block-commands/liquids.md
+      - Utility Commands: building-block-commands/utilities.md
   - Complex Commands:
-      - Overview: complex-commands/index.md
+      - Complex Commands: complex-commands/index.md
       - Sources and Destinations: complex-commands/sources-destinations.md
       - Order of Operations: complex-commands/order-operations.md
-      - Parameters: complex-commands/parameters.md
-  - Robot Position: robot-position.md
+      - Complex Command Parameters: complex-commands/parameters.md
+  - Labware and Deck Positions: robot-position.md
   - Runtime Parameters:
-      - Overview: runtime-parameters/index.md
+      - Runtime Parameters: runtime-parameters/index.md
       - Choosing Parameters: runtime-parameters/choosing.md
       - Defining Parameters: runtime-parameters/defining.md
       - Using Parameter Values: runtime-parameters/using-values.md
@@ -46,17 +46,17 @@ nav:
       - "Use Case: Dry Run": runtime-parameters/use-case-dry-run.md
       - "Use Case: Cherrypicking": runtime-parameters/use-case-cherrypicking.md
       - Parameter Style Guide: runtime-parameters/style.md
-  - Advanced Running: advanced-running.md
-  - Examples: examples.md
+  - Advanced Control: advanced-control.md
+  - Example Protocols: examples.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
-  - Protocol API Reference:
+  - API Reference:
       - Protocols: api-reference/protocols.md
       - Instruments: api-reference/instruments.md
-      - Labware: api-reference/labware.md
+      - Labware and Trash Containers: api-reference/labware.md
+      - Wells and Liquids: api-reference/wells-liquids.md
       - Modules: api-reference/modules.md
-      - Types: api-reference/types.md
-      - Wells & Liquids: api-reference/wells-liquids.md
-      - Execute & Simulate: api-reference/execute-simulate.md
+      - Useful Types: api-reference/types.md
+      - Execute and Simulate: api-reference/execute-simulate.md
 
 theme:
   name: material

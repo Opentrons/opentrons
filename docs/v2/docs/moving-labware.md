@@ -1,4 +1,6 @@
-# Moving Labware
+---
+title: "Python API: Moving Labware"
+---
 
 You can move an entire labware (and all of its contents) from one deck slot to another at any point during your protocol. On Flex, you can either use the gripper or move the labware manually. On OT-2, you can only move labware manually, since it doesn't have a gripper instrument.
 

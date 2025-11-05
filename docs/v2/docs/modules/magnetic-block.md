@@ -1,4 +1,6 @@
-# Magnetic Block
+---
+title: "Python API: Magnetic Block"
+---
 
 !!! note "Flex only"
     The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the [Magnetic Module](magnetic-module.md).

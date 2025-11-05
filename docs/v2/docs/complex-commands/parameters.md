@@ -1,8 +1,7 @@
 ---
+title: "Python API: Complex Command Parameters"
 description: Parameters for fine-tuning complex liquid handling behavior in the Python API.
 ---
-
-# Complex Liquid Handling Parameters
 
 Complex commands accept a number of optional parameters that give you greater control over the exact steps they perform. 
 

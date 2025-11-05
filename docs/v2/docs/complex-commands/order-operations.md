@@ -1,8 +1,7 @@
 ---
+title: "Python API: Complex Command Order of Operations"
 description: The order of basic commands that are part of a complex liquid handling command in the Python API.
 ---
-
-# Order of Operations
 
 Complex commands perform a series of [building block commands](../building-block-commands/liquids.md) in order. In fact, the run preview for your protocol in the Opentrons App lists all of these commands as separate steps. This lets you examine what effect your complex commands will have before running them.
 

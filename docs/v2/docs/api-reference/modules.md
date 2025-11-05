@@ -1,4 +1,6 @@
-# Modules
+---
+title: "Python API Reference: Modules"
+---
 
 ## Absorbance Plate Reader
 

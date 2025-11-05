@@ -1,4 +1,6 @@
-# Tutorial
+---
+title: "Python API: Tutorial"
+---
 
 ## Introduction
 

@@ -1,8 +1,7 @@
 ---
+title: "Python API: Liquid Control"
 description: Basic commands for working with liquids.
 ---
-
-# Liquid Control
 
 After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 

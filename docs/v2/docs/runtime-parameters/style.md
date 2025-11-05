@@ -1,4 +1,6 @@
-# Parameter Style Guide
+---
+title: "Python API: Runtime Parameter Style"
+---
 
 It's important to write clear names and descriptions when you [define parameters](defining.md) in your protocols. Clarity improves the user experience for the technicians who run your protocols. They rely on your parameter names and descriptions to understand how the robot will function when running your protocol.
 

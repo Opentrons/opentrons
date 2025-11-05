@@ -1,4 +1,6 @@
-# Building Block Commands
+---
+title: "Python API: Building Block Commands"
+---
 
 Building block commands execute some of the most basic actions that your robot can complete. But basic doesn’t mean these commands lack capabilities. They perform important tasks in your protocols. They're also foundational to the [complex commands](../complex-commands/index.md) that help you combine multiple actions into fewer lines of code.
 

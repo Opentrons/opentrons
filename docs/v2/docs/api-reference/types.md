@@ -1,4 +1,6 @@
-# Useful Types
+---
+title: "Python API Reference: Useful Types"
+---
 
 ::: opentrons.types
     options:
