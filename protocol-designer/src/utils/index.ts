@@ -7,7 +7,6 @@ import {
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   isAddressableAreaStandardSlot,
-  LOW_VOLUME_PIPETTES,
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
@@ -32,7 +31,6 @@ import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
-  PipetteEntity,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
 import type {
@@ -185,7 +183,7 @@ export const getStagingAreaAddressableAreas = (
   return addressableAreasRaw
 }
 
-export function getMatchingTipLiquidSpecsFromSpec(
+export function getMatchingTipLiquidSpecs(
   pipetteSpecs: PipetteV2Specs,
   volume: number,
   tiprackDef: LabwareDefinition2
@@ -203,52 +201,11 @@ export function getMatchingTipLiquidSpecsFromSpec(
   const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
     key => key === 'lowVolumeDefault'
   )
-
   const isUsingLowVolume = volume < 5
   const liquidType =
     isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
   const liquidSupportedTips = Object.values(
     pipetteSpecs.liquids[liquidType].supportedTips
-  )
-
-  //  find the supported tip liquid specs that either exactly match
-  //  tipLength or are closest, this accounts for custom tipracks
-  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
-    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
-    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
-    return differenceA - differenceB
-  })[0]
-  console.assert(
-    matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      tiprackDef?.metadata.displayName ?? 'unknown displayname'
-    }`
-  )
-
-  return matchingTipLiquidSpecs
-}
-
-export function getMatchingTipLiquidSpecs(
-  pipetteEntity: PipetteEntity,
-  volume: number,
-  tiprackDef: LabwareDefinition2
-): SupportedTip {
-  const tipLength = tiprackDef?.parameters.tipLength ?? 0
-
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength with tiprack ${
-        tiprackDef?.metadata.displayName ?? 'unknown displayName'
-      } but could not`
-    )
-  }
-
-  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipetteEntity.name)
-  const isUsingLowVolume = volume < 5
-  const liquidType =
-    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
-  const liquidSupportedTips = Object.values(
-    pipetteEntity.spec.liquids[liquidType].supportedTips
   )
 
   //  find the supported tip liquid specs that either exactly match

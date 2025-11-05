@@ -294,7 +294,7 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_volume'
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    hydratedFormData.pipette,
+    hydratedFormData.pipette?.spec,
     hydratedFormData.volume,
     tipRack
   )

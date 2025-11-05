@@ -570,7 +570,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
     const allOT2Defaults = getDefaultsForStepType('moveLiquid')
     const matchingTipLiquidSpecs =
       pipetteEntity != null
-        ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
+        ? getMatchingTipLiquidSpecs(pipetteEntity.spec, volume, tiprackDef)
         : null
     const aspirateOT2Defaults = {
       aspirate_wellOrder_first: allOT2Defaults.aspirate_wellOrder_first,
@@ -675,7 +675,7 @@ const getNoLiquidClassValuesMoveLiquid = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
+      ? getMatchingTipLiquidSpecs(pipetteEntity.spec, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
@@ -870,7 +870,7 @@ const getNoLiquidClassValuesMix = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
+      ? getMatchingTipLiquidSpecs(pipetteEntity.spec, volume, tiprackDef)
       : null
   const aspirateCorrectionVolume =
     linearInterpolate(
@@ -1074,7 +1074,7 @@ const getLiquidClassValuesMoveLiquid = (args: {
   const aspirateOffsetFields = getOffsetFields(aspirateOffset, 'aspirate')
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
+      ? getMatchingTipLiquidSpecs(pipetteEntity.spec, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
@@ -1302,7 +1302,7 @@ const getLiquidClassValuesMix = (args: {
 
   const matchingTipLiquidSpecs =
     pipetteEntity != null
-      ? getMatchingTipLiquidSpecs(pipetteEntity, volume, tiprackDef)
+      ? getMatchingTipLiquidSpecs(pipetteEntity.spec, volume, tiprackDef)
       : null
 
   const aspirateCorrectionVolume =
