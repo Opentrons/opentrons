@@ -7,10 +7,6 @@ on:
     paths:
       - "e2e-testing/**"
       - ".github/workflows/e2e-test-checks.yaml"
-  push:
-    branches:
-      - "edge"
-      - "e2e-testing"
   workflow_dispatch: {}
 
 concurrency:
@@ -28,10 +24,10 @@ jobs:
   checks:
     name: "E2E test checks (lint + typecheck)"
     runs-on: "ubuntu-24.04"
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - name: "Checkout Repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Setup UV"
         uses: astral-sh/setup-uv@v7
@@ -49,7 +45,7 @@ jobs:
       - name: "Run lint, format check, and type check"
         working-directory: e2e-testing
         run: make check
+
       - name: "Run unit tests"
         working-directory: e2e-testing
-        run: |
-          make test-unit
+        run: make test-unit

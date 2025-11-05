@@ -6,21 +6,21 @@ This directory contains test fixtures for e2e testing of Protocol Designer.
 
 ```md
 fixtures/
-├── protocol/           # Protocol Designer protocol files
-│   ├── 1/             # Protocol version 1 files
-│   ├── 4/             # Protocol version 4 files
-│   ├── 5/             # Protocol version 5 files
-│   ├── 6/             # Protocol version 6 files
-│   ├── 7/             # Protocol version 7 files
-│   └── 8/             # Protocol version 8 files (current)
-├── cypress_fixtures/   # Test files from original Cypress tests
-│   ├── garbage.txt                    # Invalid file for error testing
-│   ├── generic_96_tiprack_200ul.json # Generic labware definition
-│   ├── invalid_json.txt               # Malformed JSON test
-│   ├── invalid_labware.json           # Invalid labware test
-│   ├── invalid_tip_rack.json          # Invalid tip rack test
-│   └── invalid_tip_rack.txt           # Invalid tip rack text file
-└── state/              # State fixtures (deck.js)
+├── protocol/ # Protocol Designer protocol files
+│ ├── 1/ # Protocol version 1 files
+│ ├── 4/ # Protocol version 4 files
+│ ├── 5/ # Protocol version 5 files
+│ ├── 6/ # Protocol version 6 files
+│ ├── 7/ # Protocol version 7 files
+│ └── 8/ # Protocol version 8 files (current)
+├── cypress_fixtures/ # Test files from original Cypress tests
+│ ├── garbage.txt # Invalid file for error testing
+│ ├── generic_96_tiprack_200ul.json # Generic labware definition
+│ ├── invalid_json.txt # Malformed JSON test
+│ ├── invalid_labware.json # Invalid labware test
+│ ├── invalid_tip_rack.json # Invalid tip rack test
+│ └── invalid_tip_rack.txt # Invalid tip rack text file
+└── state/ # State fixtures (deck.js)
 ```
 
 ## Protocol Files
