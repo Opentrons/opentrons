@@ -2,7 +2,6 @@
 name = "analyses-snapshot-testing"
 version = "0.0.0"
 description = "Snapshot Testing of Opentrons Protocols"
-readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 dependencies = [
   "anyio>=4.9.0,<5",
