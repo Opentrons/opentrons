@@ -34,6 +34,8 @@
   "comment": "Comment",
   "comment_step": "Comment",
   "complete_protocol_to_download": "Complete the protocol to download the run log",
+  "confirm_camera_preferences": "Confirm camera preferences",
+  "confirm_camera_preferences_desc": "Confirm camera preferences to view the livestream during run setup",
   "csv_available_download": "All files associated with the run are available on the robot’s Recent Runs screen.",
   "current_step": "Current Step",
   "current_step_pause": "Current Step - Paused by User",

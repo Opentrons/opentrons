@@ -1,38 +1,45 @@
 import { useTranslation } from 'react-i18next'
 
+import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_IDLE,
+} from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
-import { useCamera } from '@opentrons/react-api-client'
 
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
 
-import type { RunStatus } from '@opentrons/api-client'
-
-const CAMERA_POLLING_INTERVAL_MS = 5000
+import type { CameraData, RunStatus } from '@opentrons/api-client'
 
 type LiveStreamInfoScreenType =
   | 'loading'
   | 'error'
   | 'disabled'
+  | 'run-setup'
   | 'run-terminal'
   | null
 
 export function useLivestreamInfoScreen(
   runStatus: RunStatus | null,
+  cameraData: CameraData | null,
   isRunLoading: boolean,
   videoError: string | null
 ): LiveStreamInfoScreenType {
-  const { data: cameraData, isLoading: isCameraSettingsLoading } = useCamera({
-    refetchInterval: CAMERA_POLLING_INTERVAL_MS,
-  })
-  const isCameraEnabled = cameraData?.cameraEnabled ?? false
+  // camera data can only undefined before a run starts unless actively being fetched.
+  const unconfirmedSettingsDuringRunSetup =
+    cameraData == null &&
+    !isRunLoading &&
+    (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+      runStatus === RUN_STATUS_IDLE)
 
-  if (isTerminalRunStatus(runStatus)) {
+  if (unconfirmedSettingsDuringRunSetup) {
+    return 'run-setup'
+  } else if (isRunLoading) {
+    return 'loading'
+  } else if (isTerminalRunStatus(runStatus)) {
     return 'run-terminal'
   } else if (videoError != null) {
     return 'error'
-  } else if (isRunLoading || isCameraSettingsLoading) {
-    return 'loading'
-  } else if (!isCameraEnabled) {
+  } else if (!cameraData?.liveStreamEnabled) {
     return 'disabled'
   } else {
     return null
@@ -58,6 +65,13 @@ export function LivestreamInfoScreen({
       )
     case 'disabled':
       return <InfoScreen content={t('camera_disabled')} />
+    case 'run-setup':
+      return (
+        <InfoScreen
+          content={t('confirm_camera_preferences')}
+          subContent={t('confirm_camera_preferences_desc')}
+        />
+      )
     case 'run-terminal':
       return <InfoScreen content={t('live_video_ended')} />
     default:
