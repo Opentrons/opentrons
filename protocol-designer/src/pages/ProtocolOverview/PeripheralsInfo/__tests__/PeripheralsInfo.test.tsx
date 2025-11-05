@@ -3,20 +3,20 @@ import { beforeEach, describe, it } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { InputDeviceInfo } from '..'
+import { PeripheralsInfo } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 
-import type { InputDeviceInfoProps } from '..'
+import type { PeripheralsInfoProps } from '..'
 
-const render = (props: InputDeviceInfoProps) => {
-  return renderWithProviders(<InputDeviceInfo {...props} />, {
+const render = (props: PeripheralsInfoProps) => {
+  return renderWithProviders(<PeripheralsInfo {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('InputDeviceInfo', () => {
-  let mockProps: InputDeviceInfoProps
+describe('PeripheralsInfo', () => {
+  let mockProps: PeripheralsInfoProps
 
   beforeEach(() => {
     mockProps = {

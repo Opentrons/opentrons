@@ -37,6 +37,7 @@
     "volume": "Recommended between 0.1 and {{max}}"
   },
   "camera": {
+    "camera": "Camera",
     "capture_image": "Capture Image"
   },
 

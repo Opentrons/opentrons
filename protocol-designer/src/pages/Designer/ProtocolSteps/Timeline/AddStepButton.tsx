@@ -42,10 +42,7 @@ import {
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
 import { OFFDECK } from '/protocol-designer/constants'
-import {
-  getEnableCameraSupport,
-  getEnableComment,
-} from '/protocol-designer/feature-flags/selectors'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
@@ -79,7 +76,6 @@ export function AddStepButton({
 }: AddStepButtonProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
-  const enableCamera = useSelector(getEnableCameraSupport)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -142,7 +138,7 @@ export function AddStepButton({
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
-    camera: enableCamera,
+    camera: true,
     comment: enableComment,
     moveLabware: true,
     moveLiquid: isLabwarePresentForLiquidHandling,

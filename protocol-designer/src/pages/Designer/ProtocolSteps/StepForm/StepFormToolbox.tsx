@@ -138,7 +138,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dirtyFields,
     focusedField,
     hydratedForm,
-    
   } = props
   const { t, i18n } = useTranslation([
     'application',

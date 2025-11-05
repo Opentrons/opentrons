@@ -8,17 +8,17 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import styles from './inputdevice.module.css'
+import styles from './peripherals.module.css'
 
 import type { RobotType } from '@opentrons/shared-data'
 
-export interface InputDeviceInfoProps {
+export interface PeripheralsInfoProps {
   robotType: RobotType
 }
 
-export function InputDeviceInfo({
+export function PeripheralsInfo({
   robotType,
-}: InputDeviceInfoProps): JSX.Element {
+}: PeripheralsInfoProps): JSX.Element {
   const { t } = useTranslation('protocol_overview')
   const isFlex = robotType === FLEX_ROBOT_TYPE
 

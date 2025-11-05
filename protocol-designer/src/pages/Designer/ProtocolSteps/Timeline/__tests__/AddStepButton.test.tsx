@@ -15,10 +15,7 @@ import {
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { OFFDECK } from '/protocol-designer/constants'
-import {
-  getEnableCameraSupport,
-  getEnableComment,
-} from '/protocol-designer/feature-flags/selectors'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getInitialRobotState,
   getRobotStateTimeline,
@@ -120,7 +117,6 @@ describe('AddStepButton', () => {
       sidebarWidth: 10,
     }
     vi.mocked(getEnableComment).mockReturnValue(true)
-    vi.mocked(getEnableCameraSupport).mockReturnValue(true)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
     vi.mocked(getIsMultiSelectMode).mockReturnValue(false)
     vi.mocked(getInitialDeckSetup).mockReturnValue({
