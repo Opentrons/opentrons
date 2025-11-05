@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "static-deploy"
 version = "0.0.0"
 description = "Tools for deploying our static web applications Labware Library and Protocol Designer"
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 dependencies = [
     "boto3>=1.40.24",

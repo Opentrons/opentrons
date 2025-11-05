@@ -54,7 +54,7 @@ dev = [
     "pytest>=8,<9",
     "types-mock~=5.1.0",
 ]
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 
 [project.urls]
 "opentrons.com" = "https://www.opentrons.com"
