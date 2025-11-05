@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "hardware_testing"
 description = "Tools for running hardware tests."
-requires-python = "~=3.10"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -21,7 +21,13 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
-dependencies = []
+dependencies = [
+    "opentrons",
+    "opentrons-shared-data",
+    "opentrons-hardware[FLEX]",
+    "pyserial==3.5",
+    "paramiko",
+]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -46,6 +52,15 @@ dev = [
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/hardware-testing"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI
+opentrons = { path = "../api", editable = true }
+"opentrons-shared-data" = { path = "../shared-data", editable = true }
+"opentrons-hardware" = { path = "../hardware", editable = true }
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "hardware_testing/_version.py"
