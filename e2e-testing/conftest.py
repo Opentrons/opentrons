@@ -1,21 +1,69 @@
 """Pytest configuration for Playwright e2e tests."""
 
 import os
+import re
 import select
 import subprocess
 import time
 import urllib.request
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from playwright.sync_api import BrowserContext, Page, Video
 from playwright.sync_api import Error as PlaywrightError
-from playwright.sync_api import Page
 
 
 def _ensure_test_results_dir() -> None:
     """Ensure the test-results directory exists."""
     os.makedirs("test-results", exist_ok=True)
+
+
+def _slugify_nodeid(nodeid: str) -> str:
+    """Convert a pytest node ID to a filesystem-friendly slug."""
+    test_identifier = nodeid.split("::")[-1]
+    candidate = re.sub(r"[^A-Za-z0-9_.-]+", "_", test_identifier)
+    candidate = candidate.strip("_")
+    if not candidate:
+        return "test"
+    return candidate[:200]
+
+
+def _save_video_with_test_name(video: Video, nodeid: str) -> None:
+    """Persist the recorded video using the test name instead of a hash."""
+    videos_dir = Path("test-results/videos")
+    videos_dir.mkdir(parents=True, exist_ok=True)
+
+    original_path: Path | None = None
+    suffix = ".webm"
+
+    try:
+        original_path = Path(video.path())
+        if original_path.suffix:
+            suffix = original_path.suffix
+    except PlaywrightError:
+        original_path = None
+
+    slug = _slugify_nodeid(nodeid)
+    destination = videos_dir / f"{slug}{suffix}"
+    counter = 1
+    while destination.exists():
+        destination = videos_dir / f"{slug}_{counter}{suffix}"
+        counter += 1
+
+    try:
+        video.save_as(str(destination))
+    except PlaywrightError as error:
+        print(f"\n⚠️  Unable to save video for {nodeid}: {error}")
+        return
+
+    if original_path and original_path.exists() and original_path != destination:
+        try:
+            original_path.unlink()
+        except OSError:
+            pass
 
 
 def pytest_configure(config: Any) -> None:
@@ -235,8 +283,9 @@ def base_url(pytestconfig: pytest.Config) -> Generator[str, None, None]:
 
 
 @pytest.fixture
-def page(page: Page, base_url: str) -> Page:
-    """Configure page with base URL."""
+def page(context: BrowserContext, base_url: str, request: FixtureRequest) -> Generator[Page, None, None]:
+    """Configure page with base URL and rename recorded video using test name."""
+    page = context.new_page()
     page.set_default_timeout(10000)
     target_url = os.environ.get("PD_SERVER_URL", base_url)
 
@@ -256,4 +305,14 @@ def page(page: Page, base_url: str) -> Page:
         print(f"✓ Recovered server on {restored_url}, retrying navigation")
         page.goto(restored_url)
 
-    return page
+    try:
+        yield page
+    finally:
+        page_video: Video | None = getattr(page, "video", None)
+        try:
+            page.close()
+        except PlaywrightError as error:
+            print(f"\n⚠️  Failed to close page for {request.node.nodeid}: {error}")
+
+        if page_video is not None:
+            _save_video_with_test_name(page_video, request.node.nodeid)

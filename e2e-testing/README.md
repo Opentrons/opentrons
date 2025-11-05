@@ -40,6 +40,30 @@ Tests against a local production build (automatically built and served on `http:
 make test-pd-local              # Headless by default
 ```
 
+or for headed (visible browser) mode:
+
+```bash
+make test-pd-local-headed
+```
+
+#### Composing and Troubleshooting Tests
+
+use the test skeleton in `e2e-testing/tests/pd/test_pd_skeleton.py` as a basis for a new test.
+
+##### To compose a test with the Playwright Inspector:
+
+1. `make codegen`
+2. copy that code into a new test file in tests/pd/
+
+##### To troubleshoot an existing test and generate code snippets:
+
+1. run the test in headed mode and insert the `page.pause()` call in the test code where you want to pause the test and start using the Playwright Inspector
+2. copy out the code into the test file.
+
+```bash
+make test-pd-local-headed PYTEST_ARGS="-k test_pd_skeleton"
+```
+
 **Note:** Local tests automatically:
 
 - Look at localhost:4173 to see if a server is running
@@ -145,7 +169,7 @@ All tests automatically generate comprehensive reports and recordings:
 
 ## Contributing
 
-1. Write tests using Page Object Model pattern
+1. Write tests using Page Object Model/Screenplay pattern
 2. Add new page objects to `automation/pd_pages/`
 3. Run `make check` before committing
 4. Ensure tests pass locally: `make test-pd-local`

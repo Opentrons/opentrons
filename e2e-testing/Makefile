@@ -34,11 +34,14 @@ test-pd:
 
 .PHONY: test-pd-local
 test-pd-local:
+	@echo "use PYTEST_ARGS to pass additional arguments"
 	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-pd-local-headless
-test-pd-local-headless:
-	TEST_ENV=local HEADLESS=true uv run pytest -m pdE2E $(PYTEST_ARGS)
+.PHONY: test-pd-local-headed
+test-pd-local-headed:
+	@echo "Example to run one test: "
+	@echo "make test-pd-local PYTEST_ARGS=\"-k test_flex_onboarding_workflow\""
+	TEST_ENV=local HEADLESS=false uv run pytest -m pdE2E $(PYTEST_ARGS)
 
 # TODO: Implement sandbox testing with branch-specific URL
 .PHONY: test-pd-sandbox
@@ -50,9 +53,9 @@ test-pd-sandbox:
 test-pd-staging:
 	TEST_ENV=staging uv run pytest -m pdE2E $(PYTEST_ARGS)
 
-.PHONY: test-pd-staging-headless
-test-pd-staging-headless:
-	TEST_ENV=staging HEADLESS=true uv run pytest -m pdE2E $(PYTEST_ARGS)
+.PHONY: test-pd-staging-headed
+test-pd-staging-headed:
+	TEST_ENV=staging HEADLESS=false uv run pytest -m pdE2E $(PYTEST_ARGS)
 
 .PHONY: test-pd-prod
 test-pd-prod:
@@ -66,7 +69,7 @@ test-pd-debug:
 codegen:
 	@echo "Starting Playwright codegen - record your test actions"
 	@echo "Target URL: $(or $(URL),http://localhost:4173)"
-	uv run playwright codegen $(or $(URL),http://localhost:4173)
+	uv run playwright codegen --target python $(or $(URL),http://localhost:4173)
 
 .PHONY: test-unit
 test-unit:
