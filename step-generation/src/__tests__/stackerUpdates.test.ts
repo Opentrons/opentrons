@@ -8,6 +8,7 @@ import {
   forFlexStackerFill,
 } from '../getNextRobotStateAndWarnings/stackerUpdates'
 import { getModuleState } from '../robotStateSelectors'
+import { FlexStackerModuleState } from '../types'
 import { uuid } from '../utils'
 
 vi.mock('../robotStateSelectors')
@@ -32,38 +33,55 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
     const props = {
       count: 1,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerEmpty(props, invariantContext, robotState)
+    forFlexStackerEmpty(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
 
-    const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
     console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toEqual(['labware2', 'labware3'])
   })
 
   it('should remove all items from the stored stacker list if count is null', () => {
     const props = {
-      count: null,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerEmpty(props, invariantContext, robotState)
+    forFlexStackerEmpty(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
 
-    const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
-    expect(moduleState?.labwareInStacker).toEqual(null)
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
+    console.log('moduleState: ', moduleState)
+    expect(moduleState?.labwareInStacker).toBeNull()
   })
 
   it('should remove all items from the stored stacker list if count is null', () => {
     const props = {
-      count: null,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerEmpty(props, invariantContext, robotState)
+    forFlexStackerEmpty(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
 
-    const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
     console.log('moduleState: ', moduleState)
-    expect(moduleState?.labwareInStacker).toEqual(null)
+    expect(moduleState?.labwareInStacker).toBeNull()
   })
 })
 
@@ -83,24 +101,34 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     const props = {
       count: 1,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerFill(props, invariantContext, robotState)
+    forFlexStackerFill(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
 
-    const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
-    console.log('moduleState: ', moduleState)
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
     expect(moduleState?.labwareInStacker).toHaveLength(4)
   })
 
   it('should not add labware to the list if count is null', () => {
     const props = {
-      count: null,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerFill(props, invariantContext, robotState)
+    forFlexStackerFill(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
 
-    const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
     console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
@@ -109,8 +137,15 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     const props = {
       count: 7,
       moduleId: FLEX_STACKER_ID,
-      strategy: 'logical',
+      strategy: 'logical' as const,
     }
-    forFlexStackerFill(props, invariantContext, robotState)
+    forFlexStackerFill(props, invariantContext, { robotState, warnings: [] })
+
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
+    console.log('moduleState: ', moduleState)
+    expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
 })
