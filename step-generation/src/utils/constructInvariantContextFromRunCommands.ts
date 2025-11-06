@@ -6,6 +6,7 @@ import {
 
 import { uuid } from '.'
 import { GRIPPER_LOCATION } from '../constants'
+import { createStagingAreaForInvariantContext } from './misc'
 
 import type {
   LoadLabwareRunTimeCommand,
@@ -17,6 +18,7 @@ import type {
   LabwareEntities,
   ModuleEntities,
   PipetteEntities,
+  StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
@@ -30,6 +32,10 @@ export function constructInvariantContextFromRunCommands(
         const { result, params } = command
         const amount = params.quantity
 
+        const newStagingAreaEntities: StagingAreaEntities =
+          createStagingAreaForInvariantContext(params)
+        let newLabwareEntities: LabwareEntities = {}
+
         if (
           result.definition != null &&
           result.definition.schemaVersion === 2
@@ -37,40 +43,49 @@ export function constructInvariantContextFromRunCommands(
           const def = result.definition
           const labwareDefURI = getLabwareDefURI(def)
 
-          const stackLabwareEntities = result.labwareIds
-            .slice(0, amount)
-            .reduce(
-              (entities: LabwareEntities, labwareId) => ({
-                ...entities,
-                [labwareId]: {
-                  id: labwareId,
-                  labwareDefURI,
-                  def,
-                  pythonName: 'n/a',
-                },
-              }),
-              acc.labwareEntities
-            )
+          newLabwareEntities = result.labwareIds.slice(0, amount).reduce(
+            (entities: LabwareEntities, labwareId) => ({
+              ...entities,
+              [labwareId]: {
+                id: labwareId,
+                labwareDefURI,
+                def,
+                pythonName: 'n/a',
+              },
+            }),
+            {}
+          )
+        }
 
-          return {
-            ...acc,
-            labwareEntities: stackLabwareEntities,
-          }
-        } else {
-          // loadLabware commands from the backend can have schema 3 labware definitions.
-          // step-generation, and this function by extension, are not prepared to handle
-          // schema 3 yet.
-          return acc
+        return {
+          ...acc,
+          labwareEntities: {
+            ...acc.labwareEntities,
+            ...newLabwareEntities,
+          },
+          stagingAreaEntities: {
+            ...acc.stagingAreaEntities,
+            ...newStagingAreaEntities,
+          },
         }
       } else if (
         (command.commandType === 'loadLabware' ||
           command.commandType === 'loadLid') &&
         command.result != null
       ) {
-        const { result } = command
+        const { result, params } = command
+
+        const newStagingAreaEntities: StagingAreaEntities =
+          createStagingAreaForInvariantContext(params)
+        let newLabwareEntities: LabwareEntities = {}
+
+        // todo(mm, 2025-05-16):
+        // loadLabware commands from the backend can have schema 3 labware definitions.
+        // step-generation, and this function by extension, are not prepared to handle
+        // schema 3 yet. Just ignore those definitions for now.
+        // See also the loadPipette handling, below.
         if (result.definition.schemaVersion === 2) {
-          const labwareEntities = {
-            ...acc.labwareEntities,
+          newLabwareEntities = {
             [result.labwareId]: {
               id: result.labwareId,
               labwareDefURI: getLabwareDefURI(result.definition),
@@ -79,17 +94,18 @@ export function constructInvariantContextFromRunCommands(
               pythonName: 'n/a',
             },
           }
-          return {
-            ...acc,
-            labwareEntities,
-          }
-        } else {
-          // todo(mm, 2025-05-16):
-          // loadLabware commands from the backend can have schema 3 labware definitions.
-          // step-generation, and this function by extension, are not prepared to handle
-          // schema 3 yet. Just ignore those definitions for now.
-          // See also the loadPipette handling, below.
-          return acc
+        }
+
+        return {
+          ...acc,
+          labwareEntities: {
+            ...acc.labwareEntities,
+            ...newLabwareEntities,
+          },
+          stagingAreaEntities: {
+            ...acc.stagingAreaEntities,
+            ...newStagingAreaEntities,
+          },
         }
       } else if (
         command.commandType === 'loadModule' &&
@@ -207,9 +223,8 @@ export function constructInvariantContextFromRunCommands(
       pipetteEntities: {},
       wasteChuteEntities: {},
       trashBinEntities: {},
-      //  this util is used for the timeline scrubber. It grabs staging area info from
-      //  command analysis. Also, it does not visualize the gripper right now
       stagingAreaEntities: {},
+      //  the timeline scrubber doesn't visualize gripper right now
       gripperEntities: {},
       //  this util is used for the timeline scrubber. It grabs liquid info from analysis
       //  so this will not be wired up right now
