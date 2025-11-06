@@ -21,8 +21,7 @@ from opentrons.system import ffmpeg
 log = logging.getLogger(__name__)
 
 # Default System Cameras
-FLEX_EMBEDDED_CAMERA = "/dev/video2"
-OT2_CAMERA = "/dev/video0"
+DEFAULT_SYSTEM_CAMERA = "/dev/ot_system_camera"
 
 # Stream Globals
 DEFAULT_CONF_FILE = (
@@ -278,9 +277,7 @@ async def image_capture(
     robot_type: RobotType, parameters: ImageParameters
 ) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
-    camera = (
-        FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA
-    )
+    camera = DEFAULT_SYSTEM_CAMERA
 
     # We must always validate the camera exists
     if not os.path.exists(camera):
