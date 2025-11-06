@@ -5,10 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 import time
 import asyncio
-import logging
 import csv
-from datetime import datetime
-
 
 COMMANDS = {'Pump_State': 'TurnOnPump', 
             'Set_Pressure': 'SetPressure'}
@@ -65,7 +62,7 @@ class SimOpentronsVacuumBase(OpentronsVacuumBase):
         """Set Pressure for the Vacuum system."""
         return
 
-    def read_continous_data(self, pressure: float) -> float:
+    def read_continuous_data(self, pressure: float) -> float:
         """Set simulation pressure."""
         self._pressure = pressure
 
