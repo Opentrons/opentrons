@@ -8,7 +8,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
-import { getOrderedWells } from '../../utils'
+import { getOrderedWells } from '../../utils/getOrderedWells'
 import { getMixDelayData } from './getDelayData'
 
 import type { MixArgs } from '@opentrons/step-generation'

@@ -16,7 +16,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
-import { getOrderedWells } from '../../utils'
+import { getOrderedWells } from '../../utils/getOrderedWells'
 import { getMoveLiquidDelayData } from './getDelayData'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
