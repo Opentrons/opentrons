@@ -36,6 +36,46 @@ dependencies = [
 dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "jsonschema==4.17.3",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "anyio==4.9.0",
+    "numpy==1.22.3",
+    "packaging==22.0",
+    "pyusb==1.2.1",
+    "zipp==3.21.0",
+]
+# Dev dependencies - from Pipfile [dev-packages]
+dev = [
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "coverage==7.4.1",
+    "mypy==1.11.0",
+    "numpydoc==0.9.1",
+    "pytest>=8,<9",
+    "pytest-asyncio>=0.23.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "sphinx==5.0.1",
+    "twine==4.0.0",
+    "wheel==0.37.0",
+    "typeguard==4.1.5",
+    "sphinx-substitution-extensions==2020.9.30.0",
+    "sphinxext-opengraph==0.8.1",
+    "sphinx-tabs>=3.4.1,<4",
+    "mock==5.1.0",
+    "flake8==7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "decoy>=2.2.0,<3",
+    "black==22.3.0",
+    "types-mock~=5.1.0",
+    "types-setuptools==57.0.2",
+    "typing-extensions>=4.0.0,<5",
+]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]
 "flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
 
@@ -70,12 +110,12 @@ git_describe_command = 'git describe --dirty --tags --long --match=v*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
-# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+# everything is doing it since everything is coversioned
 version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['src/opentrons', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['src/opentrons', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel]
 packages = ['src/opentrons']

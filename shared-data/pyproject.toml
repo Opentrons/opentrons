@@ -24,6 +24,36 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "pydantic>=2.0.0,<3.0.0",
 ]
+
+[project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "jsonschema==4.21.1",
+    "pydantic==2.11.7",
+    "numpy==1.22.3",
+    "zipp==3.21.0",
+]
+# Dev dependencies - from Pipfile [dev-packages]
+dev = [
+    "mypy==1.11.0",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "twine==4.0.0",
+    "wheel==0.37.1",
+    "pytest>=8.4.0,<9",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=3.5.0",
+    "typeguard~=4.1.5",
+    "typing-extensions>=4.0.0,<5",
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "black==22.3.0",
+    "pytest-clarity~=1.0.0",
+    "build~=1.2.0",
+]
+
 dynamic = ['version']
 
 [project.urls]
@@ -34,8 +64,7 @@ requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3']
 build-backend = 'hatchling.build'
 
 # We are keeping this commented-out code as a warning to the unwary. If you uncomment it
-# to quiet the warning from build, then it will make it impossible to run pipenv in this
-# directory, because pipenv will build a virtualenv and virtualenv will make a
+# to quiet the warning from build
 # setuptools.dist.Distribution() and that will see this line and invoke setuptools_scm and
 # that will fail because it's not actually configured. The warning that might make you
 # do this in the first place happens because hatch-vcs inherits from setuptools_scm but it
@@ -57,7 +86,7 @@ git_describe_command = 'git describe --dirty --tags --long --match=v*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
-# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+# everything is doing it since everything is coversioned
 version_scheme='only-version'
 local_scheme='no-local-version'
 
@@ -89,8 +118,6 @@ include = [
    'mypy.ini',
    'pytest.ini',
    '.flake8',
-   'Pipfile',
-   'Pipfile.lock',
 ]
 
 [tool.hatch.build.targets.wheel]

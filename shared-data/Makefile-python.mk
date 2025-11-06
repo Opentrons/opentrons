@@ -20,11 +20,6 @@ PATH := $(shell cd ../ && yarn bin):$(PATH)
 # documentation
 BUILD_NUMBER ?=
 
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
-
 BUILD_DIR := dist
 
 
@@ -57,15 +52,26 @@ setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
+	LINUX_EXTRA=""; \
+	if echo "$$UNAME_S" | grep -qi linux; then \
+		if [ -f pyproject.toml ] && grep -q '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null && grep -A 10 '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null | grep -q 'linux'; then \
+			LINUX_EXTRA="--extra linux"; \
+		fi; \
+	fi; \
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev $$LINUX_EXTRA; \
+	else \
+		uv sync --extra dev $$LINUX_EXTRA; \
+	fi; \
+	uv pip list
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	-$(pipenv) --rm
+	rm -rf .venv
 
 
 .PHONY: clean
