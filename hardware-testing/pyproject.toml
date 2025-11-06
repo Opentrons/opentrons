@@ -47,6 +47,8 @@ dev = [
     "pytest-cov==2.10.1",
     "pyusb==1.2.1",
     "requests==2.27.1",
+    "types-paramiko",
+    "types-pytz",
     "types-requests==2.25.6",
 ]
 
