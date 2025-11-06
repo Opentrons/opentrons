@@ -2153,10 +2153,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 air_gap=0,
             )
         )
-        # TODO put a version gate on this
-        if (
-            volume_for_pipette_mode_configuration is not None
-            and self._engine_client.state.pipettes.get_will_volume_mode_change(
+        if volume_for_pipette_mode_configuration is not None and (
+            self._protocol_core.api_version < APIVersion(2, 28)
+            or self._engine_client.state.pipettes.get_will_volume_mode_change(
                 self._pipette_id, volume_for_pipette_mode_configuration
             )
         ):
