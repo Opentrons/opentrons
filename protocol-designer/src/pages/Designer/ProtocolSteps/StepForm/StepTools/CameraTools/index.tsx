@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   COLORS,
@@ -14,17 +15,18 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import type { RobotType } from '@opentrons/shared-data'
-import type { StepFormProps } from '../../types'
 
 export interface CameraToolsProps {
   robotType: RobotType
 }
 
-export function CameraTools(props: StepFormProps): JSX.Element {
+export function CameraTools(): JSX.Element {
   const { t, i18n } = useTranslation('protocol_overview')
-  const { robotType } = props
-  const isFlex = robotType === FLEX_ROBOT_TYPE
+  const robotType = useSelector(getRobotType)
+  const isFlex = robotType === FLEX_ROBOT_TYPE 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -40,7 +42,7 @@ export function CameraTools(props: StepFormProps): JSX.Element {
           description={
             <RobotInfoLabel
               deckLabel={i18n.format(t('on_deck'), 'upperCase')}
-            ></RobotInfoLabel>
+            />
           }
           content={
             <StyledText desktopStyle="bodyDefaultRegular">
