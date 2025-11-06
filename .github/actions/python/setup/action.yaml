@@ -19,20 +19,35 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
-    - name: If provided set the OT_VIRTUALENV_VERSION env variable
-      shell : bash
-      if: ${{ inputs.python-version != 'false' }}
-      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: npm install --global shx@0.3.3
-    - shell: bash
-      run: $OT_PYTHON -m pip install --upgrade pip
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user pipenv==2023.12.1
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user virtualenv==20.30.0
-    - shell: bash
-      run: 'make -C ${{ inputs.project }} setup || make -C ${{ inputs.project }} setup'
+    - uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
+        enable-cache: true
+        cache-dependency-glob: '${{ inputs.project }}/uv.lock'
+    - name: Setup Python Environment
+      shell: bash
+      run: |
+        echo "::notice::Using UV for dependency management"
+        START_TIME=$(date +%s)
+        # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
+        LINUX_EXTRA=""
+        if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
+          # Check if project has linux optional dependency defined
+          if [ -f "${{ inputs.project }}/pyproject.toml" ] && grep -q '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" && grep -A 5 '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" | grep -q 'linux'; then
+            LINUX_EXTRA="--extra linux"
+          fi
+        fi
+        if [ -f "${{ inputs.project }}/uv.lock" ]; then
+          cd ${{ inputs.project }} && uv sync --frozen --extra dev $LINUX_EXTRA
+        elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
+          cd ${{ inputs.project }} && uv sync --extra dev $LINUX_EXTRA
+          # Verify dev dependencies are installed
+          uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
+        else
+          make -C ${{ inputs.project }} setup
+        fi
+        END_TIME=$(date +%s)
+        DURATION=$((END_TIME - START_TIME))
+        echo "::notice::UV setup completed in ${DURATION} seconds"
