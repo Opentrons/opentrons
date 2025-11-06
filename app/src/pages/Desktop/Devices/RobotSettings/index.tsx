@@ -24,7 +24,7 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { useRobot } from '/app/redux-resources/robots'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
 import {
   CONNECTABLE,
@@ -44,6 +44,7 @@ export function RobotSettings(): JSX.Element | null {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const robotType = useRobotType(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
@@ -73,7 +74,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    camera: <RobotSettingsCamera />,
+    camera: <RobotSettingsCamera robotType={robotType} />,
     advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}

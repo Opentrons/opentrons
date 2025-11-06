@@ -8,6 +8,11 @@ import {
 } from '@opentrons/components'
 
 import { GalleryItemErrorModal } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemErrorModal'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './gallery.module.css'
 
@@ -39,6 +44,11 @@ export function GalleryItemOverflowMenu({
   } = useMenuHandleClickOutside()
 
   const isErroredCommand = currentCommand?.error != null
+  const robotType = useRobotType(robotName)
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType,
+  })
 
   const onDownloadImage = (): void => {
     setShowOverflowMenu(false)
@@ -46,7 +56,9 @@ export function GalleryItemOverflowMenu({
     a.download = imageFilename
     a.href = imagePath ?? ''
     a.click()
-
+    reportPhotoAccessUsage({
+      action: 'download',
+    })
     a.remove()
   }
 

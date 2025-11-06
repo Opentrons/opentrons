@@ -71,7 +71,7 @@ export function ProtocolRunCamera({
         {!isTerminalRunStatus(runStatus) &&
         isCameraEnabled &&
         showLivestreamBtn ? (
-          <LaunchLivestreamBtn runId={runId} />
+          <LaunchLivestreamBtn runId={runId} robotType={robotType} />
         ) : null}
       </div>
       <Divider width="100%" />

@@ -13,6 +13,7 @@ export interface UsagePreferencesSettingsProps {
   toggleRecoveryCaptureEnabled: UseCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
   isLiveVideoEnabled: UseCameraUsageSettingsResult['isLiveVideoEnabled']
   isRecoveryCaptureEnabled: UseCameraUsageSettingsResult['isRecoveryCaptureEnabled']
+  robotName: string
 }
 
 export function UsagePreferencesSettings({
@@ -22,7 +23,6 @@ export function UsagePreferencesSettings({
   toggleLiveVideoEnabled,
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
   return (
     <div className={styles.usage_preferences_container}>
       <StyledText oddStyle="level4HeaderSemiBold">

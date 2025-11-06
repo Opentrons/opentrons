@@ -22,9 +22,12 @@ vi.mock('react-redux', async () => {
 vi.mock('@opentrons/react-api-client')
 
 const render = () => {
-  return renderWithProviders(<LaunchLivestreamBtn runId="MOCK-RUN-ID" />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <LaunchLivestreamBtn runId="MOCK-RUN-ID" robotType="OT-3 Standard" />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('LaunchLivestreamBtn', () => {

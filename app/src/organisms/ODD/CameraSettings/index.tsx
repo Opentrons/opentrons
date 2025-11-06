@@ -3,6 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
@@ -21,6 +26,7 @@ export interface CameraSettingsProps {
   isCameraEnabled: boolean
   isLiveVideoEnabled: boolean
   isRecoveryCaptureEnabled: boolean
+  robotName: string
   toggleCameraEnabled: () => void
   toggleRecoveryEnabled: () => void
   toggleLiveStreamEnabled: () => void
@@ -36,6 +42,7 @@ export function CameraSettings({
   storageInfo,
   isCameraRequired,
   isCameraEnabled,
+  robotName,
   toggleCameraEnabled,
   toggleRecoveryEnabled,
   toggleLiveStreamEnabled,
@@ -47,8 +54,43 @@ export function CameraSettings({
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
   }
-  console.log('=>(index.tsx:50) isCameraRequired', isCameraRequired)
+  const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    robotType: robotType,
+    source: SOURCE_ROBOT_SETTINGS,
+  })
 
+  const handleToggleCamera = (): void => {
+    toggleCameraEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: !isCameraEnabled,
+        liveFeedEnabled: isLiveVideoEnabled,
+        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+      })
+    }
+  }
+  const handleToggleLiveStream = (): void => {
+    toggleLiveStreamEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: isCameraEnabled,
+        liveFeedEnabled: !isLiveVideoEnabled,
+        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+      })
+    }
+  }
+
+  const handleToggleRecovery = (): void => {
+    toggleRecoveryEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: isCameraEnabled,
+        liveFeedEnabled: isLiveVideoEnabled,
+        recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
+      })
+    }
+  }
   if (showControls) {
     return <CameraControls toggleShowControls={toggleShowControls} />
   } else {
@@ -73,15 +115,16 @@ export function CameraSettings({
           </StyledText>
           <CameraEnableSetting
             isCameraEnabled={isCameraEnabled}
-            toggleCameraEnabled={toggleCameraEnabled}
+            toggleCameraEnabled={handleToggleCamera}
           />
           {isCameraEnabled && (
             <>
               <UsagePreferencesSettings
-                toggleLiveVideoEnabled={toggleLiveStreamEnabled}
-                toggleRecoveryCaptureEnabled={toggleRecoveryEnabled}
+                toggleLiveVideoEnabled={handleToggleLiveStream}
+                toggleRecoveryCaptureEnabled={handleToggleRecovery}
                 isLiveVideoEnabled={isLiveVideoEnabled}
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
+                robotName={robotName}
               />
               {isCameraSettingsEnabled && (
                 <ControlPreferencesSettings
@@ -98,6 +141,7 @@ export function CameraSettings({
 
 function StorageAlmostFullNotification(): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'branded'])
+
   return (
     <InlineNotification
       type="alert"

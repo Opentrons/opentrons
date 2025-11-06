@@ -24,6 +24,7 @@ vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
 vi.mock('/app/resources/health/useIsImageStorageLow')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 

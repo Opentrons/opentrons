@@ -207,7 +207,12 @@ export function RobotSettingsDashboard(): JSX.Element {
       return <LanguageSetting setCurrentOption={setCurrentOption} />
 
     case 'CameraPreferences':
-      return <CameraPreferences setCurrentOption={setCurrentOption} />
+      return (
+        <CameraPreferences
+          setCurrentOption={setCurrentOption}
+          robotName={robotName}
+        />
+      )
 
     // fallthrough option: render the robot settings list of buttons
     default:

@@ -42,7 +42,11 @@ import { getModalPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
-import { useRobot } from '/app/redux-resources/robots'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -159,9 +163,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   )
   const { deleteRun, isLoading: isDeletingImages } = useDeleteRunMutation()
   const robot = useRobot(robotName)
+  const robotType = useRobotType(robotName)
+
   const robotSerialNumber =
     robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
-
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     e.stopPropagation()
@@ -189,12 +194,19 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       onClose()
     })
   }
-
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
   const onClearRunImages: MouseEventHandler<HTMLButtonElement> = e => {
     handleDeleteRunImagesModal({ onDeleteRunImages })
     e.preventDefault()
     e.stopPropagation()
     closeOverflowMenu(e)
+
+    reportPhotoAccessUsage({
+      action: 'delete',
+    })
   }
 
   return (

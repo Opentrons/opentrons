@@ -7,6 +7,8 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
@@ -99,6 +101,10 @@ export function useRunHeaderModalContainer({
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
@@ -113,6 +119,13 @@ export function useRunHeaderModalContainer({
   )
 
   function proceedToRun(): void {
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    reportCameraEnablementSettings({
+      cameraEnabled: enabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
+
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -138,8 +151,8 @@ export function useRunHeaderModalContainer({
     // Camera settings do not require explicit confirmation by *any* user,
     // so if the settings haven't been confirmed, use this user's settings
     // before starting the run.
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
     if (!areCameraPreferencesConfirmed) {
-      const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
       return addCameraSettingsToRun({
         runId,
         settings: {
