@@ -16,7 +16,7 @@ You'll need to budget about 30 minutes to an hour to set up your new OT-2. Befor
 2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any robot components inside.
     ![cutting the shipping bag](../images/cut-shipping-bag.png)
 
-3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. The OT-2 weighs about 42 kg (93 lbs), always get help from a lab partner to remove the robot from the box.
+3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. Because the OT-2 weighs about 42 kg (93 lbs), always get help from a lab partner to lift it.
     ![lifting points on frame](../images/lift-points.png)
 
 4. Place the robot on a secure and stable surface.

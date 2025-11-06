@@ -31,4 +31,4 @@ Before moving your OT-2, use a 3 mm hex screwdriver to reattach the red transpor
 
 Your OT-2 is a precision scientific instrument designed to exacting tolerances. As a result, you should treat it with care when relocating it within your local work area or sending it across the country. This means following the guidance provided here and using your own common sense about how to transport an expensive piece of laboratory equipment. Bottom line: when moving your OT-2, err on the side of caution and extra padding.
 
-If you have questions or concerns about relocating your robot, contact us at support@opentrons.com.
+If you have questions or concerns about relocating your robot, contact us at <support@opentrons.com>.

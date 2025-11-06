@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Instrument Installation and Calibration"
 ---
 
-After the initial robot setup, your next step is to attach and calibrate a pipette. The OT-2 has two pipette mounts, each can hold a GEN2 1-channel or 8-channel pipette. The information in this section will help you get started; the Opentrons App provides detailed, illustrated instructions about the attachment and calibration workflows. To begin:
+After the initial robot setup, your next step is to attach and calibrate a pipette. The OT-2 has two pipette mounts, each can hold a single-channel or multi-channel pipette. The information in this section will help you get started; the Opentrons App provides detailed, illustrated instructions about the attachment and calibration workflows. To begin:
 
 <div class="instruction-list" markdown>
 
@@ -13,7 +13,7 @@ After the initial robot setup, your next step is to attach and calibrate a pipet
 3. In the Pipettes and Modules section for your device:
 
     - Select the left or right pipette mount.
-    - Click the 3-dot menu (⋮), and then click **Attach pipette**. The gantry will move towards the front of the deck and the mount will lower.
+    - Click the three-dot menu (⋮), and then click **Attach pipette**. The gantry will move towards the front of the deck and the mount will lower.
 
     ![pipette attachment](../images/pipettes-and-modules.png)
 

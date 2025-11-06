@@ -77,7 +77,17 @@ Now that you've connected the OT-2 to a network or computer, the robot can check
 
 ## Naming your robot
 
-Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, the next step is to install and calibrate a pipette.
+Naming your robot lets you easily identify it in your lab environment. If you have multiple Opentrons robots on your network, make sure to give them unique names. Once you've confirmed your robot's name, the next step is to install and calibrate a pipette. Follow these instructions to name your OT-2:
+
+<div class="instruction-list" markdown>
+
+1. In the Opentrons App, click the **Devices** tab and select the OT-2 you want to work with.
+2. Click the three-dot menu and then click **Robot settings**.
+3. Click the **Advanced** tab.
+4. In the About section, click **Rename robot**.
+5. Name your OT-2 and click **Rename robot**.
+
+</div>
 
 ## Next steps
 
