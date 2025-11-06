@@ -1,6 +1,8 @@
 .layout_container {
   display: flex;
   overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
   padding: var(--spacing-16);
 }
 

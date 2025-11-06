@@ -4,7 +4,7 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/AnnotatedSteps'
 
-import styles from './preview.module.css'
+import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'

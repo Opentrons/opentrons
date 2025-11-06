@@ -23,7 +23,7 @@ import type { MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-const INITIAL_MILLI_SECONDS_PER_FRAME = 2000
+const INITIAL_MILLISECONDS_PER_FRAME = 2000
 const INITIAL_WIDTH_PX = 200
 const MIN_CENTER_WIDTH_PX = 200
 const MIN_COLUMN_WIDTH_PX = 100
@@ -47,7 +47,7 @@ export function VisualizerContainer(
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
-    INITIAL_MILLI_SECONDS_PER_FRAME
+    INITIAL_MILLISECONDS_PER_FRAME
   )
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(

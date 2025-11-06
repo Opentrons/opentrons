@@ -5,9 +5,9 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 import { LabwareSlotContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
 
 import { ModuleSlotDetails } from './ModuleSlotDetails'
-import styles from './preview.module.css'
 import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
 import { TrashSlotDetails } from './TrashSlotDetails'
+import styles from './visualization.module.css'
 
 import type {
   Liquid,
