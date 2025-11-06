@@ -1,12 +1,11 @@
-"""Touch Probe Script for OT-3"""
+"""Touch Probe Script for OT-3."""
 import argparse
 import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import CriticalPoint
-from typing import Tuple, Union, Optional
-from dataclasses import dataclass, field
+from typing import Tuple, Optional
+from dataclasses import dataclass
 
 
 # ============================================================================
@@ -19,18 +18,13 @@ class ProbeConfig:
     """Global configuration for touch probe operations."""
 
     safe_z: float = 150.0
-    probe_deck_safe_z: float = 100.0
+    probe_deck_safe_z: float = 100.0  # for the initial deck probe
     probe_speed: float = 5.0
     edge_offset: float = 6.0  # how far inside the SLOT we start
     bound_offset: float = 5.0  # mm from edge of slot to consider as deck boundary
     xy_debounce_offset: float = 3.0  # mm to back off in X or Y
     shank_height: float = 22.0
     ball_radius: float = 0.75
-
-
-# ============================================================================
-# Dimensions Data Structure
-# ============================================================================
 
 
 @dataclass
@@ -62,7 +56,7 @@ class Dimensions:
 
     @property
     def depth(self) -> Optional[float]:
-        """Height of the hole depth (Z dimension from top to hole bottom)."""
+        """Return the vertical distance from the top to the bottom of the hole, or None if unknown."""
         if self.z_min is None:
             return None
         return self.z_max.z - self.z_min.z
@@ -95,7 +89,7 @@ async def get_deck_z(
 
     # Perform Z touch probe
     z_deck_pos = await api.touch_probe(
-        mount, axis=Axis.Z, speed=config.probe_speed, distance=config.probe_deck_safe_z
+        mount, axis=Axis.Z, speed=3.33, distance=config.probe_deck_safe_z
     )
     if z_deck_pos is None:
         # Move back to safe Z before raising error
@@ -114,7 +108,7 @@ async def get_deck_z(
 async def calibrate_labware_simple(
     api: OT3API, mount: OT3Mount, slot: int, z_deck_pos: Point, config: ProbeConfig
 ) -> Optional[Dimensions]:
-    """Probe Z, X, and Y bounds of labware in a given SLOT using absolute coordinates."""
+    """Probe Z, X, and Y bounds of labware in a given slot using absolute coordinates."""
     top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
     slot_size = helpers_ot3.get_slot_size()
     slot_center = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
@@ -151,7 +145,6 @@ async def calibrate_labware_simple(
 
     # Safe Z for XY probes
     z_safe = z_max.z + 10.0
-    config.safe_z = z_safe
 
     # ------------------------------------------------------------------------
     # Compute XY probe height based on labware height vs shank length
@@ -237,7 +230,7 @@ async def calibrate_labware_simple(
     # Return to safe Z
     current_pos = await api.current_position_ot3(mount)
     await api.move_to(
-        mount, Point(x=current_pos[Axis.X], y=current_pos[Axis.Y], z=config.safe_z)
+        mount, Point(x=current_pos[Axis.X], y=current_pos[Axis.Y], z=z_safe)
     )
 
     if None in (x_min, x_max, y_min, y_max):
@@ -262,18 +255,7 @@ async def search_hole(
     z_surface: float,
     config: ProbeConfig,
 ) -> bool:
-    """Search for a hole at the given probe point by probing down from the surface.
-
-    Args:
-        api: OT3API instance
-        mount: Mount to use for probing
-        probe_point: XY position to probe at (Z will be set to safe_z)
-        z_surface: Z height of the surface to probe from
-        config: Probe configuration
-
-    Returns:
-        True if a hole is detected (probe didn't trigger), False otherwise
-    """
+    """Search for a hole at the given probe point by probing down from the surface."""
     # Move to probe point at safe Z
     start_point = probe_point._replace(z=config.safe_z)
     await api.move_to(mount, start_point)
@@ -367,6 +349,7 @@ async def search_hole_center(
 async def get_brim_height(
     api: OT3API, mount: OT3Mount, well_center: Point, radius: float, config: ProbeConfig
 ) -> Optional[float]:
+    """Gets the height of the lip of a well, given the well center and well radius."""
     # move to safe height above center
     current_pos = await api.current_position_ot3(mount)
     await api.move_to(
@@ -380,7 +363,7 @@ async def get_brim_height(
         well_brim_point = await api.touch_probe(
             mount, axis=Axis.Z, speed=config.probe_speed, distance=10
         )
-        # compensate for ball radius on Z probe
+        # compensate for ball radius on Z probe place holder 
         try:
             well_brim_point = well_brim_point._replace(z=well_brim_point.z)
         except Exception:
@@ -390,7 +373,7 @@ async def get_brim_height(
             print(f"brim height: {well_brim_point.z - well_center.z}")
         else:
             well_brim_point = well_brim_point._replace(z=well_center.z)
-            print(f"no brim detected.")
+            print("no brim detected.")
         await api.move_to(mount, start_point)
         return well_brim_point.z
     except Exception:
@@ -401,6 +384,7 @@ async def get_brim_height(
 async def get_bottom(
     api: OT3API, mount: OT3Mount, well_center: Point, config: ProbeConfig
 ) -> Optional[Point]:
+    """Gets the bottom of a specific well, given the center point."""
     # ensure starts at well center
     current_pos = await api.current_position_ot3(mount)
     current_pos_point = Point(
@@ -516,7 +500,7 @@ async def _main(simulating: bool, mount: OT3Mount, num_wells: int, slot: int) ->
             print("unable to determine well dimensions")
 
     # Print final dimensions using dataclass properties
-    print(f"\nFinal Dimensions:")
+    print("\nFinal Dimensions:")
     print(f"  Deck Radius: {deck_square_radius:.3f} mm")
     print(f"  Deck Center: {deck_square_center} mm")
     print(f"  Width:  {dimensions.width:.3f} mm")
