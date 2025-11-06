@@ -227,6 +227,17 @@ export type NormalizedPipette =
 
 // "entities" have only properties that are time-invariant
 // when they are de-normalized, the definitions they reference are baked in
+
+// Use this when you need to refer to a particular TYPE of tip rack (such as
+// the opentrons_flex_96_tiprack_200ul). This is used in e.g. the hydrated step
+// forms, where the user selects a tip rack type rather than a specific tip
+// rack on the deck.
+// This interfaces packages together the tip rack URI and the tip rack labware
+// definition for convenience.
+export interface TipRackWithDef extends LabwareDefinition2 {
+  tiprackDefURI: string
+}
+
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
   tiprackLabwareDef: LabwareDefinition2[]

@@ -22,6 +22,7 @@ import type {
   LabwareEntities,
   PipetteEntity,
   StagingAreaEntities,
+  TipRackWithDef,
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
@@ -30,6 +31,7 @@ import type {
   LabwareOrAdditionalEquipmentEntity,
   StepFieldName,
 } from '../../form-types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { AmalgamateUnion } from '../../utils/utilityTypes'
 import type { ValueCaster, ValueMasker } from './processing'
 
@@ -158,11 +160,23 @@ const getPipetteEntity = (
   return state.pipetteEntities[id] || null
 }
 
+const getTipRackDefinition = (
+  state: InvariantContext,
+  tiprackDefURI: string,
+  allLabwareDefs: LabwareDefByDefURI
+): TipRackWithDef => {
+  return { tiprackDefURI: tiprackDefURI, ...allLabwareDefs[tiprackDefURI] }
+}
+
 interface StepFieldHelpers<ValueCasterT extends ValueCaster<any, any>> {
   // todo(mm, 2025-10-09): Refine this type to also parametrize the exact types of the
   // masked value and hydrated value.
   maskValue?: ValueMasker
-  hydrate?: (state: InvariantContext, id: string) => unknown
+  hydrate?: (
+    state: InvariantContext,
+    id: string,
+    allLabwareDefs: LabwareDefByDefURI
+  ) => unknown
   castValue?: ValueCasterT
 }
 
@@ -311,6 +325,7 @@ const stepFieldHelperMap = {
   pipette: stepFieldHelpers({
     hydrate: getPipetteEntity,
   }),
+  tipRack: stepFieldHelpers({ hydrate: getTipRackDefinition }),
   times: stepFieldHelpers({
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
@@ -466,14 +481,15 @@ export const maskField = (name: StepFieldName, value: unknown): unknown => {
 export const hydrateField = (
   state: InvariantContext,
   name: StepFieldName,
-  value: string
+  value: string,
+  allLabwareDefs: LabwareDefByDefURI
 ): unknown => {
   const hydrator =
     // @ts-expect-error - TS doesn't want to let us index stepFieldHelperMap with a
     // name that it doesn't necessarily contain. It's OK here because it'll just
     // return undefined in the worst case, which this line handles.
     stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
-  return hydrator ? hydrator(state, value) : value
+  return hydrator ? hydrator(state, value, allLabwareDefs) : value
 }
 
 /**

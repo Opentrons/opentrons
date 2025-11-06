@@ -235,10 +235,11 @@ export const getIsModuleOnDeck = (
 
 export function getHydratedForm(
   rawForm: FormData,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  allLabwareDefs: LabwareDefByDefURI
 ): HydratedFormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value as string)
+    hydrateField(invariantContext, name, value as string, allLabwareDefs)
   )
   //  @ts-expect-error because hydrateField doesn't hydrate every formField type
   //  need to udpate to hdyrate every field, will do this in a followup

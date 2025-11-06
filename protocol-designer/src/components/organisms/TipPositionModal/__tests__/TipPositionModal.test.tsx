@@ -6,6 +6,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -21,6 +22,7 @@ import type { MoveLiquidPrefixType } from '../../../../resources/types'
 vi.mock('../TipPositionSideView')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
 const render = (props: ComponentProps<typeof TipPositionModal>) => {
   return renderWithProviders(<TipPositionModal {...props} />, {
     i18nInstance: i18n,
@@ -38,6 +40,7 @@ describe('TipPositionModal', () => {
     vi.mocked(getPipetteEntities).mockReturnValue({})
     vi.mocked(getLabwareEntities).mockReturnValue({})
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
     props = {
       formData: {

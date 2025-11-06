@@ -42,7 +42,7 @@ export const mixFormToArgs = (
     tiprack_selected,
   } = castFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    pipette,
+    pipette?.spec,
     castFormData.volume,
     castFormData.tipRack
   )
@@ -115,7 +115,7 @@ export const mixFormToArgs = (
     offsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
-    tipRack: castFormData.tipRack,
+    tipRack: castFormData.tipRack?.tiprackDefURI,
     dispenseDelaySeconds,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,
