@@ -13,7 +13,6 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: auto;
 }
 
 .main_content {
@@ -21,7 +20,6 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: auto;
 }
 
 .well_details_caption_bottom {
