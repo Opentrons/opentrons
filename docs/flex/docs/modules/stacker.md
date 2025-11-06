@@ -62,7 +62,7 @@ Any Flex with a serial number that includes **A10** or **A20** _requires_ a Stac
 - Allows early model robots to recognize and communicate with the Staker.
 - Prevents the HEPA/UV module from operating if the Stacker is improperly installed.
 
-For additional information, see the [HEPA/UV compatibility section](../../stacker/compliance.md#stacker-and-hepauv-compatibility) of the Stacker instruction manual. You can also contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about a robot's manufacture date and/or have a model that needs to be upgraded.
+For additional information, see the [HEPA/UV compatibility section](../../stacker/compliance.md#flex-stacker-and-hepauv-compatibility) of the Stacker instruction manual. You can also contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about a robot's manufacture date and/or have a model that needs to be upgraded.
 
 ### Software control
 
