@@ -1,6 +1,6 @@
 """Move manager."""
 import logging
-from typing import List, Tuple, Generic
+from typing import List, Tuple, Generic, Set, Dict
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
@@ -10,6 +10,10 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisKey,
     CoordinateValue,
 )
+from opentrons_hardware.hardware_control.motion import MoveGroup
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from numpy import isclose
+import math
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +60,77 @@ class MoveManager(Generic[AxisKey]):
         start_move = Move.build_dummy(move_list[0].unit_vector.keys())
         end_move = Move.build_dummy(move_list[0].unit_vector.keys())
         return [start_move] + move_list + [end_move]
+
+    def devectorize_axes(
+        self,
+        origin: Coordinates[AxisKey, CoordinateValue],
+        target: Coordinates[AxisKey, CoordinateValue],
+        speed: float,
+        axes: List[AxisKey],
+    ) -> MoveTarget[AxisKey]:
+        """This helper method is used when a plunger is moving in conjunction with other axis.
+
+        It adjusts the speed by multiplying it by the inverse of the plunger's unit vector.
+        If only the plunger is moving, this will just result in the speed being multiplied by 1
+        and if there is more axes moving the 'speed' argument will be increased in such a way that
+        the plunger will have the speed specified by the speed argument once the target is created.
+        """
+        move_target = MoveTarget.build(position=target, max_speed=speed)  # type: ignore[type-var]
+        move_info = self._get_initial_moves_from_targets(origin, [move_target])[1]
+        target_axes = move_info.unit_vector.keys()
+        for axis in axes:
+            if axis in target_axes:
+                move_target = MoveTarget.build(  # type: ignore[type-var]
+                    position=target,
+                    max_speed=float(speed * (1 / move_info.unit_vector[axis].item())),
+                )
+        return move_target
+
+    def ensure_pipette_flow_rate_unchanged(
+        self,
+        moving_axes: Set[AxisKey],
+        origin: Dict[AxisKey, float],
+        target: Dict[AxisKey, float],
+        speed: float,
+        move_group: MoveGroup,
+        plunger_axes: List[Tuple[AxisKey, NodeId]],
+    ) -> Tuple[bool, str]:
+        """This examines the move group created to see if the plunger's speed is being reduced."""
+        for axis, node in plunger_axes:
+            if axis in moving_axes:
+                pip_constraints = self.get_constraints()[axis]
+                max_speed = pip_constraints.max_speed
+                check_speed = speed
+                if speed > max_speed:
+                    # if we've commanded an arbitrarily high speed drop it to the max speed.
+                    check_speed = max_speed.item()
+                pip_distance = abs(target[axis] - origin[axis])
+                # check to see if we can actually achieve this speed.
+                acceleration_time = (
+                    pip_constraints.max_speed - pip_constraints.max_speed_discont
+                ) / pip_constraints.max_acceleration
+                acceleration_distance = (
+                    pip_constraints.max_speed_discont * acceleration_time
+                    + 0.5 * pip_constraints.max_acceleration * (acceleration_time**2)
+                )
+                if 2 * acceleration_distance > pip_distance:
+                    # distance commanded is too short to achieve commanded speed drop the check speed
+                    # to as fast as it can do in that distance
+                    # V_max = sqrt(2 * Accel * d_accel_phase + discontinuity^2)
+                    check_speed = math.sqrt(
+                        2 * pip_constraints.max_acceleration * pip_distance / 2
+                        + pip_constraints.max_speed_discont**2
+                    )
+                pipette_speed = 0.0
+                # Iterate through the move group and find the top speed.
+                for step in move_group:
+                    pipette_speed = max(pipette_speed, step[node].velocity_mm_sec.item())  # type: ignore [union-attr]
+                if not isclose(pipette_speed, check_speed):
+                    return (
+                        True,
+                        f"Slowing down the plunger flow rate, commanded speed {check_speed} actual speed {pipette_speed}",
+                    )
+        return (False, "")
 
     def plan_motion(
         self,
