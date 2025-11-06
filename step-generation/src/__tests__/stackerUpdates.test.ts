@@ -9,7 +9,6 @@ import {
 } from '../getNextRobotStateAndWarnings/stackerUpdates'
 import { getModuleState } from '../robotStateSelectors'
 import { FlexStackerModuleState } from '../types'
-import { uuid } from '../utils'
 
 vi.mock('../robotStateSelectors')
 describe('flex stacker state updates forFlexStackerEmpty', () => {

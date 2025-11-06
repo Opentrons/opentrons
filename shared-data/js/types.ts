@@ -566,6 +566,8 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
+  maxStackerRetrievableHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
