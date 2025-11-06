@@ -62,7 +62,7 @@ export const forFlexStackerFill = (
   const moduleState = _getStackerModuleState(robotState, moduleId)
 
   if (moduleState != null) {
-    if (count != null && count > 0) {
+    if (count != null && count > 0 && moduleState.max_pool_count > count) {
       const newLabwareIdList = Array.from({ length: count }, () => uuid())
       moduleState.labwareInStacker = [
         ...(moduleState.labwareInStacker ?? []),

@@ -107,6 +107,7 @@ export interface AbsorbanceReaderState {
 
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
+  max_pool_count: number
   latchOpen: boolean | null
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
   shuttlePosition: 'home' | 'retrieved' | 'stored'

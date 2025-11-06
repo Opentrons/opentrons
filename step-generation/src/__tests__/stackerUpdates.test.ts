@@ -20,6 +20,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['labware1', 'labware2', 'labware3'],
+      max_pool_count: 6,
     } as any)
   })
 
@@ -74,6 +75,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['labware1', 'labware2', 'labware3'],
+      max_pool_count: 6,
     } as any)
   })
 
@@ -101,5 +103,14 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     const moduleState = getModuleState(robotState, FLEX_STACKER_ID)
     console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toHaveLength(3)
+  })
+
+  it('should not add labware to the list if count is greater than max_pool_count', () => {
+    const props = {
+      count: 7,
+      moduleId: FLEX_STACKER_ID,
+      strategy: 'logical',
+    }
+    forFlexStackerFill(props, invariantContext, robotState)
   })
 })
