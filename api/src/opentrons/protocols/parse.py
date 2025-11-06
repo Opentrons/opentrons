@@ -659,21 +659,16 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     protocol_schema = _get_schema_for_protocol(version_num)
 
     # instruct schema how to resolve all $ref's used in protocol schemas
-    # In jsonschema 4.21.1+, JSON pointer resolution within the same document
-    # requires proper base_uri configuration. Use the schema's $id as base_uri
-    # if available, otherwise use empty string for same-document resolution.
-    schema_id = protocol_schema.get("$id", "")
+    # For same-document references like #/definitions/slot, jsonschema handles
+    # them automatically when no resolver is provided. However, we need a resolver
+    # for cross-schema references (like labware schema). The key is to NOT add
+    # the protocol schema to the store and use empty base_uri, so same-document
+    # references resolve within the referrer (protocol_schema) automatically.
     store: Dict[str, Any] = {"opentronsLabwareSchemaV2": labware_schema_v2}
-    # Always add the protocol schema to the store, using $id as key if available
-    if schema_id:
-        store[schema_id] = protocol_schema
-        # Use the schema's $id as base_uri so that JSON pointers resolve correctly
-        base_uri = schema_id
-    else:
-        # Fallback: if no $id, use empty string for same-document resolution
-        base_uri = ""
+    # Don't add protocol schema to store - let jsonschema handle same-doc refs
+    # Use empty base_uri so #/definitions/slot resolves within protocol_schema
     resolver = jsonschema.RefResolver(
-        base_uri=base_uri,
+        base_uri="",
         referrer=protocol_schema,
         store=store,
     )
