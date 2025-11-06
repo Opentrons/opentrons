@@ -982,9 +982,9 @@ class ThermocyclerContext(ModuleContext):
                     if isinstance(well_vol, float):
                         max_vol = max(max_vol, well_vol)
                     if max_vol > BLOCK_VOL_MAX:
-                        max_vol = 100
+                        max_vol = BLOCK_VOL_MAX
                     elif max_vol < BLOCK_VOL_MIN:
-                        max_vol = 25
+                        max_vol = BLOCK_VOL_MIN
         return max_vol
 
 
