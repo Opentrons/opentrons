@@ -36,7 +36,6 @@ interface CaptureParams {
 interface LiveFeedParams {
   runId: string
 }
-// seperate livefeed back into its own param
 interface MediaAccessParams {
   action: 'download' | 'downloadZip' | 'delete' | 'storageWarning'
   transactionId?: string

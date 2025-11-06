@@ -129,6 +129,7 @@ import type {
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { CameraState } from '/app/redux/protocol-runs/types'
 import type { State } from '/app/redux/types'
+import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
   ProtocolFixture,
@@ -153,6 +154,7 @@ interface PrepareToRunProps {
   isLPCInitializing: boolean
   isCameraRequired: boolean
   appCameraSettings: CameraState
+  storageInfo: RobotStorageInfo
 }
 
 function PrepareToRun({
@@ -170,6 +172,7 @@ function PrepareToRun({
   cameraSettingsConfirmed,
   isCameraRequired,
   appCameraSettings,
+  storageInfo,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -197,11 +200,13 @@ function PrepareToRun({
       robotType: robotType,
     })
   useEffect(() => {
-    reportPhotoAccessUsage({
-      action: 'storageWarning',
-      transactionId: runId,
-    })
-  })
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        action: 'storageWarning',
+        transactionId: runId,
+      })
+    }
+  }, [storageInfo.isImageStorageLow != null])
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -960,6 +965,7 @@ export function ProtocolSetup(): JSX.Element {
         cameraSettingsConfirmed={cameraSettingsConfirmed}
         isCameraRequired={isCameraRequired}
         appCameraSettings={appCameraSettings}
+        storageInfo={storageInfo}
       />
     ),
     instruments: (

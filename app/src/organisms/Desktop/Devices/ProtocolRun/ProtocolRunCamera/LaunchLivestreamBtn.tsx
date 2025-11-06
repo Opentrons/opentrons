@@ -39,7 +39,6 @@ export function LaunchLivestreamBtn({
         t('branded:livestream_window_title') as string
       )
     )
-    // how to get if there was an error or if it actually loaded?
     reportLiveFeedUsage({
       runId: runId,
     })
