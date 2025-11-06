@@ -21,11 +21,21 @@ runs:
         fi
     - shell: bash
       run: npm install --global shx@0.3.3
+    - shell: bash
+      id: check-lockfile
+      run: |
+        if [ -f "${{ inputs.project }}/uv.lock" ]; then
+          echo "lockfile-exists=true" >> $GITHUB_OUTPUT
+          echo "cache-glob=${{ inputs.project }}/uv.lock" >> $GITHUB_OUTPUT
+        else
+          echo "lockfile-exists=false" >> $GITHUB_OUTPUT
+          echo "cache-glob=" >> $GITHUB_OUTPUT
+        fi
     - uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-        enable-cache: true
-        cache-dependency-glob: '${{ inputs.project }}/uv.lock'
+        enable-cache: ${{ steps.check-lockfile.outputs.lockfile-exists == 'true' }}
+        cache-dependency-glob: ${{ steps.check-lockfile.outputs.cache-glob }}
     - name: Setup Python Environment
       shell: bash
       run: |
