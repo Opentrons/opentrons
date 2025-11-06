@@ -59,15 +59,19 @@ You'll need to budget about 30 minutes to an hour to set up your new OT-2. Befor
 
 At this point you should have a fully assembled robot, but it isn't time to power it up and start running protocols, at least not yet. Before going forward, check your work against the items in this list:
 
-  - Confirm that all 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.
-  - Confirm that you are not missing any required cables or parts. If you are missing components, contact [Opentrons Support](https://opentrons.com/opentrons-support).
-  - Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.
-  - Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.
-  - Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Opentrons Support.
-  - Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</FONT>
+<div class="checklist-box">
+<ul>
+  <li>Confirm that all 3 transport fasteners have been removed, as powering on the robot with these brackets attached can damage the robot.</li>
+  <li>Confirm that you are not missing any required cables or parts. If you are missing components, contact <a href="https://opentrons.com/opentrons-support">Opentrons Support</a>.</li>
+  <li>Visually check the deck and windows; if there are any significantly scratched, broken, or bent components, contact Opentrons Support.</li>
+  <li>Visually check the gantry; if it is uneven or slanted, contact Opentrons Support.</li>
+  <li>Move the pipette head in the x and y direction; if it makes any loud/abnormal noises or is difficult to move, contact Opentrons Support.</li>
+  <li>Clean and sanitize the robot. <font color="red">REMINDER: LINK TO CLEANING SECTION HERE</font></li>
+</ul>
+</div>
 
-    !!!note
-        During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
+!!!note
+    During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
 
 ## Next steps
 
