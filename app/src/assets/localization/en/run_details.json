@@ -121,7 +121,7 @@
   "protocol_completed": "Protocol completed",
   "protocol_end": "Protocol end",
   "protocol_files": "Protocol files",
-  "protocol_images_viewable": "Protocol images can be viewed once captured and downloaded when the run is complete.",
+  "protocol_images_viewable": "Images can be viewed immediately after capture and downloaded once the run is complete.",
   "protocol_paused_for": "Protocol paused for",
   "protocol_run_canceled": "Protocol run canceled",
   "protocol_run_complete": "Protocol run complete",
