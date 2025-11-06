@@ -31,29 +31,37 @@ runs:
           echo "lockfile-exists=false" >> $GITHUB_OUTPUT
           echo "cache-glob=" >> $GITHUB_OUTPUT
         fi
-    - shell: bash
-      if: steps.check-lockfile.outputs.lockfile-exists == 'true'
-      env:
-        # setup-uv sets UV_CACHE_DIR, but we need to create it before setup-uv runs
-        # Use the same default paths that setup-uv uses for different OS
-        UV_CACHE_DIR_FALLBACK: ${{ runner.os == 'Windows' && 'D:\\a\\_temp\\setup-uv-cache' || runner.os == 'macOS' && '/Users/runner/work/_temp/setup-uv-cache' || '/home/runner/work/_temp/setup-uv-cache' }}
-      run: |
-        # Pre-create cache directory to prevent post-job cleanup failures
-        # The setup-uv action's post-job cleanup will fail if the cache directory
-        # doesn't exist, even if caching was enabled but setup failed before
-        # any packages were downloaded
-        # Use UV_CACHE_DIR if set (by setup-uv or previous steps), otherwise use fallback
-        CACHE_DIR="${UV_CACHE_DIR:-${UV_CACHE_DIR_FALLBACK}}"
-        # Create directory (works on both Unix and Windows with bash)
-        # On Windows, bash handles backslashes in paths correctly
-        mkdir -p "$CACHE_DIR" 2>/dev/null || mkdir "$CACHE_DIR" 2>/dev/null || true
-        # Create a placeholder file so the directory is not empty
-        touch "$CACHE_DIR/.placeholder" 2>/dev/null || echo "" > "$CACHE_DIR/.placeholder" 2>/dev/null || true
     - uses: astral-sh/setup-uv@v7
+      id: setup-uv
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
         enable-cache: ${{ steps.check-lockfile.outputs.lockfile-exists == 'true' }}
         cache-dependency-glob: ${{ steps.check-lockfile.outputs.cache-glob }}
+    - shell: bash
+      if: steps.check-lockfile.outputs.lockfile-exists == 'true'
+      run: |
+        # Ensure cache directory exists after setup-uv runs to prevent post-job cleanup failures
+        # The setup-uv action's post-job cleanup will fail if the cache directory
+        # doesn't exist, even if caching was enabled but setup failed before
+        # any packages were downloaded
+        # Use UV_CACHE_DIR which is set by setup-uv, with fallback to default paths
+        CACHE_DIR="${UV_CACHE_DIR}"
+        if [ -z "$CACHE_DIR" ]; then
+          # Fallback to default paths if UV_CACHE_DIR not set
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            CACHE_DIR="D:\\a\\_temp\\setup-uv-cache"
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            CACHE_DIR="/Users/runner/work/_temp/setup-uv-cache"
+          else
+            CACHE_DIR="/home/runner/work/_temp/setup-uv-cache"
+          fi
+        fi
+        # Create directory if it doesn't exist (works on both Unix and Windows with bash)
+        if [ ! -d "$CACHE_DIR" ]; then
+          mkdir -p "$CACHE_DIR" 2>/dev/null || mkdir "$CACHE_DIR" 2>/dev/null || true
+          # Create a placeholder file so the directory is not empty
+          touch "$CACHE_DIR/.placeholder" 2>/dev/null || echo "" > "$CACHE_DIR/.placeholder" 2>/dev/null || true
+        fi
     - name: Setup Python Environment
       shell: bash
       run: |
