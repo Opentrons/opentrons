@@ -49,7 +49,7 @@
   "camera_disabled": "Camera disabled",
   "camera_enabled": "Camera enabled",
   "camera_settings": "camera settings",
-  "camera_setup_step_description": "Set your camera preferences for this protocol run.",
+  "camera_setup_step_description": "Review camera preferences for this protocol run.",
   "camera_setup_step_title": "Camera",
   "cancel_and_restart_to_edit": "Cancel the run and restart setup to edit",
   "check_locations_and_volumes": "Check locations and volumes",

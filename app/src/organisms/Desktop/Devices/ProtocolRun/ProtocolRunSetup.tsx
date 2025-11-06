@@ -418,7 +418,6 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: CAMERA_SETUP_STEP_KEY,
         complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
-        // TODO(jh, 09-29-25): Wire this enabled/disabled state to the proper endpoint.
         completeText: t('camera_enabled'),
         incompleteText: t('check_preferences'),
         incompleteElement: null,

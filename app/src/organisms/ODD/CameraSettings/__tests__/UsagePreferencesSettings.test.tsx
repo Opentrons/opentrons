@@ -44,7 +44,9 @@ describe('UsagePreferencesSettings', () => {
     render(mockProps)
 
     screen.getByText('Live video')
-    screen.getByText('View real-time video of the deck during protocol runs.')
+    screen.getByText(
+      'View real-time video of the deck while a running a protocol.'
+    )
   })
 
   it('renders error recovery setting card', () => {
