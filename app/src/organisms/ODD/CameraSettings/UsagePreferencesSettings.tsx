@@ -42,7 +42,7 @@ export function UsagePreferencesSettings({
               className={styles.usage_subtext}
               oddStyle="level4HeaderRegular"
             >
-              {t('live_video_description')}
+              {t('live_video_description_odd')}
             </StyledText>
           </div>
           <OnOffToggle isOn={isLiveVideoEnabled} />
@@ -60,7 +60,7 @@ export function UsagePreferencesSettings({
               className={styles.usage_subtext}
               oddStyle="level4HeaderRegular"
             >
-              {t('error_recovery_camera_description')}
+              {t('automatically_capture_image')}
             </StyledText>
           </div>
           <OnOffToggle isOn={isRecoveryCaptureEnabled} />

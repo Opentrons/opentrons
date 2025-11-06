@@ -45,7 +45,7 @@ describe('UsagePreferencesSettings', () => {
 
     screen.getByText('Live video')
     screen.getByText(
-      'View real-time video of the deck while a running a protocol.'
+      'View real-time video of the deck in the Opentrons App while running a protocol.'
     )
   })
 
@@ -53,7 +53,9 @@ describe('UsagePreferencesSettings', () => {
     render(mockProps)
 
     screen.getByText('Error recovery')
-    screen.getByText('Automatically capture an image of the deck on error.')
+    screen.getByText(
+      'Automatically capture an image of the deck if an error occurs.'
+    )
   })
 
   it('calls toggleLiveVideoEnabled when live video button is clicked', () => {
