@@ -151,12 +151,12 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      width="85px"
+      width="100%"
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
       </StyledText>
-      <Flex flexWrap={WRAP}>
+      <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
             key={`${String(module.moduleModel)}_${i}_${robotName}`}
