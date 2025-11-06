@@ -150,17 +150,26 @@ You can install and use Stackers with the [Opentrons Flex HEPA/UV Module](https:
 |Side panels | The replacement side panel that comes with the User Kit is opaque to UV-C light. The other panels on the robot block UV-spectrum light to below a level which represents an exposure risk. |
 | Attachment sensors | The Stacker and HEPA/UV Module each use sensors and switches to determine if they’re installed properly. These devices deactivate/disable the UV lights when the Stacker door is open, or these components are improperly installed, removed during operation, or misaligned.|
 
-## Stacker and HEPA/UV Compatibility
+## Flex, Stacker, and HEPA/UV Compatibility
 
-Flex robots manufactured before September 2025 require an upgrade kit. This kit adds new hardware to your Flex, preventing the HEPA/UV module from operating if the Stacker is improperly installed.
+Any Flex with a serial number that includes **A10** or **A20** _requires_ a Stacker retrofit kit, even if you don't have the HEPA/UV module installed. Robots with serial numbers containing **A30** (or higher) are fully compatible with the Stacker; the retrofit kit is not required. The kit adds new firmware and hardware to your Flex which:
+
+- Allows early model robots to recognize and communicate with the Staker.
+- Prevents the HEPA/UV module from operating if the Stacker is improperly installed.
+
+The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
+
+![Flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 !!!note
     The upgrade kit must be installed by an Opentrons field service technician only.
 
-Refer to your robot's serial number to determine if an upgrade is required. Robots with a version identifier of A30 or higher are compatible with the Stacker and the HEPA/UV Module without the kit. For example, serial number FLX**A30**20250902003 indicates HEPA/UV compatibility, whereas robots with A20 or A10 version identifiers require an upgrade.
+Compare these serial number examples to the serial number on your robot to determine if it needs the Stacker retrofit kit installed.
 
-![Flex serial number](images/serial-number-cropped2.png){width="50%"}
-
-The serial number can be found on the certification sticker on the back of each Flex near the on/off switch, or under the touchscreen, or in the Opentrons App under the **Advanced** tab.
+| Serial number identifier | Example | Retrofit required |
+|----|----|----|
+| A10 | FLX**A10**20240201234 | Yes |
+| A20 | FLX**A20**20250321003 | Yes |
+| A30 | FLX**A30**20250908004 | No |
 
 Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs to be upgraded.
