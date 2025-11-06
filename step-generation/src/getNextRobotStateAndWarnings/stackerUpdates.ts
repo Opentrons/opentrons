@@ -1,10 +1,11 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
+import { uuid } from '../utils'
 
 import type {
   FlexStackerEmptyParams,
-  FlexStackerSetStoredLabwareParams,
+  FlexStackerFillParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data'
 import type {
@@ -43,7 +44,7 @@ export const forFlexStackerEmpty = (
     if (count != null && count > 0) {
       moduleState.labwareInStacker =
         moduleState?.labwareInStacker?.splice(
-          moduleState?.labwareInStacker?.length - count
+          moduleState?.labwareInStacker?.length - 1 - count
         ) ?? null
     } else {
       moduleState.labwareInStacker = null
@@ -52,16 +53,22 @@ export const forFlexStackerEmpty = (
 }
 
 export const forFlexStackerFill = (
-  params: ModuleOnlyParams,
+  params: FlexStackerFillParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId } = params
+  const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
 
   if (moduleState != null) {
-    moduleState.latchOpen = false
+    if (count != null && count > 0) {
+      const newLabwareIdList = Array.from({ length: count }, () => uuid())
+      moduleState.labwareInStacker = [
+        ...(moduleState.labwareInStacker ?? []),
+        ...newLabwareIdList,
+      ]
+    }
   }
 }
 

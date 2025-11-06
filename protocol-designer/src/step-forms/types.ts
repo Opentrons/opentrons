@@ -75,7 +75,7 @@ export interface FlexStackerModuleState {
   latchOpen: boolean | null
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
   shuttlePosition: 'home' | 'retrieved' | 'stored'
-  labwareInStacker: number | null
+  labwareInStacker: string[] | null
   labwareInShuttle: number | null
   labwareRetrieved: number | null
   labwareStored: number | null

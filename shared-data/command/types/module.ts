@@ -504,15 +504,17 @@ export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
   }
 }
 
+export interface FlexStackerFillParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
+  labwareToStore?: FlexStackerStoredLabwareGroup[]
+}
+
 export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/fill'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-    labwareToStore?: FlexStackerStoredLabwareGroup[]
-  }
+  params: FlexStackerFillParams
 }
 
 export interface FlexStackerEmptyParams {
