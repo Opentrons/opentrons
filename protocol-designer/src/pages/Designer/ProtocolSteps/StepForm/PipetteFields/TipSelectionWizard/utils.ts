@@ -1,4 +1,3 @@
-import { BORDERS, COLORS } from '@opentrons/components'
 import {
   ALL,
   COLUMN,
@@ -290,27 +289,6 @@ export const getValidTiprackIds = (args: {
     []
   )
   return validTiprackIds
-}
-
-export const getBorderPropsForPlacement = (
-  placement: LabelPlacement,
-  isError: boolean
-): string => {
-  const borderColor = isError ? COLORS.red50 : COLORS.blue50
-  const borderWidth = '1px'
-  const baseBorder = `border: ${borderWidth} solid ${borderColor};`
-  switch (placement) {
-    case LABEL_PLACEMENT_TOP:
-      return `${baseBorder}\nborder-bottom: none;\nborder-radius: ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0 0;`
-    case LABEL_PLACEMENT_BOTTOM:
-      return `${baseBorder}\nborder-top: none;\nborder-radius: 0 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4};`
-    case LABEL_PLACEMENT_LEFT:
-      return `${baseBorder}\nborder-right: none;\nborder-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius4};`
-    case LABEL_PLACEMENT_RIGHT:
-      return `${baseBorder}\nborder-left: none;\nborder-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0;`
-    default:
-      return `${baseBorder}`
-  }
 }
 
 export const getPlacementByViewboxAndPipetteSpec = (args: {

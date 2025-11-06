@@ -1,0 +1,36 @@
+.pipette_label_base {
+  width: max-content;
+  padding: var(--spacing-2);
+  background-color: var(--white);
+  border: 1px solid;
+}
+
+.pipette_label_accessible {
+  color: var(--blue-50);
+  border-color: var(--blue-50);
+}
+
+.pipette_label_inaccessible {
+  color: var(--red-50);
+  border-color: var(--red-50);
+}
+
+.pipette_label_top {
+  border-bottom: none;
+  border-radius: var(--border-radius-4) var(--border-radius-4) 0 0;
+}
+
+.pipette_label_bottom {
+  border-top: none;
+  border-radius: 0 0 var(--border-radius-4) var(--border-radius-4);
+}
+
+.pipette_label_left {
+  border-right: none;
+  border-radius: var(--border-radius-4) 0 0 var(--border-radius-4);
+}
+
+.pipette_label_right {
+  border-left: none;
+  border-radius: 0 var(--border-radius-4) var(--border-radius-4) 0;
+}
