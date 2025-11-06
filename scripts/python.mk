@@ -1,22 +1,10 @@
-# This environment variable can be used to select a specific
-# Python executable to use to run pipenv. Note: pipenv will not
-# necessary select this Python to create its virtual environments.
-OT_PYTHON ?= python
+# UV is required for Python dependency management
+UV ?= uv
 
-# This environment variable can be used to tell pipenv which
-# Python version to use for a project's virtual environment.
-# Defaults to Python 3.7, which is the version that runs on the OT-2.
-# https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
-OT_VIRTUALENV_VERSION ?= 3.10
-
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
-python := $(pipenv) run python
-pip := $(pipenv) run pip
-pytest := $(pipenv) run py.test
-
-pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
-pipenv_opts += $(and $(CI),--clear)
+# Python/pip/pytest commands using UV
+python := $(UV) run python
+pip := $(UV) pip
+pytest := $(UV) run pytest
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
