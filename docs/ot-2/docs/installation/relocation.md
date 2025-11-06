@@ -13,7 +13,7 @@ A short move could encompass anything from repositioning the OT-2 across the lab
 A long-distance move transports your OT-2 off the grounds of your university, facility, or institution. In this case, you must lock the gantry and carefully pack the OT-2 to protect it from environmental elements, shocks, and rough movements that may occur in transit. For long distance moves, Opentrons recommends that you:
 
 - Disconnect the power cable from the robot.
-- Disconnect the ethernet cable from the robot and your computer.
+- Disconnect the Ethernet cable from the robot and your computer.
 - Remove any deck-mounted modules.
 - Detach any gantry-mounted instruments.
 

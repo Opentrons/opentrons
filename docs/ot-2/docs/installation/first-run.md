@@ -43,7 +43,7 @@ After turning on the power, it may take up to 45 seconds, or longer, before the 
 
 ## Making a LAN connection
 
-Along with a direct connection to a computer, you can also connect the OT-2 to your local area network (LAN) using the supplied ethernet cable. For a LAN, just connect the ethernet cable to the robot and a wall jack. You can also plug the ethernet cable into a nearby network switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons App.
+Along with a direct connection to a computer, you can also connect the OT-2 to your local area network (LAN) using the supplied Ethernet cable. For a LAN, just connect the Ethernet cable to the robot and a wall jack. You can also plug the Ethernet cable into a nearby network switch or hub. After the robot is connected and powered on, it will appear under the **Devices** tab in the Opentrons App.
 
 ## Making a Wi-Fi connection
 
@@ -69,7 +69,7 @@ The OT-2 can connect to Wi-Fi networks with the following security types:
     - EAP-TLS
 
 !!!note "Captive portals not supported"
-    The OT-2 cannot be used on or connect to a [captive portal network](https://en.wikipedia.org/wiki/Captive_portal). Typically, these are the kind of networks deployed at airports, hotels, and other public access points. If no other networks are available, use a direct USB or ethernet connection to manage your robot.
+    The OT-2 cannot be used on or connect to a [captive portal network](https://en.wikipedia.org/wiki/Captive_portal). Typically, these are the kind of networks deployed at airports, hotels, and other public access points. If no other networks are available, use a direct USB or Ethernet connection to manage your robot.
 
 ## Install software updates
 

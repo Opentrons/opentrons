@@ -8,7 +8,7 @@ Before setting up an OT-2, make sure that your installation site meets the requi
 
 - **Weight bearing:** The OT-2 weighs 42 kg (93 lbs). Place the robot on a surface that can support its weight plus the weight of any modules, labware, liquids, or other lab equipment that may be used in your work.
 
-- **Bench surface:** A good workspace is stationary, sturdy, level, and liquid-resistant. Tables or benches with wheels (even locking wheels) are not recommended. OT-2 gantry movements can shake light weight or moveable tables.
+- **Bench surface:** A good workspace is stationary, sturdy, level, and liquid-resistant. Tables or benches with wheels (even locking wheels) are not recommended. OT-2 gantry movements can shake lightweight or moveable tables.
 
 - **Operating space:** The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x25"). The working area should include extra clearance on the sides and back, beyond the space occupied by the robot. This additional room is needed to accommodate cables, USB connections, and to allow for proper exhaust dissipation from modules that heat or cool.
 
