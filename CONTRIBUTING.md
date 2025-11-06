@@ -328,7 +328,7 @@ Not every JavaScript package has an available TypeScript definition. If you find
 **This section is a work in progress.**
 
 1. `cd` into the project directory
-2. Use `pipenv install [--dev] <package_name>` to add the dependency
+2. Use `uv add [--dev] <package_name>` to add the dependency (or edit `pyproject.toml` directly)
 
 ### Opentrons API
 

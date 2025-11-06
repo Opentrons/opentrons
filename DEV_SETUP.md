@@ -234,5 +234,5 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
-[pipenv]: https://github.com/pypa/pipenv
+[uv]: https://github.com/astral-sh/uv
 [contributing guide]: ./CONTRIBUTING.md

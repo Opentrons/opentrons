@@ -20,15 +20,15 @@ dynamic = ['version', 'hatch-dependency-coversion']
 
 dependencies = [
     "aionotify==0.3.1",
-    "anyio==4.9.0",
-    "click==8.1.2",
-    "jsonschema==4.21.1",
-    "numpy==1.22.3",
-    "packaging==22.0",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
+    "anyio>=3.6.1,<4.0.0",
+    "click>=8.0.0,<9",
+    "jsonschema>=3.0.1,<4.18.0",
+    "numpy>=1.20.0,<2",
+    "packaging>=21.0",
+    "pydantic>=2.0.0,<3",
+    "pydantic-settings>=2,<3",
     "pyusb==1.2.1",
-    "zipp==3.21.0",
+    "zipp>=3.0.0",
     "opentrons-shared-data==0.0.0",
     "opentrons-hardware[FLEX]==0.0.0",
     "performance_metrics",
@@ -36,16 +36,15 @@ dependencies = [
 
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
-# Note: Most packages from Pipfile [packages] are already in main dependencies with exact versions.
-# jsonschema is constrained by opentrons-shared-data (which requires ==4.21.1), so we don't
-# override it here. The Pipfile had ==4.17.3, but shared-data requires ==4.21.1, so robots
-# will use 4.21.1 as required by the shared-data dependency.
 robot = [
-    # Note: All packages from Pipfile [packages] are either:
-    # 1. Already pinned to exact versions in main dependencies (pydantic, pydantic-settings, anyio,
-    #    numpy, packaging, pyusb, zipp, opentrons-shared-data, opentrons-hardware, performance_metrics)
-    # 2. Constrained by transitive dependencies (jsonschema is required by opentrons-shared-data==4.21.1)
-    # So no additional packages need to be specified in the robot extra.
+    "jsonschema==4.17.3",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "anyio==4.9.0",
+    "numpy==1.22.3",
+    "packaging==22.0",
+    "pyusb==1.2.1",
+    "zipp==3.21.0",
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
@@ -127,12 +126,12 @@ git_describe_command = 'git describe --dirty --tags --long --match=v*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
-# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
+# everything is doing it since everything is coversioned
 version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['src/opentrons', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['src/opentrons', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel]
 packages = ['src/opentrons']

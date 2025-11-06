@@ -1,42 +1,17 @@
-# This environment variable can be used to select a specific
-# Python executable to use to run pipenv. Note: pipenv will not
-# necessary select this Python to create its virtual environments.
-OT_PYTHON ?= python
-
-# This environment variable can be used to tell pipenv which
-# Python version to use for a project's virtual environment.
-# Defaults to Python 3.7, which is the version that runs on the OT-2.
-# https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
-OT_VIRTUALENV_VERSION ?= 3.10
-
-# UV support - prefer UV if available, fall back to pipenv
+# UV is required for Python dependency management
 UV ?= uv
-USE_UV ?= $(shell command -v uv >/dev/null 2>&1 && echo "true" || echo "false")
 
-# Pipenv support (legacy)
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
-
-# Choose python/pip/pytest based on UV availability
-ifeq ($(USE_UV),true)
+# Python/pip/pytest commands using UV
 python := $(UV) run python
 pip := $(UV) pip
 pytest := $(UV) run pytest
-else
-python := $(pipenv) run python
-pip := $(pipenv) run pip
-pytest := $(pipenv) run py.test
-endif
 
-pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
-pipenv_opts += $(and $(CI),--clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
 # Common setup target - can be overridden by individual Makefiles if needed
 .PHONY: setup
 setup:
-ifeq ($(USE_UV),true)
 	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
 	LINUX_EXTRA=""; \
 	if echo "$$UNAME_S" | grep -qi linux; then \
@@ -45,25 +20,16 @@ ifeq ($(USE_UV),true)
 		fi; \
 	fi; \
 	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev $$LINUX_EXTRA; \
+		$(UV) sync --frozen --extra dev $$LINUX_EXTRA; \
 	else \
-		uv sync --extra dev $$LINUX_EXTRA; \
-	fi
-	uv pip list
-else
-	# pipenv reads from Pipfile which has local paths, so it should handle dependencies correctly
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-endif
+		$(UV) sync --extra dev $$LINUX_EXTRA; \
+	fi; \
+	$(UV) pip list
 
 # Common teardown target - can be overridden by individual Makefiles if needed
 .PHONY: teardown
 teardown:
-ifeq ($(USE_UV),true)
 	rm -rf .venv
-else
-	-$(pipenv) --rm
-endif
 
 poetry := poetry
 poetry_run := $(poetry) run

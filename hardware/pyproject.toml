@@ -27,6 +27,15 @@ dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
 "FLEX" = ["python-can==4.2.2"]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "python-can==4.2.2",
+    "pyserial==3.5",
+    "numpy==1.22.3",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "typing-extensions>=4.0.0,<5",
+]
 dev = [
     "black==22.3.0",
     "build~=1.2.0",
@@ -91,7 +100,7 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['opentrons_hardware', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['opentrons_hardware', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel]
 packages = ['opentrons_hardware']

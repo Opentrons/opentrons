@@ -217,7 +217,7 @@ make setup  # Creates uv virtual environment and installs dependencies
 The setup script:
 
 1. Creates/syncs uv virtual environment (Python 3.10)
-2. Extracts exact pins from `../api/Pipfile` and `../shared-data/Pipfile`
+2. Extracts exact pins from `../api/pyproject.toml` and `../shared-data/pyproject.toml`
 3. Installs pinned dependencies
 4. Installs `api` and `shared-data` as editable packages
 5. Ensures analysis uses local code, not released versions

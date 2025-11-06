@@ -27,12 +27,16 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
-    "pyudev==0.23.2",
     "pyserial==3.5",
-    "typing-extensions>=4.0.0,<5",
 ]
 
 [project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "pyserial==3.5",
+    "pyudev==0.23.2",
+    "typing-extensions>=4.0.0,<5",
+]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "black==22.3.0",
@@ -86,7 +90,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['ot3usb', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['ot3usb', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'ot3usb/LICENSE'

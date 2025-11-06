@@ -55,7 +55,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['src/test_data_generation', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['src/test_data_generation', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'test_data_generation/LICENSE'

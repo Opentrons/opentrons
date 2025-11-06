@@ -90,7 +90,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['hardware_testing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['hardware_testing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'hardware_testing/LICENSE'

@@ -19,22 +19,27 @@ description = "A server to provide an external interface to the robot."
 dynamic = ['version']
 
 dependencies = [
-    "fastapi==0.100.0",
-    "filetype==1.2.0",
-    "importlib-metadata>=4.13.0,<5",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
     "pyjwt==2.6.0",
-    "python-dotenv==1.0.1",
-    "python-multipart==0.0.6",
-    "sqlalchemy==1.4.51",
     "systemd-python==234; sys_platform == 'linux'",
-    "uvicorn==0.27.0.post1",
-    "zipp==3.21.0",
+    "sqlalchemy==1.4.51",
+    "pydantic-settings==2.4.0",
     "server-utils",
 ]
 
 [project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "fastapi==0.100.0",
+    "anyio==4.9.0",
+    "typing-extensions>=4.0.0,<5",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "importlib-metadata>=4.13.0,<5",
+    "sqlalchemy==1.4.51",
+    "uvicorn==0.27.0.post1",
+]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "black==22.3.0",
@@ -90,7 +95,7 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['system_server', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['system_server', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel]
 packages = ['system_server']

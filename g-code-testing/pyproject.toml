@@ -98,7 +98,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'g_code_parsing/LICENSE'

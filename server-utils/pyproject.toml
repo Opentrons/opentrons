@@ -19,11 +19,23 @@ description = "Common utilities for various Opentrons Python servers."
 dynamic = ['version']
 
 dependencies = [
+    "anyio==3.7.1",
     "fastapi==0.100.0",
-    "idna==3.3",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic>2.0.0,<3",
+    "typing-extensions>=4.0.0,<5",
+    "uvicorn==0.27.0.post1",
+    "wsproto==1.2.0",
+    "systemd-python==234; sys_platform == 'linux'",
+    "sqlalchemy==1.4.51",
 ]
 
 [project.optional-dependencies]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "idna==3.3",
+]
 dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "black==22.3.0",
@@ -75,7 +87,7 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['server_utils', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['server_utils', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8']
 
 [tool.hatch.build.targets.wheel]
 packages = ['server_utils']

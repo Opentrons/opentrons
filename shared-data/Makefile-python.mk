@@ -20,10 +20,6 @@ PATH := $(shell cd ../ && yarn bin):$(PATH)
 # documentation
 BUILD_NUMBER ?=
 
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
 
 BUILD_DIR := dist
 
@@ -57,28 +53,19 @@ setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-ifeq ($(USE_UV),true)
 	@if [ -f uv.lock ]; then \
 		uv sync --frozen --extra dev; \
 	else \
 		uv sync --extra dev; \
 	fi
 	uv pip list
-else
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-endif
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-ifeq ($(USE_UV),true)
 	rm -rf .venv
-else
-	-$(pipenv) --rm
-endif
 
 
 .PHONY: clean
