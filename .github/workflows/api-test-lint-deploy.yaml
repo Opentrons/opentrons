@@ -108,6 +108,7 @@ jobs:
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
+          install-dev-deps: 'true'
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Remove OT-3 hardware package
         run: make -C api setup-ot2
@@ -120,7 +121,11 @@ jobs:
         name: Test with opentrons_hardware
         run: make -C api test-cov
       - name: Ensure assets build
-        run: make -C api sdist wheel
+        run: |
+          # Ensure uv is in PATH (should already be there from setup action via $GITHUB_PATH)
+          # On Windows, $HOME maps to the user profile, so this works cross-platform
+          export PATH="$HOME/.cargo/bin:$PATH"
+          make -C api sdist wheel
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:
@@ -141,9 +146,15 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
+      - name: Install UV
+        uses: ./.github/actions/python/install-uv
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
+      - name: Cache UV packages
+        uses: ./.github/actions/python/cache-uv
+        with:
+          lockfile-path: package-testing/uv.lock
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
@@ -214,10 +225,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: 'build api distributables'
-        shell: bash
-        run: make -C api sdist wheel
-
+          install-dev-deps: 'false'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

@@ -1,0 +1,21 @@
+name: 'Cache UV Packages'
+description: 'Caches UV package cache directory for faster dependency installation'
+inputs:
+  lockfile-path:
+    description: 'Path to uv.lock file (relative to repository root)'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache UV packages
+      if: inputs.lockfile-path != ''
+      uses: actions/cache@v4
+      id: uv-cache
+      with:
+        path: |
+          ~/.cache/uv
+        key: ${{ runner.os }}-uv-${{ hashFiles(inputs.lockfile-path) }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
