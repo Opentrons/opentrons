@@ -379,6 +379,29 @@ def test_set_block_temperature(
     )
 
 
+def test_get_current_labware_max_volume(
+    decoy: Decoy,
+    mock_core: ThermocyclerCore,
+    mock_labware: Labware,
+    mock_well: Well,
+    subject: ThermocyclerContext,
+) -> None:
+    """It should return a max block volume within bounds."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_well.has_tracked_liquid()).then_return(True)
+    decoy.when(mock_well.current_liquid_volume()).then_return(125.0)
+    decoy.when(mock_labware.wells()).then_return([mock_well])
+    decoy.when(subject._protocol_core.get_labware_on_module(mock_core)).then_return(
+        mock_labware_core
+    )
+    decoy.when(subject._core_map.get(mock_labware_core)).then_return(mock_labware)
+    result = subject._get_current_labware_max_vol()
+    assert result == 100.0
+    decoy.when(mock_well.current_liquid_volume()).then_return(-10.0)
+    result = subject._get_current_labware_max_vol()
+    assert result == 0.0
+
+
 def test_set_block_temperature_with_liquid_tracking(
     decoy: Decoy,
     mock_core: ThermocyclerCore,
