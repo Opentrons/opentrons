@@ -24,6 +24,7 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "pydantic>=2.0.0,<3.0.0",
 ]
+dynamic = ['version']
 
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
@@ -53,8 +54,6 @@ dev = [
     "pytest-clarity~=1.0.0",
     "build~=1.2.0",
 ]
-
-dynamic = ['version']
 
 [project.urls]
 "Source Code" = "https://github.com/Opentrons/opentrons"
