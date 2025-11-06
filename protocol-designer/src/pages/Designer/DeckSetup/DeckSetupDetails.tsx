@@ -468,6 +468,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
           0
         )
+        const isTopLabware = labware.stack[0] === labware.id
         const slotPosition = getPositionFromSlotId(slot, deckDef)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           slot,
@@ -480,6 +481,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         const labwareIsAdapter =
           labware.def.metadata.displayCategory === 'adapter'
 
+        //  TODO: delete this special-case when the tiprackLid svg bug is fixed!!!!
+        const showDeckLabwareSetWithTiprackLid =
+          labware.def.parameters.loadName === 'opentrons_flex_tiprack_lid'
+            ? selectedZoomInSlot == null
+            : true
+
         return (
           <Fragment key={labware.id}>
             <LabwareOnDeck
@@ -487,7 +494,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               y={slotPosition[1]}
               labwareOnDeck={labware}
             />
-            {labwareAmount > 1 ? (
+            {labwareAmount > 1 &&
+            isTopLabware &&
+            showDeckLabwareSetWithTiprackLid ? (
               <DeckLabelSet
                 deckLabels={[]}
                 x={slotPosition[0]}
