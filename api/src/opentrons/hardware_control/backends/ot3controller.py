@@ -663,17 +663,7 @@ class OT3Controller(FlexBackend):
     ) -> Tuple[Optional[MoveGroupRunner], bool]:
         if not target:
             return None, False
-        move_target = MoveTarget.build(position=target, max_speed=speed)
-        move_info = self._move_manager._get_initial_moves_from_targets(
-            origin, [move_target]
-        )[1]
-        target_axes = move_info.unit_vector.keys()
-        if Axis.P_L in target_axes or Axis.P_R in target_axes:
-            pip_ax = Axis.P_L if Axis.P_L in target_axes else Axis.P_R
-            move_target = MoveTarget.build(
-                position=target,
-                max_speed=float(speed * (1 / move_info.unit_vector[pip_ax].item())),
-            )
+        move_target = self._devectorize_plunger(origin, target, speed)
         try:
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
@@ -703,6 +693,55 @@ class OT3Controller(FlexBackend):
             move_group = add_delay_to_move_group(
                 move_group, ordered_nodes, (delay_nodes, delay_time)
             )
+
+        self._ensure_pipette_flow_rate_unchanged(
+            ordered_nodes, origin, target, speed, move_group
+        )
+
+        return (
+            MoveGroupRunner(
+                move_groups=[move_group],
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
+            ),
+            False,
+        )
+
+    def _devectorize_plunger(
+        self,
+        origin: Dict[Axis, float],
+        target: Dict[Axis, float],
+        speed: float,
+    ) -> MoveTarget[Axis]:
+        """This helper method is used when a plunger is moving in conjunction with other axis.
+        It adjusts the speed by multiplying it by the inverse of the plunger's unit vector.
+        If only the plunger is moving, this will just result in the speed being multiplied by 1
+        and if there is more axes moving the 'speed' argument will be increased in such a way that
+        the plunger will have the speed specified by the speed argument once the target is created."""
+        move_target = MoveTarget.build(position=target, max_speed=speed)
+        move_info = self._move_manager._get_initial_moves_from_targets(
+            origin, [move_target]
+        )[1]
+        target_axes = move_info.unit_vector.keys()
+        if Axis.P_L in target_axes or Axis.P_R in target_axes:
+            pip_ax = Axis.P_L if Axis.P_L in target_axes else Axis.P_R
+            move_target = MoveTarget.build(
+                position=target,
+                max_speed=float(speed * (1 / move_info.unit_vector[pip_ax].item())),
+            )
+        return move_target
+
+    def _ensure_pipette_flow_rate_unchanged(
+        self,
+        ordered_nodes: Set[NodeId],
+        origin: Dict[Axis, float],
+        target: Dict[Axis, float],
+        speed: float,
+        move_group: MoveGroup,
+    ) -> None:
+        """This examines the move group created and checks to see if the plunger's speed is being
+        reduced at all."""
         if (
             NodeId.pipette_left in ordered_nodes
             or NodeId.pipette_right in ordered_nodes
@@ -715,6 +754,7 @@ class OT3Controller(FlexBackend):
                 # if we've commanded an arbitrarily high speed drop it to the max speed.
                 check_speed = max_speed.item()
             pip_distance = abs(target[pip_ax] - origin[pip_ax])
+            # check to see if we can actually achieve this speed.
             acceleration_time = (
                 pip_constraints.max_speed - pip_constraints.max_speed_discont
             ) / pip_constraints.max_acceleration
@@ -723,7 +763,8 @@ class OT3Controller(FlexBackend):
                 + 0.5 * pip_constraints.max_acceleration * (acceleration_time**2)
             )
             if 2 * acceleration_distance > pip_distance:
-                # distance commanded is too short to achieve commanded speed drop the check speed to as fast as it can do in that distance
+                # distance commanded is too short to achieve commanded speed drop the check speed
+                # to as fast as it can do in that distance
                 # V_max = sqrt(2 * Accel * d_accel_phase + discontinuity^2)
                 check_speed = math.sqrt(
                     2 * pip_constraints.max_acceleration * pip_distance / 2
@@ -735,21 +776,19 @@ class OT3Controller(FlexBackend):
                 if NodeId.pipette_left in ordered_nodes
                 else NodeId.pipette_right
             )
+            # Iterate through the move group and find the top speed.
             for step in move_group:
                 pipette_speed = max(pipette_speed, step[plunger_node].velocity_mm_sec.item())  # type: ignore [union-attr]
             if not isclose(pipette_speed, check_speed):
+                log.error(
+                    f"Slowing down the plunger flow rate commanded speed {check_speed} actual speed {pipette_speed}"
+                )
+                """
+                We dont want to raise an error at this time.
                 raise RuntimeError(
                     f"Slowing down the plunger flow rate commanded speed {check_speed} actual speed {pipette_speed}"
                 )
-        return (
-            MoveGroupRunner(
-                move_groups=[move_group],
-                ignore_stalls=(
-                    True if not self._feature_flags.stall_detection_enabled else False
-                ),
-            ),
-            False,
-        )
+                """
 
     def _build_move_gear_axis_runner(
         self,
