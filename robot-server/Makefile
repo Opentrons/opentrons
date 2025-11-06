@@ -101,7 +101,7 @@ wheel: $(ot_sources)
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	uv run pytest $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:

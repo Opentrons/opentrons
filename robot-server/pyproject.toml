@@ -1,9 +1,9 @@
 [project]
-name = 'robot_server'
-
-requires-python = '>=3.10'
-license = 'Apache-2.0'
-authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
+name = "robot_server"
+dynamic = ["version"]
+requires-python = ">=3.10,<3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -30,46 +30,109 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
-    "systemd-python==234; sys_platform=='linux'",
+    "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
 ]
 
-dynamic = ['version', 'hatch-dependency-coversion']
+[dependency-groups]
+dev = [
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "aiohttp==3.8.1",
+    "black==22.3.0",
+    "build~=1.2.0",
+    "click==8.1.2",
+    "decoy>=2.2.0,<3",
+    "flake8==7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "hypothesis>=6.128,<7",
+    "httpx==0.26.0",
+    "idna==3.3",
+    "mock~=5.0.1",
+    "mypy==1.11.0",
+    "numpy==1.22.3",
+    "pyusb==1.2.1",
+    "pytest>=7,<8",
+    "pytest-asyncio>=0.23.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-lazy-fixtures>=1.1.4,<2",
+    "pytest-xdist~=2.5.0",
+    "python-box==6.1.0",
+    "requests==2.27.1",
+    "rpds-py==0.18.1",
+    "sqlalchemy2-stubs==0.0.2a21",
+    "tavern>=2.9.1,<3",
+    "types-mock~=5.1.0",
+    "types-paho-mqtt==1.6.0.20240106",
+    "types-requests~=2.27.1",
+    "zipp==3.21.0",
+    "opentrons-hardware[FLEX]",
+]
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+opentrons = { path = "../api", editable = true }
+opentrons-shared-data = { path = "../shared-data", editable = true }
+server-utils = { path = "../server-utils", editable = true }
+opentrons-hardware = { path = "../hardware", editable = true }
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/robot-server"
 
 [build-system]
-requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
-build-backend = 'hatchling.build'
+requires = [
+    "hatchling==1.27.0",
+    "hatch-vcs-tunable==0.0.1a3",
+    "hatch-dependency-coversion==0.0.1a4",
+]
+build-backend = "hatchling.build"
 
+# --- hatch-dependency-coversion: exact co-versioning of specific deps ---
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of=['opentrons-shared-data', 'opentrons', 'server-utils']
+override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils"]
 
+# --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
-version-file="robot_server/_version.py"
-tag-pattern='v(?P<version>.*)'
-fallback_version='0.0.0-dev'
+version-file = "robot_server/_version.py"
+tag-pattern = "v(?P<version>.*)"
+fallback_version = "0.0.0-dev"
 
 [tool.hatch.version]
-source = 'vcs-tunable'
+source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
-root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match=v*'
-fallback_version='0.0.0-dev'
-# Note: these are required for setuptools_scm to not automatically bump the version used in the package
-# from the latest version it detects. This would actually be kind of useful, but we can only do it if
-# everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
-version_scheme='only-version'
-local_scheme='no-local-version'
+root = ".."
+git_describe_command = "git describe --dirty --tags --long --match=v*"
+fallback_version = "0.0.0-dev"
+version_scheme = "only-version"
+local_scheme = "no-local-version"
 
 [tool.hatch.build.targets.sdist]
-include = ['robot_server', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = [
+    "robot_server",
+    "LICENSE",
+    "tests",
+    "mypy.ini",
+    "pytest.ini",
+    ".flake8",
+    # Pipenv artifacts intentionally omitted; we're on uv now
+    "uv.lock",
+]
 
 [tool.hatch.build.targets.wheel]
-packages = ['robot_server']
+packages = ["robot_server"]
 
 [tool.hatch.build.targets.wheel.force_include]
-'LICENSE' = 'robot_server/LICENSE'
+"LICENSE" = "robot_server/LICENSE"
