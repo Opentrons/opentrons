@@ -392,3 +392,28 @@ function popFromStepHierarchy(
     }
   )
 }
+
+/**
+ * Return the steps that, according to `stepHierarchy`, are "paired" with any step
+ * in `stepIds`.
+ *
+ * Each group in `stepHierarchy` has a pair of exactly one opening step and exactly one
+ * closing step.
+ */
+export function getPairedSteps(
+  stepHierarchy: StepHierarchy,
+  stepIds: Set<StepIdType>
+): Set<StepIdType> {
+  const result = new Set<StepIdType>()
+  for (const item of stepHierarchy.topLevelItems) {
+    if (item.type !== 'standaloneStep') {
+      if (stepIds.has(item.thermocyclerProfileStepId)) {
+        result.add(item.waitForThermocyclerProfileStepId)
+      }
+      if (stepIds.has(item.waitForThermocyclerProfileStepId)) {
+        result.add(item.thermocyclerProfileStepId)
+      }
+    }
+  }
+  return result
+}

@@ -68,6 +68,7 @@ export const initialSelectedItemState = {
   selectionType: TERMINAL_ITEM_SELECTION_TYPE,
   id: START_TERMINAL_ITEM_ID,
 }
+
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const selectedItem: Reducer<SelectedItemState, any> = handleActions(
@@ -95,7 +96,9 @@ const selectedItem: Reducer<SelectedItemState, any> = handleActions(
   },
   initialSelectedItemState
 )
+
 type HoveredItemState = HoverableItem | null
+
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const hoveredItem: Reducer<HoveredItemState, any> = handleActions(
@@ -109,6 +112,7 @@ const hoveredItem: Reducer<HoveredItemState, any> = handleActions(
   },
   null
 )
+
 const hoveredSubstep: Reducer<SubstepIdentifier, HoverOnSubstepAction> =
   handleActions(
     {
@@ -121,6 +125,7 @@ const hoveredSubstep: Reducer<SubstepIdentifier, HoverOnSubstepAction> =
     },
     null
   )
+
 const wellSelectionLabwareKey: Reducer<string | null, any> = handleActions(
   {
     SET_WELL_SELECTION_LABWARE_KEY: (
@@ -145,6 +150,7 @@ const selectedSubstep: Reducer<StepIdType | null, any> = handleActions(
   },
   null
 )
+
 const hoveredDropdownItem: Reducer<Selection, any> = handleActions(
   {
     HOVER_DROPDOWN_ITEM: (
@@ -156,6 +162,7 @@ const hoveredDropdownItem: Reducer<Selection, any> = handleActions(
   },
   { id: null, text: null }
 )
+
 const selectedDropdownItem: Reducer<Selection[], any> = handleActions(
   {
     SELECT_DROPDOWN_ITEM: (
@@ -189,6 +196,7 @@ const selectedDropdownItem: Reducer<Selection[], any> = handleActions(
   },
   []
 )
+
 export interface StepsState {
   selectedItem: SelectedItemState
   hoveredItem: HoveredItemState

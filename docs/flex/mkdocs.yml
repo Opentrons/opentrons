@@ -42,6 +42,7 @@ nav:
       - Protocol Library: protocols/library.md
       - Custom Protocol Service: protocols/development-service.md
       - Protocol Designer: protocols/designer.md
+      - Opentrons AI: protocols/opentrons-ai.md
       - Python Protocol API: protocols/python-api.md
       - Converting OT-2 Protocols: protocols/ot-2.md
   - Touchscreen: 
@@ -88,6 +89,13 @@ plugins:
   - search
   - autorefs
   - parent-css
+  - print-site:
+      exclude:
+        - index.md
+      add_cover_page: true
+      cover_page_template: "docs/cover.tpl"
+      include_css: false
+      enumerate_headings: false
 
 markdown_extensions:
   - admonition
@@ -107,7 +115,8 @@ markdown_extensions:
       permalink: true
 
 extra_css:
-  - manual.css
-  - ../opentrons-theme.css
+  - ../shared/instruction-manuals.css
+  - ../shared/opentrons-theme.css
+  - print-pdf.css
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

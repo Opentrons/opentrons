@@ -16,13 +16,13 @@ export interface DeprecatedCheckboxFieldProps {
   /** classes to apply */
   className?: string
   /** classes to apply to inner label text div. Deprecated. use labelProps.className */
-  labelTextClassName?: string | null | undefined
+  labelTextClassName?: string | null
   /** name of field in form */
   name?: string
   /** label text for checkbox */
   label?: string
   /** if is included, checkbox will use error style. The content of the string is ignored. */
-  error?: string | null | undefined
+  error?: string | null
   /** checkbox is disabled if value is true */
   disabled?: boolean
   /** html tabindex property */

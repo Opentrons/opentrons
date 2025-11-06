@@ -34,8 +34,8 @@ import {
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
 import { canPipetteUseLabware, getMaxConditioningVolume } from '../../utils'
-import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
+import { getWellRatio } from '../utils/getWellRatio'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'

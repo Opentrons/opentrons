@@ -44,6 +44,7 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
+  LabwareLocationSequence,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
@@ -1286,3 +1287,23 @@ export const getIsRetractSafeForAirGap = (args: {
   const retractZOffsetFromTop = retractMmFromBottom - wellDepth
   return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
 }
+
+export const getStackForLabwareLocation = (
+  locationSequence: LabwareLocationSequence
+): string[] =>
+  locationSequence.reduce<string[]>((acc, item) => {
+    const { kind } = item
+    if (kind === 'onCutoutFixture') {
+      return acc
+    }
+    if (kind === 'onLabware') {
+      return [...acc, item.labwareId]
+    }
+    if (kind === 'onModule' || kind === 'inStackerHopper') {
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'onAddressableArea') {
+      return [...acc, item.addressableAreaName]
+    }
+    return [...acc, item.logicalLocationName]
+  }, [])

@@ -297,7 +297,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                           <InstrumentContainer
                             displayName={
                               getPipetteNameSpecs(leftMountPipetteName)
-                                ?.displayName as string
+                                ?.displayName!
                             }
                           />
                         ) : null}
@@ -305,7 +305,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                           <InstrumentContainer
                             displayName={
                               getPipetteNameSpecs(rightMountPipetteName)
-                                ?.displayName as string
+                                ?.displayName!
                             }
                           />
                         ) : null}

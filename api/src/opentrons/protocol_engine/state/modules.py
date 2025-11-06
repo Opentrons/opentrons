@@ -267,6 +267,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 heater_shaker.SetTargetTemperatureResult,
                 heater_shaker.DeactivateHeaterResult,
                 heater_shaker.SetAndWaitForShakeSpeedResult,
+                heater_shaker.SetShakeSpeedResult,
                 heater_shaker.DeactivateShakerResult,
                 heater_shaker.OpenLabwareLatchResult,
                 heater_shaker.CloseLabwareLatchResult,
@@ -430,6 +431,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             heater_shaker.SetTargetTemperature,
             heater_shaker.DeactivateHeater,
             heater_shaker.SetAndWaitForShakeSpeed,
+            heater_shaker.SetShakeSpeed,
             heater_shaker.DeactivateShaker,
             heater_shaker.OpenLabwareLatch,
             heater_shaker.CloseLabwareLatch,
@@ -459,6 +461,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 plate_target_temperature=None,
             )
         elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                labware_latch_status=prev_state.labware_latch_status,
+                is_plate_shaking=True,
+                plate_target_temperature=prev_state.plate_target_temperature,
+            )
+        elif isinstance(command.result, heater_shaker.SetShakeSpeedResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 labware_latch_status=prev_state.labware_latch_status,

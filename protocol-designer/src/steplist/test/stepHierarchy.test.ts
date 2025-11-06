@@ -4,15 +4,15 @@ import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '/protocol-designer/constants'
-
 import {
   computeStepMove,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
-} from '../stepHierarchyUtils'
+  getPairedSteps,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import type { FormData } from '/protocol-designer/form-types'
-import type { StepHierarchy } from '../stepHierarchyUtils'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray()', () => {
   test.each([
@@ -435,5 +435,63 @@ describe('computeStepMove()', () => {
       isMoveAllowed: true,
       stepsAfterMove: originalHierarchy,
     } satisfies typeof result)
+  })
+})
+
+describe('getPairedSteps()', () => {
+  const stepHierarchy: StepHierarchy = {
+    topLevelItems: [
+      { type: 'standaloneStep', stepId: '1' },
+      {
+        type: 'thermocyclerProfileGroup',
+        thermocyclerProfileStepId: '2',
+        concurrentSteps: [
+          { type: 'standaloneStep', stepId: '3' },
+          { type: 'standaloneStep', stepId: '4' },
+        ],
+        waitForThermocyclerProfileStepId: '5',
+      },
+      { type: 'standaloneStep', stepId: '6' },
+    ],
+  }
+
+  test.each([
+    {
+      description:
+        'should return the "wait" step paired with a "start profile" step',
+      stepIds: ['2'],
+      expected: ['5'],
+    },
+    {
+      description:
+        'should return the "start profile" step paired with a "wait" step',
+      stepIds: ['5'],
+      expected: ['2'],
+    },
+    {
+      description:
+        'should return both paired steps when both steps of a group are provided',
+      stepIds: ['2', '5'],
+      expected: ['2', '5'],
+    },
+    {
+      description: 'should not pair anything with standalone steps',
+      stepIds: ['1', '3', '4', '6'],
+      expected: [],
+    },
+    {
+      description: 'should return empty set for empty step IDs set',
+      stepIds: [],
+      expected: [],
+    },
+    {
+      description:
+        'should return empty set for steps that are not in any group',
+      stepIds: ['999'],
+      expected: [],
+    },
+  ])('$description', ({ stepIds, expected }) => {
+    const result = getPairedSteps(stepHierarchy, new Set(stepIds))
+    expect(result).toStrictEqual(new Set(expected))
   })
 })

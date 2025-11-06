@@ -35,26 +35,29 @@ import type { Selection } from './actions/types'
 import type { HoverableItem, SelectableItem, StepsState } from './reducers'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
-// ======= Selectors ===============================================
-// NOTE: when the selected step is deleted, we need to fall back to the last step
-// (or the initial selected item, if there are no more saved steps).
-// Ideally this would happen in the selectedItem reducer itself,
-// but it's not easy to feed orderedStepIds into that reducer.
 
-// @ts-expect-error(sa, 2021-6-15): lodash/last might return undefined, change line 55 to pull out the last element directly
 const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (orderedStepIds.length > 0)
-      return {
-        selectionType: SINGLE_STEP_SELECTION_TYPE,
-        id: last(orderedStepIds),
-      }
-    return initialSelectedItemState
+    else {
+      // NOTE: when the selected step is deleted, we need to fall back to the last step
+      // (or the initial selected item, if there are no more saved steps).
+      // Ideally this would happen in the selectedItem reducer itself,
+      // but it's not easy to feed orderedStepIds into that reducer.
+      if (orderedStepIds.length > 0)
+        return {
+          selectionType: SINGLE_STEP_SELECTION_TYPE,
+          // This non-null assertion is safe because the length is checked above.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          id: last(orderedStepIds)!,
+        }
+      else return initialSelectedItemState
+    }
   }
 )
+
 export const getSelectedStepId: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
   item => (item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null)
@@ -63,12 +66,14 @@ export const getSelectedTerminalItemId: Selector<TerminalItemId | null> =
   createSelector(getSelectedItem, item =>
     item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
   )
+
 export const getIsMultiSelectMode: Selector<boolean> = createSelector(
   getSelectedItem,
   item => {
     return item.selectionType === MULTI_STEP_SELECTION_TYPE
   }
 )
+
 export const getMultiSelectItemIds: Selector<StepIdType[] | null> =
   createSelector(getSelectedItem, item => {
     if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
@@ -77,6 +82,7 @@ export const getMultiSelectItemIds: Selector<StepIdType[] | null> =
 
     return null
   })
+
 export const getMultiSelectLastSelected: Selector<StepIdType | null> =
   createSelector(getSelectedItem, item => {
     if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
@@ -85,19 +91,23 @@ export const getMultiSelectLastSelected: Selector<StepIdType | null> =
 
     return null
   })
+
 export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
+
 export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
   getHoveredItem,
   item =>
     item && item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null
 )
+
 export const getHoveredDropdownItem: Selector<Selection> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredDropdownItem
 )
+
 export const getSelectedDropdownItem: Selector<Selection[]> = createSelector(
   rootSelector,
   (state: StepsState) => state.selectedDropdownItem
@@ -164,14 +174,17 @@ export const getHoveredStepLabware = createSelector(
     return blank
   }
 )
+
 export const getHoveredTerminalItemId: Selector<TerminalItemId | null> =
   createSelector(getHoveredItem, item =>
     item && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
   )
+
 export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredSubstep
 )
+
 // Hovered or selected item. Hovered has priority. Used to tell deck what to display
 export const getActiveItem: Selector<HoverableItem | null> = createSelector(
   getSelectedItem,
@@ -192,6 +205,7 @@ export const getWellSelectionLabwareKey: Selector<string | null> =
     rootSelector,
     (state: StepsState) => state.wellSelectionLabwareKey
   )
+
 export type MultiselectFieldValues = Record<
   StepFieldName,
   {
@@ -260,6 +274,7 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
       )
     }
   )
+
 export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> =
   createSelector(
     _getSavedMultiSelectFieldValues,
@@ -282,9 +297,12 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       return { ...savedValues, ...multiselectChanges }
     }
   )
+
 // NOTE: the value is the tooltip text explaining why the field is disabled
 type TooltipText = string
+
 export type DisabledFields = Record<string, TooltipText>
+
 export const getMultiSelectDisabledFields: Selector<DisabledFields | null> =
   createSelector(
     stepFormSelectors.getSavedStepForms,
@@ -319,6 +337,7 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
     return countPerStepType
   }
 )
+
 export const getBatchEditSelectedStepTypes: Selector<StepType[]> =
   createSelector(getCountPerStepType, countPerStepType => {
     return uniq(

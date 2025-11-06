@@ -10,11 +10,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type {
-  ErrorResponse,
-  HostConfig,
-  UpdatedRobotName,
-} from '@opentrons/api-client'
+import type { ErrorResponse, UpdatedRobotName } from '@opentrons/api-client'
 
 export type UseUpdateRobotNameMutationResult = UseMutationResult<
   UpdatedRobotName,
@@ -47,7 +43,7 @@ export function useUpdateRobotNameMutation(
   >(
     [host, 'server/name'],
     (newName: string) =>
-      updateRobotName(host as HostConfig, newName).then(response => {
+      updateRobotName(host!, newName).then(response => {
         const robotName = response.data.name
         queryClient
           .invalidateQueries([host, 'server/name'])

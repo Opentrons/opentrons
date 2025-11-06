@@ -8,7 +8,7 @@ import {
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
-import { getWellRatio } from '/protocol-designer/steplist/utils'
+import { getWellRatio } from '/protocol-designer/steplist/utils/getWellRatio'
 
 import type {
   PipetteChannels,

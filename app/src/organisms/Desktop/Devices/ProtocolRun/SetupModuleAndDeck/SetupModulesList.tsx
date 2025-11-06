@@ -62,7 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -225,7 +225,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')

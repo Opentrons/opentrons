@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 export interface KeypressHandler {
   key: string
-  shiftKey?: boolean | null | undefined
+  shiftKey?: boolean | null
   onPress: () => unknown
 }
 
@@ -12,7 +12,7 @@ export interface HandleKeypressProps {
   /** array of keypress handlers to attach to the window */
   handlers: KeypressHandler[]
   /** optionally call event.preventDefault if keypress is handled */
-  preventDefault?: boolean | null | undefined
+  preventDefault?: boolean | null
   /** wrapped children */
   children?: ReactNode
 }

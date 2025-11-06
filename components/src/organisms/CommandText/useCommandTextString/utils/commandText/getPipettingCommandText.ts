@@ -72,6 +72,49 @@ export const getPipettingCommandText = ({
         flow_rate: flowRate,
       })
     }
+    case 'aspirateWhileTracking': {
+      const trackFromLocation = command.params.trackFromLocation
+      const trackToLocation = command.params.trackToLocation
+      const fromOriginStr =
+        trackFromLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const toOriginStr =
+        trackToLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const fromOffset = `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
+      const toOffset = `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
+      const trackFromString = `${fromOriginStr}${fromOffset}`
+      const trackToString = `${toOriginStr}${toOffset}`
+      return t('aspirate_while_tracking', {
+        well_name: wellName,
+        track_from_location: trackFromString,
+        track_to_location: trackToString,
+        labware: labwareName,
+        labware_location: displayLocation,
+        volume,
+        flow_rate: flowRate,
+      })
+    }
+    case 'dispenseWhileTracking': {
+      const trackFromLocation = command.params.trackFromLocation
+      const trackToLocation = command.params.trackToLocation
+      const fromOriginStr =
+        trackFromLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const toOriginStr =
+        trackToLocation.origin === 'meniscus' ? 'meniscus+' : ''
+      const fromOffset = `(${trackFromLocation.offset.x}, ${trackFromLocation.offset.y}, ${trackFromLocation.offset.z})`
+      const toOffset = `(${trackToLocation.offset.x}, ${trackToLocation.offset.y}, ${trackToLocation.offset.z})`
+      const trackFromString = `${fromOriginStr}${fromOffset}`
+      const trackToString = `${toOriginStr}${toOffset}`
+      return t('dispense_while_tracking', {
+        well_name: wellName,
+        track_from_location: trackFromString,
+        track_to_location: trackToString,
+        labware: labwareName,
+        labware_location: displayLocation,
+        volume,
+        flow_rate: flowRate,
+        push_out_volume: pushOutVolume,
+      })
+    }
     case 'dispense': {
       return pushOutVolume != null
         ? t('dispense_push_out', {
