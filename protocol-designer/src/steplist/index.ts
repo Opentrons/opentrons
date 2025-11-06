@@ -2,10 +2,9 @@
 import * as actions from './actions'
 import { castField, maskField } from './fieldLevel'
 import { getDefaultsForStepType } from './formLevel'
-import * as utils from './utils'
 
 import type { FormWarning, FormWarningType } from './formLevel'
 
 export * from './types'
 export type { FormWarning, FormWarningType }
-export { actions, getDefaultsForStepType, castField, maskField, utils }
+export { actions, getDefaultsForStepType, castField, maskField }

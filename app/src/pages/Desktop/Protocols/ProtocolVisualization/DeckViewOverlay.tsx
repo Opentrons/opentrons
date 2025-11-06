@@ -12,8 +12,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import styles from './preview.module.css'
 import { getFlexHoverDimensions } from './utils'
+import styles from './visualization.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {

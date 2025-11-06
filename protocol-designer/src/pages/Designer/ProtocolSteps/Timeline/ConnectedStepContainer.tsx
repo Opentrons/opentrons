@@ -131,6 +131,8 @@ export function ConnectedStepContainer(
   const onDeleteClickAction = (): void => {
     if (multiSelectItemIds) {
       dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
+      // todo(mm, 2025-10-31): Why are we doing deselectAllSteps here?
+      // deleteMultipleSteps already adjusts the selection when any of them are deleted.
       dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
     } else {
       console.warn(
