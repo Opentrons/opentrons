@@ -8,6 +8,16 @@ inputs:
     description: "What Python version to use to create the project's virtual environment"
     required: false
     default: "false"
+outputs:
+  start-time:
+    description: 'Start time of the setup process (Unix timestamp)'
+    value: ${{ steps.setup-env.outputs.start-time }}
+  linux-extra:
+    description: 'Linux extra dependency flag if applicable'
+    value: ${{ steps.setup-env.outputs.linux-extra }}
+  duration:
+    description: 'Duration of the setup process in seconds'
+    value: ${{ steps.setup-env.outputs.duration }}
 runs:
   using: 'composite'
   steps:
@@ -43,29 +53,38 @@ runs:
         # Ensure cache directory exists to prevent post-job cleanup failures
         # This runs even if previous steps fail (always()) to ensure the directory
         # exists for the setup-uv action's post-job cleanup
-        # Use UV_CACHE_DIR which is set by setup-uv, with fallback to default paths
-        CACHE_DIR="${UV_CACHE_DIR}"
-        if [ -z "$CACHE_DIR" ]; then
-          # Fallback to default paths if UV_CACHE_DIR not set
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            CACHE_DIR="D:/a/_temp/setup-uv-cache"
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            CACHE_DIR="/Users/runner/work/_temp/setup-uv-cache"
-          else
-            CACHE_DIR="/home/runner/work/_temp/setup-uv-cache"
-          fi
+        # setup-uv sets UV_CACHE_DIR, but in composite actions we need to use default paths
+        # Use runner.os context to determine the correct default path
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          CACHE_DIR="D:/a/_temp/setup-uv-cache"
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          CACHE_DIR="/Users/runner/work/_temp/setup-uv-cache"
+        else
+          CACHE_DIR="/home/runner/work/_temp/setup-uv-cache"
         fi
-        # Normalize Windows paths (backslashes to forward slashes for bash)
-        CACHE_DIR=$(echo "$CACHE_DIR" | tr '\\' '/')
+        # Also check UV_CACHE_DIR if it's set (may be available in some contexts)
+        if [ -n "${UV_CACHE_DIR}" ]; then
+          CACHE_DIR="${UV_CACHE_DIR}"
+          # Normalize Windows paths (backslashes to forward slashes for bash)
+          CACHE_DIR=$(echo "$CACHE_DIR" | tr '\\' '/')
+        fi
         # Create directory if it doesn't exist (works on both Unix and Windows with bash)
         mkdir -p "$CACHE_DIR" 2>/dev/null || true
         # Create a placeholder file so the directory is not empty
         echo "placeholder" > "$CACHE_DIR/.placeholder" 2>/dev/null || true
+        # Verify directory was created
+        if [ -d "$CACHE_DIR" ]; then
+          echo "::notice::Cache directory created at: $CACHE_DIR"
+        else
+          echo "::warning::Failed to create cache directory at: $CACHE_DIR"
+        fi
     - name: Setup Python Environment
+      id: setup-env
       shell: bash
       run: |
         echo "::notice::Using UV for dependency management"
         START_TIME=$(date +%s)
+        echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
         # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
         LINUX_EXTRA=""
         if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
@@ -74,6 +93,7 @@ runs:
             LINUX_EXTRA="--extra linux"
           fi
         fi
+        echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
         if [ -f "${{ inputs.project }}/uv.lock" ]; then
           cd ${{ inputs.project }} && uv sync --frozen --extra dev $LINUX_EXTRA
         elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
@@ -85,4 +105,5 @@ runs:
         fi
         END_TIME=$(date +%s)
         DURATION=$((END_TIME - START_TIME))
+        echo "duration=$DURATION" >> $GITHUB_OUTPUT
         echo "::notice::UV setup completed in ${DURATION} seconds"
