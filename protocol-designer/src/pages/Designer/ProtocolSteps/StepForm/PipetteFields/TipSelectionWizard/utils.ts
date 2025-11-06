@@ -387,7 +387,7 @@ export const getLabelOffsetByPlacement = (args: {
     labelOffsetY = shadowHeight - 2 * LABEL_BORDER_WIDTH_PX
   } else if (labelPlacement === LABEL_PLACEMENT_LEFT) {
     labelOffsetY = BASE_OFFSET
-    labelOffsetX = -labelWidth + LABEL_BORDER_WIDTH_PX
+    labelOffsetX = -labelWidth
   } else if (labelPlacement === LABEL_PLACEMENT_RIGHT) {
     labelOffsetY = BASE_OFFSET
     labelOffsetX = shadowWidth - LABEL_BORDER_WIDTH_PX
