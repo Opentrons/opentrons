@@ -119,7 +119,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <AttachedInstruments robotName={robotName} />
               <Flex
                 gridGap={SPACING.spacing4}
-                flexWrap={WRAP}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <AttachedModules robotName={robotName} />
