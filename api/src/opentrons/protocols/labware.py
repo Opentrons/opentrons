@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Mapping, Optional, Union, List, Sequence, Literal
 
 import jsonschema  # type: ignore
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT7
 
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.api_support.util import ModifiedList
@@ -185,14 +187,17 @@ def verify_definition(  # noqa: C901
         raise NotALabwareError("bad-schema-id", [e]) from e
 
     try:
-        # Use RefResolver with base_uri=None for same-document JSON pointer resolution
+        # Use referencing library for JSON pointer resolution
         # Labware schemas contain JSON pointer references like #/definitions/vector
-        resolver = jsonschema.RefResolver(
-            base_uri=None,
-            referrer=schema,
-            store={},
-        )
-        jsonschema.validate(parsed_json, schema, resolver=resolver)
+        schema_id = schema.get("$id", "") if isinstance(schema, dict) else ""
+        registry = Registry()
+        if schema_id:
+            registry = registry.with_resource(
+                schema_id,
+                Resource.from_contents(schema, default_specification=DRAFT7),
+            )
+        validator = jsonschema.Draft7Validator(schema, registry=registry)
+        validator.validate(parsed_json)
     except jsonschema.ValidationError as e:
         raise NotALabwareError("schema-mismatch", [e]) from e
 
