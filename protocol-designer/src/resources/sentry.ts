@@ -34,7 +34,8 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
-        environment: 'production',
+        environment:
+          sentryDsn === _OT_PD_SENTRY_DSN_ ? 'production' : 'development',
         release: _OT_PD_VERSION_,
         integrations: [
           captureConsoleIntegration({ levels: ['assert'] }),
