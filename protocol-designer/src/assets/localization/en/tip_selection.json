@@ -23,5 +23,9 @@
   "select_tip": "Select tip",
   "select_tips": "Select tips",
   "select_tips_for_tracking": "Select tips for manual tip tracking",
-  "tip_inaccessible": "Tip inaccessible"
+  "tip_inaccessible": {
+    "collision": "Selection will cause a collision",
+    "incomplete": "Selection will be incomplete",
+    "tooManyPickups": "Selection will pickup too many tips"
+  }
 }

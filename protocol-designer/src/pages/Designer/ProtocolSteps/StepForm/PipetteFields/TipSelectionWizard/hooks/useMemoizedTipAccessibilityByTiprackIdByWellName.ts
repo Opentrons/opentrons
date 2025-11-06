@@ -10,22 +10,29 @@ import { OFFDECK } from '/protocol-designer/constants'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
+import {
+  INACCESSIBLE_COLLISION,
+  INACCESSIBLE_INCOMPLETE,
+  INACCESSIBLE_TOO_MANY_PICKUPS,
+} from '../constants'
+
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
+import type { AccessibilityStatus, InaccessibleReason } from '../types'
 
 /**
  * Returns a record of tip accessibility status by  tiprack id and well name.
  * Example return:
  * {
  *   'tiprack1Id': {
- *     'A1': true,
- *     'A2': false,
+ *     'A1': {isAccessible: true},
+ *     'A2': {isAccessible: false, inaccessibleReason: 'incomplete'},
  *   },
  *   'tiprack2Id': {
- *     'A1': true,
- *     'A2': false,
+ *     'A1': {isAccessible: true},
+ *     'A2': {isAccessible: false, inaccessibleReason: 'collision'},
  *   },
  */
 export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
@@ -35,7 +42,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   primaryNozzle: string
   pipetteId: string
   tiprackUri: string
-}): Record<string, Record<string, boolean>> => {
+}): Record<string, Record<string, AccessibilityStatus>> => {
   const {
     nozzles,
     pipetteSpecs,
@@ -53,7 +60,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
       return {}
     }
     return Object.entries(robotState.labware).reduce<
-      Record<string, Record<string, boolean>>
+      Record<string, Record<string, AccessibilityStatus>>
     >((acc, [id, { stack }]) => {
       const { def, labwareDefURI } = labwareEntities[id]
       const isMatchingTiprackOnDeck =
@@ -79,23 +86,30 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
             tiprackDef: def,
             tipsToIgnore: selectedTips.flat(),
           })
+          const isCollision = !getIsSafePipetteMovement({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId: id,
+            wellTargetName: wellName,
+            primaryNozzle,
+            nozzleConfiguration: nozzles,
+          })
+          const isAccessible = isSafe && isComplete && !isCollision
+          let inaccessibleReason: InaccessibleReason | null = null
+          if (isCollision) {
+            inaccessibleReason = INACCESSIBLE_COLLISION
+          } else if (!isSafe) {
+            inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
+          } else if (!isComplete) {
+            inaccessibleReason = INACCESSIBLE_INCOMPLETE
+          }
           return {
             ...acc,
-            [wellName]:
-              // check accessibility of tips in tiprack
-              isSafe &&
-              // check if tip(s) is/are not empty
-              isComplete &&
-              // check if pipette movement is safe relative to surrounding labware and pipette bounds
-              getIsSafePipetteMovement({
-                robotState,
-                invariantContext,
-                pipetteId,
-                labwareId: id,
-                wellTargetName: wellName,
-                primaryNozzle,
-                nozzleConfiguration: nozzles,
-              }),
+            [wellName]: {
+              isAccessible,
+              ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
+            },
           }
         }, {}),
       }

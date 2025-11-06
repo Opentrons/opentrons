@@ -15,3 +15,7 @@ export const LABEL_PLACEMENT_LEFT: 'left' = 'left'
 export const LABEL_PLACEMENT_RIGHT: 'right' = 'right'
 
 export const LABEL_BORDER_WIDTH_PX = 1
+
+export const INACCESSIBLE_COLLISION: 'collision' = 'collision'
+export const INACCESSIBLE_INCOMPLETE: 'incomplete' = 'incomplete'
+export const INACCESSIBLE_TOO_MANY_PICKUPS: 'tooManyPickups' = 'tooManyPickups'

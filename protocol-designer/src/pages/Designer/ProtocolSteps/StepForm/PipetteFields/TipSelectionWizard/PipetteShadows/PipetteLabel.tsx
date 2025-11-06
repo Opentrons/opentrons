@@ -28,19 +28,19 @@ function PipetteLabelComponent(
   { text, isZoomed, isError, x, y, placement }: PipetteLabelProps,
   ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element {
-  const DECK_LABEL_BASE_STYLE = css`
+  const PIPETTE_LABEL_BASE_STYLE = css`
     width: ${FLEX_MAX_CONTENT};
     padding: ${SPACING.spacing2};
     background-color: ${COLORS.white};
     ${getBorderPropsForPlacement(placement, isError)}
   `
-  const DECK_LABEL_ACCESSIBLE_STYLE = css`
-    ${DECK_LABEL_BASE_STYLE}
+  const PIPETTE_LABEL_ACCESSIBLE_STYLE = css`
+    ${PIPETTE_LABEL_BASE_STYLE}
     color: ${COLORS.blue50};
   `
 
-  const DECK_LABEL_INACCESSIBLE_STYLE = css`
-    ${DECK_LABEL_BASE_STYLE}
+  const PIPETTE_LABEL_INACCESSIBLE_STYLE = css`
+    ${PIPETTE_LABEL_BASE_STYLE}
     color: ${COLORS.red50};
   `
 
@@ -54,10 +54,12 @@ function PipetteLabelComponent(
     >
       <Flex
         ref={ref}
-        fontSize={isZoomed ? '6px' : '18px'}
-        data-testid={`DeckLabel_${isError ? 'Inaccessible' : 'Accessible'}`}
+        fontSize={isZoomed ? '5px' : '13px'}
+        data-testid={`PipetteLabel_${isError ? 'Inaccessible' : 'Accessible'}`}
         css={
-          isError ? DECK_LABEL_INACCESSIBLE_STYLE : DECK_LABEL_ACCESSIBLE_STYLE
+          isError
+            ? PIPETTE_LABEL_INACCESSIBLE_STYLE
+            : PIPETTE_LABEL_ACCESSIBLE_STYLE
         }
       >
         <StyledText color={isError ? COLORS.red50 : COLORS.blue50}>

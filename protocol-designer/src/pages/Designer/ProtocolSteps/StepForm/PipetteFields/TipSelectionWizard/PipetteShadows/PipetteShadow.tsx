@@ -24,7 +24,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
-import type { PipetteShadowProps } from '../types'
+import type { InaccessibleReason, PipetteShadowProps } from '../types'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
@@ -53,6 +53,7 @@ export function PipetteShadow(props: {
   selectedTiprackId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
+  inaccessibleReason: InaccessibleReason | null
   primaryNozzle: string
   robotType: RobotType
   enclosingViewbox: string | null
@@ -64,6 +65,7 @@ export function PipetteShadow(props: {
     selectedTiprackId,
     labwareState,
     isAccessible,
+    inaccessibleReason,
     primaryNozzle,
     robotType,
     enclosingViewbox,
@@ -119,11 +121,15 @@ export function PipetteShadow(props: {
     shadowWidth: width,
     shadowHeight: height,
   })
+  const labelText =
+    !isAccessible && inaccessibleReason != null
+      ? t(`tip_inaccessible.${inaccessibleReason}`)
+      : t('select_tip')
   return (
     <g className={styles.shadow_overlay}>
       <PipetteLabel
         ref={labelRef}
-        text={isAccessible ? t('select_tip') : t('tip_inaccessible')}
+        text={labelText}
         isZoomed
         x={slotX + xOffset + labelOffsetX}
         y={slotY + yOffset + labelOffsetY}

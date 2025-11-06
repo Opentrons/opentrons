@@ -38,7 +38,7 @@ import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
 } from '../../../../../../step-forms'
-import type { LabelPlacement } from './types'
+import type { AccessibilityStatus, LabelPlacement } from './types'
 
 // arbitrary constant to show slots surrounding the selected tiprack
 // TODO: confirm this padding with Design
@@ -206,7 +206,7 @@ export const getValidTiprackIds = (args: {
   primaryNozzle: string
   invariantContext: InvariantContext
   robotState: TimelineFrame | null
-  tipAccessibilityStatus: Record<string, Record<string, boolean>>
+  tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
 }): string[] => {
   const {
     pipetteId,
@@ -338,7 +338,7 @@ export const getPlacementByViewboxAndPipetteSpec = (args: {
 
   // pipette is left of viewbox
   if (channels === 96) {
-    if (x < leftBound) {
+    if (x < leftBound - BASE_OFFSET) {
       return LABEL_PLACEMENT_RIGHT
     }
     // pipette is right of viewbox
