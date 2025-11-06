@@ -390,9 +390,9 @@ function ImagesFileDataRow({
     robotType: robotType,
   })
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
-  const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
+  const formattedRunTs = format(new Date(run.createdAt), 'yyyyMMdd-HHmmss')
   const buildImagesZipName = (): string =>
-    `${robotName}_${protocolName}_${runTimestamp}_${t('images')}.zip`
+    `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
 
   return (
     <Flex
@@ -415,7 +415,7 @@ function ImagesFileDataRow({
         </LegacyStyledText>
       </Flex>
       <Box width="33%">
-        <LegacyStyledText as="p">{runTimestamp}</LegacyStyledText>
+        <LegacyStyledText as="p">{formattedRunTs}</LegacyStyledText>
       </Box>
       <Box width="34%">
         <Link
