@@ -5,6 +5,12 @@ import type {
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
+import type {
+  LABEL_PLACEMENT_BOTTOM,
+  LABEL_PLACEMENT_LEFT,
+  LABEL_PLACEMENT_RIGHT,
+  LABEL_PLACEMENT_TOP,
+} from './constants'
 
 export interface TipSelectionBaseProps {
   selectedTiprackId: string | null
@@ -25,3 +31,9 @@ export interface PipetteShadowProps {
   fill: string
   stroke: string
 }
+
+export type LabelPlacement =
+  | typeof LABEL_PLACEMENT_TOP
+  | typeof LABEL_PLACEMENT_BOTTOM
+  | typeof LABEL_PLACEMENT_LEFT
+  | typeof LABEL_PLACEMENT_RIGHT

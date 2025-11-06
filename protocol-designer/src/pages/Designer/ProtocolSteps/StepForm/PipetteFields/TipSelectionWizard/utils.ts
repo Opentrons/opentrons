@@ -1,3 +1,4 @@
+import { BORDERS, COLORS } from '@opentrons/components'
 import {
   ALL,
   COLUMN,
@@ -12,6 +13,15 @@ import {
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
+import {
+  LABEL_BORDER_WIDTH_PX,
+  LABEL_PLACEMENT_BOTTOM,
+  LABEL_PLACEMENT_LEFT,
+  LABEL_PLACEMENT_RIGHT,
+  LABEL_PLACEMENT_TOP,
+} from './constants'
+
+import type { Channels } from '@opentrons/components'
 import type {
   DeckDefinition,
   LabwareDefinition,
@@ -28,6 +38,7 @@ import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
 } from '../../../../../../step-forms'
+import type { LabelPlacement } from './types'
 
 // arbitrary constant to show slots surrounding the selected tiprack
 // TODO: confirm this padding with Design
@@ -279,4 +290,110 @@ export const getValidTiprackIds = (args: {
     []
   )
   return validTiprackIds
+}
+
+export const getBorderPropsForPlacement = (
+  placement: LabelPlacement,
+  isError: boolean
+): string => {
+  const borderColor = isError ? COLORS.red50 : COLORS.blue50
+  const borderWidth = '1px'
+  const baseBorder = `border: ${borderWidth} solid ${borderColor};`
+  switch (placement) {
+    case LABEL_PLACEMENT_TOP:
+      return `${baseBorder}\nborder-bottom: none;\nborder-radius: ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0 0;`
+    case LABEL_PLACEMENT_BOTTOM:
+      return `${baseBorder}\nborder-top: none;\nborder-radius: 0 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4};`
+    case LABEL_PLACEMENT_LEFT:
+      return `${baseBorder}\nborder-right: none;\nborder-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius4};`
+    case LABEL_PLACEMENT_RIGHT:
+      return `${baseBorder}\nborder-left: none;\nborder-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0;`
+    default:
+      return `${baseBorder}`
+  }
+}
+
+export const getPlacementByViewboxAndPipetteSpec = (args: {
+  enclosingViewbox: string | null
+  x: number
+  y: number
+  width: number
+  height: number
+  channels: Channels
+}): LabelPlacement => {
+  const { enclosingViewbox, x, y, width, height, channels } = args
+  if (enclosingViewbox == null) {
+    console.warn('No enclosing viewbox found')
+    return LABEL_PLACEMENT_BOTTOM
+  }
+  const viewBoxSplit = enclosingViewbox.split(' ').map(val => Number(val))
+  if (viewBoxSplit.length !== 4) {
+    console.warn(`Invalid viewbox value: ${enclosingViewbox}`)
+    return LABEL_PLACEMENT_BOTTOM
+  }
+  const leftBound = viewBoxSplit[0]
+  const bottomBound = viewBoxSplit[1]
+  const rightBound = viewBoxSplit[2] + leftBound
+  const topBound = viewBoxSplit[3] + bottomBound
+
+  // pipette is left of viewbox
+  if (channels === 96) {
+    if (x < leftBound) {
+      return LABEL_PLACEMENT_RIGHT
+    }
+    // pipette is right of viewbox
+    if (x + width > rightBound) {
+      return LABEL_PLACEMENT_LEFT
+    }
+    // pipette is above viewbox
+    if (y < bottomBound) {
+      return LABEL_PLACEMENT_TOP
+    }
+    // pipette is below viewbox
+    if (y + height > topBound) {
+      return LABEL_PLACEMENT_BOTTOM
+    }
+    return LABEL_PLACEMENT_BOTTOM
+  }
+  // 1- or 8-channel pipette
+  const distanceFromLeft = x - leftBound
+  const distanceFromRight = rightBound - (x + width)
+  const isCloserToLeft = distanceFromLeft < distanceFromRight
+  return isCloserToLeft ? LABEL_PLACEMENT_RIGHT : LABEL_PLACEMENT_LEFT
+}
+
+const BASE_OFFSET = 15
+
+// TODO (nd: 2025/11/06): extend to top-right, top-left, etc. once different nozzle configurations are supported
+export const getLabelOffsetByPlacement = (args: {
+  labelPlacement: LabelPlacement
+  labelWidth: number
+  labelHeight: number
+  shadowWidth: number
+  shadowHeight: number
+}): {
+  x: number
+  y: number
+} => {
+  const { labelPlacement, labelWidth, labelHeight, shadowWidth, shadowHeight } =
+    args
+  let labelOffsetX: number = 0
+  let labelOffsetY: number = 0
+  if (labelPlacement === LABEL_PLACEMENT_BOTTOM) {
+    labelOffsetX = BASE_OFFSET
+    labelOffsetY = -labelHeight + 2 * LABEL_BORDER_WIDTH_PX
+  } else if (labelPlacement === LABEL_PLACEMENT_TOP) {
+    labelOffsetX = BASE_OFFSET
+    labelOffsetY = shadowHeight - 2 * LABEL_BORDER_WIDTH_PX
+  } else if (labelPlacement === LABEL_PLACEMENT_LEFT) {
+    labelOffsetY = BASE_OFFSET
+    labelOffsetX = -labelWidth + LABEL_BORDER_WIDTH_PX
+  } else if (labelPlacement === LABEL_PLACEMENT_RIGHT) {
+    labelOffsetY = BASE_OFFSET
+    labelOffsetX = shadowWidth - LABEL_BORDER_WIDTH_PX
+  }
+  return {
+    x: labelOffsetX,
+    y: labelOffsetY,
+  }
 }

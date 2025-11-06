@@ -283,6 +283,7 @@ export function SelectTips(
             labwareState={activeDeckSetup.labware}
             isAccessible={areAllHoveredWellsAccessibleAndOccupied}
             primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
           />
         ) : null}
       </>
