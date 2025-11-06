@@ -31,6 +31,17 @@ runs:
           echo "lockfile-exists=false" >> $GITHUB_OUTPUT
           echo "cache-glob=" >> $GITHUB_OUTPUT
         fi
+    - shell: bash
+      if: steps.check-lockfile.outputs.lockfile-exists == 'true'
+      run: |
+        # Pre-create cache directory to prevent post-job cleanup failures
+        # The setup-uv action's post-job cleanup will fail if the cache directory
+        # doesn't exist, even if caching was enabled but setup failed before
+        # any packages were downloaded
+        CACHE_DIR="${UV_CACHE_DIR:-/home/runner/work/_temp/setup-uv-cache}"
+        mkdir -p "$CACHE_DIR"
+        # Create a placeholder file so the directory is not empty
+        touch "$CACHE_DIR/.placeholder"
     - uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
