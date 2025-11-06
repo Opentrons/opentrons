@@ -75,6 +75,11 @@ dev = [
     "types-mock~=5.1.0",
     "types-setuptools==57.0.2",
     "typing-extensions>=4.0.0,<5",
+    "pytest-profiling~=1.7.0",
+    "jinja2>=2.3,<3.1",
+    "hypothesis>=6.96.1,<7",
+    "pytest-lazy-fixtures>=1.1.4,<2",
+    "build~=1.2.0",
 ]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]
 "flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
