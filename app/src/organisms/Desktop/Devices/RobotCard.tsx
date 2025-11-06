@@ -217,12 +217,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const leftAndRightMountsPipetteDisplayName = null
 
   return (
-    <Flex
-      flex="1"
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      minWidth="24rem"
-    >
+    <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {i18n.format(t('shared:instruments'), 'capitalize')}
       </StyledText>
