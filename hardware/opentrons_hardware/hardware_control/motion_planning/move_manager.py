@@ -1,6 +1,6 @@
 """Move manager."""
 import logging
-from typing import List, Tuple, Generic, Set, Dict
+from typing import List, Tuple, Generic, Dict
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
@@ -88,7 +88,7 @@ class MoveManager(Generic[AxisKey]):
 
     def ensure_pipette_flow_rate_unchanged(
         self,
-        moving_axes: Set[AxisKey],
+        moving_axes: List[AxisKey],
         origin: Dict[AxisKey, float],
         target: Dict[AxisKey, float],
         speed: float,
