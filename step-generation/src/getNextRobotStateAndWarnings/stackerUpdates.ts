@@ -3,7 +3,6 @@ import {
   FLEX_STACKER_MODULE_V1,
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
-  getModuleDef,
   getStackerMaxPoolCountByHeight,
 } from '@opentrons/shared-data'
 
@@ -71,11 +70,6 @@ export const forFlexStackerFill = (
   const labwareDefinition =
     invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
 
-  const moduleDefinition = getModuleDef(FLEX_STACKER_MODULE_V1)
-  console.log(
-    'moduleDefinition.dimensions.maxStackerFillHeight: ',
-    moduleDefinition.dimensions.maxStackerFillHeight
-  )
   const poolHeight = getHeightOfLabwareStackFromDefinitions([labwareDefinition])
   console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
@@ -87,7 +81,6 @@ export const forFlexStackerFill = (
       'default'
     ).z
   )
-  console.log('maxStorableLabware: ', maxStorableLabware)
 
   if (moduleState != null) {
     if (

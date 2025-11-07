@@ -4,7 +4,6 @@ import {
   fixtureTiprack1000ul,
   FLEX_STACKER_MODULE_V1,
   getSchema2Dimensions,
-  LabwareDefinition2,
   MAGNETIC_MODULE_V1,
 } from '../..'
 import {
@@ -13,6 +12,8 @@ import {
   getModuleMaxFillHeight,
   getStackerMaxPoolCountByHeight,
 } from '../getFlexStackerHardwareProps'
+
+import type { LabwareDefinition2 } from '../..'
 
 describe('getModuleMaxFillHeight()', () => {
   it('should return the max fill height for a given module model', () => {

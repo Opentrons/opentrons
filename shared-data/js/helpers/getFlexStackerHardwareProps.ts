@@ -2,11 +2,7 @@ import { FLEX_STACKER_MODULE_V1 } from '../constants'
 import { getModuleDef } from '../modules'
 import { getSchema2Dimensions } from './positionMath'
 
-import type {
-  LabwareDefinition,
-  ModuleModel,
-  Vector3D,
-} from '../types'
+import type { LabwareDefinition, ModuleModel, Vector3D } from '../types'
 
 export const getModuleMaxFillHeight = (model: ModuleModel): number => {
   if (model === FLEX_STACKER_MODULE_V1) {
@@ -58,15 +54,13 @@ export const getLabwareOverlapOffset = (
       }
     )
   }
-  return (
-    definition.stackingOffsetWithLabware?.['default'] ?? { x: 0, y: 0, z: 0 }
-  )
+  return definition.stackingOffsetWithLabware?.default ?? { x: 0, y: 0, z: 0 }
 }
 
 export const getHeightOfLabwareStackFromDefinitions = (
   definitions: LabwareDefinition[]
 ): number => {
-  if (definitions.length == 0) {
+  if (definitions.length === 0) {
     return 0
   }
   let total_height = 0.0

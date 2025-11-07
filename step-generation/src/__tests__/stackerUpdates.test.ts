@@ -8,7 +8,8 @@ import {
   forFlexStackerFill,
 } from '../getNextRobotStateAndWarnings/stackerUpdates'
 import { getModuleState } from '../robotStateSelectors'
-import { FlexStackerModuleState } from '../types'
+
+import type { FlexStackerModuleState } from '../types'
 
 vi.mock('../robotStateSelectors')
 
