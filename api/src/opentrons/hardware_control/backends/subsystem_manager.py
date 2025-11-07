@@ -15,6 +15,7 @@ from typing import (
     AsyncIterator,
     Union,
     List,
+    cast,
 )
 
 from opentrons_hardware.hardware_control import network, tools
@@ -110,7 +111,7 @@ class SubsystemManager:
 
     @property
     def targets(self) -> Set[FirmwareTarget]:
-        return self._network_info.targets
+        return cast(Set[FirmwareTarget], self._network_info.targets)
 
     @property
     def tools(self) -> tools.types.ToolSummary:
