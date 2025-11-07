@@ -67,13 +67,16 @@ export const forFlexStackerFill = (
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
+  // make sure this to the actual stacker stack
   const labwareDefinition =
     invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
 
   const moduleDefinition = getModuleDef(FLEX_STACKER_MODULE_V1)
+  console.log('moduleDefinition.dimensions.maxStackerFillHeight: ', moduleDefinition.dimensions.maxStackerFillHeight)
   const poolHeight = getHeightOfLabwareStackFromDefinitions(
-    [labwareDefinition, ...(moduleState?.labwareInStacker?.map(id => invariantContext.labwareEntities[id]?.def) ?? [])]
+    [labwareDefinition]
   )
+  console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
     FLEX_STACKER_MODULE_V1,
     poolHeight,
