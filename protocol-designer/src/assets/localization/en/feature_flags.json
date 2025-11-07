@@ -58,9 +58,5 @@
   "OT_PD_ENABLE_TIP_SELCTION": {
     "title": "Enable tip selection",
     "description": "Enables the ability to select tips manually"
-  },
-  "OT_PD_ENABLE_CAMERA_SUPPORT": {
-    "title": "Enable camera support",
-    "description": "Enables developmental camera support"
   }
 }

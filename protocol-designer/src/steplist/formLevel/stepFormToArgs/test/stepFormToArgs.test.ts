@@ -10,6 +10,7 @@ import type {
   TipRackWithDef,
 } from '@opentrons/step-generation'
 import type {
+  HydratedCameraFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
@@ -152,6 +153,27 @@ describe('form casting', () => {
     expect(_castForm(input)).toEqual({
       ...input,
       pauseTemperature: 0,
+    })
+  })
+
+  it('should cast camera form fields', () => {
+    const input: HydratedCameraFormData = {
+      stepNumber: 1,
+      stepName: 'camera',
+      stepDetails: 'captured image',
+      id: 'stepId',
+      stepType: 'camera',
+      homeBefore: false,
+      fileName: 'fileName',
+      resolution: [10, 10],
+      zoom: 2,
+      contrast: 10,
+      brightness: 10,
+      saturation: 10,
+    }
+
+    expect(_castForm(input)).toEqual({
+      ...input,
     })
   })
 
