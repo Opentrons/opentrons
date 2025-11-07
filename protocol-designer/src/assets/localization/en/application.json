@@ -3,7 +3,6 @@
   "are_you_sure_clear_all_wells": "Are you sure you want to remove liquids from all wells?",
   "are_you_sure_delete_well": "Are you sure you want to delete well {{well}}?",
   "blowout": "Blowout",
-  "camera": "Camera",
   "cancel": "cancel",
   "date_created": "Date Created",
   "description": "Description",
@@ -34,6 +33,7 @@
   "save": "save",
   "stepType": {
     "absorbanceReader": "absorbance plate reader",
+    "camera": "camera",
     "comment": "comment",
     "ending_hold": "ending hold",
     "heaterShaker": "heater-shaker",
