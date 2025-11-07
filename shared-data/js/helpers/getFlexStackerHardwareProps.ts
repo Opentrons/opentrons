@@ -20,9 +20,6 @@ export const getStackerMaxPoolCountByHeight = (
 ): number => {
   if (model === FLEX_STACKER_MODULE_V1) {
     const maxFillHeight = getModuleMaxFillHeight(model)
-    console.log('maxFillHeight:', maxFillHeight)
-    console.log('poolHeight:', poolHeight)
-    console.log('poolOverlap:', poolOverlap)
     if (maxFillHeight <= 0) {
       throw new Error(
         `Invalid max fill height for ${model}: ${maxFillHeight} must be greater than 0`
@@ -63,7 +60,6 @@ export const getHeightOfLabwareStackFromDefinitions = (
   if (definitions.length === 0) {
     return 0
   }
-  console.log('definitions: ', definitions)
   let total_height = 0.0
   let upper_def: LabwareDefinition = definitions[0]
   for (const lower_def of definitions.slice(1)) {

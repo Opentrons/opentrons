@@ -66,11 +66,9 @@ export const forFlexStackerFill = (
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
-  // make sure this to the actual stacker stack
   const labwareDefinition =
     invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
-
-  const listOfLabwareDefinitions = Array.from({ length: moduleState?.labwareInStacker?.length ?? 0 }, (_, i) => labwareDefinition)
+  const listOfLabwareDefinitions = Array.from({ length: moduleState?.labwareInStacker?.length ?? 0 }, (_, ) => labwareDefinition)
   const poolHeight = getHeightOfLabwareStackFromDefinitions(listOfLabwareDefinitions)
   console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
@@ -107,7 +105,14 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
-    moduleState.shuttlePosition = 'retrieved'
+    //get original location of labware to retrieve
+    // const originalLocation = robotState.labware.get(moduleState.labwareInStacker?.[0] ?? '').location
+    // if (originalLocation == null) {
+    //   throw new Error('Original location of labware is null')
+    // }
+    // check if slot to retrieve to is occupied 
+    // set state for both
+    // update labware batch
   }
 }
 
