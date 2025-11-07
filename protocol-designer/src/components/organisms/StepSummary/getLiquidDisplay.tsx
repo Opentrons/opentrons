@@ -13,7 +13,11 @@ export function getLiquidDisplay(
   liquidInfo: LiquidEntity[],
   t: any
 ): JSX.Element | null {
-  const filteredLiquids = liquidInfo.filter((l): l is LiquidEntity => l != null)
+  //  filtering out liquids with no liquidEntities to prevent whitescreens
+  //  when the user deletes a liquid in use
+  const filteredLiquids = liquidInfo.filter(
+    liquidEntity => liquidEntity != null
+  )
   const liquidLength = filteredLiquids.length
 
   if (liquidLength === 0) {
