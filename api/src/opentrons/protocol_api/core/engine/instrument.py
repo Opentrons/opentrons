@@ -229,8 +229,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             in_place: whether this is a in-place command.
             meniscus_tracking: Optional data about where to aspirate from.
         """
-        if meniscus_tracking == MeniscusTrackingTarget.START and end_location is None:
-            raise ValueError("Cannot aspirate at the starting liquid height.")
         final_location = location
         if well_core is None:
             if not in_place:
