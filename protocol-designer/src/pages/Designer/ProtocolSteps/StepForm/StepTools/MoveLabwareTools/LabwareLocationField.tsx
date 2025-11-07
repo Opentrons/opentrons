@@ -10,6 +10,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getUnoccupiedStackOptions,
   TIPRACK_LID_LOADNAME,
@@ -68,7 +69,7 @@ export function LabwareLocationField(
     deckSetupLabware[labware]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
-
+  const robotType = useSelector(getRobotType)
   // invalid offDeck move filter
   let unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
@@ -113,7 +114,11 @@ export function LabwareLocationField(
   }
   const optionsSorted =
     robotState != null
-      ? getSortedAddressableArea(unoccupiedLabwareLocationsOptions, robotState)
+      ? getSortedAddressableArea(
+          unoccupiedLabwareLocationsOptions,
+          robotState,
+          robotType
+        )
       : unoccupiedLabwareLocationsOptions
   return (
     <DropdownStepFormField
