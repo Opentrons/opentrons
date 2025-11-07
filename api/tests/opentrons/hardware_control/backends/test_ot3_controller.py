@@ -1484,6 +1484,148 @@ async def test_controller_move(
 
 
 @pytest.mark.parametrize(
+    argnames=["origin_pos", "target_pos", "expected_pos", "gear_position"],
+    argvalues=[
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 50,
+                Axis.P_L: 70,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 50,
+                Axis.Z_R: 0,
+                Axis.P_L: 70,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.X: 20,
+                Axis.Y: 20,
+                Axis.Z_L: 10,
+                Axis.P_L: 48,
+            },
+            {
+                Axis.X: 20,
+                Axis.Y: 20,
+                Axis.Z_L: 10,
+                Axis.Z_R: 0,
+                Axis.P_L: 48,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.P_L: 70,
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 70,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.P_L: 30,  # Too short to hit top speed
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 30,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+    ],
+)
+async def test_controller_move_dynamic(
+    controller: OT3Controller,
+    mock_present_devices: mock.AsyncMock,
+    origin_pos: Dict[Axis, float],
+    target_pos: Dict[Axis, float],
+    expected_pos: Dict[Axis, float],
+    gear_position: Optional[float],
+) -> None:
+    from copy import deepcopy
+
+    controller.update_constraints_for_gantry_load(GantryLoad.LOW_THROUGHPUT)
+
+    run_target_pos = deepcopy(target_pos)
+    config = {"run.side_effect": move_group_run_side_effect(controller, run_target_pos)}
+    with mock.patch(  # type: ignore [call-overload]
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        spec=MoveGroupRunner,
+        **config
+    ):
+        await controller.move(origin_pos, target_pos, 70)
+        position = await controller.update_position()
+        gear_position = controller.gear_motor_position
+
+        assert position == expected_pos
+        assert gear_position == gear_position
+
+
+@pytest.mark.parametrize(
     argnames=["axes", "pipette_has_sensor"],
     argvalues=[[[Axis.P_L, Axis.P_R], True], [[Axis.P_L, Axis.P_R], False]],
 )
