@@ -1,4 +1,10 @@
-import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
+  getModuleDef,
+  getLabwareOverlapOffset,
+  getStackerMaxPoolCountByHeight,
+} from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
 import { uuid } from '../utils'
@@ -60,9 +66,25 @@ export const forFlexStackerFill = (
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
+  const labwareDefinition =
+    invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
 
+  const moduleDefinition = getModuleDef(FLEX_STACKER_MODULE_V1)
+  const maxStorableLabware = getStackerMaxPoolCountByHeight(
+    FLEX_STACKER_MODULE_V1,
+    moduleDefinition.dimensions.maxStackerFillHeight ?? 0,
+    getLabwareOverlapOffset(
+      FLEX_STACKER_MODULE_V1,
+      labwareDefinition,
+      'default'
+    ).z
+  )
   if (moduleState != null) {
-    if (count != null && count > 0 && moduleState.maxPoolCount > count) {
+    if (
+      count != null &&
+      count > 0 &&
+      maxStorableLabware > count + (moduleState.labwareInStacker?.length ?? 0)
+    ) {
       const newLabwareIdList = Array.from({ length: count }, () => uuid())
       moduleState.labwareInStacker = [
         ...(moduleState.labwareInStacker ?? []),
