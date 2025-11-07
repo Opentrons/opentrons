@@ -418,7 +418,6 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: CAMERA_SETUP_STEP_KEY,
         complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
-        // TODO(jh, 09-29-25): Wire this enabled/disabled state to the proper endpoint.
         completeText: t('camera_enabled'),
         incompleteText: t('check_preferences'),
         incompleteElement: null,
@@ -581,14 +580,14 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={COLORS.yellow60}
+          color={COLORS.grey60}
           marginRight={SPACING.spacing8}
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={COLORS.yellow60}
+          color={COLORS.grey60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >

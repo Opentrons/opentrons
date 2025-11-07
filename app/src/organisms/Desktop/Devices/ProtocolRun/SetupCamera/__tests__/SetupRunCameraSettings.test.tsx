@@ -48,7 +48,7 @@ describe('SetupRunCameraUsage', () => {
 
     screen.getByText('Error Recovery')
     screen.getByText(
-      'Automatically capture an image of the deck if an error occurs.'
+      'Automatically capture an image of the deck in the event of an error.'
     )
   })
 
