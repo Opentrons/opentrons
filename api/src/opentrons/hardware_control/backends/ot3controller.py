@@ -1599,7 +1599,9 @@ class OT3Controller(FlexBackend):
         )
 
         self._position[axis_to_node(moving)] = status.motor_position
-        return cast(bool, status.move_ack == MoveCompleteAck.stopped_by_condition)
+        return cast(
+            bool, status.move_ack == MoveCompleteAck.stopped_by_condition
+        )
 
     async def capacitive_pass(
         self,
@@ -1847,7 +1849,9 @@ class OT3Controller(FlexBackend):
             )
 
     async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
-        return cast(bool, await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle))
+        return cast(
+            bool, await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+        )
 
     async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
         res = await get_hepa_fan_state_fw(self._messenger)
@@ -1861,7 +1865,9 @@ class OT3Controller(FlexBackend):
         )
 
     async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
-        return cast(bool, await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s))
+        return cast(
+            bool, await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
+        )
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         res = await get_hepa_uv_state_fw(self._messenger)
