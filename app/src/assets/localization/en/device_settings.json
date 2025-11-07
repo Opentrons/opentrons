@@ -19,7 +19,7 @@
   "are_you_sure_you_want_to_disconnect": "Are you sure you want to disconnect from {{ssid}}?",
   "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration",
   "authentication": "Authentication",
-  "automatically_capture_image": "Automatically capture an image of the deck if an error occurs.",
+  "automatically_capture_image": "Automatically capture an image of the deck in the event of an error.",
   "boot_scripts": "Boot scripts",
   "both": "Both",
   "brightness": "Brightness",
