@@ -41,34 +41,23 @@ runs:
           echo "lockfile-exists=false" >> $GITHUB_OUTPUT
           echo "cache-glob=" >> $GITHUB_OUTPUT
         fi
-    - shell: bash
+    - name: Cache UV packages
       if: steps.check-lockfile.outputs.lockfile-exists == 'true'
-      run: |
-        # Pre-create cache directory structure that setup-uv expects
-        # This must happen before setup-uv runs so the post-job cleanup can find it
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          CACHE_DIR="D:/a/_temp/setup-uv-cache"
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          CACHE_DIR="/Users/runner/work/_temp/setup-uv-cache"
-        else
-          CACHE_DIR="/home/runner/work/_temp/setup-uv-cache"
-        fi
-        # Create the cache directory structure
-        mkdir -p "$CACHE_DIR" 2>/dev/null || true
-        # Create a minimal cache structure that uv recognizes
-        # uv expects certain subdirectories in the cache
-        mkdir -p "$CACHE_DIR/archives" 2>/dev/null || true
-        mkdir -p "$CACHE_DIR/git" 2>/dev/null || true
-        mkdir -p "$CACHE_DIR/wheels" 2>/dev/null || true
-        # Create a marker file so the directory is recognized as a cache
-        echo '{"version":1}' > "$CACHE_DIR/.uv-cache" 2>/dev/null || true
+      uses: actions/cache@v4
+      id: uv-cache
+      with:
+        path: |
+          ~/.cache/uv
+        key: ${{ runner.os }}-uv-${{ hashFiles(format('{0}/uv.lock', inputs.project)) }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
     - uses: astral-sh/setup-uv@v7
       id: setup-uv
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-        # Only enable caching if lockfile exists
-        enable-cache: ${{ steps.check-lockfile.outputs.lockfile-exists == 'true' }}
-        cache-dependency-glob: ${{ steps.check-lockfile.outputs.cache-glob }}
+        # Disable setup-uv's built-in caching since we're using actions/cache instead
+        # This prevents post-job cleanup failures while still getting caching benefits
+        enable-cache: false
     - name: Setup Python Environment
       id: setup-env
       shell: bash
