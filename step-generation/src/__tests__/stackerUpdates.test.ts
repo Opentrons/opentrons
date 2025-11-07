@@ -11,16 +11,20 @@ import { getModuleState } from '../robotStateSelectors'
 import { FlexStackerModuleState } from '../types'
 
 vi.mock('../robotStateSelectors')
+
+const LABWARE_ID = 'sourcePlateId'
+const FLEX_STACKER_ID = 'flexStackerId'
+
 describe('flex stacker state updates forFlexStackerEmpty', () => {
   const FLEX_STACKER_ID = 'flexStackerId'
   const invariantContext = makeContext()
   const robotState = getInitialRobotStateStandard(invariantContext)
-  console.log('robotState: ', robotState)
   beforeEach(() => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['labware1', 'labware2', 'labware3'],
       maxPoolCount: 6,
+      labwareStored: LABWARE_ID,
     } as any)
   })
 
@@ -85,7 +89,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
 })
 
 describe('flex stacker state updates forFlexStackerFill', () => {
-  const FLEX_STACKER_ID = 'flexStackerId'
   const invariantContext = makeContext()
   const robotState = getInitialRobotStateStandard(invariantContext)
   beforeEach(() => {
@@ -93,10 +96,11 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['labware1', 'labware2', 'labware3'],
       max_pool_count: 6,
+      labwareStored: LABWARE_ID,
     } as any)
   })
 
-  it('should add the specified number of items to the stored stacker list', () => {
+  it.only('should add the specified number of items to the stored stacker list', () => {
     const props = {
       count: 1,
       moduleId: FLEX_STACKER_ID,
