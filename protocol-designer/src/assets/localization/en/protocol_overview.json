@@ -2,6 +2,7 @@
   "add_gripper": "Add a gripper",
   "app_version": "{{version}} or higher",
   "author": "Organization/Author",
+  "camera": "camera",
   "camera_controls": "Camera controls",
   "conflict_on_slot_labware": "Cannot add module to this slot because the {{displayName}} is incompatible with this module",
   "conflict_on_slot_labware_fixture": "Cannot add hardware to this slot due to a labware conflict",

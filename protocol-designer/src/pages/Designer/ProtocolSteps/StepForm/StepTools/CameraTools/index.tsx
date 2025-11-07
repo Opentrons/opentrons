@@ -26,7 +26,7 @@ export interface CameraToolsProps {
 export function CameraTools(): JSX.Element {
   const { t, i18n } = useTranslation('protocol_overview')
   const robotType = useSelector(getRobotType)
-  const isFlex = robotType === FLEX_ROBOT_TYPE 
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
