@@ -1,5 +1,4 @@
 export { checkLiquidClassCompatibility } from './checkLiquidClassCompatibility'
-export { createQuickTransferFile } from './createQuickTransferFile'
 export { createQuickTransferPythonFile } from './createQuickTransferFile'
 export { generateCompatibleLabwareForPipette } from './generateCompatibleLabwareForPipette'
 export { generateQuickTransferArgs } from './generateQuickTransferArgs'
