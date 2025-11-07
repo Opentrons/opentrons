@@ -249,8 +249,11 @@ async def run(api: OT3API, report: CSVReport, section: str, camera_removed: bool
         try:
             # Assert there is no camera device at /dev/video2, the traditional device where the embedded camera appears
             assert not os.path.exists("/dev/video2")
+            removed_result = CSVResult.PASS
         except Exception as e:
             print(f"Confirming camera not attached failed with the following error: {e}")
+            removed_result = CSVResult.FAIL
+        report(section, "camera-image", [removed_result])
     else:
         try:
             cam_pic_path = await _take_picture(api, report, section)
