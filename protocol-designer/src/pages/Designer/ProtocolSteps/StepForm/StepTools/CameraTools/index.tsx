@@ -8,7 +8,6 @@ import {
   Flex,
   ListItem,
   ListItemDescriptor,
-  RadioButton,
   RobotInfoLabel,
   SPACING,
   StyledText,
@@ -16,12 +15,6 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getRobotType } from '/protocol-designer/file-data/selectors'
-
-import type { RobotType } from '@opentrons/shared-data'
-
-export interface CameraToolsProps {
-  robotType: RobotType
-}
 
 export function CameraTools(): JSX.Element {
   const { t, i18n } = useTranslation('protocol_overview')
@@ -36,6 +29,7 @@ export function CameraTools(): JSX.Element {
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {i18n.format(t('camera'), 'capitalize')}
       </StyledText>
+
       <ListItem type="default" backgroundColor={COLORS.grey20}>
         <ListItemDescriptor
           type="large"
@@ -51,17 +45,24 @@ export function CameraTools(): JSX.Element {
           }
         />
       </ListItem>
+
       <Divider marginY="0" />
+
       <StyledText desktopStyle="bodyDefaultSemiBold">
         {i18n.format(t('camera_controls'))}
       </StyledText>
-      <RadioButton
-        buttonLabel={i18n.format(t('image_capture'))}
-        buttonValue="imageCapture"
-        largeDesktopBorderRadius
-        onChange={() => {}}
-        isSelected={true}
-      />
+
+      <ListItem type="default" backgroundColor={COLORS.blue50}>
+        <ListItemDescriptor
+          type="large"
+          description={<StyledText />}
+          content={
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.white}>
+              {t('image_capture')}
+            </StyledText>
+          }
+        />
+      </ListItem>
     </Flex>
   )
 }

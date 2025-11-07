@@ -3,6 +3,7 @@ import type {
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  Height,
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
@@ -18,6 +19,7 @@ import type {
   ShakeSpeedParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  Width,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
@@ -603,9 +605,6 @@ export interface CommentArgs extends CommonArgs {
   commandCreatorFnName: 'comment'
   message: string
 }
-
-type Width = number
-type Height = number
 
 export interface CaptureImageArgs extends CommonArgs {
   commandCreatorFnName: 'captureImage'
