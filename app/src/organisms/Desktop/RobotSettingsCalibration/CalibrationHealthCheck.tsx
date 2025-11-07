@@ -31,7 +31,6 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
-import { useRunStatuses } from '/app/resources/runs'
 
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
@@ -46,6 +45,7 @@ interface CalibrationHealthCheckProps {
   dispatchRequests: DispatchRequestsType
   isPending: boolean
   robotName: string
+  isRobotBusy: boolean
 }
 
 const attachedPipetteCalPresent: (
@@ -64,6 +64,7 @@ export function CalibrationHealthCheck({
   dispatchRequests,
   isPending,
   robotName,
+  isRobotBusy,
 }: CalibrationHealthCheckProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -80,8 +81,6 @@ export function CalibrationHealthCheck({
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
-
-  const { isRunRunning: isRunning } = useRunStatuses()
 
   const pipetteCalPresent = attachedPipetteCalPresent(
     attachedPipettes,
@@ -105,7 +104,7 @@ export function CalibrationHealthCheck({
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason) || isPending || isRunning
+    ? Boolean(buttonDisabledReason) || isPending || isRobotBusy
     : true
 
   const handleHealthCheck = (

@@ -56,15 +56,10 @@ vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 vi.mock('../AdvancedTab/DisableStackerSensors')
 
-const mockUpdateRobotStatus = vi.fn()
-
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsAdvanced
-        robotName="otie"
-        updateRobotStatus={mockUpdateRobotStatus}
-      />
+      <RobotSettingsAdvanced robotName="otie" isRobotBusy={false} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,

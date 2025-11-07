@@ -15,11 +15,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
-import {
-  useIsFlex,
-  useIsRobotBusy,
-  useRobot,
-} from '/app/redux-resources/robots'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
 import {
   fetchSettings,
@@ -62,12 +58,12 @@ import type { Dispatch, State } from '/app/redux/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function RobotSettingsAdvanced({
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: RobotSettingsAdvancedProps): JSX.Element {
   const [showRenameRobotSlideout, setShowRenameRobotSlideout] =
     useState<boolean>(false)
@@ -78,7 +74,6 @@ export function RobotSettingsAdvanced({
   const [showFactoryModeSlideout, setShowFactoryModeSlideout] =
     useState<boolean>(false)
 
-  const isRobotBusy = useIsRobotBusy({ poll: true })
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const robot = useRobot(robotName)
@@ -124,10 +119,6 @@ export function RobotSettingsAdvanced({
   useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
-
-  useEffect(() => {
-    updateRobotStatus(isRobotBusy)
-  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <>

@@ -15,16 +15,16 @@ import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsModuleCalibrationProps {
   attachedModules: AttachedModule[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
+  isRobotBusy: boolean
 }
 
 export function RobotSettingsModuleCalibration({
   attachedModules,
-  updateRobotStatus,
   formattedPipetteOffsetCalibrations,
   robotName,
+  isRobotBusy,
 }: RobotSettingsModuleCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -43,11 +43,11 @@ export function RobotSettingsModuleCalibration({
       {attachedModules.length > 0 ? (
         <ModuleCalibrationItems
           attachedModules={attachedModules}
-          updateRobotStatus={updateRobotStatus}
           formattedPipetteOffsetCalibrations={
             formattedPipetteOffsetCalibrations
           }
           robotName={robotName}
+          isRobotBusy={isRobotBusy}
         />
       ) : (
         <LegacyStyledText as="label" marginTop={SPACING.spacing8}>

@@ -50,14 +50,14 @@ const BODY_STYLE = css`
 `
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
+  isRobotBusy: boolean
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
+  isRobotBusy,
   formattedPipetteOffsetCalibrations,
-  updateRobotStatus,
 }: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -147,9 +147,9 @@ export function PipetteOffsetCalibrationItems({
                   <OverflowMenu
                     calType="pipetteOffset"
                     robotName={robotName}
+                    isRobotBusy={isRobotBusy}
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
-                    updateRobotStatus={updateRobotStatus}
                     pipetteName={
                       isFlex
                         ? (attachedPipetteFromInstrumentQuery[calibration.mount]

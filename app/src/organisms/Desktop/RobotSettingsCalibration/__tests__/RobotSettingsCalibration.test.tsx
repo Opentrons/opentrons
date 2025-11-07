@@ -77,14 +77,9 @@ const RUN_STATUSES = {
   isRunIdle: false,
 }
 
-const mockUpdateRobotStatus = vi.fn()
-
 const render = () => {
   return renderWithProviders(
-    <RobotSettingsCalibration
-      robotName="otie"
-      updateRobotStatus={mockUpdateRobotStatus}
-    />,
+    <RobotSettingsCalibration robotName="otie" isRobotBusy={false} />,
     {
       i18nInstance: i18n,
     }

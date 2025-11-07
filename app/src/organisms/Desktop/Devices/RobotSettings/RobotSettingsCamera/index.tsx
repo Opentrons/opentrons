@@ -6,7 +6,6 @@ import {
   useCameraAnalytics,
 } from '/app/redux-resources/analytics'
 import { useFeatureFlag } from '/app/redux/config'
-import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
@@ -18,9 +17,11 @@ import type { RobotType } from '@opentrons/shared-data'
 
 export interface RobotSettingsCameraProps {
   robotType: RobotType
+  isRobotBusy: boolean
 }
 export function RobotSettingsCamera({
   robotType,
+  isRobotBusy,
 }: RobotSettingsCameraProps): JSX.Element {
   const {
     toggleCameraEnabled,
@@ -34,8 +35,6 @@ export function RobotSettingsCamera({
     source: SOURCE_ROBOT_SETTINGS,
     robotType: robotType,
   })
-  const runId = useCurrentRunId()
-  const doesRunExist = runId != null
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const handleToggleLiveStream = (): void => {
     toggleLiveVideoEnabled()
@@ -59,7 +58,7 @@ export function RobotSettingsCamera({
       <CameraStatusContainer
         toggleCameraEnabled={toggleCameraEnabled}
         isCameraEnabled={isCameraEnabled}
-        toggleDisabled={doesRunExist}
+        toggleDisabled={isRobotBusy}
       />
       {isCameraEnabled && (
         <>
@@ -68,7 +67,7 @@ export function RobotSettingsCamera({
             isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
             toggleLiveVideoEnabled={handleToggleLiveStream}
             toggleRecoveryCaptureEnabled={handleToggleRecovery}
-            toggleDisabled={doesRunExist}
+            toggleDisabled={isRobotBusy}
           />
           {isCameraSettingsEnabled && (
             <>

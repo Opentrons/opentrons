@@ -33,18 +33,13 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
-const mockUpdateRobotStatus = vi.fn()
-
 const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsNetworking
-        robotName={ROBOT_NAME}
-        updateRobotStatus={mockUpdateRobotStatus}
-      />
+      <RobotSettingsNetworking robotName={ROBOT_NAME} isRobotBusy={false} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,

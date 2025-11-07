@@ -104,9 +104,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
     props = {
       isCalibrated: false,
       attachedModule: mockThermocyclerGen2,
-      updateRobotStatus: vi.fn(),
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       robotName: ROBOT_NAME,
+      isRobotBusy: false,
     }
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,

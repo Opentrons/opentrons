@@ -71,9 +71,9 @@ describe('ModuleCalibrationItems', () => {
   beforeEach(() => {
     props = {
       attachedModules: mockFetchModulesSuccessActionPayloadModules,
-      updateRobotStatus: vi.fn(),
       formattedPipetteOffsetCalibrations: [],
       robotName: ROBOT_NAME,
+      isRobotBusy: false,
     }
     vi.mocked(ModuleCalibrationOverflowMenu).mockReturnValue(
       <div>mock ModuleCalibrationOverflowMenu</div>

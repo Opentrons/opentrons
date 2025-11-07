@@ -347,7 +347,7 @@
   "slider_value": "{{value}}%",
   "software_is_up_to_date": "Your software is already up to date!",
   "software_update_error": "Software update error",
-  "some_robot_controls_are_not_available": "Some robot controls are not available when run is in progress",
+  "some_robot_controls_are_not_available": "Some robot controls are not available when run is in progress or robot is busy",
   "ssh_public_keys": "SSH public keys",
   "subnet_mask": "Subnet Mask",
   "successfully_connected": "Successfully connected!",
