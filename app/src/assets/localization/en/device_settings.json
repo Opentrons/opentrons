@@ -140,7 +140,7 @@
   "e_stop_connected": "E-stop successfully connected",
   "e_stop_not_connected": "Connect the E-stop to an auxiliary port on the back of the robot.",
   "edit_settings": "Edit settings",
-  "enable_camera_to_run": "Enable the camera to run this protocol",
+  "enable_camera_to_run": "Enable the camera to start the run",
   "enable_status_light": "Enable status light",
   "enable_status_light_description": "Turn on or off the strip of color LEDs on the front of the robot.",
   "enabled": "Enabled",

@@ -38,6 +38,7 @@ import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
   CAMERA_SETUP_STEP_KEY,
+  getCameraUsageState,
   getMissingSetupSteps,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -135,6 +136,9 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  const { enabled: cameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
 
   const missingSteps = useSelector<State, StepKey[]>(
     (state: State): StepKey[] => getMissingSetupSteps(state, runId)
@@ -248,6 +252,7 @@ export function ProtocolRunSetup({
   if (robot == null) {
     return null
   }
+
   const StepDetailMap: Record<
     StepKey,
     {
@@ -288,6 +293,7 @@ export function ProtocolRunSetup({
         incompleteText: t('calibration_needed'),
         missingHardwareText: t('action_needed'),
         incompleteElement: null,
+        disabledHardware: false,
       },
     },
     [MODULE_SETUP_STEP_KEY]: {
@@ -316,6 +322,7 @@ export function ProtocolRunSetup({
           ? t('modules_and_fixtures_ready')
           : t('modules_ready'),
         incompleteText: t('action_needed'),
+        disabledHardware: false,
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,
@@ -421,6 +428,9 @@ export function ProtocolRunSetup({
         completeText: t('camera_enabled'),
         incompleteText: t('check_preferences'),
         incompleteElement: null,
+        disabledHardware: !cameraEnabled,
+        missingHardware: !!storageInfo?.isImageStorageLow,
+        missingHardwareText: t('check_preferences'),
       },
     },
   }
@@ -511,9 +521,13 @@ interface NoHardwareRequiredStepCompletion {
 }
 
 interface HardwareRequiredStepCompletion {
-  stepKey: typeof ROBOT_CALIBRATION_STEP_KEY | typeof MODULE_SETUP_STEP_KEY
+  stepKey:
+    | typeof ROBOT_CALIBRATION_STEP_KEY
+    | typeof MODULE_SETUP_STEP_KEY
+    | typeof CAMERA_SETUP_STEP_KEY
   complete: boolean
   missingHardware: boolean
+  disabledHardware: boolean
   incompleteText: string | null
   incompleteElement: JSX.Element | null
   completeText: string
@@ -528,7 +542,8 @@ const stepRequiresHW = (
   props: StepRightElementProps
 ): props is HardwareRequiredStepCompletion =>
   props.stepKey === ROBOT_CALIBRATION_STEP_KEY ||
-  props.stepKey === MODULE_SETUP_STEP_KEY
+  props.stepKey === MODULE_SETUP_STEP_KEY ||
+  props.stepKey === CAMERA_SETUP_STEP_KEY
 
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
   if (props.complete) {
@@ -555,23 +570,37 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
         </StyledText>
       </Flex>
     )
-  } else if (stepRequiresHW(props) && props.missingHardware) {
+  } else if (stepRequiresHW(props)) {
     return (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={COLORS.yellow60}
+          color={
+            props.disabledHardware
+              ? COLORS.red60
+              : props.missingHardware
+                ? COLORS.yellow60
+                : COLORS.grey60
+          }
           marginRight={SPACING.spacing8}
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={COLORS.yellow60}
+          color={
+            props.disabledHardware
+              ? COLORS.red60
+              : props.missingHardware
+                ? COLORS.yellow60
+                : COLORS.grey60
+          }
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >
-          {props.missingHardwareText}
+          {props.missingHardware
+            ? props.missingHardwareText
+            : props.incompleteText}
         </StyledText>
       </Flex>
     )
@@ -580,14 +609,14 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={COLORS.grey60}
+          color={COLORS.yellow60}
           marginRight={SPACING.spacing8}
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={COLORS.grey60}
+          color={COLORS.yellow60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >
