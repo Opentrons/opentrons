@@ -1850,7 +1850,8 @@ class OT3Controller(FlexBackend):
 
     async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
         return cast(
-            bool, await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+            bool,
+            await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle),
         )
 
     async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
@@ -1866,7 +1867,10 @@ class OT3Controller(FlexBackend):
 
     async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
         return cast(
-            bool, await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
+            bool,
+            await set_hepa_uv_state_fw(
+                self._messenger, light_on, uv_duration_s
+            ),
         )
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
