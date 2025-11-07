@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Chip } from '@opentrons/components'
 
 import { useHlsVideo } from '/app/pages/Desktop/LivestreamViewer/hooks/useHlsVideo'
+import { useReportWindowDurationEvent } from '/app/pages/Desktop/LivestreamViewer/hooks/useReportWindowDurationEvent'
 import {
   LivestreamInfoScreen,
   useLivestreamInfoScreen,
@@ -42,6 +43,12 @@ export function LivestreamViewer(): JSX.Element {
     cameraData,
     isCurrentRunLoading,
     videoError
+  )
+
+  useReportWindowDurationEvent(
+    retainedRunId,
+    runStatus,
+    cameraData?.liveStreamEnabled ?? false
   )
 
   return (
