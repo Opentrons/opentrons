@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest'
 import {
   fixtureTiprack1000ul,
   FLEX_STACKER_MODULE_V1,
+  getSchema2Dimensions,
   LabwareDefinition2,
   MAGNETIC_MODULE_V1,
 } from '../..'
 import {
+  getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
   getModuleMaxFillHeight,
   getStackerMaxPoolCountByHeight,
@@ -46,7 +48,7 @@ describe('getLabwareOverlapOffset()', () => {
     expect(result).toStrictEqual({ x: 0, y: 0, z: 0 })
   })
 
-  it.only('should throw an error if the module model is invalid', () => {
+  it('should throw an error if the module model is invalid', () => {
     expect(() =>
       getLabwareOverlapOffset(
         MAGNETIC_MODULE_V1,
@@ -55,6 +57,32 @@ describe('getLabwareOverlapOffset()', () => {
       )
     ).toThrow(
       'Invalid module model for labware overlap offset: magneticModuleV1'
+    )
+  })
+})
+
+describe('getHeightOfLabwareStackFromDefinitions()', () => {
+  it('should return the height of a stack of labware from definitions', () => {
+    const mockLabwareDefinition = fixtureTiprack1000ul as LabwareDefinition2
+    const result = getHeightOfLabwareStackFromDefinitions([
+      mockLabwareDefinition,
+    ])
+    expect(result).toBe(getSchema2Dimensions(mockLabwareDefinition).zDimension)
+  })
+
+  it('should return 0 if the definitions are empty', () => {
+    const result = getHeightOfLabwareStackFromDefinitions([])
+    expect(result).toBe(0)
+  })
+
+  it('should return the height of a stack of labware from definitions', () => {
+    const mockLabwareDefinition = fixtureTiprack1000ul as LabwareDefinition2
+    const result = getHeightOfLabwareStackFromDefinitions([
+      mockLabwareDefinition,
+      mockLabwareDefinition,
+    ])
+    expect(result).toBe(
+      getSchema2Dimensions(mockLabwareDefinition).zDimension * 2
     )
   })
 })

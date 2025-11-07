@@ -1,8 +1,12 @@
 import { FLEX_STACKER_MODULE_V1 } from '../constants'
 import { getModuleDef } from '../modules'
-
-import type { LabwareDefinition, LabwareDefinition2, ModuleModel, Vector3D } from '../types'
 import { getSchema2Dimensions } from './positionMath'
+
+import type {
+  LabwareDefinition,
+  ModuleModel,
+  Vector3D,
+} from '../types'
 
 export const getModuleMaxFillHeight = (model: ModuleModel): number => {
   if (model === FLEX_STACKER_MODULE_V1) {
@@ -59,16 +63,21 @@ export const getLabwareOverlapOffset = (
   )
 }
 
-// TODO: write a test for this
-export const getHeightOfLabwareStackFromDefinitions = (definitions: LabwareDefinition[]): number => {
+export const getHeightOfLabwareStackFromDefinitions = (
+  definitions: LabwareDefinition[]
+): number => {
   if (definitions.length == 0) {
     return 0
   }
   let total_height = 0.0
   let upper_def: LabwareDefinition = definitions[0]
   for (const lower_def of definitions.slice(1)) {
-    const overlap = getLabwareOverlapOffset(FLEX_STACKER_MODULE_V1, upper_def, lower_def.parameters.loadName).z
-    total_height += (getSchema2Dimensions(upper_def).zDimension - overlap)
+    const overlap = getLabwareOverlapOffset(
+      FLEX_STACKER_MODULE_V1,
+      upper_def,
+      lower_def.parameters.loadName
+    ).z
+    total_height += getSchema2Dimensions(upper_def).zDimension - overlap
     upper_def = lower_def
   }
   return total_height + getSchema2Dimensions(upper_def).zDimension
