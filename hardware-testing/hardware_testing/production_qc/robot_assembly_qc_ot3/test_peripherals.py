@@ -1,5 +1,6 @@
 """Test Peripherals."""
 import asyncio
+import os
 from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
@@ -173,7 +174,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def run(api: OT3API, report: CSVReport, section: str) -> None:
+async def run(api: OT3API, report: CSVReport, section: str, camera_removed: bool) -> None:
     """Run."""
     await api.set_lights(rails=True)
     await api.set_status_bar_state(StatusBarState.IDLE)
@@ -244,12 +245,19 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA
     ui.print_header("CAMERA")
-    try:
-        cam_pic_path = await _take_picture(api, report, section)
-    except Exception as e:
-        print(f"Take a picture failed with the following error: {e}")
-    if cam_pic_path:
-        await _run_image_check_server(api, report, section, cam_pic_path)
-        cam_pic_path.unlink()
+    if camera_removed:
+        try:
+            # Assert there is no camera device at /dev/video2, the traditional device where the embedded camera appears
+            assert not os.path.exists("/dev/video2")
+        except Exception as e:
+            print(f"Confirming camera not attached failed with the following error: {e}")
     else:
-        print("skipping checking the image, because taking a picture failed")
+        try:
+            cam_pic_path = await _take_picture(api, report, section)
+        except Exception as e:
+            print(f"Take a picture failed with the following error: {e}")
+        if cam_pic_path:
+            await _run_image_check_server(api, report, section, cam_pic_path)
+            cam_pic_path.unlink()
+        else:
+            print("skipping checking the image, because taking a picture failed")

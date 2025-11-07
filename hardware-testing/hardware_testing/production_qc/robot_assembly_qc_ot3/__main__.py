@@ -35,7 +35,10 @@ async def _main(cfg: TestConfig) -> None:
     # RUN TESTS
     for section, test_run in cfg.tests.items():
         ui.print_title(section.value)
-        await test_run(api, report, section.value)
+        if section == TestSection.PERIPHERALS:
+            await test_run(api, report, section.value, cfg.camera_removed)
+        else:
+            await test_run(api, report, section.value)
 
     # SAVE REPORT
     ui.print_title("DONE")
@@ -46,6 +49,7 @@ async def _main(cfg: TestConfig) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--camera_removed", action="store_true")
     # add each test-section as a skippable argument (eg: --skip-gantry)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -60,5 +64,5 @@ if __name__ == "__main__":
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, tests=_t_sections)
+    _config = TestConfig(simulate=args.simulate, camera_removed=args.camera_removed, tests=_t_sections)
     asyncio.run(_main(_config))

@@ -29,6 +29,7 @@ class TestConfig:
     """Test Config."""
 
     simulate: bool
+    camera_removed: bool
     tests: Dict[TestSection, Callable]
 
 
