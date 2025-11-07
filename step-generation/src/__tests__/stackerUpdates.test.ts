@@ -48,7 +48,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toEqual(['labware2', 'labware3'])
   })
 
@@ -66,7 +65,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toBeNull()
   })
 
@@ -84,7 +82,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toBeNull()
   })
 })
@@ -133,7 +130,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
 
@@ -149,7 +145,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
 })

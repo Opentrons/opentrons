@@ -70,7 +70,8 @@ export const forFlexStackerFill = (
   const labwareDefinition =
     invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
 
-  const poolHeight = getHeightOfLabwareStackFromDefinitions([labwareDefinition])
+  const listOfLabwareDefinitions = Array.from({ length: moduleState?.labwareInStacker?.length ?? 0 }, (_, i) => labwareDefinition)
+  const poolHeight = getHeightOfLabwareStackFromDefinitions(listOfLabwareDefinitions)
   console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
     FLEX_STACKER_MODULE_V1,

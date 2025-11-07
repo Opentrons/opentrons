@@ -63,6 +63,7 @@ export const getHeightOfLabwareStackFromDefinitions = (
   if (definitions.length === 0) {
     return 0
   }
+  console.log('definitions: ', definitions)
   let total_height = 0.0
   let upper_def: LabwareDefinition = definitions[0]
   for (const lower_def of definitions.slice(1)) {
