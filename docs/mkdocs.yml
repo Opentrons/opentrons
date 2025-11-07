@@ -44,6 +44,8 @@ plugins:
             show_symbol_type_toc: true
             heading_level: 2
             autolink: true
+            extensions:
+              - v2/griffe_version_required.py:RequiresVersionExtension
 
 theme:
   name: material
