@@ -51,29 +51,14 @@ runs:
         key: ${{ runner.os }}-uv-${{ hashFiles(format('{0}/uv.lock', inputs.project)) }}
         restore-keys: |
           ${{ runner.os }}-uv-
-    - shell: bash
-      run: |
-        # Pre-create cache directory that setup-uv expects to prevent post-job cleanup failures
-        # setup-uv always sets UV_CACHE_DIR and tries to clean it up, even when enable-cache: false
-        # We create it in the runner's temp directory which should persist across contexts
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          CACHE_DIR="${{ runner.temp }}/setup-uv-cache"
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          CACHE_DIR="${{ runner.temp }}/setup-uv-cache"
-        else
-          CACHE_DIR="${{ runner.temp }}/setup-uv-cache"
-        fi
-        mkdir -p "$CACHE_DIR" 2>/dev/null || true
-        # Create a marker file so the directory is recognized
-        echo "placeholder" > "$CACHE_DIR/.placeholder" 2>/dev/null || true
-        # Set UV_CACHE_DIR to point to our directory so setup-uv uses it
-        echo "UV_CACHE_DIR=$CACHE_DIR" >> $GITHUB_ENV
     - uses: astral-sh/setup-uv@v7
       id: setup-uv
+      continue-on-error: true
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-        # Disable setup-uv's built-in caching since we're using actions/cache instead
-        # This prevents post-job cleanup failures while still getting caching benefits
+        # Disable setup-uv's built-in caching - we use actions/cache instead
+        # setup-uv's post-job cleanup fails when cache directory doesn't exist,
+        # so we use continue-on-error to prevent job failure
         enable-cache: false
     - name: Setup Python Environment
       id: setup-env
