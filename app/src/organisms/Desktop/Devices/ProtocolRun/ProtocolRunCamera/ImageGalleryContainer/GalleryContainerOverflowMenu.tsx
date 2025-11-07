@@ -50,7 +50,15 @@ export function GalleryContainerOverflowMenu({
     source: SOURCE_RUN_RECORD,
     robotType,
   })
-  const formattedRunTs = format(new Date(runTimestamp), 'M/d/yy_HH:mm:ss')
+  const formattedRunTs = (() => {
+    try {
+      if (runTimestamp == null) return ''
+      return format(new Date(runTimestamp), 'yyyyMMdd-HHmmss')
+    } catch (error) {
+      console.warn('Invalid timestamp:', runTimestamp)
+      return ''
+    }
+  })()
   const buildImagesZipName = (): string =>
     `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
 
