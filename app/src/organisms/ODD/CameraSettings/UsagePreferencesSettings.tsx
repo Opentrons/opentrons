@@ -42,7 +42,7 @@ export function UsagePreferencesSettings({
               className={styles.usage_subtext}
               oddStyle="level4HeaderRegular"
             >
-              {t('live_video_description_odd')}
+              {t('branded:live_video_description_odd')}
             </StyledText>
           </div>
           <OnOffToggle isOn={isLiveVideoEnabled} />

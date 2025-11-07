@@ -2,14 +2,13 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 
 import { Chip } from '@opentrons/components'
-// eslint-disable-next-line no-restricted-imports
-import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useHlsVideo } from '/app/pages/Desktop/LivestreamViewer/hooks/useHlsVideo'
 import {
   LivestreamInfoScreen,
   useLivestreamInfoScreen,
 } from '/app/pages/Desktop/LivestreamViewer/LivestreamInfoScreen'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './livestream.module.css'
 
@@ -18,8 +17,7 @@ const RUN_POLLING_INTERVAL_MS = 5000
 export function LivestreamViewer(): JSX.Element {
   const [searchParams] = useSearchParams()
   const runId = searchParams.get('runId') ?? ''
-  // TODO(jh, 11-04-25): Notifications are not working in secondary windows. Investigate further.
-  const { data: runData, isLoading: isRunLoading } = useRunQuery(runId, {
+  const { data: runData, isLoading: isRunLoading } = useNotifyRunQuery(runId, {
     refetchInterval: RUN_POLLING_INTERVAL_MS,
   })
   const runStatus = runData?.data.status ?? null

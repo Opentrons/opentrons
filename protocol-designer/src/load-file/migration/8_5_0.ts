@@ -26,7 +26,7 @@ import { getMaxUiFlowRate } from '../../pages/Designer/ProtocolSteps/StepForm/Pi
 import {
   getDefaultBlowoutFlowRate,
   getDefaultPushOutVolume,
-  getMatchingTipLiquidSpecsFromSpec,
+  getMatchingTipLiquidSpecs,
 } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -132,7 +132,7 @@ const getClippedFlowRateForMoveLiquid = (args: {
       ) ?? 0
   }
 
-  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipetteSpecs,
     volume,
     tiprackDef

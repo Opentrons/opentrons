@@ -81,7 +81,7 @@ describe('ImageGalleryContainer', () => {
     screen.getByText('Image Gallery')
     screen.getByText('3 photos')
     screen.getByText(
-      'Protocol images can be viewed once captured and downloaded when the run is complete.'
+      'Images can be viewed immediately after capture and downloaded once the run is complete.'
     )
   })
 
