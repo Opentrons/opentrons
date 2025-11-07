@@ -38,6 +38,7 @@ runs:
     - name: 'Send Slack Alert'
       uses: slackapi/slack-github-action@v2.1.1
       with:
+        webhook-type: 'incoming-webhook'
         payload: |
           {
             "channel": "${{ steps.channel-config.outputs.channel }}",
