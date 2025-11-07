@@ -90,7 +90,6 @@ export function useCameraAnalytics({
       name: ANALYTICS_IMAGE_CAPTURE_KIND,
       properties: {
         robotType,
-        source,
         transactionId: data.transactionId,
         amount: data.amount,
       },
@@ -101,7 +100,6 @@ export function useCameraAnalytics({
     doTrackEvent({
       name: ANALYTICS_LIVE_FEED_KIND,
       properties: {
-        source,
         robotType,
         runId: data.runId,
       },
