@@ -21,6 +21,7 @@ vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 vi.mock('/app/local-resources/images/hooks/useCameraUsageSettings')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery/selectors')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {

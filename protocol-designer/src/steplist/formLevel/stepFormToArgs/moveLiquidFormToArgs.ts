@@ -79,15 +79,11 @@ const getCheckedPath = (
 ): PathOption => {
   const { pipette, tipRack, volume } = castFormData
   const { spec: pipetteSpecs } = pipette
-  const tiprackEntity = Object.values(contextualState.labwareEntities).find(
-    lw => lw.labwareDefURI === tipRack
-  )
   // should not hit
-  if (tiprackEntity == null) {
-    console.error('Tiprack for transfer has no associated labware entity.')
+  if (tipRack == null) {
+    console.error('Transfer has no associated tipRack.')
     return path
   }
-  const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
     castFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
@@ -98,7 +94,7 @@ const getCheckedPath = (
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+    ?.byTipType.find(({ tiprack }) => tiprack === tipRack?.tiprackDefURI)
 
   // be permissive with path if no liquid class tip values found
   if (liquidClassValuesForTip == null) {
@@ -117,7 +113,7 @@ const getCheckedPath = (
     path === 'multiAspirate'
       ? getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
@@ -129,7 +125,7 @@ const getCheckedPath = (
         })
       : getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
@@ -300,7 +296,7 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_volume'
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    castFormData.pipette,
+    castFormData.pipette?.spec,
     castFormData.volume,
     tipRack
   )
@@ -316,7 +312,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack,
+    tipRack: tipRack?.tiprackDefURI,
     aspirateFlowRateUlSec:
       castFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,

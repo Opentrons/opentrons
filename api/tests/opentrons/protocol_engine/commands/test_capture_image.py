@@ -8,6 +8,7 @@ from typing import Tuple
 from opentrons.system import camera
 from opentrons.system import ffmpeg
 from opentrons.protocol_engine.resources import FileProvider, CameraProvider
+from opentrons.protocol_engine.resources.file_provider import SPECIAL_CHARACTERS
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
@@ -24,6 +25,7 @@ from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
+    FileNameInvalidError,
 )
 from opentrons.system.camera import image_capture, ZOOM_DEFAULT, RESOLUTION_DEFAULT
 
@@ -369,3 +371,21 @@ async def test_capture_image_result_has_clean_defaults(
             ),
             state_update=result.state_update,
         )
+
+
+async def test_raises_filename_error(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+) -> None:
+    """It should raise FileNameInvalidError when the capture image command is provided a bad file name."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider,
+    )
+    for char in SPECIAL_CHARACTERS:
+        params = CaptureImageParams(fileName="badname" + char)
+        with pytest.raises(FileNameInvalidError):
+            await subject.execute(params=params)

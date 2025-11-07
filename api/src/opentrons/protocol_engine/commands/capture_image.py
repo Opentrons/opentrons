@@ -19,6 +19,7 @@ from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     CameraDisabledError,
+    FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
@@ -26,6 +27,7 @@ from ..resources.file_provider import (
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
+from ..resources.file_provider import SPECIAL_CHARACTERS
 from ..resources import CameraProvider
 from ..resources.camera_provider import ImageParameters
 from ..state import update_types
@@ -182,6 +184,14 @@ class CaptureImageImpl(
         state_update.precondition_update = update_types.PreconditionUpdate(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
+
+        # Validate the filename param provided to fail analysis
+        if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
+            set(params.fileName)
+        ):
+            raise FileNameInvalidError(
+                message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+            )
 
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()

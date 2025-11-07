@@ -52,7 +52,10 @@ import {
   useRunControls,
 } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import {
+  useCameraAnalytics,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
@@ -217,15 +220,16 @@ const mockFixture = {
 
 const MOCK_MAKE_SNACKBAR = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn()
-
 // TODO(jh, 04-23-25): Some of these tests are failing (the skipped ones) due to circular
 //  imports. Investigate further.
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC = vi.fn()
+
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockNavigate = vi.fn()
+
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
         setIsConfirmed(true)
@@ -338,6 +342,16 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
+
+    when(vi.mocked(useCameraAnalytics))
+      .calledWith({ source: 'runRecord', robotType: 'OT-3 Standard' })
+      .thenReturn({
+        reportCameraSettings: vi.fn(),
+        reportCameraEnablementSettings: vi.fn(),
+        reportPhotoAccessUsage: vi.fn(),
+        reportImageCaptureUsage: vi.fn(),
+        reportLiveFeedUsage: vi.fn(),
+      })
     vi.mocked(useScrollPosition).mockReturnValue({
       isScrolled: false,
       scrollRef: {} as any,

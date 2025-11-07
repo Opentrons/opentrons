@@ -10,6 +10,7 @@ import { UsagePreferencesSettings } from '../UsagePreferencesSettings'
 import type { UsagePreferencesSettingsProps } from '../UsagePreferencesSettings'
 
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard')
+vi.mock('/app/redux/discovery/selectors')
 
 const render = (props: UsagePreferencesSettingsProps) => {
   return renderWithProviders(<UsagePreferencesSettings {...props} />, {
@@ -26,6 +27,7 @@ describe('UsagePreferencesSettings', () => {
       toggleRecoveryCaptureEnabled: vi.fn(),
       isLiveVideoEnabled: true,
       isRecoveryCaptureEnabled: true,
+      robotName: 'robotName',
     }
     vi.mocked(OnOffToggle).mockImplementation(({ isOn }) => (
       <div>MOCK_ON_OFF_TOGGLE_{isOn ? 'ON' : 'OFF'}</div>
