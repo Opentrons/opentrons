@@ -388,6 +388,7 @@ jobs:
       - name: 'slack notify internal-release'
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        continue-on-error: true
         with:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
         env:
@@ -396,6 +397,7 @@ jobs:
       - name: 'slack notify release'
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        continue-on-error: true
         with:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
         env:
@@ -451,6 +453,7 @@ jobs:
         uses: actions/checkout@v4
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
+        continue-on-error: true
         with:
           status: 'success'
           workflow_name: 'App test, build, and deploy'
@@ -494,6 +497,7 @@ jobs:
 
       - name: 'Send failure alert'
         uses: ./.github/actions/simple-build-alert
+        continue-on-error: true
         with:
           status: 'failure'
           workflow_name: 'App test, build, and deploy'
@@ -517,6 +521,7 @@ jobs:
         uses: actions/checkout@v4
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
+        continue-on-error: true
         with:
           status: 'cancelled'
           workflow_name: 'App test, build, and deploy'
