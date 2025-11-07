@@ -20,7 +20,9 @@ The deck is the machined aluminum surface on which automated science protocols a
 
 The working area is the physical space on and above the deck that is accessible for pipetting. Labware placed in slots 1–11 are in the working area.
 
-<font color="red">PLACEHOLDER FOR DECK SLIDE OUT</font>
+The OT-2 deck is removable, it slides in and out of the enclosure. Pull it out part way, or remove it completely, to more easily place labware in a slot or for cleaning.
+
+![OT-2 sliding deck](../images/sliding-deck.png)
 
 ## Rear and side panels
 
@@ -32,13 +34,11 @@ Some text here
 
 ### Status lights
 
-Status lights on the front and back of the OT-2 provide at-a-glance information about the robot.
+Status indicator lights on the front and back of the OT-2 provide at-a-glance information about the robot. The front light on the robot indicates its power status. When powered on and fully booted up, the status light turns solid blue.
 
 IMAGE
 
-### OT-2 Back Panel Status Lights
-
-The OT-2 has five (5) status indicator lights, known as LEDs, located on the side of its external electronics enclosure, which is on the upper left side of the back panel of the robot. These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
+The OT-2 has five (5) status indicator lights, known as LEDs, located on on the upper left side of the back panel of the robot. These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
 
 <table>
   <thead>
