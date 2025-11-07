@@ -13,7 +13,8 @@ export function getLiquidDisplay(
   liquidInfo: LiquidEntity[],
   t: any
 ): JSX.Element | null {
-  const liquidLength = liquidInfo.length
+  const filteredLiquids = liquidInfo.filter((l): l is LiquidEntity => l != null)
+  const liquidLength = filteredLiquids.length
 
   if (liquidLength === 0) {
     return null
@@ -27,8 +28,11 @@ export function getLiquidDisplay(
         <StyledText desktopStyle="bodyDefaultRegular">{t('of')}</StyledText>
         <Tag
           type="default"
-          text={liquidInfo[0].displayName}
-          liquidIcon={{ color: liquidInfo[0].displayColor, size: 'xSmall' }}
+          text={filteredLiquids[0].displayName}
+          liquidIcon={{
+            color: filteredLiquids[0].displayColor,
+            size: 'xSmall',
+          }}
         />
       </Flex>
     )
@@ -39,18 +43,18 @@ export function getLiquidDisplay(
         <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
           <Tag
             type="default"
-            text={liquidInfo[0].displayName}
+            text={filteredLiquids[0].displayName}
             liquidIcon={{
-              color: liquidInfo[0].displayColor,
+              color: filteredLiquids[0].displayColor,
               size: 'xSmall',
             }}
           />
           {t('and')}
           <Tag
             type="default"
-            text={liquidInfo[1].displayName}
+            text={filteredLiquids[1].displayName}
             liquidIcon={{
-              color: liquidInfo[1].displayColor,
+              color: filteredLiquids[1].displayColor,
               size: 'xSmall',
             }}
           />
