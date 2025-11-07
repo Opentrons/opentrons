@@ -83,6 +83,7 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
+
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
