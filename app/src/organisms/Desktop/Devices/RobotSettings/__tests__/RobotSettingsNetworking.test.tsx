@@ -22,6 +22,7 @@ import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
+import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
@@ -36,10 +37,15 @@ vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
-const render = () => {
+const render = (
+  props?: Partial<ComponentProps<typeof RobotSettingsNetworking>>
+) => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsNetworking robotName={ROBOT_NAME} isRobotBusy={false} />
+      <RobotSettingsNetworking
+        robotName={ROBOT_NAME}
+        isRobotBusy={props?.isRobotBusy ?? false}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -315,8 +321,7 @@ describe('RobotSettingsNetworking', () => {
   it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
     when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     when(useCanDisconnect).calledWith(ROBOT_NAME).thenReturn(true)
-    when(useIsRobotBusy).calledWith({ poll: true }).thenReturn(true)
-    render()
+    render({ isRobotBusy: true })
 
     expect(
       screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })
