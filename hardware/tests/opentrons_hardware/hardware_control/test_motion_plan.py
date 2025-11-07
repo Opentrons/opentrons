@@ -267,3 +267,38 @@ def test_pipette_high_speed_motion() -> None:
             top_set_axis_speed = unit_vector[set_axis_kind] * block.final_speed
             if top_set_axis_speed != 0:
                 assert abs(top_set_axis_speed) == dummy_em_pipette_max_speed
+
+@given(
+    x_constraint=generate_axis_constraint(),
+    y_constraint=generate_axis_constraint(),
+    z_constraint=generate_axis_constraint(),
+    a_constraint=generate_axis_constraint(),
+    b_constraint=generate_axis_constraint(),
+    c_constraint=generate_axis_constraint(),
+)
+async def test_plunger_devectorize(
+    x_constraint: AxisConstraints,
+    y_constraint: AxisConstraints,
+    z_constraint: AxisConstraints,
+    a_constraint: AxisConstraints,
+    b_constraint: AxisConstraints,
+    c_constraint: AxisConstraints,
+) -> None:
+    constraints: SystemConstraints[str] = {
+        "X": x_constraint,
+        "Y": y_constraint,
+        "Z": z_constraint,
+        "A": a_constraint,
+        "B": b_constraint,
+        "C": c_constraint,
+    }
+    manager = move_manager.MoveManager(constraints=constraints)
+    origin = {"X": 0, "Y": 0, "Z": 0, "A": 0}
+    target = {"X": 10, "Y": 10, "Z": 10, "A": 10}
+    speed = 10
+    all_vectored = MoveTarget.build(position=target, max_speed=speed)
+    devectorized = manager.devectorize_axes(origin, target, speed, ["A"])
+    assert devectorized.max_speed > all_vectored.max_speed
+    assert devectorized.max_speed == 20
+
+
