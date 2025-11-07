@@ -206,7 +206,6 @@
   "likely_incorrect_password": "Likely incorrect network password.",
   "live_video": "Live Video",
   "live_video_description": "View real-time video of the deck while a running a protocol",
-  "live_video_description_odd": "View real-time video of the deck in the Opentrons App while running a protocol.",
   "live_video_lc": "Live video",
   "mac_address": "MAC Address",
   "manage_oem_settings": "Manage OEM settings",
