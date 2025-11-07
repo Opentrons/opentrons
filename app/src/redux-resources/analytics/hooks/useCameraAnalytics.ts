@@ -2,6 +2,7 @@ import {
   ANALYTICS_CAMERA_ENABLEMENT_KIND,
   ANALYTICS_CAMERA_SETTINGS_KIND,
   ANALYTICS_IMAGE_CAPTURE_KIND,
+  ANALYTICS_LIVE_FEED_DURATION,
   ANALYTICS_LIVE_FEED_KIND,
   ANALYTICS_PHOTO_ACCESS,
   useTrackEvent,
@@ -36,6 +37,9 @@ interface CaptureParams {
 interface LiveFeedParams {
   runId: string
 }
+interface LiveFeedDurationParams extends LiveFeedParams {
+  durationSeconds: number
+}
 interface MediaAccessParams {
   action: 'download' | 'downloadZip' | 'delete' | 'storageWarning'
   transactionId?: string
@@ -53,6 +57,8 @@ export interface UseCameraUsageAnalyticsResult {
   /* Reports how often images are downloaded together, seperately, 
   how often images are deleted, and how often storage warnings appear. */
   reportPhotoAccessUsage: (data: MediaAccessParams) => void
+  /* Reports the duration that the livestream was viewed for a particular session. */
+  reportLiveFeedDuration: (data: LiveFeedDurationParams) => void
 }
 
 export function useCameraAnalytics({
@@ -106,6 +112,16 @@ export function useCameraAnalytics({
     })
   }
 
+  const reportLiveFeedDuration = (data: LiveFeedDurationParams): void => {
+    doTrackEvent({
+      name: ANALYTICS_LIVE_FEED_DURATION,
+      properties: {
+        runId: data.runId,
+        duration: `${data.durationSeconds} seconds`,
+      },
+    })
+  }
+
   const reportPhotoAccessUsage = (data: MediaAccessParams): void => {
     const baseProperties = {
       robotType,
@@ -126,6 +142,7 @@ export function useCameraAnalytics({
     reportCameraSettings,
     reportImageCaptureUsage,
     reportLiveFeedUsage,
+    reportLiveFeedDuration,
     reportPhotoAccessUsage,
   }
 }

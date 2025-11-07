@@ -146,3 +146,5 @@ export const ANALYTICS_IMAGE_CAPTURE_KIND: 'cameraImageCaptureKind' =
 export const ANALYTICS_LIVE_FEED_KIND: 'cameraLiveFeed' = 'cameraLiveFeed'
 export const ANALYTICS_PHOTO_ACCESS: 'cameraPhotoAccessKind' =
   'cameraPhotoAccessKind'
+export const ANALYTICS_LIVE_FEED_DURATION: 'cameraLiveFeedDuration' =
+  'cameraLiveFeedDuration'
