@@ -141,13 +141,15 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
+      - name: Install UV
+        uses: ./.github/actions/python/install-uv
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
-      - uses: astral-sh/setup-uv@v7
+      - name: Cache UV packages
+        uses: ./.github/actions/python/cache-uv
         with:
-          python-version: '3.10'
-          enable-cache: true
+          lockfile-path: package-testing/uv.lock
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
