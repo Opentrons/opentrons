@@ -1079,7 +1079,7 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     [
         # Happy cases:
         _CalculateMagnetHardwareHeightTestParams(
-            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v1_def"),
             mm_from_base=10,
             # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
             # https://github.com/Opentrons/opentrons/issues/9585
@@ -1087,7 +1087,7 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(
-            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v2_def"),
             mm_from_base=10,
             expected_result=12.5,
             expected_exception_type=None,
@@ -1101,49 +1101,49 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
         # TODO(mm, 2022-03-09): It's unclear if the bounds used for V1 modules
         # are physically correct. https://github.com/Opentrons/opentrons/issues/9585
         _CalculateMagnetHardwareHeightTestParams(  # V1 barely too low.
-            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v1_def"),
             mm_from_base=-2.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 lowest allowed.
-            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v1_def"),
             mm_from_base=-2.5,
             expected_result=0,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 highest allowed.
-            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v1_def"),
             mm_from_base=20,
             expected_result=45,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V1 barely too high.
-            definition=lazy_fixture("magdeck_v1_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v1_def"),
             mm_from_base=20.01,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 barely too low.
-            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v2_def"),
             mm_from_base=-2.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 lowest allowed.
-            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v2_def"),
             mm_from_base=-2.5,
             expected_result=0,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 highest allowed.
-            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v2_def"),
             mm_from_base=22.5,
             expected_result=25,
             expected_exception_type=None,
         ),
         _CalculateMagnetHardwareHeightTestParams(  # V2 barely too high.
-            definition=lazy_fixture("magdeck_v2_def"),  # type: ignore[arg-type]
+            definition=lazy_fixture("magdeck_v2_def"),
             mm_from_base=22.51,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
