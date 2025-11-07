@@ -196,4 +196,4 @@ Introduction of return tip in robot stack v8.8.0, mirroring return tip support i
 
 ## Version 2.1.1
 
-Note that this might still change and adding it here so we don't forget. The ability to generate JSON behind a feature flag has been deprecated.
+Note that this version number might still change and adding it here so we don't forget. The ability to generate JSON behind a feature flag has been deleted.
