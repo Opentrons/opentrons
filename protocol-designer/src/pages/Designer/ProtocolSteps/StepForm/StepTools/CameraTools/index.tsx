@@ -55,7 +55,7 @@ export function CameraTools(): JSX.Element {
       <ListItem type="default" backgroundColor={COLORS.blue50}>
         <ListItemDescriptor
           type="large"
-          description={<StyledText />}
+          description={<div />}
           content={
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.white}>
               {t('image_capture')}
