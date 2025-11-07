@@ -20,7 +20,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['labware1', 'labware2', 'labware3'],
-      max_pool_count: 6,
+      maxPoolCount: 6,
     } as any)
   })
 

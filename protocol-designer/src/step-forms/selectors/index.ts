@@ -231,6 +231,7 @@ const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
 const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
   latchOpen: null,
+  maxPoolCount: 0,
   storedLabwareDetails: null,
   shuttlePosition: 'home',
   labwareInStacker: null,
