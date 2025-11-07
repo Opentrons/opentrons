@@ -1,0 +1,22 @@
+name: 'Install UV'
+description: 'Installs uv package manager manually to avoid setup-uv action post-job cleanup issues'
+inputs:
+  version:
+    description: 'UV version to install (default: latest)'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - name: Install uv
+      shell: bash
+      run: |
+        # Install uv manually to avoid setup-uv's post-job cleanup issues
+        # This gives us full control and avoids the cache directory cleanup bug
+        if [ -n "${{ inputs.version }}" ]; then
+          curl -LsSf https://astral.sh/uv/install.sh | UV_VERSION="${{ inputs.version }}" sh
+        else
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+        fi
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+

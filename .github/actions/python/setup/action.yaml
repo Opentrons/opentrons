@@ -8,6 +8,10 @@ inputs:
     description: "What Python version to use to create the project's virtual environment"
     required: false
     default: "false"
+  install-system-deps:
+    description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
+    required: false
+    default: 'true'
 outputs:
   start-time:
     description: 'Start time of the setup process (Unix timestamp)'
@@ -22,6 +26,7 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
+      if: inputs.install-system-deps == 'true'
       run: |
         if [[ "${OSTYPE}" =~ "linux" ]]; then
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
@@ -31,35 +36,16 @@ runs:
         fi
     - shell: bash
       run: npm install --global shx@0.3.3
-    - shell: bash
-      id: check-lockfile
-      run: |
-        if [ -f "${{ inputs.project }}/uv.lock" ]; then
-          echo "lockfile-exists=true" >> $GITHUB_OUTPUT
-          echo "cache-glob=${{ inputs.project }}/uv.lock" >> $GITHUB_OUTPUT
-        else
-          echo "lockfile-exists=false" >> $GITHUB_OUTPUT
-          echo "cache-glob=" >> $GITHUB_OUTPUT
-        fi
-    - name: Cache UV packages
-      if: steps.check-lockfile.outputs.lockfile-exists == 'true'
-      uses: actions/cache@v4
-      id: uv-cache
-      with:
-        path: |
-          ~/.cache/uv
-        key: ${{ runner.os }}-uv-${{ hashFiles(format('{0}/uv.lock', inputs.project)) }}
-        restore-keys: |
-          ${{ runner.os }}-uv-
-    - uses: astral-sh/setup-uv@v7
-      id: setup-uv
-      continue-on-error: true
+    - name: Install UV
+      uses: ./.github/actions/python/install-uv
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-        # Disable setup-uv's built-in caching - we use actions/cache instead
-        # setup-uv's post-job cleanup fails when cache directory doesn't exist,
-        # so we use continue-on-error to prevent job failure
-        enable-cache: false
+    - name: Cache UV packages
+      uses: ./.github/actions/python/cache-uv
+      with:
+        lockfile-path: ${{ inputs.project }}/uv.lock
     - name: Setup Python Environment
       id: setup-env
       shell: bash
