@@ -193,3 +193,7 @@ You can still generate JSON behind a feature flag.
 ## Version 2.1.0
 
 Introduction of return tip in robot stack v8.8.0, mirroring return tip support introducted in Protocol Designer 8.6.0: Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing.
+
+## Version 2.1.1
+
+Note that this might still change and adding it here so we don't forget. The ability to generate JSON behind a feature flag has been deprecated.

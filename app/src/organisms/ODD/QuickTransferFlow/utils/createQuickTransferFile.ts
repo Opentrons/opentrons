@@ -10,7 +10,7 @@ import { pythonDef } from './pythonDef'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from '../types'
 
-const QUICK_TRANSFER_VERSION = '2.1.0'
+const QUICK_TRANSFER_VERSION = '2.1.1'
 
 export function createQuickTransferPythonFile(
   quickTransferState: QuickTransferSummaryState,
