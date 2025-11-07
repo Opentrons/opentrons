@@ -25,6 +25,8 @@ import {
 } from '/protocol-designer/top-selectors/labware-locations'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
+import { getSortedAddressableArea } from './utils'
+
 import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { Option } from '/protocol-designer/top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
@@ -109,11 +111,14 @@ export function LabwareLocationField(
         option => !allSlotNames.includes(option.value as AddressableAreaName)
       )
   }
-
+  const optionsSorted =
+    robotState != null
+      ? getSortedAddressableArea(unoccupiedLabwareLocationsOptions, robotState)
+      : unoccupiedLabwareLocationsOptions
   return (
     <DropdownStepFormField
       {...props}
-      options={unoccupiedLabwareLocationsOptions}
+      options={optionsSorted}
       errorToShow={props.errorToShow}
       width="100%"
       title={t('protocol_steps:new_location')}
