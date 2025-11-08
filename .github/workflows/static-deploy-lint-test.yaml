@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
