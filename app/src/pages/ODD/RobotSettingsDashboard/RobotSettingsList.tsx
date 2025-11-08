@@ -174,7 +174,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => {
             setCurrentOption('CameraPreferences')
           }}
-          iconName="photo-camera"
+          iconName="camera"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}

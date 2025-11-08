@@ -186,7 +186,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
       </StyledText>
       <Icon
         key={`${String('camera')}_${robotName}`}
-        name="photo-camera"
+        name="camera"
         color={COLORS.grey50}
         size={SPACING.spacing16}
       ></Icon>
