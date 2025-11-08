@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -2448,7 +2451,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -10583,7 +10587,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -10615,7 +10620,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 41.0
+        "targetBlockTemperature": 41.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -10790,7 +10796,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 41.0
+        "targetBlockTemperature": 41.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16063,7 +16070,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16095,7 +16103,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.0
+        "targetBlockTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16242,7 +16251,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.0
+        "targetBlockTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16275,7 +16285,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 50.0
+        "targetBlockTemperature": 50.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -27100,7 +27111,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

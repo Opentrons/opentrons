@@ -1,11 +1,15 @@
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
 
-import { COLORS, ModalShell, PrimaryButton } from '@opentrons/components'
+import {
+  COLORS,
+  ModalShell,
+  PrimaryButton,
+  WizardHeader,
+} from '@opentrons/components'
 
 import { configReducer } from '/app/redux/config/reducer'
 
-import { WizardHeader } from '../WizardHeader'
 import { SimpleWizardBody } from './index'
 
 import type { Meta, Story } from '@storybook/react'

@@ -17,6 +17,7 @@ import {
 import {
   getAADisplayName,
   getFixtureDisplayName,
+  getWasteChuteOptions,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
@@ -32,7 +33,6 @@ import {
   getFixtureOptions,
   getModuleOptions,
   getOptions,
-  getWasteChuteOptions,
 } from '../DeviceDetailsDeckConfiguration/utils'
 import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
 
@@ -84,9 +84,8 @@ export function AddFixtureModal({
   const { data: modulesData } = useModulesQuery()
   const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
   const unconfiguredMods =
     modulesData?.data.filter(
       attachedMod =>
@@ -163,7 +162,7 @@ export function AddFixtureModal({
           <ODDFixtureOption
             key="fixturesOption"
             optionName="Fixtures"
-            buttonText={t('add')}
+            buttonText={t('select_options')}
             onClickHandler={() => {
               setOptionStage('fixtureOptions')
             }}
@@ -172,7 +171,7 @@ export function AddFixtureModal({
         <ODDFixtureOption
           key="modulesOption"
           optionName="Modules"
-          buttonText={t('add')}
+          buttonText={t('select_options')}
           onClickHandler={() => {
             setOptionStage('moduleOptions')
           }}

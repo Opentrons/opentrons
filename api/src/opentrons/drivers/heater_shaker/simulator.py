@@ -92,3 +92,7 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
     @ensure_yield
     async def enter_programming_mode(self) -> None:
         pass
+
+    @ensure_yield
+    async def get_error_state(self) -> None:
+        return

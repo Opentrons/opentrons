@@ -1,0 +1,63 @@
+/* WizardHeader CSS Module */
+
+.exit_button {
+  color: var(--grey-60);
+  font-weight: var(--font-weight-semi-bold);
+  text-transform: capitalize;
+}
+
+.exit_button:hover {
+  color: var(--grey-50);
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .exit_button {
+    margin-right: 1.75rem;
+    font-size: var(--font-size-22);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .exit_button:hover {
+    opacity: 100%;
+  }
+
+  .exit_button:active {
+    color: var(--grey-50);
+  }
+}
+
+.box {
+  background-color: var(--white);
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .box {
+    border-radius: var(--border-radius-16);
+  }
+}
+
+.header_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: var(--spacing-16) var(--spacing-32);
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .header_container {
+    padding: 1.75rem var(--spacing-32);
+    border-radius: var(--border-radius-16);
+  }
+}
+
+.step_text {
+  color: var(--grey-60);
+  font-weight: var(--font-weight-semi-bold);
+}
+
+@media (width: 1024px) and (height: 600px) {
+  .step_text {
+    margin-left: var(--spacing-16);
+    font-size: var(--font-size-22);
+  }
+}

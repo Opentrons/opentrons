@@ -1,4 +1,5 @@
 {
+  "__dev_internal__camera": "启用相机支持",
   "__dev_internal__enableLabwareCreator": "启用应用实验耗材创建器",
   "__dev_internal__enableRunNotes": "在协议运行期间显示备注",
   "__dev_internal__forceHttpPolling": "强制轮询所有网络请求，而不是使用MQTT",
@@ -83,7 +84,7 @@
   "restart_touchscreen": "重启触摸屏",
   "restarting_app": "下载完成，正在重启应用程序...",
   "restore_previous": "查看如何恢复过往软件版本",
-  "searching": "正在搜索30秒",
+  "searching": "正在搜索30s",
   "select_a_language": "请选择使用语言。",
   "select_language": "选择语言 (Select language)",
   "setup_connection": "设置连接",

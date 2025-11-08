@@ -3,19 +3,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renameLabware } from '/protocol-designer/labware-ingred/actions'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+
 import { EditNickNameModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { renameLabware } from '../../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../../step-forms/selectors'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../ui/labware/selectors')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/ui/labware/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof EditNickNameModal>) => {
   return renderWithProviders(<EditNickNameModal {...props} />, {
     i18nInstance: i18n,

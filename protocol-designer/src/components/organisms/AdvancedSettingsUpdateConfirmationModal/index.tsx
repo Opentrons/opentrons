@@ -16,7 +16,7 @@ import {
 import { getMainPagePortalEl } from '../Portal'
 import { useConfirmationContent } from './useConfirmationContent'
 
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 interface AdvancedSettingsUpdateConfirmationModalProps {
   formData: FormData

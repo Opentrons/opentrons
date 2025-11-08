@@ -8,7 +8,6 @@ import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from './matrixMath'
 import { pairsFromArray } from './pairsFromArray'
 import {
   coordinateTupleToVector3D,
-  getVectorDifference,
   getVectorInverse,
   getVectorSum,
   IDENTITY_VECTOR,
@@ -42,9 +41,7 @@ export function getSchema2Dimensions(
  * Return a bounding box, in coordinates relative to the labware's origin,
  * that encloses the labware when viewed from the top down.
  */
-export function getLabwareViewBox(
-  definition: LabwareDefinition
-): {
+export function getLabwareViewBox(definition: LabwareDefinition): {
   /** The minimum x-coord, i.e. the left of the labware. */
   minX: number
   /** The minimum y-coord, i.e. the front of the labware. */
@@ -151,6 +148,7 @@ function getLabwareStackAsArray(
   if (labwareDefinitionsTopToBottom.length === 0) {
     return []
   }
+  const topLabware = labwareDefinitionsTopToBottom[0]
   const bottomLabware =
     labwareDefinitionsTopToBottom[labwareDefinitionsTopToBottom.length - 1]
 
@@ -160,16 +158,26 @@ function getLabwareStackAsArray(
     childLabwareDefinition,
     parentLabwareDefinition,
   ] of pairsFromArray(labwareDefinitionsTopToBottom)) {
+    const parentOriginToChildOrigin = getLabwareOriginToLabwareOrigin(
+      parentLabwareDefinition,
+      childLabwareDefinition
+    )
+
+    // Preserving legacy misbehavior:
+    // If we're computing the position of a schema 2 labware, the labware below
+    // it don't contribute anything to its x or y offset. Only z.
+    if (topLabware.schemaVersion === 2) {
+      parentOriginToChildOrigin.x = 0
+      parentOriginToChildOrigin.y = 0
+    }
+
     result.push({
       debugInfo: {
         type: 'labwareOnLabware',
         parentLabwareDefinition,
         childLabwareDefinition,
       },
-      offset: getLabwareOriginToLabwareOrigin(
-        parentLabwareDefinition,
-        childLabwareDefinition
-      ),
+      offset: parentOriginToChildOrigin,
     })
   }
 
@@ -184,16 +192,25 @@ function getLabwareStackAsArray(
       return null
     }
     const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
+    const slotPositionToLabwareOrigin = getDeckSlotOriginToLabwareOrigin(
+      slotAddressableArea,
+      bottomLabware
+    )
+    // Preserving legacy misbehavior:
+    // If we're computing the position of a schema 2 labware, the labware below
+    // it don't contribute anything to its x or y offset. Only z.
+    if (bottomLabware !== topLabware && topLabware.schemaVersion === 2) {
+      slotPositionToLabwareOrigin.x = 0
+      slotPositionToLabwareOrigin.y = 0
+    }
+
     result.push({
       debugInfo: {
         type: 'labwareOnDeckSlot',
         parentSlotId: slotId,
         childLabwareDefinition: bottomLabware,
       },
-      offset: getDeckSlotOriginToLabwareOrigin(
-        slotAddressableArea,
-        bottomLabware
-      ),
+      offset: slotPositionToLabwareOrigin,
     })
     result.push({
       debugInfo: {
@@ -204,23 +221,26 @@ function getLabwareStackAsArray(
     })
   } else {
     // The bottom of the stack is a labware in a module in a deck slot.
-    const slotPositionTuple = getPositionFromSlotId(slotId, deckDefinition)
-    if (slotPositionTuple == null) {
+    const deckSlotPositionTuple = getPositionFromSlotId(slotId, deckDefinition)
+    if (deckSlotPositionTuple == null) {
       return null
     }
-    const slotPosition = coordinateTupleToVector3D(slotPositionTuple)
+    const deckSlotPosition = coordinateTupleToVector3D(deckSlotPositionTuple)
+    const deckSlotPositionToLabwareOrigin =
+      getModuleParentOriginToLabwareOrigin(
+        deckDefinition.otId,
+        slotId,
+        moduleDefinition,
+        bottomLabware
+      )
+
     result.push({
       debugInfo: {
         type: 'labwareOnModule',
         parentModuleDefinition: moduleDefinition,
         childLabwareDefinition: bottomLabware,
       },
-      offset: getModuleParentOriginToLabwareOrigin(
-        deckDefinition.otId,
-        slotId,
-        moduleDefinition,
-        bottomLabware
-      ),
+      offset: deckSlotPositionToLabwareOrigin,
     })
     result.push({
       debugInfo: {
@@ -230,7 +250,7 @@ function getLabwareStackAsArray(
       },
       // Modules don't really have an origin of their own that's separate from the
       // origin of their parent deck slot.
-      offset: slotPosition,
+      offset: deckSlotPosition,
     })
   }
 
@@ -357,11 +377,8 @@ export function getModuleParentOriginToLabwareOrigin(
       // based on locatingFeatures. As a first-pass approximation, this currently just
       // puts the front-left-bottom of the labware at the front-left of the module's
       // child slot, which is the traditional behavior with labware schema 2.
-      const moduleParentOriginToLabwareFrontLeftBottom = getModuleParentOriginToChildSlotOrigin(
-        deckId,
-        slotId,
-        moduleDefinition
-      )
+      const moduleParentOriginToLabwareFrontLeftBottom =
+        getModuleParentOriginToChildSlotOrigin(deckId, slotId, moduleDefinition)
       const labwareOriginToLabwareFrontLeftBottom = {
         x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
         y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,
@@ -398,8 +415,11 @@ export function getLabwareOriginToLabwareOrigin(
     childDefinition.stackingOffsetWithLabware?.[
       parentDefinition.parameters.loadName
     ] ?? IDENTITY_VECTOR
-  const total = getVectorDifference(base, adjustment)
-  return total
+  return getVectorSum(base, {
+    x: adjustment.x,
+    y: adjustment.y,
+    z: -adjustment.z,
+  })
 }
 
 /**
@@ -426,7 +446,7 @@ export function getModuleParentOriginToChildSlotOrigin(
 ): Vector3D {
   const transformsForLocation =
     deckId != null && slotId != null
-      ? moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {}
+      ? (moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {})
       : {}
   const labwareOffsetTransform =
     transformsForLocation.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM

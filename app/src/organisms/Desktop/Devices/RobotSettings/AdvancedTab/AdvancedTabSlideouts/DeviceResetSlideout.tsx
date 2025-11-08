@@ -66,10 +66,8 @@ export function DeviceResetSlideout({
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const [
-    displayedOptions,
-    setDisplayedOptions,
-  ] = useState<DisplayedResetOptionState>(ALL_DESELECTED)
+  const [displayedOptions, setDisplayedOptions] =
+    useState<DisplayedResetOptionState>(ALL_DESELECTED)
   const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
 
@@ -238,8 +236,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.common.pipetteOffsetCalibrations = !options
-                          .common.pipetteOffsetCalibrations
+                        options.common.pipetteOffsetCalibrations =
+                          !options.common.pipetteOffsetCalibrations
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.common.pipetteOffsetCalibrations}
@@ -249,8 +247,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.flexOnly.gripperCalibrations = !options.flexOnly
-                          .gripperCalibrations
+                        options.flexOnly.gripperCalibrations =
+                          !options.flexOnly.gripperCalibrations
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.flexOnly.gripperCalibrations}
@@ -259,8 +257,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.flexOnly.moduleCalibrations = !options.flexOnly
-                          .moduleCalibrations
+                        options.flexOnly.moduleCalibrations =
+                          !options.flexOnly.moduleCalibrations
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.flexOnly.moduleCalibrations}
@@ -272,8 +270,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.ot2Only.deckCalibration = !options.ot2Only
-                          .deckCalibration
+                        options.ot2Only.deckCalibration =
+                          !options.ot2Only.deckCalibration
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.ot2Only.deckCalibration}
@@ -282,8 +280,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.ot2Only.tipLengthCalibrations = !options.ot2Only
-                          .tipLengthCalibrations
+                        options.ot2Only.tipLengthCalibrations =
+                          !options.ot2Only.tipLengthCalibrations
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.ot2Only.tipLengthCalibrations}
@@ -292,8 +290,8 @@ export function DeviceResetSlideout({
                     <CheckboxField
                       onChange={() => {
                         const options = cloneDeep(displayedOptions)
-                        options.common.pipetteOffsetCalibrations = !options
-                          .common.pipetteOffsetCalibrations
+                        options.common.pipetteOffsetCalibrations =
+                          !options.common.pipetteOffsetCalibrations
                         setDisplayedOptions(options)
                       }}
                       value={displayedOptions.common.pipetteOffsetCalibrations}
@@ -337,8 +335,8 @@ export function DeviceResetSlideout({
                   <CheckboxField
                     onChange={() => {
                       const options = cloneDeep(displayedOptions)
-                      options.flexOnly.labwareOffsets = !options.flexOnly
-                        .labwareOffsets
+                      options.flexOnly.labwareOffsets =
+                        !options.flexOnly.labwareOffsets
                       setDisplayedOptions(options)
                     }}
                     value={displayedOptions.flexOnly.labwareOffsets}

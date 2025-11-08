@@ -49,7 +49,9 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
       : state.touchTipDispense != null
   )
   const initialSpeed =
-    kind === 'aspirate' ? state.touchTipAspirate : state.touchTipDispense
+    kind === 'aspirate'
+      ? state.touchTipAspirateSpeed
+      : state.touchTipDispenseSpeed
   const [speed, setSpeed] = useState<number | null>(initialSpeed ?? null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const touchTipAspirate =

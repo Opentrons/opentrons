@@ -9,11 +9,12 @@ import {
   fixture_96_plate,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import {
+  AUTOMATIC,
   DEST_WELL_BLOWOUT_DESTINATION,
   makeContext,
 } from '@opentrons/step-generation'
 
-import { getOrderedWells } from '../../../utils'
+import { getOrderedWells } from '../../../utils/getOrderedWells'
 import {
   getAirGapData,
   getMixData,
@@ -21,12 +22,10 @@ import {
 } from '../moveLiquidFormToArgs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type {
-  HydratedMoveLiquidFormData,
-  PathOption,
-} from '../../../../form-types'
+import type { HydratedMoveLiquidFormData } from '/protocol-designer/form-types'
+import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
-vi.mock('../../../utils')
+vi.mock('../../../utils/getOrderedWells')
 vi.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
@@ -34,34 +33,33 @@ const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
 const invariantContext = makeContext()
 
 describe('move liquid step form -> command creator args', () => {
-  let hydratedForm: HydratedMoveLiquidFormData
+  let castForm: GetCastFormData<HydratedMoveLiquidFormData>
   const sourceLabwareDef = fixture_12_trough as LabwareDefinition2
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
   const destLabwareDef = fixture_96_plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
+  const tiprackLabwareDef = {
+    parameters: {
+      tipLength: 10,
+      loadName: 'mockTiprack',
+    },
+    metadata: {
+      displayName: 'mock display name',
+    },
+  } as LabwareDefinition2
   beforeEach(() => {
     vi.mocked(getOrderedWells).mockClear()
     vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
     // the "base case" is a 1 to 1 transfer, single path
-    hydratedForm = {
+    castForm = {
       stepType: 'moveLiquid',
       stepName: 'Test Step',
       description: null,
       pipette: {
         id: 'pipetteId',
         spec: fixtureP10SingleV2Specs,
-        tiprackLabwareDef: [
-          {
-            parameters: {
-              tipLength: 10,
-              loadName: 'mockTiprack',
-            },
-            metadata: {
-              displayName: 'mock display name',
-            },
-          },
-        ] as any,
+        tiprackLabwareDef: [tiprackLabwareDef] as any,
       } as any,
       volume: 10,
       path: 'single',
@@ -72,7 +70,7 @@ describe('move liquid step form -> command creator args', () => {
         type: sourceLabwareType,
         def: sourceLabwareDef,
       },
-      tipRack: 'tiprack1Id',
+      tipRack: { tiprackDefURI: 'tiprack1Id', ...tiprackLabwareDef } as any,
       aspirate_wells: [ASPIRATE_WELL],
       aspirate_wellOrder_first: 'l2r',
       aspirate_wellOrder_second: 't2b',
@@ -81,9 +79,15 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_touchTip_checkbox: false,
       aspirate_touchTip_mmFromTop: null,
       aspirate_mix_checkbox: false,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       aspirate_mix_volume: null,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       aspirate_mix_times: null,
       aspirate_delay_checkbox: false,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       aspirate_delay_seconds: null,
 
       dispense_labware: {
@@ -100,18 +104,29 @@ describe('move liquid step form -> command creator args', () => {
       dispense_touchTip_checkbox: false,
       dispense_touchTip_mmFromTop: null,
       dispense_mix_checkbox: false,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       dispense_mix_volume: null,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       dispense_mix_times: null,
       dispense_delay_checkbox: false,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       dispense_delay_seconds: null,
 
       aspirate_wells_grouped: false,
       preWetTip: false,
       disposalVolume_checkbox: false,
+      // @ts-expect-error - todo(mm, 2025-10-09): According to recently improved type
+      // hints, this can't be null. Investigate and change it if it's safe.
       disposalVolume_volume: null,
       disposalVolume_location: null,
       blowout_checkbox: false,
       blowout_location: null,
+      tip_tracking: AUTOMATIC,
+      tips_selected: [],
+      tiprack_selected: null,
     }
   })
 
@@ -120,7 +135,7 @@ describe('move liquid step form -> command creator args', () => {
   })
 
   it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
-    moveLiquidFormToArgs(hydratedForm, invariantContext)
+    moveLiquidFormToArgs(castForm, invariantContext)
 
     expect(vi.mocked(getOrderedWells)).toHaveBeenCalledTimes(2)
     expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
@@ -140,7 +155,7 @@ describe('move liquid step form -> command creator args', () => {
   it('moveLiquidFormToArgs calls getOrderedWells only for aspirate when dispensing is into a waste chute', () => {
     moveLiquidFormToArgs(
       {
-        ...hydratedForm,
+        ...castForm,
         dispense_labware: {
           id: 'destLabwareId',
           name: 'wasteChute',
@@ -162,7 +177,7 @@ describe('move liquid step form -> command creator args', () => {
   })
 
   it('moveLiquid form with 1:1 single transfer translated to args', () => {
-    const result = moveLiquidFormToArgs(hydratedForm, invariantContext)
+    const result = moveLiquidFormToArgs(castForm, invariantContext)
 
     expect(result).toMatchObject({
       pipette: 'pipetteId',
@@ -172,6 +187,9 @@ describe('move liquid step form -> command creator args', () => {
       sourceWells: [ASPIRATE_WELL],
       destLabware: 'destLabwareId',
       destWells: [DISPENSE_WELL],
+      tipTracking: AUTOMATIC,
+      tipsSelected: [],
+      tiprackSelected: null,
     })
 
     // no form-specific fields should be passed along
@@ -279,7 +297,7 @@ describe('move liquid step form -> command creator args', () => {
         expect(
           moveLiquidFormToArgs(
             {
-              ...hydratedForm,
+              ...castForm,
 
               [checkboxField]: false,
               ...formFields,
@@ -291,7 +309,7 @@ describe('move liquid step form -> command creator args', () => {
         expect(
           moveLiquidFormToArgs(
             {
-              ...hydratedForm,
+              ...castForm,
               [checkboxField]: true,
               ...formFields,
             },
@@ -305,7 +323,7 @@ describe('move liquid step form -> command creator args', () => {
   describe('distribute: disposal volume / blowout behaviors', () => {
     const blowoutLabwareId = 'blowoutLabwareId'
     const disposalVolumeFields = {
-      path: 'multiDispense' as PathOption, // 'multiDispense' required to use `distribute` command creator
+      path: 'multiDispense' as const, // 'multiDispense' required to use `distribute` command creator
       blowout_location: blowoutLabwareId, // disposal volume uses `blowout_location` for the blowout
       disposalVolume_volume: 123,
       // NOTE: when spreading these in to hydratedForm fixture,
@@ -315,7 +333,7 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume works when checkbox true', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           disposalVolume_checkbox: true,
@@ -331,7 +349,7 @@ describe('move liquid step form -> command creator args', () => {
     it('blowout location works when checkbox true', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           blowout_checkbox: true,
@@ -347,7 +365,7 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume fields ignored when checkbox false', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           disposalVolume_checkbox: false,
@@ -363,7 +381,7 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume overrides blowout', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           disposalVolume_checkbox: true,
@@ -381,7 +399,7 @@ describe('move liquid step form -> command creator args', () => {
     it('fallback to blowout when disposal volume unchecked', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           disposalVolume_checkbox: false,
@@ -399,7 +417,7 @@ describe('move liquid step form -> command creator args', () => {
     it('should blow out into the destination when checkbox is true and blowout location is destination', () => {
       const result = moveLiquidFormToArgs(
         {
-          ...hydratedForm,
+          ...castForm,
 
           ...disposalVolumeFields,
           blowout_checkbox: true,
@@ -420,10 +438,10 @@ describe('getMixData', () => {
   it('return null if checkbox field is false', () => {
     expect(
       getMixData(
-        { checkboxField: false, volumeField: 30, timesField: 2 },
-        'checkboxField',
-        'volumeField',
-        'timesField'
+        { checkbox: false, volumeField: 30, timesField: 2 } as any,
+        'checkboxField' as any,
+        'volumeField' as any,
+        'timesField' as any
       )
     ).toBe(null)
   })
@@ -446,10 +464,10 @@ describe('getMixData', () => {
             checkboxField: true,
             volumeField: volumeValue,
             timesField: timesValue,
-          },
-          'checkboxField',
-          'volumeField',
-          'timesField'
+          } as any,
+          'checkboxField' as any,
+          'volumeField' as any,
+          'timesField' as any
         )
       ).toBe(null)
     })
@@ -458,10 +476,10 @@ describe('getMixData', () => {
   it('return volume & times if checkbox is checked', () => {
     expect(
       getMixData(
-        { checkboxField: true, volumeField: 30, timesField: 2 },
-        'checkboxField',
-        'volumeField',
-        'timesField'
+        { checkboxField: true, volumeField: 30, timesField: 2 } as any,
+        'checkboxField' as any,
+        'volumeField' as any,
+        'timesField' as any
       )
     ).toEqual({ volume: 30, times: 2 })
   })

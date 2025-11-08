@@ -62,6 +62,10 @@ LID_STACK_VERSION_GATE = APIVersion(2, 23)
 # The first APIVersion where Python protocols can use the Flex Stacker module.
 FLEX_STACKER_VERSION_GATE = APIVersion(2, 23)
 
+# The first APIVersion where various "multi labware load" methods allow you to specify
+# the namespace and version of adapters and lids separately from the main labware.
+NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE = APIVersion(2, 26)
+
 
 class InvalidPipetteMountError(ValueError):
     """An error raised when attempting to load pipettes on an invalid mount."""
@@ -95,11 +99,18 @@ class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
 
 
+def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
+    """Return if this pipette type is a 96 channel."""
+    if pipette is not None:
+        return pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]
+    return False
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:
     """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
-    if pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]:
+    if is_pipette_96_channel(pipette):
         # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
         # to use the mount value.
         if mount is not None:
@@ -366,7 +377,7 @@ def ensure_definition_is_not_lid_after_api_version(
         and api_version >= LID_STACK_VERSION_GATE
     ):
         raise APIVersionError(
-            f"Labware Lids cannot be loaded like standard labware in Protocols written with an API version greater than {LID_STACK_VERSION_GATE}."
+            f"Labware Lids cannot be loaded like standard labware in Protocols written with an API version of {LID_STACK_VERSION_GATE} or higher."
         )
 
 
@@ -485,6 +496,7 @@ def ensure_thermocycler_profile_steps(
         temperature = step.get("temperature")
         hold_mins = step.get("hold_time_minutes")
         hold_secs = step.get("hold_time_seconds")
+        ramp_rate = step.get("ramp_rate")
         if temperature is None:
             raise ValueError("temperature must be defined for each step in cycle")
         if hold_mins is None and hold_secs is None:
@@ -492,10 +504,14 @@ def ensure_thermocycler_profile_steps(
                 "either hold_time_minutes or hold_time_seconds must be"
                 "defined for each step in cycle"
             )
+        if ramp_rate is not None and ramp_rate <= 0:
+            raise ValueError("Ramp rate must be greater than 0.")
         validated_seconds = ensure_hold_time_seconds(hold_secs, hold_mins)
         validated_steps.append(
             ThermocyclerStep(
-                temperature=temperature, hold_time_seconds=validated_seconds
+                temperature=temperature,
+                hold_time_seconds=validated_seconds,
+                ramp_rate=ramp_rate,
             )
         )
     return validated_steps
@@ -559,6 +575,40 @@ class LocationTypeError(TypeError):
 
 
 ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
+
+
+def validate_dynamic_locations(
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
+    end_location: Location,
+) -> None:
+    """Given that we have an end_location we check that they're a vaild dynamic pair."""
+    if location is None:
+        raise ValueError("Location must be supplied if using an End Location.")
+    if not isinstance(location, Location):
+        raise ValueError(
+            "Location must be a point within a well when dynamic pipetting."
+        )
+    # Shouldn't be true ever if using typing but a customer protocol may not check
+    if not isinstance(end_location, Location):
+        raise ValueError(
+            "End location must be a point within a well when dynamic pipetting."
+        )
+    if not location.labware.is_well:
+        raise ValueError("Start location must be within a well when dynamic pipetting")
+    if not end_location.labware.is_well:
+        raise ValueError("End location must be within a well when dynamic pipetting")
+    (
+        _,
+        start_well,
+    ) = location.labware.get_parent_labware_and_well()
+    (
+        _,
+        end_well,
+    ) = end_location.labware.get_parent_labware_and_well()
+    if start_well != end_well:
+        raise ValueError(
+            "Start and end locations must be within the same well when dynamic pipetting"
+        )
 
 
 def validate_location(

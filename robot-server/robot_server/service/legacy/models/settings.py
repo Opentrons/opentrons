@@ -239,3 +239,72 @@ class PipetteSettingsUpdate(BaseModel):
                 else:
                     raise ValueError(f"{key} is not a valid field or quirk name")
         return v
+
+
+class CameraEnable(BaseModel):
+    """Configuration value for Opentrons Camera and Live Stream enablement.
+    Disabling the Camera also disables the Live Stream and Error Recovery Camera useage.
+    Enabling the Camera retains the existing Live Stream and Error Recovery enablement settings.
+    """
+
+    cameraEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the general use of the Opentrons Camera.",
+    )
+    liveStreamEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the Opentrons Live Stream.",
+    )
+    errorRecoveryCameraEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the Opentrons Camera to record error recovery.",
+    )
+
+
+class LiveStreamData(BaseModel):
+    """Opentrons Live Stream enablement and URL values."""
+
+    enabled: bool = Field(
+        ..., description="Enable status of the Opentrons Live Stream."
+    )
+    hls: str = Field(..., description="URL for the HLS browser-compatible stream.")
+    rtmp: str = Field(..., description="URL for the RTMP raw stream in FLV format.")
+
+
+class StreamStatusType(str, Enum):
+    """Status types of the Opentrons Live Stream Service.
+
+    * `"ON"`: Start the live stream.
+
+    * `"OFF"`: Stop (cancel) the live stream.
+    """
+
+    OFF = "OFF"
+    ON = "ON"
+
+
+class Resolution(BaseModel):
+    """Resolution width and height data for the Opentrons Live Stream service."""
+
+    width: int = Field(
+        ..., description="Resolution width in pixels of the live stream."
+    )
+    height: int = Field(
+        ..., description="Resolution height in pixels of the live stream."
+    )
+
+
+class LiveStreamSettings(BaseModel):
+    """Configuration values of Opentrons Live Stream service."""
+
+    source: str = Field(
+        ..., description="Source video device for the live stream feed."
+    )
+    resolution: Resolution = Field(
+        ..., description="Video resolution for the live stream."
+    )
+    framerate: int = Field(..., description="Framerate of the live stream.")
+    bitrate_k: int = Field(
+        ...,
+        description="Bitrate in Kbps to use when broadcasting the live stream video over the network.",
+    )

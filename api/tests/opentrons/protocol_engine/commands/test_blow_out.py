@@ -81,6 +81,7 @@ async def test_blow_out_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -156,6 +157,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -231,6 +233,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=None,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_raise(StallOrCollisionDetectedError())
 

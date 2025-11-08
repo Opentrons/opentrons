@@ -21,11 +21,13 @@ export type ModuleRunTimeCommand =
   | TCDeactivateBlockRunTimeCommand
   | TCDeactivateLidRunTimeCommand
   | TCRunProfileRunTimeCommand
+  | TCStartRunExtendedProfileRunTimeCommand
   | TCRunExtendedProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
   | HeaterShakerWaitForTemperatureRunTimeCommand
   | HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
+  | HeaterShakerSetShakeSpeedRunTimeCommand
   | HeaterShakerOpenLatchRunTimeCommand
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
@@ -57,9 +59,11 @@ export type ModuleCreateCommand =
   | TCDeactivateLidCreateCommand
   | TCRunProfileCreateCommand
   | TCRunExtendedProfileCreateCommand
+  | TCStartRunExtendedProfileCreateCommand
   | TCAwaitProfileCompleteCreateCommand
   | HeaterShakerWaitForTemperatureCreateCommand
   | HeaterShakerSetAndWaitForShakeSpeedCreateCommand
+  | HeaterShakerSetShakeSpeedCreateCommand
   | HeaterShakerOpenLatchCreateCommand
   | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
@@ -144,6 +148,7 @@ export interface TCSetTargetBlockTemperatureRunTimeCommand
     TCSetTargetBlockTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
@@ -154,6 +159,7 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
     TCSetTargetLidTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
@@ -220,6 +226,16 @@ export interface TCRunProfileRunTimeCommand
     TCRunProfileCreateCommand {
   result?: any
 }
+export interface TCStartRunExtendedProfileCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'thermocycler/startRunExtendedProfile'
+  params: TCExtendedProfileParams
+}
+export interface TCStartRunExtendedProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCStartRunExtendedProfileCreateCommand {
+  result?: any
+}
 export interface TCRunExtendedProfileCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/runExtendedProfile'
@@ -268,6 +284,16 @@ export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
 export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
+  result?: any
+}
+export interface HeaterShakerSetShakeSpeedCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'heaterShaker/setShakeSpeed'
+  params: ShakeSpeedParams
+}
+export interface HeaterShakerSetShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerSetShakeSpeedCreateCommand {
   result?: any
 }
 export interface HeaterShakerDeactivateHeaterCreateCommand
@@ -402,6 +428,12 @@ export interface TCExtendedProfileParams {
   blockMaxVolumeUl?: number
 }
 
+export interface TCStartExtendedProfileParams {
+  moduleId: string
+  profileElements: Array<TCProfileCycle | AtomicProfileStep>
+  blockMaxVolumeUl?: number
+}
+
 export interface FlexStackerStoredLabwareDetails {
   loadName: string
   namespace: string
@@ -464,7 +496,10 @@ export interface FlexStackerRetrieveCreateCommand
 
 export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/store'
-  params: { moduleId: string }
+  params: {
+    moduleId: string
+    strategy: 'automatic' | 'manual'
+  }
 }
 
 export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {

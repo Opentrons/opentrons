@@ -105,6 +105,9 @@ describe('getDefaultsForStepType', () => {
         dispense_y_position: 0,
         liquidClassesSupported: true,
         liquidClass: 'none',
+        tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })
@@ -145,6 +148,9 @@ describe('getDefaultsForStepType', () => {
         pushOut_checkbox: null,
         pushOut_volume: null,
         mix_position_reference: 'well-bottom',
+        tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })

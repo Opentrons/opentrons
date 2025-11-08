@@ -1,0 +1,31 @@
+.text_style {
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-16);
+}
+
+.crumb_link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.crumb_link:hover {
+  opacity: 0.8;
+}
+
+.crumb_link_inactive {
+  color: inherit;
+  text-decoration: none;
+}
+
+.crumb_link_inactive:hover {
+  opacity: 1;
+}
+
+.crumb_active {
+  color: var(--blue-50);
+}
+
+.crumb_inactive {
+  color: var(--grey-50);
+}

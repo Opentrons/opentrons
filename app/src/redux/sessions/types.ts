@@ -156,7 +156,8 @@ export type MultiSessionResponse = RobotApiV2ResponseBody<
   SessionResponseModel[]
 >
 
-export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
+export type SessionCommandResponse =
+  RobotApiV2ResponseBody<SessionCommandResponseModel>
 
 export interface CreateSessionAction {
   type: typeof CREATE_SESSION
@@ -320,8 +321,16 @@ export type SessionState = Partial<{
   readonly [robotName: string]: undefined | PerRobotSessionState
 }>
 
+// Unfortunately, the server can sometimes give us numerical slots here, so let's make
+// this a unique and gross type so you can't accidentally check them against a string
+// without converting. Use utils.ts slotNameFromCalibrationSlot and calibrationSlotFromSlotName
+// to convert.
+export interface CalibrationLabwareSlot {
+  readonly __brand: 'CalibrationLabwareSlot'
+}
+
 export interface CalibrationLabware {
-  slot: string
+  slot: CalibrationLabwareSlot
   loadName: string
   namespace: string
   version: number

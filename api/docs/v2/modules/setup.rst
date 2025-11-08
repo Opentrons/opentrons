@@ -98,6 +98,9 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    | Absorbance Plate   | ``absorbanceReaderV1``        | 2.21                      |
    | Reader Module      |                               |                           |
    +--------------------+-------------------------------+---------------------------+
+   | Flex Stacker       | ``flexStackerModuleV1``       | 2.25                      |
+   | Module             |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies an :ref:`API version <v2-versioning>` high enough to support all the module generations you want to use.
 

@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux'
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
 import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 
-import { getEnablePartialTipSupport } from '../../../../../feature-flags/selectors'
-import { getInitialDeckSetup } from '../../../../../step-forms/selectors'
+import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteV2Specs } from '@opentrons/shared-data'

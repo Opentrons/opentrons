@@ -216,6 +216,14 @@ class WellCore(AbstractWellCore):
             labware_id=labware_id, well_name=well_name
         )
 
+    def has_tracked_liquid(self) -> bool:
+        """Return true if liquid has been loaded or probed."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.well_has_tracked_liquid(
+            labware_id=labware_id, well_name=well_name
+        )
+
     def get_liquid_volume(self) -> LiquidTrackingType:
         """Return the current volume in a well."""
         labware_id = self.labware_id

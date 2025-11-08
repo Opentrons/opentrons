@@ -2,6 +2,7 @@ import mapValues from 'lodash/mapValues'
 
 import { castField } from '../../../steplist/fieldLevel'
 import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
+import { cameraFormToArgs } from './cameraFormToArgs'
 import { commentFormToArgs } from './commentFormToArgs'
 import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
@@ -16,74 +17,84 @@ import type {
   CommandCreatorArgs,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type {
-  HydratedAbsorbanceReaderFormData,
-  HydratedCommentFormData,
-  HydratedFormData,
-  HydratedHeaterShakerFormData,
-  HydratedMagnetFormData,
-  HydratedMixFormData,
-  HydratedMoveLabwareFormData,
-  HydratedMoveLiquidFormData,
-  HydratedPauseFormData,
-  HydratedTemperatureFormData,
-  HydratedThermocyclerFormData,
-} from '../../../form-types'
+import type { HydratedFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../../steplist/fieldLevel'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 type StepArgs = CommandCreatorArgs | null
-export const _castForm = (hydratedForm: HydratedFormData): any =>
-  mapValues(hydratedForm, (value, name) => castField(name, value))
+export function _castForm<HydratedFormDataT extends HydratedFormData>(
+  hydratedForm: HydratedFormDataT
+): GetCastFormData<HydratedFormDataT> {
+  // @ts-expect-error - todo(mm, 2025-10-09) See if TypeScript can be made to understand this.
+  return mapValues(hydratedForm, (value, name) => castField(name, value))
+}
 
 export const stepFormToArgs = (
   hydratedForm: HydratedFormData,
   contextualState: InvariantContext
 ): StepArgs => {
   const castForm = _castForm(hydratedForm)
-  switch (castForm.stepType) {
+  let stepArgs: StepArgs = null
+  switch (hydratedForm.stepType) {
     case 'moveLiquid': {
-      return moveLiquidFormToArgs(
-        castForm as HydratedMoveLiquidFormData,
-        contextualState
-      )
+      stepArgs = moveLiquidFormToArgs(_castForm(hydratedForm), contextualState)
+      break
     }
-
-    case 'pause':
-      return pauseFormToArgs(castForm as HydratedPauseFormData)
-
-    case 'mix':
-      return mixFormToArgs(castForm as HydratedMixFormData)
-
-    case 'magnet':
-      return magnetFormToArgs(castForm as HydratedMagnetFormData)
-
-    case 'temperature':
-      return temperatureFormToArgs(castForm as HydratedTemperatureFormData)
-
-    case 'thermocycler':
-      return thermocyclerFormToArgs(castForm as HydratedThermocyclerFormData)
-
-    case 'heaterShaker':
-      return heaterShakerFormToArgs(castForm as HydratedHeaterShakerFormData)
-
+    case 'pause': {
+      stepArgs = pauseFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'mix': {
+      stepArgs = mixFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'magnet': {
+      stepArgs = magnetFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'temperature': {
+      stepArgs = temperatureFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'thermocycler': {
+      stepArgs = thermocyclerFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'heaterShaker': {
+      stepArgs = heaterShakerFormToArgs(_castForm(hydratedForm))
+      break
+    }
     case 'moveLabware': {
-      return moveLabwareFormToArgs(castForm as HydratedMoveLabwareFormData)
-    }
+      stepArgs = moveLabwareFormToArgs(_castForm(hydratedForm))
 
+      break
+    }
+    case 'camera': {
+      stepArgs = cameraFormToArgs(_castForm(hydratedForm))
+
+      break
+    }
     case 'comment': {
-      return commentFormToArgs(castForm as HydratedCommentFormData)
-    }
+      stepArgs = commentFormToArgs(_castForm(hydratedForm))
 
+      break
+    }
     case 'absorbanceReader': {
-      return absorbanceReaderFormToArgs(
-        castForm as HydratedAbsorbanceReaderFormData
-      )
+      stepArgs = absorbanceReaderFormToArgs(_castForm(hydratedForm))
+      break
     }
+  }
 
-    default:
-      console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
-      return null
+  if (stepArgs == null) {
+    console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
+    return null
+  }
+  return {
+    ...stepArgs,
+    stepNumber: castForm.stepNumber,
+    name: castForm.stepName,
+    description: castForm.stepDetails,
   }
 }

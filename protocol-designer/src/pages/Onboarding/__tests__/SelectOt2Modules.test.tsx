@@ -6,15 +6,16 @@ import { screen } from '@testing-library/react'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { SelectOt2Modules } from '../SelectOt2Modules'
 
 import type { ComponentProps } from 'react'
-import type { WizardFormState } from '../../../components/organisms'
+import type { WizardFormState } from '/protocol-designer/components/organisms'
 import type { WizardTileProps } from '../types'
 
-vi.mock('../../../feature-flags/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
 
 const render = (props: ComponentProps<typeof SelectOt2Modules>) => {
   return renderWithProviders(<SelectOt2Modules {...props} />, {

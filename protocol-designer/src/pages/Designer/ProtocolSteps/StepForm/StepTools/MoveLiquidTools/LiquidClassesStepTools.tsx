@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 import type { LiquidClassOption } from './hooks/useAssignLiquidClass'
 

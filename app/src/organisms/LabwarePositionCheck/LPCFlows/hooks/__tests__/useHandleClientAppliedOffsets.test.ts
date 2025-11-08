@@ -31,7 +31,7 @@ describe('useHandleClientAppliedOffsets', () => {
 
     vi.mocked(appliedOffsetsToRun).mockImplementation(
       (runId: string) =>
-        ({ type: 'APPLIED_OFFSETS_TO_RUN', payload: runId } as any)
+        ({ type: 'APPLIED_OFFSETS_TO_RUN', payload: runId }) as any
     )
 
     vi.mocked(useIsRunCurrent).mockImplementation(

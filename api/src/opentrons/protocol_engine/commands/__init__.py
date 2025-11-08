@@ -271,6 +271,22 @@ from .wait_for_duration import (
     WaitForDurationCommandType,
 )
 
+from .create_timer import (
+    CreateTimer,
+    CreateTimerCreate,
+    CreateTimerParams,
+    CreateTimerResult,
+    CreateTimerCommandType,
+)
+
+from .wait_for_tasks import (
+    WaitForTasks,
+    WaitForTasksCreate,
+    WaitForTasksParams,
+    WaitForTasksResult,
+    WaitForTasksCommandType,
+)
+
 from .pick_up_tip import (
     PickUpTip,
     PickUpTipParams,
@@ -384,6 +400,14 @@ from .get_next_tip import (
     GetNextTipCommandType,
 )
 
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
 from .liquid_probe import (
     LiquidProbe,
     LiquidProbeParams,
@@ -425,6 +449,14 @@ from .identify_module import (
     IdentifyModuleCreate,
     IdentifyModuleResult,
     IdentifyModuleCommandType,
+)
+
+from .capture_image import (
+    CaptureImage,
+    CaptureImageParams,
+    CaptureImageCreate,
+    CaptureImageResult,
+    CaptureImageCommandType,
 )
 
 __all__ = [
@@ -619,6 +651,12 @@ __all__ = [
     "WaitForDurationCreate",
     "WaitForDurationResult",
     "WaitForDurationCommandType",
+    # Timer command models
+    "CreateTimer",
+    "CreateTimerCreate",
+    "CreateTimerParams",
+    "CreateTimerResult",
+    "CreateTimerCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",
@@ -725,6 +763,12 @@ __all__ = [
     "GetNextTipParams",
     "GetNextTipResult",
     "GetNextTipCommandType",
+    # set tip state command bundle
+    "SetTipState",
+    "SetTipStateCreate",
+    "SetTipStateParams",
+    "SetTipStateResult",
+    "SetTipStateCommandType",
     # liquid probe command bundle
     "LiquidProbe",
     "LiquidProbeParams",
@@ -754,4 +798,16 @@ __all__ = [
     "PressureDispenseCreate",
     "PressureDispenseResult",
     "PressureDispenseCommandType",
+    # wait for tasks command bundle
+    "WaitForTasks",
+    "WaitForTasksCreate",
+    "WaitForTasksParams",
+    "WaitForTasksResult",
+    "WaitForTasksCommandType",
+    # capture image command bundle
+    "CaptureImage",
+    "CaptureImageCreate",
+    "CaptureImageParams",
+    "CaptureImageResult",
+    "CaptureImageCommandType",
 ]

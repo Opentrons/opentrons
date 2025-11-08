@@ -60,7 +60,6 @@ describe('RecentProtocolRuns', () => {
 
   it('renders the correct information derived from run and protocol', () => {
     render(props)
-    screen.debug()
     screen.getByText('Completed')
     screen.getByText('mock HistoricalProtocolRunOverflowMenu')
   })

@@ -4,12 +4,13 @@ import { useSelector } from 'react-redux'
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { CheckboxStepFormField } from '../../../../../../components/molecules'
-import { getRobotType } from '../../../../../../file-data/selectors'
+import { CheckboxStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getAdditionalEquipment,
   getCurrentFormCanBeSaved,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import { LabwareLocationField } from './LabwareLocationField'
 import { MoveLabwareField } from './MoveLabwareField'
 

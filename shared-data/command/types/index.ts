@@ -7,6 +7,14 @@ import type {
   CalibrationCreateCommand,
   CalibrationRunTimeCommand,
 } from './calibration'
+import type {
+  ConcurrentCreateCommand,
+  ConcurrentRunTimeCommand,
+} from './concurrent'
+import type {
+  RobotDevicesCreateCommand,
+  RobotDevicesRunTimeCommand,
+} from './devices'
 import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
 import type {
   IncidentalCreateCommand,
@@ -33,6 +41,8 @@ export * from './timing'
 export * from './unsafe'
 export * from './support'
 export * from './robot'
+export * from './concurrent'
+export * from './devices'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
@@ -45,7 +55,7 @@ export interface CommandNote {
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export type CommandIntent = 'protocol' | 'setup' | 'fixit'
 export interface CommonCommandRunTimeInfo<
-  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError
+  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError,
 > {
   key?: string
   id: string
@@ -75,6 +85,8 @@ export type CreateCommand =
   | IncidentalCreateCommand // command with only incidental effects (status bar animations)
   | UnsafeCreateCommand // command providing capabilities that are not safe for scientific uses
   | RobotCreateCommand // command providing underlying robot capabilities outside the normal model
+  | ConcurrentCreateCommand // command providing concurrent actions
+  | RobotDevicesCreateCommand // commands that interface with robot devices
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -88,6 +100,8 @@ export type RunTimeCommand =
   | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
   | UnsafeRunTimeCommand // command providing capabilities that are not safe for scientific uses
   | RobotRunTimeCommand // command providing underlying robot capabilities outside the normal model
+  | ConcurrentRunTimeCommand // command providing concurrent actions
+  | RobotDevicesRunTimeCommand // commands that interface with robot devices
 
 export type RunCommandError = RunCommandErrorUndefined | DefinedRunCommandError
 

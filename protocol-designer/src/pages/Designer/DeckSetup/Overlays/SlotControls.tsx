@@ -15,15 +15,16 @@ import {
 } from '@opentrons/components'
 import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
 
-import { DND_TYPES } from '../../../../constants'
-import { selectors as labwareDefSelectors } from '../../../../labware-defs'
-import { moveDeckItem } from '../../../../labware-ingred/actions'
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+import { DND_TYPES } from '/protocol-designer/constants'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
+import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
-} from '../../../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { DECK_CONTROLS_STYLE } from '../constants'
 import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
@@ -141,9 +142,11 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
 
+  // when dragging labware over a slot many times quickly
+  // labwareOnDeck could be null/undefined and cause the white screen
   const isCustomLabware =
-    draggedItem != null
-      ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
+    draggedItem?.labwareOnDeck != null
+      ? getLabwareIsCustom(customLabwareDefs, draggedItem?.labwareOnDeck)
       : false
 
   const isSlotBlocked =

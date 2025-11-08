@@ -5,11 +5,11 @@ import {
   getFlexNameConversion,
 } from '@opentrons/shared-data'
 
-import { MINIMUM_LIQUID_CLASS_VOLUME } from '../../../../../../../constants'
-import { getPipetteEntities } from '../../../../../../../step-forms/selectors'
+import { MINIMUM_LIQUID_CLASS_VOLUME } from '/protocol-designer/constants'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
 
 import type { PathOption } from '@opentrons/step-generation'
-import type { FormData } from '../../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 export interface LiquidClassOption {
   name: string

@@ -21,6 +21,7 @@ export * from './useCreateLabwareDefinitionMutation'
 export * from './useUpdateErrorRecoveryPolicy'
 export * from './useErrorRecoveryPolicy'
 export * from './useRunLoadedLabwareDefinitions'
+export * from './useAddCameraSettingsToRunMutation'
 
 export type { UsePlayRunMutationResult } from './usePlayRunMutation'
 export type { UsePauseRunMutationResult } from './usePauseRunMutation'

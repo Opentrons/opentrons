@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Installation Requirements"
 ---
 
-# Installation Requirements
-
 Before setting up Opentrons Flex, make sure that your installation site meets all of the requirements in this section. And follow all of the safety guidance here and throughout the installation instructions.
 
 ## Where to place Opentrons Flex
@@ -29,7 +27,7 @@ Space is a valuable commodity in almost every lab. Your Flex is going to need so
 <figcaption>Top view of Opentrons Flex, showing minimum side and back clearance.</figcaption>
 </figure>
 
-## Power consumption
+## Power consumption { #power-consumption-flex }
 
 Opentrons Flex should be connected to a wall outlet at or near the bench location where you install it. Only connect Flex to circuits that can accommodate its peak power draw:
 
@@ -60,7 +58,7 @@ Along with the conditions described above, total power consumption also depends 
 !!! note 
     Always account for other electronics that consume power on the same circuit, including Flex modules with their own power supplies. For example, the Thermocycler Module has a peak power consumption (630 W) that is much greater than the Flex robot itself. If necessary, consult the manager of your facility to make sure it meets your equipment's peak power requirements.
 
-## Environmental conditions
+## Environmental conditions { #environmental-conditions-flex }
 
 Environmental conditions for recommended use, acceptable use, and storage vary:
 
@@ -82,11 +80,11 @@ The following table lists the network ports used by Flex, along with their funct
 
 | Port number | Description |
 | :---------- | :---------- |
-| **22** | Used to make a Secure Shell (SSH) connection. See [Command-line operation over SSH][command-line-operation-over-ssh]. | **80** | Used for HTTP traffic. |
+| **22** | Used to make a Secure Shell (SSH) connection. See [Command-line operation over SSH](../advanced-operation/command-line.md). | **80** | Used for HTTP traffic. |
 | **443** | Used for HTTPS traffic. The Opentrons App uses this port to check for and download software updates. |
 | **1883** | Used for [MQTT messages](https://mqtt.org). Flex sends realtime notifications to the Opentrons App using MQTT. This reduces network traffic and shortens delays within the app, compared to polling. |
 | **5353** | Used for Multicast DNS ([mDNS or zero-configuration networking](https://en.wikipedia.org/wiki/Zero-configuration_networking)). The Opentrons App relies on mDNS to find Flex robots on a network. |
 | **31950** | Used by the robot server for [HTTP API commands](https://docs.opentrons.com/http/api_reference.html). |
-| **48888** | Used for the built-in [Jupyter Notebook server][jupyter-notebook], which you can connect to with your web browser. |
+| **48888** | Used for the built-in [Jupyter Notebook server](../advanced-operation/jupyter-notebook.md), which you can connect to with your web browser. |
 
 If you're having trouble with these services, consult your facility's IT documentation or contact your IT manager for assistance with your network setup.

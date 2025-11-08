@@ -45,6 +45,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
+
     expect(checkBoxIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius2}`)
     expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
@@ -67,9 +68,14 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxFieldBox).toHaveStyle(`color: ${COLORS.black90}`)
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
-    expect(checkBoxFieldBox).toHaveStyle(
-      `padding: ${SPACING.spacing8} ${SPACING.spacing8}`
-    )
+    expect(checkBoxFieldBox).toHaveStyle(`padding: ${SPACING.spacing8}`)
+  })
+
+  it('applies correct padding when padding prop is passed', () => {
+    props.padding = SPACING.spacing24
+    render(props)
+    const checkBoxFieldBox = screen.getByText('checkMockCheckboxField')
+    expect(checkBoxFieldBox).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
 
   it('render icon with correct style - value true', () => {

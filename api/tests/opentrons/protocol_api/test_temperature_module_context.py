@@ -4,6 +4,7 @@ from decoy import Decoy, matchers
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import TemperatureStatus
+from opentrons.protocol_api.tasks import Task
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, TemperatureModuleContext
@@ -88,15 +89,19 @@ def test_set_temperature(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3), APIVersion(2, 27)])
 def test_start_set_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
     mock_broker: LegacyBroker,
     subject: TemperatureModuleContext,
+    api_version: APIVersion,
 ) -> None:
-    """It should set the target temperature via the core."""
-    subject.start_set_temperature(42.0)
+    """It should set the target temperature via the core and return a task."""
+    subject._api_version = api_version
+    mock_task = decoy.mock(cls=Task)
+    decoy.when(mock_core.set_target_temperature(42.0)).then_return(mock_task._core)
+    result = subject.start_set_temperature(42.0)
 
     decoy.verify(
         mock_broker.publish(
@@ -109,13 +114,18 @@ def test_start_set_temperature(
                 }
             ),
         ),
-        mock_core.set_target_temperature(42.0),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
     )
 
     decoy.verify(
         mock_core.wait_for_target_temperature(), ignore_extra_args=True, times=0
     )
+    if api_version >= APIVersion(2, 27):
+        assert isinstance(result, Task)
+        assert result._core is mock_task._core
+        assert result._api_version == api_version
+    else:
+        assert result is None
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 2)])

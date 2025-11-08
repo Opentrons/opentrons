@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
+  AlertPrimaryButton,
   ALIGN_CENTER,
   Check,
   COLORS,
@@ -16,11 +17,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions } from '../../../tutorial'
+import { actions } from '/protocol-designer/tutorial'
+
 import { getMainPagePortalEl } from '../Portal'
 
 import type { ReactNode } from 'react'
-import type { HintKey } from '../../../tutorial'
+import type { HintKey } from '/protocol-designer/tutorial'
 
 export * from './useBlockingHint'
 export interface HintProps {
@@ -50,14 +52,11 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
     handleContinue()
   }
 
-  const confirmButtonText =
-    hintKey === 'no_commands' ? 'continue_with_export' : 'confirm'
-
   return createPortal(
     <Modal
       marginLeft="0"
       type="warning"
-      zIndexOverlay={15}
+      zIndexOverlay={1001}
       title={t(`hint.${hintKey}.title`)}
       onClose={onCancelClick}
       footer={
@@ -80,9 +79,15 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
             <SecondaryButton onClick={onCancelClick}>
               {t('shared:cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={onContinueClick}>
-              {i18n.format(t(`shared:${confirmButtonText}`), 'capitalize')}
-            </PrimaryButton>
+            {hintKey === 'has_errors' || hintKey === 'no_commands' ? (
+              <AlertPrimaryButton onClick={onContinueClick}>
+                {i18n.format(t(`shared:continue_with_export`), 'capitalize')}
+              </AlertPrimaryButton>
+            ) : (
+              <PrimaryButton onClick={onContinueClick}>
+                {i18n.format(t(`shared:confirm`), 'capitalize')}
+              </PrimaryButton>
+            )}
           </Flex>
         </Flex>
       }

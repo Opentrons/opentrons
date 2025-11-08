@@ -4,7 +4,6 @@ import {
   ReleaseLabware,
   SkipStepInfo,
   StackerEmptyHopper,
-  StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerReengageLatch,
   StackerShuttleLwInfo,
@@ -23,8 +22,6 @@ export function StackerShuttleEmptySkip(
   switch (step) {
     case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.EMPTY_STACKER:
       return <StackerEmptyHopper {...props} />
-    case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING:
-      return <StackerHomeShuttle {...props} />
     case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.CONFIRM_LABWARE_IN_LATCH:
       return <HoldingLabware {...props} />
     case STACKER_SHUTTLE_EMPTY_SKIP.STEPS.RELEASE_FROM_LATCH:

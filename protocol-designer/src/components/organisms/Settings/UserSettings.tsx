@@ -13,11 +13,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions as featureFlagActions } from '../../../feature-flags'
-import { actions as tutorialActions } from '../../../tutorial'
-import { ToggleButton } from '../../atoms/ToggleButton'
+import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
+import { actions as tutorialActions } from '/protocol-designer/tutorial'
 
-import type { FlagTypes } from '../../../feature-flags'
+import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 const userFacingFlags: FlagTypes[] = [
   'OT_PD_ENABLE_HOT_KEYS_DISPLAY',

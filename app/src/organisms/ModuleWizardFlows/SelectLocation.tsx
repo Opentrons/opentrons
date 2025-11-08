@@ -11,17 +11,22 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  COMBO_FIXTURES,
   FAKE_FIXTURE_IDS,
+  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_ROBOT_TYPE,
-  FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_TYPE,
+  getAAByAAId,
   getAAForModuleFixture,
+  getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
   getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureIdByCutoutIdFromModuleAnchorCutoutId,
   getModuleDisplayName,
+  getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
+  replaceCutoutFixtureForFixtureRemoval,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -34,11 +39,12 @@ import {
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
-import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
-  CutoutFixtureId,
+  AreaType,
+  CutoutFixtureIdsWithFakes,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -69,14 +75,13 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     setErrorMessage,
   } = props
 
-  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutId(
+  const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
     attachedModule,
     deckConfig
   )
 
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
 
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -86,11 +91,14 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
 
   const handleOnClick = (): void => {
     if (maintenanceRunId == null) {
-      createMaintenanceRun({}).catch(error => {
-        setErrorMessage(error.message as string)
-      })
+      createMaintenanceRun({})
+        .catch(error => {
+          setErrorMessage(error.message as string)
+        })
+        .then(proceed)
+    } else {
+      proceed()
     }
-    proceed()
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -115,13 +123,12 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
         ) && attachedModule.serialNumber === opentronsModuleSerialNumber
       if (
         // in run setup, module calibration only available when module location is already correctly configured
-        (!isLoadedInRun &&
-          mayMountToCutoutIds.includes(cutoutId) &&
-          (isCurrentConfiguration ||
-            SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
-            // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
-            FAKE_FIXTURE_IDS.includes(cutoutFixtureId))) ||
-        FLEX_STACKER_FIXTURES.includes(cutoutFixtureId)
+        !isLoadedInRun &&
+        mayMountToCutoutIds.includes(cutoutId) &&
+        (isCurrentConfiguration ||
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId) ||
+          // fake fixtures include mag block next to an empty staging slot and a waste chute next to an empty staging slot
+          FAKE_FIXTURE_IDS.includes(cutoutFixtureId))
       ) {
         return [...acc, cutoutId]
       }
@@ -131,10 +138,11 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   )
 
   const handleAddFixture = (anchorCutoutId: CutoutId): void => {
-    const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-      anchorCutoutId,
-      moduleFixtures
-    )
+    const selectedFixtureIdByCutoutIds =
+      getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+        anchorCutoutId,
+        moduleFixtures
+      )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       const updatedDeckConfig = deckConfig.map(cc => {
         if (cc.cutoutId in configuredFixtureIdByCutoutId) {
@@ -142,6 +150,40 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
             return {
               ...cc,
               cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+              opentronsModuleSerialNumber: undefined,
+            }
+          } else if (COMBO_FIXTURES.includes(cc.cutoutFixtureId)) {
+            const aaForSelectedFixture = getAAWithFakesFromCutoutFixtureId(
+              Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId,
+              selectedFixtureIdByCutoutIds[
+                Object.keys(selectedFixtureIdByCutoutIds)[0] as CutoutId
+              ] ?? cc.cutoutFixtureId,
+              deckDef
+            )
+            const filteredAAForSelectedFixture = aaForSelectedFixture?.find(
+              aa => {
+                const aaAreaType = getAAByAAId(aa, deckDef).areaType
+                return (
+                  Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+                    aaAreaType as AreaType
+                  ) && aaAreaType !== 'magneticBlock'
+                )
+              }
+            )
+            if (filteredAAForSelectedFixture == null) {
+              return cc
+            }
+
+            const fixtureReplacement = replaceCutoutFixtureForFixtureRemoval(
+              cc.cutoutFixtureId,
+              cc.cutoutId,
+              filteredAAForSelectedFixture
+            )
+            return {
+              ...cc,
+              cutoutFixtureId: getReplacementFixtureForFakeFixture(
+                fixtureReplacement as CutoutFixtureIdsWithFakes
+              ),
               opentronsModuleSerialNumber: undefined,
             }
           } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
@@ -177,19 +219,19 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
   }
 
   const handleRemoveFixture = (anchorCutoutId: CutoutId): void => {
-    const removedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-      anchorCutoutId,
-      moduleFixtures
-    )
+    const removedFixtureIdByCutoutIds =
+      getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+        anchorCutoutId,
+        moduleFixtures
+      )
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
           const fixtureInPlace = deckConfigWithAA.find(
             dc => dc.cutoutId === anchorCutoutId
           )
-          const removedDefaultFixture = removedFixtureIdByCutoutIds[
-            cc.cutoutId
-          ] as CutoutFixtureId // we know there is a match by the condition
+          const removedDefaultFixture =
+            removedFixtureIdByCutoutIds[cc.cutoutId]! // we know there is a match by the condition
           const aa = getAAForModuleFixture(
             anchorCutoutId,
             removedDefaultFixture,

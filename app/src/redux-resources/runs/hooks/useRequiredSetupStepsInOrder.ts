@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  CAMERA_SETUP_STEP_KEY,
   getSetupStepsRequired,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -37,12 +38,14 @@ const ALL_STEPS_IN_ORDER = [
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  CAMERA_SETUP_STEP_KEY,
 ] as const
 
 const NO_ANALYSIS_STEPS_IN_ORDER = [
   ROBOT_CALIBRATION_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
+  CAMERA_SETUP_STEP_KEY,
 ]
 
 const keysInOrder = (
@@ -51,6 +54,9 @@ const keysInOrder = (
 ): UseRequiredSetupStepsInOrderReturn => {
   const orderedSteps =
     protocolAnalysis == null ? NO_ANALYSIS_STEPS_IN_ORDER : ALL_STEPS_IN_ORDER
+  const orderedFinalizedSteps = orderedSteps.filter(
+    step => step !== CAMERA_SETUP_STEP_KEY
+  )
 
   const orderedApplicableSteps =
     protocolAnalysis == null
@@ -67,7 +73,10 @@ const keysInOrder = (
             return true
           }
         })
-  return { orderedSteps: orderedSteps as StepKey[], orderedApplicableSteps }
+  return {
+    orderedSteps: orderedFinalizedSteps as StepKey[],
+    orderedApplicableSteps,
+  }
 }
 
 const keyFor = (

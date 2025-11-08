@@ -268,12 +268,15 @@ export function Toast(props: ToastProps): JSX.Element {
   const isAutomaticAnimationExit = !disableTimeout || exitNow
 
   if (isAutomaticAnimationExit) {
-    setTimeout(() => {
-      setIsClosed(true)
-      setTimeout(() => {
-        onClose?.()
-      }, TOAST_ANIMATION_DURATION - 50)
-    }, calculatedDuration(message, headingText, duration))
+    setTimeout(
+      () => {
+        setIsClosed(true)
+        setTimeout(() => {
+          onClose?.()
+        }, TOAST_ANIMATION_DURATION - 50)
+      },
+      calculatedDuration(message, headingText, duration)
+    )
   }
 
   // Require intentional clicking if links and close button present on toast.

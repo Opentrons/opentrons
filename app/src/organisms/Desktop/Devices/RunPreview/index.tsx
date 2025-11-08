@@ -78,10 +78,8 @@ export const RunPreviewComponent = (
   const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
-  const [
-    isCurrentCommandVisible,
-    setIsCurrentCommandVisible,
-  ] = useState<boolean>(true)
+  const [isCurrentCommandVisible, setIsCurrentCommandVisible] =
+    useState<boolean>(true)
 
   const isValidRobotSideAnalysis = robotSideAnalysis != null
   const allRunDefs = useMemo(
@@ -197,7 +195,8 @@ export const RunPreviewComponent = (
                   borderRadius={BORDERS.borderRadius4}
                   padding={SPACING.spacing8}
                   css={css`
-                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                    transition:
+                      background-color ${COLOR_FADE_MS}ms ease-out,
                       border-color ${COLOR_FADE_MS}ms ease-out;
                   `}
                 >

@@ -1,5 +1,7 @@
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
+import { calibrationSlotFromSlotName } from '../utils'
+
 import type { PipetteOffsetCalibrationSessionParams } from '../pipette-offset-calibration/types'
 import type {
   CalibrationLabware,
@@ -7,7 +9,7 @@ import type {
 } from '../types'
 
 export const mockPipetteOffsetTipRack: CalibrationLabware = {
-  slot: '8',
+  slot: calibrationSlotFromSlotName('8'),
   loadName: 'opentrons_96_tiprack_300ul',
   namespace: 'opentrons',
   version: 1,
@@ -15,24 +17,26 @@ export const mockPipetteOffsetTipRack: CalibrationLabware = {
   definition: fixtureTiprack300ul as CalibrationLabware['definition'],
 }
 
-export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails = {
-  instrument: {
-    model: 'fake_pipette_model' as any,
-    name: 'fake_pipette_name',
-    tipLength: 42,
-    mount: 'right',
-    serial: 'fake serial 2',
-    defaultTipracks: [],
-  },
-  currentStep: 'labwareLoaded',
-  labware: [mockPipetteOffsetTipRack],
-  shouldPerformTipLength: false,
-  supportedCommands: [],
-}
+export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails =
+  {
+    instrument: {
+      model: 'fake_pipette_model' as any,
+      name: 'fake_pipette_name',
+      tipLength: 42,
+      mount: 'right',
+      serial: 'fake serial 2',
+      defaultTipracks: [],
+    },
+    currentStep: 'labwareLoaded',
+    labware: [mockPipetteOffsetTipRack],
+    shouldPerformTipLength: false,
+    supportedCommands: [],
+  }
 
-export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams = {
-  mount: 'left',
-  shouldRecalibrateTipLength: true,
-  tipRackDefinition: null,
-  hasCalibrationBlock: true,
-}
+export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams =
+  {
+    mount: 'left',
+    shouldRecalibrateTipLength: true,
+    tipRackDefinition: null,
+    hasCalibrationBlock: true,
+  }

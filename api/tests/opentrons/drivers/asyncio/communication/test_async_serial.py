@@ -136,3 +136,29 @@ def test_reset_input_buffer(mock_serial: MagicMock, subject: AsyncSerial) -> Non
     """It should call the underlying serial port's Reset function"""
     subject.reset_input_buffer()
     mock_serial.reset_input_buffer.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "flush_side_effect",
+    [
+        None,
+        OSError("device disconnected!"),
+    ],
+)
+async def test_no_exception_on_flush(
+    mock_serial: MagicMock, subject: AsyncSerial, flush_side_effect: Optional[Exception]
+) -> None:
+    """It should ignore exceptions from flush.
+
+    This can happen after a device has been issued a `dfu` command
+    and disconnects before the flush command executes.
+    """
+    mock_serial.flush.side_effect = flush_side_effect
+
+    try:
+        await subject.write("dfu".encode())
+    except Exception as e:
+        pytest.fail(f"_sync_write leaked an exception: {e!r}")
+
+    mock_serial.flush.assert_called_once()
+    mock_serial.reset_mock()

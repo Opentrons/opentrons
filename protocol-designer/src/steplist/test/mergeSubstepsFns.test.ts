@@ -243,11 +243,8 @@ describe('mergeSubstepRowsSingleChannel', () => {
 })
 
 describe('mergeSubstepRowsMultiChannel', () => {
-  const {
-    transferRowsFixture,
-    consolidateRowsFixture,
-    distributeRowsFixture,
-  } = getFixtures({ isMulti: true })
+  const { transferRowsFixture, consolidateRowsFixture, distributeRowsFixture } =
+    getFixtures({ isMulti: true })
   const testCases: Array<{
     testName: string
     showDispenseVol: boolean

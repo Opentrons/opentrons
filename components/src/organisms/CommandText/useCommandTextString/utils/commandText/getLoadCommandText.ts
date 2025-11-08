@@ -2,12 +2,13 @@ import find from 'lodash/find'
 
 import {
   getAllLiquidClassDefs,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
+  locationIsOffDeck,
+  locationIsOnLabware,
 } from '@opentrons/shared-data'
 
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
@@ -36,27 +37,24 @@ export const getLoadCommandText = ({
       return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
-            ? getPipetteSpecsV2(pipetteModel)?.displayName ?? ''
+            ? (getPipetteSpecsV2(pipetteModel)?.displayName ?? '')
             : '',
         mount_name: command.params.mount === 'left' ? t('left') : t('right'),
       })
     }
     case 'loadModule': {
+      const moduleType = getModuleType(command.params.model)
       const occludedSlotCount = getOccludedSlotCountForModule(
-        getModuleType(command.params.model),
+        moduleType,
         robotType
       )
-      let slotName = command.params.location.slotName
-      if (
-        THERMOCYCLER_MODULE_V2 === command.params.model ||
-        THERMOCYCLER_MODULE_V1 === command.params.model
-      ) {
-        slotName = 'A1 + B1'
-      }
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name: slotName,
+        slot_name: getModuleDeckLabel(
+          moduleType,
+          command.params.location.slotName
+        ),
       })
     }
     case 'loadLid':
@@ -76,10 +74,7 @@ export const getLoadCommandText = ({
 
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
-      if (
-        command.params.location === 'offDeck' ||
-        command.params.location === 'systemLocation'
-      ) {
+      if (locationIsOffDeck(command.params.location)) {
         displayLocation = location
       } else if ('labwareId' in command.params.location) {
         displayLocation = t('on_location', { location })
@@ -108,11 +103,7 @@ export const getLoadCommandText = ({
           : ''
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
-      if (
-        command.params.location !== 'systemLocation' &&
-        command.params.location !== 'offDeck' &&
-        'labwareId' in command.params.location
-      ) {
+      if (locationIsOnLabware(command.params.location)) {
         displayLocation = t('on_location', { location })
       }
       const lidName = command.result.definition.metadata.displayName

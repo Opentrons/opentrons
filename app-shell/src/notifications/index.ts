@@ -22,11 +22,9 @@ import type { RobotData } from './connect'
 
 export function registerNotify(
   dispatch: Dispatch,
-  mainWindow: BrowserWindow
+  window: BrowserWindow
 ): (action: Action) => unknown {
-  if (connectionStore.getBrowserWindow() == null) {
-    connectionStore.setBrowserWindow(mainWindow)
-  }
+  connectionStore.addBrowserWindow(window)
 
   return function handleAction(action: Action) {
     switch (action.type) {

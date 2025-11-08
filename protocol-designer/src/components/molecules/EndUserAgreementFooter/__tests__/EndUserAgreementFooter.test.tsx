@@ -1,9 +1,10 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { EndUserAgreementFooter } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
 
 const render = () => {
   return renderWithProviders(<EndUserAgreementFooter />, { i18nInstance: i18n })

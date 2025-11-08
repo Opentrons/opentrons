@@ -39,6 +39,7 @@ describe('labwareDefToFields', () => {
       gridOffsetY: '11.24',
 
       homogeneousWells: 'true',
+      hasLpcQuirk: 'false',
       regularRowSpacing: 'true',
       regularColumnSpacing: 'true',
 
@@ -59,6 +60,7 @@ describe('labwareDefToFields', () => {
       loadName: null, // should be cleared
       displayName: null, // should be cleared
 
+      stackedLabwareZDimension: null, // should not exist
       compatibleAdapters: {},
       compatibleModules: {},
     })

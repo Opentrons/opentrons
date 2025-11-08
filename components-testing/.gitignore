@@ -1,0 +1,6 @@
+# Playwright test outputs
+test-results/**
+playwright-report/**
+
+# Packed .tgz files from local package builds and extracted packages
+pack/

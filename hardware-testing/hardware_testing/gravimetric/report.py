@@ -1,7 +1,7 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Optional
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -85,9 +85,12 @@ def create_csv_test_report(
     trials: int,
     name: str,
     run_id: str,
+    runtime_parameters: Optional[List[List[str]]] = None,
     dont_write_to_disk: bool = False,
 ) -> CSVReport:
     """Create CSV test report."""
+    if runtime_parameters is None:
+        runtime_parameters = []
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
     meas_info = [field.name.replace("_", "-") for field in fields(MeasurementData)]
     if pipette_channels == 8 and not increment:
@@ -226,8 +229,18 @@ def create_csv_test_report(
                     for d in ["target", "encoder", "drift"]
                 ],
             ),
+            CSVSection(
+                title="RUNTIME_PARAMS",
+                lines=[
+                    CSVLine(
+                        param[0], [str for _ in range(len(param) - 1)]
+                    )  # just convert to a string, always
+                    for param in runtime_parameters
+                ],
+            ),
         ],
     )
+
     # NOTE: just immediately clear all the "isolate" flags on the volume section
     #       so that final CSV is guaranteed to not be filled with a bunch of "None"
     for line in report["VOLUMES"].lines:

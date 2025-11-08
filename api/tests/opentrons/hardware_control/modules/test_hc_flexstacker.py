@@ -1,8 +1,12 @@
 import asyncio
-import pytest
 import mock
 from contextlib import nullcontext as does_not_raise
 from typing import AsyncGenerator, ContextManager, Any
+
+import pytest
+from decoy import Decoy, matchers
+
+
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -11,6 +15,12 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     LEDColor,
     LEDPattern,
+    TOFSensorStatus,
+    TOFSensor,
+    TOFSensorState,
+    TOFSensorMode,
+    StackerInfo,
+    HardwareRevision,
 )
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -24,7 +34,11 @@ from opentrons.hardware_control.modules.flex_stacker import (
     STACKER_MOTION_CONFIG,
     FlexStackerReader,
 )
-from opentrons.hardware_control.modules.types import PlatformState
+from opentrons.hardware_control.modules.types import (
+    PlatformState,
+    ModuleErrorCallback,
+    ModuleDisconnectedCallback,
+)
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 from opentrons_shared_data.errors.exceptions import (
@@ -36,6 +50,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 @pytest.fixture
 def usb_port() -> USBPort:
+    """Token USB port."""
     return USBPort(
         name="",
         port_number=0,
@@ -44,16 +59,21 @@ def usb_port() -> USBPort:
 
 
 @pytest.fixture
-def mock_driver() -> mock.AsyncMock:
-    return mock.AsyncMock(spec=SimulatingDriver)
+def mock_driver(decoy: Decoy) -> SimulatingDriver:
+    """Mocked simulating driver."""
+    return decoy.mock(cls=SimulatingDriver)
 
 
 @pytest.fixture
 async def subject(
     usb_port: USBPort,
-    mock_driver: mock.AsyncMock,
+    mock_driver: SimulatingDriver,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    decoy: Decoy,
 ) -> AsyncGenerator[modules.FlexStacker, None]:
-    """Test subject with mocked driver"""
+    """Test subject with mocked driver."""
     reader = FlexStackerReader(driver=mock_driver)
     poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
     stacker = modules.FlexStacker(
@@ -68,8 +88,30 @@ async def subject(
             "version": "stacker-fw",
         },
         hw_control_loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
     )
+    decoy.when(await mock_driver.get_device_info()).then_return(
+        StackerInfo(fw="stacker-fw", hw=HardwareRevision.EVT, sn="dummySerialFS")
+    )
+    decoy.when(await mock_driver.get_tof_sensor_status(TOFSensor.X)).then_return(
+        TOFSensorStatus(
+            TOFSensor.X, TOFSensorState.IDLE, TOFSensorMode.MEASURE, ok=True
+        )
+    )
+    decoy.when(await mock_driver.get_tof_sensor_status(TOFSensor.Z)).then_return(
+        TOFSensorStatus(
+            TOFSensor.Z, TOFSensorState.IDLE, TOFSensorMode.MEASURE, ok=True
+        )
+    )
+    decoy.when(await mock_driver.get_platform_status()).then_return(
+        PlatformStatus(False, False)
+    )
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(
+        LimitSwitchStatus(False, True, False, False, False)
+    )
+
     await poller.start()
     try:
         yield stacker
@@ -78,6 +120,7 @@ async def subject(
 
 
 async def test_sim_state(subject: modules.FlexStacker) -> None:
+    """It should forward state."""
     status = subject.device_info
     assert status["serial"] == "dummySerialFS"
     assert status["model"] == "a1"
@@ -85,17 +128,9 @@ async def test_sim_state(subject: modules.FlexStacker) -> None:
 
 
 async def test_set_run_hold_current(
-    subject: modules.FlexStacker, mock_driver: mock.AsyncMock
+    subject: modules.FlexStacker, mock_driver: SimulatingDriver, decoy: Decoy
 ) -> None:
-    mock_driver.get_platform_status.side_effect = [
-        PlatformStatus(True, False),
-        PlatformStatus(False, True),
-    ]
-    mock_driver.get_limit_switches_status.side_effect = [
-        LimitSwitchStatus(False, True, False, False, False),
-        LimitSwitchStatus(True, True, False, False, False),
-    ]
-
+    """It should set currents."""
     # Test move_axis
 
     # run and hold current are 0 by default
@@ -106,54 +141,81 @@ async def test_set_run_hold_current(
     # Call the move_axis function with default current
     await subject.move_axis(StackerAxis.X, Direction.EXTEND, 44)
     # set_run_current should be called and run_current recorded
-    mock_driver.set_run_current.assert_called_with(StackerAxis.X, default.run_current)
-    mock_driver.set_ihold_current.assert_called_with(
-        StackerAxis.X, default.hold_current
+    decoy.verify(await mock_driver.set_run_current(StackerAxis.X, default.run_current))
+    decoy.verify(
+        await mock_driver.set_ihold_current(StackerAxis.X, default.hold_current)
     )
     motion_params = subject._reader.motion_params[StackerAxis.X]
     assert motion_params.run_current == default.run_current
     assert motion_params.hold_current == default.hold_current
-    mock_driver.set_run_current.reset_mock()
-    mock_driver.set_ihold_current.reset_mock()
+    decoy.reset()
+
+    decoy.when(await mock_driver.get_platform_status()).then_return(
+        PlatformStatus(False, True)
+    )
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(
+        LimitSwitchStatus(True, True, False, False, False)
+    )
 
     # Make sure set_run_current and set_ihold_current are not called again
     await subject.move_axis(StackerAxis.X, Direction.EXTEND, 44)
-    mock_driver.set_run_current.assert_not_called()
-    mock_driver.set_ihold_current.assert_not_called()
+    decoy.verify(
+        await mock_driver.set_run_current(matchers.Anything(), matchers.Anything()),
+        times=0,
+    )
+    decoy.verify(
+        await mock_driver.set_ihold_current(matchers.Anything(), matchers.Anything()),
+        times=0,
+    )
     motion_params = subject._reader.motion_params[StackerAxis.X]
     assert motion_params.run_current == default.run_current
     assert motion_params.hold_current == default.hold_current
 
     # Test home_axis
-
+    decoy.reset()
     # Reset the run/hold current recorded
     default = STACKER_MOTION_CONFIG[StackerAxis.X]["home"]
     subject._reader.motion_params[StackerAxis.X].run_current = 0
     subject._reader.motion_params[StackerAxis.X].hold_current = 0
+    decoy.when(await mock_driver.get_platform_status()).then_return(
+        PlatformStatus(False, True)
+    )
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(
+        LimitSwitchStatus(True, True, False, False, False)
+    )
 
     # Call the home_axis function with default current
     await subject.home_axis(StackerAxis.X, Direction.EXTEND)
-    mock_driver.set_run_current.assert_called_with(StackerAxis.X, default.run_current)
-    mock_driver.set_ihold_current.assert_called_with(
-        StackerAxis.X, default.hold_current
+    decoy.verify(await mock_driver.set_run_current(StackerAxis.X, default.run_current))
+    decoy.verify(
+        await mock_driver.set_ihold_current(StackerAxis.X, default.hold_current)
     )
     motion_params = subject._reader.motion_params[StackerAxis.X]
     assert motion_params.run_current == default.run_current
     assert motion_params.hold_current == default.hold_current
-    mock_driver.set_run_current.reset_mock()
-    mock_driver.set_ihold_current.reset_mock()
+    decoy.reset()
+    decoy.when(await mock_driver.get_platform_status()).then_return(
+        PlatformStatus(False, True)
+    )
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(
+        LimitSwitchStatus(True, True, False, False, False)
+    )
 
     # Make sure set_run_current and set_ihold_current are not called again
     await subject.home_axis(StackerAxis.X, Direction.EXTEND, 44)
-    mock_driver.set_run_current.assert_not_called()
-    mock_driver.set_ihold_current.assert_not_called()
+    decoy.verify(
+        await mock_driver.set_run_current(matchers.Anything(), matchers.Anything()),
+        times=0,
+    )
+    decoy.verify(
+        await mock_driver.set_ihold_current(matchers.Anything(), matchers.Anything()),
+        times=0,
+    )
 
     # The recorded run/hold current should stay the same
     motion_params = subject._reader.motion_params[StackerAxis.X]
     assert motion_params.run_current == default.run_current
     assert motion_params.hold_current == default.hold_current
-    mock_driver.set_run_current.reset_mock()
-    mock_driver.set_ihold_current.reset_mock()
 
 
 PLATFORM_STATUS_UNKNOWN = PlatformStatus(False, False)
@@ -175,14 +237,15 @@ X_RETRACTED = LimitSwitchStatus(False, True, False, False, False)
 )
 async def test_platform_state(
     subject: modules.FlexStacker,
-    mock_driver: mock.AsyncMock,
+    mock_driver: SimulatingDriver,
     x_status: LimitSwitchStatus,
     platform_status: PlatformStatus,
     expected: PlatformState,
+    decoy: Decoy,
 ) -> None:
     """Test that the platform state is correctly determined."""
-    mock_driver.get_platform_status.return_value = platform_status
-    mock_driver.get_limit_switches_status.return_value = x_status
+    decoy.when(await mock_driver.get_platform_status()).then_return(platform_status)
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(x_status)
 
     # update the cached value
     await subject._reader.get_limit_switch_status()
@@ -200,13 +263,17 @@ async def test_platform_state(
 )
 async def test_platform_state_unknown(
     subject: modules.FlexStacker,
-    mock_driver: mock.AsyncMock,
+    mock_driver: SimulatingDriver,
     x_status: LimitSwitchStatus,
     expected: PlatformState,
+    decoy: Decoy,
 ) -> None:
     """Test that the platform state is correctly determined."""
-    mock_driver.get_platform_status.return_value = PLATFORM_STATUS_UNKNOWN
-    mock_driver.get_limit_switches_status.return_value = x_status
+
+    decoy.when(await mock_driver.get_platform_status()).then_return(
+        PLATFORM_STATUS_UNKNOWN
+    )
+    decoy.when(await mock_driver.get_limit_switches_status()).then_return(x_status)
 
     # update the value
     await subject._reader.get_limit_switch_status()
@@ -305,22 +372,26 @@ async def test_platform_state_unknown(
 )
 async def test_stacker_status_bar_event_handler(
     subject: modules.FlexStacker,
-    mock_driver: mock.AsyncMock,
+    mock_driver: SimulatingDriver,
     should_identify: bool,
     hopper_door: bool,
     event: StatusBarUpdateEvent,
     result_params: tuple[float, LEDColor, LEDPattern, int | None],
+    decoy: Decoy,
 ) -> None:
-    mock_driver.get_hopper_door_closed.return_value = hopper_door
+    """It should handle LED lights."""
+    decoy.when(await mock_driver.get_hopper_door_closed()).then_return(hopper_door)
     subject.set_stacker_identify(should_identify)
     await subject._reader.get_door_closed()
     await subject._handle_status_bar_event(event)
-    mock_driver.set_led.assert_called_with(
-        result_params[0],
-        color=result_params[1],
-        pattern=result_params[2],
-        duration=result_params[3],
-        reps=None,
+    decoy.verify(
+        await mock_driver.set_led(
+            result_params[0],
+            color=result_params[1],
+            pattern=result_params[2],
+            duration=result_params[3],
+            reps=None,
+        )
     )
 
 
@@ -329,12 +400,9 @@ async def test_stacker_status_bar_event_handler(
     [(16), (100)],
 )
 async def test_store_labware_motion_sequence(
-    subject: modules.FlexStacker,
-    labware_height: float,
+    subject: modules.FlexStacker, labware_height: float
 ) -> None:
-    """
-    Test successful storage labware with labware sensing enforced.
-    """
+    """It should store labware with sensing on."""
     with (
         mock.patch.object(
             subject, "_prepare_for_action", mock.AsyncMock()
@@ -541,15 +609,12 @@ async def test_dispense_labware_error_handling(
     [(0), (-10), (200)],
 )
 async def test_invalid_labware_height(
-    subject: modules.FlexStacker,
-    labware_height: float,
+    subject: modules.FlexStacker, labware_height: float
 ) -> None:
     """Raise a ValueError if the labware_height is invalid"""
-    with (
-        mock.patch.object(
-            subject, "_prepare_for_action", mock.AsyncMock()
-        ) as _prepare_for_action
-    ):
+    with mock.patch.object(
+        subject, "_prepare_for_action", mock.AsyncMock()
+    ) as _prepare_for_action:
         # Test invalid labware height
         with pytest.raises(ValueError):
             await subject.store_labware(
@@ -557,3 +622,26 @@ async def test_invalid_labware_height(
                 enforce_shuttle_lw_sensing=True,
             )
         _prepare_for_action.assert_not_called()
+
+
+async def test_error_callback(
+    subject: modules.FlexStacker,
+    mock_driver: SimulatingDriver,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+) -> None:
+    """It should forward an error from the poller to the callback."""
+    # There are no asynchronous errors from the stacker (the door is handled
+    # differently) so just inject a random exception.
+    exc = Exception("Oh no!")
+    decoy.when(mock_driver.get_hopper_door_closed()).then_raise(exc)
+    with pytest.raises(Exception, match="Oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            exc,
+            "flexStackerModuleV1",
+            "/dev/ot_module_sim_flexstacker0",
+            "dummySerialFS",
+        )
+    )

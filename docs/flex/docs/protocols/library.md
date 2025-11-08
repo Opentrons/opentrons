@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Protocol Library"
 ---
 
-# Protocol Library
-
 The Opentrons Protocol Library hosts protocols authored either by Opentrons itself or by members of the Opentrons community. To find a protocol that fits your target application, use the search field at the top of the [Protocol Library homepage](https://library.opentrons.com).
 
 You can also browse protocols by categories, like DNA/RNA, cell biology, cell and tissue culture, proteins, commercial assay kits, or molecular biology. There's even a category for protocols that create art by pipetting! Take some time to check out the protocols in our library. Understanding what's available—and making some cool pixel art—is a great way to learn about the features and capabilities of your robot before moving on to using real samples and reagents.

@@ -131,3 +131,17 @@ export const ANALYTICS_LPC_OFFSET_SOURCE_RESOLUTION: 'lpcOffsetSourceResolution'
 
 export const ANALYTICS_MODULE_COMMAND_COMPLETED = 'moduleEventCompleted'
 export const ANALYTICS_MODULE_COMMAND_ERROR = 'moduleCommandError'
+
+/**
+ * Camera Action Analytics
+ */
+
+export const ANALYTICS_CAMERA_ENABLEMENT_KIND: 'cameraEnablementType' =
+  'cameraEnablementType'
+export const ANALYTICS_CAMERA_SETTINGS_KIND: 'cameraSettingsKind' =
+  'cameraSettingsKind'
+
+export const ANALYTICS_IMAGE_CAPTURE_KIND: 'imageCaptureKind' =
+  'imageCaptureKind'
+export const ANALYTICS_LIVE_FEED_KIND: 'liveFeed' = 'liveFeed'
+export const ANALYTICS_PHOTO_ACCESS: 'photoAccessKind' = 'photoAccessKind'

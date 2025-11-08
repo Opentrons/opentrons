@@ -25,6 +25,10 @@ from .command_annotations import (
     CustomCommandAnnotation,
     CommandAnnotation,
 )
+from .command_preconditions import (
+    CommandPreconditions,
+    PreconditionTypes,
+)
 from .partial_tip_configuration import (
     AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
@@ -68,6 +72,7 @@ from .module import (
     ModuleOffsetData,
     StackerFillEmptyStrategy,
     StackerStoredLabwareGroup,
+    StackerLabwareMovementStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -82,6 +87,8 @@ from .location import (
     NonStackedLocation,
     DeckPoint,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
+    AccessibleByGripperLocation,
     OnLabwareLocationSequenceComponent,
     OnModuleLocationSequenceComponent,
     OnAddressableAreaLocationSequenceComponent,
@@ -91,6 +98,7 @@ from .location import (
     LoadableLabwareLocation,
     labware_location_is_system,
     labware_location_is_off_deck,
+    labware_location_is_in_waste_chute,
 )
 from .labware import (
     OverlapOffset,
@@ -99,8 +107,8 @@ from .labware import (
     LegacyLabwareOffsetCreate,
     LabwareOffsetCreateInternal,
     LoadedLabware,
-    LabwareParentDefinition,
     LabwareWellId,
+    GripSpecs,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
 from .labware_offset_location import (
@@ -130,6 +138,7 @@ from .instrument import (
     CurrentWell,
     CurrentPipetteLocation,
     InstrumentOffsetVector,
+    GripperMoveType,
 )
 from .execution import EngineStatus, PostRunHardwareState
 from .liquid_level_detection import (
@@ -143,9 +152,10 @@ from .liquid_level_detection import (
 )
 from .liquid_handling import FlowRates
 from .labware_movement import LabwareMovementStrategy, LabwareMovementOffsetData
-from .tip import TipGeometry
+from .tip import TipGeometry, TipRackWellState
 from .hardware_passthrough import MovementAxis, MotorAxis
 from .util import Vec3f, Dimensions
+from .tasks import Task, TaskSummary, FinishedTask
 
 __all__ = [
     # Runtime parameters
@@ -163,6 +173,9 @@ __all__ = [
     "SecondOrderCommandAnnotation",
     "CustomCommandAnnotation",
     "CommandAnnotation",
+    # Command preconditions
+    "PreconditionTypes",
+    "CommandPreconditions",
     # Partial tip handling
     "AllNozzleLayoutConfiguration",
     "SingleNozzleLayoutConfiguration",
@@ -212,6 +225,7 @@ __all__ = [
     "ModuleOffsetData",
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
+    "StackerLabwareMovementStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -225,8 +239,10 @@ __all__ = [
     "NonStackedLocation",
     "DeckPoint",
     "OffDeckLocationType",
-    "SystemLocationType",
+    "WasteChuteLocationType" "SystemLocationType",
     "InStackerHopperLocation",
+    "WASTE_CHUTE_LOCATION",
+    "AccessibleByGripperLocation",
     "OnLabwareLocationSequenceComponent",
     "OnModuleLocationSequenceComponent",
     "OnAddressableAreaLocationSequenceComponent",
@@ -236,6 +252,7 @@ __all__ = [
     "LoadableLabwareLocation",
     "labware_location_is_off_deck",
     "labware_location_is_system",
+    "labware_location_is_in_waste_chute",
     # Labware offset location
     "LegacyLabwareOffsetLocation",
     "LabwareOffsetLocationSequence",
@@ -253,8 +270,8 @@ __all__ = [
     "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
-    "LabwareParentDefinition",
     "LabwareWellId",
+    "GripSpecs",
     # Liquids
     "HexColor",
     "EmptyLiquidId",
@@ -282,6 +299,7 @@ __all__ = [
     "CurrentWell",
     "CurrentPipetteLocation",
     "InstrumentOffsetVector",
+    "GripperMoveType",
     # Liquid level detection types
     "LoadedVolumeInfo",
     "ProbedHeightInfo",
@@ -297,6 +315,7 @@ __all__ = [
     "LabwareMovementOffsetData",
     # Tips
     "TipGeometry",
+    "TipRackWellState",
     # Hardware passthrough
     "MovementAxis",
     "MotorAxis",
@@ -305,4 +324,8 @@ __all__ = [
     "Dimensions",
     # Convenience re-export
     "LabwareUri",
+    # Tasks
+    "Task",
+    "TaskSummary",
+    "FinishedTask",
 ]

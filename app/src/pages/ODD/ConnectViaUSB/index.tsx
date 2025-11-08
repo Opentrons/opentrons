@@ -15,12 +15,12 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { MediumButton } from '/app/atoms/buttons'
-import { StepMeter } from '/app/atoms/StepMeter'
 
 export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])

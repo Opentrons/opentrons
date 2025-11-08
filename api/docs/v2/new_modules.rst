@@ -9,6 +9,7 @@ Hardware Modules
 .. toctree::
     modules/setup
     modules/absorbance_plate_reader
+    modules/stacker
     modules/heater_shaker
     modules/magnetic_block
     modules/magnetic_module
@@ -26,6 +27,7 @@ Pages in this section of the documentation cover:
     - Working with the module contexts for each type of module.
     
         - :ref:`Absorbance Plate Reader Module <absorbance-plate-reader-module>`
+        - :ref:`Flex Stacker Module <stacker>`
         - :ref:`Heater-Shaker Module <heater-shaker-module>`
         - :ref:`Magnetic Block <magnetic-block>`
         - :ref:`Magnetic Module <magnetic-module>`

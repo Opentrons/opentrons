@@ -73,22 +73,16 @@ export function useCalibrationTaskList(
   }
   const attachedPipettes = useAttachedPipettes()
 
-  const {
-    data: calStatusData,
-    isLoading: calStatusIsLoading,
-  } = useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-  const {
-    data: pipOffsetData,
-    isLoading: pipOffsetIsLoading,
-  } = useAllPipetteOffsetCalibrationsQuery({
-    refetchInterval: CALIBRATION_DATA_POLL_MS,
-  })
-  const {
-    data: tipLengthData,
-    isLoading: tipLengthIsLoading,
-  } = useAllTipLengthCalibrationsQuery({
-    refetchInterval: CALIBRATION_DATA_POLL_MS,
-  })
+  const { data: calStatusData, isLoading: calStatusIsLoading } =
+    useCalibrationStatusQuery({ refetchInterval: CALIBRATION_DATA_POLL_MS })
+  const { data: pipOffsetData, isLoading: pipOffsetIsLoading } =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: CALIBRATION_DATA_POLL_MS,
+    })
+  const { data: tipLengthData, isLoading: tipLengthIsLoading } =
+    useAllTipLengthCalibrationsQuery({
+      refetchInterval: CALIBRATION_DATA_POLL_MS,
+    })
 
   taskList.isLoading =
     calStatusIsLoading || pipOffsetIsLoading || tipLengthIsLoading

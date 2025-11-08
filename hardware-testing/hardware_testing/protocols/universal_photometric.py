@@ -20,7 +20,7 @@ from opentrons.protocol_api.core.engine import (
 
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.26"}
 
 DYE_RESERVOIR_DEAD_VOLUME = 20000  # 20k uL
 
@@ -45,7 +45,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     parameters.add_int(
         display_name="model type",
         variable_name="model_type",
-        default=200,
+        default=1000,
         choices=[
             {"display_name": "200", "value": 200},
             {"display_name": "1000", "value": 1000},
@@ -96,6 +96,12 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         default=True,
     )
 
+    parameters.add_bool(
+        variable_name="lld",
+        display_name="enable lld",
+        description=("Use LLD to detect liquid height."),
+        default=True,
+    )
     parameters.add_float(
         display_name="conditioning volume",
         variable_name="conditioning_volume",
@@ -255,12 +261,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         ],
         default="corning_96_wellplate_360ul_flat",
     )
-    parameters.add_bool(
-        variable_name="lld",
-        display_name="enable lld",
-        description=("Use LLD to detect liquid height."),
-        default=True,
-    )
 
 
 def dispense_with_liquid_class(
@@ -402,7 +402,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
     def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
-        liquid_class = ctx.get_liquid_class("water")
+        liquid_class = ctx.get_liquid_class("water", version=2)
         transfer_properties = liquid_class.get_for(pip, tiprack)
 
         asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]

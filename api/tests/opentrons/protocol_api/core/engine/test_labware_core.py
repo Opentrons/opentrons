@@ -12,6 +12,7 @@ from opentrons_shared_data.labware.types import (
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
+    RectangularWellDefinition2,
     Parameters2 as LabwareDefinition2Parameters,
     Metadata as LabwareDefinitionMetadata,
 )
@@ -25,6 +26,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocationSequence,
     LabwareOffsetVector,
     OnAddressableAreaOffsetLocationSequenceComponent,
+    TipRackWellState,
 )
 from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -362,6 +364,10 @@ def test_get_next_tip(
     [
         LabwareDefinition2.model_construct(  # type: ignore[call-arg]
             ordering=[],
+            wells={
+                "A1": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+                "H12": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+            },
             parameters=LabwareDefinition2Parameters.model_construct(isTiprack=True),  # type: ignore[call-arg]
         )
     ],
@@ -371,7 +377,15 @@ def test_reset_tips(
 ) -> None:
     """It should reset the tip state of a labware."""
     subject.reset_tips()
-    decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.SetTipStateParams(
+                labwareId="cool-labware",
+                wellNames=["A1", "H12"],
+                tipWellState=TipRackWellState.CLEAN,
+            )
+        )
+    )
 
 
 @pytest.mark.parametrize(

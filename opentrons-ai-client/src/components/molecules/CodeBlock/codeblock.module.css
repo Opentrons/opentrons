@@ -1,0 +1,22 @@
+/* Code Block - Light theme */
+.code_block_wrapper {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.375rem;
+  background: #f8f8f8;
+}
+
+.code_block {
+  padding: 1.25rem var(--spacing-16, 1rem);
+  background: #f8f8f8;
+  color: #000;
+  font-family: 'Reddit Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  overflow-x: auto;
+}
+
+.python_code {
+  display: block;
+}

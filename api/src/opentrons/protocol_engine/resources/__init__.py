@@ -10,7 +10,9 @@ from .deck_data_provider import DeckDataProvider, DeckFixedLabware
 from .labware_data_provider import LabwareDataProvider
 from .module_data_provider import ModuleDataProvider
 from .file_provider import FileProvider
+from .camera_provider import CameraProvider
 from .ot3_validation import ensure_ot3_hardware
+from .concurrency_provider import ConcurrencyProvider
 
 
 __all__ = [
@@ -18,8 +20,10 @@ __all__ = [
     "LabwareDataProvider",
     "DeckDataProvider",
     "DeckFixedLabware",
+    "ConcurrencyProvider",
     "ModuleDataProvider",
     "FileProvider",
+    "CameraProvider",
     "ensure_ot3_hardware",
     "pipette_data_provider",
     "labware_validation",

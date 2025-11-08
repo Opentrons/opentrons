@@ -1,4 +1,4 @@
-import { Chip, DeckInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
+import { Chip, RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { MultiDeckLabelTagBtns as MultiDeckLabelTagBtnsComponent } from '.'
 
@@ -8,10 +8,10 @@ export default {
   title: 'App/Molecules/MultiDeckLabelTagBtns',
   component: MultiDeckLabelTagBtnsComponent,
   argTypes: {
-    numDeckInfoLabels: {
+    numRobotInfoLabels: {
       control: { type: 'range', min: 1, max: 4, step: 1 },
       description:
-        'Number of example DeckInfoLabels to include (max 3 will be displayed).',
+        'Number of example RobotInfoLabels to include (max 3 will be displayed).',
     },
     colTwoTagText: {
       control: 'text',
@@ -44,7 +44,7 @@ export default {
 } as Meta
 
 interface MultiDeckLabelTagBtnsStoryProps {
-  numDeckInfoLabels: number
+  numRobotInfoLabels: number
   colTwoTagText: string
   colTwoTagType: string
   hasColTwoChip: boolean
@@ -56,7 +56,7 @@ interface MultiDeckLabelTagBtnsStoryProps {
 
 const Template: Story<MultiDeckLabelTagBtnsStoryProps> = args => {
   const {
-    numDeckInfoLabels,
+    numRobotInfoLabels,
     colTwoTagText,
     hasColTwoChip,
     colTwoChipText,
@@ -66,9 +66,9 @@ const Template: Story<MultiDeckLabelTagBtnsStoryProps> = args => {
   } = args
 
   const deckInfoLabels = []
-  for (let i = 0; i < numDeckInfoLabels; i++) {
+  for (let i = 0; i < numRobotInfoLabels; i++) {
     deckInfoLabels.push(
-      <DeckInfoLabel
+      <RobotInfoLabel
         key={`deck-label-${i}`}
         highlight={i === 1}
         iconName={
@@ -117,7 +117,7 @@ const Template: Story<MultiDeckLabelTagBtnsStoryProps> = args => {
 
 export const Default = Template.bind({})
 Default.args = {
-  numDeckInfoLabels: 3,
+  numRobotInfoLabels: 3,
   colTwoTagText: 'Text',
   hasColTwoChip: true,
   colTwoChipText: 'Text',
@@ -128,7 +128,7 @@ Default.args = {
 
 export const WithoutChip = Template.bind({})
 WithoutChip.args = {
-  numDeckInfoLabels: 3,
+  numRobotInfoLabels: 3,
   colTwoTagText: 'Text',
   hasColTwoChip: false,
   colThreePrimaryBtnText: 'Text',
@@ -138,7 +138,7 @@ WithoutChip.args = {
 
 export const WithoutSecondaryButton = Template.bind({})
 WithoutSecondaryButton.args = {
-  numDeckInfoLabels: 3,
+  numRobotInfoLabels: 3,
   colTwoTagText: 'Text',
   hasColTwoChip: true,
   colTwoChipText: 'Text',

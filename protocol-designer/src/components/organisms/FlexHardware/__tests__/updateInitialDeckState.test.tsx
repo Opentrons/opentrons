@@ -11,12 +11,13 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { deleteModule } from '../../../../modules'
-import { createModule } from '../../../../step-forms/actions'
+import { deleteModule } from '/protocol-designer/modules'
+import { createModule } from '/protocol-designer/step-forms/actions'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../../../step-forms/actions/additionalItems'
+} from '/protocol-designer/step-forms/actions/additionalItems'
+
 import { updateInitialDeckState } from '../util'
 
 import type {
@@ -26,11 +27,11 @@ import type {
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
-} from '../../../../step-forms'
+} from '/protocol-designer/step-forms'
 
-vi.mock('../../../../step-forms/actions')
-vi.mock('../../../../modules')
-vi.mock('../../../../step-forms/actions/additionalItems')
+vi.mock('/protocol-designer/step-forms/actions')
+vi.mock('/protocol-designer/modules')
+vi.mock('/protocol-designer/step-forms/actions/additionalItems')
 
 const mockDispatch = vi.fn()
 const mockEmptyIntialDeckSetup: AllTemporalPropertiesForTimelineFrame = {
@@ -86,7 +87,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
-          type: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -113,7 +114,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
-          type: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
         },
       ],
       initialDeckSetup: {
@@ -145,7 +146,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
-          type: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -170,7 +171,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutD1',
           cutoutFixtureId: HEATERSHAKER_MODULE_V1,
-          type: HEATERSHAKER_MODULE_V1,
+          addressableAreaId: 'heaterShakerV1D1',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -190,7 +191,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          type: 'trashBin',
+          addressableAreaId: 'movableTrashA3',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -211,7 +212,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          type: 'trashBin',
+          addressableAreaId: 'movableTrashA3',
         },
       ],
       initialDeckSetup: {
@@ -243,7 +244,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutA3',
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-          type: 'trashBin',
+          addressableAreaId: 'movableTrashA3',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -264,7 +265,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'magneticBlockV1B3',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -294,7 +295,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'magneticBlockV1B3',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -323,7 +324,7 @@ describe('updateInitialDeckState', () => {
         {
           cutoutId: 'cutoutB3',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          type: 'stagingAreaAndMagneticBlock',
+          addressableAreaId: 'B4',
         },
       ],
       initialDeckSetup: {
@@ -353,8 +354,9 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: 'D4',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -379,8 +381,9 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: 'D4',
         },
       ],
       initialDeckSetup: mockInitialDeckSetup,
@@ -404,8 +407,9 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: 'D4',
         },
       ],
       initialDeckSetup: {
@@ -435,8 +439,9 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          type: 'stagingAreaAndWasteChute',
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: 'D4',
         },
       ],
 

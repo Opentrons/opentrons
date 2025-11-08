@@ -48,6 +48,12 @@
     "ot2_short_trash": {},
     "ot3_standard": {}
   },
+  "orientation": {
+    "A3": "right",
+    "B3": "right",
+    "C3": "right",
+    "D3": "right"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"],
   "uniqueModuleData": {}

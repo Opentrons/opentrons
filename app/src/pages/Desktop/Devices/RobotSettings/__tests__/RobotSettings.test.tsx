@@ -6,9 +6,11 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useRobot } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -21,9 +23,11 @@ import { RobotSettings } from '..'
 vi.mock('/app/organisms/Desktop/RobotSettingsCalibration')
 vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking')
 vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced')
+vi.mock('/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/config')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -50,6 +54,7 @@ describe('RobotSettings', () => {
     when(vi.mocked(useRobot))
       .calledWith('otie')
       .thenReturn(mockConnectableRobot)
+    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
     vi.mocked(RobotSettingsCalibration).mockReturnValue(
       <div>Mock RobotSettingsCalibration</div>
     )
@@ -58,6 +63,9 @@ describe('RobotSettings', () => {
     )
     vi.mocked(RobotSettingsAdvanced).mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
+    )
+    vi.mocked(RobotSettingsCamera).mockReturnValue(
+      <div>Mock RobotSettingsCamera</div>
     )
   })
   afterEach(() => {
@@ -145,6 +153,15 @@ describe('RobotSettings', () => {
     expect(screen.queryByText('Mock RobotSettingsNetworking')).toBeFalsy()
     fireEvent.click(networkingTab)
     screen.getByText('Mock RobotSettingsNetworking')
+  })
+
+  it('renders camera settings content when the camera tab is clicked', () => {
+    render('/devices/otie/robot-settings/advanced')
+
+    const cameraTab = screen.getByText('Camera')
+    expect(screen.queryByText('Mock RobotSettingsCamera')).toBeFalsy()
+    fireEvent.click(cameraTab)
+    screen.getByText('Mock RobotSettingsCamera')
   })
 
   it('renders advanced content when the advanced tab is clicked', () => {

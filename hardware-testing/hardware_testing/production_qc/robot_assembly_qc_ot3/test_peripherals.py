@@ -28,7 +28,7 @@ SERVER_CMD = "{0} -m http.server {1} --directory {2}"
 CAM_PIC_FILE_NAME = "camera_{0}.jpg"
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/video2 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "v4l2-ctl --device /dev/ot_system_camera --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
 

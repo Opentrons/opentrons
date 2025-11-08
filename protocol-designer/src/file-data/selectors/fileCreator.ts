@@ -64,14 +64,14 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
-// console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
-if (isEmpty(process.env.OT_PD_VERSION))
+// console.assert(!isEmpty(_OT_PD_VERSION_), 'Could not find application version!')
+if (isEmpty(_OT_PD_VERSION_))
   console.warn('Could not find application version!')
-const applicationVersion: string = process.env.OT_PD_VERSION || ''
+const applicationVersion: string = _OT_PD_VERSION_ || ''
 // Internal release date: this should never be read programatically,
 // it just helps us humans quickly identify what build a user was using
 // when we look at saved protocols (without requiring us to trace thru git logs)
-const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
+const _internalAppBuildDate = _OT_PD_BUILD_DATE_
 // A labware definition is considered "in use" and should be included in
 // the protocol file if it either...
 // 1. is present on the deck in initial deck setup
@@ -130,12 +130,8 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
     invariantContext
   ) => {
     const { author, description, created, source } = fileMetadata
-    const {
-      pipetteEntities,
-      labwareEntities,
-      liquidEntities,
-      moduleEntities,
-    } = invariantContext
+    const { pipetteEntities, labwareEntities, liquidEntities, moduleEntities } =
+      invariantContext
 
     const loadCommands = getLoadCommands(
       initialRobotState,
@@ -186,8 +182,9 @@ export const createJSONFile: Selector<ProtocolFile> = createSelector(
         _internalAppBuildDate,
         pipetteTiprackAssignments: mapValues(
           pipetteEntities,
-          (p: typeof pipetteEntities[keyof typeof pipetteEntities]): string[] =>
-            p.tiprackDefURI
+          (
+            p: (typeof pipetteEntities)[keyof typeof pipetteEntities]
+          ): string[] => p.tiprackDefURI
         ),
         dismissedWarnings,
         ingredients,
@@ -339,21 +336,17 @@ export const createFile: Selector<PDPythonFile> = createSelector(
     labwareNicknamesById,
     invariantContext
   ) => {
-    const {
-      pipetteEntities,
-      moduleEntities,
-      labwareEntities,
-      liquidEntities,
-    } = invariantContext
+    const { pipetteEntities, moduleEntities, labwareEntities, liquidEntities } =
+      invariantContext
 
     const savedOrderedStepIds = orderedStepIds.filter(
       stepId => savedStepForms[stepId]
     )
 
     const ingredients: Ingredients = Object.fromEntries(
-      Object.entries(
-        liquidEntities
-      ).map(([liquidId, { pythonName, ...rest }]) => [liquidId, rest])
+      Object.entries(liquidEntities).map(
+        ([liquidId, { pythonName, ...rest }]) => [liquidId, rest]
+      )
     )
 
     const allUniqueLiquidClassesFromForms = Array.from(
@@ -384,7 +377,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
             (
-              p: typeof pipetteEntities[keyof typeof pipetteEntities]
+              p: (typeof pipetteEntities)[keyof typeof pipetteEntities]
             ): string[] => p.tiprackDefURI
           ),
           dismissedWarnings,
@@ -404,7 +397,13 @@ export const createFile: Selector<PDPythonFile> = createSelector(
       [
         // Here are the sections of the Python file:
         pythonImports(),
-        pythonMetadata(fileMetadata),
+        pythonMetadata({
+          ...fileMetadata,
+          // It's OK to use the "real" _OT_PD_VERSION_ here instead of the hard-coded
+          // proxy PD_APPLICATION_VERSION, as done above, because this is just metadata for humans
+          // and doesn't have the migration baggage described above.
+          protocolDesigner: _OT_PD_VERSION_,
+        }),
         pythonRequirements(robotType),
         pythonDefRun(
           invariantContext,

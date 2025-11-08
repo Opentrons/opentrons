@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getDisposalOptions } from '../../../../../ui/labware/selectors'
-import { hoverSelection } from '../../../../../ui/steps/actions/actions'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getDisposalOptions } from '/protocol-designer/ui/labware/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
 import { useLabwareDropdownOptions } from '../../../utils'
 
 import type { FieldProps } from '../types'

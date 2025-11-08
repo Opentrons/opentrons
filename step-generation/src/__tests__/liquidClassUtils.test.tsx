@@ -9,6 +9,7 @@ import {
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
+import { AUTOMATIC } from '../constants'
 import {
   DEFAULT_PIPETTE,
   DEST_LABWARE,
@@ -90,7 +91,10 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
-          stepId: 1,
+          stepNumber: 1,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',
@@ -250,7 +254,10 @@ describe('getCustomLiquidClassProperties', () => {
           dispenseRetractZOffset: -5,
           dispenseRetractPositionReference: POSITION_REFERENCE_TOP,
           nozzles: null,
-          stepId: 1,
+          stepNumber: 1,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
         pipetteName: 'p20_single_gen2',
         tiprackUri: 'opentrons/opentrons_96_tiprack_20ul/1',

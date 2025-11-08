@@ -1,5 +1,6 @@
 import {
   browserTracingIntegration,
+  captureConsoleIntegration,
   init,
   replayIntegration,
 } from '@sentry/react'
@@ -15,8 +16,8 @@ let isSentryInitialized = false
 // because we are not using Sentry in development. If we decide to use it
 // in the future, we can add a dev DSN here.
 const sentryDsn = getIsProduction()
-  ? process.env.OT_PD_SENTRY_DSN
-  : process.env.OT_PD_SENTRY_DEV_DSN
+  ? _OT_PD_SENTRY_DSN_
+  : _OT_PD_SENTRY_DEV_DSN_
 
 export const initializeSentry = (state: BaseState): void => {
   const optedIn = getHasOptedIn(state)?.hasOptedIn ?? false
@@ -33,7 +34,14 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
-        integrations: [replayIntegration(), browserTracingIntegration()],
+        environment: 'production',
+        release: _OT_PD_VERSION_,
+        integrations: [
+          captureConsoleIntegration({ levels: ['assert'] }),
+          replayIntegration(),
+          browserTracingIntegration(),
+        ],
+        attachStacktrace: true, // include stack traces in captureConsoleIntegration
         tracesSampleRate: 1.0,
         tracePropagationTargets: [
           'localhost',
@@ -41,6 +49,13 @@ export const initializeSentry = (state: BaseState): void => {
         ],
         replaysSessionSampleRate: 0.0, // No Session Replay
         replaysOnErrorSampleRate: 0.0, // No Session Replay
+        ignoreErrors: [
+          // Ignore the fetch since PD doesn't use fetch
+          /Failed to fetch/i,
+          // Most likely triggered by MS Defender trying to run PD. Nothing we can do but ignore it:
+          // https://github.com/getsentry/sentry-javascript/issues/3440
+          'Non-Error promise rejection captured with value: Object Not Found Matching Id:',
+        ],
       })
       isSentryInitialized = true
       console.log('Sentry.init done')

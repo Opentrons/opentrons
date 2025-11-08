@@ -1,13 +1,13 @@
 """Production QC User Interface."""
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import StatusBarState
-from typing import Optional
+from typing import Optional, Set, Union, List
 
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
 PRINT_TITLE_POUNDS = "#" * PRINT_HEADER_NUM_SPACES
 PRINT_HEADER_SPACES = " " * (PRINT_HEADER_NUM_SPACES - 1)
-PRINT_HEADER_ASTERISK = "*"
+PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
 
 outfile: Optional[str] = None
 
@@ -97,3 +97,44 @@ def print_warning(message: str) -> None:
 def print_info(message: str) -> None:
     """Print information."""
     _output(message)
+
+
+def print_fail(message: str) -> None:
+    """Print fail."""
+    length = len(message)
+    dashes = PRINT_HEADER_DASHES + ("-" * length) + PRINT_HEADER_DASHES
+    middle = f"|{PRINT_HEADER_SPACES}{message}{PRINT_HEADER_SPACES}|"
+    # print(f"\n{dashes}\n{middle}\n{dashes}\n")
+    _output(f"\033[1;31m\n -FAIL- {dashes} \n{middle}\n{dashes}\n\033[0m")
+
+
+def print_test_results(message: str, passval: bool) -> None:
+    """Print test results."""
+    PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
+    length = len(message)
+    dashes = PRINT_HEADER_ASTERISK + ("*" * length) + PRINT_HEADER_ASTERISK
+    middle = f"|{PRINT_HEADER_SPACES}{message}{PRINT_HEADER_SPACES}|"
+    # print(f"\n{dashes}\n{middle}\n{dashes}\n")
+    if passval:
+        _output(f"\033[4;32m\n 测试结果 {dashes} \n{middle}\n{dashes}\n\033[0m")
+    else:
+        _output(f"\033[1;31m\n 测试结果 {dashes} \n{middle}\n{dashes}\n\033[0m")
+
+
+def print_results(message: Union[Set[str], List[str]], passval: bool) -> None:
+    """Print test results list."""
+    max_length = max(len(item) for item in message)
+    PRINT_HEADER_ASTERISK = "*" * PRINT_HEADER_NUM_SPACES
+    dashes = PRINT_HEADER_ASTERISK + ("*" * max_length) + PRINT_HEADER_ASTERISK
+    if passval:
+        _output("\033[4;32m\n 测试结果PASS  ")
+        _output(f"{dashes}\n\033[0m")
+    else:
+        middle = [
+            f"|{PRINT_HEADER_SPACES}{item.center(max_length)}{PRINT_HEADER_SPACES}|"
+            for item in message
+        ]
+        _output(f"\033[1;31m\n 测试结果FAIL {dashes} ")
+        for line in middle:
+            _output(line)
+        _output(f"{dashes}\n\033[0m")

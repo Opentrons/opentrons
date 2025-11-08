@@ -24,7 +24,11 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.persistence.persistence_directory import PersistenceResetter
-from robot_server.persistence.fastapi_dependencies import get_persistence_resetter
+from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.persistence.fastapi_dependencies import (
+    get_persistence_resetter,
+    get_images_resetter,
+)
 
 
 def test_get_robot_settings(api_client, hardware):
@@ -512,6 +516,20 @@ def mock_persistence_resetter(
 
 
 @pytest.fixture
+def mock_images_resetter(
+    decoy: Decoy,
+) -> Generator[ImagesResetter, None, None]:
+    mock_images_resetter = decoy.mock(cls=ImagesResetter)
+
+    async def mock_get_images_resetter() -> ImagesResetter:
+        return mock_images_resetter
+
+    app.dependency_overrides[get_images_resetter] = mock_get_images_resetter
+    yield mock_images_resetter
+    del app.dependency_overrides[get_images_resetter]
+
+
+@pytest.fixture
 def mock_deck_configuration_store_failsafe(
     decoy: Decoy,
 ) -> Generator[Optional[DeckConfigurationStore], None, None]:
@@ -580,6 +598,7 @@ def test_reset_success(
     api_client,
     mock_reset,
     mock_persistence_resetter: PersistenceResetter,
+    mock_images_resetter: ImagesResetter,
     mock_deck_configuration_store_failsafe: Optional[DeckConfigurationStore],
     body,
     called_with,
@@ -593,6 +612,7 @@ def test_reset_invalid_option(
     api_client,
     mock_reset,
     mock_persistence_resetter,
+    mock_images_resetter,
     mock_deck_configuration_store_failsafe,
 ):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})

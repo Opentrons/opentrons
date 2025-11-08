@@ -66,6 +66,7 @@ export const SetupModulesMap = ({
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(
     (module): ModuleOnDeck => ({
+      nestedLabwareDefsBottomToTop: [],
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.slotName },
       moduleChildren: (
@@ -85,9 +86,8 @@ export const SetupModulesMap = ({
     })
   )
 
-  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
-    protocolAnalysis
-  )
+  const simplestProtocolDeckConfig =
+    getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex

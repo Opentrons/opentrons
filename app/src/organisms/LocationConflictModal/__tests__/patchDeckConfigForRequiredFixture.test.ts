@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
-  FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+  FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -117,7 +117,7 @@ describe('patchDeckConfigForRequiredFixture', () => {
     const result = patchDeckConfigForRequiredFixture(
       startingDeckConfig,
       'cutoutD3',
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
     )
     expect(result).toEqual([
       { cutoutId: 'cutoutA1', cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE },
@@ -143,7 +143,7 @@ describe('patchDeckConfigForRequiredFixture', () => {
       },
       {
         cutoutId: 'cutoutD3',
-        cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
         opentronsModuleSerialNumber: 'flex-2',
       },
     ])
@@ -152,7 +152,7 @@ describe('patchDeckConfigForRequiredFixture', () => {
     const result = patchDeckConfigForRequiredFixture(
       startingDeckConfig,
       'cutoutD3',
-      FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
     )
     expect(result).toEqual([
       { cutoutId: 'cutoutA1', cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE },
@@ -178,7 +178,7 @@ describe('patchDeckConfigForRequiredFixture', () => {
       },
       {
         cutoutId: 'cutoutD3',
-        cutoutFixtureId: FLEX_STACKER_WTIH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
+        cutoutFixtureId: FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
         opentronsModuleSerialNumber: 'flex-2',
       },
     ])

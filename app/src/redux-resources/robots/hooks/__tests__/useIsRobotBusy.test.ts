@@ -82,7 +82,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
           id: 'test',
@@ -93,7 +93,7 @@ describe('useIsRobotBusy', () => {
         },
       ],
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
@@ -106,7 +106,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
           id: 'test',
@@ -117,7 +117,7 @@ describe('useIsRobotBusy', () => {
         },
       ],
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
@@ -131,7 +131,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
           id: 'test',
@@ -142,7 +142,7 @@ describe('useIsRobotBusy', () => {
         },
       ],
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const mockEngagedStatus = {
       data: {
         ...mockEstopStatus.data,
@@ -162,7 +162,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as any)
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
           id: 'test',
@@ -173,7 +173,7 @@ describe('useIsRobotBusy', () => {
         },
       ],
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const mockEngagedStatus = {
       data: {
         ...mockEstopStatus.data,

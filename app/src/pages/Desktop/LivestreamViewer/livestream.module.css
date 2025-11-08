@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  gap: var(--spacing-16);
+}
+
+.video_container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius-8);
+}
+
+.video_container video {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius-8);
+  object-fit: cover;
+}
+
+.chip_overlay {
+  position: absolute;
+  z-index: 10;
+  top: 16px;
+  left: 16px;
+}
+
+.video_active {
+  display: block;
+}
+
+.video_inactive {
+  display: none;
+}

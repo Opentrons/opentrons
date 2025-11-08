@@ -14,9 +14,9 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '../../../../../../constants'
+import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '/protocol-designer/constants'
 
-import type { Initialization } from '../../../../../../step-forms/types'
+import type { Initialization } from '/protocol-designer/step-forms/types'
 
 const getWavelengthDisplay = (
   wavelength: number,

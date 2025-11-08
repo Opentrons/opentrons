@@ -9,7 +9,6 @@ import {
   Box,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -18,6 +17,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ListButton,
   MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -33,6 +33,7 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getOffDeckRenderInfo,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
@@ -107,9 +108,7 @@ export function ProtocolSetupLabware({
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
-  const offDeckItems = Object.keys(stacksWithLaware).includes('offDeck')
-    ? startingDeck.offDeck
-    : null
+  const offDeckItems = getOffDeckRenderInfo(stacksWithLaware)
 
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
@@ -211,6 +210,7 @@ export function ProtocolSetupLabware({
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={'offDeck'}
+                    offDeckQuantity={item.quantity}
                     stackedItems={[item]}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
@@ -247,10 +247,8 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const {
-    createLiveCommand,
-    isLoading: isLiveCommandLoading,
-  } = useCreateLiveCommandMutation()
+  const { createLiveCommand, isLoading: isLiveCommandLoading } =
+    useCreateLiveCommandMutation()
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -404,6 +402,7 @@ interface RowLabwareProps {
   stackedItems: StackItem[]
   onClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
   labwareByLiquidId: LabwareByLiquidId
+  offDeckQuantity?: number
 }
 
 function RowLabware({
@@ -413,6 +412,7 @@ function RowLabware({
   stackedItems,
   onClick,
   labwareByLiquidId,
+  offDeckQuantity,
 }: RowLabwareProps): JSX.Element | null {
   const moduleInStack = getModuleFromStack(stackedItems)
   const labwareInStack = stackedItems.filter(
@@ -445,7 +445,7 @@ function RowLabware({
       : null
 
   const location: JSX.Element = (
-    <DeckInfoLabel
+    <RobotInfoLabel
       deckLabel={
         slotName === 'offDeck'
           ? i18n.format(t('off_deck'), 'upperCase')
@@ -466,13 +466,13 @@ function RowLabware({
       <Flex gridGap={SPACING.spacing4} flexWrap="wrap" width="11rem">
         {location}
         {matchedModule != null ? (
-          <DeckInfoLabel
+          <RobotInfoLabel
             iconName={
               MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
             }
           />
         ) : null}
-        {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
+        {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -480,59 +480,68 @@ function RowLabware({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          {labwareLiquidRenderInfo.map((labware, index) => (
-            <>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                <StyledText
-                  oddStyle="bodyTextSemiBold"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          {labwareLiquidRenderInfo.map((labware, index) => {
+            const quantityTag = offDeckQuantity ?? labware.quantity
+            return (
+              <>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
                 >
-                  {labware.displayName}
-                </StyledText>
-                {labware.lidDisplayName != null ? (
-                  <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-                    {labware.lidDisplayName}
-                  </StyledText>
-                ) : null}
-                {labware.quantity > 1 || labware.liquids > 0 ? (
-                  <Flex
-                    flexDirection={DIRECTION_ROW}
-                    paddingTop={SPACING.spacing4}
-                    gridGap={SPACING.spacing8}
+                  <StyledText
+                    oddStyle="bodyTextSemiBold"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
-                    {labware.quantity > 1 ? (
-                      <Tag
-                        type="default"
-                        text={t('protocol_setup:labware_quantity', {
-                          quantity: labware.quantity,
-                        })}
-                      />
-                    ) : null}
-                    {labware.liquids > 0 ? (
-                      <Tag
-                        type="default"
-                        text={
-                          labware.quantity > 1
-                            ? t('protocol_setup:multiple_liquid_layouts')
-                            : t('protocol_setup:number_of_liquids', {
-                                number: labware.liquids,
-                                count: labware.liquids,
-                              })
-                        }
-                      />
-                    ) : null}
-                  </Flex>
-                ) : null}
-                {index !== labwareLiquidRenderInfo.length - 1 ? (
-                  <Box
-                    borderBottom={`1px solid ${COLORS.grey60}`}
-                    marginY={SPACING.spacing16}
-                    width={matchingHeaterShaker != null ? '26rem' : '40rem'}
-                  />
-                ) : null}
-              </Flex>
-            </>
-          ))}
+                    {labware.displayName}
+                  </StyledText>
+                  {labware.lidDisplayName != null ? (
+                    <StyledText
+                      oddStyle="bodyTextRegular"
+                      color={COLORS.grey60}
+                    >
+                      {labware.lidDisplayName}
+                    </StyledText>
+                  ) : null}
+                  {quantityTag > 1 || labware.liquids > 0 ? (
+                    <Flex
+                      flexDirection={DIRECTION_ROW}
+                      paddingTop={SPACING.spacing4}
+                      gridGap={SPACING.spacing8}
+                    >
+                      {quantityTag > 1 ? (
+                        <Tag
+                          type="default"
+                          text={t('protocol_setup:labware_quantity', {
+                            quantity: quantityTag,
+                          })}
+                        />
+                      ) : null}
+                      {labware.liquids > 0 ? (
+                        <Tag
+                          type="default"
+                          text={
+                            labware.quantity > 1
+                              ? t('protocol_setup:multiple_liquid_layouts')
+                              : t('protocol_setup:number_of_liquids', {
+                                  number: labware.liquids,
+                                  count: labware.liquids,
+                                })
+                          }
+                        />
+                      ) : null}
+                    </Flex>
+                  ) : null}
+                  {index !== labwareLiquidRenderInfo.length - 1 ? (
+                    <Box
+                      borderBottom={`1px solid ${COLORS.grey60}`}
+                      marginY={SPACING.spacing16}
+                      width={matchingHeaterShaker != null ? '26rem' : '40rem'}
+                    />
+                  ) : null}
+                </Flex>
+              </>
+            )
+          })}
         </Flex>
         {matchingHeaterShaker != null ? (
           <LabwareLatch

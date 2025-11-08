@@ -7,11 +7,11 @@ import {
   ListButtonAccordionContainer,
 } from '@opentrons/components'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { ThunkDispatch } from '../../../types'
@@ -36,7 +36,6 @@ export function SelectLidOnLabware(
     lidURIs,
   } = props
   const { t } = useTranslation('starting_deck_state')
-  const enableStacking = useSelector(getEnableStacking)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const defs = getOnlyLatestDefs()
@@ -69,8 +68,7 @@ export function SelectLidOnLabware(
 
           return (
             <CustomizeExpandButton
-              enableStackingFF={enableStacking}
-              loadName={def.parameters.loadName}
+              isNestedDefALid={getIsNestedDefinitionALid(def)}
               allowInputField={lidLoadNames.includes(def.parameters.loadName)}
               key={`${category}_${loadName}_${defUri}`}
               id={`${category}_${loadName}_${defUri}`}

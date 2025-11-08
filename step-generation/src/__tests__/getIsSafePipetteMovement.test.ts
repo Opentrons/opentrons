@@ -10,6 +10,7 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import { CLEAN } from '../constants'
 import { getIsSafePipetteMovement } from '../utils'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -168,7 +169,9 @@ describe('getIsSafePipetteMovement', () => {
     expect(result).toEqual(true)
   })
   it('returns false when there is a tip that collides', () => {
-    mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
+    mockRobotState.tipState.tipracks = {
+      mockTiprackId: { A1: CLEAN },
+    }
     mockRobotState.labware = {
       ...mockRobotState.labware,
       [mockAdapter]: { stack: [mockAdapter, 'D1'] },

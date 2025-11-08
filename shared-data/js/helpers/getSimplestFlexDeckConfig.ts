@@ -20,6 +20,10 @@ export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
 }
 
+export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+}
+
 export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
   { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
@@ -35,9 +39,11 @@ export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
 ]
 
-export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] = FLEX_SIMPLEST_DECK_CONFIG.map(
-  config => ({ ...config, requiredAddressableAreas: [] })
-)
+export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] =
+  FLEX_SIMPLEST_DECK_CONFIG.map(config => ({
+    ...config,
+    requiredAddressableAreas: [],
+  }))
 
 export function getSimplestDeckConfigForProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
@@ -53,10 +59,11 @@ export function getSimplestDeckConfigForProtocol(
     CutoutConfigProtocolSpec[]
   >((acc, addressableArea) => {
     // finds all cutout fixtures that provide this addressable area
-    const cutoutFixturesForAddressableArea = getCutoutFixturesForAddressableAreas(
-      [addressableArea],
-      deckDef.cutoutFixtures
-    )
+    const cutoutFixturesForAddressableArea =
+      getCutoutFixturesForAddressableAreas(
+        [addressableArea],
+        deckDef.cutoutFixtures
+      )
     // grabs the cutout id for the addressable area
     const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
       addressableArea,
@@ -171,10 +178,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)

@@ -4,11 +4,11 @@ import noop from 'lodash/noop'
 
 import {
   ALIGN_CENTER,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -17,7 +17,10 @@ import {
 import { formatVolume } from './utils'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
-import type { SubstepIdentifier, SubstepWellData } from '../../../../steplist'
+import type {
+  SubstepIdentifier,
+  SubstepWellData,
+} from '/protocol-designer/steplist'
 
 interface SubstepProps {
   trashName: AdditionalEquipmentName | null
@@ -108,7 +111,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('protocol_steps:in')}
               </StyledText>
-              <DeckInfoLabel
+              <RobotInfoLabel
                 deckLabel={i18n.format(
                   t('protocol_steps:well_name', {
                     wellName: source?.well ?? '',
@@ -138,7 +141,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('protocol_steps:from')}
                   </StyledText>
-                  <DeckInfoLabel
+                  <RobotInfoLabel
                     deckLabel={i18n.format(
                       t('protocol_steps:well_name', {
                         wellName: source.well,
@@ -169,7 +172,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                       {t('protocol_steps:into')}
                     </StyledText>
 
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       deckLabel={i18n.format(
                         dest?.well != null
                           ? t('protocol_steps:well_name', {

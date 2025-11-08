@@ -2,8 +2,6 @@
 title: "Opentrons Flex: System Specifications"
 ---
 
-# System Specifications
-
 ## General specifications
 
 | Specification | Details |
@@ -35,7 +33,7 @@ title: "Opentrons Flex: System Specifications"
 | **Relative humidity**     | 40–60%, non-condensing (recommended) |
 | **Pollution degree**      | 2 (non-conductive pollution only) |
 
-For additional information on acceptable environmental conditions for use and transport, see the [Environmental Conditions section][environmental-conditions] of the Installation and Relocation chapter.
+For additional information on acceptable environmental conditions for use and transport, see the [Environmental Conditions section][environmental-conditions-flex] of the Installation and Relocation chapter.
 
 ## Certifications
 

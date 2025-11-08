@@ -15,7 +15,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { NameQuickTransfer } from '../NameQuickTransfer'
 import { Overview } from '../Overview'
 import { SummaryAndSettings } from '../SummaryAndSettings'
-import { createQuickTransferFile, getInitialSummaryState } from '../utils'
+import { createQuickTransferPythonFile, getInitialSummaryState } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -92,7 +92,7 @@ describe('SummaryAndSettings', () => {
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun,
     } as any)
-    vi.mocked(createQuickTransferFile).mockReturnValue('' as any)
+    vi.mocked(createQuickTransferPythonFile).mockReturnValue('' as any)
     vi.mocked(getInitialSummaryState).mockReturnValue({
       liquidClassValuesInitialized: true,
     } as any)
@@ -151,7 +151,7 @@ describe('SummaryAndSettings', () => {
       name: ANALYTICS_QUICK_TRANSFER_RUN_NOW,
       properties: {},
     })
-    expect(vi.mocked(createQuickTransferFile)).toHaveBeenCalled()
+    expect(vi.mocked(createQuickTransferPythonFile)).toHaveBeenCalled()
     expect(vi.mocked(createProtocol)).toHaveBeenCalled()
   })
 })

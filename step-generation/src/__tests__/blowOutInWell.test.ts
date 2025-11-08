@@ -97,9 +97,8 @@ mock_pipette.blow_out(mock_source_plate["A1"].top(z=-1.3))
     })
   })
   it('should return an error when blowing out from labware off deck', () => {
-    initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
-      invariantContext
-    )
+    initialRobotState =
+      getInitialRobotStateWithOffDeckLabwareStandard(invariantContext)
     const result = blowOutInWell(
       {
         flowRate: 10,

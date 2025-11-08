@@ -7,14 +7,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { getOffDeckRenderInfo } from '@opentrons/shared-data'
 
 import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { LabwareDefinitionsByURI, StackItem } from '@opentrons/shared-data'
+import type {
+  LabwareDefinitionsByURI,
+  StackedItemsOnDeck,
+  StackItem,
+} from '@opentrons/shared-data'
 
 interface OffDeckLabwareListProps {
-  labwareItems: StackItem[]
+  labwareItems: StackedItemsOnDeck
   isFlex: boolean
   definitionsByURI: LabwareDefinitionsByURI
   setSelectedStack: Dispatch<
@@ -26,7 +31,8 @@ export function OffDeckLabwareList(
 ): JSX.Element | null {
   const { labwareItems, isFlex, definitionsByURI, setSelectedStack } = props
   const { t } = useTranslation('protocol_setup')
-  if (labwareItems.length < 1) return null
+  const offDeckItems = getOffDeckRenderInfo(labwareItems)
+  if (offDeckItems.length < 1) return null
   return (
     <>
       <LegacyStyledText
@@ -38,12 +44,13 @@ export function OffDeckLabwareList(
         {t('additional_off_deck_labware')}
       </LegacyStyledText>
       <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-        {labwareItems.map((labwareItem, index) => (
+        {offDeckItems.map((labwareItem, index) => (
           <LabwareListItem
             key={index}
             attachedModuleInfo={{}}
             extraAttentionModules={[]}
             stackedItems={[labwareItem]}
+            offDeckQuantity={labwareItem.quantity}
             slotName="offDeck"
             isFlex={isFlex}
             showLabwareSVG

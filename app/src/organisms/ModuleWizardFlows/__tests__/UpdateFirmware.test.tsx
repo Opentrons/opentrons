@@ -89,10 +89,14 @@ describe('UpdateFirmware', () => {
 
   afterEach(() => {
     vi.clearAllTimers()
+    vi.resetAllMocks()
   })
 
   it('should render update found screen when hasAvailableUpdate is true', () => {
     render(props)
+    act(() => {
+      vi.advanceTimersByTime(1001)
+    })
     screen.getByText('Firmware update found')
     screen.getByText(
       'Update to the latest firmware for the Heater-Shaker Module GEN1 before proceeding'
@@ -106,6 +110,9 @@ describe('UpdateFirmware', () => {
       attachedModule: { ...mockHeaterShaker, hasAvailableUpdate: false },
     }
     render(props)
+    act(() => {
+      vi.advanceTimersByTime(1001)
+    })
     screen.getByText('Heater-Shaker Module GEN1 firmware up to date.')
     act(() => {
       vi.advanceTimersByTime(2001)
@@ -115,6 +122,9 @@ describe('UpdateFirmware', () => {
 
   it('should call handleModuleApiRequests when update firmware button is clicked', () => {
     render(props)
+    act(() => {
+      vi.advanceTimersByTime(1001)
+    })
     const updateButton = screen.getByRole('button', { name: 'Install update' })
     fireEvent.click(updateButton)
     expect(handleModuleApiRequests).toBeCalledWith(
@@ -128,6 +138,9 @@ describe('UpdateFirmware', () => {
       .calledWith({} as State, LAST_ID)
       .thenReturn({ status: PENDING } as RequestState)
     render(props)
+    act(() => {
+      vi.advanceTimersByTime(1001)
+    })
     screen.getByText('Installing latest firmware')
   })
 
@@ -145,10 +158,11 @@ describe('UpdateFirmware', () => {
       .calledWith({} as State, LAST_ID)
       .thenReturn({ status: SUCCESS } as RequestState)
     render(props)
-    screen.getByText(
-      'Update to the latest firmware for the Heater-Shaker Module GEN1 before proceeding'
-    )
+    screen.getByText('Checking Heater-Shaker Module GEN1 firmware')
     expect(props.patchModuleAfterUpdate).toHaveBeenCalled()
+    act(() => {
+      vi.advanceTimersByTime(2001)
+    })
     expect(props.proceed).toHaveBeenCalled()
   })
 

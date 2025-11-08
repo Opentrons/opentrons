@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
+import { ModalShell, WizardHeader } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { CalibratePipetteOffset } from '/app/organisms/Desktop/CalibratePipetteOffset'
 import { LoadingState } from '/app/organisms/Desktop/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '/app/redux/analytics'
@@ -38,11 +37,10 @@ export function useDashboardCalibratePipOffset(
   const dispatch = useDispatch()
   const { t } = useTranslation('robot_calibration')
 
-  const pipOffsetCalSession: PipetteOffsetCalibrationSession | null = useSelector(
-    (state: State) => {
+  const pipOffsetCalSession: PipetteOffsetCalibrationSession | null =
+    useSelector((state: State) => {
       return getPipetteOffsetCalibrationSession(state, robotName)
-    }
-  )
+    })
 
   const [dispatchRequests, requestIds] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -53,7 +51,7 @@ export function useDashboardCalibratePipOffset(
       ) {
         createRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type === Sessions.DELETE_SESSION &&
@@ -61,7 +59,7 @@ export function useDashboardCalibratePipOffset(
       ) {
         deleteRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
@@ -70,7 +68,7 @@ export function useDashboardCalibratePipOffset(
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       } else if (
         dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
@@ -80,7 +78,7 @@ export function useDashboardCalibratePipOffset(
       ) {
         spinnerRequestId.current =
           'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
+            ? (dispatchedAction.meta.requestId ?? null)
             : null
       }
     }
@@ -121,37 +119,38 @@ export function useDashboardCalibratePipOffset(
     }
   }, [shouldClose, onComplete])
 
-  const handleStartDashboardPipOffsetCalSession: DashboardCalOffsetInvoker = props => {
-    const { params } = props
-    const {
-      mount,
-      shouldRecalibrateTipLength = false,
-      hasCalibrationBlock = false,
-      tipRackDefinition = null,
-    } = params
-    dispatchRequests(
-      Sessions.ensureSession(
-        robotName,
-        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-        {
-          mount,
-          shouldRecalibrateTipLength,
-          hasCalibrationBlock,
-          tipRackDefinition,
-        }
-      )
-    )
-    dispatch(
-      pipetteOffsetCalibrationStarted(
+  const handleStartDashboardPipOffsetCalSession: DashboardCalOffsetInvoker =
+    props => {
+      const { params } = props
+      const {
         mount,
-        hasCalibrationBlock,
-        shouldRecalibrateTipLength,
-        tipRackDefinition != null
-          ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
-          : null
+        shouldRecalibrateTipLength = false,
+        hasCalibrationBlock = false,
+        tipRackDefinition = null,
+      } = params
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+          {
+            mount,
+            shouldRecalibrateTipLength,
+            hasCalibrationBlock,
+            tipRackDefinition,
+          }
+        )
       )
-    )
-  }
+      dispatch(
+        pipetteOffsetCalibrationStarted(
+          mount,
+          hasCalibrationBlock,
+          shouldRecalibrateTipLength,
+          tipRackDefinition != null
+            ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
+            : null
+        )
+      )
+    }
 
   let Wizard: JSX.Element | null = createPortal(
     startingSession ? (

@@ -49,6 +49,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
     if (Object.keys(labwareDef.wells).length === 1) {
       probeOffsetX = 99 / 2
     }
+    if (Object.keys(labwareDef.wells).length === 384) {
+      probeOffsetY = 65.75
+    }
   }
 
   return (

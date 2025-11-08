@@ -6,6 +6,7 @@ import {
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   DEFAULT_PIPETTE,
   DEST_LABWARE,
   FIXED_TRASH_ID,
@@ -28,7 +29,7 @@ describe('generateRobotStateTimeline', () => {
       a: {
         errors: false,
         stepArgs: {
-          stepId: 1,
+          stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
@@ -97,12 +98,15 @@ describe('generateRobotStateTimeline', () => {
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
           dispenseRetractDelay: null,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
       b: {
         errors: false,
         stepArgs: {
-          stepId: 1,
+          stepNumber: 1,
           dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
           volume: 5,
@@ -171,6 +175,9 @@ describe('generateRobotStateTimeline', () => {
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
           dispenseRetractDelay: null,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
       c: {
@@ -203,6 +210,9 @@ describe('generateRobotStateTimeline', () => {
           finalPushOut: 0,
           zOffset: 0,
           positionReference: POSITION_REFERENCE_BOTTOM,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
     }

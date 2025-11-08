@@ -1,4 +1,5 @@
 """Build a module emulator for integration tests."""
+
 import asyncio
 from typing import Optional, Type, TypeVar, cast
 
@@ -30,6 +31,8 @@ async def build_module(
     module = await module_cls.build(
         port=f"socket://127.0.0.1:{port}",
         execution_manager=execution_manager,
+        disconnected_callback=lambda *args: None,
+        error_callback=lambda *args: None,
         usb_port=USBPort(
             name="",
             port_number=1,

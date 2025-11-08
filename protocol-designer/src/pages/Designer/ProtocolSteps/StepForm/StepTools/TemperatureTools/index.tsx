@@ -2,20 +2,25 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Divider,
   Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../components/molecules'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/components/molecules'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import { usePriorModuleState } from '../../hooks/usePriorModuleState'
+import { PriorTemperatureState } from './PriorTemperatureState'
 
 import type { StepFormProps } from '../../types'
 
@@ -23,6 +28,13 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)
+  const enableConcurrentModuleActions = useSelector(
+    getEnableConcurrentModuleActions
+  )
+  const priorState = usePriorModuleState(
+    propsForFields.moduleId.value as string | null,
+    TEMPERATURE_MODULE_TYPE
+  )
   const dispatch = useDispatch()
 
   return (
@@ -44,7 +56,25 @@ export function TemperatureTools(props: StepFormProps): JSX.Element {
           dispatch(hoverSelection({ id: null, text: null }))
         }}
       />
-      <Box borderBottom={`1px solid ${COLORS.grey30}`} />
+      <Divider marginY={0} />
+      {enableConcurrentModuleActions && priorState != null && (
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            paddingX={SPACING.spacing16}
+          >
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              color={COLORS.black90}
+            >
+              {t('protocol_steps:prior_state')}
+            </StyledText>
+            <PriorTemperatureState priorState={priorState} />
+          </Flex>
+          <Divider marginY={0} />
+        </>
+      )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { getNextDefaultMagnetAction } from '../'
 
-import type { StepType } from '../../../../form-types'
+import type { StepType } from '/protocol-designer/form-types'
 
 describe('getNextDefaultMagnetAction', () => {
   describe('no previous forms defaults to engage', () => {

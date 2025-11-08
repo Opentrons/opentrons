@@ -16,9 +16,7 @@ import { useDispatchApiRequest } from '/app/redux/robot-api'
 import type { AttachedModule } from '/app/redux/modules/types'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
-  //  TODO(jr, 9/22/22): add images for V1 of magneticModule and temperatureModule
   switch (attachedModule.moduleModel) {
-    // TODO: Add correct image for flex stacker
     case 'magneticModuleV1':
     case 'magneticModuleV2':
       return magneticModule
@@ -55,13 +53,11 @@ type GetLatestRequestIdType = (moduleId: string) => string | null
 
 export function useModuleApiRequests(): [
   GetLatestRequestIdType,
-  HandleModuleApiRequestsType
+  HandleModuleApiRequestsType,
 ] {
   const [dispatchApiRequest] = useDispatchApiRequest()
-  const [
-    requestIdsBySerial,
-    setRequestIdsBySerial,
-  ] = useState<RequestIdsBySerialNumber>({})
+  const [requestIdsBySerial, setRequestIdsBySerial] =
+    useState<RequestIdsBySerialNumber>({})
 
   const handleModuleApiRequests = (
     robotName: string,

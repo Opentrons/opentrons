@@ -14,18 +14,38 @@
   "extents": {
     "total": {
       "backLeftBottom": {
-        "x": 8.5,
-        "y": -5.5,
+        "x": 0,
+        "y": 0,
         "z": 0
       },
       "frontRightTop": {
-        "x": 119.5,
-        "y": -80.5,
+        "x": 127.2,
+        "y": -74.8,
         "z": 12
       }
     }
   },
-  "features": {},
+  "features": {
+    "heaterShakerUniversalFlatAdapter": {
+      "flatSupportThermalCouplingZ": 4.7,
+      "deckLeft": {
+        "wallX": 7.52,
+        "screwCenter": {
+          "x": 71.7,
+          "y": -37.4,
+          "z": 0
+        }
+      },
+      "deckRight": {
+        "wallX": -7.52,
+        "screwCenter": {
+          "x": 55.5,
+          "y": -37.4,
+          "z": 0
+        }
+      }
+    }
+  },
   "wells": {},
   "groups": [
     {

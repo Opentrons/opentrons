@@ -112,6 +112,17 @@ export interface ConfigureNozzleLayoutRunTimeCommand
   result?: {}
 }
 
+export interface SetTipStateCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'setTipState'
+  params: SetTipStateParams
+}
+
+export interface SetTipStateRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    SetTipStateCreateCommand {
+  result?: {}
+}
+
 export type SetupRunTimeCommand =
   | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
@@ -123,6 +134,7 @@ export type SetupRunTimeCommand =
   | MoveLabwareRunTimeCommand
   | LoadLidRunTimeCommand
   | LoadLidStackRunTimeCommand
+  | SetTipStateRunTimeCommand
 
 export type SetupCreateCommand =
   | ConfigureNozzleLayoutCreateCommand
@@ -135,10 +147,12 @@ export type SetupCreateCommand =
   | MoveLabwareCreateCommand
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
+  | SetTipStateCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
   | 'systemLocation'
+  | 'wasteChuteLocation'
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
@@ -185,7 +199,7 @@ export interface OnAddressableAreaLocationSequenceComponent {
 
 export interface NotOnDeckLocationSequenceComponent {
   kind: 'notOnDeck'
-  logicalLocationName: 'offDeck' | 'systemLocation'
+  logicalLocationName: 'offDeck' | 'systemLocation' | 'wasteChuteLocation'
 }
 
 export interface OnCutoutFixtureLocationSequenceComponent {
@@ -336,4 +350,12 @@ interface LoadLidResult {
   labwareId: string
   definition: LabwareDefinition
   locationSequence?: LabwareLocationSequence
+}
+
+export type TipWellState = 'clean' | 'used' | 'empty'
+
+export interface SetTipStateParams {
+  labwareId: string
+  wellNames: string[]
+  tipWellState?: TipWellState
 }

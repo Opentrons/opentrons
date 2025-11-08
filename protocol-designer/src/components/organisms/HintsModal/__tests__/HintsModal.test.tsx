@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { HintsModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { removeHint } from '../../../../tutorial/actions'
-import { getHint } from '../../../../tutorial/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { removeHint } from '/protocol-designer/tutorial/actions'
+import { getHint } from '/protocol-designer/tutorial/selectors'
 
-vi.mock('../../../../tutorial/actions')
-vi.mock('../../../../tutorial/selectors')
+import { HintsModal } from '..'
+
+vi.mock('/protocol-designer/tutorial/actions')
+vi.mock('/protocol-designer/tutorial/selectors')
 const render = () => {
   return renderWithProviders(<HintsModal />, {
     i18nInstance: i18n,

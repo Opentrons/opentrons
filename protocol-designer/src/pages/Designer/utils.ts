@@ -4,19 +4,18 @@ import { reduce } from 'lodash'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
-  getIsPipettableLabware,
+  getAllDefinitions,
+  getIsLid,
   getIsTiprack,
   getPositionFromSlotId,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
-  getNearestParentInStack,
   getSlotInLocationStack,
-  TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 
 import { getRobotType } from '../../file-data/selectors'
@@ -31,6 +30,7 @@ import {
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
+  AddressableAreaName,
   CoordinateTuple,
   CutoutId,
   DeckDefinition,
@@ -90,14 +90,14 @@ export const getSlotInformation = (
     modules: deckSetupModules,
     additionalEquipmentOnDeck,
   } = deckSetup
-  const latestDefs = getAllLabwareDefs()
+  const latestDefs = getAllDefinitions()
   const lidLoadNames = Object.values(latestDefs)
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? getPositionFromSlotId(slot, deckDef) ?? null
+      ? (getPositionFromSlotId(slot, deckDef) ?? null)
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === slot
@@ -197,8 +197,8 @@ export const getSlotInformation = (
       slot === 'offDeck'
         ? []
         : offDeckLabware != null
-        ? [offDeckLabware.id]
-        : remainingLabwareIds,
+          ? [offDeckLabware.id]
+          : remainingLabwareIds,
     createdLidForSlot:
       lidIdFromStack != null ? deckSetupLabware[lidIdFromStack] : undefined,
   }
@@ -266,7 +266,7 @@ const getLabwareInfo = (
   const name = nicknamesById[labwareId]
   let nickName: string = name
   if (latestSlot != null && latestSlot !== 'offDeck') {
-    nickName = t('labware_in_slot', { name, slot: latestSlot })
+    nickName = name
   } else if (latestSlot != null && latestSlot === 'offDeck') {
     nickName = t('labware_offdeck', { name })
   }
@@ -294,28 +294,27 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
+
+      const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
-        deckSlot
+        deckSlot,
+        labwareId
       )
-      const labwareStack = fullStackFromLabwares.filter(
-        id =>
-          deckSetupLabware[id] != null &&
-          !deckSetupLabware[id].def.allowedRoles?.includes('adapter')
-      )
-      const labwareStackLength = labwareStack.length - 1
-      const allowStacking = def.stackLimit != null && def.stackLimit > 1
-      const showStackOption = !useGripper && type === 'moveLabware'
-
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
-      const isBottomOfStack =
-        labwareStack[labwareStackLength] === labwareId &&
-        allowStacking &&
-        labwareStack.length > 1
-      const bottomOfStack = isBottomOfStack
-        ? labwareStack[labwareStackLength]
-        : null
-      const isLabwareInWasteChute = deckSlot === 'gripperWasteChute'
+      const topId = fullStackFromLabwares[0]
+      const isLabwareLidCombo =
+        (fullStackFromLabwares[1] === labwareId &&
+          labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('lid') &&
+          !def.allowedRoles?.includes('adapter')) ??
+        false
+      const isLabwareInTrash =
+        deckSlot === 'gripperWasteChute' ||
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+          deckSlot as AddressableAreaName
+        ) ||
+        deckSlot === 'fixedTrash'
 
       const isAdapter = def.allowedRoles?.includes('adapter') ?? false
       const { nickName, latestSlot } = getLabwareInfo(
@@ -326,25 +325,19 @@ export const useLabwareDropdownOptions = (
         t
       )
       const isTiprack = getIsTiprack(def)
+      const isLid = getIsLid(def)
       const isFilterOffDeck =
-        deckSlot === 'offDeck' &&
+        isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
-      //  show full stack option if moving labware manually
-      const bottomOfStackOption: DropdownOption | null =
-        showStackOption && bottomOfStack != null
-          ? {
-              name: t('protocol_steps:unoccupied_stack', { name: nickName }),
-              value: bottomOfStack,
-              deckLabel: latestSlot,
-            }
-          : null
-      const restOfOptions: DropdownOption[] =
+      //  TODO: refactor this to be easier to read
+      const options: DropdownOption[] =
         isAdapter ||
-        isLabwareInWasteChute ||
-        (type === 'labware' && isTiprack) ||
+        isLabwareInTrash ||
+        (type === 'labware' && (isTiprack || isLid)) ||
         isFilterOffDeck ||
-        !isTopOfStack
+        (type === 'moveLabware' && !isTopOfStack && !isLabwareLidCombo) ||
+        (type === 'labware' && !isTopOfStack)
           ? acc
           : [
               ...acc,
@@ -358,10 +351,7 @@ export const useLabwareDropdownOptions = (
       //  filter out moving adapters, and labware in
       //  waste chute for moveLabware, labware off-deck and
       //  labware that is a tiprack for the labware dropdown only
-      return [
-        ...restOfOptions,
-        ...(bottomOfStackOption != null ? [bottomOfStackOption] : []),
-      ]
+      return options
     },
     []
   )
@@ -376,13 +366,7 @@ export const getUnoccupiedStackOptions = (args: {
   labwareEntities: LabwareEntities
   t: any
 }): Option[] => {
-  const {
-    robotState,
-    deckSetupLabware,
-    labwareIdFromDropdown,
-    labwareEntities,
-    t,
-  } = args
+  const { robotState, deckSetupLabware, labwareIdFromDropdown, t } = args
   if (deckSetupLabware[labwareIdFromDropdown] == null) {
     return []
   }
@@ -392,45 +376,50 @@ export const getUnoccupiedStackOptions = (args: {
 
   const { labware: labwareState } = robotState
 
-  const isLabwareToMoveUsedLid =
-    labwareState[labwareIdFromDropdown]?.sterility ===
-    TOUCHED_PIPETTABLE_LABWARE
-
   return Object.entries(labwareState).reduce<Option[]>(
     (acc, [labwareId, temporalLabwareOnDeck]) => {
       const slot = getSlotInLocationStack(temporalLabwareOnDeck.stack)
-      const fullStack = getFullStackFromLabwares(labwareState, slot)
+      const fullStack = getFullStackFromLabwares(labwareState, slot, labwareId)
       const labwareOnDeck = deckSetupLabware[labwareId]
       const isTopOfStack = fullStack[0] === labwareId
       const { def: labwareOnDeckDef } = labwareOnDeck
       const { displayName } = labwareOnDeckDef.metadata
-      const { loadName } = labwareOnDeckDef.parameters
+      const { loadName: labwareOnDeckLoadName } = labwareOnDeckDef.parameters
+      const isUniversalLid =
+        def.parameters.loadName === 'opentrons_tough_universal_lid'
+      const isLabwareOnSlotTuberack =
+        labwareOnDeckDef.metadata.displayCategory === 'tubeRack'
+      const isLabwareOnSlotAluminumBlock =
+        labwareOnDeckDef.metadata.displayCategory === 'aluminumBlock'
+      const isLabwareOnSlotTiprack = labwareOnDeckDef.parameters.isTiprack
 
-      const isCompatible = labwareCompatibleParentLabware?.includes(loadName)
+      const allowedRoles = labwareOnDeckDef.allowedRoles ?? []
+      const isLidRole = allowedRoles.includes('lid')
+
+      const isCompatible =
+        labwareCompatibleParentLabware?.includes(labwareOnDeckLoadName) ||
+        // allow universal lid can go anywhere except for tubeRacks, aluminum blocks, and tipracks and other lids
+        // since it doesn't have a labwareCompatibleLabware array, we need to special-case it, huhu
+        (isUniversalLid &&
+          !isLabwareOnSlotTuberack &&
+          !isLabwareOnSlotAluminumBlock &&
+          !isLabwareOnSlotTiprack &&
+          (labwareOnDeckLoadName === 'opentrons_tough_universal_lid' ||
+            !isLidRole))
+
       const isNotCurrentLabwareStack = !fullStack.includes(
         labwareIdFromDropdown
       )
-
-      const nearestParentInStack = getNearestParentInStack(fullStack)
-      const isNearestParentPipettableLabware =
-        nearestParentInStack != null &&
-        labwareEntities[nearestParentInStack] != null &&
-        getIsPipettableLabware(labwareEntities[nearestParentInStack].def)
-
-      const isNewLabwarePipettable =
-        labwareOnDeckDef != null && getIsPipettableLabware(labwareOnDeckDef)
-      const isSafeLidMove =
-        !(isLabwareToMoveUsedLid && isNewLabwarePipettable) &&
-        !isNearestParentPipettableLabware
-
-      const isInWasteChute = slot === 'gripperWasteChute'
+      const isInTrash =
+        slot === 'gripperWasteChute' ||
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot as AddressableAreaName) ||
+        slot === 'fixedTrash'
 
       if (
         isTopOfStack &&
         isCompatible &&
         isNotCurrentLabwareStack &&
-        !isInWasteChute &&
-        isSafeLidMove
+        !isInTrash
       ) {
         const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
           deckSetupLabware,

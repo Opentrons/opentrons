@@ -1,6 +1,7 @@
 import ast
 import keyword
 import re
+import subprocess
 from pathlib import Path
 
 from rich.console import Console
@@ -217,7 +218,7 @@ def audit_snapshots_against_registry(console, file_stem_set):
         )
 
 
-def main():
+def main():  # noqa: C901
     console = Console()
     file_stems = get_protocol_stems_from_files()
     class_stems = get_protocol_stems_from_class_ast()
@@ -234,24 +235,13 @@ def main():
     if not missing and not extra:
         console.print(Panel("[green]Protocols registry matches protocol files. No changes needed![/green]", title="Audit Result"))
     else:
+        added_command = None
+        added_names_for_command = []
         if missing or extra:
             added_names = add_missing_protocols_to_class_ast(missing, file_stem_set)
-            # --- Print big panel with names of added protocols and a command with names in it ---
             if added_names:
-                command_placeholder = f"make snapshot-test-update PROTOCOL_NAMES={','.join(added_names)} OVERRIDE_PROTOCOL_NAMES=none"
-                panel_content = (
-                    f"[bold red]You need to run this command:[/bold red]\n\n"
-                    f"[bold yellow]{command_placeholder}[/bold yellow]\n\n"
-                    f"[bold]Protocols added:[/bold]\n" + "\n".join(added_names)
-                )
-                console.print(
-                    Panel(
-                        panel_content,
-                        title="[red]Manual Action Required[/red]",
-                        expand=True,
-                        style="bold red",
-                    )
-                )
+                added_command = f"make snapshot-test-update PROTOCOL_NAMES={','.join(added_names)} OVERRIDE_PROTOCOL_NAMES=none"
+                added_names_for_command = added_names
             console.print(
                 Panel(
                     f"[yellow]Added {len(missing)} missing protocols and removed {len(extra)} extra protocols. "
@@ -281,6 +271,45 @@ def main():
                 )
     # --- Snapshot audit ---
     audit_snapshots_against_registry(console, file_stem_set)
+
+    # --- Final manual action (moved to end for better copy/paste; plain output, no panel) ---
+    try:
+        if "added_command" in locals() and added_command:
+            plain_command = added_command
+            console.print("\n=== Snapshot Update Command ===")
+            console.print("Run this to generate/update snapshots for newly added protocols:")
+            # Print raw command alone on its own line for single-click copy
+            console.print(f"\n{plain_command}\n")
+            console.print("Protocols added (in order used above):")
+            for n in added_names_for_command:
+                console.print(f" - {n}")
+            # Automatically execute the command and capture output
+            console.print("\n=== Executing Snapshot Update Command (auto) ===")
+            root_dir = Path(__file__).resolve().parents[2]  # analyses-snapshot-testing root
+            try:
+                result = subprocess.run(
+                    plain_command,
+                    shell=True,
+                    cwd=root_dir,
+                    capture_output=True,
+                    text=True,
+                )
+                console.print(f"Return code: {result.returncode}")
+                if result.stdout:
+                    console.print("\n--- STDOUT ---")
+                    console.print(result.stdout.rstrip())
+                if result.stderr:
+                    console.print("\n--- STDERR ---")
+                    console.print(result.stderr.rstrip())
+                if result.returncode == 0:
+                    console.print("\n[green]Snapshot update command completed successfully.[/green]")
+                else:
+                    console.print("\n[red]Snapshot update command failed.[/red]")
+            except FileNotFoundError:
+                console.print("[red]Failed to execute snapshot update command: make not found[/red]")
+            console.print("\n(End of command output)\n")
+    except Exception:  # pragma: no cover - defensive, shouldn't fail the audit
+        pass
 
 
 if __name__ == "__main__":

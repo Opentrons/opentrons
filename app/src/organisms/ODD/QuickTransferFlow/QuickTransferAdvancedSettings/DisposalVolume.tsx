@@ -68,10 +68,8 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     return `trashBin:${blowOut.location.cutoutId}`
   }
 
-  const [
-    selectedBlowoutLocation,
-    setSelectedBlowoutLocation,
-  ] = useState<string>(getInitialBlowoutLocation(state.blowOutDispense))
+  const [selectedBlowoutLocation, setSelectedBlowoutLocation] =
+    useState<string>(getInitialBlowoutLocation(state.blowOutDispense))
   const [flowRate, setFlowRate] = useState<number | null>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const fixtureLocationOptions = deckConfig.filter(

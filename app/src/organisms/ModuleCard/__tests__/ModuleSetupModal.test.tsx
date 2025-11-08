@@ -93,8 +93,6 @@ describe('ModuleSetupModal', () => {
           name: 'mockModuleDisplayName setup instructions',
         })
         .getAttribute('href')
-    ).toBe(
-      'https://insights.opentrons.com/hubfs/Opentrons%20Flex%20Stacker%20Quickstart%20Guide.pdf'
-    )
+    ).toBe('https://docs.opentrons.com/stacker/installation/')
   })
 })

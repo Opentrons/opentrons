@@ -160,12 +160,12 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
       <Overlay
         onClick={handleClose}
         css={`
-          ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
+          ${(isExpanded ?? false) ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
         backgroundColor={COLORS.black90}
       />
       <Box
-        css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        css={(isExpanded ?? false) ? EXPANDED_STYLE : collapsedStyle}
         cursor="auto"
         position={POSITION_FIXED}
         right="0"

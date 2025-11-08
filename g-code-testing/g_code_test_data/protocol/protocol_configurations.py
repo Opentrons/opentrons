@@ -152,7 +152,7 @@ PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
 
 PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
     path="protocol/protocols/fast/pcr_prep_part_2.py",
-    versions={APIVersion(2, 12), APIVersion(2, 13),APIVersion(2, 14)},
+    versions={APIVersion(2, 12), APIVersion(2, 13), APIVersion(2, 14)},
     settings=Settings(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
@@ -196,7 +196,7 @@ JSON_SMOKE = ProtocolGCodeConfirmConfig(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
-        )
+        ),
     ),
 )
 
@@ -228,3 +228,6 @@ FAST_PROTOCOLS = [
 ]
 
 PROTOCOL_CONFIGURATIONS = SLOW_PROTOCOLS + FAST_PROTOCOLS
+
+for configuration in PROTOCOL_CONFIGURATIONS:
+    configuration.settings.thermocycler.model = "thermocyclerModuleV1"

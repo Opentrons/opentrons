@@ -1,10 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { DOC_URL } from '/protocol-designer/components/organisms/KnowledgeLink'
+
 import { AppInfo } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { DOC_URL } from '../../KnowledgeLink'
 
 import type { ComponentProps } from 'react'
 
@@ -40,7 +41,6 @@ describe('AppInfo', () => {
     const windowOpenButton = screen.getByRole('button', {
       name: 'Software manual',
     })
-    screen.debug(windowOpenButton)
     fireEvent.click(windowOpenButton)
     expect(window.open).toHaveBeenCalledWith(DOC_URL, '_blank')
     screen.getByRole('button', { name: 'Release notes' })

@@ -7,19 +7,20 @@ import {
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { FlexHardware } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import {
   getAdditionalEquipmentEntities,
   getDeckConfiguration,
   getInitialDeckSetup,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
-import { useKitchen } from '../../Kitchen/useKitchen'
+} from '/protocol-designer/step-forms/selectors'
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../Kitchen/useKitchen')
+import { FlexHardware } from '..'
+
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof DeckConfigurator>()
   return {

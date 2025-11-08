@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
+
 import { FeatureFlag } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { actions as featureFlagActions } from '../../../../feature-flags'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../feature-flags')
+vi.mock('/protocol-designer/feature-flags')
 
 const render = (props: ComponentProps<typeof FeatureFlag>) => {
   return renderWithProviders(<FeatureFlag {...props} />, {
@@ -22,12 +23,10 @@ describe('FeatureFlag', () => {
     props = {
       flags: {
         PRERELEASE_MODE: true,
-        OT_PD_ALLOW_ALL_TIPRACKS: true,
         OT_PD_ENABLE_COMMENT: true,
-        OT_PD_ENABLE_TIP_PICKUP_LOCATION: true,
-        OT_PD_ENABLE_RETURN_TIP: true,
         OT_PD_ENABLE_REACT_SCAN: true,
         OT_PD_ENABLE_TIMELINE_SCRUBBER: true,
+        OT_PD_ENABLE_TIP_SELCTION: true,
       },
     }
   })
@@ -37,19 +36,15 @@ describe('FeatureFlag', () => {
     screen.getByText('Developer Feature Flags')
     screen.getByText('Use prerelease mode')
     screen.getByText('Show in-progress features for testing & internal use')
-    screen.getByText('Allow all tip rack options')
-    screen.getByText('Enable selection of all tip racks for each pipette.')
     screen.getByText('Enable comment step')
     screen.getByText('You can add comments anywhere between timeline steps.')
-    screen.getByText('Enable tip pickup location')
-    screen.getByText('You can choose which tip to pick up.')
-    screen.getByText('Enable return tip')
-    screen.getByText('You can choose where to drop tip.')
     screen.getByText('Enable React Scan')
     screen.getByText('Enable React Scan support for components rendering check')
     screen.getByText('Enable timeline scrubber')
     screen.getByText('See the protocol timeline visualization in overview')
-    expect(screen.getAllByRole('switch').length).toBe(7)
+    screen.getByText('Enable tip selection')
+    screen.getByText('Enables the ability to select tips manually')
+    expect(screen.getAllByRole('switch').length).toBe(5)
   })
   it('should call function when clicking toggle switches', () => {
     render(props)
@@ -62,32 +57,22 @@ describe('FeatureFlag', () => {
 
     fireEvent.click(toggleButtons[1])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ALLOW_ALL_TIPRACKS: false,
+      OT_PD_ENABLE_COMMENT: false,
     })
 
     fireEvent.click(toggleButtons[2])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_COMMENT: false,
+      OT_PD_ENABLE_REACT_SCAN: false,
     })
 
     fireEvent.click(toggleButtons[3])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_TIP_PICKUP_LOCATION: false,
+      OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
     })
 
     fireEvent.click(toggleButtons[4])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_RETURN_TIP: false,
-    })
-
-    fireEvent.click(toggleButtons[5])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_REACT_SCAN: false,
-    })
-
-    fireEvent.click(toggleButtons[6])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
+      OT_PD_ENABLE_TIP_SELCTION: false,
     })
   })
 })

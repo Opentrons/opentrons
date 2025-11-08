@@ -20,6 +20,7 @@ export interface RouteProps {
 export type RobotSettingsTab =
   | 'calibration'
   | 'networking'
+  | 'camera'
   | 'advanced'
   | 'feature-flags'
 
@@ -34,6 +35,7 @@ export type ProtocolRunDetailsTab =
   | 'module-controls'
   | 'run-preview'
   | 'runtime-parameters'
+  | 'camera'
 
 /**
  * desktop app route params type definition
@@ -46,6 +48,7 @@ export interface DesktopRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+  runCreatedAtTimestamp: string
 }
 
 /**
@@ -56,3 +59,9 @@ export interface OnDeviceRouteParams {
   runId: string
   quickTransferId: string
 }
+
+/* The type of electron-created window.
+ * Main: Renders DesktopApp/OnDeviceDisplay
+ * Secondary: Renders SecondaryWindowApp
+ * */
+export type WindowType = 'desktop-main' | 'odd-main' | 'secondary' | null

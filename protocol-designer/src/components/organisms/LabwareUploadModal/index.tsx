@@ -13,8 +13,9 @@ import {
 import {
   dismissLabwareUploadMessage,
   replaceCustomLabwareDef,
-} from '../../../labware-defs/actions'
-import { getLabwareUploadMessage } from '../../../labware-defs/selectors'
+} from '/protocol-designer/labware-defs/actions'
+import { getLabwareUploadMessage } from '/protocol-designer/labware-defs/selectors'
+
 import { LabwareUploadModalBody } from './LabwareUploadModalBody'
 
 export function LabwareUploadModal(): JSX.Element | null {

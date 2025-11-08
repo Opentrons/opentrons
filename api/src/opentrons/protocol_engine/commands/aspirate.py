@@ -161,6 +161,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             well_location=well_location,
             current_well=current_well,
             operation_volume=-params.volume,
+            offset_pipette_for_reservoir_subwells=False,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):

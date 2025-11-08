@@ -1,4 +1,4 @@
-import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+import { getPipetteModelSpecs, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
@@ -12,7 +12,18 @@ export function usePipetteSpecsV2(
   name?: PipetteName | PipetteModel
 ): PipetteV2Specs | null {
   const isOEMMode = useIsOEMMode()
-  const pipetteSpecs = getPipetteSpecsV2(name)
+
+  // If it's a PipetteModel (contains 'v'), convert to PipetteName first
+  let pipetteName: PipetteName | undefined
+  if (name && name.includes('v')) {
+    // This is a PipetteModel, get the PipetteName from it
+    const modelSpecs = getPipetteModelSpecs(name as PipetteModel)
+    pipetteName = modelSpecs?.name as PipetteName
+  } else {
+    pipetteName = name as PipetteName
+  }
+
+  const pipetteSpecs = getPipetteSpecsV2(pipetteName)
 
   if (pipetteSpecs == null) {
     return null

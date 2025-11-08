@@ -362,6 +362,27 @@
       "tip_position": {
         "label": "tip position"
       },
+      "tip_tracking": {
+        "label": "Tip tracking",
+        "manual": {
+          "description": {
+            "has_tips_one": "{{count}} pickup selected",
+            "has_tips_multiple": "{{count}} pickups selected",
+            "no_tips": "No tips selected"
+          },
+          "title": "Select tips for manual tip tracking"
+        },
+        "options": {
+          "automatic": {
+            "description": "Automatically select tips for the transfer.",
+            "title": "Automatic tip tracking (recommended)"
+          },
+          "manual": {
+            "description": "Manually select tips for the transfer. This will enable reuse of tips.",
+            "title": "Manual tip tracking"
+          }
+        }
+      },
       "touchTip": {
         "label": "touch tip"
       },

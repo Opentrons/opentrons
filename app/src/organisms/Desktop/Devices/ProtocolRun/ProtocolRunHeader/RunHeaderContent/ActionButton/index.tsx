@@ -3,9 +3,11 @@ import { useSelector } from 'react-redux'
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   DISPLAY_FLEX,
   Icon,
   JUSTIFY_CENTER,
+  NO_WRAP,
   PrimaryButton,
   SIZE_1,
   SPACING,
@@ -16,7 +18,10 @@ import {
 
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { selectIsAnyNecessaryDefaultOffsetMissing } from '/app/redux/protocol-runs'
+import {
+  getCameraUsageState,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+} from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
@@ -33,6 +38,7 @@ import {
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
+import type { State } from '/app/redux/types'
 import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
@@ -45,16 +51,15 @@ interface ActionButtonProps extends BaseActionButtonProps {
 export function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
+    runRecord,
     robotName,
     runStatus,
     isResetRunLoadingRef,
     runHeaderModalContainerUtils,
     isClosingCurrentRun,
   } = props
-  const {
-    missingStepsModalUtils,
-    HSConfirmationModalUtils,
-  } = runHeaderModalContainerUtils
+  const { missingStepsModalUtils, HSConfirmationModalUtils } =
+    runHeaderModalContainerUtils
 
   const isFlex = useIsFlex(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -68,18 +73,28 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
-  const isRobotOnWrongVersionOfSoftware = useIsRobotOnWrongVersionOfSoftware(
-    robotName
-  )
+  const isRobotOnWrongVersionOfSoftware =
+    useIsRobotOnWrongVersionOfSoftware(robotName)
   const currentRunId = useCurrentRunId()
   const isRequiredOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
+  const { enabled: isCameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  const isCameraRequiredForRun =
+    protocolData != null &&
+    'commandPreconditions' in protocolData &&
+    protocolData.commandPreconditions?.isCameraUsed
+  const isCameraReadyToRun = isCameraRequiredForRun ? isCameraEnabled : true
+  const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
+
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+    missingModuleIds.length === 0 &&
+    isCameraReadyToRun
   const isRobotTypeSetupComplete = isFlex
     ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
@@ -96,6 +111,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
+    isCameraReadyToRun,
     ...props,
   })
 
@@ -106,22 +122,22 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const validRunAgainButRequiresSetup =
     isValidRunAgain && !isRobotTypeSetupComplete
 
-  const {
-    buttonText,
-    handleButtonClick,
-    buttonIconName,
-  } = useActionButtonProperties({
-    isProtocolNotReady,
-    confirmMissingSteps: missingStepsModalUtils.conditionalConfirmUtils.confirm,
-    confirmAttachment: HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
-    robotAnalyticsData,
-    robotSerialNumber,
-    currentRunId,
-    isValidRunAgain,
-    isOtherRunCurrent,
-    isRobotOnWrongVersionOfSoftware,
-    ...props,
-  })
+  const { buttonText, handleButtonClick, buttonIconName } =
+    useActionButtonProperties({
+      isProtocolNotReady,
+      confirmMissingSteps:
+        missingStepsModalUtils.conditionalConfirmUtils.confirm,
+      confirmAttachment:
+        HSConfirmationModalUtils.conditionalConfirmUtils.confirm,
+      robotAnalyticsData,
+      robotSerialNumber,
+      currentRunId,
+      isValidRunAgain,
+      isOtherRunCurrent,
+      isRobotOnWrongVersionOfSoftware,
+      areCameraPreferencesConfirmed,
+      ...props,
+    })
 
   return (
     <>
@@ -130,13 +146,13 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
         // TODO(jh, 05-05-25): These boolean checks should live in useActionBtnDisabledUtils as a part of the singular disabled check.
         disabled={
           isDisabled && (!validRunAgainButRequiresSetup || isClosingCurrentRun)
         }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
+        borderRadius={BORDERS.borderRadiusFull}
         {...targetProps}
       >
         {buttonIconName != null ? (
@@ -152,7 +168,9 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText as="pSemiBold">{buttonText}</StyledText>
+        <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
+          {buttonText}
+        </StyledText>
       </PrimaryButton>
       {disabledReason && (
         <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">

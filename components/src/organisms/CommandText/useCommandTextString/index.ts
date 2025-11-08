@@ -41,10 +41,16 @@ export interface GetTCRunExtendedProfileCommandTextResult {
   commandText: string
   profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
 }
+export interface GetTCStartRunExtendedProfileCommandTextResult {
+  kind: 'thermocycler/startRunExtendedProfile'
+  commandText: string
+  profileElementTexts: Array<TCProfileStepText | TCProfileCycleText>
+}
 export type GetCommandTextResult =
   | GetGenericCommandTextResult
   | GetTCRunProfileCommandTextResult
   | GetTCRunExtendedProfileCommandTextResult
+  | GetTCStartRunExtendedProfileCommandTextResult
 
 // TODO(jh, 07-18-24): Move the testing that covers this from CommandText to a new file, and verify that all commands are
 // properly tested.
@@ -88,6 +94,8 @@ export function useCommandTextString(
     case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
+    case 'aspirateWhileTracking':
+    case 'dispenseWhileTracking':
     case 'blowout':
     case 'blowOutInPlace':
     case 'dropTip':
@@ -169,10 +177,24 @@ export function useCommandTextString(
         command,
       })
 
+    case 'thermocycler/startRunExtendedProfile':
+      return utils.getTCStartRunExtendedProfileCommandText({
+        ...fullParams,
+        command,
+      })
+
     case 'heaterShaker/setAndWaitForShakeSpeed':
       return {
         kind: 'generic',
         commandText: utils.getHSShakeSpeedCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    case 'heaterShaker/setShakeSpeed':
+      return {
+        kind: 'generic',
+        commandText: utils.getHSConcurrentShakeSpeedCommandText({
           ...fullParams,
           command,
         }),
@@ -311,6 +333,12 @@ export function useCommandTextString(
         commandText: utils.getRailLightsCommandText({ ...fullParams, command }),
       }
 
+    case 'setTipState':
+      return {
+        kind: 'generic',
+        commandText: utils.getTipStateCommandText({ ...fullParams, command }),
+      }
+
     case 'robot/moveTo':
     case 'robot/moveAxesTo':
     case 'robot/moveAxesRelative':
@@ -320,6 +348,23 @@ export function useCommandTextString(
         kind: 'generic',
         commandText: utils.getRobotCommandText({ ...fullParams, command }),
       }
+    case 'waitForTasks':
+    case 'createTimer': {
+      return {
+        kind: 'generic',
+        commandText: utils.getConcurrentCommandText({ ...fullParams, command }),
+      }
+    }
+
+    case 'captureImage': {
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotDevicesCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+    }
 
     case undefined:
     case null:

@@ -9,9 +9,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { START_TERMINAL_ITEM_ID } from '../../../steplist'
-import { selectTerminalItem } from '../../../ui/steps/actions/actions'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { selectTerminalItem } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { AlertLevel } from './types'
 

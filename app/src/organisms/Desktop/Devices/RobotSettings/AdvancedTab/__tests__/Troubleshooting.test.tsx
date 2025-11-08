@@ -51,10 +51,10 @@ describe('RobotSettings Troubleshooting', () => {
     when(useHost).calledWith().thenReturn(HOST_CONFIG)
     when(useToaster)
       .calledWith()
-      .thenReturn(({
+      .thenReturn({
         makeToast: MOCK_MAKE_TOAST,
         eatToast: MOCK_EAT_TOAST,
-      } as unknown) as ToasterContextType)
+      } as unknown as ToasterContextType)
   })
   it('should render title, description, and button', () => {
     render(props)

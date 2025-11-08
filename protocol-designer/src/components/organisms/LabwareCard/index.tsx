@@ -22,18 +22,19 @@ import {
 } from '@opentrons/components'
 import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
-import { openIngredientSelector } from '../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { getAllLabwareIdsOfCertainURIOnStack } from '../../../utils'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
+import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { getAllLabwareIdsOfCertainURIOnStack } from '/protocol-designer/utils'
+
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
 
-import type { LabwareOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
@@ -122,13 +123,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               gridGap={SPACING.spacing16}
               padding={SPACING.spacing16}
             >
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
                   {nickName}
                 </StyledText>
                 {isNicknameDifferent ? (
                   <StyledText
-                    desktopStyle="captionRegular"
+                    desktopStyle="bodyDefaultRegular"
                     color={COLORS.grey60}
                   >
                     {displayName}
@@ -136,7 +137,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 ) : null}
                 {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
-                    desktopStyle="captionRegular"
+                    desktopStyle="bodyDefaultRegular"
                     color={COLORS.grey60}
                   >
                     {t('with_lid', {
@@ -144,8 +145,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                     })}
                   </StyledText>
                 ) : null}
-
-                <Flex gridGap={SPACING.spacing8}>
+                <Flex gridGap={SPACING.spacing8} paddingTop={SPACING.spacing8}>
                   {!isAdapterOrTiprack && !isLid ? (
                     <LiquidInfoDisplay
                       text={

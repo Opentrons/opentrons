@@ -33,6 +33,11 @@ class ProfileStep(BaseModel):
     holdSeconds: float = Field(
         ..., description="Time to hold target temperature in seconds."
     )
+    rampRate: float | SkipJsonSchema[None] = Field(
+        None,
+        description="How quickly to change temperature in °C/second.",
+        json_schema_extra=_remove_default,
+    )
 
 
 class ProfileCycle(BaseModel):
@@ -68,6 +73,7 @@ def _transform_profile_step(
     return ThermocyclerStep(
         temperature=thermocycler_state.validate_target_block_temperature(step.celsius),
         hold_time_seconds=step.holdSeconds,
+        ramp_rate=thermocycler_state.validate_ramp_rate(step.rampRate, step.celsius),
     )
 
 

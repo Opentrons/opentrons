@@ -21,6 +21,7 @@ from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
+    ModuleModel as HardwareModuleModel,
 )
 
 from .location import DeckSlotLocation
@@ -42,6 +43,11 @@ class ModuleModel(str, Enum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
+
+    @classmethod
+    def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":
+        """Convert from the hardware model representation."""
+        return cls(hardware_model.value)
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -193,6 +199,10 @@ class ModuleDefinition(BaseModel):
         ...,
     )
 
+    orientation: Dict[str, str] = Field(
+        ...,
+    )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
     )
@@ -276,6 +286,13 @@ class StackerFillEmptyStrategy(str, Enum):
     LOGICAL = "logical"
 
 
+class StackerLabwareMovementStrategy(str, Enum):
+    """Strategy to retrieve or store labware."""
+
+    AUTOMATIC = "automatic"
+    MANUAL = "manual"
+
+
 class StackerStoredLabwareGroup(BaseModel):
     """Represents one group of labware stored in a stacker hopper."""
 
@@ -286,7 +303,7 @@ class StackerStoredLabwareGroup(BaseModel):
 
 @dataclass
 class StackerPoolDefinition:
-    """Represents an internal configuraiton of stored labware."""
+    """Represents an internal configuration of stored labware."""
 
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None

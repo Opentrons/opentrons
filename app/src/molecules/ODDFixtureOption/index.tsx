@@ -35,25 +35,23 @@ export function ODDFixtureOption(props: ODDFixtureOptionProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.grey35}
     >
-      <Flex gridGap={SPACING.spacing24}>
-        <StyledText oddStyle="bodyTextSemiBold">{optionName}</StyledText>
-        <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_END}>
-          {secondaryOnClickHandler != null && secondaryButtonText != null ? (
-            <SmallButton
-              buttonType="secondary"
-              onClick={secondaryOnClickHandler}
-              data-testid={optionName}
-              buttonText={secondaryButtonText}
-              buttonCategory="rounded"
-            />
-          ) : null}
+      <StyledText oddStyle="bodyTextSemiBold">{optionName}</StyledText>
+      <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_END}>
+        {secondaryOnClickHandler != null && secondaryButtonText != null ? (
           <SmallButton
-            onClick={onClickHandler}
+            buttonType="secondary"
+            onClick={secondaryOnClickHandler}
             data-testid={optionName}
-            buttonText={buttonText}
+            buttonText={secondaryButtonText}
             buttonCategory="rounded"
           />
-        </Flex>
+        ) : null}
+        <SmallButton
+          onClick={onClickHandler}
+          data-testid={optionName}
+          buttonText={buttonText}
+          buttonCategory="rounded"
+        />
       </Flex>
     </ListItem>
   )

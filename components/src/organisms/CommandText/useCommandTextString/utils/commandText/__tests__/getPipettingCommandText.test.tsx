@@ -68,7 +68,7 @@ describe('getPipettingCommandText', () => {
       (labware, id) =>
         ({
           definitionUri: id === 'tiprack-id' ? 'tiprack-uri' : 'plate-uri',
-        } as any)
+        }) as any
     )
     vi.mocked(getLabwareDisplayLocation).mockReturnValue('Slot 1')
     vi.mocked(getFinalMoveToAddressableAreaCmd).mockReturnValue({

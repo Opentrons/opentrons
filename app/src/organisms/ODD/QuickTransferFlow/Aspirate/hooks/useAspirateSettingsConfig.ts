@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
+
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { ASPIRATE_SETTING_OPTIONS as SETTING_OPTIONS } from '../../constants'
@@ -13,6 +15,7 @@ import type {
   SettingItem,
 } from '../../types'
 
+const DIGIT = 1
 interface UseAspirateSettingsConfigProps {
   state: QuickTransferSummaryState
   dispatch: Dispatch<QuickTransferSummaryAction>
@@ -35,7 +38,9 @@ export function useAspirateSettingsConfig({
     {
       option: SETTING_OPTIONS.ASPIRATE_FLOW_RATE,
       copy: t('aspirate_flow_rate'),
-      value: t('flow_rate_value', { flow_rate: state.aspirateFlowRate }),
+      value: t('flow_rate_value', {
+        flow_rate: state.aspirateFlowRate.toFixed(DIGIT),
+      }),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_FLOW_RATE)
@@ -61,7 +66,12 @@ export function useAspirateSettingsConfig({
           ? t('submerge_value', {
               speed: state.submergeAspirate.speed,
               delayDuration: state.submergeAspirate.delayDuration,
-              position: state.submergeAspirate.positionFromBottom,
+              position: state.submergeAspirate.position,
+              positionReference:
+                state.submergeAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : t('option_disabled'),
       enabled: true,
@@ -106,7 +116,8 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_CONDITION,
       copy: t('condition'),
       value:
-        state.conditionAspirate != null || state.conditionAspirate !== 0
+        (state.conditionAspirate != null || state.conditionAspirate !== 0) &&
+        isMultiTransfer
           ? t('volume', { volume: state.conditionAspirate })
           : t('option_disabled'),
       enabled: isMultiTransfer,
@@ -118,11 +129,11 @@ export function useAspirateSettingsConfig({
       option: SETTING_OPTIONS.ASPIRATE_DELAY,
       copy: t('delay'),
       value:
-        state.delayAspirate !== undefined
+        state.delayAspirate != null
           ? t('delay_value', {
               delay: state.delayAspirate.delayDuration,
             })
-          : '',
+          : t('option_disabled'),
       enabled: true,
       onClick: () => {
         setSelectedSetting(SETTING_OPTIONS.ASPIRATE_DELAY)
@@ -136,7 +147,12 @@ export function useAspirateSettingsConfig({
           ? t('retract_value', {
               speed: state.retractAspirate.speed,
               delayDuration: state.retractAspirate.delayDuration,
-              position: state.retractAspirate.positionFromBottom,
+              position: state.retractAspirate.position,
+              positionReference:
+                state.retractAspirate.positionReference ===
+                POSITION_REFERENCE_TOP
+                  ? t('top')
+                  : t('bottom'),
             })
           : '',
       enabled: true,

@@ -1,16 +1,17 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { LiquidButton } from '../../../../../components/molecules'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { LiquidButton } from '/protocol-designer/components/molecules'
+
 import { Configurations } from '../Configurations'
 import { HardwareStep } from '../HardwareStep'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../HardwareStep')
-vi.mock('../../../../../components/molecules')
+vi.mock('/protocol-designer/components/molecules')
 
 const render = (props: ComponentProps<typeof Configurations>) => {
   return renderWithProviders(<Configurations {...props} />, {

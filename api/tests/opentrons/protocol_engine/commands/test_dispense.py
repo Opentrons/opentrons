@@ -81,6 +81,7 @@ async def test_dispense_implementation(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -203,6 +204,7 @@ async def test_overpressure_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(position)
 
@@ -304,6 +306,7 @@ async def test_stall_error(
             minimum_z_height=None,
             speed=None,
             operation_volume=50.0,
+            offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

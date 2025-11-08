@@ -3,7 +3,7 @@ import {
   SetupSteps,
   SetupVerifications,
 } from '../support/SetupSteps'
-import { StepBuilder } from '../support/StepBuilder'
+import { StepExecutor } from '../support/StepBuilder'
 import { UniversalSteps } from '../support/UniversalSteps'
 
 describe('Create new Flex', () => {
@@ -16,8 +16,8 @@ describe('Create new Flex', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
 
-    const steps = new StepBuilder()
-    steps.add(
+    const se = new StepExecutor()
+    se.execute(
       CompositeSetupSteps.FlexSetup({
         thermocycler: true,
         heatershaker: true,
@@ -25,28 +25,27 @@ describe('Create new Flex', () => {
         tempdeck: true,
       })
     )
-    steps.add(
+    se.execute(
       CompositeSetupSteps.AddLabwareToDeckSlot('C2', 'Bio-Rad 96 Well Plate')
     )
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
-    steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.AddLiquid())
-    steps.add(SetupSteps.ClickLiquidButton())
-    steps.add(SetupSteps.DefineLiquid())
-    steps.add(SetupSteps.LiquidSaveWIP())
-    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
-    steps.add(SetupSteps.LiquidDropdown())
-    steps.add(SetupVerifications.LiquidPage())
-    steps.add(UniversalSteps.Snapshot())
-    steps.add(SetupSteps.SelectLiquidWells())
-    steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
-    steps.add(SetupSteps.SelectDone())
-    steps.add(
+    se.execute(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    se.execute(SetupSteps.AddHardwareLabware())
+    se.execute(SetupSteps.AddLiquid())
+    se.execute(SetupSteps.ClickLiquidButton())
+    se.execute(SetupSteps.DefineLiquid())
+    se.execute(SetupSteps.LiquidSaveWIP())
+    se.execute(SetupSteps.WellSelector(['A1', 'A2']))
+    se.execute(SetupSteps.LiquidDropdown())
+    se.execute(SetupVerifications.LiquidPage())
+    se.execute(UniversalSteps.Snapshot())
+    se.execute(SetupSteps.SelectLiquidWells())
+    se.execute(SetupSteps.SetVolumeAndSaveForWells('150'))
+    se.execute(SetupSteps.SelectDone())
+    se.execute(
       CompositeSetupSteps.AddLabwareToDeckSlot(
         'C3',
         'Armadillo 96 Well Plate 200 µL'
       )
     )
-    steps.execute()
   })
 })

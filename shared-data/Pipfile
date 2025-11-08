@@ -24,6 +24,7 @@ colorama = { version = "==0.4.4", markers="sys_platform=='win32'" }
 black = "==22.3.0"
 pytest-clarity = "~=1.0.0"
 build = "~=1.2.0"
+pillow = "*"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "." }

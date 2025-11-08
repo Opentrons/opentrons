@@ -37,7 +37,6 @@ describe('configureNozzleLayout', () => {
           style: ALL,
         },
         pipetteId: mockPipette,
-        tiprackId: mockTiprack,
       },
       invariantContext,
       robotInitialState
@@ -57,7 +56,6 @@ describe('configureNozzleLayout', () => {
       `
 mock_pipette.configure_nozzle_layout(
     protocol_api.ALL,
-    tip_racks=[mock_tiprack],
 )`.trimStart()
     )
   })
@@ -69,7 +67,6 @@ mock_pipette.configure_nozzle_layout(
           style: COLUMN,
         },
         pipetteId: mockPipette,
-        tiprackId: mockTiprack,
       },
       invariantContext,
       robotInitialState
@@ -90,7 +87,6 @@ mock_pipette.configure_nozzle_layout(
 mock_pipette.configure_nozzle_layout(
     protocol_api.COLUMN,
     start="A12",
-    tip_racks=[mock_tiprack],
 )`.trimStart()
     )
   })

@@ -49,7 +49,8 @@ describe('useRunControls hook', () => {
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
       resumeRunFromRecovery: mockResumeRunFromRecovery,
-      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
+      resumeRunFromRecoveryAssumingFalsePositive:
+        mockResumeRunFromRecoveryAssumingFalsePositive,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
@@ -107,14 +108,14 @@ describe('useRunErrors hook', () => {
     ]
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: {
           data: {
             ...mockRunningRun,
             errors: fixtureErrors,
           },
         },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunErrors(RUN_ID_2))
     expect(result.current).toBe(fixtureErrors)
@@ -123,12 +124,12 @@ describe('useRunErrors hook', () => {
   it('returns no errors if no errors present', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: {
           data: mockRunningRun,
           errors: undefined,
         },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunErrors(RUN_ID_2))
     expect(result.current).toEqual([])

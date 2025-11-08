@@ -1,8 +1,6 @@
 ---
-title: "Protocol Designer: Magnets"
+title: "Protocol Designer: Magnet steps"
 ---
-
-# Magnet Steps
 
 Module steps using the Magnetic Module (GEN1 or GEN2, only on the OT-2) appear as magnet steps in the "Add step" menu. When you add a magnet step, the form shows the deck slot the module is on and any labware currently in the module. 
 

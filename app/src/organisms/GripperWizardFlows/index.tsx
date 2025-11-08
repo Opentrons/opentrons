@@ -12,6 +12,7 @@ import {
   ModalShell,
   POSITION_ABSOLUTE,
   useConditionalConfirm,
+  WizardHeader,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -20,7 +21,6 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
@@ -66,10 +66,8 @@ export function GripperWizardFlows(
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
   } = useChainMaintenanceCommands()
-  const {
-    createMaintenanceCommand,
-    isLoading: isCommandLoading,
-  } = useCreateMaintenanceCommandMutation()
+  const { createMaintenanceCommand, isLoading: isCommandLoading } =
+    useCreateMaintenanceCommandMutation()
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
@@ -83,17 +81,15 @@ export function GripperWizardFlows(
     setMonitorMaintenanceRunForDeletion,
   ] = useState<boolean>(false)
 
-  const {
-    createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
-  } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
-      setCreatedMaintenanceRunId(response.data.id)
-    },
-    onError: error => {
-      setErrorMessage(error.message)
-    },
-  })
+  const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
+    useCreateTargetedMaintenanceRunMutation({
+      onSuccess: response => {
+        setCreatedMaintenanceRunId(response.data.id)
+      },
+      onError: error => {
+        setErrorMessage(error.message)
+      },
+    })
 
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
@@ -135,17 +131,15 @@ export function GripperWizardFlows(
     closeFlow()
   }
 
-  const {
-    deleteMaintenanceRun,
-    isLoading: isDeleteLoading,
-  } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      closeFlow()
-    },
-    onError: () => {
-      closeFlow()
-    },
-  })
+  const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
+    useDeleteMaintenanceRunMutation({
+      onSuccess: () => {
+        closeFlow()
+      },
+      onError: () => {
+        closeFlow()
+      },
+    })
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)

@@ -4,6 +4,7 @@ import {
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
@@ -49,6 +50,14 @@ export const patchDeckConfigForRequiredFixture = (
         return {
           ...fixture,
           cutoutFixtureId: FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+        }
+      } else if (
+        requiredFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
+        FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId)
+      ) {
+        return {
+          ...fixture,
+          cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
         }
       } else if (
         requiredFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE &&

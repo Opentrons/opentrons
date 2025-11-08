@@ -83,6 +83,10 @@
       }
     }
   },
+  "orientation": {
+    "7": "left",
+    "B1": "left"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": [],
   "uniqueModuleData": {}

@@ -2,11 +2,9 @@
 title: "Opentrons Flex: Gripper"
 ---
 
-# Gripper
+The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration](../installation/instruments.md).
 
-The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration][instrument-installation-and-calibration].
-
-The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, lids, and tip racks. For more details on what labware the gripper can move, see the [Labware and the Opentrons Flex Gripper section][labware-and-the-opentrons-flex-gripper] of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
+The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, lids, and tip racks. For more details on what labware the gripper can move, see the [Using Labware with the Gripper section](../labware/gripper.md) of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
 
 ## Gripper specifications
 

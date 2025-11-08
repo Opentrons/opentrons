@@ -25,8 +25,10 @@ async def heatershaker(
         execution_manager=execution_manager,
         poll_interval_seconds=poll_interval_seconds,
     )
-    yield module
-    await module.cleanup()
+    try:
+        yield module
+    finally:
+        await module.cleanup()
 
 
 def test_device_info(heatershaker: HeaterShaker) -> None:
@@ -40,6 +42,7 @@ def test_device_info(heatershaker: HeaterShaker) -> None:
 
 async def test_latch_status(heatershaker: HeaterShaker) -> None:
     """It should run open and close latch."""
+    await heatershaker._poller.wait_next_poll()
     assert heatershaker.labware_latch_status.value == "idle_open"
 
     await heatershaker.close_labware_latch()

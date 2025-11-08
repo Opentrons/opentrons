@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Quick Transfer"
 ---
 
-# Quick Transfer
-
 Quick transfer is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
 
 - Provision well plates with a reagent, buffer, or other liquid.
@@ -32,7 +30,7 @@ From the Quick Transfer tab on the touchscreen, tap **+ Quick transfer.** This s
 
 ## Deck slots and hardware requirements
 
-Quick transfers require a Flex pipette, a tip rack in slot B2, source labware in slot C2, and destination labware in slot D2. For tip disposal, quick transfer relies on the robot's [deck configuration][deck-configuration] to determine where the trash bin or waste chute is on the deck. It shows the trash bin in slot A3 if no trash container is configured. You cannot use the gripper, modules, and custom labware in a quick transfer.
+Quick transfers require a Flex pipette, a tip rack in slot B2, source labware in slot C2, and destination labware in slot D2. For tip disposal, quick transfer relies on the robot's [deck configuration](deck-config.md) to determine where the trash bin or waste chute is on the deck. It shows the trash bin in slot A3 if no trash container is configured. You cannot use the gripper, modules, and custom labware in a quick transfer.
 
 <figure class="screenshot" markdown>
 ![Quick transfer deck setup with trash bin in A3, tip rack in B2, source labware in C2, and destination labware in D2.](../images/quick-transfer-deck.png "Quick transfer deck setup")
@@ -43,6 +41,8 @@ If everything is set up correctly, you'll move on to selecting pipettes and tips
 ## Pipettes and tips
 
 Creating a quick transfer involves selecting a pipette and appropriate tips. Quick transfer can use any 1-, 8-, or 96-channel pipette that's attached to the robot. When selecting a pipette tip, try to match the tip to a pipette of the same capacity or larger. For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
+
+Beginning with robot software version 8.6.0, you can apply Opentrons-verified liquid class settings in a quick transfer. After choosing your pipette and tips, select the aqueous, viscous, or volatile liquid class to increase pipetting accuracy.
 
 ## Labware
 
@@ -76,10 +76,11 @@ You'll set the amount of liquid to transfer (in μL) after specifying the source
 
 These are available after you name a quick transfer and before you save it. If some settings are familiar to you that's because they're the same as those offered in Protocol Designer. Advanced settings are optional; select any that you need or just save or run the transfer.
 
+If your quick transfer will apply liquid class settings, values for your chosen liquid class are shown for each advanced setting. You can still make changes before moving to the next step. 
+
 | Setting {style="width: 25%;"} | Description |
 |----------|-------------|
 | Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in μL/s.|
-| Pipette path           | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul> |
 | Tip position           | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well. |
 | Pre-wet tip            | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume. |
 | Mix                    | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together. |

@@ -2,11 +2,7 @@ import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import {
-  POSITION_STICKY,
-  StepMeter,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { StepMeter, useConditionalConfirm } from '@opentrons/components'
 
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_EXIT_EARLY } from '/app/redux/analytics'
@@ -113,8 +109,6 @@ export const QuickTransferFlow = (): JSX.Element => {
             <StepMeter
               totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
               currentStep={currentStep + 1}
-              position={POSITION_STICKY}
-              top="0"
             />
           ) : null}
           {contentInOrder[currentStep]}

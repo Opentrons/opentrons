@@ -77,6 +77,11 @@ export function ModulesAndFixturesSection(): JSX.Element | null {
       model: 'magneticBlockV1',
       name: t('magnetic_block_v1'),
     },
+    {
+      type: 'flexStackerModuleType',
+      model: 'flexStackerModuleV1',
+      name: t('flex_stacker_module_v1'),
+    },
   ]
 
   const allFixtures: DisplayFixture[] = [
@@ -93,7 +98,8 @@ export function ModulesAndFixturesSection(): JSX.Element | null {
             module.type === 'temperatureModuleType' ||
             module.type === 'thermocyclerModuleType' ||
             module.type === 'absorbanceReaderType' ||
-            module.type === 'magneticBlockType'
+            module.type === 'magneticBlockType' ||
+            module.type === 'flexStackerModuleType'
         )
       : allModules.filter(
           // For OT-2 or default case

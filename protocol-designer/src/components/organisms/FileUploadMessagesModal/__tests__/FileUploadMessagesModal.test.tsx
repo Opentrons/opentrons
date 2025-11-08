@@ -1,18 +1,19 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FileUploadMessagesModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   dismissFileUploadMessage,
   undoLoadFile,
-} from '../../../../load-file/actions'
-import { getFileUploadMessages } from '../../../../load-file/selectors'
+} from '/protocol-designer/load-file/actions'
+import { getFileUploadMessages } from '/protocol-designer/load-file/selectors'
 
-vi.mock('../../../../load-file/selectors')
-vi.mock('../../../../load-file/actions')
-vi.mock('../../../../feature-flags/selectors')
+import { FileUploadMessagesModal } from '..'
+
+vi.mock('/protocol-designer/load-file/selectors')
+vi.mock('/protocol-designer/load-file/actions')
+vi.mock('/protocol-designer/feature-flags/selectors')
 
 const render = () => {
   return renderWithProviders(<FileUploadMessagesModal />, {

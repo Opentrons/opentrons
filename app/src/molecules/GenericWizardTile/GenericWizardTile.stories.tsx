@@ -8,12 +8,12 @@ import {
   ModalShell,
   PrimaryButton,
   SPACING,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
 import { configReducer } from '/app/redux/config/reducer'
 
-import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
 
 import type { Meta, Story } from '@storybook/react'

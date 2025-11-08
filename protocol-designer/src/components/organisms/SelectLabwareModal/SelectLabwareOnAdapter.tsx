@@ -8,7 +8,6 @@ import {
   ListButtonAccordionContainer,
 } from '@opentrons/components'
 
-import { getEnableStacking } from '../../../feature-flags/selectors'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import {
@@ -26,6 +25,7 @@ import { getPipetteEntities } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
 import { ADAPTER_96_CHANNEL } from '../../../utils/labwareModuleCompatibility'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -54,7 +54,6 @@ export function SelectLabwareOnAdapter(
     universalLid,
   } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
-  const enableStacking = useSelector(getEnableStacking)
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const pipetteEntities = useSelector(getPipetteEntities)
   const has96Channel = getHas96Channel(pipetteEntities)
@@ -62,11 +61,8 @@ export function SelectLabwareOnAdapter(
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedAdapterDefURI,
-    selectedTopLabware,
-    selectedLidLabware,
-  } = zoomedInSlotInfo
+  const { selectedAdapterDefURI, selectedTopLabware, selectedLidLabware } =
+    zoomedInSlotInfo
 
   const handleSelectLabware = (
     nestedDefUri: string,
@@ -92,8 +88,7 @@ export function SelectLabwareOnAdapter(
 
   return isAdapter &&
     parentLabwareURI === selectedAdapterDefURI &&
-    getLabwareCompatibleWithAdapter(defs, enableStacking, loadName)?.length >
-      0 ? (
+    getLabwareCompatibleWithAdapter(defs, loadName)?.length > 0 ? (
     <ListButtonAccordionContainer id={`nestedAccordionContainer_${loadName}`}>
       <ListButtonAccordion
         key={`${category}_${loadName}_accordion`}
@@ -104,11 +99,56 @@ export function SelectLabwareOnAdapter(
         {has96Channel && loadName === ADAPTER_96_CHANNEL
           ? permittedTipracks.map((tiprackDefUri, index) => {
               const nestedDef = defs[tiprackDefUri]
+              const stackingLabwareDefUris = getStackerDefinitions(
+                {
+                  ...defs,
+                  ...customLabwareDefs,
+                },
+                undefined,
+                nestedDef.parameters.loadName,
+                nestedDef.metadata.displayCategory
+              )
+
+              const stackingProps: StackingProps | null =
+                stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
+                  ? {
+                      inputTitle: t('labware_quantity'),
+                      errorMessage: t('unsupported_range'),
+                      checkboxCaption: t('with_lid', {
+                        name: defs[stackingLabwareDefUris[0]].metadata
+                          .displayName,
+                      }),
+                      checked: selectedLidLabware != null,
+                      onCheckboxChange: () => {
+                        dispatch(
+                          selectLid({
+                            labwareDefURI:
+                              selectedLidLabware === stackingLabwareDefUris[0]
+                                ? null
+                                : stackingLabwareDefUris[0],
+                          })
+                        )
+                      },
+                      inputCaption: t('valid_range', {
+                        max: defs[stackingLabwareDefUris[0]].stackLimit,
+                      }),
+                      definition: defs[stackingLabwareDefUris[0]],
+                      inputFieldValue: selectedTopLabware.amount ?? 1,
+                      onInputFieldChange: (e: ChangeEvent<any>) => {
+                        dispatch(
+                          selectTopLabwareAmount({
+                            amount: parseInt(e.target.value as string),
+                          })
+                        )
+                      },
+                    }
+                  : null
+
               return (
                 <CustomizeExpandButton
-                  enableStackingFF={enableStacking}
-                  loadName={loadName}
+                  isNestedDefALid={false}
                   allowInputField={false}
+                  stackingProps={stackingProps ?? undefined}
                   key={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   id={`${index}_${category}_${loadName}_${tiprackDefUri}`}
                   buttonText={nestedDef?.metadata.displayName ?? ''}
@@ -132,7 +172,7 @@ export function SelectLabwareOnAdapter(
                 ...defs,
                 ...customLabwareDefs,
               },
-              enableStacking,
+
               loadName
             ).map(nestedDefUri => {
               const nestedDef =
@@ -153,8 +193,8 @@ export function SelectLabwareOnAdapter(
                       inputTitle: t('labware_quantity'),
                       errorMessage: t('unsupported_range'),
                       checkboxCaption: t('with_lid', {
-                        name:
-                          defs[stackingLabwareDefUris[0]].metadata.displayName,
+                        name: defs[stackingLabwareDefUris[0]].metadata
+                          .displayName,
                       }),
                       checked: selectedLidLabware != null,
                       onCheckboxChange: () => {
@@ -185,8 +225,7 @@ export function SelectLabwareOnAdapter(
               return (
                 <Fragment key={`${loadName}_${category}`}>
                   <CustomizeExpandButton
-                    enableStackingFF={enableStacking}
-                    loadName={nestedDef.parameters.loadName}
+                    isNestedDefALid={getIsNestedDefinitionALid(nestedDef)}
                     allowInputField={lidLoadNames.includes(
                       nestedDef.parameters.loadName
                     )}

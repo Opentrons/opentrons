@@ -29,18 +29,21 @@ import { TertiaryButton } from '/app/atoms/buttons/TertiaryButton'
 import { StatusLabel } from '/app/atoms/StatusLabel'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
+import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import {
   getFilteredDeckConfigFixtureCompatibility,
   isConflictingFixtureConfigured,
   isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
-import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
+} from '/app/resources/deck_configuration/utils'
 
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CutoutFixtureId, DeckDefinition } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
+import type {
+  CutoutConfigAndCompatibility,
+  CutoutFixtureId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
@@ -56,9 +59,8 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    deckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(deckConfigCompatibility)
   return (
     <>
       {filteredDeckConfigCompatibility.map(cutoutConfigAndCompatibility => (
@@ -125,18 +127,13 @@ export function FixtureListItem({
     )
   }
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
 
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const isFourthColumnFixture =
     (partialRequiredCutoutFixtureId != null &&

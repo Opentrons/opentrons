@@ -461,7 +461,12 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         command = GCODE.GET_TOF_MEASUREMENT.build_command().add_element(sensor.name)
         if resend:
             command.add_element("R")
-        resp = await self._connection.send_command(command)
+
+        # Note: We DONT want to auto resend the request if it fails, because the
+        # firmware will send the next frame id instead of the current one missed.
+        # So lets set `retries=0` so we only send the frame once and we can
+        # use the retry mechanism of the `get_tof_histogram` method instead.
+        resp = await self._connection.send_command(command, retries=0)
         return self.parse_get_tof_measurement(resp)
 
     async def get_tof_histogram(self, sensor: TOFSensor) -> TOFMeasurementResult:

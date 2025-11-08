@@ -27,10 +27,8 @@ export function useCompatibleAnalysis(
   mostRecentAnalysis: CompletedProtocolAnalysis | null,
   isFlex: boolean
 ): CompletedProtocolAnalysis | null {
-  const [
-    compatibleAnalysis,
-    setCompatibleAnalysis,
-  ] = useState<CompletedProtocolAnalysis | null>(null)
+  const [compatibleAnalysis, setCompatibleAnalysis] =
+    useState<CompletedProtocolAnalysis | null>(null)
   const [compatibleAnalysisId, setCompatibleAnalysisId] = useState<
     string | null
   >(null)
@@ -38,9 +36,8 @@ export function useCompatibleAnalysis(
 
   const trackEvent = useTrackEvent()
   const protocolId = runRecord?.data.protocolId ?? ''
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    protocolId
-  )
+  const { createProtocolAnalysis } =
+    useCreateProtocolAnalysisMutation(protocolId)
   const { data: freshAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     compatibleAnalysisId,

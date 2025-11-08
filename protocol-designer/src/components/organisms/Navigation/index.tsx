@@ -15,13 +15,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { actions as loadFileActions } from '../../../load-file'
-import { getHasUnsavedChanges } from '../../../load-file/selectors'
-import { toggleNewProtocolModal } from '../../../navigation/actions'
+import { ACCEPTED_PROTOCOL_FILE_TYPES } from '/protocol-designer/constants'
+import { actions as loadFileActions } from '/protocol-designer/load-file'
+import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
+import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+
 import { SettingsIcon } from '../SettingsIcon'
 
 import type { ChangeEvent } from 'react'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export function Navigation(): JSX.Element | null {
   const { t } = useTranslation(['shared', 'alert'])
@@ -45,6 +47,9 @@ export function Navigation(): JSX.Element | null {
     }
   }
 
+  // todo(mm, 2025-10-27): Unlike the "create new" button, the "import" button
+  // will not warn you if you're overwriting a protocol with unsaved changes.
+  // Should it?
   const handleImport = (): void => {
     if (fileInputRef.current != null) {
       fileInputRef.current.click()
@@ -71,8 +76,9 @@ export function Navigation(): JSX.Element | null {
           <input
             type="file"
             onChange={loadFile}
-            aria-label={t('import')}
+            aria-label={`${t('import')}_from_navigation`}
             ref={fileInputRef}
+            accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </StyledLabel>
         {location.pathname === '/createNew' ? null : <SettingsIcon />}

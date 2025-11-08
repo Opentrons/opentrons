@@ -52,6 +52,9 @@
   "displayName": "Thermocycler Module GEN1",
   "quirks": [],
   "slotTransforms": {},
+  "orientation": {
+    "7": "left"
+  },
   "compatibleWith": ["thermocyclerModuleV1"],
   "incompatibleWithDecks": ["ot3_standard"],
   "uniqueModuleData": {}

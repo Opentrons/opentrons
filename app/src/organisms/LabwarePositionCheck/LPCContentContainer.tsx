@@ -19,14 +19,14 @@ import {
   RESPONSIVENESS,
   SecondaryButton,
   SPACING,
+  StepMeter,
   StyledText,
   truncateString,
+  WizardHeader,
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { StepMeter } from '/app/atoms/StepMeter'
 import { LPC_HREF } from '/app/local-resources/offsets'
-import { WizardHeader } from '/app/molecules/WizardHeader'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getIsOnDevice } from '/app/redux/config'

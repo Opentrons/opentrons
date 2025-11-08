@@ -9,10 +9,10 @@ import {
   WRAP,
 } from '@opentrons/components'
 
-import { PIPETTE_GENS } from '../../../pages/Onboarding/constants'
+import { PIPETTE_GENS } from '/protocol-designer/pages/Onboarding/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { Gen } from '../../../pages/Onboarding/types'
+import type { Gen } from '/protocol-designer/pages/Onboarding/types'
 
 interface SelectPipetteGenProps {
   setPipetteGen: Dispatch<SetStateAction<'flex' | Gen>>

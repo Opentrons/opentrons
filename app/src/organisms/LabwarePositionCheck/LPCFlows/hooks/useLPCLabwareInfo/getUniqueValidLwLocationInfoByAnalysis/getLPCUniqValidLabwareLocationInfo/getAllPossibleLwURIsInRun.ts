@@ -61,12 +61,8 @@ function getFlexStackerRetrieveLwAndAdapterInfo(
     )
     return { lw: { id: '', uri: '' } }
   } else {
-    const {
-      labwareId,
-      primaryLabwareURI,
-      adapterId,
-      adapterLabwareURI,
-    } = command.result
+    const { labwareId, primaryLabwareURI, adapterId, adapterLabwareURI } =
+      command.result
     const adapterInfo =
       adapterId != null && adapterLabwareURI != null
         ? { id: adapterId, uri: adapterLabwareURI }

@@ -31,7 +31,6 @@ import {
   StepSummary,
   TimelineAlerts,
 } from '../../../components/organisms'
-import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
 import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
 import {
@@ -55,7 +54,6 @@ import {
   getSelectedSubstep,
   getSelectedTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { getHasTrash } from '../../../utils'
 import { DeckSetupContainer } from '../DeckSetup'
 import { zoomInOnCoordinate } from '../DeckSetup/utils'
 import { OffDeck } from '../OffDeck'
@@ -76,18 +74,19 @@ const DETAILS_HOVER_SPACE = 60
 interface ProtocolStepsProps {
   zoomedInSlot: string | null
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  showDefineLiquidModal: boolean
   targetWidth: number
   setTargetWidth: (width: number) => void
 }
 export function ProtocolSteps({
   zoomedInSlot,
   showLiquidOverflowMenu,
+  showDefineLiquidModal,
   targetWidth,
   setTargetWidth,
 }: ProtocolStepsProps): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
   const formData = useSelector(getUnsavedForm)
-  const { makeSnackbar } = useKitchen()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
@@ -102,7 +101,6 @@ export function ProtocolSteps({
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
   const savedStepForms = useSelector(getSavedStepForms)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
-  const hasTrash = getHasTrash(additionalEquipmentOnDeck)
   const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
   const windowInnerWidthRem = window.innerWidth / 16
   const deckMapRatio = round(
@@ -134,23 +132,13 @@ export function ProtocolSteps({
   const isOffDeck = deckView === rightString
   const isZoomedIn = zoomedInSlot != null
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(saveProtocolFile())
-    },
-  })
-
-  const handleExporting = (): void => {
-    if (hasTrash) {
-      handleExportClick()
-    } else {
-      makeSnackbar(t('trash_required') as string)
-    }
-  }
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(saveProtocolFile())
+      },
+    })
 
   let currentStep
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
@@ -271,9 +259,9 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
-                zIndex={1000}
+                zIndex={showDefineLiquidModal ? 1 : 1000}
               >
-                <ExportButton onClick={handleExporting} />
+                <ExportButton onClick={handleExportClick} />
               </Flex>
             )}
             <Flex
@@ -285,8 +273,8 @@ export function ProtocolSteps({
                   robotType === OT2_ROBOT_TYPE)
                   ? '90%'
                   : isZoomedIn && isOffDeck
-                  ? '100%'
-                  : CONTENT_MAX_WIDTH
+                    ? '100%'
+                    : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
               paddingTop={

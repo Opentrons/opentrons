@@ -7,11 +7,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -24,22 +24,22 @@ import {
 
 import { SmallButton } from '/app/atoms/buttons'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
-import {
-  getFilteredDeckConfigFixtureCompatibility,
-  isConflictingFixtureConfigured,
-  isFixtureCompatible,
-} from '/app/organisms/LocationConflictModal/getFilteredDeckConfigFixtureCompatibility'
 import { NotConfiguredModal } from '/app/organisms/LocationConflictModal/NotConfiguredModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
+import {
+  getFilteredDeckConfigFixtureCompatibility,
+  getRequiredDeckConfig,
+  isConflictingFixtureConfigured,
+  isFixtureCompatible,
+} from '/app/resources/deck_configuration/utils'
 
 import type { TFunction } from 'i18next'
 import type {
+  CutoutConfigAndCompatibility,
   CutoutFixtureId,
   DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
-import type { CutoutConfigAndCompatibility } from '/app/resources/deck_configuration/hooks'
 
 interface FixtureTableProps {
   robotType: RobotType
@@ -63,9 +63,8 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    requiredDeckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(requiredDeckConfigCompatibility)
 
   // list not configured/conflicted fixtures first
   const sortedDeckConfigCompatibility = filteredDeckConfigCompatibility.sort(
@@ -111,13 +110,10 @@ function FixtureTableItem({
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
@@ -230,7 +226,7 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel deckLabel={displayLocation} />
+          <RobotInfoLabel deckLabel={displayLocation} />
         </Flex>
         <Flex
           flex="4 0 0"

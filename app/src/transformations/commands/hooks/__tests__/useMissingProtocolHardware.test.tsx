@@ -209,6 +209,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: false,
@@ -218,14 +219,14 @@ describe.only('useMissingProtocolHardware', () => {
     })
   })
   it('should return 1 conflicted slot', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
-    } as any) as UseQueryResult<DeckConfiguration>)
+    } as any as UseQueryResult<DeckConfiguration>)
 
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
@@ -243,6 +244,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: true,
@@ -338,6 +340,7 @@ describe.only('useMissingProtocolHardware', () => {
         {
           hardwareType: 'module',
           moduleModel: 'heaterShakerModuleV1',
+          comboFixtureId: null,
           slot: 'D3',
           connected: false,
           hasSlotConflict: true,

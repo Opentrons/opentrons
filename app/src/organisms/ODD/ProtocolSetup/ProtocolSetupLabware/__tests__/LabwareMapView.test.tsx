@@ -73,8 +73,9 @@ describe('LabwareMapView', () => {
       {
         moduleModel: 'heaterShakerModuleV1' as ModuleModel,
         moduleLocation: { slotName: 'B1' },
-        nestedLabwareDef: mockProtocolModuleInfo[0]
-          .nestedLabwareDef as LabwareDefinition,
+        nestedLabwareDefsBottomToTop: [
+          mockProtocolModuleInfo[0].nestedLabwareDef,
+        ] as LabwareDefinition[],
         onLabwareClick: expect.any(Function),
         moduleChildren: null,
         innerProps: {},
@@ -91,7 +92,7 @@ describe('LabwareMapView', () => {
       .thenReturn(<div>mock base deck</div>)
     render({
       handleLabwareClick: vi.fn(),
-      mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
+      mostRecentAnalysis: {} as unknown as CompletedProtocolAnalysis,
       startingDeck: {
         A1: [
           {

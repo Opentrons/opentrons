@@ -33,11 +33,10 @@ export function useIsRobotBusy(
     ...queryOptions,
     enabled: isFlex,
   })
-  const {
-    data: currentSubsystemsUpdatesData,
-  } = useCurrentAllSubsystemUpdatesQuery({
-    refetchInterval: ROBOT_STATUS_POLL_MS,
-  })
+  const { data: currentSubsystemsUpdatesData } =
+    useCurrentAllSubsystemUpdatesQuery({
+      refetchInterval: ROBOT_STATUS_POLL_MS,
+    })
   const isSubsystemUpdating =
     currentSubsystemsUpdatesData?.data.some(
       update =>

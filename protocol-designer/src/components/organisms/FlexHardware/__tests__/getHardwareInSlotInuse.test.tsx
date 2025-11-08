@@ -8,7 +8,7 @@ import type {
   LabwareOnDeck,
   ModuleOnDeck,
   SavedStepFormState,
-} from '../../../../step-forms'
+} from '/protocol-designer/step-forms'
 
 const mockSavedSteps: SavedStepFormState = {
   mockId: {

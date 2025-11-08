@@ -2,6 +2,7 @@
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
     LabwareRole,
 )
 
@@ -44,15 +45,18 @@ def validate_definition_is_system(definition: LabwareDefinition) -> bool:
     return LabwareRole.system in definition.allowedRoles
 
 
-def validate_labware_can_be_stacked(
-    top_labware_definition: LabwareDefinition, below_labware_load_name: str
+def validate_legacy_labware_can_be_stacked(
+    child_labware_definition: LabwareDefinition2, parent_labware_load_name: str
 ) -> bool:
-    """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
+    """Validate that the parent labware is in the child labware's stackingOffsetWithLabware definition.
+
+    Schema 3 Labware stacking validation is handled in locating features.
+    """
     return (
-        below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
+        parent_labware_load_name in child_labware_definition.stackingOffsetWithLabware
         or (
-            "default" in top_labware_definition.stackingOffsetWithLabware
-            and top_labware_definition.compatibleParentLabware is None
+            "default" in child_labware_definition.stackingOffsetWithLabware
+            and child_labware_definition.compatibleParentLabware is None
         )
     )
 

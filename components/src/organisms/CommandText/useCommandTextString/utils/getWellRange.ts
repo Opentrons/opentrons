@@ -13,8 +13,8 @@ const usedChannelsFromCommand = (
   command?.params?.configurationParams?.style === 'SINGLE'
     ? 1
     : command?.params?.configurationParams?.style === 'COLUMN'
-    ? 8
-    : defaultChannels
+      ? 8
+      : defaultChannels
 
 const usedChannelsForPipette = (
   pipetteId: string,
@@ -52,13 +52,13 @@ export function getWellRange(
   pipetteName?: PipetteName
 ): string {
   const pipetteChannels = pipetteName
-    ? getPipetteNameSpecs(pipetteName)?.channels ?? 1
+    ? (getPipetteNameSpecs(pipetteName)?.channels ?? 1)
     : 1
   const channelCount = usedChannels(pipetteId, commands, pipetteChannels)
   if (channelCount === 96) {
     return 'A1 - H12'
   } else if (channelCount === 8) {
-    const column = wellName.substr(1)
+    const column = wellName.substring(1)
     return `A${column} - H${column}`
   }
   return wellName

@@ -95,14 +95,6 @@ describe('orderedStepIds reducer', () => {
     }
     expect(orderedStepIds(state, action)).toBe(state)
   })
-  it('should remove a saved step when the step is deleted', () => {
-    const state = ['1', '2', '3']
-    const action = {
-      type: 'DELETE_STEP',
-      payload: '2',
-    }
-    expect(orderedStepIds(state, action)).toEqual(['1', '3'])
-  })
   it('should remove multiple saved steps when multiple steps are deleted', () => {
     const state = ['1', '2', '3']
     const action = {
@@ -781,7 +773,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         it(testName, () => {
           vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(deckSetup)
           vi.mocked(getLabwareIsCompatible).mockReturnValue(
-            labwareIsCompatible as boolean
+            labwareIsCompatible!
           )
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
@@ -1198,23 +1190,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
       }
     })
-    it('should delete one step', () => {
-      const action = {
-        type: 'DELETE_STEP',
-        payload: 'id1',
-      }
-      const expectedState = { ...savedStepFormsState }
-      delete expectedState.id1
-      expect(
-        savedStepForms(
-          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
-          {
-            savedStepForms: savedStepFormsState,
-          },
-          action
-        )
-      ).toEqual(expectedState)
-    })
     it('should delete multiple steps', () => {
       const action = {
         type: 'DELETE_MULTIPLE_STEPS',
@@ -1450,6 +1425,7 @@ describe('unsavedForm reducer', () => {
         },
         startStepId: '3',
         endStepId: '5',
+        newTiprackURI: 'mockURI',
       },
     }
     const rootState: RootState = {
@@ -1483,6 +1459,7 @@ describe('unsavedForm reducer', () => {
       [
         {
           pipette: 'newPipetteId',
+          tipRack: 'mockURI',
         },
         rootState.unsavedForm,
         'pipetteEntitiesPlaceholder',
@@ -1499,7 +1476,6 @@ describe('unsavedForm reducer', () => {
     'CANCEL_STEP_FORM',
     'CREATE_MODULE',
     'DELETE_MODULE',
-    'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
@@ -1597,7 +1573,6 @@ describe('presavedStepForm reducer', () => {
   })
   const clearingActions: Array<PresavedStepFormAction['type']> = [
     'CANCEL_STEP_FORM',
-    'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
     'SAVE_STEP_FORM',
     'SELECT_STEP',

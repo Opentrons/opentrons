@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 from math import trunc
 
 from opentrons.drivers import utils
@@ -89,6 +89,24 @@ def thermocycler_set_block_temp(
     }
 
 
+def thermocycler_start_set_block_temp(
+    temperature: float,
+) -> command_types.ThermocyclerStartSetBlockTempCommand:
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f"Starting to set Thermocycler well block temperature to {temp} °C"
+    # TODO: BC 2019-09-05 this time resolving logic is partially duplicated
+    # in the thermocycler api class definition, with this command logger
+    # implementation, there isn't a great way to avoid this, but it should
+    # be consolidated as soon as an alternative to the publisher is settled on.
+    return {
+        "name": command_types.THERMOCYCLER_START_SET_BLOCK_TEMP,
+        "payload": {
+            "temperature": temperature,
+            "text": text,
+        },
+    }
+
+
 def thermocycler_execute_profile(
     steps: List[ThermocyclerStep], repetitions: int
 ) -> command_types.ThermocyclerExecuteProfileCommand:
@@ -98,6 +116,19 @@ def thermocycler_execute_profile(
     )
     return {
         "name": command_types.THERMOCYCLER_EXECUTE_PROFILE,
+        "payload": {"text": text, "steps": steps},
+    }
+
+
+def thermocycler_start_execute_profile(
+    steps: List[ThermocyclerStep], repetitions: int
+) -> command_types.ThermocyclerStartExecuteProfileCommand:
+    text = (
+        f"In the background, thermocycler starting to run {repetitions} repetitions "
+        f" of cycle composed of the following steps: {steps}"
+    )
+    return {
+        "name": command_types.THERMOCYCLER_START_EXECUTE_PROFILE,
         "payload": {"text": text, "steps": steps},
     }
 
@@ -118,6 +149,17 @@ def thermocycler_set_lid_temperature(
     temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
     text = f"Setting Thermocycler lid temperature to {temp} °C"
     return {"name": command_types.THERMOCYCLER_SET_LID_TEMP, "payload": {"text": text}}
+
+
+def thermocycler_start_set_lid_temperature(
+    temperature: float,
+) -> command_types.ThermocyclerStartSetLidTempCommand:
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f"Starting to set Thermocycler lid temperature to {temp} °C"
+    return {
+        "name": command_types.THERMOCYCLER_START_SET_LID_TEMP,
+        "payload": {"text": text},
+    }
 
 
 def thermocycler_deactivate_lid() -> command_types.ThermocyclerDeactivateLidCommand:
@@ -183,6 +225,16 @@ def heater_shaker_set_and_wait_for_shake_speed(
     }
 
 
+def heater_shaker_set_shake_speed(
+    rpm: int,
+) -> command_types.HeaterShakerSetShakeSpeedCommand:
+    text = f"Setting Heater-Shaker to Shake at {rpm} RPM"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_SHAKE_SPEED,
+        "payload": {"text": text},
+    }
+
+
 def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
     text = "Unlatching labware on Heater-Shaker"
     return {
@@ -211,5 +263,66 @@ def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHea
     text = "Deactivating Heater"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,
+        "payload": {"text": text},
+    }
+
+
+# FLex Stacker
+
+
+def flex_stacker_set_stored_labware(
+    self: Any,
+    load_name: str,
+    namespace: str | None = None,
+    version: int | None = None,
+    adapter: str | None = None,
+    lid: str | None = None,
+    count: int | None = None,
+    stacking_offset_z: float | None = None,
+) -> command_types.FlexStackerSetStoredLabwareCommand:
+    uri = f"{namespace}/{load_name}/{version}"
+    text = f"Configuring {self} with {count} labware {uri}, adapter: {adapter}, lid: {lid}, stacking_offset_z: {stacking_offset_z}"
+    return {
+        "name": command_types.FLEX_STACKER_SET_STORED_LABWARE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_retrieve(
+    self: Any,
+) -> command_types.FlexStackerRetrieveCommand:
+    text = f"Retrieving labware from {self}"
+    return {
+        "name": command_types.FLEX_STACKER_RETRIEVE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_store(
+    self: Any,
+) -> command_types.FlexStackerStoreCommand:
+    text = f"Storing labware to {self}"
+    return {
+        "name": command_types.FLEX_STACKER_STORE,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_empty(
+    self: Any,
+) -> command_types.FlexStackerEmptyCommand:
+    text = f"Emptying {self}"
+    return {
+        "name": command_types.FLEX_STACKER_EMPTY,
+        "payload": {"text": text},
+    }
+
+
+def flex_stacker_fill(
+    self: Any, count: int | None = None
+) -> command_types.FlexStackerFillCommand:
+    text = f"Filling {self} with {count} labware"
+    return {
+        "name": command_types.FLEX_STACKER_FILL,
         "payload": {"text": text},
     }

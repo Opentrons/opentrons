@@ -8,7 +8,7 @@ import {
   Tag,
 } from '@opentrons/components'
 
-import { getUserOS } from '../../../pages/Designer/ProtocolSteps/Timeline/utils'
+import { getUserOS } from '/protocol-designer/pages/Designer/ProtocolSteps/Timeline/utils'
 
 interface HotKeyDisplayProps {
   targetWidth: number

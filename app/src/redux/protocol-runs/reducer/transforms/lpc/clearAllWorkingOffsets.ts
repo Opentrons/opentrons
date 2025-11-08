@@ -16,12 +16,13 @@ export function clearAllWorkingOffsets(
 
     // Clear all location-specific offsets' working offsets.
     if (lwGeometryDetails.locationSpecificOffsetDetails.length > 0) {
-      lwGeometryDetails.locationSpecificOffsetDetails = lwGeometryDetails.locationSpecificOffsetDetails.map(
-        locationSpecificOffset => ({
-          ...locationSpecificOffset,
-          workingOffset: null,
-        })
-      )
+      lwGeometryDetails.locationSpecificOffsetDetails =
+        lwGeometryDetails.locationSpecificOffsetDetails.map(
+          locationSpecificOffset => ({
+            ...locationSpecificOffset,
+            workingOffset: null,
+          })
+        )
     }
 
     updatedLabware[uri] = lwGeometryDetails

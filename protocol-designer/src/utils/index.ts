@@ -3,12 +3,10 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
   getDeckDefFromRobotType,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   isAddressableAreaStandardSlot,
-  LOW_VOLUME_PIPETTES,
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
@@ -33,7 +31,6 @@ import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
-  PipetteEntity,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
 import type {
@@ -186,24 +183,17 @@ export const getStagingAreaAddressableAreas = (
   return addressableAreasRaw
 }
 
-export function getMatchingTipLiquidSpecsFromSpec(
+export function getMatchingTipLiquidSpecs(
   pipetteSpecs: PipetteV2Specs,
   volume: number,
-  tiprackUri: string
+  tiprackDef: LabwareDefinition2
 ): SupportedTip {
-  const matchingLabwareDef = getAllLabwareDefs()[tiprackUri]
-
-  console.assert(
-    matchingLabwareDef,
-    `expected to find a matching labware def with tiprack ${tiprackUri} but could not`
-  )
-
-  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+  const tipLength = tiprackDef?.parameters.tipLength ?? 0
 
   if (tipLength === 0) {
     console.error(
       `expected to find a tiplength with tiprack ${
-        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+        tiprackDef?.metadata.displayName ?? 'unknown displayName'
       } but could not`
     )
   }
@@ -211,7 +201,6 @@ export function getMatchingTipLiquidSpecsFromSpec(
   const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
     key => key === 'lowVolumeDefault'
   )
-
   const isUsingLowVolume = volume < 5
   const liquidType =
     isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
@@ -229,56 +218,7 @@ export function getMatchingTipLiquidSpecsFromSpec(
   console.assert(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
-    }`
-  )
-
-  return matchingTipLiquidSpecs
-}
-
-export function getMatchingTipLiquidSpecs(
-  pipetteEntity: PipetteEntity,
-  volume: number,
-  tiprack: string
-): SupportedTip {
-  const matchingLabwareDef = Object.values(
-    pipetteEntity.tiprackLabwareDef
-  ).find(def => tiprack.includes(def.parameters.loadName))
-
-  console.assert(
-    matchingLabwareDef,
-    `expected to find a matching labware def with tiprack ${tiprack} but could not`
-  )
-
-  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
-
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength with tiprack ${
-        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
-      } but could not`
-    )
-  }
-
-  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipetteEntity.name)
-  const isUsingLowVolume = volume < 5
-  const liquidType =
-    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
-  const liquidSupportedTips = Object.values(
-    pipetteEntity.spec.liquids[liquidType].supportedTips
-  )
-
-  //  find the supported tip liquid specs that either exactly match
-  //  tipLength or are closest, this accounts for custom tipracks
-  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
-    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
-    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
-    return differenceA - differenceB
-  })[0]
-  console.assert(
-    matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+      tiprackDef?.metadata.displayName ?? 'unknown displayname'
     }`
   )
 
@@ -397,26 +337,16 @@ export const getDefaultPushOutVolume = (
 export const getMaxConditioningVolume = (args: {
   transferVolume: number
   disposalVolume: number
-  tiprackDefUri: string
-  labwareEntities: LabwareEntities
+  tiprackDef: LabwareDefinition2
   pipetteSpecs: PipetteV2Specs
 }): number => {
-  const {
-    transferVolume,
-    disposalVolume,
-    labwareEntities,
-    tiprackDefUri,
-    pipetteSpecs,
-  } = args
+  const { transferVolume, disposalVolume, tiprackDef, pipetteSpecs } = args
   const { liquids } = pipetteSpecs
   const minVolumeForMultiDispense = transferVolume * 2
   const isInLowVolumeMode =
     minVolumeForMultiDispense < liquids.default.minVolume &&
     'lowVolumeDefault' in liquids
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
-  )
-  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+  const tipMaxVolume = tiprackDef != null ? getTiprackVolume(tiprackDef) : null
 
   const maxWorkingVolume = Math.min(
     isInLowVolumeMode
@@ -451,13 +381,23 @@ export function getLocationStackTopToBottom(
   return stack
 }
 
-export const getTopmostLabwareOnModuleFromStack = (
+export const getLabwaresOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): string => {
-  return labware
-    .filter(lw => lw.stack.includes(moduleId)) // all stacks involving this module
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack[0] // return topmost labware from largest stack
+): { topMostId: string | null; rightBelowTopId: string | null } => {
+  // all stacks involving this module
+  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+  const largestStack = allStacks.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
+  const topMostId = largestStack?.stack[0]
+  const isTopMostIdALid = labware.find(
+    lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
+  )
+  return {
+    topMostId: largestStack?.stack[0],
+    rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+  }
 }
 
 export const getFullStackFromLabwaresOnDeck = (

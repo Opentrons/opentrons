@@ -8,6 +8,7 @@ import {
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
+  FixedTrashText,
   Flex,
   ListItem,
   ListItemCustomize,
@@ -36,24 +37,28 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { MagnetModuleChangeContent } from '/protocol-designer/components/molecules'
 import {
   getDisableModuleRestrictions,
   getEnableMutlipleTempsOT2,
-} from '../../../feature-flags/selectors'
-import { deleteModule, getAllModuleSlotsByTypeOt2 } from '../../../modules'
-import { SlotWarning } from '../../../pages/Designer/DeckSetup/SlotWarning'
-import { OT2_SUPPORTED_MODULE_MODELS } from '../../../pages/Onboarding/constants'
-import { ModuleDiagram } from '../../../pages/Onboarding/ModuleDiagram'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { createModule } from '../../../step-forms/actions'
-import { createModuleEntityAndChangeForm } from '../../../step-forms/actions/thunks'
+} from '/protocol-designer/feature-flags/selectors'
+import {
+  deleteModule,
+  getAllModuleSlotsByTypeOt2,
+} from '/protocol-designer/modules'
+import { SlotWarning } from '/protocol-designer/pages/Designer/DeckSetup/SlotWarning'
+import { OT2_SUPPORTED_MODULE_MODELS } from '/protocol-designer/pages/Onboarding/constants'
+import { ModuleDiagram } from '/protocol-designer/pages/Onboarding/ModuleDiagram'
+import { getHasGen1MultiChannelPipette } from '/protocol-designer/step-forms'
+import { createModule } from '/protocol-designer/step-forms/actions'
+import { createModuleEntityAndChangeForm } from '/protocol-designer/step-forms/actions/thunks'
 import {
   getInitialDeckSetup,
   getSavedStepForms,
-} from '../../../step-forms/selectors'
-import { getDismissedHints } from '../../../tutorial/selectors'
-import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '../../../utils/labwareModuleCompatibility'
-import { FixedTrashText, MagnetModuleChangeContent } from '../../molecules'
+} from '/protocol-designer/step-forms/selectors'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE } from '/protocol-designer/utils/labwareModuleCompatibility'
+
 import { useBlockingHint } from '../BlockingHintModal'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { useKitchen } from '../Kitchen/useKitchen'
@@ -62,8 +67,8 @@ import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { getModuleOnSlot } from './util'
 
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
-import type { StepType } from '../../../form-types'
-import type { OT2ModuleType, ThunkDispatch } from '../../../types'
+import type { StepType } from '/protocol-designer/form-types'
+import type { OT2ModuleType, ThunkDispatch } from '/protocol-designer/types'
 
 type MagneticModuleModels =
   | typeof MAGNETIC_MODULE_V1
@@ -76,7 +81,7 @@ const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   thermocyclerModuleType: 'thermocycler',
 }
 
-const THERMOCYCLER_SLOTS = ['8', '9', '10', '11']
+const THERMOCYCLER_SLOTS = ['7', '8', '10', '11']
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -104,9 +109,8 @@ export function Ot2Modules(): JSX.Element {
   const [entityToDelete, setDeleteEntityInUseModal] = useState<string | null>(
     null
   )
-  const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
-    false
-  )
+  const [changeModuleWarningInfo, displayModuleWarning] =
+    useState<boolean>(false)
   const { modules, pipettes, labware } = initialDeckSetup
   const hasMagneticModuleSteps = Object.values(savedSteps).find(
     step => step.stepType === 'magnet'
@@ -115,14 +119,12 @@ export function Ot2Modules(): JSX.Element {
     module => module.type === MAGNETIC_MODULE_TYPE
   )?.model
 
-  const [
-    magnetModuleModel,
-    setMagnetModuleModel,
-  ] = useState<MagneticModuleModels | null>(
-    hasMagneticModuleSteps && magModModel
-      ? (magModModel as MagneticModuleModels)
-      : null
-  )
+  const [magnetModuleModel, setMagnetModuleModel] =
+    useState<MagneticModuleModels | null>(
+      hasMagneticModuleSteps && magModModel
+        ? (magModModel as MagneticModuleModels)
+        : null
+    )
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const hasThermocycler = Object.values(modules).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
@@ -167,11 +169,15 @@ export function Ot2Modules(): JSX.Element {
           COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
         ).includes(lw.def.parameters.loadName)
     )?.def.metadata.displayName
-    const incompatibleLabwareSlots = Object.values(labware)
-      .filter(lw =>
-        THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
-      )
-      ?.map(lw => getSlotInLocationStack(lw.stack))
+    const incompatibleLabwareSlots = [
+      ...new Set(
+        Object.values(labware)
+          .filter(lw =>
+            THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
+          )
+          .map(lw => getSlotInLocationStack(lw.stack))
+      ),
+    ]
     if (somethingInSlotModule) {
       makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
     } else if (
@@ -282,9 +288,10 @@ export function Ot2Modules(): JSX.Element {
   const showGen1MultichannelCollisionWarnings =
     !disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? getSlotsWithCollisions(deckDef, Object.values(modules))
-    : []
+  const multichannelWarningSlotIds: AddressableAreaName[] =
+    showGen1MultichannelCollisionWarnings
+      ? getSlotsWithCollisions(deckDef, Object.values(modules))
+      : []
 
   //  for switch magnetic module models since the units are 1/2mm and mm
   const changeModuleWarning = useBlockingHint({

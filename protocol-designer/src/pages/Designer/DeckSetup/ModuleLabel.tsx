@@ -21,6 +21,7 @@ import type {
 } from '@opentrons/shared-data'
 
 interface ModuleLabelProps {
+  showModuleIcon: boolean
   moduleModel: ModuleModel
   position: CoordinateTuple
   orientation: 'left' | 'right'
@@ -42,6 +43,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     isZoomed = true,
     labelName,
     slot,
+    showModuleIcon = false,
   } = props
   const robotType = useSelector(getRobotType)
   const labelContainerRef = useRef<HTMLDivElement>(null)
@@ -100,6 +102,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
       }
       width={def?.dimensions.xDimension + 2}
       height={def?.dimensions.yDimension + 2}
+      showModuleIcon={showModuleIcon}
     />
   )
 }

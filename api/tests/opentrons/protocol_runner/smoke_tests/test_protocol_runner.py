@@ -8,6 +8,7 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to check that
 everything was loaded and run as expected.
 """
+
 from datetime import datetime
 from decoy import matchers
 from pathlib import Path
@@ -108,6 +109,7 @@ async def test_runner_with_python(
     )
 
     assert expected_command in commands_result
+    await subject.finish()
 
 
 async def test_runner_with_json(json_protocol_file: Path) -> None:
@@ -170,6 +172,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
     )
 
     assert expected_command in commands_result
+    await subject.finish()
 
 
 async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
@@ -234,6 +237,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     )
 
     assert expected_command in commands_result
+    await subject.finish()
 
 
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
@@ -299,6 +303,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     )
 
     assert expected_command in commands_result
+    await subject.finish()
 
 
 async def test_runner_with_python_and_run_time_parameters(
@@ -381,3 +386,4 @@ async def test_runner_with_python_and_run_time_parameters(
     )
 
     assert expected_command in commands_result
+    await subject.finish()

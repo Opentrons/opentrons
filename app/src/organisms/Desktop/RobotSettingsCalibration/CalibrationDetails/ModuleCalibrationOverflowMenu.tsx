@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -15,8 +15,9 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
@@ -44,6 +45,7 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
+  const host = useHost()!
 
   const {
     menuOverlay,
@@ -52,7 +54,6 @@ export function ModuleCalibrationOverflowMenu({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
-  const [showModuleWizard, setShowModuleWizard] = useState<boolean>(false)
   const { isRunRunning: isRunning } = useRunStatuses()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -70,7 +71,11 @@ export function ModuleCalibrationOverflowMenu({
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCalibration = (): void => {
-    setShowModuleWizard(true)
+    handleModuleWizardFlows({
+      attachedModule,
+      robotName,
+      host,
+    })
   }
 
   useEffect(() => {
@@ -87,15 +92,6 @@ export function ModuleCalibrationOverflowMenu({
         onClick={handleOverflowClick}
         disabled={isEstopNotDisengaged}
       />
-      {showModuleWizard ? (
-        <ModuleWizardFlows
-          attachedModule={attachedModule}
-          closeFlow={() => {
-            setShowModuleWizard(false)
-          }}
-          robotName={robotName}
-        />
-      ) : null}
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}

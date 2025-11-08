@@ -51,6 +51,7 @@ class QueueWorker:
         """
         if self._worker_task:
             self._worker_task.cancel()
+            self._command_executor.cancel_tasks("Engine cancelled")
 
     async def join(self) -> None:
         """Wait for the worker to finish, propagating any errors."""
@@ -65,7 +66,10 @@ class QueueWorker:
                 pass
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)
+                self._command_executor.cancel_tasks("Engine failed")
                 raise e
+            else:
+                self._command_executor.cancel_tasks("Engine commands complete")
 
     async def _run_commands(self) -> None:
         async for command_id in self._command_generator():

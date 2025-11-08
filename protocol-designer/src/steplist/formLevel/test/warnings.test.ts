@@ -7,7 +7,6 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  belowPipetteMinimumVolume,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
   mixTipPositionInTube,
@@ -25,48 +24,6 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 
-describe('Below pipette minimum volume', () => {
-  let fieldsWithPipette: {
-    pipette: { spec: { liquids: { default: { minVolume: number } } } }
-  }
-  beforeEach(() => {
-    fieldsWithPipette = {
-      pipette: {
-        spec: {
-          liquids: {
-            default: {
-              minVolume: 100,
-            },
-          },
-        },
-      },
-    }
-  })
-  it('should NOT return a warning when the volume equals the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 100,
-    } as any
-    expect(belowPipetteMinimumVolume(fields)).toBe(null)
-  })
-  it('should NOT return a warning when the volume is greater than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 101,
-    } as any
-    expect(belowPipetteMinimumVolume(fields)).toBe(null)
-  })
-  it('should return a warning when the volume is less than the min pipette volume', () => {
-    const fields = {
-      ...fieldsWithPipette,
-      volume: 99,
-    }
-    // @ts-expect-error(sa, 2021-6-15): belowPipetteMinimumVolume might return null, need to null check before property access
-    expect(belowPipetteMinimumVolume(fields).type).toBe(
-      'BELOW_PIPETTE_MINIMUM_VOLUME'
-    )
-  })
-})
 describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware: any
   beforeEach(() => {
@@ -206,7 +163,7 @@ const MOCK_GLYCEROL = {
   ],
 } as LiquidClass
 const MOCK_WATER = {
-  liquidClassName: 'waterV1',
+  liquidClassName: 'waterV2',
   byPipette: [
     {
       pipetteModel: 'flex_1channel_1000',
@@ -228,7 +185,9 @@ describe('liquid class compatibility', () => {
       pipette: {
         spec: { channels: 1, liquids: { default: { maxVolume: 1000 } } },
       },
-      tipRack: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      tipRack: {
+        tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+      },
       liquidClass: 'glycerol_50',
       path: 'singleDispense',
     }
@@ -277,7 +236,7 @@ describe('liquid class compatibility', () => {
   it('should return liquid classes incompatible with the pipette warning if tiprack incompatible with all liquid classes', () => {
     fields = {
       ...fields,
-      tipRack: 'badTiprack',
+      tipRack: { tiprackDefURI: 'badTiprack' },
     }
     expect(incompatibleLiquidClass(fields)?.type).toBe(
       'INCOMPATIBLE_TIP_RACK_ALL'

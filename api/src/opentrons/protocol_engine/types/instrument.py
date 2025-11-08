@@ -1,5 +1,5 @@
 """Protocol Engine types to do with instruments."""
-
+import enum
 from typing import Union
 
 from dataclasses import dataclass
@@ -45,3 +45,10 @@ class InstrumentOffsetVector(BaseModel):
     x: float
     y: float
     z: float
+
+
+class GripperMoveType(enum.Enum):
+    """Types of gripper movement."""
+
+    PICK_UP_LABWARE = enum.auto()
+    DROP_LABWARE = enum.auto()

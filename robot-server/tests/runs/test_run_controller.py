@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     RunTimeParameter,
     BooleanParameter,
     CommandAnnotation,
+    CommandPreconditions,
     SecondOrderCommandAnnotation,
 )
 from opentrons.protocol_runner import RunResult
@@ -108,6 +109,12 @@ def command_annotations() -> List[CommandAnnotation]:
 
 
 @pytest.fixture
+def command_preconditions() -> CommandPreconditions:
+    """Get a CommandPreconditions result."""
+    return CommandPreconditions(isCameraUsed=False)
+
+
+@pytest.fixture
 def protocol_commands() -> List[pe_commands.Command]:
     """Get a StateSummary value object."""
     return [
@@ -175,6 +182,7 @@ async def test_create_play_action_to_start(
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
     command_annotations: List[CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     protocol_commands: List[pe_commands.Command],
     run_id: str,
     subject: RunController,
@@ -208,6 +216,7 @@ async def test_create_play_action_to_start(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 

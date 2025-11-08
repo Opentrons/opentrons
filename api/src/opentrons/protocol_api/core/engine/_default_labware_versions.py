@@ -112,7 +112,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "thermoscientificnunc_96_wellplate_2000ul": 3,
         "usascientific_96_wellplate_2.4ml_deep": 3,
     },
-    APIVersion(2, 26): {
+    APIVersion(2, 27): {
         "agilent_1_reservoir_290ml": 4,
         "axygen_1_reservoir_90ml": 3,
         "biorad_96_wellplate_200ul_pcr": 5,
@@ -140,6 +140,7 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "opentrons_24_tuberack_nest_0.5ml_screwcap": 4,
         "opentrons_6_tuberack_nest_50ml_conical": 3,
         "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 4,
+        "opentrons_tough_universal_lid": 2,
         "usascientific_12_reservoir_22ml": 4,
         "usascientific_96_wellplate_2.4ml_deep": 4,
     },
@@ -170,6 +171,7 @@ KNOWN_EXCEPTIONS_FOR_TESTS: set[str] = {
     "schema3test_flex_tiprack_lid",
     "schema3test_tough_pcr_auto_sealing_lid",
     "schema3test_universal_flat_adapter",
+    "schema3test_96_wellplate_360ul_flat",
 }
 
 

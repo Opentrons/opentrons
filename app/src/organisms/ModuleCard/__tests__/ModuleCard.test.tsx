@@ -2,11 +2,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { useCurrentAllSubsystemUpdatesQuery } from '@opentrons/react-api-client'
 
 import { nestedTextMatcher, renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
@@ -22,9 +21,11 @@ import { FAILURE, getRequestById, PENDING, SUCCESS } from '/app/redux/robot-api'
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import { useRunStatuses } from '/app/resources/runs'
 
 import { ModuleCard } from '..'
 import { useIsDoorOpen } from '../../DoorOpenControl/useIsDoorOpen'
+import { handleModuleWizardFlows } from '../../ModuleWizardFlows'
 import { ErrorInfo } from '../ErrorInfo'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from '../FlexStackerModuleData'
@@ -52,8 +53,10 @@ vi.mock('../ThermocyclerModuleData')
 vi.mock('../HeaterShakerModuleData')
 vi.mock('../FlexStackerModuleData')
 vi.mock('/app/redux/config')
+vi.mock('@opentrons/react-api-client')
 vi.mock('../ModuleOverflowMenu')
-vi.mock('/app/organisms/RunTimeControl')
+vi.mock('../../ModuleWizardFlows')
+vi.mock('/app/resources/runs')
 vi.mock('../FirmwareUpdateFailedModal')
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/redux-resources/robots')
@@ -259,12 +262,14 @@ describe('ModuleCard', () => {
       eatToast: mockEatToast,
     })
     vi.mocked(getRequestById).mockReturnValue(null)
-    when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_IDLE)
+    when(useRunStatuses)
+      .calledWith()
+      .thenReturn({ isRunRunning: false } as any)
     when(useIsFlex).calledWith(props.robotName).thenReturn(true)
     when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectedRobot,
       name: props.robotName,
@@ -273,6 +278,9 @@ describe('ModuleCard', () => {
       isDoorOpen: true,
       moduleDoorLocation: null,
     })
+    vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -355,7 +363,9 @@ describe('ModuleCard', () => {
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {
-    when(useCurrentRunStatus).calledWith().thenReturn(RUN_STATUS_RUNNING)
+    when(useRunStatuses)
+      .calledWith()
+      .thenReturn({ isRunRunning: true } as any)
     render({
       ...props,
       module: mockMagneticModule,
@@ -409,9 +419,10 @@ describe('ModuleCard', () => {
       ...props,
       module: mockFlexStacker,
     })
-    screen.getByText('Setup module for use.')
-    const button = screen.getByText('Setup module')
+    screen.getByText('Set up module for use.')
+    const button = screen.getByText('Set up module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders module setup link for no-calibration required modules if firmware update available', () => {
@@ -421,13 +432,14 @@ describe('ModuleCard', () => {
       ...props,
       module: mockFlexStacker,
     })
-    screen.getByText('Setup module for use.')
-    const button = screen.getByText('Setup module')
+    screen.getByText('Set up module for use.')
+    const button = screen.getByText('Set up module')
     fireEvent.click(button)
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders firmware update for no-calibration required modules only if its already in the deck config', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -435,7 +447,7 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'fs123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
       module: {
@@ -443,14 +455,13 @@ describe('ModuleCard', () => {
         hasAvailableUpdate: true,
       },
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders information when a firmware update is available if it has already been calibrated', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -458,19 +469,18 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'jkl123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()
   })
   it('renders information for update available and it fails rendering the fail modal', () => {
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB3',
@@ -478,7 +488,7 @@ describe('ModuleCard', () => {
           opentronsModuleSerialNumber: 'jkl123',
         },
       ],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     vi.mocked(getRequestById).mockReturnValue({
       status: FAILURE,
       response: {
@@ -493,8 +503,7 @@ describe('ModuleCard', () => {
       ...props,
       module: mockHotThermo,
     })
-    // FIXME: remove the extra period when InlineNotification is updated
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(vi.mocked(getRequestById)).toHaveBeenCalled()

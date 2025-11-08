@@ -125,16 +125,12 @@ export function useLPCFlows({
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
-  const {
-    createTargetedMaintenanceRun,
-  } = useCreateTargetedMaintenanceRunMutation()
-  const {
-    createLabwareDefinition,
-  } = useCreateMaintenanceRunLabwareDefinitionMutation()
-  const {
-    deleteMaintenanceRun,
-    isLoading: isClosing,
-  } = useDeleteMaintenanceRunMutation()
+  const { createTargetedMaintenanceRun } =
+    useCreateTargetedMaintenanceRunMutation()
+  const { createLabwareDefinition } =
+    useCreateMaintenanceRunLabwareDefinitionMutation()
+  const { deleteMaintenanceRun, isLoading: isClosing } =
+    useDeleteMaintenanceRunMutation()
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(() => {

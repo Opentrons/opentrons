@@ -23,6 +23,9 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
+      - 'api/**'
+      - 'hardware/**'
+      - 'shared-data/**'
       - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
 

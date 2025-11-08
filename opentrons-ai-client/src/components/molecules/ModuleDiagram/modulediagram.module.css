@@ -1,0 +1,14 @@
+.image {
+  width: 100%;
+  max-width: 96px;
+  height: auto;
+}
+
+.flex_stacker_image {
+  display: block;
+  width: auto;
+  max-width: 96px;
+  height: 54px;
+  object-fit: contain;
+  transform: translateX(-10px);
+}

@@ -35,6 +35,7 @@ In a ``transfer_with_liquid_class()``, your chosen liquid class definition speci
 A liquid class definition with every action enabled would proceed in this order: 
 
 To **aspirate:**
+
 1. Pick up tip
 2. Submerge into the source well to the aspirate position
 3. Delay for an amount of time
@@ -47,6 +48,7 @@ To **aspirate:**
 10. Add an air gap 
 
 To **dispense:**
+
 11. Move to and submerge into the destination well to the dispense position
 12. Delay for an amount of time 
 13. Dispense into the destination well
@@ -58,6 +60,11 @@ To **dispense:**
 19. Blow out at the specified location
 20. Touch tip at the blow out location
 21. Drop tip
+
+.. note:: 
+    If you specify a blowout at a location other than the destination well, the pipette will touch the tip at the destination well and add an air gap before continuing to the blowout location. 
+
+    In addition, the pipette will always touch the tip after a blowout.
 
 Each command may repeat some or all of these steps in order to move liquid as requested. :py:meth:`.transfer` repeats as many times as there are wells in the longer of its ``source`` or ``dest`` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See :ref:`complex-tip-refilling` below for how they behave when they do need to repeat. 
 

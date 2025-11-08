@@ -9,31 +9,32 @@ import {
   fixture24Tuberack,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { LabwareOnDeck } from '../../../../components/organisms'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { getSelectedTerminalItemId } from '../../../../ui/steps'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
+import { getSelectedTerminalItemId } from '/protocol-designer/ui/steps'
+
 import { FixtureRender } from '../FixtureRender'
 import { SelectedItems } from '../SelectedItems'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../FixtureRender')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../components/organisms')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../ui/steps')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/components/organisms')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/ui/steps')
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Module>()
@@ -43,10 +44,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getAllLabwareDefs>()
+  const actual = await importOriginal<typeof getAllDefinitions>()
   return {
     ...actual,
-    getAllLabwareDefs: vi.fn(),
+    getAllDefinitions: vi.fn(),
   }
 })
 
@@ -65,7 +66,7 @@ describe('SelectedItems', () => {
       slotPosition: [0, 0, 0],
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
-    vi.mocked(getAllLabwareDefs).mockReturnValue({
+    vi.mocked(getAllDefinitions).mockReturnValue({
       [mockAdapterURI]: {
         ...fixture24Tuberack,
         metadata: {
@@ -179,7 +180,6 @@ describe('SelectedItems', () => {
     })
     render(props)
     screen.getByText('mock FixtureRender')
-    screen.getByText('mock LabwareOnDeck')
     expect(
       screen.getAllByText(
         'Fixture Opentrons Universal Flat Heater-Shaker Adapter'

@@ -114,7 +114,7 @@ class TouchTipImplementation(
 
         if self._state_view.labware.get_has_quirk(labware_id, "touchTipDisabled"):
             raise TouchTipDisabledError(
-                f"Touch tip not allowed on labware {labware_id}"
+                f"Touch tip not allowed on labware {self._state_view.labware.get_display_name(labware_id)}"
             )
 
         if self._state_view.labware.is_tiprack(labware_id):

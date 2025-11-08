@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Settings"
 ---
 
-# Robot Settings
-
 The Settings screen lists all the ways you can customize the behavior of your Flex.
 
 <figure class="screenshot" markdown>
@@ -15,7 +13,7 @@ Although they are presented in a single list, they roughly break down into four 
 
 ## Setup
 
-All of these settings are covered when you [first set up your Flex][first-run]. However, you can change them at any time.
+All of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time.
 
 - **Network Settings:** View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
@@ -43,7 +41,7 @@ Flex records what it's doing in several log files that are stored on the robot. 
 
 - **Display Usage:** Data about how the touchscreen draws its graphics.
 
-If you opt out of automatic data sharing, you can still [download your Flex log files](https://support.opentrons.com/s/article/How-to-download-the-logs-on-Opentrons-Flex) for your own use or to manually send them to Opentrons Support for troubleshooting.
+If you opt out of automatic data sharing, you can still download Flex log files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Log Files](../advanced-operation/log-files.md#downloading-flex-log-files) for instructions.
 
 !!! note
     There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.

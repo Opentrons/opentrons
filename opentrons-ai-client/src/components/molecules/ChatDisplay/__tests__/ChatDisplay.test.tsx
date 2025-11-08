@@ -94,47 +94,8 @@ describe('ChatDisplay', () => {
     })
   })
 
-  it('should call trackEvent when download button is clicked', () => {
-    props.chat = {
-      ...props.chat,
-      role: 'assistant',
-      reply:
-        '```python\ndef run(protocol):\n    print("hello")\n print("protocol")\n return True\n```',
-    }
-    URL.createObjectURL = vi.fn()
-    window.URL.revokeObjectURL = vi.fn()
-    HTMLAnchorElement.prototype.click = vi.fn()
-
-    render(props)
-    // eslint-disable-next-line testing-library/no-node-access, @typescript-eslint/non-nullable-type-assertion-style
-    const downloadPath = document.querySelector(
-      '[aria-roledescription="download"]'
-    ) as Element
-    fireEvent.click(downloadPath)
-
-    expect(mockUseTrackEvent).toHaveBeenCalledWith({
-      name: 'download-protocol',
-      properties: {},
-    })
-  })
-
-  it('should not call trackEvent when download button is clicked', () => {
-    URL.createObjectURL = vi.fn()
-    window.URL.revokeObjectURL = vi.fn()
-    HTMLAnchorElement.prototype.click = vi.fn()
-
-    render(props)
-    // eslint-disable-next-line testing-library/no-node-access, @typescript-eslint/non-nullable-type-assertion-style
-    const downloadPath = document.querySelector(
-      '[aria-roledescription="download"]'
-    ) as Element
-    fireEvent.click(downloadPath)
-
-    expect(mockUseTrackEvent).not.toHaveBeenCalledWith({
-      name: 'download-protocol',
-      properties: {},
-    })
-  })
+  // Note: Download functionality has been moved to individual code blocks in EnhancedMarkdown
+  // These tests are removed as the main ChatDisplay no longer has a download button
 
   it('should call trackEvent when copy button is clicked', async () => {
     Object.defineProperty(navigator, 'clipboard', {
@@ -156,5 +117,29 @@ describe('ChatDisplay', () => {
         properties: {},
       })
     })
+  })
+
+  it('should render markdown content with EnhancedMarkdown', () => {
+    const markdownContent =
+      '# Protocol\n\nThis is **bold** text with a [link](https://opentrons.com)'
+    props.chat.reply = markdownContent
+    render(props)
+
+    // Verify markdown is rendered properly
+    screen.getByRole('heading', { level: 1, name: 'Protocol' })
+    screen.getByText(/This is/)
+    screen.getByText(/bold/)
+    screen.getByRole('link', { name: 'link' })
+  })
+
+  it('should render code blocks with syntax highlighting', () => {
+    const codeContent = '```python\ndef transfer():\n    return True\n```'
+    props.chat.reply = codeContent
+    render(props)
+
+    // Verify code block UI elements are rendered
+    screen.getByText('Python')
+    screen.getByRole('button', { name: 'Copy code' })
+    screen.getByRole('button', { name: 'Download as .py file' })
   })
 })

@@ -33,6 +33,7 @@ export function ModulesAndDeckMapView({
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(
     (module): ModuleOnDeck => ({
+      nestedLabwareDefsBottomToTop: [],
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.slotName },
       moduleChildren: (

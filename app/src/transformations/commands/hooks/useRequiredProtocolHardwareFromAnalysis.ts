@@ -5,16 +5,18 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
   MAGNETIC_BLOCK_TYPE,
+  WASTE_CHUTE_FLEX_STACKER_FIXTURES,
 } from '@opentrons/shared-data'
 
 import {
+  getFilteredDeckConfigFixtureCompatibility,
   useDeckConfigurationCompatibility,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
@@ -34,16 +36,12 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 export const useRequiredProtocolHardwareFromAnalysis = (
   analysis: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-  const {
-    data: attachedModulesData,
-    isLoading: isLoadingModules,
-  } = useModulesQuery()
+  const { data: attachedModulesData, isLoading: isLoadingModules } =
+    useModulesQuery()
   const attachedModules = attachedModulesData?.data ?? []
 
-  const {
-    data: attachedInstrumentsData,
-    isLoading: isLoadingInstruments,
-  } = useInstrumentsQuery()
+  const { data: attachedInstrumentsData, isLoading: isLoadingInstruments } =
+    useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   const robotType = FLEX_ROBOT_TYPE
@@ -80,6 +78,19 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         location.slotName,
         deckDef
       )
+      const moduleType = getModuleType(model)
+      const fixtureD3 = deckConfigCompatibility.find(
+        fixture => fixture.cutoutId === 'cutoutD3'
+      )
+      const comboFixtureId =
+        moduleType === FLEX_STACKER_MODULE_TYPE &&
+        location.slotName === 'D3' &&
+        fixtureD3 != null &&
+        WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(
+          fixtureD3.compatibleCutoutFixtureIds[0]
+        )
+          ? fixtureD3.compatibleCutoutFixtureIds[0]
+          : null
       const moduleFixtures = getCutoutFixturesForModuleModel(model, deckDef)
 
       const configuredModuleSerialNumber =
@@ -101,6 +112,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         hardwareType: 'module',
         moduleModel: model,
         slot: location.slotName,
+        comboFixtureId,
         connected: isConnected,
         hasSlotConflict: deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
@@ -137,24 +149,27 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       return atLeastOneAA && notOnlySingleSlot
     }
   )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(requiredDeckConfigCompatibility)
 
-  const requiredFixtures = requiredDeckConfigCompatibility
-    // filter out all fixtures that only provide usb module addressable areas
-    // as they're handled in the requiredModules section via hardwareType === 'module'
-    .filter(
-      ({ requiredAddressableAreas }) =>
-        !requiredAddressableAreas.every(modAA =>
-          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
-        )
-    )
-    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
-      hardwareType: 'fixture' as const,
-      cutoutFixtureId: compatibleCutoutFixtureIds[0],
-      location: { cutout: cutoutId },
-      hasSlotConflict:
-        cutoutFixtureId != null &&
-        !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
-    }))
+  const requiredFixtures = filteredDeckConfigCompatibility.map(
+    ({
+      cutoutFixtureId,
+      compatibleCutoutFixtureIds,
+      cutoutId,
+      partialRequiredCutoutFixtureId,
+    }) => {
+      return {
+        hardwareType: 'fixture' as const,
+        cutoutFixtureId:
+          partialRequiredCutoutFixtureId ?? compatibleCutoutFixtureIds[0],
+        location: { cutout: cutoutId },
+        hasSlotConflict:
+          cutoutFixtureId != null &&
+          !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
+      }
+    }
+  )
 
   return {
     requiredProtocolHardware: [

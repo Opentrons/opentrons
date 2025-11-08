@@ -46,7 +46,7 @@ export function UpdateResultsModal(
   if (instrument?.ok) {
     instrumentName =
       instrument?.instrumentType === 'pipette'
-        ? pipetteDisplayName ?? 'pipette'
+        ? (pipetteDisplayName ?? 'pipette')
         : 'Flex Gripper'
   }
   return (

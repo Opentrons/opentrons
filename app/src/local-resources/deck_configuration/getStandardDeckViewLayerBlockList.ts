@@ -8,6 +8,7 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'removalHandle',
   'removableDeckOutline',
   'screwHoles',
+  'fixedTrash',
 ]
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [

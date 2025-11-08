@@ -569,10 +569,12 @@ VALID_TEST_PARAMS = [
                     ProfileStep(
                         celsius=2.22,
                         holdSeconds=3.33,
+                        rampRate=0.0,
                     ),
                     ProfileStep(
                         celsius=4.44,
                         holdSeconds=5.55,
+                        rampRate=0.0,
                     ),
                 ],
             ),
@@ -586,10 +588,12 @@ VALID_TEST_PARAMS = [
                     ProfileStep(
                         celsius=2.22,
                         holdSeconds=3.33,
+                        rampRate=0.0,
                     ),
                     ProfileStep(
                         celsius=4.44,
                         holdSeconds=5.55,
+                        rampRate=0.0,
                     ),
                 ],
             ),
@@ -603,10 +607,12 @@ VALID_TEST_PARAMS = [
                     {
                         "celsius": 2.22,
                         "holdSeconds": 3.33,
+                        "rampRate": 0.0,
                     },
                     {
                         "celsius": 4.44,
                         "holdSeconds": 5.55,
+                        "rampRate": 0.0,
                     },
                 ],
             },
@@ -617,10 +623,10 @@ VALID_TEST_PARAMS = [
                 blockMaxVolumeUl=1.11,
                 profile=[
                     pe_commands.thermocycler.RunProfileStepParams(
-                        celsius=2.22, holdSeconds=3.33
+                        celsius=2.22, holdSeconds=3.33, rampRate=0.0
                     ),
                     pe_commands.thermocycler.RunProfileStepParams(
-                        celsius=4.44, holdSeconds=5.55
+                        celsius=4.44, holdSeconds=5.55, rampRate=0.0
                     ),
                 ],
             ),

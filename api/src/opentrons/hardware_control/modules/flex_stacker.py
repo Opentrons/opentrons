@@ -44,6 +44,7 @@ from opentrons.hardware_control.modules.types import (
     FlexStackerStatus,
     HopperDoorState,
     LatchState,
+    ModuleErrorCallback,
     ModuleDisconnectedCallback,
     ModuleType,
     PlatformState,
@@ -215,12 +216,13 @@ class FlexStacker(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
-        poll_interval_seconds: Optional[float] = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
+        poll_interval_seconds: float | None = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "FlexStacker":
         """
         Build a FlexStacker
@@ -259,10 +261,8 @@ class FlexStacker(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
-
-        # Set initialized callback
-        reader.set_initialized_callback(module._initialized_callback)
 
         # Enable stallguard
         for axis, config in STALLGUARD_CONFIG.items():
@@ -286,8 +286,9 @@ class FlexStacker(mod_abc.AbstractModule):
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ):
         super().__init__(
             port=port,
@@ -295,6 +296,7 @@ class FlexStacker(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver
@@ -304,11 +306,19 @@ class FlexStacker(mod_abc.AbstractModule):
         self._stacker_status = FlexStackerStatus.IDLE
         self._last_status_bar_event: Optional[StatusBarUpdateEvent] = None
         self._should_identify = False
+        # Set initialized callback
+        self._unsubscribe_init = reader.set_initialized_callback(
+            self._initialized_callback
+        )
+        self._unsubscribe_error = reader.set_error_callback(self._async_error_callback)
 
     async def _initialized_callback(self) -> None:
         """Called by the reader once the module is initialized."""
         if self._last_status_bar_event:
             await self._handle_status_bar_event(self._last_status_bar_event)
+
+    def _async_error_callback(self, exception: Exception) -> None:
+        self.error_callback(exception)
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -864,10 +874,27 @@ class FlexStackerReader(Reader):
         self.installation_detected = False
         self._refresh_state = False
         self._initialized_callback: Optional[Callable[[], Awaitable[None]]] = None
+        self._error_callback: Optional[Callable[[Exception], None]] = None
 
-    def set_initialized_callback(self, callback: Callable[[], Awaitable[None]]) -> None:
+    def set_initialized_callback(
+        self, callback: Callable[[], Awaitable[None]]
+    ) -> Callable[[], None]:
         """Sets the callback used when done initializing the module."""
         self._initialized_callback = callback
+        return self._remove_init_callback
+
+    def _remove_init_callback(self) -> None:
+        self._initialized_callback = None
+
+    def set_error_callback(
+        self, error_callback: Callable[[Exception], None]
+    ) -> Callable[[], None]:
+        """Register a handler for asynchronous hardware errors."""
+        self._error_callback = error_callback
+        return self._remove_error_callback
+
+    def _remove_error_callback(self) -> None:
+        self._error_callback = None
 
     async def read(self) -> None:
         await self.get_door_closed()
@@ -942,6 +969,8 @@ class FlexStackerReader(Reader):
         if exception is None:
             self.error = None
         else:
+            if self._error_callback:
+                self._error_callback(exception)
             try:
                 self.error = str(exception.args[0])
             except Exception:

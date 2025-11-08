@@ -1,10 +1,10 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
+import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useRunStatuses } from '/app/resources/runs'
@@ -108,7 +108,6 @@ describe('ModuleCalibrationOverflowMenu', () => {
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       robotName: ROBOT_NAME,
     }
-    vi.mocked(ModuleWizardFlows).mockReturnValue(<div>module wizard flows</div>)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
@@ -135,9 +134,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    await waitFor(() => {
-      screen.getByText('module wizard flows')
-    })
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should have a disabled button when heater shaker is hot', () => {
@@ -158,7 +155,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    screen.getByText('module wizard flows')
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should call a mock function when clicking calibrate button for heated temp module', async () => {
@@ -169,7 +166,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    screen.getByText('module wizard flows')
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should call a mock function when clicking calibrate button for heated TC module with lid closed', async () => {
@@ -180,7 +177,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     fireEvent.click(screen.getByText('Calibrate module'))
-    screen.getByText('module wizard flows')
+    expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
   })
 
   it('should be disabled when not calibrated module and pipette is not attached', () => {

@@ -21,7 +21,11 @@ from opentrons.protocol_engine import (
     OnLabwareLocation,
     DropTipWellLocation,
 )
-from opentrons.protocol_engine.types import StagingSlotLocation, WellLocationType
+from opentrons.protocol_engine.types import (
+    StagingSlotLocation,
+    WellLocationType,
+    LoadedModule,
+)
 from opentrons.types import DeckSlotName, StagingSlotName, Point
 from . import point_calculations
 
@@ -136,22 +140,47 @@ def check_safe_for_pipette_movement(  # noqa: C901
             f" will result in collision with thermocycler lid in deck slot A1."
         )
 
+    def _check_for_column_4_module_collision(slot: DeckSlotName) -> None:
+        slot_module = engine_state.modules.get_by_slot(slot)
+        if (
+            slot_module
+            and engine_state.modules.is_column_4_module(slot_module.model)
+            and _slot_has_potential_colliding_object(
+                engine_state=engine_state,
+                pipette_bounds=pipette_bounds_at_well_location,
+                surrounding_location=slot_module,
+            )
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {slot} with {primary_nozzle} nozzle partial configuration will"
+                f" result in collision with items on {slot_module.model} mounted in {slot}."
+            )
+
+    # We check the labware slot for a module that is mounted in the same cutout
+    # as the labwares slot but does not occupy the same heirarchy (like the stacker).
+    _check_for_column_4_module_collision(labware_slot)
+
     for regular_slot in surrounding_slots.regular_slots:
         if _slot_has_potential_colliding_object(
             engine_state=engine_state,
             pipette_bounds=pipette_bounds_at_well_location,
-            surrounding_slot=regular_slot,
+            surrounding_location=regular_slot,
         ):
             raise PartialTipMovementNotAllowedError(
                 f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
                 f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
                 f" will result in collision with items in deck slot {regular_slot}."
             )
+
+        # Check for Column 4 Modules that may be descendants of a given surrounding slot
+        _check_for_column_4_module_collision(regular_slot)
+
     for staging_slot in surrounding_slots.staging_slots:
         if _slot_has_potential_colliding_object(
             engine_state=engine_state,
             pipette_bounds=pipette_bounds_at_well_location,
-            surrounding_slot=staging_slot,
+            surrounding_location=staging_slot,
         ):
             raise PartialTipMovementNotAllowedError(
                 f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
@@ -178,18 +207,45 @@ def _get_critical_point_to_use(
 def _slot_has_potential_colliding_object(
     engine_state: StateView,
     pipette_bounds: Tuple[Point, Point, Point, Point],
-    surrounding_slot: Union[DeckSlotName, StagingSlotName],
+    surrounding_location: Union[DeckSlotName, StagingSlotName, LoadedModule],
 ) -> bool:
-    """Return the slot, if any, that has an item that the pipette might collide into."""
-    # Check if slot overlaps with pipette position
-    slot_pos = engine_state.addressable_areas.get_addressable_area_position(
-        addressable_area_name=surrounding_slot.id,
-        do_compatibility_check=False,
-    )
-    slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
-        addressable_area_name=surrounding_slot.id,
-        do_compatibility_check=False,
-    )
+    """Return the slot, if any, that has an item that the pipette might collide into.
+    Can be provided a Deck Slot, Staging Slot, or Column 4 Module.
+    """
+    if isinstance(surrounding_location, LoadedModule):
+        if (
+            engine_state.modules.is_column_4_module(surrounding_location.model)
+            and surrounding_location.location is not None
+        ):
+            module_area = (
+                engine_state.modules.ensure_and_convert_module_fixture_location(
+                    surrounding_location.location.slotName, surrounding_location.model
+                )
+            )
+            slot_pos = engine_state.addressable_areas.get_addressable_area_position(
+                addressable_area_name=module_area,
+                do_compatibility_check=False,
+            )
+            slot_bounds = (
+                engine_state.addressable_areas.get_addressable_area_bounding_box(
+                    addressable_area_name=module_area,
+                    do_compatibility_check=False,
+                )
+            )
+        else:
+            raise ValueError(
+                f"Error during collision validation, Module {surrounding_location.model} must be in Column 4."
+            )
+    else:
+        # Check if slot overlaps with pipette position
+        slot_pos = engine_state.addressable_areas.get_addressable_area_position(
+            addressable_area_name=surrounding_location.id,
+            do_compatibility_check=False,
+        )
+        slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name=surrounding_location.id,
+            do_compatibility_check=False,
+        )
     slot_back_left_coords = Point(slot_pos.x, slot_pos.y + slot_bounds.y, slot_pos.z)
     slot_front_right_coords = Point(slot_pos.x + slot_bounds.x, slot_pos.y, slot_pos.z)
 
@@ -199,13 +255,17 @@ def _slot_has_potential_colliding_object(
         rectangle2=(slot_back_left_coords, slot_front_right_coords),
     ):
         # Check z-height of items in overlapping slot
-        if isinstance(surrounding_slot, DeckSlotName):
+        if isinstance(surrounding_location, DeckSlotName):
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-                DeckSlotLocation(slotName=surrounding_slot)
+                DeckSlotLocation(slotName=surrounding_location)
+            )
+        elif isinstance(surrounding_location, LoadedModule):
+            slot_highest_z = engine_state.geometry.get_highest_z_of_column_4_module(
+                surrounding_location
             )
         else:
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-                StagingSlotLocation(slotName=surrounding_slot)
+                StagingSlotLocation(slotName=surrounding_location)
             )
         return slot_highest_z >= pipette_bounds[0].z
     return False

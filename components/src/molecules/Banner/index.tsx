@@ -50,12 +50,12 @@ const BANNER_PROPS_BY_TYPE: Record<
     color: COLORS.green60,
   },
   error: {
-    icon: { name: 'alert-circle' },
+    icon: { name: 'ot-alert' },
     backgroundColor: COLORS.red30,
     color: COLORS.red60,
   },
   warning: {
-    icon: { name: 'alert-circle' },
+    icon: { name: 'ot-alert' },
     backgroundColor: COLORS.yellow30,
     color: COLORS.yellow60,
   },

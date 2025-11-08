@@ -115,7 +115,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         {
           commandType: 'unsafe/updatePositionEstimators' as const,
           params: {
-            axes: ['x', 'y'],
+            axes: ['x', 'y', 'rightZ', 'leftZ'],
           },
         },
         {
@@ -136,9 +136,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       })
   }
 
-  const [showPipetteStillAttached, setShowPipetteStillAttached] = useState(
-    false
-  )
+  const [showPipetteStillAttached, setShowPipetteStillAttached] =
+    useState(false)
 
   const handleOnClick = (): void => {
     setFetching(true)

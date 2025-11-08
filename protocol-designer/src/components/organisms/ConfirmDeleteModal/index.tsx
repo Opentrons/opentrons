@@ -14,11 +14,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { selectDropdownItem } from '../../../ui/steps/actions/actions'
+import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
+
 import { getMainPagePortalEl } from '../Portal'
 
 import type { MouseEvent } from 'react'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
 export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =

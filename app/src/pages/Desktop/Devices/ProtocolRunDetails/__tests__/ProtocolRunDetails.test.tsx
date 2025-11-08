@@ -7,17 +7,21 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
+import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '/app/organisms/Desktop/Devices/RunPreview'
 import { useRobot } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useProtocolDetailsForRun,
   useRunHasStarted,
   useRunStatuses,
 } from '/app/resources/runs'
@@ -37,6 +41,7 @@ vi.mock(
 )
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera')
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 
@@ -96,6 +101,9 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(ProtocolRunRuntimeParameters).mockReturnValue(
       <div>Mock ProtocolRunRuntimeParameters</div>
     )
+    vi.mocked(ProtocolRunCamera).mockReturnValue(
+      <div>Mock ProtocolRunCamera</div>
+    )
     vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
       [mockMagneticModule.moduleId]: {
         moduleId: mockMagneticModule.moduleId,
@@ -114,6 +122,13 @@ describe('ProtocolRunDetails', () => {
       mockRobotSideAnalysis
     )
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: { data: { createdAt: '123' } },
+    } as any)
+    vi.mocked(useProtocolDetailsForRun).mockReturnValue({
+      displayName: 'MOCK-PROTOCOL-NAME',
+    } as any)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -144,6 +159,7 @@ describe('ProtocolRunDetails', () => {
     screen.getByText('Setup')
     screen.getByText('Module Controls')
     screen.getByText('Run Preview')
+    screen.getByText('Camera')
   })
 
   it('defaults to setup content when given an unspecified tab', () => {
@@ -181,6 +197,17 @@ describe('ProtocolRunDetails', () => {
     expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
     fireEvent.click(moduleTab)
     screen.getByText('Mock ProtocolRunModuleControls')
+    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+  })
+
+  it('renders camera info when the camera tab is clicked', () => {
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
+
+    const cameraTab = screen.getByText('Camera')
+    screen.getByText('Mock ProtocolRunSetup')
+    expect(screen.queryByText('Mock ProtocolRunCamera')).toBeFalsy()
+    fireEvent.click(cameraTab)
+    screen.getByText('Mock ProtocolRunCamera')
     expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 

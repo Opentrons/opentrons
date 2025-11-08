@@ -19,8 +19,8 @@ export function StackerShuttleLwInfo(props: RecoveryContentProps): JSX.Element {
         <LeftColumnLabwareInfo
           {...props}
           title={t('load_labware_into_labware_shuttle')}
-          type={'location'}
-          layout={'stacked'}
+          type="location"
+          layout="default"
           showQuantity={false}
         />
         <RightColumnAnimation animationSrc={ShuttleLabware} />

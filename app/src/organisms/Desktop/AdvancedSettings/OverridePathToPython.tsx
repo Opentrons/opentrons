@@ -35,7 +35,9 @@ export function OverridePathToPython(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
 
-  const handleClickPythonDirectoryChange: MouseEventHandler<HTMLButtonElement> = _event => {
+  const handleClickPythonDirectoryChange: MouseEventHandler<
+    HTMLButtonElement
+  > = _event => {
     dispatch(changePythonPathOverrideConfig())
     trackEvent({
       name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,

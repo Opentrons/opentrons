@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -11,9 +10,9 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { DropdownStepFormField } from '../../../../../components/molecules'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { getTiprackOptions } from '../../../../../ui/labware/selectors'
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
 import type { FieldProps } from '../types'
 
@@ -23,8 +22,8 @@ interface TiprackFieldProps extends FieldProps {
 export function TiprackField(props: TiprackFieldProps): JSX.Element {
   const {
     value,
-    updateValue,
     pipetteId,
+    errorToShow,
     padding = `0 ${SPACING.spacing16}`,
   } = props
   const { t } = useTranslation('protocol_steps')
@@ -36,16 +35,6 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
     defaultTiprackUris.includes(option.value)
   )
 
-  useEffect(() => {
-    //  if default value is not included in the pipette's tiprack uris then
-    //  change it so it is
-    if (
-      !defaultTiprackUris.includes(value as string) &&
-      defaultTiprackUris.length > 0
-    ) {
-      updateValue(defaultTiprackUris[0])
-    }
-  }, [defaultTiprackUris, value, updateValue])
   const hasMissingTiprack = defaultTiprackUris.length > tiprackOptions.length
   return (
     <>
@@ -68,7 +57,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('tiprack')}
           </StyledText>
-          <ListItem type="default">
+          <ListItem type={errorToShow ? 'error' : 'default'}>
             <Flex padding={SPACING.spacing12}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {tiprackOptions[0]?.name ?? t('no_tiprack')}

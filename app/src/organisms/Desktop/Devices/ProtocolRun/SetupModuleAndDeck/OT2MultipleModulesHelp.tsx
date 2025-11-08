@@ -26,10 +26,8 @@ const HOW_TO_MULTIPLE_MODULES_HREF =
 
 export function OT2MultipleModulesHelp(): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  const [
-    showMultipleModulesModal,
-    setShowMultipleModulesModal,
-  ] = useState<boolean>(false)
+  const [showMultipleModulesModal, setShowMultipleModulesModal] =
+    useState<boolean>(false)
 
   const onCloseClick = (): void => {
     setShowMultipleModulesModal(false)

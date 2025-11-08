@@ -3,16 +3,17 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { DeckConfigurator } from '@opentrons/components'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { HardwareConfiguratorContainer } from '../HardwareConfiguratorContainer'
-import { useDeckConfigurationEditing } from '../useDeckConfigurationEditing'
+import { useDeckConfigurationEditing } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('../useDeckConfigurationEditing')
-vi.mock('../../../../step-forms/actions')
+vi.mock('../utils')
+vi.mock('/protocol-designer/step-forms/actions')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {

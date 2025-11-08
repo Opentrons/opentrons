@@ -66,15 +66,11 @@ export function ProtocolSetupModulesAndDeck({
       navigate('/protocols')
     }
   }, [runStatus, navigate])
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
   const [showMapView, setShowMapView] = useState<boolean>(false)
-  const [
-    clearModuleMismatchBanner,
-    setClearModuleMismatchBanner,
-  ] = useState<boolean>(false)
+  const [clearModuleMismatchBanner, setClearModuleMismatchBanner] =
+    useState<boolean>(false)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     FLEX_ROBOT_TYPE,
@@ -102,10 +98,8 @@ export function ProtocolSetupModulesAndDeck({
 
   const hasModules = attachedProtocolModuleMatches.length > 0
 
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
+  const { missingModuleIds, remainingAttachedModules } =
+    getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
 
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0

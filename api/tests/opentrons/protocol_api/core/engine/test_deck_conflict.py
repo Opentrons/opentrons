@@ -1,7 +1,8 @@
 """Unit tests for the deck_conflict module."""
+
 import pytest
-from typing import ContextManager, Any, NamedTuple, List, Tuple
-from decoy import Decoy
+from typing import ContextManager, Any, NamedTuple, List, Tuple, Literal, cast
+from decoy import Decoy, matchers
 from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -280,9 +281,6 @@ def test_maps_different_module_models(
     decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel
 ) -> None:
     """It should correctly map all possible kinds of hardware module."""
-    # TODO: skipping flex stacker check for now to enable evt
-    if module_model is ModuleModel.FLEX_STACKER_MODULE_V1:
-        pytest.skip("Flex stacker check not implemented yet")
 
     def get_expected_mapping_result() -> wrapped_deck_conflict.DeckItem:
         expected_name_for_errors = module_model.value
@@ -304,6 +302,11 @@ def test_maps_different_module_models(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
                 is_semi_configuration=False,
+            )
+        elif module_model is ModuleModel.FLEX_STACKER_MODULE_V1:
+            return wrapped_deck_conflict.FlexStackerModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
             )
         else:
             return wrapped_deck_conflict.OtherModule(
@@ -406,6 +409,272 @@ def test_maps_trash_bins(
     )
 
 
+def _modules_non_stacker() -> list[ModuleModel]:
+    return [m for m in ModuleModel if not ModuleModel.is_flex_stacker(m)]
+
+
+_lw_index = 0
+_mod_index = 0
+
+
+def _provide_item_in_state(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_sync_client: SyncClient,
+    item_type: Literal["labware", "trash-bin"] | ModuleModel,
+) -> tuple[str | None, str | None, TrashBin | None]:
+    global _lw_index, _mod_index
+    if item_type == "labware":
+        labware_id = f"labware-id-{_lw_index}"
+        _lw_index += 1
+        decoy.when(
+            mock_state_view.labware.get_location(labware_id=labware_id)
+        ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+        decoy.when(
+            mock_state_view.labware.get_load_name(labware_id=labware_id)
+        ).then_return("labware_load_name")
+        decoy.when(
+            mock_state_view.geometry.get_labware_highest_z(labware_id=labware_id)
+        ).then_return(3.14159)
+        decoy.when(
+            mock_state_view.labware.get_definition_uri(labware_id=labware_id)
+        ).then_return(LabwareUri("test/labware_load_name/123"))
+        decoy.when(
+            mock_state_view.labware.is_fixed_trash(labware_id=labware_id)
+        ).then_return(False)
+        return (labware_id, None, None)
+    elif item_type == "trash-bin":
+        decoy.when(
+            mock_sync_client.state.addressable_areas.get_fixture_height(
+                _TRASH_BIN_CUTOUT_FIXTURE
+            )
+        ).then_return(1.23)
+        return (
+            None,
+            None,
+            TrashBin(
+                location=DeckSlotName.SLOT_5,
+                addressable_area_name="blah",
+                engine_client=mock_sync_client,
+                api_version=APIVersion(2, 23),
+            ),
+        )
+    else:
+        module_id = f"module-id-{_mod_index}"
+        _mod_index += 1
+        decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
+            item_type
+        )
+        decoy.when(mock_state_view.modules.get_location(module_id)).then_return(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+        )
+        return (None, module_id, None)
+
+
+def occupancy_check_state_setup(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Set up the current state in the engine occupancy check."""
+    kind = cast(Literal["labware", "trash-bin"] | ModuleModel, request.param)
+    labware_id, module_id, trash_bin = _provide_item_in_state(
+        decoy, mock_state_view, mock_sync_client, kind
+    )
+
+    return {
+        "existing_labware_ids": [labware_id] if labware_id is not None else [],
+        "existing_module_ids": [module_id] if module_id is not None else [],
+        "existing_disposal_locations": [trash_bin] if trash_bin is not None else [],
+    }
+
+
+@pytest.fixture
+def occupancy_check_state_setup1(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """First preconfigured item in the occupancy check."""
+    return occupancy_check_state_setup(
+        decoy, mock_state_view, request, mock_sync_client
+    )
+
+
+@pytest.fixture
+def occupancy_check_state_setup2(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Second preconfigured item in the occupancy check."""
+    return occupancy_check_state_setup(
+        decoy, mock_state_view, request, mock_sync_client
+    )
+
+
+@pytest.fixture
+def occupancy_check_new_item(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    request: pytest.FixtureRequest,
+    mock_sync_client: SyncClient,
+) -> dict[str, Any]:
+    """Set up the engine for the new-item side for the occupancy check."""
+    kind = cast(Literal["labware", "trash-bin"] | ModuleModel, request.param)
+    labware_id, module_id, trash_bin = _provide_item_in_state(
+        decoy, mock_state_view, mock_sync_client, kind
+    )
+    return {
+        "new_labware_id": labware_id,
+        "new_module_id": module_id,
+        "new_trash_bin": trash_bin,
+    }
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    ["labware", "trash-bin"] + _modules_non_stacker(),  # type: ignore[operator]
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["labware", "trash-bin"] + _modules_non_stacker(),  # type: ignore[operator]
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_default_single_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly prevent double occupancy when a stacker is not involved."""
+    setup = {**occupancy_check_state_setup1}
+    for k, v in occupancy_check_state_setup2.items():
+        setup[k].extend(v)
+    with pytest.raises(
+        wrapped_deck_conflict.DeckConflictError, match="cannot both be loaded in"
+    ):
+        deck_conflict.check(
+            engine_state=mock_state_view,
+            **setup,
+            **occupancy_check_new_item,
+        )
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["labware"] + [m for m in ModuleModel if ModuleModel.is_magnetic_block(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_allows_stacker_labware_double_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly allow double occupancy for a stacker and labware or mag block."""
+    decoy.when(
+        wrapped_deck_conflict.check(
+            existing_items=matchers.Anything(),
+            new_item=matchers.Anything(),
+            new_location=matchers.Anything(),
+            robot_type=matchers.Anything(),
+        )
+    ).then_return(None)
+    setup_a = {k: [i for i in v] for k, v in occupancy_check_state_setup1.items()}
+    for k, v in occupancy_check_state_setup2.items():
+        setup_a[k].extend(v)
+    deck_conflict.check(  # type: ignore[call-overload]
+        engine_state=mock_state_view,
+        **setup_a,
+        **occupancy_check_new_item,
+    )
+    setup_b = {k: [i for i in v] for k, v in occupancy_check_state_setup2.items()}
+    for k, v in occupancy_check_state_setup1.items():
+        setup_b[k].extend(v)
+    deck_conflict.check(  # type: ignore[call-overload]
+        engine_state=mock_state_view,
+        **setup_b,
+        **occupancy_check_new_item,
+    )
+
+
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup1",
+    [m for m in ModuleModel if ModuleModel.is_flex_stacker(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_state_setup2",
+    ["trash-bin"] + [m for m in ModuleModel if not ModuleModel.is_magnetic_block(m)],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "occupancy_check_new_item",
+    ["labware"],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_prevents_stacker_non_labware_double_occupancy(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    occupancy_check_state_setup1: dict[str, Any],
+    occupancy_check_state_setup2: dict[str, Any],
+    occupancy_check_new_item: dict[str, Any],
+) -> None:
+    """It should correctly allow double occupancy for a stacker and labware or mag block."""
+    setup = {**occupancy_check_state_setup1}
+    for k, v in occupancy_check_state_setup2.items():
+        setup[k].extend(v)
+    with pytest.raises(
+        wrapped_deck_conflict.DeckConflictError, match="cannot both be loaded in"
+    ):
+        deck_conflict.check(
+            engine_state=mock_state_view,
+            **setup,
+            **occupancy_check_new_item,
+        )
+
+
 plate = LoadedLabware(
     id="plate-id",
     loadName="plate-load-name",
@@ -480,6 +749,19 @@ module = LoadedModule(
             ),
             170,
         ),
+        (
+            (
+                Point(x=150, y=250, z=40),
+                Point(x=250, y=201, z=40),
+                Point(x=150, y=201, z=40),
+                Point(x=250, y=250, z=40),
+            ),
+            pytest.raises(
+                pipette_movement_conflict.PartialTipMovementNotAllowedError,
+                match="result in collision with items on flexStackerModuleV1 mounted in B3.",
+            ),
+            170,
+        ),
     ],
 )
 def test_deck_conflict_raises_for_bad_pipette_move(
@@ -497,6 +779,8 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     - we are checking for conflicts when moving to a labware in C2.
       For each test case, we are moving to a different point in the destination labware,
       with the same pipette and tip
+    - we are checking for conflicts when moving to a point that would collide with a
+      flex stacker in column 4 at position B4 but nothing in the ancestor slot of B3
 
     Note: this test does not stub out the slot overlap checker function
           in order to preserve readability of the test. That means the test does
@@ -573,6 +857,24 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(pipette_bounds)
 
+    stacker = LoadedModule(
+        id="fake-stacker-id",
+        model=ModuleModel.FLEX_STACKER_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_B3),
+        serialNumber="serial-number",
+    )
+    decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_B3)).then_return(
+        stacker
+    )
+    decoy.when(mock_state_view.modules.is_column_4_module(stacker.model)).then_return(
+        True
+    )
+    decoy.when(
+        mock_state_view.modules.ensure_and_convert_module_fixture_location(
+            DeckSlotName.SLOT_B3, stacker.model
+        )
+    ).then_return("flexStackerModuleV1B4")
+
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
     ).then_return(
@@ -581,6 +883,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
                 DeckSlotName.SLOT_D1,
                 DeckSlotName.SLOT_D2,
                 DeckSlotName.SLOT_C1,
+                DeckSlotName.SLOT_B3,
             ],
             staging_slots=[StagingSlotName.SLOT_C4],
         )
@@ -618,6 +921,38 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         mock_state_view.geometry.get_highest_z_in_slot(
             StagingSlotLocation(slotName=StagingSlotName.SLOT_C4)
         )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Point(150, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="B3", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+
+    # Ensure slot B3 is empty so we can test the stacker
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
+        )
+    ).then_return(0)
+
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_position(
+            addressable_area_name="flexStackerModuleV1B4", do_compatibility_check=False
+        )
+    ).then_return(Point(200, 200, 0))
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_bounding_box(
+            addressable_area_name="flexStackerModuleV1B4", do_compatibility_check=False
+        )
+    ).then_return(Dimensions(90, 90, 0))
+
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_of_column_4_module(stacker)
     ).then_return(50)
     for slot_name in [DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, DeckSlotName.SLOT_D2]:
         decoy.when(

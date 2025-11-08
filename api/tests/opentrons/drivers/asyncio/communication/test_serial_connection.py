@@ -129,6 +129,27 @@ async def test_send_command_with_retry(
     )
 
 
+async def test_send_command_with_zero_retries(
+    mock_serial_port: AsyncMock, async_subject: AsyncResponseSerialConnection, ack: str
+) -> None:
+    """It should a command once"""
+    mock_serial_port.read_until.side_effect = (b"", b"")
+
+    # Set the default number of retries to 1, we want to overide this with
+    # the retries from the subject.send_data(data, retries=0) method call.
+    async_subject._number_of_retries = 1
+
+    with pytest.raises(NoResponse):
+        # We want this to overwrite the internal `_number_of_retries`
+        await async_subject.send_data(data="send data", retries=0)
+
+    mock_serial_port.timeout_override.assert_called_once_with("timeout", None)
+    mock_serial_port.write.assert_called_once_with(data=b"send data")
+    mock_serial_port.read_until.assert_called_once_with(match=ack.encode())
+    mock_serial_port.close.assert_called_once()
+    mock_serial_port.open.assert_called_once()
+
+
 async def test_send_command_with_retry_exhausted(
     mock_serial_port: AsyncMock, subject: SerialKind
 ) -> None:
@@ -231,7 +252,7 @@ async def test_send_data_with_async_error_before(
         encoded_successful_response,
     ]
 
-    response = await subject_raise_on_error_patched._send_data(data=data)
+    response = await subject_raise_on_error_patched._send_data(data=data, retries=0)
 
     assert response == successful_response
     mock_serial_port.read_until.assert_has_calls(
@@ -266,7 +287,7 @@ async def test_send_data_with_async_error_after(
         encoded_error_response,
     ]
 
-    response = await subject_raise_on_error_patched._send_data(data=data)
+    response = await subject_raise_on_error_patched._send_data(data=data, retries=0)
 
     assert response == successful_response
     mock_serial_port.read_until.assert_has_calls(
@@ -277,6 +298,98 @@ async def test_send_data_with_async_error_after(
     subject_raise_on_error_patched.raise_on_error.assert_has_calls(  # type: ignore[attr-defined]
         calls=[
             call(response=successful_response, request=data),
+        ]
+    )
+
+
+async def test_send_data_multiple_ack_ok(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return all acks."""
+    successful_response = "M411"
+    data = "M411"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_successful_response,
+        encoded_successful_response,
+        encoded_successful_response,
+    ]
+
+    responses = await async_subject._send_data_multiack(data=data, retries=0, acks=3)
+
+    assert responses == [successful_response] * 3
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+        ]
+    )
+
+
+async def test_send_data_multiple_ack_some_errors(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return all acks."""
+    successful_response = "M411"
+    data = "M411"
+    error_response = "ERR003:test"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    serial_error_response = f" {error_response}  {ack}"
+    encoded_error_response = serial_error_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_successful_response,
+        encoded_error_response,
+        encoded_successful_response,
+    ]
+
+    with pytest.raises(ErrorResponse, match=error_response):
+        await async_subject._send_data_multiack(data=data, retries=0, acks=3)
+
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+        ]
+    )
+
+
+async def test_send_data_multiple_ack_ok_with_async_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return all acks."""
+    successful_response = "M411"
+    data = "M411"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    error_response = "async ERR106:main motor:speedsensor failed"
+    serial_error_response = f" {error_response}  {ack}"
+    encoded_error_response = serial_error_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_error_response,
+        encoded_successful_response,
+        encoded_successful_response,
+        encoded_successful_response,
+    ]
+
+    with pytest.raises(ErrorResponse, match=error_response):
+        await async_subject._send_data_multiack(data=data, retries=0, acks=3)
+
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+            call(match=ack.encode()),
         ]
     )
 

@@ -16,11 +16,13 @@ describe('SkipStepInfo', () => {
   let mockHandleMotionRouting: Mock
   let mockSkipFailedCommand: Mock
   let mockManualRetrieve: Mock
+  let mockManualStore: Mock
 
   beforeEach(() => {
     mockHandleMotionRouting = vi.fn(() => Promise.resolve())
     mockSkipFailedCommand = vi.fn(() => Promise.resolve())
     mockManualRetrieve = vi.fn(() => Promise.resolve())
+    mockManualStore = vi.fn(() => Promise.resolve())
 
     props = {
       routeUpdateActions: {
@@ -29,6 +31,7 @@ describe('SkipStepInfo', () => {
       recoveryCommands: {
         skipFailedCommand: mockSkipFailedCommand,
         manualRetrieve: mockManualRetrieve,
+        manualStore: mockManualStore,
       } as any,
       currentRecoveryOptionUtils: {
         selectedRecoveryOption: RECOVERY_MAP.SKIP_STEP_WITH_SAME_TIPS.ROUTE,
@@ -113,7 +116,8 @@ describe('SkipStepInfo', () => {
   })
 
   it('renders error message for unexpected recovery option', () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption = 'UNEXPECTED_ROUTE' as any
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      'UNEXPECTED_ROUTE' as any
     render(props)
 
     expect(screen.getAllByText('UNEXPECTED STEP')[0]).toBeInTheDocument()
@@ -123,8 +127,12 @@ describe('SkipStepInfo', () => {
     RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
     RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+    RECOVERY_MAP.SHUTTLE_FULL_SKIP.ROUTE,
   ])('calls manualRetreive when the route is %s', async route => {
     props.currentRecoveryOptionUtils.selectedRecoveryOption = route
+    props.failedCommand = {
+      byRunRecord: { commandType: 'flexStacker/retrieve' as any },
+    } as any
     render(props)
 
     clickButtonLabeled('Continue run now')
@@ -141,6 +149,37 @@ describe('SkipStepInfo', () => {
     await waitFor(() => {
       expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
         mockManualRetrieve.mock.invocationCallOrder[0]
+      )
+    })
+  })
+
+  it.each([
+    RECOVERY_MAP.STACKER_HOPPER_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE,
+    RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_SKIP.ROUTE,
+  ])('calls manualStore when the route is %s', async route => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption = route
+    props.failedCommand = {
+      byRunRecord: { commandType: 'flexStacker/store' as any },
+    } as any
+    render(props)
+
+    clickButtonLabeled('Continue run now')
+
+    await waitFor(() => {
+      expect(mockHandleMotionRouting).toHaveBeenCalledWith(
+        true,
+        RECOVERY_MAP.ROBOT_SKIPPING_STEP.ROUTE
+      )
+    })
+    await waitFor(() => {
+      expect(mockManualStore).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(mockHandleMotionRouting.mock.invocationCallOrder[0]).toBeLessThan(
+        mockManualStore.mock.invocationCallOrder[0]
       )
     })
   })

@@ -1,16 +1,17 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
+import { actions as tutorialActions } from '/protocol-designer/tutorial'
+
 import { UserSettings } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { actions as featureFlagActions } from '../../../../feature-flags'
-import { actions as tutorialActions } from '../../../../tutorial'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../tutorial')
-vi.mock('../../../../feature-flags')
+vi.mock('/protocol-designer/tutorial')
+vi.mock('/protocol-designer/feature-flags')
 
 const render = (props: ComponentProps<typeof UserSettings>) => {
   return renderWithProviders(<UserSettings {...props} />, {

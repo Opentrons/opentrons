@@ -65,7 +65,8 @@ export function PipetteOffsetCalibrationItems({
     return getCustomLabwareDefinitions(state)
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
-  const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipetteFromInstrumentQuery =
+    useAttachedPipettesFromInstrumentsQuery()
   const isFlex = useIsFlex(robotName)
   const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
@@ -151,10 +152,10 @@ export function PipetteOffsetCalibrationItems({
                     updateRobotStatus={updateRobotStatus}
                     pipetteName={
                       isFlex
-                        ? attachedPipetteFromInstrumentQuery[calibration.mount]
-                            ?.instrumentName ?? null
-                        : attachedPipettesFromPipetteQuery[calibration.mount]
-                            ?.name ?? null
+                        ? (attachedPipetteFromInstrumentQuery[calibration.mount]
+                            ?.instrumentName ?? null)
+                        : (attachedPipettesFromPipetteQuery[calibration.mount]
+                            ?.name ?? null)
                     }
                   />
                 </StyledTableCell>

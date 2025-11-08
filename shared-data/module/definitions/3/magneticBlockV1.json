@@ -64,6 +64,20 @@
     "ot2_short_trash": {},
     "ot3_standard": {}
   },
+  "orientation": {
+    "A1": "center",
+    "A2": "center",
+    "A3": "center",
+    "B1": "center",
+    "B2": "center",
+    "B3": "center",
+    "C1": "center",
+    "C2": "center",
+    "C3": "center",
+    "D1": "center",
+    "D2": "center",
+    "D3": "center"
+  },
   "compatibleWith": [],
   "incompatibleWithDecks": [],
   "uniqueModuleData": {}

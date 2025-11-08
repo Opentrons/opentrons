@@ -18,18 +18,18 @@ import type {
 } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
 
-export const getLabwareNicknamesById: Selector<
-  Record<string, string>
-> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  labwareIngredSelectors.getLabwareNameInfo,
-  (labwareEntities, displayLabware): Record<string, string> =>
-    mapValues(
-      labwareEntities,
-      (labwareEntity: LabwareEntity, id: string): string =>
-        displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
-    )
-)
+export const getLabwareNicknamesById: Selector<Record<string, string>> =
+  createSelector(
+    stepFormSelectors.getLabwareEntities,
+    labwareIngredSelectors.getLabwareNameInfo,
+    (labwareEntities, displayLabware): Record<string, string> =>
+      mapValues(
+        labwareEntities,
+        (labwareEntity: LabwareEntity, id: string): string =>
+          displayLabware[id]?.nickname ||
+          getLabwareDisplayName(labwareEntity.def)
+      )
+  )
 export const _sortLabwareDropdownOptions = (
   options: DropdownOption[]
 ): DropdownOption[] =>
@@ -38,23 +38,24 @@ export const _sortLabwareDropdownOptions = (
   })
 
 /** Returns waste chute option */
-export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
-  stepFormSelectors.getAdditionalEquipmentEntities,
-  additionalEquipmentEntities => {
-    const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'wasteChute'
-    )
-    const wasteChuteOption: DropdownOption | null =
-      wasteChuteEntity != null
-        ? {
-            name: WASTE_CHUTE_DISPLAY_NAME,
-            value: wasteChuteEntity.id,
-          }
-        : null
+export const getWasteChuteOption: Selector<DropdownOption | null> =
+  createSelector(
+    stepFormSelectors.getAdditionalEquipmentEntities,
+    additionalEquipmentEntities => {
+      const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
+        aE => aE.name === 'wasteChute'
+      )
+      const wasteChuteOption: DropdownOption | null =
+        wasteChuteEntity != null
+          ? {
+              name: WASTE_CHUTE_DISPLAY_NAME,
+              value: wasteChuteEntity.id,
+            }
+          : null
 
-    return wasteChuteOption
-  }
-)
+      return wasteChuteOption
+    }
+  )
 
 /** Returns options for disposal (e.g. trash) */
 export const getDisposalOptions = createSelector(
@@ -87,14 +88,12 @@ export const getDisposalOptions = createSelector(
 
 export const getTiprackOptions: Selector<DropdownOption[]> = createSelector(
   stepFormSelectors.getLabwareEntities,
-  getLabwareNicknamesById,
-  (labwareEntities, nicknamesById) => {
+  labwareEntities => {
     const options = reduce(
       labwareEntities,
       (
         acc: DropdownOption[],
-        labwareEntity: LabwareEntity,
-        labwareId: string
+        labwareEntity: LabwareEntity
       ): DropdownOption[] => {
         const labwareDefURI = labwareEntity.labwareDefURI
         const optionDefURI = acc.map(option => option.value)
@@ -108,7 +107,7 @@ export const getTiprackOptions: Selector<DropdownOption[]> = createSelector(
           return [
             ...acc,
             {
-              name: nicknamesById[labwareId],
+              name: labwareEntity.def.metadata.displayName,
               value: labwareDefURI,
             },
           ]

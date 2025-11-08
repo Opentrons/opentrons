@@ -18,6 +18,7 @@ import type { CommandTextData } from '../ProtocolTimelineScrubber/types'
 import type {
   GetTCRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
+  GetTCStartRunExtendedProfileCommandTextResult,
 } from './useCommandTextString'
 
 export * from './useCommandTextString'
@@ -61,6 +62,15 @@ export function CommandText(props: BaseProps & STProps): JSX.Element | null {
     case 'thermocycler/runExtendedProfile': {
       return (
         <ThermocyclerRunExtendedProfile
+          {...props}
+          commandText={commandText.commandText}
+          profileElementTexts={commandText.profileElementTexts}
+        />
+      )
+    }
+    case 'thermocycler/startRunExtendedProfile': {
+      return (
+        <ThermocyclerStartRunExtendedProfile
           {...props}
           commandText={commandText.commandText}
           profileElementTexts={commandText.profileElementTexts}
@@ -154,7 +164,7 @@ function ThermocyclerRunProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText
@@ -221,7 +231,97 @@ function ThermocyclerRunExtendedProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
+      `}
+    >
+      <CommandStyledText
+        {...forwardSTProps(props)}
+        marginBottom={SPACING.spacing4}
+        {...styleProps}
+      >
+        {commandText}
+      </CommandStyledText>
+      <CommandStyledText
+        {...forwardSTProps(props)}
+        marginLeft={SPACING.spacing16}
+      >
+        <ul>
+          {shouldPropagateTextLimit(propagateTextLimit, isOnDevice) ? (
+            <li css={LIST_STYLE}>
+              {profileElementTexts[0].kind === 'step'
+                ? profileElementTexts[0].stepText
+                : profileElementTexts[0].cycleText}
+            </li>
+          ) : (
+            profileElementTexts.map((element, index: number) =>
+              element.kind === 'step' ? (
+                <li css={LIST_STYLE} key={`tc-outer-step-${index}`}>
+                  {' '}
+                  {element.stepText}
+                </li>
+              ) : (
+                <li css={LIST_STYLE} key={`tc-outer-step-${index}`}>
+                  {element.cycleText}
+                  <ul>
+                    {element.stepTexts.map(
+                      ({ stepText }, stepIndex: number) => (
+                        <li
+                          css={LIST_STYLE}
+                          key={`tc-inner-step-${index}.${stepIndex}`}
+                        >
+                          {' '}
+                          {stepText}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </li>
+              )
+            )
+          )}
+        </ul>
+      </CommandStyledText>
+    </Flex>
+  )
+}
+
+type ThermocyclerStartRunExtendedProfileProps = BaseProps &
+  STProps &
+  Omit<GetTCStartRunExtendedProfileCommandTextResult, 'kind'>
+
+function ThermocyclerStartRunExtendedProfile(
+  props: ThermocyclerStartRunExtendedProfileProps
+): JSX.Element {
+  const {
+    isOnDevice,
+    propagateCenter = false,
+    propagateTextLimit = false,
+    commandText,
+    profileElementTexts,
+    ...styleProps
+  } = props
+
+  // TODO(sfoster): Command sometimes wraps this in a cascaded display: -webkit-box
+  // to achieve multiline text clipping with an automatically inserted ellipsis, which works
+  // everywhere except for here where it overrides this property in the flex since this is
+  // the only place where CommandText uses a flex.
+  // The right way to handle this is probably to take the css that's in Command and make it
+  // live here instead, but that should be done in a followup since it would touch everything.
+  // See also the margin-left on the <li>s, which is needed to prevent their bullets from
+  // clipping if a container set overflow: hidden.
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      {...styleProps}
+      alignItems={
+        shouldPropagateCenter(propagateCenter, isOnDevice)
+          ? ALIGN_CENTER
+          : undefined
+      }
+      css={`
+        @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+          display: flex !important;
+        }
       `}
     >
       <CommandStyledText

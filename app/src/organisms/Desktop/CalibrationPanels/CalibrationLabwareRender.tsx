@@ -1,5 +1,8 @@
 import {
   CalibrationBlockRender,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  JUSTIFY_FLEX_END,
   LabwareNameOverlay,
   LabwareRender,
   RobotCoordsForeignDiv,
@@ -9,8 +12,6 @@ import {
   getLabwareDisplayName,
   getLabwareViewBox,
 } from '@opentrons/shared-data'
-
-import styles from './styles.module.css'
 
 import type { LabwareDefinition, Vector2D } from '@opentrons/shared-data'
 
@@ -43,9 +44,13 @@ export function CalibrationLabwareRender(
               width={xDimension}
               height={yDimension}
               x={minX}
-              y={minY - yDimension}
-              transformWithSVG
-              innerDivProps={{ className: styles.labware_ui_wrapper }}
+              y={minY}
+              innerDivProps={{
+                display: DISPLAY_FLEX,
+                flexDirection: DIRECTION_COLUMN,
+                justifyContent: JUSTIFY_FLEX_END,
+                transform: 'rotate(180deg) scaleX(-1)',
+              }}
             >
               {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
               <LabwareNameOverlay title={title.replace('µL', 'uL')} />

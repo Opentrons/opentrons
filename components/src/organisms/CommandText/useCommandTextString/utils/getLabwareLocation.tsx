@@ -1,10 +1,13 @@
 import {
+  FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getCutoutDisplayName,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleModelFromAddressableArea,
+  getModuleType,
   getSlotFromAddressableAreaName,
+  locationIsOffDeck,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -115,7 +118,7 @@ export function getLabwareLocationFromSequence(
           moduleModel:
             moduleModel === FLEX_STACKER_MODULE_V1
               ? undefined
-              : moduleModel ?? undefined,
+              : (moduleModel ?? undefined),
         }
       } else if (sequenceItem.kind === 'onModule') {
         const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
@@ -127,12 +130,24 @@ export function getLabwareLocationFromSequence(
             moduleModel:
               moduleModel === FLEX_STACKER_MODULE_V1
                 ? undefined
-                : moduleModel ?? undefined,
+                : (moduleModel ?? undefined),
           }
         }
-      }
-      // TODO(tz, 4-16-25): add inHopperLocation when logic is merged
-      else if (detailLevel === 'full') {
+      } else if (sequenceItem.kind === 'inStackerHopper') {
+        const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
+        if (moduleModel == null) {
+          console.error('labware is located on an unknown module model')
+        } else {
+          return {
+            ...acc,
+            slotName: getModuleDisplayLocation(
+              loadedModules,
+              sequenceItem.moduleId
+            ),
+            moduleModel,
+          }
+        }
+      } else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
         if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {
           if (!Array.isArray(loadedLabwares)) {
@@ -179,6 +194,8 @@ export function getLabwareLocation(
     return { slotName: 'offDeck' }
   } else if (location === 'systemLocation') {
     return { slotName: 'systemLocation' }
+  } else if (location === 'wasteChuteLocation') {
+    return { slotName: 'wasteChuteLocation' }
   } else if ('slotName' in location) {
     return { slotName: location.slotName }
   } else if ('addressableAreaName' in location) {
@@ -195,7 +212,11 @@ export function getLabwareLocation(
 
     return {
       slotName,
-      moduleModel,
+      moduleModel:
+        getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE &&
+        !('kind' in location && location.kind === 'inStackerHopper')
+          ? undefined
+          : moduleModel,
     }
   } else if ('labwareId' in location) {
     if (!Array.isArray(loadedLabwares)) {
@@ -221,10 +242,7 @@ export function getLabwareLocation(
       const adapterName =
         adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
 
-      if (
-        adapter.location === 'offDeck' ||
-        adapter.location === 'systemLocation'
-      ) {
+      if (locationIsOffDeck(adapter.location)) {
         return { slotName: 'offDeck', adapterName }
       } else if (
         'slotName' in adapter.location ||

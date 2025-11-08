@@ -5,6 +5,7 @@ PROTOCOL_NAMES ?= all
 OVERRIDE_PROTOCOL_NAMES ?= all
 LOCAL_IMAGE_TAG ?= local
 ANALYZER_IMAGE_NAME ?= opentrons-analysis
+VENV_DIR ?= .venv
 
 export ANALYSIS_REF # tag, branch or commit for the opentrons repository. Used as the image tag for the analyzer image
 export PROTOCOL_NAMES # tell the test which protocols to run
@@ -35,20 +36,20 @@ audit:
 test-protocol-analysis:
 	uv run python -m pytest -v tests/protocol_analyze_test.py
 
-.PHONY: ci-setup
-ci-setup:
-	@echo "Setting up CI environment with editable installs..."
-	@if uv sync --locked --all-extras 2>/dev/null; then \
-		echo "Lockfile is current, using locked dependencies"; \
-	else \
-		echo "Lockfile needs update due to editable installs, syncing without lock"; \
-		uv sync --all-extras; \
-	fi
-
 .PHONY: setup
 setup:
 	@echo "You must have uv installed to run this Makefile"
-	uv sync
+	uv run python bootstrap_uv_env.py
+
+.PHONY: teardown
+teardown:
+	@echo "Tearing down uv virtual environment at $(VENV_DIR)"
+	@if [ -d "$(VENV_DIR)" ]; then \
+		rm -rf "$(VENV_DIR)"; \
+		echo "Removed $(VENV_DIR)"; \
+	else \
+		echo "No $(VENV_DIR) directory found; nothing to do"; \
+	fi
 
 .PHONY: format-readme
 format-readme:
@@ -60,12 +61,12 @@ snapshot-test:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	uv run python -m pytest -k analyses_snapshot_test -vv
+	uv run python -m pytest -k analyses_snapshot_test -v --tb=line
 
 .PHONY: snapshot-audit-test
 snapshot-audit-test:
 	@echo "validate that analysis outcome matches the test intention"
-	uv run python -m pytest -k audit_snapshot_test -vv
+	uv run python -m pytest -k audit_snapshot_test -v --tb=line
 
 .PHONY: snapshot-test-update
 snapshot-test-update:

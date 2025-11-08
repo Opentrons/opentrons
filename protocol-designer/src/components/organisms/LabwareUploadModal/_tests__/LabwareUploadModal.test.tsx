@@ -1,14 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { LabwareUploadModal } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { dismissLabwareUploadMessage } from '../../../../labware-defs/actions'
-import { getLabwareUploadMessage } from '../../../../labware-defs/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { dismissLabwareUploadMessage } from '/protocol-designer/labware-defs/actions'
+import { getLabwareUploadMessage } from '/protocol-designer/labware-defs/selectors'
 
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../labware-defs/actions')
+import { LabwareUploadModal } from '..'
+
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/labware-defs/actions')
 
 const render = () => {
   return renderWithProviders(<LabwareUploadModal />, {

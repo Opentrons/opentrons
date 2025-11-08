@@ -42,7 +42,9 @@ export function ControlledAddLiquidInputs(): JSX.Element {
                   name={`liquid-${index + 1}`}
                   title={`${t('liquid')} ${index + 1}`}
                   caption={index === 0 && t('add_liquid_caption')}
-                  value={liquids[index] === '' ? '' : liquids[index] ?? liquid}
+                  value={
+                    liquids[index] === '' ? '' : (liquids[index] ?? liquid)
+                  }
                   onChange={e => {
                     const newLiquids = [...liquids]
                     newLiquids[index] = e.target.value

@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Additional Documentation"
 ---
 
-# Additional Documentation
-
 Opentrons maintains additional online documentation for our hardware and software products. You may find these resources valuable as you use Opentrons Flex.
 
 ## Opentrons Knowledge Hub

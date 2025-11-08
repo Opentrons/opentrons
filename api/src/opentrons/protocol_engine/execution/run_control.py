@@ -31,3 +31,11 @@ class RunControlHandler:
         """Delay protocol execution for a duration."""
         if not self._state_store.config.ignore_pause:
             await asyncio.sleep(seconds)
+
+    async def wait_for_tasks(self, tasks: list[str]) -> None:
+        """Wait for concurrent tasks to complete."""
+        await self._state_store.wait_for(
+            condition=lambda: self._state_store.tasks.all_tasks_finished_or_any_task_failed(
+                task_ids=tasks
+            )
+        )

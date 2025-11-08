@@ -13,7 +13,9 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { ApiWifiKey, FetchWifiKeysAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchWifiKeysAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchWifiKeysAction
+> = action => ({
   method: GET,
   path: WIFI_KEYS_PATH,
 })

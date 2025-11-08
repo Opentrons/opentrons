@@ -25,11 +25,8 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 vi.mock('/app/organisms/DropTipWizardFlows')
 vi.mock('../SelectRecoveryOption')
 
-const {
-  DROP_TIP_FLOWS,
-  RETRY_NEW_TIPS,
-  MANUAL_FILL_AND_RETRY_NEW_TIPS,
-} = RECOVERY_MAP
+const { DROP_TIP_FLOWS, RETRY_NEW_TIPS, MANUAL_FILL_AND_RETRY_NEW_TIPS } =
+  RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,

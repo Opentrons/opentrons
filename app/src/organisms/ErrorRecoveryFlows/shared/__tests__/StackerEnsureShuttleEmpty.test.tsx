@@ -42,8 +42,8 @@ describe('StackerEnsureShuttleEmpty', () => {
       },
       recoveryMap: {
         route: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
-        step:
-          RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS.ENSURE_SHUTTLE_EMPTY,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS
+          .ENSURE_SHUTTLE_EMPTY,
       },
     } as any
   })

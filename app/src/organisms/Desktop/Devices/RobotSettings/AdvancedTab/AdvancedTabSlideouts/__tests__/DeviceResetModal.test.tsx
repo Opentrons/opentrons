@@ -45,9 +45,11 @@ describe('RobotSettings DeviceResetModal', () => {
       resetOptions: mockResetOptions,
     })
     screen.getByText('Reset to factory settings?')
-    screen.getByText('This data cannot be retrieved later.')
+    screen.getByText(
+      'Resetting will erase all saved data and restart the robot. This action is permanent and cannot be undone.'
+    )
     screen.getByRole('button', { name: 'cancel' })
-    screen.getByRole('button', { name: 'Yes, clear data and restart robot' })
+    screen.getByRole('button', { name: 'Confirm' })
   })
 
   it('should close the modal when the user clicks the Yes button', () => {
@@ -65,7 +67,7 @@ describe('RobotSettings DeviceResetModal', () => {
       resetOptions: clearMockResetOptions,
     })
     const clearDataAndRestartRobotButton = screen.getByRole('button', {
-      name: 'Yes, clear data and restart robot',
+      name: 'Confirm',
     })
     fireEvent.click(clearDataAndRestartRobotButton)
     expect(dispatchApiRequest).toBeCalledWith(

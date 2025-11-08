@@ -13,6 +13,7 @@ stages:
       json:
         data:
           sessionType: deckCalibration
+          createParams: {}
     response:
       status_code: 201
       save:

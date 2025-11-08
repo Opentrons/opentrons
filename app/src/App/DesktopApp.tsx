@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -29,12 +29,12 @@ import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetail
 import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
-import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellRequestor } from '/app/redux/shell/remote'
 
+import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { useFeatureFlag } from '../redux/config'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useSoftwareUpdatePoll } from './hooks'
@@ -46,10 +46,8 @@ import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
-  const [
-    isEmergencyStopModalDismissed,
-    setIsEmergencyStopModalDismissed,
-  ] = useState<boolean>(false)
+  const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
+    useState<boolean>(false)
 
   // note for react-scan
   const enableReactScan = useFeatureFlag('reactScan')
@@ -80,9 +78,16 @@ export const DesktopApp = (): JSX.Element => {
       path: '/protocols/:protocolKey',
     },
     {
-      Component: ProtocolPreview,
-      name: 'Preview',
-      path: '/protocols/:protocolKey/preview',
+      Component: ProtocolVisualization,
+      name: 'Visualization',
+      path: '/protocols/:protocolKey/visualization',
+    },
+    // for protocol visualization path from protocol setup page and back to protocol setup page
+    // protocolKey is for visualization page and runId is for back to protocol setup page
+    {
+      Component: ProtocolVisualization,
+      name: 'Visualization',
+      path: '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: Labware,
@@ -124,8 +129,8 @@ export const DesktopApp = (): JSX.Element => {
   ]
 
   return (
-    <NiceModal.Provider>
-      <LocalizationProvider>
+    <LocalizationProvider>
+      <NiceModal.Provider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
           <ReactQueryDevtools />
           <SystemLanguagePreferenceModal />
@@ -137,7 +142,7 @@ export const DesktopApp = (): JSX.Element => {
                 setIsEmergencyStopModalDismissed,
               }}
             >
-              <Box width="100%">
+              <Box width="100%" height="100vh">
                 <Alerts>
                   <Routes>
                     {desktopRoutes.map(({ Component, path }: RouteProps) => {
@@ -145,12 +150,18 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <Fragment key={Component.name}>
+                            <Box
+                              key={Component.name}
+                              display="flex"
+                              flexDirection="column"
+                              height="100%"
+                            >
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
                                 width="100%"
-                                height="100%"
+                                flex="1"
+                                minHeight="0"
                               >
                                 <Box
                                   width="100%"
@@ -162,7 +173,7 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </Fragment>
+                            </Box>
                           }
                           path={path}
                         />
@@ -176,8 +187,8 @@ export const DesktopApp = (): JSX.Element => {
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>
-      </LocalizationProvider>
-    </NiceModal.Provider>
+      </NiceModal.Provider>
+    </LocalizationProvider>
   )
 }
 

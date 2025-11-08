@@ -57,6 +57,9 @@ export const MAX_TC_PROFILE_VOLUME = 100
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
+export const PAUSE_UNTIL_TC_PROFILE_COMPLETE: 'untilThermocyclerProfileComplete' =
+  'untilThermocyclerProfileComplete'
+
 export const DND_TYPES = {
   LABWARE: 'LABWARE',
   STEP_ITEM: 'STEP_ITEM',
@@ -152,3 +155,5 @@ export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
 }
 
 export const MINIMUM_LIQUID_CLASS_VOLUME = 1
+
+export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'

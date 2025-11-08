@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import styled, { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -14,18 +13,16 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_AROUND,
-  LegacyStyledText,
   OVERFLOW_SCROLL,
-  POSITION_RELATIVE,
   SPACING,
-  Tooltip,
-  TYPOGRAPHY,
-  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
+import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
 import { BackToTopButton } from '/app/organisms/Desktop/Devices/ProtocolRun/BackToTopButton'
+import { ProtocolRunCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera'
 import { ProtocolRunHeader } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
@@ -40,6 +37,8 @@ import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -47,83 +46,7 @@ import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
 
-const baseRoundTabStyling = css`
-  ${TYPOGRAPHY.pSemiBold}
-  color: ${COLORS.black90};
-  background-color: ${COLORS.purple30};
-  border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
-  border-radius: ${BORDERS.borderRadius8};
-  padding: ${SPACING.spacing8} ${SPACING.spacing16};
-  position: ${POSITION_RELATIVE};
-
-  &:hover {
-    background-color: ${COLORS.purple35};
-  }
-
-  &:focus-visible {
-    outline: 2px ${BORDERS.styleSolid} ${COLORS.yellow50};
-  }
-`
-
-const disabledRoundTabStyling = css`
-  ${baseRoundTabStyling}
-  color: ${COLORS.grey40};
-  background-color: ${COLORS.grey30};
-
-  &:hover {
-    background-color: ${COLORS.grey30};
-  }
-`
-
-const RoundNavLink = styled(NavLink)`
-  ${baseRoundTabStyling}
-  color: ${COLORS.black90};
-
-  &:hover {
-    background-color: ${COLORS.purple35};
-  }
-
-  &.active {
-    background-color: ${COLORS.purple50};
-    color: ${COLORS.white};
-
-    &:hover {
-      background-color: ${COLORS.purple55};
-    }
-  }
-`
-
 const JUMP_OFFSET_FROM_TOP_PX = 20
-
-interface RoundTabProps {
-  disabled: boolean
-  tabDisabledReason?: string
-  to: string
-  tabName: string
-}
-
-function RoundTab({
-  disabled,
-  tabDisabledReason,
-  to,
-  tabName,
-}: RoundTabProps): JSX.Element {
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  return disabled ? (
-    <>
-      <LegacyStyledText css={disabledRoundTabStyling} {...targetProps}>
-        {tabName}
-      </LegacyStyledText>
-      {tabDisabledReason != null ? (
-        <Tooltip tooltipProps={tooltipProps}>{tabDisabledReason}</Tooltip>
-      ) : null}
-    </>
-  ) : (
-    <RoundNavLink to={to} replace>
-      {tabName}
-    </RoundNavLink>
-  )
-}
 
 export function ProtocolRunDetails(): JSX.Element | null {
   const { robotName, runId, protocolRunDetailsTab } = useParams<
@@ -174,9 +97,16 @@ interface PageContentsProps {
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
+  const run = useNotifyRunQuery(runId)
+  const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
+  const runTimestamp = run.data?.data.createdAt ?? ''
+  const runStatus = run?.data?.data.status ?? null
+  const { displayName: protocolName } = useProtocolDetailsForRun(runId)
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
+
+  useToastOnErrorImage(runId)
 
   useEffect(() => {
     if (jumpedIndex != null) {
@@ -245,6 +175,20 @@ function PageContents(props: PageContentsProps): JSX.Element {
       ),
       backToTop: null,
     },
+    camera: {
+      content: (
+        <ProtocolRunCamera
+          runStatus={runStatus}
+          runRecordCameraSettings={runRecordCameraSettings}
+          runId={runId}
+          robotType={robotType}
+          robotName={robotName}
+          runTimestamp={runTimestamp}
+          protocolName={protocolName ?? ''}
+        />
+      ),
+      backToTop: null,
+    },
   }
   const tabDetails = protocolRunDetailsContentByTab[protocolRunDetailsTab] ?? {
     // default to the setup tab if no tab or nonexistent tab is passed as a param
@@ -280,6 +224,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
           protocolRunDetailsTab={protocolRunDetailsTab}
         />
         <RunPreviewTab robotName={robotName} runId={runId} />
+        <CameraTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
@@ -318,7 +263,8 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
     // On the initial render or when a run first begins, navigate to "run preview" if the run has started.
     if (
       currentRunStatus !== RUN_STATUS_IDLE &&
-      protocolRunDetailsTab !== 'run-preview'
+      protocolRunDetailsTab !== 'run-preview' &&
+      protocolRunDetailsTab !== 'camera'
     ) {
       navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     }
@@ -347,7 +293,7 @@ interface ParametersTabProps {
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
-const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
+const ParametersTab = (props: ParametersTabProps): JSX.Element => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -383,9 +329,8 @@ const ModuleControlsTab = (
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
-  )
+  const moduleRenderInfoForProtocolById =
+    useModuleRenderInfoForProtocolById(runId)
   const { isRunStill } = useRunStatuses()
   const navigate = useNavigate()
 
@@ -411,7 +356,7 @@ const ModuleControlsTab = (
   )
 }
 
-const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
+const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
 
@@ -422,6 +367,19 @@ const RunPreviewTab = (props: SetupTabProps): JSX.Element | null => {
       disabled={robotSideAnalysis == null}
       to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       tabName={t('run_preview')}
+    />
+  )
+}
+
+const CameraTab = (props: SetupTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+
+  return (
+    <RoundTab
+      disabled={false}
+      to={`/devices/${robotName}/protocol-runs/${runId}/camera`}
+      tabName={t('camera')}
     />
   )
 }

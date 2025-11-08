@@ -55,18 +55,20 @@ export default defineConfig(
         exclude: ['node_modules'],
       },
       define: {
-        'process.env': {
-          NODE_ENV: process.env.NODE_ENV,
-          OPENTRONS_PROJECT: process.env.OPENTRONS_PROJECT,
-        },
+        // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
-        _PKG_VERSION_: JSON.stringify(version),
-        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
-        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
+        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
+        _PKG_VERSION_: JSON.stringify(version),
       },
       resolve: {
         alias: {
+          // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+          // files being processed with the wrong config (the config from the
+          // consuming project vs. the config from the source project).
+          // Can these be replaced with regular package.json dependencies?
           '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'

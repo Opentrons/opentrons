@@ -21,7 +21,9 @@ from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
 from .door_watcher import DoorWatcher
 from .status_bar import StatusBarHandler
+from .task_handler import TaskHandler
 from ..resources.file_provider import FileProvider
+from ..resources.camera_provider import CameraProvider
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -46,5 +48,7 @@ __all__ = [
     "DoorWatcher",
     "RailLightsHandler",
     "StatusBarHandler",
+    "TaskHandler",
     "FileProvider",
+    "CameraProvider",
 ]

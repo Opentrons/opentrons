@@ -5,11 +5,11 @@ import {
   getFieldIndeterminateTooltip,
 } from '../StepForm/utils'
 
-import type { StepFieldName } from '../../../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 import type {
   DisabledFields,
   MultiselectFieldValues,
-} from '../../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import type { FieldPropsByName } from '../StepForm/types'
 
 export const makeBatchEditFieldProps = (

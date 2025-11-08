@@ -23,6 +23,7 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
     LabwareOffsetVector,
+    TipRackWellState,
 )
 from opentrons.types import DeckSlotName, NozzleMapInterface, Point, StagingSlotName
 
@@ -165,7 +166,13 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def reset_tips(self) -> None:
         if self.is_tip_rack():
-            self._engine_client.reset_tips(labware_id=self.labware_id)
+            self._engine_client.execute_command(
+                cmd.SetTipStateParams(
+                    labwareId=self._labware_id,
+                    wellNames=list(self._definition.wells),
+                    tipWellState=TipRackWellState.CLEAN,
+                )
+            )
         else:
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 

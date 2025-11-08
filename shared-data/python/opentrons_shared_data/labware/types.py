@@ -180,6 +180,29 @@ class OpentronsFlexTipRackLidAsChildFeature(TypedDict):
     matingZ: float
 
 
+class HeaterShakerUniversalFlatAdapterDeckSide(TypedDict):
+    wallX: float
+    screwCenter: Vector3D
+
+
+class HeaterShakerUniversalFlatAdapterFeature(TypedDict):
+    flatSupportThermalCouplingZ: float
+    deckLeft: HeaterShakerUniversalFlatAdapterDeckSide
+    deckRight: HeaterShakerUniversalFlatAdapterDeckSide
+
+
+class FlatSupportThermalCouplingAsChildFeature(TypedDict):
+    wellExteriorBottomZ: float
+
+
+class ScrewAnchoredAsParentFeature(TypedDict):
+    screwCenter: Vector3D
+
+
+class ScrewAnchoredAsChildFeature(TypedDict):
+    screwCenter: Vector3D
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
@@ -188,6 +211,14 @@ class LocatingFeatures(TypedDict):
     springDirectionalForceAsParent: NotRequired[SpringDirectionalForce]
     opentronsFlexTipRackLidAsParent: NotRequired[OpentronsFlexTipRackLidAsParentFeature]
     opentronsFlexTipRackLidAsChild: NotRequired[OpentronsFlexTipRackLidAsChildFeature]
+    heaterShakerUniversalFlatAdapter: NotRequired[
+        HeaterShakerUniversalFlatAdapterFeature
+    ]
+    flatSupportThermalCouplingAsChild: NotRequired[
+        FlatSupportThermalCouplingAsChildFeature
+    ]
+    screwAnchoredAsParent: NotRequired[ScrewAnchoredAsParentFeature]
+    screwAnchoredAsChild: NotRequired[ScrewAnchoredAsChildFeature]
 
 
 class LabwareDefinition2(TypedDict):
@@ -237,6 +268,7 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     wells: dict[str, WellDefinition3]
     groups: list[WellGroup]
     stackingOffsetWithLabware: NotRequired[dict[str, Vector3D]]
+    legacyStackingOffsetWithLabware: NotRequired[dict[str, Vector3D]]
     stackingOffsetWithModule: NotRequired[dict[str, Vector3D]]
     allowedRoles: NotRequired[list[LabwareRoles]]
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]

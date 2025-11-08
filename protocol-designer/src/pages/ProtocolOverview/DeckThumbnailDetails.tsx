@@ -3,6 +3,7 @@ import values from 'lodash/values'
 
 import { Module } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getModuleDef,
   getPositionFromSlotId,
@@ -18,8 +19,8 @@ import {
   getSlotIsEmpty,
 } from '../../step-forms'
 import {
+  getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
-  getTopmostLabwareOnModuleFromStack,
 } from '../../utils'
 import { SlotHover } from './SlotHover'
 
@@ -70,7 +71,7 @@ export const DeckThumbnailDetails = (
           return null
         }
         const moduleDef = getModuleDef(model)
-        const labwareLoadedOnModuleId = getTopmostLabwareOnModuleFromStack(
+        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
           id,
           allLabware
         )
@@ -91,16 +92,25 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode="offsetToSlot"
+              childrenPositioningMode={
+                moduleState.type === FLEX_STACKER_MODULE_TYPE
+                  ? 'passThrough'
+                  : 'offsetToSlot'
+              }
             >
               <>
-                {labwareLoadedOnModuleId != null ? (
+                {rightBelowTopId != null ? (
                   <LabwareOnDeck
                     x={0}
                     y={0}
-                    labwareOnDeck={
-                      initialDeckSetup.labware[labwareLoadedOnModuleId]
-                    }
+                    labwareOnDeck={initialDeckSetup.labware[rightBelowTopId]}
+                  />
+                ) : null}
+                {topMostId != null ? (
+                  <LabwareOnDeck
+                    x={0}
+                    y={0}
+                    labwareOnDeck={initialDeckSetup.labware[topMostId]}
                   />
                 ) : null}
                 <SlotHover
@@ -119,15 +129,18 @@ export const DeckThumbnailDetails = (
       {allLabware.map(labware => {
         if (
           getSlotInLocationStack(labware.stack) === 'offDeck' ||
-          allModules.some(m => labware.stack.includes(m.id))
+          allModules.some(m => labware.stack.includes(m.id)) ||
+          labware.stack.includes('fixedTrash')
         ) {
           return null
         }
         const slot = getSlotInLocationStack(labware.stack)
 
         const slotPosition = getPositionFromSlotId(slot, deckDef)
-        const slotBoundingBox = getAddressableAreaFromSlotId(slot, deckDef)
-          ?.boundingBox
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          slot,
+          deckDef
+        )?.boundingBox
         if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${slot} for labware ${labware.id}!`)
           return null
@@ -153,9 +166,8 @@ export const DeckThumbnailDetails = (
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
-            stagingAreaCutoutIds
-          )
+          const stagingAreaAddressableAreas =
+            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
             stagingAreaAddressableAreas.includes(addressableArea.id)

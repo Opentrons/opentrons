@@ -57,6 +57,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    InvalidRampRateError,
     InvalidHoldTimeError,
     InvalidWavelengthError,
     CannotPerformModuleAction,
@@ -83,6 +84,7 @@ from .exceptions import (
     OperationLocationNotInWellError,
     InvalidDispenseVolumeError,
     StorageLimitReachedError,
+    FileNameInvalidError,
     InvalidLiquidError,
     LiquidClassDoesNotExistError,
     LiquidClassRedefinitionError,
@@ -90,6 +92,10 @@ from .exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
     FlexStackerNotLogicallyEmptyError,
     InvalidLabwarePositionError,
+    InvalidModuleOrientation,
+    CameraCaptureError,
+    CameraDisabledError,
+    CameraSettingsInvalidError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -151,6 +157,7 @@ __all__ = [
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
+    "InvalidRampRateError",
     "InvalidBlockVolumeError",
     "InvalidHoldTimeError",
     "InvalidLiquidError",
@@ -174,6 +181,7 @@ __all__ = [
     "FlexStackerLabwarePoolNotYetDefinedError",
     "FlexStackerNotLogicallyEmptyError",
     "InvalidLabwarePositionError",
+    "InvalidModuleOrientation",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",
@@ -186,6 +194,10 @@ __all__ = [
     "OperationLocationNotInWellError",
     "InvalidDispenseVolumeError",
     "StorageLimitReachedError",
+    "FileNameInvalidError",
     "LiquidClassDoesNotExistError",
     "LiquidClassRedefinitionError",
+    "CameraCaptureError",
+    "CameraDisabledError",
+    "CameraSettingsInvalidError",
 ]

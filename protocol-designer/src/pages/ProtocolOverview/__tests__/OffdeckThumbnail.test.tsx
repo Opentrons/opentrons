@@ -59,7 +59,7 @@ describe('OffDeckThumbnail', () => {
         },
       },
     })
-    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue([])
+    vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue({})
     vi.mocked(getAllWellContentsForActiveItem).mockReturnValue({})
   })
 

@@ -157,8 +157,7 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name:
-        'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
+      name: 'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
       action: {
         type: 'robotUpdate:DOWNLOAD_DONE',
         payload: 'ot2',
@@ -180,8 +179,7 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name:
-        'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
+      name: 'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
       action: {
         type: 'robotUpdate:DOWNLOAD_DONE',
         payload: 'ot2',

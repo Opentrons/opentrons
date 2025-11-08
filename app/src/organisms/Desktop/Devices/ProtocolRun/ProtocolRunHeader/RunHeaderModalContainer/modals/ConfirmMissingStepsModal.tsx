@@ -19,21 +19,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  LABWARE_SETUP_STEP_KEY,
-  LPC_STEP_KEY,
-  MODULE_SETUP_STEP_KEY,
-  ROBOT_CALIBRATION_STEP_KEY,
-} from '/app/redux/protocol-runs'
+import { LPC_STEP_KEY, STEP_KEY_TO_I18N_KEY } from '/app/redux/protocol-runs'
 
 import type { StepKey } from '/app/redux/protocol-runs'
-
-const STEP_KEY_TO_I18N_KEY = {
-  [LPC_STEP_KEY]: 'applied_labware_offsets',
-  [LABWARE_SETUP_STEP_KEY]: 'labware_placement',
-  [MODULE_SETUP_STEP_KEY]: 'module_setup',
-  [ROBOT_CALIBRATION_STEP_KEY]: 'robot_calibration',
-}
 
 export interface ConfirmMissingStepsModalProps {
   onCloseClick: () => void
@@ -52,6 +40,20 @@ export const ConfirmMissingStepsModal = (
     onCloseClick()
   }
 
+  const isMissingLPCStep = missingSteps.includes(LPC_STEP_KEY)
+
+  const buildMissingStepsCopy = (): string => {
+    const formattedSteps = new Intl.ListFormat('en', {
+      style: 'short',
+      type: 'conjunction',
+    }).format(missingSteps.map(step => t(STEP_KEY_TO_I18N_KEY[step])))
+
+    const i18nKey = isMissingLPCStep
+      ? 'you_havent_confirmed_lpc_missing'
+      : 'you_havent_confirmed'
+    return t(i18nKey, { missingSteps: formattedSteps })
+  }
+
   return (
     <Modal
       title={t('are_you_sure_you_want_to_proceed')}
@@ -60,12 +62,7 @@ export const ConfirmMissingStepsModal = (
     >
       <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
         <LegacyStyledText paddingBottom={SPACING.spacing4}>
-          {t('you_havent_confirmed', {
-            missingSteps: new Intl.ListFormat('en', {
-              style: 'short',
-              type: 'conjunction',
-            }).format(missingSteps.map(step => t(STEP_KEY_TO_I18N_KEY[step]))),
-          })}
+          {buildMissingStepsCopy()}
         </LegacyStyledText>
       </Flex>
       <Flex

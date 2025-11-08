@@ -5,10 +5,10 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   Flex,
   LegacyStyledText,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
   WRAP,
@@ -16,6 +16,7 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getModuleDeckLabel,
   getModuleDisplayName,
   getModuleType,
   GRIPPER_V1_2,
@@ -120,10 +121,17 @@ function HardwareItem({
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
-    location = <DeckInfoLabel deckLabel={hardware.slot} />
+    location = (
+      <RobotInfoLabel
+        deckLabel={getModuleDeckLabel(
+          getModuleType(hardware.moduleModel),
+          hardware.slot
+        )}
+      />
+    )
   } else if (hardware.hardwareType === 'fixture') {
     location = (
-      <DeckInfoLabel
+      <RobotInfoLabel
         deckLabel={getCutoutDisplayName(hardware.location.cutout)}
       />
     )

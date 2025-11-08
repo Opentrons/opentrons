@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Instrument Installation and Calibration"
 ---
 
-# Instrument Installation and Calibration
-
 After initial robot setup, the next step is to attach instruments to the robot and calibrate them.
 
 To install an instrument, first tap on **Instruments** on the touchscreen or go to the **Pipettes and Modules** section of the device detail screen in the Opentrons App. Choose an empty mount and select either **Attach Pipette** or **Attach Gripper**. If the mount you want to use is already occupied, you need to detach the pipette or gripper first.

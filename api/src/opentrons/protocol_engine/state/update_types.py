@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-from typing_extensions import Self, Optional
+from typing_extensions import Self
 from datetime import datetime
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     OnLabwareLocation,
     TipGeometry,
+    TipRackWellState,
     AspiratedFluid,
     LiquidClassRecord,
     ABSMeasureMode,
@@ -23,6 +24,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     LabwareWellId,
+    PreconditionTypes,
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -235,8 +237,10 @@ class PipetteAspirateReadyUpdate:
 
 
 @dataclasses.dataclass
-class TipsUsedUpdate:
-    """Represents an update that marks tips in a tip rack as used."""
+class TipsStateUpdate:
+    """Represents an update that marks tips in a tip rack as the requested state."""
+
+    tip_state: TipRackWellState
 
     labware_id: str
     """The labware ID of the tip rack."""
@@ -399,6 +403,13 @@ class FilesAddedUpdate:
 
 
 @dataclasses.dataclass
+class PreconditionUpdate:
+    """An update that changes command preconditions flags."""
+
+    preconditions: dict[PreconditionTypes, bool]
+
+
+@dataclasses.dataclass
 class AddressableAreaUsedUpdate:
     """An update that says an addressable area has been used."""
 
@@ -413,7 +424,7 @@ class LoadModuleUpdate:
     definition: ModuleDefinition
     slot_name: DeckSlotName
     requested_model: ModuleModel
-    serial_number: Optional[str]
+    serial_number: typing.Optional[str]
 
 
 @dataclasses.dataclass
@@ -452,7 +463,7 @@ class StateUpdate:
 
     labware_lid: LabwareLidUpdate | NoChangeType = NO_CHANGE
 
-    tips_used: TipsUsedUpdate | NoChangeType = NO_CHANGE
+    tips_state: TipsStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_loaded: LiquidLoadedUpdate | NoChangeType = NO_CHANGE
 
@@ -473,6 +484,8 @@ class StateUpdate:
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
 
     ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
+
+    precondition_update: PreconditionUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
@@ -682,7 +695,7 @@ class StateUpdate:
         definition: ModuleDefinition,
         slot_name: DeckSlotName,
         requested_model: ModuleModel,
-        serial_number: Optional[str],
+        serial_number: typing.Optional[str],
     ) -> Self:
         """Add a new module to state. See `LoadModuleUpdate`."""
         self.loaded_module = LoadModuleUpdate(
@@ -729,9 +742,13 @@ class StateUpdate:
         )
         return self
 
-    def mark_tips_as_used(self: Self, labware_id: str, well_names: list[str]) -> Self:
-        """Mark tips in a tip rack as used. See `TipsUsedUpdate`."""
-        self.tips_used = TipsUsedUpdate(labware_id=labware_id, well_names=well_names)
+    def update_tip_rack_well_state(
+        self: Self, tip_state: TipRackWellState, labware_id: str, well_names: list[str]
+    ) -> Self:
+        """Marks tips in a tip rack to provided tip state. See `TipsStateUpdate`."""
+        self.tips_state = TipsStateUpdate(
+            tip_state=tip_state, labware_id=labware_id, well_names=well_names
+        )
         return self
 
     def set_liquid_loaded(

@@ -7,8 +7,9 @@ import { screen } from '@testing-library/react'
 import { WasteChute } from '@opentrons/components'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
+
 import { BlockedSlot } from '../Overlays/BlockedSlot'
 import { SlotOverlay } from '../Overlays/SlotOverlay'
 
@@ -17,7 +18,7 @@ import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../Overlays/SlotOverlay')
 vi.mock('@opentrons/step-generation')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {

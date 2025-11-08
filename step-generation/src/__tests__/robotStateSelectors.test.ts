@@ -8,6 +8,8 @@ import {
 
 import {
   _getNextTip,
+  CLEAN,
+  EMPTY,
   getModuleState,
   getNextTiprack,
   sortLabwareBySlot,
@@ -21,7 +23,7 @@ import {
 } from '../fixtures'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { InvariantContext } from '../types'
+import type { InvariantContext, TipState } from '../types'
 
 let invariantContext: InvariantContext
 
@@ -67,7 +69,7 @@ describe('sortLabwareBySlot', () => {
 describe('_getNextTip', () => {
   const getNextTipHelper = (
     channel: 1 | 8,
-    tiprackTipState: Record<string, boolean>
+    tiprackTipState: Record<string, TipState>
   ): string | null => {
     const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
@@ -111,7 +113,7 @@ describe('_getNextTip', () => {
   it('missing A1, go to B1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
-      A1: false,
+      A1: EMPTY,
     })
     expect(result).toEqual('B1')
   })
@@ -119,8 +121,8 @@ describe('_getNextTip', () => {
   it('missing A1 and B1, go to C1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
-      A1: false,
-      B1: false,
+      A1: EMPTY,
+      B1: EMPTY,
     })
     expect(result).toEqual('C1')
   })
@@ -128,7 +130,7 @@ describe('_getNextTip', () => {
   it('missing first column, go to A2', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
-      ...getTipColumn(1, false),
+      ...getTipColumn(1, EMPTY),
     })
     expect(result).toEqual('A2')
   })
@@ -136,9 +138,9 @@ describe('_getNextTip', () => {
   it('missing a few random tips, go to lowest col, then lowest row', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
-      ...getTipColumn(1, false),
-      ...getTipColumn(2, false),
-      D2: true,
+      ...getTipColumn(1, EMPTY),
+      ...getTipColumn(2, EMPTY),
+      D2: CLEAN,
     })
     expect(result).toEqual('D2')
   })
@@ -156,7 +158,7 @@ describe('getNextTiprack - single-channel', () => {
       tiprackSetting: { tiprack1Id: true },
     })
 
-    robotState.tipState.tipracks.tiprack1Id.A1 = false
+    robotState.tipState.tipracks.tiprack1Id.A1 = EMPTY
 
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
@@ -218,8 +220,8 @@ describe('getNextTiprack - single-channel', () => {
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
     // remove A1 tip from both racks
-    robotState.tipState.tipracks.tiprack1Id.A1 = false
-    robotState.tipState.tipracks.tiprack2Id.A1 = false
+    robotState.tipState.tipracks.tiprack1Id.A1 = EMPTY
+    robotState.tipState.tipracks.tiprack2Id.A1 = EMPTY
     const result = getNextTiprack(
       DEFAULT_PIPETTE,
       mockTiprackURI,
@@ -285,9 +287,9 @@ describe('getNextTiprack - 8-channel', () => {
     })
     robotState.tipState.tipracks.tiprack1Id = {
       ...robotState.tipState.tipracks.tiprack1Id,
-      A1: false,
-      A2: false,
-      A5: false,
+      A1: EMPTY,
+      A2: EMPTY,
+      A5: EMPTY,
     }
     const result = getNextTiprack(
       'p300MultiId',
@@ -330,18 +332,18 @@ describe('getNextTiprack - 8-channel', () => {
     })
     robotState.tipState.tipracks.tiprack1Id = {
       ...robotState.tipState.tipracks.tiprack1Id,
-      F1: false,
-      B2: false,
-      C3: false,
-      A4: false,
-      H5: false,
-      E6: false,
-      B7: false,
-      A8: false,
-      C9: false,
-      D10: false,
-      G11: false,
-      F12: false,
+      F1: EMPTY,
+      B2: EMPTY,
+      C3: EMPTY,
+      A4: EMPTY,
+      H5: EMPTY,
+      E6: EMPTY,
+      B7: EMPTY,
+      A8: EMPTY,
+      C9: EMPTY,
+      D10: EMPTY,
+      G11: EMPTY,
+      F12: EMPTY,
     }
 
     const result = getNextTiprack(
@@ -391,38 +393,38 @@ describe('getNextTiprack - 8-channel', () => {
     robotState.tipState.tipracks.tiprack1Id = {
       ...robotState.tipState.tipracks.tiprack1Id,
       // empty row, 8-channel cannot use
-      A1: false,
-      A2: false,
-      A3: false,
-      A4: false,
-      A5: false,
-      A6: false,
-      A7: false,
-      A8: false,
-      A9: false,
-      A10: false,
-      A11: false,
-      A12: false,
+      A1: EMPTY,
+      A2: EMPTY,
+      A3: EMPTY,
+      A4: EMPTY,
+      A5: EMPTY,
+      A6: EMPTY,
+      A7: EMPTY,
+      A8: EMPTY,
+      A9: EMPTY,
+      A10: EMPTY,
+      A11: EMPTY,
+      A12: EMPTY,
     }
     robotState.tipState.tipracks.tiprack2Id = {
       ...robotState.tipState.tipracks.tiprack2Id,
       // empty diagonal, 8-channel cannot use
-      F1: false,
-      B2: false,
-      C3: false,
-      A4: false,
-      H5: false,
-      E6: false,
-      B7: false,
-      A8: false,
-      C9: false,
-      D10: false,
-      G11: false,
-      F12: false,
+      F1: EMPTY,
+      B2: EMPTY,
+      C3: EMPTY,
+      A4: EMPTY,
+      H5: EMPTY,
+      E6: EMPTY,
+      B7: EMPTY,
+      A8: EMPTY,
+      C9: EMPTY,
+      D10: EMPTY,
+      G11: EMPTY,
+      F12: EMPTY,
     }
     robotState.tipState.tipracks.tiprack3Id = {
       ...robotState.tipState.tipracks.tiprack3Id,
-      A1: false,
+      A1: EMPTY,
     }
 
     const result = getNextTiprack(

@@ -10,7 +10,7 @@ import { getLoadLiquidClassCommands } from '../getLoadLiquidClassCommands'
 
 import type { LiquidClass } from '@opentrons/shared-data'
 import type { PipetteEntities } from '@opentrons/step-generation'
-import type { SavedStepFormState } from '../../../../step-forms/reducers'
+import type { SavedStepFormState } from '/protocol-designer/step-forms/reducers'
 
 vi.mock('@opentrons/shared-data', async () => {
   const actual = await vi.importActual('@opentrons/shared-data')
@@ -20,16 +20,16 @@ vi.mock('@opentrons/shared-data', async () => {
   }
 })
 
-const MOCK_PIPETTE_ENTITIES = ({
+const MOCK_PIPETTE_ENTITIES = {
   mockPipette1: {
     spec: {
       channels: 1,
       liquids: { default: { maxVolume: 1000 } },
     },
   },
-} as unknown) as PipetteEntities
+} as unknown as PipetteEntities
 
-const MOCK_SAVED_STEP_FORMS = ({
+const MOCK_SAVED_STEP_FORMS = {
   step0: {
     pipette: 'mockPipette1',
     liquidClass: ETHANOL_LIQUID_CLASS_NAME,
@@ -44,7 +44,7 @@ const MOCK_SAVED_STEP_FORMS = ({
     stepType: 'mix',
     id: 'step1',
   },
-} as unknown) as SavedStepFormState
+} as unknown as SavedStepFormState
 
 const mockLiquidClasses = {
   [ETHANOL_LIQUID_CLASS_NAME]: {
@@ -84,7 +84,7 @@ const mockLiquidClasses = {
 describe('getLoadLiquidClassCommands', () => {
   beforeEach(() => {
     vi.mocked(getAllLiquidClassDefs).mockReturnValue(
-      (mockLiquidClasses as unknown) as Record<string, LiquidClass>
+      mockLiquidClasses as unknown as Record<string, LiquidClass>
     )
   })
 

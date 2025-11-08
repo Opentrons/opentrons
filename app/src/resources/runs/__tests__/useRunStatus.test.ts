@@ -20,9 +20,9 @@ describe('useRunStatus hook', () => {
   it('returns the run status of the run', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunStatus(RUN_ID_2))
     expect(result.current).toBe('running')
@@ -31,9 +31,9 @@ describe('useRunStatus hook', () => {
   it('returns a "idle" run status if idle and run unstarted', () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockIdleUnstartedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunStatus(RUN_ID_2))
     expect(result.current).toBe('idle')
@@ -42,9 +42,9 @@ describe('useRunStatus hook', () => {
   it('returns a "running" run status if idle and run started', () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: { data: mockIdleStartedRun },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunStatus(RUN_ID_2))
     expect(result.current).toBe('running')

@@ -20,8 +20,10 @@ async def magdeck(
         port=emulator_settings.magdeck_proxy.driver_port,
         execution_manager=execution_manager,
     )
-    yield module
-    await module.cleanup()
+    try:
+        yield module
+    finally:
+        await module.cleanup()
 
 
 def test_device_info(magdeck: MagDeck) -> None:

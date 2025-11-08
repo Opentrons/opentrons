@@ -3,15 +3,19 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
-import { FlexHardware, Ot2Modules } from '../../../../components/organisms'
-import { getRobotType } from '../../../../file-data/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import {
+  FlexHardware,
+  Ot2Modules,
+} from '/protocol-designer/components/organisms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+
 import { TimelineEditHardware } from '../TimelineEditHardware'
 
-vi.mock('../../../../components/organisms/FlexHardware')
-vi.mock('../../../../components/organisms/Ot2Modules')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/components/organisms/FlexHardware')
+vi.mock('/protocol-designer/components/organisms/Ot2Modules')
+vi.mock('/protocol-designer/file-data/selectors')
 const render = () => {
   return renderWithProviders(<TimelineEditHardware />, {
     i18nInstance: i18n,

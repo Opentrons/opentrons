@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+
 import { DisabledScreen } from '..'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
 
 const render = () => {
   return renderWithProviders(<DisabledScreen />, { i18nInstance: i18n })

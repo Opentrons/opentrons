@@ -49,6 +49,7 @@ from .ot3utils import (
     gripper_jaw_state_from_fw,
     get_system_constraints,
     get_system_constraints_for_plunger_acceleration,
+    add_delay_to_move_group,
 )
 from .tip_presence_manager import TipPresenceManager
 
@@ -657,6 +658,7 @@ class OT3Controller(FlexBackend):
         speed: float,
         stop_condition: HWStopCondition,
         nodes_in_moves_only: bool,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> Tuple[Optional[MoveGroupRunner], bool]:
         if not target:
             return None, False
@@ -683,12 +685,20 @@ class OT3Controller(FlexBackend):
         move_group, _ = create_move_group(
             origin, moves, ordered_nodes, MoveStopCondition[stop_condition.name]
         )
+
+        if delay is not None:
+            delay_axes, delay_time = delay
+            delay_nodes = [axis_to_node(ax) for ax in delay_axes]
+            move_group = add_delay_to_move_group(
+                move_group, ordered_nodes, (delay_nodes, delay_time)
+            )
+
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             False,
         )
@@ -712,9 +722,9 @@ class OT3Controller(FlexBackend):
         return (
             MoveGroupRunner(
                 move_groups=[tip_motor_move_group],
-                ignore_stalls=True
-                if not self._feature_flags.stall_detection_enabled
-                else False,
+                ignore_stalls=(
+                    True if not self._feature_flags.stall_detection_enabled else False
+                ),
             ),
             True,
         )
@@ -728,6 +738,7 @@ class OT3Controller(FlexBackend):
         speed: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         nodes_in_moves_only: bool = True,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Move to a position.
 
@@ -750,7 +761,7 @@ class OT3Controller(FlexBackend):
 
         maybe_runners = (
             self._build_move_node_axis_runner(
-                origin, target, speed, stop_condition, nodes_in_moves_only
+                origin, target, speed, stop_condition, nodes_in_moves_only, delay
             ),
             self._build_move_gear_axis_runner(
                 possible_q_axis_origin,
@@ -939,9 +950,9 @@ class OT3Controller(FlexBackend):
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -976,9 +987,9 @@ class OT3Controller(FlexBackend):
         move_group = self._build_tip_action_group(origin, targets)
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True
-            if not self._feature_flags.stall_detection_enabled
-            else False,
+            ignore_stalls=(
+                True if not self._feature_flags.stall_detection_enabled else False
+            ),
         )
         try:
             positions = await runner.run(can_messenger=self._messenger)
@@ -1398,6 +1409,9 @@ class OT3Controller(FlexBackend):
         except RuntimeError:
             return
 
+        if hasattr(self, "_module_controls") and self._module_controls is not None:
+            await self._module_controls.clean_up()
+
         if hasattr(self, "_event_watcher"):
             if (
                 loop.is_running()
@@ -1763,6 +1777,7 @@ class OT3Controller(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """
         Check if the gripper is at the expected location.
@@ -1777,7 +1792,16 @@ class OT3Controller(FlexBackend):
             expected_grip_width + grip_width_uncertainty_wider
         )
         current_gripper_position = jaw_width
-        if isclose(current_gripper_position, hard_limit_lower):
+        log.info(
+            f"Checking gripper position: current {jaw_width}; max error {max_allowed_grip_error}; hard limits {hard_limit_lower}, {hard_limit_upper}; expected {expected_gripper_position_min}, {expected_grip_width}, {expected_gripper_position_max}; uncertainty {grip_width_uncertainty_narrower}, {grip_width_uncertainty_wider}"
+        )
+        if (
+            isclose(current_gripper_position, hard_limit_lower)
+            # this odd check handles internal backlash that can lead the position to read as if
+            # the gripper has overshot its lower bound; this is physically impossible and an
+            # artifact of the gearing, so it always indicates a hard stop
+            or current_gripper_position < hard_limit_lower
+        ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws all the way closed",
                 details={
@@ -1796,6 +1820,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_min
             < -max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws closed too far",
@@ -1809,6 +1834,7 @@ class OT3Controller(FlexBackend):
         if (
             current_gripper_position - expected_gripper_position_max
             > max_allowed_grip_error
+            and not disable_geometry_grip_check
         ):
             raise FailedGripperPickupError(
                 message="Failed to grip: jaws could not close far enough",

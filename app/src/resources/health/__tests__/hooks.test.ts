@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { useHealthQuery } from '@opentrons/react-api-client'
 
-import { INIT_STATUS, useRobotInitializationStatus } from '../hooks'
+import {
+  INIT_STATUS,
+  useRobotInitializationStatus,
+} from '../useRobotInitializationStatus'
 
 vi.mock('@opentrons/react-api-client')
 

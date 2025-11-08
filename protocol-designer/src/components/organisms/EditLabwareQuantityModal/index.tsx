@@ -16,16 +16,17 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { HandleEnter } from '/protocol-designer/components/atoms'
 import {
   createContainer,
   deleteContainer,
-} from '../../../labware-ingred/actions'
-import { getLabwareEntities } from '../../../step-forms/selectors'
-import { maskToPositiveInteger } from '../../../steplist/fieldLevel/processing'
-import { HandleEnter } from '../../atoms'
+} from '/protocol-designer/labware-ingred/actions'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { maskToPositiveInteger } from '/protocol-designer/steplist/fieldLevel/processing'
+
 import { getMainPagePortalEl } from '../Portal'
 
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface EditLabwareQuantityModalProps {
   allLabwareIdsOnStack: string[]

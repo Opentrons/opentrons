@@ -2,8 +2,6 @@
 title: "Opentrons Flex: Open-Source Software"
 ---
 
-# Open-Source Software
-
 Opentrons believes that open-source software and hardware make science
 better. That's why we make our code available on GitHub and welcome
 contributions from the open-source community.

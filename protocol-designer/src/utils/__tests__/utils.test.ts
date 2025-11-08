@@ -69,20 +69,13 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 5,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {
-        tiprack: {
-          id: 'tiprack',
-          labwareDefURI: 'opentrons/opentrons_96_tiprack_300ul/1',
-          def: {
-            parameters: {
-              loadName: 'opentrons_96_tiprack_300ul',
-            },
-            wells: {
-              A1: {
-                totalLiquidVolume: 300,
-              },
-            },
+      tiprackDef: {
+        parameters: {
+          loadName: 'opentrons_96_tiprack_300ul',
+        },
+        wells: {
+          A1: {
+            totalLiquidVolume: 300,
           },
         },
       },
@@ -104,8 +97,7 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 5,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {},
+      tiprackDefUri: {},
       pipetteSpecs: {
         liquids: {
           default: {
@@ -124,20 +116,13 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 0,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {
-        tiprack: {
-          id: 'tiprack',
-          labwareDefURI: 'opentrons/opentrons_96_tiprack_300ul/1',
-          def: {
-            parameters: {
-              loadName: 'opentrons_96_tiprack_300ul',
-            },
-            wells: {
-              A1: {
-                totalLiquidVolume: 300,
-              },
-            },
+      tiprackDef: {
+        parameters: {
+          loadName: 'opentrons_96_tiprack_300ul',
+        },
+        wells: {
+          A1: {
+            totalLiquidVolume: 300,
           },
         },
       },
@@ -158,22 +143,23 @@ describe('getMaxConditioningVolume', () => {
 
 describe('getAllLabwareIdsOfCertainURIOnStack', () => {
   it('returns an 1 item in string when there are no duplicates on the stack', () => {
-    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
-      labware: {
-        stack: ['labware', 'adapter', 'module', 'A2'],
-        id: 'labware',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
-        labwareDefURI: 'mockLabwareDefUri',
-      },
-      adapter: {
-        stack: ['adapter', 'module', 'A2'],
-        id: 'adapter',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
-        labwareDefURI: 'mockAdapterDefUri',
-      },
-    }
+    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] =
+      {
+        labware: {
+          stack: ['labware', 'adapter', 'module', 'A2'],
+          id: 'labware',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          labwareDefURI: 'mockLabwareDefUri',
+        },
+        adapter: {
+          stack: ['adapter', 'module', 'A2'],
+          id: 'adapter',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          labwareDefURI: 'mockAdapterDefUri',
+        },
+      }
     const mockLabwareOnDeck: LabwareOnDeck = {
       stack: ['labware', 'adapter', 'module', 'A2'],
       id: 'labware',
@@ -189,29 +175,30 @@ describe('getAllLabwareIdsOfCertainURIOnStack', () => {
     ).toEqual(['labware'])
   })
   it('returns an 3 items in string when there are duplicates on the stack', () => {
-    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] = {
-      labware: {
-        stack: ['labware', 'module', 'A2'],
-        id: 'labware',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
-        labwareDefURI: 'mockLabwareDefUri',
-      },
-      labware2: {
-        stack: ['labware2', 'labware', 'module', 'A2'],
-        id: 'labware2',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
-        labwareDefURI: 'mockLabwareDefUri',
-      },
-      labware3: {
-        stack: ['labware3', 'labware2', 'labware', 'module', 'A2'],
-        id: 'labware3',
-        def: fixture96Plate as LabwareDefinition2,
-        pythonName: 'mockPythonName',
-        labwareDefURI: 'mockLabwareDefUri',
-      },
-    }
+    const mockDeckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware'] =
+      {
+        labware: {
+          stack: ['labware', 'module', 'A2'],
+          id: 'labware',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          labwareDefURI: 'mockLabwareDefUri',
+        },
+        labware2: {
+          stack: ['labware2', 'labware', 'module', 'A2'],
+          id: 'labware2',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          labwareDefURI: 'mockLabwareDefUri',
+        },
+        labware3: {
+          stack: ['labware3', 'labware2', 'labware', 'module', 'A2'],
+          id: 'labware3',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
+          labwareDefURI: 'mockLabwareDefUri',
+        },
+      }
     const mockLabwareOnDeck: LabwareOnDeck = {
       stack: ['labware', 'adapter', 'module', 'A2'],
       id: 'labware',

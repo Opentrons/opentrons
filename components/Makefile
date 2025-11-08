@@ -50,3 +50,8 @@ test:
 .PHONY: test-cov
 test-cov:
 	$(MAKE) -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	make -C .. test-js-components tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+
+.PHONY: pack
+pack: build-ts lib
+	pnpm dlx pack

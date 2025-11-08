@@ -105,9 +105,8 @@ mock_pipette.dispense(
       })
     })
     it('should return an error when dispensing from labware off deck', () => {
-      initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
-        invariantContext
-      )
+      initialRobotState =
+        getInitialRobotStateWithOffDeckLabwareStandard(invariantContext)
       const result = dispense(
         {
           flowRate: 10,
@@ -216,9 +215,8 @@ mock_pipette.dispense(
     })
     it('should return an error when dispensing into heater shaker with latch open for flex', () => {
       if (FlexPipetteNameSpecs != null) {
-        invariantContext.pipetteEntities[
-          DEFAULT_PIPETTE
-        ].spec = FlexPipetteNameSpecs
+        invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+          FlexPipetteNameSpecs
       }
 
       vi.mocked(pipetteIntoHeaterShakerLatchOpen).mockImplementationOnce(
@@ -262,9 +260,8 @@ mock_pipette.dispense(
     })
     it('should return an error when dispensing into heater-shaker when it is shaking for flex', () => {
       if (FlexPipetteNameSpecs != null) {
-        invariantContext.pipetteEntities[
-          DEFAULT_PIPETTE
-        ].spec = FlexPipetteNameSpecs
+        invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+          FlexPipetteNameSpecs
       }
 
       vi.mocked(pipetteIntoHeaterShakerWhileShaking).mockImplementationOnce(

@@ -5,14 +5,15 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
+
 import { MultichannelSubstep } from './MultichannelSubstep'
 import { Substep } from './Substep'
 
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
-} from '../../../../steplist'
+} from '/protocol-designer/steplist'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem

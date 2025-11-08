@@ -9,7 +9,10 @@ from opentrons.protocol_engine.state.update_types import (
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+    LiquidClasses as VolumeModes,
+)
 from opentrons_shared_data.robot.types import RobotType
 from opentrons_shared_data.pipette.pipette_definition import AvailableSensorDefinition
 from opentrons.types import MountType, Point
@@ -86,6 +89,7 @@ async def test_load_pipette_implementation(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
+        volume_mode=VolumeModes.default,
     )
 
     decoy.when(
@@ -166,6 +170,7 @@ async def test_load_pipette_implementation_96_channel(
         },
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
+        volume_mode=VolumeModes.lowVolumeDefault,
     )
 
     decoy.when(

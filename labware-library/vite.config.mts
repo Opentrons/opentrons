@@ -49,11 +49,18 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+    _OT_LL_MIXPANEL_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_ID),
+    _OT_LL_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_LL_MIXPANEL_DEV_ID),
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
   resolve: {
     alias: {
+      // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+      // files being processed with the wrong config (the config from the
+      // consuming project vs. the config from the source project).
+      // Can these be replaced with regular package.json dependencies?
       '@opentrons/components/styles': path.resolve(
         '../components/src/index.module.css'
       ),

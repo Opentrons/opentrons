@@ -15,6 +15,7 @@ from opentrons.protocol_api.module_contexts import (
     MagneticModuleContext,
     AbsorbanceReaderContext,
 )
+from abr_testing.data_collection.read_robot_logs import get_logs
 import configparser
 from pathlib import Path
 import json
@@ -22,6 +23,7 @@ from abr_testing.automation import slack
 from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from datetime import datetime
+import subprocess
 
 # FUNCTIONS FOR LOADING COMMON CONFIGURATIONS
 
@@ -602,6 +604,27 @@ def set_up_slack() -> slack.Slack:
         channel_name="abr-robot-alerts",
         user_name=robot_name,
     )
+
+
+def create_robot_log_zip() -> str:
+    """Create a zip file of logs saved locally on robot."""
+    storage_directory = "/data/testing_data"
+    result = subprocess.run(
+        "ip route get 1.1.1.1 | awk '{print $7}'",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
+    ip = result.stdout.strip()
+    return get_logs(storage_directory, ip)
+
+
+def send_slack_error_message_with_log(
+    slack_bot: slack.Slack, protocol_name: str, error_str: str
+) -> None:
+    """Send error slack message with log files attached."""
+    log_path = create_robot_log_zip()
+    slack_bot.send_error_message(protocol_name, error_str, log_path)
 
 
 def comment_height_of_specific_labware(

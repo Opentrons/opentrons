@@ -90,6 +90,7 @@ stages:
             robotType: OT-2 Standard
             runTimeParameters: []
             commandAnnotations: []
+            commandPreconditions: { isCameraUsed: false }
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single

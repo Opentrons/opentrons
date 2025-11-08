@@ -40,9 +40,8 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
 
-  const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] = useState(
-    false
-  )
+  const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] =
+    useState(false)
 
   const isOnDevice = useSelector(getIsOnDevice)
   const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))

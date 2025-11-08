@@ -35,11 +35,8 @@ export function quickTransferStepCommands(
   props: QuickTransferStepCommandsProps
 ): string {
   const { stepArgs, invariantContext, initialRobotState } = props
-  const {
-    trashBinEntities,
-    wasteChuteEntities,
-    pipetteEntities,
-  } = invariantContext
+  const { trashBinEntities, wasteChuteEntities, pipetteEntities } =
+    invariantContext
   const pipettePythonName = Object.values(pipetteEntities)[0].pythonName
   let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
@@ -64,7 +61,7 @@ export function quickTransferStepCommands(
 
   const nonLoadCommands =
     nonLoadCommandCreator != null && 'python' in nonLoadCommandCreator
-      ? nonLoadCommandCreator.python ?? []
+      ? (nonLoadCommandCreator.python ?? [])
       : []
 
   let finalDropTipCommand = ''
@@ -88,11 +85,8 @@ export function pythonDef(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration
 ): string {
-  const {
-    stepArgs,
-    invariantContext,
-    initialRobotState,
-  } = generateQuickTransferArgs(quickTransferState, deckConfig)
+  const { stepArgs, invariantContext, initialRobotState } =
+    generateQuickTransferArgs(quickTransferState, deckConfig)
   const {
     moduleEntities,
     labwareEntities,
@@ -104,7 +98,7 @@ export function pythonDef(
   const sections: string[] = [
     getLoadAdapters(moduleEntities, labwareEntities, labware),
     getLoadLabware(moduleEntities, labwareEntities, labware, {}),
-    getLoadPipettes(pipetteEntities, labwareEntities, labware, pipettes),
+    getLoadPipettes(pipetteEntities, pipettes),
     ...[
       getLoadTrashBins(trashBinEntities),
       getLoadWasteChute(wasteChuteEntities),

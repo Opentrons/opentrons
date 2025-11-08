@@ -42,7 +42,7 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
        - Provides a fixed list of values to choose from.
        - Each choice has its own display name and value.
        - Can't be used at the same time as ``minimum`` and ``maximum``.
-   * - ``units``
+   * - ``unit``
      -
        - Optional, for numeric parameters with ``minimum`` and ``maximum`` only.
        - Displays after the number during run setup.

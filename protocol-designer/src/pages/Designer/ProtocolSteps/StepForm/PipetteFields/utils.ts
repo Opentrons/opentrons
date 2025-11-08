@@ -1,12 +1,14 @@
 import round from 'lodash/round'
 
-import { CHANNELS_MAPPED_TO_MAX_SPEED } from '../../../../../constants'
-import { getPipetteCapacity } from '../../../../../pipettes/pipetteData'
+import { getPipetteWithTipMaxVol } from '@opentrons/step-generation'
+
+import { CHANNELS_MAPPED_TO_MAX_SPEED } from '/protocol-designer/constants'
+import { getPipetteCapacity } from '/protocol-designer/pipettes/pipetteData'
 import {
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
-} from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { getWellRatio } from '../../../../../steplist/utils'
+} from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getWellRatio } from '/protocol-designer/steplist/utils/getWellRatio'
 
 import type {
   PipetteChannels,
@@ -15,10 +17,15 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
+  InvariantContext,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { PathOption, StepType } from '../../../../../form-types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type {
+  FormData,
+  PathOption,
+  StepType,
+} from '/protocol-designer/form-types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 
 export interface DisabledChangeTipArgs {
   aspirateWells?: string[]
@@ -30,13 +37,8 @@ export interface DisabledChangeTipArgs {
 export const getDisabledChangeTipOptions = (
   args: DisabledChangeTipArgs
 ): Set<ChangeTipOptions> | null | undefined => {
-  const {
-    path,
-    aspirateWells,
-    dispenseWells,
-    stepType,
-    isDisposalLocation,
-  } = args
+  const { path, aspirateWells, dispenseWells, stepType, isDisposalLocation } =
+    args
 
   switch (stepType) {
     case 'moveLiquid': {
@@ -241,4 +243,73 @@ export const getMaxUiFlowRate = (
   const travelMm = targetVolume / pipetteAccuracyUlPerMm
   const travelMmCorrected = travelMm * correctionMultiplier
   return round(targetVolume / (travelMmCorrected / maxPlungerSpeed))
+}
+
+export const getNumPickups = (args: {
+  formData: FormData
+  invariantContext: InvariantContext
+  multiWellHandling?: {
+    isSupported: boolean
+    numWellsToFitInTip?: number
+  }
+}): number => {
+  const { formData, multiWellHandling, invariantContext } = args
+
+  if (formData.stepType !== 'moveLiquid' && formData.stepType !== 'mix') {
+    console.warn(
+      'getNumPickups called for step type other than moveLiquid or mix'
+    )
+    return 0
+  }
+
+  // next 2 if statements are relevant for both moveLiquid and mix steps
+  if (formData.changeTip === 'never') {
+    return 0
+  }
+  if (formData.changeTip === 'once') {
+    return 1
+  }
+
+  if (formData.stepType === 'moveLiquid') {
+    if (formData.changeTip === 'perSource') {
+      return formData.aspirate_wells.length
+    }
+    if (formData.changeTip === 'perDest') {
+      return formData.dispense_wells.length
+    }
+
+    let numWellsToConsider: number
+    const isMultiWellHandlingSupported = multiWellHandling?.isSupported
+    const numWellsToFitInTip = multiWellHandling?.numWellsToFitInTip
+    if (
+      isMultiWellHandlingSupported &&
+      numWellsToFitInTip != null &&
+      numWellsToFitInTip > 0 &&
+      formData.path !== 'single'
+    ) {
+      numWellsToConsider =
+        formData.path === 'multiDispense'
+          ? formData.dispense_wells.length
+          : formData.aspirate_wells.length
+      return Math.ceil(numWellsToConsider / numWellsToFitInTip)
+    } else {
+      const effectiveTransferVol =
+        getPipetteWithTipMaxVol(
+          formData.pipette as string,
+          invariantContext,
+          formData.tipRack as string
+        ) - (formData.aspirate_airGap_volume as number)
+      const chunksPerSubTransfer = Math.ceil(
+        (formData.volume as number) / effectiveTransferVol
+      )
+      numWellsToConsider = Math.max(
+        (formData.dispense_wells as string[]).length,
+        (formData.aspirate_wells as string[]).length
+      )
+      return chunksPerSubTransfer * numWellsToConsider
+    }
+  } else {
+    // if form type is 'mix', we will use single path and assume volume can be accommdated in tip
+    return formData.wells.length
+  }
 }

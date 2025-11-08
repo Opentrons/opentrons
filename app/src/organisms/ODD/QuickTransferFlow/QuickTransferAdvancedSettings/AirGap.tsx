@@ -55,8 +55,8 @@ export function AirGap(props: AirGapProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [volume, setVolume] = useState<number | null>(
     kind === 'aspirate'
-      ? state.airGapAspirate ?? null
-      : state.airGapDispense ?? null
+      ? (state.airGapAspirate ?? null)
+      : (state.airGapDispense ?? null)
   )
 
   const action =

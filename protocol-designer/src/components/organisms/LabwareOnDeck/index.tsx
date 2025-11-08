@@ -8,18 +8,44 @@ import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
-import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import type { CSSProperties } from 'react'
+import type { TipType, WellMouseEvent } from '@opentrons/components'
+import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
   labwareOnDeck: LabwareOnDeckType
   x: number
   y: number
+  highlight?: boolean
+  showHighlightedWells?: boolean
+  handleClickWell?: (wellName: string) => void
+  tipStatusByWellName?: Record<string, TipType>
+  onMouseEnterWell?: (e: WellMouseEvent) => void
+  onMouseLeaveWell?: (e: WellMouseEvent) => void
+  selectedTipsByIndex?: Record<string, number>
+  fill?: CSSProperties['fill']
+  borderStroke?: CSSProperties['stroke']
+  ignoreMissingTips?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
-  const { labwareOnDeck, x, y } = props
-  const missingTipsByLabwareId = useSelector(
-    tipContentsSelectors.getMissingTipsByLabwareId
+  const {
+    labwareOnDeck,
+    x,
+    y,
+    highlight = false,
+    showHighlightedWells = true,
+    tipStatusByWellName,
+    handleClickWell,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+    selectedTipsByIndex,
+    fill,
+    borderStroke,
+    ignoreMissingTips = false,
+  } = props
+  const missingAndUsedTipsByLabwareId = useSelector(
+    tipContentsSelectors.getMissingAndUsedTipsByLabwareId
   )
   const allWellContentsForActiveItem = useSelector(
     getAllWellContentsForActiveItem
@@ -32,10 +58,11 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     ? allWellContentsForActiveItem[labwareOnDeck.id]
     : null
   const highlightedWells = allHighlightedWells[labwareOnDeck.id]
-  const missingTips = missingTipsByLabwareId
-    ? missingTipsByLabwareId[labwareOnDeck.id]
-    : null
-
+  const labwareTipInfo =
+    missingAndUsedTipsByLabwareId != null
+      ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
+      : null
+  const { missingTips } = labwareTipInfo ?? {}
   return (
     <g transform={`translate(${x}, ${y})`}>
       <LabwareRender
@@ -45,8 +72,16 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
           wellContents,
           liquidDisplayColors
         )}
-        highlightedWells={highlightedWells}
-        missingTips={missingTips}
+        handleClickWell={handleClickWell}
+        {...(showHighlightedWells ? { highlightedWells } : {})}
+        {...(ignoreMissingTips ? {} : { missingTips })}
+        highlight={highlight}
+        tipStatusByWellName={tipStatusByWellName}
+        onMouseEnterWell={onMouseEnterWell}
+        onMouseLeaveWell={onMouseLeaveWell}
+        selectedTipsByIndex={selectedTipsByIndex}
+        fill={fill}
+        labwareStroke={borderStroke}
       />
     </g>
   )

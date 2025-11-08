@@ -7,6 +7,7 @@ from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
 )
@@ -308,6 +309,7 @@ def test_get_potential_cutout_fixtures_raises(
                     "heaterShakerModuleType",
                 ],
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             ),
             lazy_fixture("ot2_standard_deck_def"),
         ),
@@ -329,6 +331,7 @@ def test_get_potential_cutout_fixtures_raises(
                     springDirectionalForceAsParent="backLeftBottom"
                 ),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             ),
             lazy_fixture("ot2_short_trash_deck_def"),
         ),
@@ -346,6 +349,7 @@ def test_get_potential_cutout_fixtures_raises(
                     springDirectionalForceAsParent="backLeftBottom"
                 ),
                 mating_surface_unit_vector=[-1, 1, -1],
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -361,6 +365,7 @@ def test_get_potential_cutout_fixtures_raises(
                 compatible_module_types=[],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=None,
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -376,6 +381,7 @@ def test_get_potential_cutout_fixtures_raises(
                 compatible_module_types=[],
                 features=LocatingFeatures(),
                 mating_surface_unit_vector=None,
+                orientation=ModuleOrientation.NOT_APPLICABLE,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),

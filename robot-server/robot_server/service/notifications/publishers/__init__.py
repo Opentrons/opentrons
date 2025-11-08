@@ -8,6 +8,7 @@ from .maintenance_runs_publisher import (
     get_maintenance_runs_publisher,
 )
 from .runs_publisher import RunsPublisher, get_runs_publisher
+from .data_file_publisher import DataFilePublisher, get_data_file_publisher
 from .deck_configuration_publisher import (
     DeckConfigurationPublisher,
     get_deck_configuration_publisher,
@@ -18,8 +19,10 @@ __all__ = [
     "MaintenanceRunsPublisher",
     "RunsPublisher",
     "DeckConfigurationPublisher",
+    "DataFilePublisher",
     # for use by FastAPI
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
     "get_deck_configuration_publisher",
+    "get_data_file_publisher",
 ]

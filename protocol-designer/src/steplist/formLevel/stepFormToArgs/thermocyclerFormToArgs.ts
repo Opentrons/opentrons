@@ -10,6 +10,7 @@ import type {
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
@@ -49,57 +50,67 @@ const _flattenProfileSteps = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  formData: HydratedThermocyclerFormData
-): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
-  const { thermocyclerFormType } = formData
+  castFormData: GetCastFormData<HydratedThermocyclerFormData>
+): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs => {
+  const { thermocyclerFormType, stepDetails } = castFormData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
-        moduleId: formData.moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: castFormData.moduleId!,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
-          formData.blockIsActive && formData.blockTargetTemp !== null
-            ? Number(formData.blockTargetTemp)
+          castFormData.blockIsActive && castFormData.blockTargetTemp !== null
+            ? Number(castFormData.blockTargetTemp)
             : null,
         lidTargetTemp:
-          formData.lidIsActive && formData.lidTargetTemp !== null
-            ? Number(formData.lidTargetTemp)
+          castFormData.lidIsActive && castFormData.lidTargetTemp !== null
+            ? Number(castFormData.lidTargetTemp)
             : null,
-        lidOpen: formData.lidOpen,
+        // todo(mm, 2025-10-09): Nullability error inherited from prior code. Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lidOpen: castFormData.lidOpen!,
       }
     }
 
     case THERMOCYCLER_PROFILE: {
       const profileSteps = _flattenProfileSteps({
-        orderedProfileItems: formData.orderedProfileItems,
-        profileItemsById: formData.profileItemsById,
+        orderedProfileItems: castFormData.orderedProfileItems,
+        profileItemsById: castFormData.profileItemsById,
       })
 
       return {
-        moduleId: formData.moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: castFormData.moduleId!,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         blockTargetTempHold:
-          formData.blockIsActiveHold && formData.blockTargetTempHold !== null
-            ? Number(formData.blockTargetTempHold)
+          castFormData.blockIsActiveHold &&
+          castFormData.blockTargetTempHold !== null
+            ? Number(castFormData.blockTargetTempHold)
             : null,
-        lidOpenHold: formData.lidOpenHold,
+        lidOpenHold: castFormData.lidOpenHold,
         lidTargetTempHold:
-          formData.lidIsActiveHold && formData.lidTargetTempHold !== null
-            ? Number(formData.lidTargetTempHold)
+          castFormData.lidIsActiveHold &&
+          castFormData.lidTargetTempHold !== null
+            ? Number(castFormData.lidTargetTempHold)
             : null,
         meta: {
-          rawProfileItems: formData.orderedProfileItems.map(
-            (itemId: string | number) => formData.profileItemsById[itemId]
+          rawProfileItems: castFormData.orderedProfileItems.map(
+            (itemId: string | number) => castFormData.profileItemsById[itemId]
           ),
         },
         profileSteps,
-        profileTargetLidTemp: Number(formData.profileTargetLidTemp),
-        profileVolume: Number(formData.profileVolume),
+        profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
+        profileVolume: Number(castFormData.profileVolume),
+        description: stepDetails,
       }
     }
   }
-
-  // this should not happen, for Flow only
-  return null
 }

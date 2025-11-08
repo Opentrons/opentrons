@@ -75,6 +75,11 @@ deploy: gen-requirements
 	@echo "Deploying to environment: $(ENV)"
 	python -m pipenv run python deploy.py --env $(ENV) $(if $(TAG),--tag $(TAG),)
 
+.PHONY: build-only
+build-only: gen-requirements
+	@echo "Building Docker image only for environment: $(ENV)"
+	python -m pipenv run python deploy.py --build-only --env $(ENV) $(if $(TAG),--tag $(TAG),)
+
 .PHONY: dry-deploy
 dry-deploy: gen-requirements
 	@echo "Dry run deploying to environment: $(ENV)"
@@ -112,8 +117,9 @@ ENV_FILE=.env
 CACHEBUST := $(shell date +%s)
 
 .PHONY: build
-build:
-	docker build --build-arg CACHEBUST=$(CACHEBUST) -t $(IMAGE_NAME) .
+build: gen-requirements
+	# Use repo root as context so Dockerfile COPY paths like 'api/docs/v2' resolve
+	cd .. && docker build --build-arg CACHEBUST=$(CACHEBUST) -t $(IMAGE_NAME) -f opentrons-ai-server/Dockerfile .
 
 .PHONY: run
 run:

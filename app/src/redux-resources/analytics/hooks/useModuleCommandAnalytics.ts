@@ -106,18 +106,20 @@ export function useModuleCommandAnalytics(): UseModuleCommandAnalyticsResult {
     const reportedSerialNumber =
       'serialNumber' in rest
         ? rest.serialNumber
-        : matchedModule?.serialNumber ?? null
+        : (matchedModule?.serialNumber ?? null)
 
     const reportedTemperature =
-      'temperature' in rest ? rest.temperature : celsius ?? null
+      'temperature' in rest ? rest.temperature : (celsius ?? null)
 
     const reportedFirmwareVersion =
       'firmwareVersion' in rest
         ? rest.firmwareVersion
-        : matchedModule?.firmwareVersion ?? null
+        : (matchedModule?.firmwareVersion ?? null)
 
     const reportedModuleType =
-      'moduleType' in rest ? rest.moduleType : matchedModule?.moduleType ?? null
+      'moduleType' in rest
+        ? rest.moduleType
+        : (matchedModule?.moduleType ?? null)
 
     const reportedErrorDetails =
       'errorDetails' in rest ? rest.errorDetails : null

@@ -36,15 +36,27 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
         ModuleType.Thermocycler,
         ModuleType.Heatershaker,
     ]
+    in_thread_loop = asyncio.new_event_loop()
 
-    def _run_app() -> None:
-        async def _async_run() -> None:
+    def _run_app(thread_loop: asyncio.AbstractEventLoop) -> None:
+        asyncio.set_event_loop(thread_loop)
+
+        async def _main_task() -> None:
             await asyncio.gather(
                 run_smoothie.run(emulator_settings),
                 run_app.run(emulator_settings, modules=[m.value for m in modules]),
             )
 
-        asyncio.run(_async_run())
+        try:
+            thread_loop.run_until_complete(_main_task())
+        except Exception:
+            # this exception is from stopping the loop in the way that we will when
+            # the fixture closes (by just, well, stopping the loop, and then cleaning
+            # stuff up later). We can ignore it.
+            pass
+
+        thread_loop.run_until_complete(thread_loop.shutdown_asyncgens())
+        thread_loop.close()
 
     async def _wait_ready() -> None:
         c = await ModuleStatusClient.connect(
@@ -58,8 +70,9 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     def _run_wait_ready() -> None:
         asyncio.run(_wait_ready())
 
+    # these threads are daemonized to make ctrl-c behavior a little better
     # Start the emulator thread.
-    t = threading.Thread(target=_run_app)
+    t = threading.Thread(target=_run_app, args=(in_thread_loop,))
     t.daemon = True
     t.start()
 
@@ -70,6 +83,8 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     ready_proc.join()
 
     yield
+    in_thread_loop.call_soon_threadsafe(in_thread_loop.stop)
+    t.join()
 
 
 @pytest.fixture
@@ -86,4 +101,4 @@ def poll_interval_seconds() -> float:
     If too fast, tests may fail due to stale data in the serial buffers.
     If too slow, tests will take too long and may time out.
     """
-    return 0.1
+    return 0.01

@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StepMeter,
   useInterval,
 } from '@opentrons/components'
 
-import { StepMeter } from '/app/atoms/StepMeter'
 import { NetworkDetailsModal } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getLocalRobot } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
@@ -26,10 +26,8 @@ export function ConnectViaEthernet(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
-  const [
-    showNetworkDetailsModal,
-    setShowNetworkDetailsModal,
-  ] = useState<boolean>(false)
+  const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
+    useState<boolean>(false)
 
   const { ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)

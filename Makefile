@@ -131,7 +131,7 @@ deploy-py: export pypi_username = $(pypi_username)
 deploy-py: export pypi_password = $(pypi_password)
 deploy-py:
 	$(MAKE) -C $(API_DIR) deploy
-	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
+	$(MAKE) -C $(SHARED_DATA_DIR) deploy
 
 .PHONY: push-api
 push-api: export host = $(usb_host)

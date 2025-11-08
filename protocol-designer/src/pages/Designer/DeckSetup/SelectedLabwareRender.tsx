@@ -1,6 +1,4 @@
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { LabwareLabel } from '../LabwareLabel'
-import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
 
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
@@ -8,14 +6,12 @@ import type {
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { LabwareOnDeck } from '../../../step-forms'
 
 interface SelectedLabwareRenderProps {
   labwareDef: LabwareDefinition2 | null
   slotPosition: CoordinateTuple | null
   moduleModel: ModuleModel | null
   showModuleIcon: boolean
-  labwareOnDeck?: LabwareOnDeck
   nestedLabwareInfo?: DeckLabelProps[] | undefined
   showLabel?: boolean
 }
@@ -23,7 +19,6 @@ export function SelectedLabwareRender(
   props: SelectedLabwareRenderProps
 ): JSX.Element | null {
   const {
-    labwareOnDeck,
     labwareDef,
     slotPosition,
     moduleModel,
@@ -31,25 +26,8 @@ export function SelectedLabwareRender(
     showLabel = true,
     showModuleIcon,
   } = props
-
-  return (labwareOnDeck != null || labwareDef != null) &&
-    slotPosition != null &&
-    moduleModel == null ? (
+  return labwareDef != null && slotPosition != null && moduleModel == null ? (
     <>
-      {labwareDef != null ? (
-        <LabwareRenderOnDeck
-          labwareDef={labwareDef}
-          x={slotPosition[0]}
-          y={slotPosition[1]}
-        />
-      ) : null}
-      {labwareOnDeck != null ? (
-        <LabwareOnDeckComponent
-          x={slotPosition[0]}
-          y={slotPosition[1]}
-          labwareOnDeck={labwareOnDeck}
-        />
-      ) : null}
       {labwareDef != null && showLabel ? (
         <LabwareLabel
           isLast

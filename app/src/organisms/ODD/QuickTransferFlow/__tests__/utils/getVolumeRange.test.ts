@@ -56,20 +56,20 @@ describe('getVolumeRange', () => {
   }
   it('calculates the range for a 1 to 1 transfer', () => {
     const result = getVolumeRange(state)
-    expect(result.min).toEqual(5)
+    expect(result.min).toEqual(1)
     // should equal lesser of pipette max, tip capacity, volume of all selected wells
     expect(result.max).toEqual(200)
   })
   it('calculates the range for an n to 1 transfer', () => {
     const result = getVolumeRange({ ...state, sourceWells: ['A1', 'A2'] })
-    expect(result.min).toEqual(5)
+    expect(result.min).toEqual(1)
     // should equal lesser of pipette max, tip capacity, volume of all
     // selected source wells and 1 / 2 volume of destination well
     expect(result.max).toEqual(75)
   })
   it('calculates the range for an 1 to n transfer', () => {
     const result = getVolumeRange({ ...state, destinationWells: ['A1', 'A2'] })
-    expect(result.min).toEqual(5)
+    expect(result.min).toEqual(1)
     // should equal lesser of pipette max, tip capacity, volume of all
     // selected destination wells and 1 / 2 volume of source well
     expect(result.max).toEqual(100)
@@ -80,7 +80,7 @@ describe('getVolumeRange', () => {
       destination: 'source',
       destinationWells: ['A2', 'A3'],
     })
-    expect(result.min).toEqual(5)
+    expect(result.min).toEqual(1)
     // should equal lesser of pipette max, tip capacity, volume of all
     // selected destination wells and 1 / 2 volume of source well
     expect(result.max).toEqual(75)

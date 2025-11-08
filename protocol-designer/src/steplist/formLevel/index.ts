@@ -71,7 +71,8 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
-  transferVolumeMax,
+  tiprackRequired,
+  tipSelectionRequired,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -80,12 +81,12 @@ import {
   wellRatioMoveLiquid,
 } from './errors'
 import {
-  belowPipetteMinimumVolume,
   composeWarnings,
   incompatibleLiquidClass,
   maxDispenseWellVolume,
   mixTipPositionInTube,
   tipPositionInTube,
+  wellVolumeMax,
 } from './warnings'
 
 import type {
@@ -94,6 +95,7 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCameraFormData,
   HydratedCommentFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
@@ -134,6 +136,7 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
+  camera: HydratedCameraFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -180,14 +183,14 @@ const stepFormHelperMap: {
       pushOutVolumeOutOfRange,
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       mixTipPositionInTube,
-      incompatibleLiquidClass
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   pause: {
@@ -232,20 +235,21 @@ const stepFormHelperMap: {
       conditioningVolumeRequired,
       conditioningVolumeOutOfRange,
       blowoutFlowRateRequired,
-      transferVolumeMax,
       transferVolumeMin,
       pipetteRequired,
+      tiprackRequired,
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
       dispenseRetractSpeedRequired,
-      disposalVolumeRequired
+      disposalVolumeRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
-      belowPipetteMinimumVolume,
       maxDispenseWellVolume,
       tipPositionInTube,
-      incompatibleLiquidClass
+      incompatibleLiquidClass,
+      wellVolumeMax
     ),
   },
   magnet: {
@@ -282,6 +286,9 @@ const stepFormHelperMap: {
   },
   comment: {
     getErrors: composeErrors(messageRequired),
+  },
+  camera: {
+    getErrors: composeErrors(),
   },
 }
 
@@ -364,6 +371,12 @@ export const getFormErrors = (
     case 'comment':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCommentFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'camera':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCameraFormData,
         moduleEntities,
         labwareEntities
       )

@@ -20,9 +20,9 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getTiprackOptions } from '../../../pages/Onboarding/utils'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getTiprackOptions } from '/protocol-designer/pages/Onboarding/utils'
+
 import { IncompatibleTipsModal } from '../IncompatibleTipsModal'
 import { getMainPagePortalEl } from '../Portal'
 import { SelectPipetteGen } from './SelectPipetteGen'
@@ -36,7 +36,7 @@ import type {
   Gen,
   PipetteType,
   WizardTileProps,
-} from '../../../pages/Onboarding/types'
+} from '/protocol-designer/pages/Onboarding/types'
 
 interface SelectedPipetteModalProps extends WizardTileProps {
   mount: PipetteMount
@@ -67,6 +67,7 @@ export function SelectPipetteModal(
     setSelectedPipetteName,
   } = props
   const { t } = useTranslation(['onboarding', 'shared'])
+  const [allowAllTipracks, setAllowAllTipracks] = useState<boolean>(false)
   const pipettesByMount = watch('pipettesByMount')
   const fields = watch('fields')
   const allLabware = useSelector(getLabwareDefsByURI)
@@ -75,7 +76,6 @@ export function SelectPipetteModal(
     () => pipettesByMount[mount].tiprackDefURI ?? []
   )
 
-  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
   const robotType = fields.robotType
   const selectedPipetteName =
@@ -111,6 +111,7 @@ export function SelectPipetteModal(
         onClose={() => {
           setIncompatibleTip(false)
         }}
+        setAllowAllTipracks={setAllowAllTipracks}
       />
     ) : (
       <Modal
@@ -177,12 +178,14 @@ export function SelectPipetteModal(
                 })
                 return (
                   <SelectPipetteTips
+                    setAllowAllTipracks={setAllowAllTipracks}
                     tiprackOptions={tiprackOptions}
                     setIncompatibleTip={setIncompatibleTip}
                     robotType={robotType}
                     pipetteVolume={pipetteVolume}
                     selectedValues={selectedTipracks}
                     setSelectedTipracks={setSelectedTipracks}
+                    allowAllTipracks={allowAllTipracks}
                   />
                 )
               })()

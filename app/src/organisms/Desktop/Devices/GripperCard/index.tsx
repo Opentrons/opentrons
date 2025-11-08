@@ -43,14 +43,10 @@ export function GripperCard({
   isEstopNotDisengaged,
 }: GripperCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const [
-    openWizardFlowType,
-    setOpenWizardFlowType,
-  ] = useState<GripperWizardFlowType | null>(null)
-  const [
-    showAboutGripperSlideout,
-    setShowAboutGripperSlideout,
-  ] = useState<boolean>(false)
+  const [openWizardFlowType, setOpenWizardFlowType] =
+    useState<GripperWizardFlowType | null>(null)
+  const [showAboutGripperSlideout, setShowAboutGripperSlideout] =
+    useState<boolean>(false)
 
   const handleAttach: MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)

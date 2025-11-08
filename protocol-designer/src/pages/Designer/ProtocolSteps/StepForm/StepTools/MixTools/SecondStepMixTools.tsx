@@ -15,12 +15,13 @@ import { getMaxPushOutVolume } from '@opentrons/shared-data'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../../../components/molecules'
-import { ResetSettingsModal } from '../../../../../../components/organisms/ResetSettingsModal'
-import { getRobotType } from '../../../../../../file-data/selectors'
+} from '/protocol-designer/components/molecules'
+import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+
 import {
   getAdditionalEquipmentEntities,
-  getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { updateFieldsForLiquidClass } from '../../../../../../steplist/formLevel/handleFormChange/utils'
@@ -38,7 +39,7 @@ import {
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 
 interface SecondStepMixToolsProps {
@@ -58,10 +59,10 @@ export function SecondStepMixTools({
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const pipetteEntities = useSelector(getPipetteEntities)
-  const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
   const robotType = useSelector(getRobotType)
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const aspirateTab = {
@@ -105,8 +106,8 @@ export function SecondStepMixTools({
               propsForFields,
               rawForm: formData,
               pipetteEntities,
-              labwareEntities,
               additionalEquipmentEntities,
+              allLabwareDefs,
               liquidHandlingAction: tab,
               robotType,
             })

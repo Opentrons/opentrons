@@ -6,7 +6,7 @@ import json
 import textwrap
 import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast, Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -30,6 +30,16 @@ if TYPE_CHECKING:
 
 
 HERE = Path(__file__).parent
+
+
+@pytest.fixture(autouse=True)
+def clean_up_hw() -> Iterator[None]:
+    """Make sure hardware objects are cleaned up."""
+    yield
+    execute._LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
+    if execute._THREAD_MANAGED_HW is not None:
+        execute._THREAD_MANAGED_HW.clean_up()
+        execute._THREAD_MANAGED_HW = None
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])

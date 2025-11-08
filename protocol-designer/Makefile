@@ -55,7 +55,7 @@ dev:
 # production assets server
 .PHONY: serve
 serve: all
-	node ../scripts/serve-static dist
+	vite preview
 
 # end to end tests
 .PHONY: test-e2e
@@ -116,3 +116,8 @@ clean-downloads:
 .PHONY: clean-screenshots
 clean-screenshots:
 	shx rm -rf cypress/screenshots
+
+# analyze bundle
+.PHONY: bundle-analyzer
+bundle-analyzer:
+	ANALYZE_DEBUG=true make build

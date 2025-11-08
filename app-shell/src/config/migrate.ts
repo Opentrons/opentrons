@@ -31,6 +31,7 @@ import type {
   ConfigV24,
   ConfigV25,
   ConfigV26,
+  ConfigV27,
 } from '@opentrons/app/src/redux/config/types'
 
 // format
@@ -38,7 +39,7 @@ import type {
 // any default values for later config versions are specified in the migration
 // functions for those version below
 
-const CONFIG_VERSION_LATEST = 26
+const CONFIG_VERSION_LATEST = 27
 
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
@@ -271,8 +272,7 @@ const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
     robotSystemUpdate: {
       manifestUrls: {
         // do not rely on this value; it is present only for back compatibility
-        OT2:
-          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+        OT2: 'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
         OT3: 'not-used',
       },
     },
@@ -375,8 +375,7 @@ const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
     robotSystemUpdate: {
       manifestUrls: {
         // do not rely on this value; it is present only for back compatibility
-        OT2:
-          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+        OT2: 'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
       },
     },
   }
@@ -454,6 +453,18 @@ const toVersion26 = (prevConfig: ConfigV25): ConfigV26 => {
   return nextConfig
 }
 
+const toVersion27 = (prevConfig: ConfigV26): ConfigV27 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 27 as const,
+    ui: {
+      ...prevConfig.ui,
+      minWidth: 601,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -480,7 +491,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV22) => ConfigV23,
   (prevConfig: ConfigV23) => ConfigV24,
   (prevConfig: ConfigV24) => ConfigV25,
-  (prevConfig: ConfigV25) => ConfigV26
+  (prevConfig: ConfigV25) => ConfigV26,
+  (prevConfig: ConfigV26) => ConfigV27,
 ] = [
   toVersion1,
   toVersion2,
@@ -508,6 +520,7 @@ const MIGRATIONS: [
   toVersion24,
   toVersion25,
   toVersion26,
+  toVersion27,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -541,6 +554,7 @@ export function migrate(
     | ConfigV24
     | ConfigV25
     | ConfigV26
+    | ConfigV27
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

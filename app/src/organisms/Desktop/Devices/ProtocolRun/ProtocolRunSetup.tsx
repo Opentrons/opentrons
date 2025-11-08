@@ -29,12 +29,15 @@ import {
 
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
+import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
+  CAMERA_SETUP_STEP_KEY,
   getMissingSetupSteps,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -52,6 +55,7 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import {
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -75,6 +79,8 @@ import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
 
+const RUN_RECORD_REFETCH_MS = 5000
+
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null
   robotName: string
@@ -91,10 +97,9 @@ export function ProtocolRunSetup({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const {
-    orderedSteps,
-    orderedApplicableSteps,
-  } = useRequiredSetupStepsInOrder({ runId, protocolAnalysis })
+  const { orderedSteps, orderedApplicableSteps } = useRequiredSetupStepsInOrder(
+    { runId, protocolAnalysis }
+  )
   const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
@@ -110,7 +115,10 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: RUN_RECORD_REFETCH_MS,
+  })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -206,6 +214,36 @@ export function ProtocolRunSetup({
   const ot2DeckHardwareDescription = hasModules
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
+
+  const isCameraRequired =
+    protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
+  const isCameraConfirmed =
+    !missingSteps.includes(CAMERA_SETUP_STEP_KEY) || runHasStarted
+  const cameraSettingsApplied = runRecord?.data.cameraSettings != null
+  const storageInfo = useRobotStorageInfo()
+  const baseProps = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        ...baseProps,
+        transactionId: runId,
+        action: 'storageWarning',
+      })
+    }
+  }, [storageInfo.isImageStorageLow !== null])
+  // A separate app can apply camera settings.
+  // We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (cameraSettingsApplied && !isCameraConfirmed) {
+      dispatch(
+        updateRunSetupStepsComplete(runId, { [CAMERA_SETUP_STEP_KEY]: true })
+      )
+    }
+  }, [cameraSettingsApplied, dispatch, isCameraConfirmed, runId])
 
   if (robot == null) {
     return null
@@ -333,7 +371,7 @@ export function ProtocolRunSetup({
               })
             )
             if (confirmed) {
-              setExpandedStepKey(null)
+              setExpandedStepKey(CAMERA_SETUP_STEP_KEY)
             }
           }}
         />
@@ -356,6 +394,34 @@ export function ProtocolRunSetup({
             {t('check_locations_and_volumes')}
           </StyledText>
         ),
+      },
+    },
+    [CAMERA_SETUP_STEP_KEY]: {
+      stepInternals: (
+        <SetupCamera
+          runId={runId}
+          robotName={robotName}
+          isCameraRequired={isCameraRequired}
+          cameraConfirmed={isCameraConfirmed}
+          confirmCameraSettings={() => {
+            dispatch(
+              updateRunSetupStepsComplete(runId, {
+                [CAMERA_SETUP_STEP_KEY]: true,
+              })
+            )
+            setExpandedStepKey(null)
+          }}
+        />
+      ),
+      description: t(`${CAMERA_SETUP_STEP_KEY}_description`),
+      descriptionElement: null,
+      rightElProps: {
+        stepKey: CAMERA_SETUP_STEP_KEY,
+        complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
+        // TODO(jh, 09-29-25): Wire this enabled/disabled state to the proper endpoint.
+        completeText: t('camera_enabled'),
+        incompleteText: t('check_preferences'),
+        incompleteElement: null,
       },
     },
   }

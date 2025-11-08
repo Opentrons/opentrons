@@ -120,8 +120,12 @@ class AsyncSerial:
         """
         if self._reset_buffer_before_write:
             self._serial.reset_input_buffer()
-        self._serial.write(data=data)
-        self._serial.flush()
+        self._serial.write(data)
+        # flush can fail after entering dfu mode, ignore any exceptions.
+        try:
+            self._serial.flush()
+        except Exception:
+            pass
 
     async def open(self) -> None:
         """

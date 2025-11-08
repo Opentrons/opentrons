@@ -5,7 +5,10 @@
     "composite": true,
     "emitDeclarationOnly": false,
     "rootDir": ".",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/protocol-designer/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*.json", "fixtures/**/*.json", "vite.config.ts"],
   "exclude": ["**/*.ts", "**/*.tsx"]

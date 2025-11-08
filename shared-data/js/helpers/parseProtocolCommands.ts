@@ -2,7 +2,10 @@
 import reduce from 'lodash/reduce'
 
 import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { getModuleType } from '../modules'
 import { getLabwareDefURI } from './getLabwareDefURI'
+import { getModuleDeckLabel } from './getModuleDeckLabel'
+import { locationIsOnLabware } from './symbolicPositionHelpers'
 
 import type {
   LabwareLocation,
@@ -152,12 +155,10 @@ export function getTopLabwareInfo(
   const nestedCommand = loadLabwareCommands.find(
     command =>
       command.commandType === 'loadLabware' &&
-      command.params.location !== 'offDeck' &&
-      command.params.location !== 'systemLocation' &&
-      'labwareId' in command.params.location &&
+      locationIsOnLabware(command.params.location) &&
       command.params.location.labwareId === labwareId
   )
-  // prevent recurssion errors (like labware stacked on itself)
+  // prevent recursion errors (like labware stacked on itself)
   // by enforcing a max stack height
   if (nestedCommand == null || currentStackHeight > 5) {
     const loadCommand = loadLabwareCommands.find(
@@ -177,7 +178,7 @@ export function getTopLabwareInfo(
     }
   } else {
     return getTopLabwareInfo(
-      nestedCommand?.result?.labwareId as string,
+      nestedCommand?.result?.labwareId!,
       loadLabwareCommands,
       currentStackHeight + 1
     )
@@ -209,11 +210,7 @@ export function getLabwareStackCountAndLocation(
 
   const labwareLocation = loadLabwareCommand.params.location
 
-  if (
-    labwareLocation !== 'offDeck' &&
-    labwareLocation !== 'systemLocation' &&
-    'labwareId' in labwareLocation
-  ) {
+  if (locationIsOnLabware(labwareLocation)) {
     const lowerLabwareCommand = loadLabwareCommands?.find(command =>
       command.result != null
         ? command.result?.labwareId === labwareLocation.labwareId
@@ -221,7 +218,7 @@ export function getLabwareStackCountAndLocation(
     )
     if (lowerLabwareCommand?.result?.labwareId == null) {
       console.warn(
-        `could not find the load labware command assosciated with thie labwareId: ${labwareLocation.labwareId}`
+        `could not find the load labware command associated with this labwareId: ${labwareLocation.labwareId}`
       )
       return { labwareLocation: 'offDeck', labwareQuantity: 0 }
     }
@@ -336,7 +333,13 @@ export function parseInitialLoadedModulesBySlot(
     loadModuleCommandsReversed,
     (acc, command) =>
       'slotName' in command.params.location
-        ? { ...acc, [command.params.location.slotName]: command }
+        ? {
+            ...acc,
+            [getModuleDeckLabel(
+              getModuleType(command.params.model),
+              command.params.location.slotName
+            )]: command,
+          }
         : acc,
     {}
   )

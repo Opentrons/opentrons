@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -24,7 +25,7 @@ import {
 import { MODULES_FIELD_NAME } from '/ai-client/components/organisms/ModulesAndFixturesSection'
 import { getOnlyLatestDefs } from '/ai-client/resources/utils'
 
-import { ModuleDiagram } from '../ModelDiagram'
+import { ModuleDiagram } from '../ModuleDiagram'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -64,6 +65,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [ABSORBANCE_READER_TYPE]: [],
+  [FLEX_STACKER_MODULE_TYPE]: [],
 }
 
 export function ModuleListItemGroup(): JSX.Element | null {
@@ -71,10 +73,11 @@ export function ModuleListItemGroup(): JSX.Element | null {
   const { t } = useTranslation('create_protocol')
   const modulesWatch: DisplayModule[] = watch(MODULES_FIELD_NAME) ?? []
 
-  const allDefinitionsValues = useMemo(
-    () => Object.values(getOnlyLatestDefs()),
-    []
-  )
+  const allDefinitionsValues = useMemo(() => {
+    const defs = getOnlyLatestDefs()
+
+    return Object.values(defs)
+  }, [])
 
   const getDefDisplayName = (value: string): string => {
     return (
@@ -96,6 +99,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
             MAGNETIC_MODULE_TYPE,
             MAGNETIC_BLOCK_TYPE,
             ABSORBANCE_READER_TYPE,
+            FLEX_STACKER_MODULE_TYPE,
           ].includes(module.type)
 
         return (
@@ -119,7 +123,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
                     dropdown={
                       shouldShowAdapterOptions
                         ? {
-                            title: (null as unknown) as string,
+                            title: null as unknown as string,
                             width: '13rem',
                             currentOption: {
                               name:

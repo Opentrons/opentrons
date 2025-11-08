@@ -21,13 +21,15 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    AddCameraSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
     FinishErrorDetails,
     DoorChangeAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
+    StartTaskAction,
+    FinishTaskAction,
 )
 from .get_state_update import get_state_updates
 
@@ -50,13 +52,15 @@ __all__ = [
     "FailCommandAction",
     "AddLabwareOffsetAction",
     "AddLabwareDefinitionAction",
+    "AddCameraSettingsAction",
     "AddLiquidAction",
     "SetDeckConfigurationAction",
     "AddAddressableAreaAction",
     "AddModuleAction",
     "DoorChangeAction",
-    "ResetTipsAction",
     "SetPipetteMovementSpeedAction",
+    "StartTaskAction",
+    "FinishTaskAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

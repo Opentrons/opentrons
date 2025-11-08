@@ -1,4 +1,7 @@
-import type { ModuleOnDeck, SavedStepFormState } from '../../../step-forms'
+import type {
+  ModuleOnDeck,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 
 interface ModuleOnSlot {
   isModuleInUse: boolean
@@ -15,7 +18,7 @@ export function getModuleOnSlot(
         //  module step
         ('moduleId' in step && step.moduleId === moduleOnDeck.id) ||
         //  moving labware to the module
-        ('newLocation' in step && step.newlocation === moduleOnDeck.id) ||
+        ('newLocation' in step && step.newLocation === moduleOnDeck.id) ||
         //  moving a labware from the module location
         ('labware' in step && step.labware === moduleOnDeck.id)
     ) != null

@@ -160,10 +160,8 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useTooltip()
-  const [
-    showRestoreValuesTooltip,
-    setShowRestoreValuesTooltip,
-  ] = useState<boolean>(false)
+  const [showRestoreValuesTooltip, setShowRestoreValuesTooltip] =
+    useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const multiSlideoutRef = useRef<HTMLDivElement>(null)
 

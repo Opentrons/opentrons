@@ -51,7 +51,7 @@ export function PlayButton({
     >
       <Icon
         color={isEnabled ? COLORS.white : COLORS.grey50}
-        name="play-icon"
+        name="play"
         size="2.5rem"
       />
     </Btn>
@@ -124,8 +124,8 @@ function getPlayButtonStyle(isEnabled: boolean): FlattenSimpleInterpolation {
 
     &:focus-visible {
       box-shadow: 0 0 0 ${SPACING.spacing4} ${
-    isEnabled ? COLORS.blue50 : COLORS.grey50
-  }
+        isEnabled ? COLORS.blue50 : COLORS.grey50
+      }
       background-color: ${isEnabled ? COLORS.blue50 : COLORS.grey35};
     }
 

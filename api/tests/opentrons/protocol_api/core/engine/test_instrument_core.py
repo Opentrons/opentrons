@@ -175,6 +175,8 @@ def subject(
         LoadedPipette.model_construct(mount=MountType.LEFT)  # type: ignore[call-arg]
     )
 
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+
     decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
         FlowRates(
             default_aspirate={"1.2": 2.3},
@@ -2900,3 +2902,131 @@ def test_get_next_tip_raises_for_starting_tip_with_partial_config(
             tip_racks=tip_racks,
             starting_well=mock_starting_well,
         )
+
+
+@pytest.mark.parametrize("version", versions_at_or_above(APIVersion(2, 26)))
+def test_flow_rates_use_defaults_on_newer_api_versions(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware: SyncHardwareAPI,
+    mock_protocol_core: ProtocolCore,
+    version: APIVersion,
+) -> None:
+    """It should default to getting the flow rates from the engine when not set by a user."""
+    decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
+        LoadedPipette.model_construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+
+    decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
+        FlowRates(
+            default_aspirate={"1.2": 2.3},
+            default_dispense={"3.4": 4.5},
+            default_blow_out={"5.6": 6.7},
+        ),
+    )
+
+    subject = InstrumentCore(
+        pipette_id="abc123",
+        engine_client=mock_engine_client,
+        sync_hardware_api=mock_sync_hardware,
+        protocol_core=mock_protocol_core,
+        default_movement_speed=1337,
+    )
+
+    # Flow rates should default to the engine core
+    assert subject.get_aspirate_flow_rate() == 2.3
+    assert subject.get_dispense_flow_rate() == 4.5
+    assert subject.get_blow_out_flow_rate() == 6.7
+
+    decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
+        FlowRates(
+            default_aspirate={"1.2": 9.8},
+            default_dispense={"3.4": 7.6},
+            default_blow_out={"5.6": 5.4},
+        ),
+    )
+
+    # Now that the flow rates from the engine have "changed" these calls should reflect that
+    assert subject.get_aspirate_flow_rate() == 9.8
+    assert subject.get_dispense_flow_rate() == 7.6
+    assert subject.get_blow_out_flow_rate() == 5.4
+
+    # Flow rates should use user set ones
+    subject.set_flow_rate(aspirate=99.9, dispense=66.6, blow_out=33.3)
+
+    assert subject.get_aspirate_flow_rate() == 99.9
+    assert subject.get_dispense_flow_rate() == 66.6
+    assert subject.get_blow_out_flow_rate() == 33.3
+
+    # Resetting them via configure for volume should go back to engine defaults
+    subject.configure_for_volume(1337)
+
+    assert subject.get_aspirate_flow_rate() == 9.8
+    assert subject.get_dispense_flow_rate() == 7.6
+    assert subject.get_blow_out_flow_rate() == 5.4
+
+
+@pytest.mark.parametrize("version", versions_below(APIVersion(2, 26), flex_only=True))
+def test_flow_rates_use_maintains_buggy_defaults_on_older_versions(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware: SyncHardwareAPI,
+    mock_protocol_core: ProtocolCore,
+    version: APIVersion,
+) -> None:
+    """It should only use the initial defaults on pre 2.26 API versions."""
+    decoy.when(mock_engine_client.state.pipettes.get("abc123")).then_return(
+        LoadedPipette.model_construct(mount=MountType.LEFT)  # type: ignore[call-arg]
+    )
+
+    decoy.when(mock_protocol_core.api_version).then_return(version)
+
+    decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
+        FlowRates(
+            default_aspirate={"1.2": 2.3},
+            default_dispense={"3.4": 4.5},
+            default_blow_out={"5.6": 6.7},
+        ),
+    )
+
+    subject = InstrumentCore(
+        pipette_id="abc123",
+        engine_client=mock_engine_client,
+        sync_hardware_api=mock_sync_hardware,
+        protocol_core=mock_protocol_core,
+        default_movement_speed=1337,
+    )
+
+    # Flow rates should default to the engine core
+    assert subject.get_aspirate_flow_rate() == 2.3
+    assert subject.get_dispense_flow_rate() == 4.5
+    assert subject.get_blow_out_flow_rate() == 6.7
+
+    decoy.when(mock_engine_client.state.pipettes.get_flow_rates("abc123")).then_return(
+        FlowRates(
+            default_aspirate={"1.2": 9.8},
+            default_dispense={"3.4": 7.6},
+            default_blow_out={"5.6": 5.4},
+        ),
+    )
+
+    # Flow rates should stay with their initial default
+    assert subject.get_aspirate_flow_rate() == 2.3
+    assert subject.get_dispense_flow_rate() == 4.5
+    assert subject.get_blow_out_flow_rate() == 6.7
+
+    # Flow rates should use user set ones
+    subject.set_flow_rate(aspirate=99.9, dispense=66.6, blow_out=33.3)
+
+    assert subject.get_aspirate_flow_rate() == 99.9
+    assert subject.get_dispense_flow_rate() == 66.6
+    assert subject.get_blow_out_flow_rate() == 33.3
+
+    # Resetting them via configure for volume should NOT reset the user set ones for older buggy versions
+    subject.configure_for_volume(1337)
+
+    assert subject.get_aspirate_flow_rate() == 99.9
+    assert subject.get_dispense_flow_rate() == 66.6
+    assert subject.get_blow_out_flow_rate() == 33.3

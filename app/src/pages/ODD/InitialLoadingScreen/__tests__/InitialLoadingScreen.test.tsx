@@ -22,9 +22,9 @@ const render = () => {
 describe('InitialLoadingScreen', () => {
   beforeEach(() => {
     vi.mocked(getIsShellReady).mockReturnValue(false)
-    vi.mocked(useRobotSettingsQuery).mockReturnValue(({
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: { settings: [] },
-    } as unknown) as UseQueryResult<RobotSettingsResponse>)
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
   })
 
   afterEach(() => {

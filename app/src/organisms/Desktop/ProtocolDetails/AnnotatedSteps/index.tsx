@@ -83,6 +83,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   let commandNumber = 0
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = analysis.commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   return (
     <div className={styles.annotated_steps_container}>
       <div className={styles.annotated_steps_wrap}>
@@ -130,9 +136,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 )
               }
             })
-          : analysis.commands.map((command, index) => {
+          : filteredCommands.map(command => {
               const currentCommandNumber = ++commandNumber
-
               return (
                 <IndividualCommand
                   scrollTargetId={scrollTargetId}
@@ -140,7 +145,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   key={`individual_${command.id}`}
                   command={command}
                   commandNumber={currentCommandNumber}
-                  isHighlighted={index === currentCommandIndex}
+                  isHighlighted={
+                    currentCommandIndex != null &&
+                    filteredCommands[currentCommandIndex]?.id === command.id
+                  }
                   analysis={analysis}
                   allRunDefs={allRunDefs}
                   setSelectedCommand={setSelectedCommand}

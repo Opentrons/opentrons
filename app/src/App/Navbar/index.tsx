@@ -41,7 +41,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavLink
             key={name}
-            to={navLinkTo as string}
+            to={navLinkTo!}
             className={({ isActive }) =>
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }

@@ -10,6 +10,10 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwarePoolNotCompatibleWithModuleError,
+)
+
 
 from ...errors import ErrorOccurrence
 from ...types import (
@@ -34,6 +38,15 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.resources import ModelUtils
     from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+
+
+# The stacker cannot dispense labware where there is no gap between the top surface
+# of the bottom labware being dispensed, and bottom surface of the top labware.
+# This is because the stacker latch, which holds the labware stack, needs enough
+# empty space to free the bottom labware, but still hold the top labware once it
+# closes.
+STACKER_INCOMPATIBLE_LABWARE = set(["opentrons_tough_universal_lid"])
+
 
 INITIAL_COUNT_DESCRIPTION = dedent(
     """\
@@ -142,6 +155,19 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
     errorType: Literal[
         "flexStackerLabwareRetrieveFailed"
     ] = "flexStackerLabwareRetrieveFailed"
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
+    errorInfo: FailedLabware
+
+
+class FlexStackerLabwareStoreError(ErrorOccurrence):
+    """Returned when the labware was not able to get to the shuttle."""
+
+    isDefined: bool = True
+    errorType: Literal[
+        "flexStackerLabwareStoreFailed"
+    ] = "flexStackerLabwareStoreFailed"
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
@@ -437,12 +463,12 @@ def _check_one_preloaded_labware(  # noqa: C901
 
     if pool_primary_uri != stored_primary_uri:
         raise CommandPreconditionViolated(
-            f"URI {stored_primary_uri} of primary labware {group.primaryLabwareId} must match pool URI {pool_primary_uri} but does not"
+            f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify primary URI {stored_primary_uri} and this one specifies {pool_primary_uri}."
         )
     if pool_adapter_definition:
         if group.adapterLabwareId is None:
             raise CommandPreconditionViolated(
-                "All pool components must have an ID, but adapter has no id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify an adapter and this one does not."
             )
         stored_adapter_uri = state_view.labware.get_definition_uri(
             group.adapterLabwareId
@@ -452,7 +478,7 @@ def _check_one_preloaded_labware(  # noqa: C901
         )
         if stored_adapter_uri != pool_adapter_uri:
             raise CommandPreconditionViolated(
-                f"URI {stored_adapter_uri} of adapter labware {group.adapterLabwareId} must match pool URI {pool_adapter_uri} but does not"
+                f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify adapter URI {stored_adapter_uri} and this one specifies {pool_adapter_uri}."
             )
         if state_view.labware.get_location(group.adapterLabwareId) != OFF_DECK_LOCATION:
             raise CommandPreconditionViolated(
@@ -467,7 +493,7 @@ def _check_one_preloaded_labware(  # noqa: C901
     else:
         if group.adapterLabwareId is not None:
             raise CommandPreconditionViolated(
-                "No unspecified pool component may have an ID, but adapter has an id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify no adapter and this one does."
             )
         if state_view.labware.get_location(group.primaryLabwareId) != OFF_DECK_LOCATION:
             raise CommandPreconditionViolated(
@@ -476,13 +502,13 @@ def _check_one_preloaded_labware(  # noqa: C901
     if pool_lid_definition:
         if group.lidLabwareId is None:
             raise CommandPreconditionViolated(
-                "All pool components must have an ID but lid has no id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups specify a lid and this one does not."
             )
         stored_lid_uri = state_view.labware.get_definition_uri(group.lidLabwareId)
         pool_lid_uri = state_view.labware.get_uri_from_definition(pool_lid_definition)
         if stored_lid_uri != pool_lid_uri:
             raise CommandPreconditionViolated(
-                f"URI {stored_lid_uri} of lid labware {group.lidLabwareId} must match pool URI {pool_lid_uri} but does not"
+                f"Each labware group must be composed of the same kinds of labware, but previous labware groups specify lid URI {stored_lid_uri} and this one specifies {pool_lid_uri}."
             )
 
         if (
@@ -497,7 +523,7 @@ def _check_one_preloaded_labware(  # noqa: C901
     else:
         if group.lidLabwareId is not None:
             raise CommandPreconditionViolated(
-                "No unspecified pool component may have an id, but lid has an id"
+                "Each labware group must be composed of the same kinds of labware, but previous labware groups did not specify a lid and this one does."
             )
 
 
@@ -898,3 +924,25 @@ def build_retrieve_labware_move_updates(
             lid_offset_location,
         )
     return locations_for_ids, offset_ids_by_id
+
+
+def validate_labware_pool_compatible_with_stacker(
+    pool_primary_definition: LabwareDefinition,
+    pool_adapter_definition: LabwareDefinition | None,
+    pool_lid_definition: LabwareDefinition | None,
+) -> None:
+    """Verifies that the given labware pool is compatible with the stacker."""
+    labware_pool = set(
+        lw.parameters.loadName
+        for lw in [
+            pool_primary_definition,
+            pool_adapter_definition,
+            pool_lid_definition,
+        ]
+        if lw is not None
+    )
+    incompatible_labware = list(labware_pool & STACKER_INCOMPATIBLE_LABWARE)
+    if incompatible_labware:
+        raise LabwarePoolNotCompatibleWithModuleError(
+            f"The stacker cannot store {incompatible_labware}"
+        )

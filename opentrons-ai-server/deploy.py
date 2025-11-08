@@ -66,18 +66,22 @@ class ProdDeploymentConfig(BaseDeploymentConfig):
 
 
 class Deploy:
-    def __init__(self, config: BaseDeploymentConfig) -> None:
+    def __init__(self, config: BaseDeploymentConfig, build_only: bool = False) -> None:
         self.config: BaseDeploymentConfig = config
         self.ecr_client = boto3.client("ecr")
         self.ecs_client = boto3.client("ecs")
         self.secret_manager_client = boto3.client("secretsmanager")
         self.docker_client = docker.from_env()
         self.full_image_name = f"{self.config.ECR_URL}/{self.config.ECR_REPOSITORY}:{self.config.TAG}"
-        self.env_variables: Settings = self.retrieve_environment_variables()
+        # Only retrieve environment variables if not build-only mode
+        self.env_variables: Settings | None = None if build_only else self.retrieve_environment_variables()
 
     def build_docker_image(self) -> None:
         print(f"Building Docker image {self.config.IMAGE_NAME}:{self.config.TAG}")
-        self.docker_client.images.build(path=".", tag=f"{self.config.IMAGE_NAME}:{self.config.TAG}")
+        # Build from repo root so Dockerfile COPY paths like 'api/docs/v2' resolve
+        self.docker_client.images.build(
+            path="..", dockerfile="opentrons-ai-server/Dockerfile", tag=f"{self.config.IMAGE_NAME}:{self.config.TAG}"
+        )
         print(f"Successfully built {self.config.IMAGE_NAME}:{self.config.TAG}")
 
     def push_docker_image_to_ecr(self) -> None:
@@ -130,6 +134,9 @@ class Deploy:
         return str(response["ARN"])
 
     def update_secrets_in_container_definition(self, container_definition: dict[str, Any]) -> None:
+        if self.env_variables is None:
+            raise ValueError("Environment variables not loaded. Cannot update secrets in build-only mode.")
+
         expected_secrets = {field.upper() for field, field_type in self.env_variables.__annotations__.items() if field_type == SecretStr}
         print(f"Expected secrets: {expected_secrets}")
 
@@ -152,7 +159,7 @@ class Deploy:
                 # secret name is the same as the property name
                 # of the secret in the Settings class
                 # but with _ replaced with -
-                secret_name = f"{self.config.ENV}-{secret.lower().replace("_", "-")}"
+                secret_name = f"{self.config.ENV}-{secret.lower().replace('_', '-')}"
                 value_from = self.get_secret_arn(secret_name)
                 # name is the all caps version of the secret name
                 # valueFrom is the ARN of the secret
@@ -162,6 +169,9 @@ class Deploy:
             print("No secrets need to be added.")
 
     def update_ecs_task(self, dry: bool) -> None:
+        if self.env_variables is None:
+            raise ValueError("Environment variables not loaded. Cannot update ECS task in build-only mode.")
+
         print(f"Updating ECS task with new image: {self.full_image_name}")
         response = self.ecs_client.describe_services(cluster=self.config.CLUSTER_NAME, services=[self.config.SERVICE_NAME])
         task_definition_arn = response["services"][0]["taskDefinition"]
@@ -232,6 +242,7 @@ def main() -> None:
     parser.add_argument("--tag", type=str, help="The tag and therefore version of the container to use")
     # action="store_true" sets args.dry to True only if --dry is provided on the command line
     parser.add_argument("--dry", action="store_true", help="Dry run, do not make any changes")
+    parser.add_argument("--build-only", action="store_true", help="Only build the Docker image, do not deploy")
     args = parser.parse_args()
 
     if args.env:
@@ -261,8 +272,13 @@ def main() -> None:
     else:
         print(f"[red]Invalid environment specified: {env}[/red]")
         exit(1)
-    aws = Deploy(config)
+    aws = Deploy(config, build_only=args.build_only)
     aws.build_docker_image()
+
+    if args.build_only:
+        print(f"[green]Build complete! Image built: {config.IMAGE_NAME}:{tag}[/green]")
+        return
+
     if args.dry:
         print("Dry run, not pushing image to ECR.")
     else:

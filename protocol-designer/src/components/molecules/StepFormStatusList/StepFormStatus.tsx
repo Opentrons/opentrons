@@ -1,0 +1,50 @@
+import {
+  ALIGN_CENTER,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  Tag,
+} from '@opentrons/components'
+
+interface StepFormStatusProps {
+  label: string
+  value: string
+}
+
+/**
+ * A part of a step form that's a label-value pair like "Temperature: 50 °C,"
+ * to indicate the status of something. Styled as a block.
+ *
+ * For proper DOM hierarchy, must be nested within a `StepFormStatusList.`
+ */
+export function StepFormStatus(props: StepFormStatusProps): JSX.Element {
+  const { label, value } = props
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing16}
+      borderRadius={BORDERS.borderRadius4}
+      backgroundColor={COLORS.grey20}
+    >
+      <Box as="dt">
+        <StyledText
+          as="span"
+          desktopStyle="bodyDefaultRegular"
+          color={COLORS.black90}
+        >
+          {label}
+        </StyledText>
+      </Box>
+      <Box as="dd">
+        <Tag type="default" text={value} />
+      </Box>
+    </Flex>
+  )
+}

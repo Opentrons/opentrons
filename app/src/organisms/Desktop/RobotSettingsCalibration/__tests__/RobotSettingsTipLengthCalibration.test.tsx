@@ -24,7 +24,8 @@ vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('../CalibrationDetails/TipLengthCalibrationItems')
 vi.mock('/app/resources/instruments')
 
-const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
+const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
+  []
 
 const mockUpdateRobotStatus = vi.fn()
 

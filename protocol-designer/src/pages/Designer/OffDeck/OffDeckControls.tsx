@@ -74,7 +74,7 @@ export function OffDeckControls(
           closeModal={() => {
             setShowSlotDetailModal(false)
           }}
-          itemId={labwareId}
+          stackOfLabware={[labwareId]}
         />
       ) : null}
       <RobotCoordsForeignDiv

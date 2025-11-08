@@ -8,6 +8,7 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
   useCloseCurrentRun,
   useNotifyRunQuery,
@@ -39,7 +40,9 @@ vi.mock('../RunHeaderBannerContainer')
 vi.mock('../RunHeaderContent')
 vi.mock('../../../../RunProgressMeter')
 vi.mock('../RunHeaderProtocolName')
+vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
+vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
 
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'
@@ -74,6 +77,7 @@ describe('ProtocolRunHeader', () => {
       isClosingCurrentRun: false,
       closeCurrentRun: vi.fn(),
     })
+    vi.mocked(useRunGeneratedDataFiles).mockReturnValue({ jpeg: [], csv: [] })
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
     vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)

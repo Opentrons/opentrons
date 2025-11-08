@@ -1,8 +1,13 @@
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_ROBOT_TYPE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getIsLid,
   HEATERSHAKER_MODULE_TYPE,
+  locationIsOnAddressableArea,
+  locationIsOnDeck,
+  locationIsOnLabware,
+  locationIsOnModule,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -39,6 +44,8 @@ import type {
   ModuleState,
 } from '../../types'
 
+export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
+
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareParams> = (
   args,
@@ -72,9 +79,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const warnings: CommandCreatorWarning[] = []
 
   const newLocationInWasteChute =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'addressableAreaName' in newLocation &&
+    locationIsOnAddressableArea(newLocation) &&
     newLocation.addressableAreaName === 'gripperWasteChute'
 
   if (!labwareId || !prevRobotState.labware[labwareId]) {
@@ -115,7 +120,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       ? getSlotInLocationStack(prevRobotState.labware[labwareId].stack)
       : null
 
-  if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
+  if (
+    (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+      initialLabwareSlot as AddressableAreaName
+    ) ||
+    initialLabwareSlot === 'fixedTrash'
+  ) {
     errors.push(errorCreators.labwareDiscarded())
   }
   const initialAdapterSlot =
@@ -165,18 +176,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     }
   }
   const destModuleId =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'moduleId' in newLocation
+    locationIsOnModule(newLocation) && 'moduleId' in newLocation
       ? newLocation.moduleId
       : null
 
-  const destAdapterId =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'labwareId' in newLocation
-      ? newLocation.labwareId
-      : null
+  const destAdapterId = locationIsOnLabware(newLocation)
+    ? newLocation.labwareId
+    : null
 
   const destModuleOrSlotUnderAdapterId =
     destAdapterId != null
@@ -217,13 +223,26 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       }
     }
   }
+  const isLabwareIdATiprackLid =
+    labwareEntities[labwareId]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
+  if (
+    isLabwareIdATiprackLid &&
+    newLocation != null &&
+    locationIsOnDeck(newLocation) &&
+    ('slotName' in newLocation ||
+      ('addressableAreaName' in newLocation &&
+        FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+          newLocation.addressableAreaName as AddressableAreaName
+        )))
+  ) {
+    errors.push(errorCreators.tipRackLidNotAllowedOnDeck())
+  }
 
   const params = {
     labwareId,
     strategy,
     newLocation,
   }
-
   const commands: CreateCommand[] = [
     {
       commandType: 'moveLabware',
@@ -240,6 +259,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     location = OFF_DECK
   } else if (newLocation === 'systemLocation') {
     location = 'system_location' // NOTE: i think this is for LPC but shouldn't be used in PD
+  } else if (newLocation === 'wasteChuteLocation') {
+    location = OFF_DECK // NOTE: this should never happen; labware should only be here if moved
+    // to the waste chute
   } else if ('labwareId' in newLocation) {
     location = labwareEntities[newLocation.labwareId].pythonName
     const newLocationStack = prevRobotState.labware[newLocation.labwareId].stack
@@ -256,7 +278,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
         prevRobotState.labware[slotName].stack
       )
       const isParentLid = getIsLid(labwareEntities[slotName].def)
-      location = isParentLid ? slot : labwareEntities[slotName].pythonName
+      location = isParentLid
+        ? formatPyStr(slot)
+        : labwareEntities[slotName].pythonName
       const newLocationStack = prevRobotState.labware[slotName].stack
       parentSlotForSlotCompatibility =
         newLocationStack[newLocationStack.length - 1]
@@ -319,14 +343,18 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       prevRobotState.labware,
       parentSlotForSlotCompatibility
     )
-    const isCompatibleStack = getIsLabwareCompatibleWithStack(
+    const slot = getSlotInLocationStack(largestStackInSlot)
+    const { isCompatible, isAboveStackLimit } = getIsLabwareCompatibleWithStack(
       labwareId,
       largestStackInSlot,
       labwareEntities,
       moduleEntities
     )
-    if (!isCompatibleStack) {
+    if (!isCompatible) {
       errors.push(errorCreators.multipleEntitiesOnSameSlotName())
+    }
+    if (isAboveStackLimit) {
+      errors.push(errorCreators.stackTooHigh({ slot }))
     }
   }
 

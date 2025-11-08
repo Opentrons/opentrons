@@ -360,6 +360,7 @@ def _make_ot3_pe_ctx(
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
         #   this be False
         load_fixed_trash=True,
+        camera_provider=None,
     ) as (
         engine,
         loop,
@@ -793,6 +794,19 @@ def minimal_module_def() -> ModuleDefinitionV3:
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},
+        "orientation": {
+            "1": "left",
+            "2": "center",
+            "3": "right",
+            "4": "left",
+            "5": "center",
+            "6": "right",
+            "7": "left",
+            "8": "center",
+            "9": "right",
+            "10": "left",
+            "11": "center",
+        },
         "compatibleWith": ["temperatureModuleV2"],
         "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
     }

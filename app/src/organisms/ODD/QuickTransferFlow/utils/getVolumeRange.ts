@@ -2,9 +2,10 @@ import { getSelectedWellCount } from './'
 
 import type { QuickTransferWizardState } from '../types'
 
-export function getVolumeRange(
-  state: QuickTransferWizardState
-): { min: number; max: number } {
+export function getVolumeRange(state: QuickTransferWizardState): {
+  min: number
+  max: number
+} {
   if (
     state.pipette == null ||
     state.tipRack == null ||
@@ -17,7 +18,9 @@ export function getVolumeRange(
     return { min: 0, max: 0 }
   }
 
-  const minPipetteVolume = Object.values(state.pipette.liquids)[0].minVolume
+  // Note (09/02 kk) this might be a temp fix
+  // In the future we would need to update the min value again to align with PD
+  const minPipetteVolume = 1
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipRackVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
   const sourceLabwareVolume = Math.min(

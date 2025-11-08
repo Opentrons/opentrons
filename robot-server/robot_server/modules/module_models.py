@@ -336,6 +336,13 @@ class AbsorbanceReaderModuleData(BaseModel):
         ...,
         description="The reference wavelength used for single measurement mode.",
     )
+    errorDetails: Optional[str] = Field(
+        ...,
+        description=(
+            "Error details, if the module hardware has encountered something"
+            " unexpected and unrecoverable."
+        ),
+    )
 
 
 class AbsorbanceReaderModule(
@@ -366,6 +373,13 @@ class FlexStackerModuleData(BaseModel):
     )
     installDetected: bool = Field(
         ..., description="The install state of the Stacker on the Flex."
+    )
+    errorDetails: Optional[str] = Field(
+        ...,
+        description=(
+            "Error details, if the module hardware has encountered something"
+            " unexpected and unrecoverable."
+        ),
     )
 
 

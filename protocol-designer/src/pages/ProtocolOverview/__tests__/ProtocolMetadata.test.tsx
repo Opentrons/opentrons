@@ -45,7 +45,7 @@ describe('ProtocolMetadata', () => {
     screen.getByText('Protocol Metadata')
     screen.getByText('Edit')
     screen.getByText('Required app version')
-    screen.getByText('8.5.1 or higher')
+    screen.getByText('fake_app_version or higher')
   })
 
   it('should render protocol metadata', () => {

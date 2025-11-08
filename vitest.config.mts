@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
+
+// todo(mm, 2025-09-15): This file is used under confusing circumstances.
+// See comments in the global vite.config.mts.
+
 import path from 'path'
 import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
+
 import viteConfig from './vite.config.mts'
 
 // eslint-disable-next-line import/no-default-export
@@ -12,16 +17,28 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       allowOnly: true,
-      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
+      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**', '**/lib/**'],
       setupFiles: ['./setup-vitest.mts'],
       coverage: {
-        exclude: ['**/node_modules/**', '**/dist/**', '**/__tests__/**', 'protocol-designer/cypress/**/*', 'labware-library/cypress/**/*', ...configDefaults.exclude],
+        exclude: [
+          '**/node_modules/**',
+          '**/dist/**',
+          '**/__tests__/**',
+          '**/lib/**',
+          'protocol-designer/cypress/**/*',
+          'labware-library/cypress/**/*',
+          ...configDefaults.exclude,
+        ],
         provider: 'v8',
         reporter: ['text', 'json', 'html', 'lcov'],
       },
     },
     resolve: {
       alias: {
+        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+        // files being processed with the wrong config (the config from the
+        // consuming project vs. the config from the source project).
+        // Can these be replaced with regular package.json dependencies?
         '@opentrons/components/styles': path.resolve(
           './components/src/index.module.css'
         ),
@@ -58,6 +75,8 @@ export default mergeConfig(
         // "The resulting path (...) trailing slashes are removed unless the path is resolved to the root directory."
         // https://nodejs.org/api/path.html#pathresolvepaths
         '/app/': path.resolve('./app/src/') + '/',
+        '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
+        '/ai-client/': path.resolve('./opentrons-ai-client/src/') + '/',
       },
     },
   })

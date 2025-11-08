@@ -6,7 +6,7 @@
 Heater-Shaker Module
 ********************
 
-The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
+The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat samples to 95 °C, and can shake samples from 200 to 3000 rpm.
 
 The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
@@ -15,6 +15,10 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
     )
 
 .. versionadded:: 2.13
+  The Heater-Shaker can heat samples from 37 to 95 °C. 
+.. versionchanged:: 2.25
+  The Heater-Shaker accepts target temperatures lower than 37 °C. Set the Heater-Shaker's temperature at least 1.5 °C above ambient temperature. 
+
 
 Deck Slots
 ==========

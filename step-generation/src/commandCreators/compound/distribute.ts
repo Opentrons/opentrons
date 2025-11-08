@@ -6,6 +6,7 @@ import {
   getAllLiquidClassDefs,
   getByVolumeValue,
   getFlexNameConversion,
+  getIsTiprack,
   getMmFromBottom,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   isFlexPipette,
@@ -17,17 +18,23 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
-import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import {
+  getNextTiprack,
+  getPipetteWithTipMaxVol,
+} from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -37,6 +44,7 @@ import {
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
+  getPythonAssignTipRacksString,
 } from '../../utils/liquidClassUtils'
 import {
   airGapInPlace,
@@ -45,6 +53,7 @@ import {
   configureForVolume,
   delay,
   dispenseInPlace,
+  dropTip,
   moveToAddressableArea,
   moveToWell,
   prepareToAspirate,
@@ -105,7 +114,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     blowoutFlowRateUlSec,
     blowoutLocation,
     changeTip,
-    conditioningVolume,
     destLabware,
     destWells,
     dispenseDelay,
@@ -136,6 +144,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     sourceLabware,
     sourceWell,
     tipRack,
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -144,7 +155,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     touchTipAfterDispenseMmFromEdge,
     touchTipAfterDispenseOffsetMmFromTop,
     touchTipAfterDispenseSpeed,
-    stepId,
+    stepNumber,
     volume,
   } = args
   const {
@@ -157,12 +168,19 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-
+  const isTouchTipDisabled =
+    labwareEntities[sourceLabware]?.def.parameters.quirks?.includes(
+      'touchTipDisabled'
+    )
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   const disposalVolume =
     args.disposalVolume != null && args.disposalVolume > 0
       ? args.disposalVolume
+      : 0
+  const conditioningVolume =
+    args.conditioningVolume != null && args.conditioningVolume > 0
+      ? args.conditioningVolume
       : 0
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -200,10 +218,34 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
-  const isWasteChute = wasteChuteEntities[dropTipLocation] != null
-  const isTrashBin = trashBinEntities[dropTipLocation] != null
+  const trashLikeIds = [
+    ...Object.keys(invariantContext.trashBinEntities),
+    ...Object.keys(invariantContext.wasteChuteEntities),
+  ]
 
-  if (!dropTipLocation || (!isWasteChute && !isTrashBin)) {
+  const fallBackTrashLikeId = trashLikeIds.length > 0 ? trashLikeIds[0] : null
+
+  // tiprack for return tip
+  const dropTipLabware = Object.values(invariantContext.labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip = dropTipLabware != null && getIsTiprack(dropTipLabware.def)
+
+  const isWasteChuteDropLocation =
+    invariantContext.wasteChuteEntities[dropTipLocation] != null
+  const isTrashBinDropLocation =
+    invariantContext.trashBinEntities[dropTipLocation] != null
+
+  const hasTip = prevRobotState.tipState.pipettes[pipette]?.hasTip
+
+  if (
+    dropTipLocation == null ||
+    (isReturnTip &&
+      fallBackTrashLikeId == null &&
+      changeTip !== 'never' &&
+      hasTip) ||
+    (!isReturnTip && !isWasteChuteDropLocation && !isTrashBinDropLocation)
+  ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -348,6 +390,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
     return {
       errors,
     }
+  const { tipracks } = getNextTiprack(
+    pipette,
+    tipRack,
+    invariantContext,
+    prevRobotState,
+    ...(nozzles != null ? [nozzles] : [])
+  )
 
   const dispenseCorrectionVolumeForDestination =
     getByVolumeValue({
@@ -377,7 +426,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     .join(', ')
 
   const pythonLiquidClassArgs = [
-    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepId}`)}`,
+    `name=${formatPyStr(`${args.commandCreatorFnName}_step_${stepNumber}`)}`,
     ...(liquidClass != null
       ? [`base_liquid_class=${getLiquidClassName(liquidClass, true)}`]
       : []),
@@ -394,15 +443,54 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=[${pythonDestWells ?? destTrashPipetteName}]`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
-    `trash_location=${trashPipetteName}`,
+    ...(isReturnTip
+      ? [`return_tip=True`]
+      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
-    `keep_last_tip=True`,
+    ...(tipracks.filteredSortedTiprackIds.length > 0
+      ? [
+          getPythonAssignTipRacksString({
+            labwareEntities,
+            tiprackIds: tipracks.filteredSortedTiprackIds,
+          }),
+        ]
+      : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
@@ -524,6 +612,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const numDestsPerAsp = destWellChunk.length // can differ on final chunk
       const totalSampleAspirateVolume = volume * numDestsPerAsp
+      const totalGrossAspirateVolume =
+        totalSampleAspirateVolume + disposalVolume + conditioningVolume
       const isFirstChunk = chunkIndex === 0
       const isLastChunk = chunkIndex === destWellChunks.length - 1
       const changeTipNow =
@@ -536,21 +626,36 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ? [
             curryWithoutPython(configureForVolume, {
               pipetteId: pipette,
-              volume: totalSampleAspirateVolume,
+              volume: totalGrossAspirateVolume,
             }),
           ]
         : []
 
-      const tipCommands = changeTipNow
-        ? [
-            curryCommandCreator(replaceTip, {
-              pipette,
-              dropTipLocation,
-              tipRack,
-              ...(nozzles != null ? { nozzles } : {}),
-            }),
-          ]
-        : []
+      let tipCommands: CurriedCommandCreator[] = []
+      if (changeTipNow) {
+        const nextTip = targetTips?.shift()
+        tipCommands = [
+          curryCommandCreator(replaceTip, {
+            pipette,
+            dropTipLocation:
+              isReturnTip && fallBackTrashLikeId != null
+                ? fallBackTrashLikeId
+                : dropTipLocation,
+            tipRack,
+            ...(nozzles != null ? { nozzles } : {}),
+            ...(tipTracking === MANUAL &&
+            nextTip != null &&
+            tiprackSelected != null
+              ? {
+                  tipSelectionArgs: {
+                    tipRackId: tiprackSelected,
+                    tipWell: nextTip,
+                  },
+                }
+              : {}),
+          }),
+        ]
+      }
       // TODO (nd, 05/20/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
       // let liquidProbeCommand: CurriedCommandCreator[] = []
       // if (changeTipNow && !probedWells.has(sourceWell)) {
@@ -601,7 +706,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: dispenseAirGapDispenseFlowRate,
                 ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                   ? {
-                      correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                      correctionVolume:
+                        dispenseCorrectionVolumeForDispenseAirGap,
                     }
                   : {}),
                 pushOut: 0,
@@ -742,7 +848,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                   ? {
-                      correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                      correctionVolume:
+                        aspirateCorrectionVolumeForAspirateAirGap,
                     }
                   : {}),
               }),
@@ -754,10 +861,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
-          targetVolume:
-            totalSampleAspirateVolume +
-            (disposalVolume ?? 0) +
-            (conditioningVolume ?? 0),
+          targetVolume: totalGrossAspirateVolume,
           liquidHandlingAction: 'aspirate',
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
@@ -767,7 +871,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           liquidClass,
           pipetteSpecs,
           tiprackDefUri: tipRack,
-          targetVolume: conditioningVolume ?? 0,
+          targetVolume: conditioningVolume,
           liquidHandlingAction: 'multiDispense',
           byVolumeProperty: 'correctionByVolume',
           defaultValue: 0,
@@ -788,10 +892,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const aspirateCommands = [
         curryWithoutPython(aspirateInPlace, {
           pipetteId: pipette,
-          volume:
-            totalSampleAspirateVolume +
-            (disposalVolume ?? 0) +
-            (conditioningVolume ?? 0),
+          volume: totalGrossAspirateVolume,
           flowRate: aspirateFlowRateUlSec,
           correctionVolume: aspirateCorrectionVolumeForTotalAspiration,
         }),
@@ -834,7 +935,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           } else if (
             !isFirstWellInChunk &&
             dispenseAirGapVolume > 0 &&
-            (conditioningVolume == null || conditioningVolume === 0)
+            conditioningVolume === 0
           ) {
             airGapInTip = dispenseAirGapVolume
             airGapDispenseFlowRate = dispenseAirGapDispenseFlowRate
@@ -991,11 +1092,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ): CurriedCommandCreator[] =>
             dispenseAirGapVolume > 0 &&
             // don't air gap if not last well in chunk and conditioning volume is present
-            !(
-              wellIndex < destWellChunk.length - 1 &&
-              conditioningVolume != null &&
-              conditioningVolume > 0
-            ) &&
+            !(wellIndex < destWellChunk.length - 1 && conditioningVolume > 0) &&
             // don't air gap if end of full transfer and not changing tip
             !(
               changeTip === 'never' &&
@@ -1015,7 +1112,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                   }),
@@ -1080,9 +1178,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...getAirGapAfterDispenseCommands(true),
             ]
           } else if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-            const finalAirGapAfterDispenseCommands = getAirGapAfterDispenseCommands(
-              true
-            )
+            const finalAirGapAfterDispenseCommands =
+              getAirGapAfterDispenseCommands(true)
             advancedDispenseArgsCommands = [
               ...getTouchTipAfterDispenseRetractCommands(false),
               ...getAirGapAfterDispenseCommands(false),
@@ -1095,8 +1192,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 },
               }),
               ...blowoutInPlaceCommand,
-              // touch tip at source well with dispense touch tip parameters
-              ...(touchTipAfterDispense
+              // touch tip at source well with source touch tip parameters
+              // only if source is touchTip-able
+              ...(touchTipAfterDispense && !isTouchTipDisabled
                 ? [
                     curryWithoutPython(touchTip, {
                       pipetteId: pipette,
@@ -1155,6 +1253,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
         }
       )
 
+      const returnTipCommands: CurriedCommandCreator[] =
+        isReturnTip &&
+        (chunkIndex === destWellChunks.length - 1 || changeTip === 'always')
+          ? [
+              curryWithoutPython(dropTip, {
+                pipette,
+                dropTipLocation: tipRack,
+                isReturnTip,
+              }),
+            ]
+          : []
+
       return [
         ...tipCommands,
         ...preAspirateSubmergeCommands,
@@ -1166,6 +1276,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ...touchTipAfterAspirateRetractCommands,
         ...airGapAfterAspirateRetractCommands,
         ...dispenseChunkCommands,
+        ...returnTipCommands,
       ]
     }
   )

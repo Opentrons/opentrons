@@ -20,6 +20,7 @@ import {
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
+  StepMeter,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -27,7 +28,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { AlphanumericKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { StepMeter } from '/app/atoms/StepMeter'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
@@ -55,9 +55,8 @@ export function NameRobot(): JSX.Element {
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
   const [newName, setNewName] = useState<string>('')
-  const [isShowConfirmRobotName, setIsShowConfirmRobotName] = useState<boolean>(
-    false
-  )
+  const [isShowConfirmRobotName, setIsShowConfirmRobotName] =
+    useState<boolean>(false)
   const keyboardRef = useRef(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()

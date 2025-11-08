@@ -9,7 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getRobotStateTimeline } from '../../../file-data/selectors'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+
 import { ErrorContents } from './ErrorContents'
 
 import type { StyleProps } from '@opentrons/components'

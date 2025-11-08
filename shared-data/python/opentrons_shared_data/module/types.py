@@ -2,7 +2,7 @@
 opentrons_shared_data.module.types: types requiring typing_extensions
 for modules
 """
-
+import enum
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
@@ -112,6 +112,13 @@ class TOFSensorBaseline(TypedDict):
     Z: TOFBaseline
 
 
+class ModuleOrientation(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    CENTER = "center"
+    NOT_APPLICABLE = None
+
+
 # TODO(mc, 2022-03-18): potentially move from typed-dict to Pydantic
 ModuleDefinitionV3 = TypedDict(
     "ModuleDefinitionV3",
@@ -133,6 +140,7 @@ ModuleDefinitionV3 = TypedDict(
         "uniqueModuleData": Dict[str, Any],
         "incompatibleWithDecks": List[str],
         "gripperOffsets": Dict[str, GripperOffsets],
+        "orientation": Dict[str, str],
     },
     total=False,
 )

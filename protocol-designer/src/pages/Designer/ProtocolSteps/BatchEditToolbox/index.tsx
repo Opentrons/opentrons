@@ -9,28 +9,29 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { useKitchen } from '../../../../components/organisms/Kitchen/useKitchen'
+import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import {
   changeBatchEditField,
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
-} from '../../../../step-forms/actions'
-import { getBatchEditFormHasUnsavedChanges } from '../../../../step-forms/selectors'
-import { maskField } from '../../../../steplist/fieldLevel'
-import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/step-forms/actions'
+import { getBatchEditFormHasUnsavedChanges } from '/protocol-designer/step-forms/selectors'
+import { maskField } from '/protocol-designer/steplist/fieldLevel'
+import { deselectAllSteps } from '/protocol-designer/ui/steps/actions/actions'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
-} from '../../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
+
 import { BatchEditMixTools } from './BatchEditMixTools'
 import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { makeBatchEditFieldProps } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { BaseState } from '../../../../types'
+import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
+import type { BaseState } from '/protocol-designer/types'
 
 export const BatchEditToolbox = (): JSX.Element | null => {
   const { t } = useTranslation(['tooltip', 'protocol_steps', 'shared'])

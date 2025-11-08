@@ -5,20 +5,20 @@ import { useDispatch } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
   LINE_CLAMP_TEXT_STYLE,
   ListItem,
+  RobotInfoLabel,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { selectDropdownItem } from '../../../ui/steps/actions/actions'
+import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
-import type { DropdownOption } from '@opentrons/components'
-import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { DropdownOption, MenuPlacement } from '@opentrons/components'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export interface DropdownStepFormFieldProps extends FieldProps {
   options: DropdownOption[]
@@ -26,6 +26,7 @@ export interface DropdownStepFormFieldProps extends FieldProps {
   width?: string
   onEnter?: (id: string) => void
   onExit?: () => void
+  menuPlacement?: MenuPlacement
 }
 
 const FIRST_FIELDS = ['aspirate_labware', 'labware', 'moduleId']
@@ -48,6 +49,7 @@ export function DropdownStepFormField(
     onExit,
     onFieldBlur,
     name: fieldName,
+    menuPlacement,
   } = props
   const { t } = useTranslation(['tooltip', 'application'])
   const dispatch = useDispatch()
@@ -114,6 +116,7 @@ export function DropdownStepFormField(
           }}
           onEnter={onEnter}
           onExit={onExit}
+          menuPlacement={menuPlacement}
         />
       ) : (
         <Flex
@@ -131,7 +134,7 @@ export function DropdownStepFormField(
               padding={SPACING.spacing12}
             >
               {options[0].deckLabel != null ? (
-                <DeckInfoLabel deckLabel={options[0].deckLabel} svgSize={13} />
+                <RobotInfoLabel deckLabel={options[0].deckLabel} svgSize={13} />
               ) : null}
               <Flex
                 flexDirection={DIRECTION_COLUMN}

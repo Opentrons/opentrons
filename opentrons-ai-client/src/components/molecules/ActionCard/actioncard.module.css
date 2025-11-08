@@ -1,0 +1,62 @@
+.action_card {
+  display: flex;
+  min-width: 15rem;
+  max-width: 17.5rem;
+  height: 14.125rem;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-20);
+  border-radius: var(--border-radius-16);
+  background: var(--blue-10);
+  gap: var(--spacing-10);
+  text-align: left;
+}
+
+.card_title {
+  align-self: stretch;
+  margin: 0;
+  font-size: 1.4375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-28);
+}
+
+.card_description {
+  flex: 1;
+  align-self: stretch;
+  margin: 0;
+  font-family: var(--font-family-body, 'Public Sans', sans-serif);
+  font-size: 1rem;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-24);
+}
+
+.card_link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--blue-50);
+  cursor: pointer;
+  font-family: var(--font-family-body, 'Public Sans', sans-serif);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semi-bold);
+  gap: var(--spacing-4);
+  line-height: var(--line-height-24);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.card_link:hover {
+  color: var(--blue-60);
+  text-decoration: underline;
+}
+
+.card_link_icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-90deg);
+}

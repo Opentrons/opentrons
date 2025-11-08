@@ -50,7 +50,7 @@ describe('Module Update Banner', () => {
     screen.getByTestId('InlineNotification_error')
     expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
     screen.getByText('Module setup required.')
-    screen.getByText('Setup module')
+    screen.getByText('Set up module')
   })
 
   it('renders an alert banner if a module setup is required with no exit button', () => {
@@ -62,8 +62,8 @@ describe('Module Update Banner', () => {
     screen.getByTestId('ModuleCard_setup_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
     expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
-    screen.getByText('Setup module for use.')
-    screen.getByText('Setup module')
+    screen.getByText('Set up module for use.')
+    screen.getByText('Set up module')
   })
 
   it('renders an alert banner if a module firmware is available with exit button', () => {
@@ -76,14 +76,14 @@ describe('Module Update Banner', () => {
     screen.getByTestId('ModuleCard_firmware_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
     screen.queryByLabelText('close_icon')
-    screen.getByText('Firmware update available..')
+    screen.getByText('Firmware update available.')
     screen.getByText('Update now')
   })
 
   it('enables clicking of text to open the appropriate update modal', () => {
     render(props) // updateType is 'calibration'
     screen.getByText('Module setup required.')
-    const moduleSetupBtn = screen.getByText('Setup module')
+    const moduleSetupBtn = screen.getByText('Set up module')
     fireEvent.click(moduleSetupBtn)
     expect(props.handleUpdateClick).toHaveBeenCalled()
 
@@ -92,7 +92,7 @@ describe('Module Update Banner', () => {
       updateType: 'setup',
     }
     render(props) // Re-render with new props
-    screen.getByText('Setup module for use.')
+    screen.getByText('Set up module for use.')
     fireEvent.click(moduleSetupBtn)
     expect(props.handleUpdateClick).toHaveBeenCalledTimes(2)
   })
@@ -107,7 +107,7 @@ describe('Module Update Banner', () => {
     screen.getByText(
       'Module setup required. Attach a pipette before running module setup.'
     )
-    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+    expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
   it('should not render a module setup link if pipette calibration is required', () => {
@@ -120,7 +120,7 @@ describe('Module Update Banner', () => {
     screen.getByText(
       'Module setup required. Calibrate pipette before running module setup.'
     )
-    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+    expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
   it('should render module setup banner even if pipette calibration is required', () => {
@@ -135,7 +135,7 @@ describe('Module Update Banner', () => {
         'ModuleCard_calibration_update_banner_test_number'
       )
     ).not.toBeInTheDocument()
-    screen.getByText('Setup module')
+    screen.getByText('Set up module')
   })
 
   it('should not render a module setup link if pipette firmware update is required', () => {
@@ -148,18 +148,18 @@ describe('Module Update Banner', () => {
     screen.getByText(
       'Update pipette firmware before proceeding with required module setup.'
     )
-    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+    expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
   it('should not render a module setup link when e-stop is pressed ', () => {
     when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(true)
     render(props)
-    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+    expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 
   it('should not render a module setup link if the robot is an OT-2', () => {
     when(useIsFlex).calledWith(props.robotName).thenReturn(false)
     render(props)
-    expect(screen.queryByText('Setup module')).not.toBeInTheDocument()
+    expect(screen.queryByText('Set up module')).not.toBeInTheDocument()
   })
 })

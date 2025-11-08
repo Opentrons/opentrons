@@ -1,11 +1,12 @@
 """Tests for opentrons.hardware_control.module_control."""
+
 import pytest
 from decoy import Decoy, matchers
 from typing import Awaitable, Callable, cast, Union, List
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import API as HardwareAPI, types
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
@@ -45,12 +46,20 @@ def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
 
 
 @pytest.fixture()
+def event_callback(decoy: Decoy) -> Callable[[types.HardwareEvent], None]:
+    return decoy.mock(name="event_callback")  # type: ignore[no-any-return]
+
+
+@pytest.fixture()
 def subject(
     hardware_api: HardwareAPI,
     usb_bus: USBDriverInterface,
     build_module: Callable[..., Awaitable[AbstractModule]],
+    event_callback: Callable[[types.HardwareEvent], None],
 ) -> AttachedModulesControl:
-    modules_control = AttachedModulesControl(api=hardware_api, usb=usb_bus)
+    modules_control = AttachedModulesControl(
+        api=hardware_api, usb=usb_bus, event_callback=event_callback
+    )
 
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests

@@ -53,9 +53,9 @@ export function SetupInstrumentCalibration({
     mostRecentAnalysis?.commands ?? storedProtocolAnalysis?.commands ?? []
   )
   const attachedGripperMatch = usesGripper
-    ? (instrumentsQueryData?.data ?? []).find(
+    ? ((instrumentsQueryData?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
-      ) ?? null
+      ) ?? null)
     : null
 
   return (

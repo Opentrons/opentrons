@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "/app/*": ["./app/src/*"],
-      "/ai-client/*": ["./opentrons-ai-client/src/*"]
+      "/ai-client/*": ["./opentrons-ai-client/src/*"],
+      "/protocol-designer/*": ["./protocol-designer/src/*"]
     },
     "emitDeclarationOnly": false,
     "noEmit": true
@@ -17,6 +18,11 @@
     "app-shell-odd/typings",
     "components/src",
     "components/typings",
+    "components-testing/src",
+    "components-testing/tests",
+    "components-testing/typings",
+    "components-testing/cssModulesSideEffect.ts",
+    "components-testing/playwright.config.ts",
     "discovery-client/src",
     "discovery-client/typings",
     "labware-designer/src",

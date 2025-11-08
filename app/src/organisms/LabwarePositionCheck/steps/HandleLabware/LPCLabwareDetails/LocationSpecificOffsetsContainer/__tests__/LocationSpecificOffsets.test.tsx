@@ -67,14 +67,12 @@ describe('LocationSpecificOffsetsContainer', () => {
       ...mockLPCContentProps,
     }
 
-    vi.mocked(
-      selectSortedLSOffsetDetailsWithCopy
-    ).mockImplementation((runId: string) => () =>
-      mockLocationSpecificOffsetDetails
+    vi.mocked(selectSortedLSOffsetDetailsWithCopy).mockImplementation(
+      (runId: string) => () => mockLocationSpecificOffsetDetails
     )
-    vi.mocked(
-      selectSelectedLwOverview
-    ).mockImplementation((runId: string) => () => ({ uri: 'mock-uri' } as any))
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      (runId: string) => () => ({ uri: 'mock-uri' }) as any
+    )
   })
 
   it('renders the header text', () => {

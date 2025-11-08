@@ -10,10 +10,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getMainPagePortalEl } from '../../../../../../components/organisms'
+import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
+
 import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
 
-import type { FormData } from '../../../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface ProfileStepsSummaryProps {

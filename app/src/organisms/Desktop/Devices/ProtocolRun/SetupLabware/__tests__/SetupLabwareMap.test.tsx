@@ -113,11 +113,11 @@ describe('SetupLabwareMap', () => {
   it('should render a deck WITHOUT labware and WITHOUT modules', () => {
     render({
       runId: RUN_ID,
-      protocolAnalysis: ({
+      protocolAnalysis: {
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
-      } as unknown) as CompletedProtocolAnalysis,
+      } as unknown as CompletedProtocolAnalysis,
     })
     expect(vi.mocked(LabwareInfoOverlay)).not.toHaveBeenCalled()
     expect(vi.mocked(BaseDeck)).toHaveBeenCalledWith(
@@ -128,11 +128,11 @@ describe('SetupLabwareMap', () => {
   it.skip('should render a deck WITH labware and WITHOUT modules', () => {
     render({
       runId: RUN_ID,
-      protocolAnalysis: ({
+      protocolAnalysis: {
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
-      } as unknown) as CompletedProtocolAnalysis,
+      } as unknown as CompletedProtocolAnalysis,
     })
 
     expect(vi.mocked(BaseDeck)).toHaveBeenCalledWith(
@@ -189,11 +189,11 @@ describe('SetupLabwareMap', () => {
 
     render({
       runId: RUN_ID,
-      protocolAnalysis: ({
+      protocolAnalysis: {
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
-      } as unknown) as CompletedProtocolAnalysis,
+      } as unknown as CompletedProtocolAnalysis,
     })
 
     screen.getByText('mock module viz magneticModuleType')

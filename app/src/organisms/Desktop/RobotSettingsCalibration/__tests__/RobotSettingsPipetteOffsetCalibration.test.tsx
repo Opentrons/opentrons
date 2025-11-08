@@ -25,7 +25,8 @@ vi.mock('/app/resources/instruments')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
-const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
+const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
+  []
 const mockUpdateRobotStatus = vi.fn()
 
 const render = (

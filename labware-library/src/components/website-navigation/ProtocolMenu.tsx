@@ -8,14 +8,8 @@ interface Props {
 
 export function ProtocolMenu(props: Props): JSX.Element {
   const { active } = props
-  const {
-    options,
-    designer,
-    library,
-    api,
-    github,
-    bottomLink,
-  } = protocolLinkProps
+  const { options, designer, library, api, github, bottomLink } =
+    protocolLinkProps
   return (
     <>
       <span>Protocols</span>
