@@ -151,6 +151,10 @@
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
-    "worker-plugin": "^5.0.0"
+    "worker-plugin": "^5.0.0",
+    "postcss-apply": "0.12.0",
+    "postcss-color-mod-function": "3.0.3",
+    "postcss-import": "16.0.0",
+    "postcss-preset-env": "9.3.0"
   }
 }
