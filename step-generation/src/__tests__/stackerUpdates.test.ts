@@ -6,6 +6,7 @@ import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import {
   forFlexStackerEmpty,
   forFlexStackerFill,
+  forFlexStackerRetrieve,
 } from '../getNextRobotStateAndWarnings/stackerUpdates'
 import { getModuleState } from '../robotStateSelectors'
 
@@ -98,7 +99,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     } as any)
   })
 
-  it.only('should add the specified number of items to the stored stacker list', () => {
+  it('should add the specified number of items to the stored stacker list', () => {
     const props = {
       count: 1,
       moduleId: FLEX_STACKER_ID,
@@ -146,5 +147,29 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
     expect(moduleState?.labwareInStacker).toHaveLength(3)
+  })
+})
+
+
+describe('flex stacker state updates forFlexStackerRetrieve', () => {
+  const invariantContext = makeContext()
+  const robotState = getInitialRobotStateStandard(invariantContext)
+  beforeEach(() => {
+    vi.mocked(getModuleState).mockReturnValue({
+      type: FLEX_STACKER_MODULE_TYPE,
+      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      max_pool_count: 6,
+      labwareStored: LABWARE_ID,
+    } as any)
+  })
+
+  it.only('should retrieve the first item from the stored stacker list', () => {
+    const props = {
+      moduleId: FLEX_STACKER_ID,
+    }
+    forFlexStackerRetrieve(props, invariantContext, {
+      robotState: robotState,
+      warnings: [],
+    })
   })
 })

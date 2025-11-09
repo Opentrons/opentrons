@@ -68,8 +68,13 @@ export const forFlexStackerFill = (
   const moduleState = _getStackerModuleState(robotState, moduleId)
   const labwareDefinition =
     invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
-  const listOfLabwareDefinitions = Array.from({ length: moduleState?.labwareInStacker?.length ?? 0 }, (_, ) => labwareDefinition)
-  const poolHeight = getHeightOfLabwareStackFromDefinitions(listOfLabwareDefinitions)
+  const listOfLabwareDefinitions = Array.from(
+    { length: moduleState?.labwareInStacker?.length ?? 0 },
+    _ => labwareDefinition
+  )
+  const poolHeight = getHeightOfLabwareStackFromDefinitions(
+    listOfLabwareDefinitions
+  )
   console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
     FLEX_STACKER_MODULE_V1,
@@ -105,14 +110,10 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
-    //get original location of labware to retrieve
-    // const originalLocation = robotState.labware.get(moduleState.labwareInStacker?.[0] ?? '').location
-    // if (originalLocation == null) {
-    //   throw new Error('Original location of labware is null')
-    // }
-    // check if slot to retrieve to is occupied 
-    // set state for both
-    // update labware batch
+    // do i need to know the state of every stacker and every stacker in the labware or do we match step by step?
+    const labwareToRetrieve = moduleState.labwareInStacker?.[0]
+    const labwareLocation = robotState.labware[labwareToRetrieve ?? '']?.stack[robotState.labware[labwareToRetrieve ?? '']?.stack.length - 1]
+    
   }
 }
 
