@@ -13,7 +13,7 @@ import { useNotifyRunQuery } from '/app/resources/runs'
 //  otherwise, populate the toggles with the camera settings once the network
 //  request completes.
 export function useInitializeCameraState(runId: string): void {
-  const { data: cameraSettings } = useNotifyCamera()
+  const { data: cameraSettings } = useNotifyCamera({ staleTime: Infinity })
   const { data } = useNotifyRunQuery(runId)
   const dispatch = useDispatch()
   const runCameraSettings = data?.data.cameraSettings

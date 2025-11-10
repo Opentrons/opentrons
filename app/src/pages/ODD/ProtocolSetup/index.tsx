@@ -847,7 +847,9 @@ export function ProtocolSetup(): JSX.Element {
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const { data: initialRobotCameraSettings } = useNotifyCamera()
+  const { data: initialRobotCameraSettings } = useNotifyCamera({
+    staleTime: Infinity,
+  })
 
   // The initial app-internal camera state should match the server state.
   useEffect(() => {

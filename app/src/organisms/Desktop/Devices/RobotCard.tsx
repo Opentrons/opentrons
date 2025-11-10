@@ -52,6 +52,8 @@ import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
+const CAMERA_REFETCH_MS = 5000
+
 interface RobotCardProps {
   robot: DiscoveredRobot
 }
@@ -173,7 +175,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data } = useNotifyCamera()
+  const { data } = useNotifyCamera({ refetchInterval: CAMERA_REFETCH_MS })
 
   return data?.cameraEnabled ? (
     <Flex
