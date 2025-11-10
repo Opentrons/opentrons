@@ -20,7 +20,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -37,6 +36,7 @@ import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
@@ -51,6 +51,8 @@ import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
+
+const CAMERA_REFETCH_MS = 5000
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -173,7 +175,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data } = useCamera()
+  const { data } = useNotifyCamera({ refetchInterval: CAMERA_REFETCH_MS })
 
   return data?.cameraEnabled ? (
     <Flex
