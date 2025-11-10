@@ -1454,6 +1454,32 @@ def move_group_run_side_effect(
             },
             None,
         ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+            },
+            {
+                Axis.X: 0,  # Zero Length Move, make sure it doesn't raise an error
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.P_L: 0,
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
     ],
 )
 async def test_controller_move(
