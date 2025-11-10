@@ -31,6 +31,7 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_RETURN_TIP',
   'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
   'OT_PD_ALLOW_ALL_TIPRACKS',
+  'OT_PD_ENABLE_CAMERA_SUPPORT',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =

@@ -12,7 +12,7 @@ import {
   getMinPipetteVolume,
   getPipetteCapacity,
 } from '../../../pipettes/pipetteData'
-import { getWellRatio } from '../../utils'
+import { getWellRatio } from '../../utils/getWellRatio'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {

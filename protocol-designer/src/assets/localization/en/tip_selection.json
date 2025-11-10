@@ -20,6 +20,12 @@
   "select": "Select",
   "selected": "Selected",
   "select_tiprack": "Select a tip rack to pick up tips from",
+  "select_tip": "Select tip",
   "select_tips": "Select tips",
-  "select_tips_for_tracking": "Select tips for manual tip tracking"
+  "select_tips_for_tracking": "Select tips for manual tip tracking",
+  "tip_inaccessible": {
+    "collision": "Selection will cause a collision",
+    "incomplete": "Selection will be incomplete",
+    "tooManyPickups": "Selection will pickup too many tips"
+  }
 }

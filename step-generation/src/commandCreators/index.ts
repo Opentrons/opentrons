@@ -20,6 +20,7 @@ export {
   absorbanceReaderRead,
   aspirate,
   blowOutInWell,
+  captureImage,
   comment,
   deactivateTemperature,
   delay,

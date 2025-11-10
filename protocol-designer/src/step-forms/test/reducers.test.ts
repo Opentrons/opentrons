@@ -773,7 +773,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         it(testName, () => {
           vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(deckSetup)
           vi.mocked(getLabwareIsCompatible).mockReturnValue(
-            labwareIsCompatible as boolean
+            labwareIsCompatible!
           )
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)

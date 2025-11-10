@@ -38,8 +38,8 @@ export const PlaceholderStyledText = (
     oddStyle != null ? styleMap[oddStyle as StyleKey] : null
   )
   return (
-    <text className={combinedClassName} style={{ color: color ?? '' }}>
+    <span className={combinedClassName} style={{ color: color ?? '' }}>
       {children}
-    </text>
+    </span>
   )
 }

@@ -4,7 +4,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import styles from './preview.module.css'
+import styles from './visualization.module.css'
 
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 

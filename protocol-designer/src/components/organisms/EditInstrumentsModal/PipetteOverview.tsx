@@ -183,7 +183,7 @@ export function PipetteOverview({
               tiprackDefURIs={
                 (isLeftPipette96Channel
                   ? visibleLeftPipette.tiprackDefURI
-                  : visibleRightPipette?.tiprackDefURI) as string[]
+                  : visibleRightPipette?.tiprackDefURI)!
               }
               editClick={() => {
                 const pipette96 = isLeftPipette96Channel

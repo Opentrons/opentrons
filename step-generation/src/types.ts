@@ -3,6 +3,7 @@ import type {
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  Height,
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
@@ -18,6 +19,7 @@ import type {
   ShakeSpeedParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  Width,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
@@ -615,11 +617,23 @@ export interface CommentArgs extends CommonArgs {
   message: string
 }
 
+export interface CaptureImageArgs extends CommonArgs {
+  commandCreatorFnName: 'captureImage'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
+}
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
   | AbsorbanceReaderLidArgs
   | ConsolidateArgs
+  | CaptureImageArgs
   | DistributeArgs
   | MixArgs
   | PauseArgs

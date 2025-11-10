@@ -1,6 +1,8 @@
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
+import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
+
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
@@ -80,6 +82,51 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
             liquidsForLabware, // Only give _getWellContents the selection data if it's a selected container
             isSelectedLabware ? selectedWells : null,
             isSelectedLabware ? highlightedWells : null
+          )
+
+          // Skip labware ids with no liquids
+          return wellContents ? { ...acc, [labwareId]: wellContents } : acc
+        },
+        {}
+      )
+    }
+  )
+
+export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> =
+  createSelector(
+    stepFormSelectors.getLabwareEntities,
+    getInitialRobotState,
+    labwareIngredSelectors.getLiquidsByLabwareId,
+    labwareIngredSelectors.getSelectedLabwareId,
+    getSelectedWells,
+    getHighlightedWells,
+    (
+      labwareEntities,
+      initialRobotState,
+      liquidsByLabware,
+      selectedLabwareId,
+      selectedWells,
+      highlightedWells
+    ) => {
+      const selectedLabwareStack = selectedLabwareId
+        ? initialRobotState.labware[selectedLabwareId].stack
+        : []
+
+      const allLabwareIds: string[] = selectedLabwareStack ?? []
+      return allLabwareIds.reduce(
+        (
+          acc: WellContentsByLabware,
+          labwareId: string
+        ): WellContentsByLabware => {
+          const liquidsForLabware = liquidsByLabware[labwareId]
+          if (!labwareEntities[labwareId]) {
+            return acc
+          }
+          const wellContents = _getWellContents(
+            labwareEntities[labwareId].def,
+            liquidsForLabware,
+            selectedWells,
+            highlightedWells
           )
 
           // Skip labware ids with no liquids

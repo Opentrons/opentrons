@@ -17,6 +17,8 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
+import { convertStepArrayToHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -48,6 +50,7 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
   HydratedFormData,
@@ -448,10 +451,13 @@ export const getStepGroups: Selector<
 
 export const getUnsavedForm: Selector<BaseState, FormData | null | undefined> =
   createSelector(rootSelector, state => state.unsavedForm)
+
 export const getOrderedStepIds: Selector<BaseState, StepIdType[]> =
   createSelector(rootSelector, state => state.orderedStepIds)
+
 export const getSavedStepForms: Selector<BaseState, SavedStepFormState> =
   createSelector(rootSelector, state => state.savedStepForms)
+
 export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
   createSelector(
     getOrderedStepIds,
@@ -462,6 +468,19 @@ export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
         .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
     }
   )
+
+export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
+  createSelector(
+    getOrderedSavedForms,
+    featureFlagSelectors.getEnableConcurrentModuleActions,
+    (orderedSavedForms, enableConcurrentModuleActions) => {
+      return convertStepArrayToHierarchy(
+        orderedSavedForms,
+        enableConcurrentModuleActions
+      )
+    }
+  )
+
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
     getUnsavedForm,

@@ -92,7 +92,7 @@ export function WizardBody(props: WizardBodyProps): JSX.Element {
   const [loaded, setLoaded] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    const videoAsset = ONBOARDING_ANIMATIONS[subStepNumber as number]
+    const videoAsset = ONBOARDING_ANIMATIONS[subStepNumber!]
     setLoaded(false)
     setAsset(videoAsset)
     const timeout = setTimeout(() => {

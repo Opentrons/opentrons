@@ -75,11 +75,20 @@ describe('CameraCard', () => {
     expect(image.getAttribute('src')).toContain('system_camera_flex.png')
   })
 
-  it('renders on deck and camera text', () => {
-    render(mockProps)
+  it('renders on deck and camera text for Flex robot', () => {
+    const flexProps = { ...mockProps, isFlex: true }
+    render(flexProps)
 
     screen.getByText('On Deck')
-    screen.getByText('Camera')
+    screen.getByText('Flex Camera')
+  })
+
+  it('renders on deck and camera text for OT-2 robot', () => {
+    const flexProps = { ...mockProps, isFlex: false }
+    render(flexProps)
+
+    screen.getByText('On Deck')
+    screen.getByText('OT-2 Camera')
   })
 
   it('renders enabled chip by default', () => {

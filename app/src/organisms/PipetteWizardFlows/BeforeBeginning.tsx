@@ -45,7 +45,6 @@ import type {
   CreateCommand,
   DeckConfiguration,
   LoadedPipette,
-  PipetteName,
 } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
@@ -95,7 +94,7 @@ export const BeforeBeginning = (
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
   const pipetteDisplayName = usePipetteNameSpecs(
-    requiredPipette?.pipetteName as PipetteName
+    requiredPipette?.pipetteName!
   )?.displayName
 
   if (

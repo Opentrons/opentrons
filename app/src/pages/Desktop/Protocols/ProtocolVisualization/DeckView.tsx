@@ -26,8 +26,8 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
-import styles from './preview.module.css'
 import { getActiveLayer, getBackgroundColor } from './utils'
+import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
