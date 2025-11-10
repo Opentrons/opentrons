@@ -52,6 +52,7 @@ nav:
   - API Reference:
       - Protocols: api-reference/protocols.md
       - Instruments: api-reference/instruments.md
+      - Robot Motors: api-reference/robot-motors.md
       - Labware and Trash Containers: api-reference/labware.md
       - Wells and Liquids: api-reference/wells-liquids.md
       - Modules: api-reference/modules.md

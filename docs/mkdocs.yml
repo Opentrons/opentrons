@@ -39,6 +39,9 @@ plugins:
             filters: 
               - "public"
               - "!^__"
+              - "!broker"
+              - "!geometry"
+              - "!load_labware_object"
             show_root_heading: true
             show_root_full_path: false
             show_symbol_type_toc: true
