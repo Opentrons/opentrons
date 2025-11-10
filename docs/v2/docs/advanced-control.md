@@ -6,7 +6,7 @@ As its name implies, the Python Protocol API is primarily designed for creating 
 
 The Python API offers two ways of issuing commands to the robot outside of the app: through Jupyter Notebook or on the command line with `opentrons_execute`.
 
-## Jupyter Notebook
+## Jupyter Notebook {#jupyter-notebook-api}
 
 The Flex and OT-2 run [Jupyter Notebook](https://jupyter.org) servers on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
@@ -21,7 +21,7 @@ Once you've launched Jupyter Notebook, you can create a notebook file or edit an
 
 Jupyter Notebook is structured around *cells*: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
 
-Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md#v2-versioning) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
+Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
 
 ```python
 import opentrons.execute

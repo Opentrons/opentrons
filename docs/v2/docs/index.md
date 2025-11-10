@@ -12,7 +12,7 @@ As a programmer, you can leverage the full power of Python for advanced automati
 
 **New to Python protocols?** Check out the [tutorial](tutorial.md) to learn about the different parts of a protocol file and build a working protocol from scratch.
 
-If you want to **dive right into code**, take a look at our [examples](examples.md) and the comprehensive [Protocol API Reference][opentrons.protocol_api].
+If you want to **dive right into code**, take a look at our [examples](examples.md) and the comprehensive [Protocol API Reference](api-reference/protocols.md).
 
 When you're ready to **try out a protocol**, download the [Opentrons App](https://www.opentrons.com/ot-app), import the protocol file, and run it on your robot.
 

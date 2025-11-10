@@ -722,7 +722,7 @@ class InstrumentContext(publisher.CommandPublisher):
         If [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] is used to
         empty a pipette, usually a small amount of liquid remains in the tip. During a
         blowout, the pipette moves the plunger beyond its normal limits to help remove
-        all liquid from the pipette tip. See [Blow Out][blow-out].
+        all liquid from the pipette tip. See [Blow Out][blow-out-building-block].
 
         Args:
             location (Union[`Well`][opentrons.protocol_api.labware.Well],
@@ -830,7 +830,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Touch the pipette tip to the sides of a well, with the intent of removing leftover
         droplets.
 
-        See [touch-tip][touch-tip] for more details and examples.
+        See [Touch Tip][touch-tip-building-block] for more details and examples.
 
         Args:
             location (Union[`Well`][opentrons.protocol_api.labware.Well], None):
@@ -944,7 +944,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Draw air into the pipette's tip at the current well.
 
-        See [Air Gap][air-gap].
+        See [Air Gap][air-gap-building-block].
 
         Args:
             volume (float, optional): The amount of air, measured in µL. Calling
@@ -1641,14 +1641,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 following each [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and
                 [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense]. Defaults to `False`.
 
-                See [Touch Tip][touch-tip] for details.
+                See [Touch Tip][touch-tip-complex] for details.
 
             blow_out (bool): If `True`, a [`blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out]
                 will occur following each [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense],
                 but only if the pipette has no liquid left in it. If `False` (default),
                 the pipette will not blow out liquid.
 
-                See [Blow Out][blow-out] for details.
+                See [Blow Out][blow-out-complex] for details.
 
             blowout_location (str): Accepts one of three string values: `"trash"`,
                 `"source well"`, or `"destination well"`.

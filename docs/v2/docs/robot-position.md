@@ -40,7 +40,7 @@ Let's look at the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] 
 plate["A1"].bottom()  # the bottom center of the well
 ```
 
-This is a good position for [aspirating liquid](building-block-commands/liquids.md#aspirate) or an activity where you want the tip to contact the liquid. Similar to the `Well.top()` method, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` numbers move the position up, negative `z` numbers move it down.
+This is a good position for [aspirating liquid](building-block-commands/liquids.md#aspirate-building-block) or an activity where you want the tip to contact the liquid. Similar to the `Well.top()` method, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` numbers move the position up, negative `z` numbers move it down.
 
 ```python
 plate["A1"].bottom(z=1)  # 1 mm above the bottom center of the well
@@ -128,10 +128,10 @@ You should only adjust labware offsets in your Python code if you plan to run yo
 
 ## Position Relative to Trash Containers
 
-Movement to [TrashBin][opentrons.protocol_api.labware.TrashBin] or [WasteChute][opentrons.protocol_api.labware.WasteChute] objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
+Movement to [`TrashBin`][opentrons.protocol_api.TrashBin] or [`WasteChute`][opentrons.protocol_api.WasteChute] objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
 
 !!! note
-    In API version 2.15 and earlier, trash containers are [Labware][opentrons.protocol_api.labware.Labware] objects that have a single well. See [fixed_trash][opentrons.protocol_api.ProtocolContext.fixed_trash] and [Position Relative to Labware](#position-relative-to-labware) above.
+    In API version 2.15 and earlier, trash containers are [`Labware`][opentrons.protocol_api.labware.Labware] objects that have a single well. See [fixed_trash][opentrons.protocol_api.ProtocolContext.fixed_trash] and [Position Relative to Labware](#position-relative-to-labware) above.
 
 You can adjust the position of the pipette center with the [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top] and [`WasteChute.top()`][opentrons.protocol_api.WasteChute.top] methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, `Well.top()`, [covered above](#top), only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
 

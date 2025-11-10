@@ -159,7 +159,7 @@ Blowing out at A1 of Opentrons Fixed Trash on 12
 Dropping tip into A1 of Opentrons Fixed Trash on 12
 ```
 
-This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use [complex liquid handling parameters](parameters.md) to reduce or eliminate the [disposal volume](parameters.md#disposal-volume), or to [blow out](parameters.md#blow-out) in a location other than the trash.
+This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use [complex liquid handling parameters](parameters.md) to reduce or eliminate the [disposal volume](parameters.md#disposal-volume), or to [blow out][blow-out-complex] in a location other than the trash.
 
 ## List of Volumes
 

@@ -142,7 +142,7 @@ If the labware is inaccessible, the API will raise an error.
 
 ## Movement into the Waste Chute
 
-Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first [configure the waste chute](deck-slots.md#waste-chute) in your protocol. Then use the loaded [`WasteChute`][opentrons.protocol_api.WasteChute] object as the value of `new_location`:
+Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first [configure the waste chute](deck-slots.md#waste-chute-api) in your protocol. Then use the loaded [`WasteChute`][opentrons.protocol_api.WasteChute] object as the value of `new_location`:
 
 ```python
 chute = protocol.load_waste_chute()
