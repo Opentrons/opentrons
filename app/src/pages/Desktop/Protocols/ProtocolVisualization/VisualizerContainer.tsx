@@ -24,7 +24,7 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
-const INITIAL_WIDTH_PX = 200
+const INITIAL_WIDTH_PX = 230
 const MIN_CENTER_WIDTH_PX = 200
 const MIN_COLUMN_WIDTH_PX = 100
 const MAX_COLUMN_WIDTH_PX = 400
