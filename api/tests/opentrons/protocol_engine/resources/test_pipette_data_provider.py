@@ -74,8 +74,8 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
         nozzle_map=result.nozzle_map,
-        back_left_corner_offset=Point(0, 0, 10.45),
-        front_right_corner_offset=Point(0, 0, 10.45),
+        back_left_corner_offset=Point(-16, 22.25, 10.45),
+        front_right_corner_offset=Point(16, -22.25, 10.45),
         pipette_lld_settings={},
         plunger_positions={
             "top": 19.5,
