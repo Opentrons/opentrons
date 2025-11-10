@@ -111,7 +111,7 @@ export function CameraCard({
                 marginRight={SPACING.spacing8}
               />
               <StyledText desktopStyle="bodyDefaultRegular">
-                {isFlex ? t('flex_camera') : t('ot2_camera')}
+                {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
               </StyledText>
             </Flex>
           </div>

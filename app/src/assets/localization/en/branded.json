@@ -25,6 +25,7 @@
   "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have Flex move the gantry to its home position.",
   "find_your_robot": "Find your robot in the Opentrons App to install software updates.",
   "firmware_update_download_logs": "Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
+  "flex_camera": "Flex Camera",
   "flex_stacker_empty": "Manually empty all labware from Flex Stacker",
   "flex_stacker_empty_from_location": "Manually empty all labware from Flex {{stackerColumn}}",
   "flex_stacker_fill": "Fill Flex Stacker",

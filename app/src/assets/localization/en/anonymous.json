@@ -25,6 +25,7 @@
   "estop_pressed_description": "First, safely clear the deck of any labware or spills. Then, twist the E-stop button clockwise. Finally, have the robot move the gantry to its home position.",
   "find_your_robot": "Find your robot in the Devices section of the app to install software updates.",
   "firmware_update_download_logs": "Contact support for assistance.",
+  "flex_camera": "Camera",
   "flex_stacker_empty": "Manually empty all labware from robot Stacker",
   "flex_stacker_empty_from_location": "Manually empty all labware from robot {{stackerColumn}}",
   "flex_stacker_fill": "Fill robot Stacker",
