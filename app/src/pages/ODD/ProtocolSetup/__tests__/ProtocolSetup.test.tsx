@@ -351,6 +351,7 @@ describe('ProtocolSetup', () => {
         reportPhotoAccessUsage: vi.fn(),
         reportImageCaptureUsage: vi.fn(),
         reportLiveFeedUsage: vi.fn(),
+        reportLiveFeedDuration: vi.fn(),
       })
     vi.mocked(useScrollPosition).mockReturnValue({
       isScrolled: false,
