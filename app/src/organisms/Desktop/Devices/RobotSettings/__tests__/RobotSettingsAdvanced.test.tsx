@@ -9,6 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import { getShellUpdateState } from '/app/redux/shell'
+import { useCurrentRun } from '/app/resources/runs'
 
 import {
   DeviceReset,
@@ -55,6 +56,7 @@ vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 vi.mock('../AdvancedTab/DisableStackerSensors')
+vi.mock('/app/resources/runs')
 
 const render = () => {
   return renderWithProviders(
@@ -117,6 +119,7 @@ describe('RobotSettings Advanced tab', () => {
       <div>Mock DisableStackerSensors Section</div>
     )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useCurrentRun).mockReturnValue(null)
   })
 
   afterEach(() => {

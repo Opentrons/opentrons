@@ -23,6 +23,7 @@ import {
   updateSetting,
 } from '/app/redux/robot-settings'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useCurrentRun } from '/app/resources/runs'
 
 import {
   DeviceReset,
@@ -75,6 +76,7 @@ export function RobotSettingsAdvanced({
     useState<boolean>(false)
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const currentRun = useCurrentRun()
 
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
@@ -223,7 +225,7 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
+          currentRun={currentRun}
           onUpdateStart={() => {
             handleUpdateBuildroot(robot)
           }}
