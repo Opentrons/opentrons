@@ -8,6 +8,13 @@ title: "Python API Reference: Modules"
     options:
       heading_level: 3
       inherited_members: true
+      filters:
+        - "public"
+        - "!^__"
+        - "!broker"
+        - "!geometry"
+        - "!load_labware_object"
+        - "!load_adapter*"
       
 ## Flex Stacker
 
@@ -36,6 +43,13 @@ title: "Python API Reference: Modules"
     options:
       heading_level: 3
       inherited_members: true
+      filters:
+        - "public"
+        - "!^__"
+        - "!broker"
+        - "!geometry"
+        - "!load_labware_object"
+        - "!calibrate"
       
 ## Temperature Module
 
@@ -50,3 +64,15 @@ title: "Python API Reference: Modules"
     options:
       heading_level: 3
       inherited_members: true
+      filters:
+        - "public"
+        - "!^__"
+        - "!broker"
+        - "!geometry"
+        - "!load_labware_object"
+        - "!total_step_count"
+        - "!current_cycle_index"
+        - "!total_cycle_count"
+        - "!hold_time"
+        - "!ramp_rate"
+        - "!current_step_index"
