@@ -21,6 +21,7 @@ import styles from './runheadersectionlower.module.css'
 
 import type { RunHeaderContentProps } from '..'
 
+// Note thd following minimum supported versions from Protocol Visualization PRD
 const MIN_SUPPORTED_JSON_SCHEMA_VERSION = 6
 const MIN_SUPPORTED_PYTHON_API_VERSION = [2, 14]
 
