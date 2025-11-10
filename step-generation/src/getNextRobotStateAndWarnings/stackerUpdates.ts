@@ -8,6 +8,7 @@ import {
 
 import { getModuleState } from '../robotStateSelectors'
 import { uuid } from '../utils'
+import { getIsSlotOccupied } from '../utils/stackerUtils'
 
 import type {
   FlexStackerEmptyParams,
@@ -20,7 +21,6 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import { getIsSlotOccupied } from '../utils/stackerUtils'
 
 const _getStackerModuleState = (
   robotState: RobotState,
@@ -149,4 +149,3 @@ export const forFlexStackerStore = (
     moduleState.shuttlePosition = 'stored'
   }
 }
-

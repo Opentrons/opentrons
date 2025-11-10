@@ -1,3 +1,5 @@
+import { STANDARD_FLEX_SLOTS, STANDARD_OT2_SLOTS } from '../../js'
+
 import type {
   LabwareLocation,
   OnDeckLabwareLocation,
@@ -41,3 +43,14 @@ export const locationIsOnAddressableArea = (
   labwareLocation: LabwareLocation
 ): labwareLocation is { addressableAreaName: AddressableAreaName } =>
   locationIsOnDeck(labwareLocation) && 'addressableAreaName' in labwareLocation
+
+export const getIsSlotValid = (slot: string): boolean => {
+  return (
+    STANDARD_OT2_SLOTS.includes(slot as AddressableAreaName) ||
+    STANDARD_FLEX_SLOTS.includes(slot as AddressableAreaName) ||
+    slot === 'A4' ||
+    slot === 'B4' ||
+    slot === 'C4' ||
+    slot === 'D4'
+  )
+}
