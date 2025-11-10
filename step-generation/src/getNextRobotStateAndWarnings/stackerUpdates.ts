@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { getSlotInLocationStack, uuid } from '../utils'
+import { uuid } from '../utils'
 
 import type {
   FlexStackerEmptyParams,
@@ -19,8 +19,8 @@ import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
-  TimelineFrame,
 } from '../types'
+import { getIsSlotOccupied } from '../utils/stackerUtils'
 
 const _getStackerModuleState = (
   robotState: RobotState,
@@ -104,7 +104,7 @@ export const forFlexStackerFill = (
 }
 
 export const forFlexStackerRetrieve = (
-  params: ModuleOnlyParams,
+  params: FlexStackerRetrieveParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -149,19 +149,4 @@ export const forFlexStackerStore = (
     moduleState.shuttlePosition = 'stored'
   }
 }
-function getIsSlotOccupied(robotState: TimelineFrame, slot: string) {
-  for (const labware of Object.values(robotState.labware)) {
-    if (labware.stack.length > 0) {
-      const slot = getSlotInLocationStack(labware.stack)
-      if (slot === slot) {
-        return true
-      }
-    }
-  }
-  for (const module of Object.values(robotState.modules)) {
-    if (module.slot === slot) {
-      return true
-    }
-  }
-  return false
-}
+
