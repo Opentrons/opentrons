@@ -264,7 +264,8 @@ export function getLoadLabware(
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
   labwareRobotState: TimelineFrame['labware'],
-  labwareNicknamesById: Record<string, string>
+  labwareNicknamesById: Record<string, string>,
+  suppressLPC: boolean = false // emit set_offset to bypass LPC
 ): string {
   const labwareEntities = Object.values(allLabwareEntities).filter(
     lw =>
@@ -322,6 +323,7 @@ export function getLoadLabware(
           `${pythonName} = ${parentName}.load_labware(\n` +
             `${indentPyLines(loadLabwareArgs)},\n` +
             `)`,
+          ...[suppressLPC ? [`${pythonName}.set_offset(0, 0, 0)`] : []],
         ]
       } else {
         // custom labware
@@ -335,6 +337,7 @@ export function getLoadLabware(
           `${pythonName} = ${parentName}.load_labware_from_definition(\n` +
             `${indentPyLines(loadFromDefnArgs)},\n` +
             `)`,
+          ...[suppressLPC ? [`${pythonName}.set_offset(0, 0, 0)`] : []],
         ]
       }
     }, [])

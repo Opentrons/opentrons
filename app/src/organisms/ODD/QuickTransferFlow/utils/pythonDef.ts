@@ -97,7 +97,7 @@ export function pythonDef(
   const { labware, pipettes } = initialRobotState
   const sections: string[] = [
     getLoadAdapters(moduleEntities, labwareEntities, labware),
-    getLoadLabware(moduleEntities, labwareEntities, labware, {}),
+    getLoadLabware(moduleEntities, labwareEntities, labware, {}, true),
     getLoadPipettes(pipetteEntities, pipettes),
     ...[
       getLoadTrashBins(trashBinEntities),
