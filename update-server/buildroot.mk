@@ -3,10 +3,11 @@
 # python-opentrons-update-server
 #
 ################################################################################
+OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 define OTUPDATESERVER_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
+	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_UPDATE_SERVER_VERSION = $(call OTUPDATESERVER_CALL_PBU,get_version)
