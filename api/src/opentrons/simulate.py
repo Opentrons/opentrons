@@ -476,7 +476,7 @@ def simulate(
 
     - `payload`: The command. The human-readable run log text is available at
         `payload["text"]`. The other keys of `payload` are command-dependent;
-        see [`opentrons.legacy_commands`][opentrons.legacy_commands].
+        see `opentrons.legacy_commands`.
 
         !!! note
             In older software versions, `payload["text"]` was a
@@ -488,7 +488,7 @@ def simulate(
 
     - `logs`: Any log messages that occurred during execution of this
         command, as a standard Python
-        [`LogRecord`][logging.LogRecord].
+        [`LogRecord`](https://docs.python.org/3/library/logging.html#logging.LogRecord).
 
     Args:
         protocol_file: The protocol file to simulate.

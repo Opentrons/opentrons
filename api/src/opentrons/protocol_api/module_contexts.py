@@ -1558,7 +1558,7 @@ class FlexStackerContext(ModuleContext):
             labware: A list of labware to load into the Stacker.
 
                 - The list must have at least one element.
-                - All labware must be loaded [`OFF_DECK`][opentrons.protocol_api.labware.OFF_DECK].
+                - All labware must be loaded [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
                 - All labware must be of the same kind. If any of them have lids, they
                 must all have lids, and the lids must be the same. If any of them are
                 on adapters, they all must be on adapters, and the adapters must be
