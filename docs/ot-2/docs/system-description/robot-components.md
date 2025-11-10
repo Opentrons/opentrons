@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Robot Components"
 ---
 
-<font color="red">IMAGE PLACEHOLDER</font>
+![OT-2 main parts with labels](../images/ot2-features-hero.png)
 
 ## Frame and enclosure
 
@@ -10,7 +10,11 @@ The frame of the OT-2 provides rigidity and structural support for its deck and 
 
 The metal frame has openings for side windows and a front door made of transparent polycarbonate that let you see what's going on inside the robot. The lower-half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare the deck before a protocol or manipulate the state of the deck during a protocol.
 
-LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A built-in camera can photograph the deck and working area for recording and tracking protocol execution.
+Other frame elements include:
+
+- LED strips within the enclosure provide software-controllable ambient lighting.
+- A built-in camera can photograph the deck and working area for recording and tracking protocol execution.
+- A front LED indicates the robot's status. It turns solid blue when your OT-2 powered on and fully booted up.
 
 ## Deck and working area
 
@@ -20,25 +24,28 @@ The deck is the machined aluminum surface on which automated science protocols a
 
 The working area is the physical space on and above the deck that is accessible for pipetting. Labware placed in slots 1–11 are in the working area.
 
-The OT-2 deck is removable, it slides in and out of the enclosure. Pull it out part way, or remove it completely, to more easily place labware in a slot or for cleaning.
+The OT-2 deck also slides in and out of the enclosure. Pull it out part way, or remove it completely, to more easily place labware in a slot or for cleaning.
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
-## Rear and side panels
+## Side and back
 
-## Other features and components
+Status indicator lights on the front and back of the OT-2 provide at-a-glance information about the robot.
 
-Some text here
+### Front LED
 
-### User-accessible components
 
-### Status lights
 
-Status indicator lights on the front and back of the OT-2 provide at-a-glance information about the robot. The front light on the robot indicates its power status. When powered on and fully booted up, the status light turns solid blue.
+!!!note
+    This feature is not the power button. The on/off switch is on the left side of the robot.
 
-IMAGE
+### Rear LEDs
 
-The OT-2 has five (5) status indicator lights, known as LEDs, located on on the upper left side of the back panel of the robot. These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
+The OT-2 has five (5) status LEDs, on the back panel of the robot.
+
+![Side panel showing 5 led status lights](../images/side-LEDs.png)
+
+These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
 
 <table>
   <thead>
@@ -66,7 +73,7 @@ The OT-2 has five (5) status indicator lights, known as LEDs, located on on the 
     </tr>
     <tr>
       <td><img src="../../images/ot2-other.png" alt="not yet implemented" width="50%"></td>
-      <td>No function, reserved for future use.</td>
+      <td>Reserved for future use.</td>
     </tr>
   </tbody>
 </table>
