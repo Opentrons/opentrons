@@ -217,7 +217,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('disable_stacker_sensors')}
           dataTestId="RobotSettingButton_disable_stacker_sensors"
           settingInfo={t('disable_stacker_sensors_description')}
-          iconName="stacker-sensors"
+          iconName="ot-flex-stacker"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
         />
