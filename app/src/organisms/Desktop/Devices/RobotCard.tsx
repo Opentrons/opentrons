@@ -174,6 +174,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const { data } = useCamera()
+
   return data?.cameraEnabled ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}

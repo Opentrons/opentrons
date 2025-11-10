@@ -112,7 +112,7 @@ describe('SetupCamera', () => {
     render(mockProps)
 
     screen.getByText('Camera is required.')
-    screen.getByText('Enable the camera to run this protocol.')
+    screen.getByText('Enable the camera to start the run.')
   })
 
   it('does not render SetupRunCameraUsage when camera is disabled', () => {
