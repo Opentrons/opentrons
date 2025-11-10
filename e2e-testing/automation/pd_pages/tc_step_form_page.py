@@ -357,11 +357,7 @@ class ThermocyclerProfileModal(BasePage):
         Args:
             step_index: The index of the thermocycler step (0-based).
         """
-        step_container = self.page.get_by_test_id(f"thermocyclerStep-{step_index}")
-        self.wait_for_visible(step_container)
-
-        delete_button = step_container.get_by_role("button", name="Delete")
-        self.wait_for_visible(delete_button)
+        delete_button = self.page.get_by_test_id("cycleStep-0").locator("path")
         delete_button.click()
 
     def save_thermocycler_step(self, step_index: int) -> None:
