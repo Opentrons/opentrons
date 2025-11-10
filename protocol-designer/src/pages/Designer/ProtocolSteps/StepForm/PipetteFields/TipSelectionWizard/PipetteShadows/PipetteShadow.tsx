@@ -54,6 +54,8 @@ export function PipetteShadow(props: {
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   isAccessible: boolean
   inaccessibleReason: InaccessibleReason | null
+  isHoveredWellSelected: boolean
+  hasPickupsRemaining: boolean
   primaryNozzle: string
   robotType: RobotType
   enclosingViewbox: string | null
@@ -66,6 +68,8 @@ export function PipetteShadow(props: {
     labwareState,
     isAccessible,
     inaccessibleReason,
+    isHoveredWellSelected,
+    hasPickupsRemaining,
     primaryNozzle,
     robotType,
     enclosingViewbox,
@@ -94,15 +98,24 @@ export function PipetteShadow(props: {
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const width = frontRightCorner[0] - backLeftCorner[0]
   const height = backLeftCorner[1] - frontRightCorner[1]
+
+  const isError =
+    !isAccessible || (!hasPickupsRemaining && !isHoveredWellSelected)
+
   const shadowProps = {
     x: slotX + xOffset,
     y: slotY + yOffset,
     width,
     height,
-    stroke: isAccessible ? COLORS.blue50 : COLORS.red50,
-    fill: isAccessible
-      ? `${COLORS.black90}${COLORS.opacity20HexCode}`
-      : `${COLORS.red50}${COLORS.opacity20HexCode}`,
+    ...(isError
+      ? {
+          fill: `${COLORS.red50}${COLORS.opacity20HexCode}`,
+          stroke: COLORS.red50,
+        }
+      : {
+          fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+          stroke: COLORS.blue50,
+        }),
   }
 
   const labelPlacement = getPlacementByViewboxAndPipetteSpec({
@@ -123,10 +136,22 @@ export function PipetteShadow(props: {
     shadowHeight: height,
     isOt2EightChannel,
   })
-  const labelText =
-    !isAccessible && inaccessibleReason != null
-      ? t(`tip_inaccessible.${inaccessibleReason}`)
-      : t('select_tip')
+  const labelText = (() => {
+    if (!hasPickupsRemaining && !isHoveredWellSelected) {
+      return t('all_pickups_selected')
+    }
+    if (!isAccessible && inaccessibleReason != null) {
+      return t(`tip_inaccessible.${inaccessibleReason}`)
+    }
+    if (isAccessible) {
+      return isHoveredWellSelected
+        ? t('tip_accessible.deselect')
+        : t('tip_accessible.select')
+    }
+    console.error('No label text found')
+    return ''
+  })()
+
   return (
     <g className={styles.shadow_overlay}>
       <PipetteLabel
@@ -136,7 +161,7 @@ export function PipetteShadow(props: {
         x={slotX + xOffset + labelOffsetX}
         y={slotY + yOffset + labelOffsetY}
         placement={labelPlacement}
-        isError={!isAccessible}
+        isError={isError}
       />
       <ShadowComponent {...shadowProps} />
     </g>

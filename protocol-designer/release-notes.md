@@ -12,10 +12,11 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.6.3!**
 
-This hotfix release addresses two bugs:
+This hotfix release addresses the following bugs:
 
 - Protocol Designer no longer crashes when uploading protocols containing custom labware.
 - Protocol Designer allows scrolling to view details of a transfer step using a "consolidate" pipette path.
+- Eliminates some crashes when deleting liquids that are already used in the protocol.
 
 ## Opentrons Protocol Designer Changes in 8.6.1
 
@@ -86,9 +87,6 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
-  - deleting a pipette involved in a mix step.
-  - deleting a Protocol Designer step title.
-  - checking labware details after deleting a liquid.
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.

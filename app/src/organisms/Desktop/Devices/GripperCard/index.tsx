@@ -20,7 +20,7 @@ import type { GripperWizardFlowType } from '/app/organisms/GripperWizardFlows/ty
 interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null
   isCalibrated: boolean
-  isRunActive: boolean
+  isRobotBusy: boolean
   isEstopNotDisengaged: boolean
 }
 
@@ -39,7 +39,7 @@ const POLL_DURATION_MS = 5000
 export function GripperCard({
   attachedGripper,
   isCalibrated,
-  isRunActive,
+  isRobotBusy,
   isEstopNotDisengaged,
 }: GripperCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
@@ -89,7 +89,7 @@ export function GripperCard({
       ? [
           {
             label: t('attach_gripper'),
-            disabled: attachedGripper != null || isRunActive,
+            disabled: attachedGripper != null || isRobotBusy,
             onClick: handleAttach,
           },
         ]
@@ -99,12 +99,12 @@ export function GripperCard({
               attachedGripper.data.calibratedOffset?.last_modified != null
                 ? t('recalibrate_gripper')
                 : t('calibrate_gripper'),
-            disabled: attachedGripper == null || isRunActive,
+            disabled: attachedGripper == null || isRobotBusy,
             onClick: handleCalibrate,
           },
           {
             label: t('detach_gripper'),
-            disabled: attachedGripper == null || isRunActive,
+            disabled: attachedGripper == null || isRobotBusy,
             onClick: handleDetach,
           },
           {

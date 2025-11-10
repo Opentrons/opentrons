@@ -141,7 +141,10 @@ export const ANALYTICS_CAMERA_ENABLEMENT_KIND: 'cameraEnablementType' =
 export const ANALYTICS_CAMERA_SETTINGS_KIND: 'cameraSettingsKind' =
   'cameraSettingsKind'
 
-export const ANALYTICS_IMAGE_CAPTURE_KIND: 'imageCaptureKind' =
-  'imageCaptureKind'
-export const ANALYTICS_LIVE_FEED_KIND: 'liveFeed' = 'liveFeed'
-export const ANALYTICS_PHOTO_ACCESS: 'photoAccessKind' = 'photoAccessKind'
+export const ANALYTICS_IMAGE_CAPTURE_KIND: 'cameraImageCaptureKind' =
+  'cameraImageCaptureKind'
+export const ANALYTICS_LIVE_FEED_KIND: 'cameraLiveFeed' = 'cameraLiveFeed'
+export const ANALYTICS_PHOTO_ACCESS: 'cameraPhotoAccessKind' =
+  'cameraPhotoAccessKind'
+export const ANALYTICS_LIVE_FEED_DURATION: 'cameraLiveFeedDuration' =
+  'cameraLiveFeedDuration'

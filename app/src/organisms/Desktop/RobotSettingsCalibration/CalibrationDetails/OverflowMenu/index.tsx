@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
 import { css } from 'styled-components'
@@ -33,7 +33,6 @@ import {
 } from '/app/redux/analytics'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import { useRunStatuses } from '/app/resources/runs'
 
 import { ConfirmDeleteCalibrationModal } from './ConfirmDeleteCalibrationModal'
 
@@ -46,9 +45,9 @@ import type { SelectablePipettes } from '/app/organisms/PipetteWizardFlows/types
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
+  isRobotBusy: boolean
   mount: Mount
   serialNumber: string | null
-  updateRobotStatus: (isRobotBusy: boolean) => void
   pipetteName?: string | null
   tiprackDefURI?: string | null
 }
@@ -56,9 +55,9 @@ interface OverflowMenuProps {
 export function OverflowMenu({
   calType,
   robotName,
+  isRobotBusy,
   mount,
   serialNumber,
-  updateRobotStatus,
   pipetteName,
   tiprackDefURI = null,
 }: OverflowMenuProps): JSX.Element {
@@ -92,7 +91,6 @@ export function OverflowMenu({
     useAllPipetteOffsetCalibrationsQuery().data?.data
 
   const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
-  const { isRunRunning: isRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
@@ -113,7 +111,7 @@ export function OverflowMenu({
   const handleRecalibrate = (e: MouseEvent): void => {
     e.preventDefault()
     if (
-      !isRunning &&
+      !isRobotBusy &&
       isPipetteForFlex &&
       calType === 'pipetteOffset' &&
       pipetteName != null
@@ -143,12 +141,6 @@ export function OverflowMenu({
     }
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
-
-  useEffect(() => {
-    if (isRunning) {
-      updateRobotStatus(true)
-    }
-  }, [isRunning, updateRobotStatus])
 
   const { deleteCalibration } = useDeleteCalibrationMutation()
 
@@ -222,7 +214,7 @@ export function OverflowMenu({
               css={css`
                 border-radius: ${BORDERS.borderRadius8};
               `}
-              disabled={isRunning}
+              disabled={isRobotBusy}
               aria-label={`CalibrationOverflowMenu_button_calibrate`}
             >
               {t(
