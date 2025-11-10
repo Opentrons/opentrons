@@ -184,7 +184,6 @@ export interface CameraStreamOpenAction {
   payload: {
     hostname: string
     robotName: string
-    runId: string
     windowTitle: string
   }
   meta: { shell: true }
