@@ -222,7 +222,7 @@ class CaptureImageImpl(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
                 command_metadata=ImageCaptureCmdFileNameMetadata(
-                    step_number=len(self._state_view.commands.get_all()) + 1,
+                    step_number=len(self._state_view.commands.get_all()),
                     command_timestamp=datetime.now(),
                     base_filename=params.fileName,
                     command_id=this_cmd_id or "",
