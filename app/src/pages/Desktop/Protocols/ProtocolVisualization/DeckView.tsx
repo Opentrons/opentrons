@@ -26,7 +26,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
-import { getActiveLayer, getBackgroundColor } from './utils'
+import { getActiveLayer, getBackgroundColor, isCutoutA1Active } from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -92,7 +92,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
-  const { labware } = robotState
+  const { labware, modules } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -175,11 +175,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                             selectedRunTimeCommand
                           )
                         : { isActiveLayerVisible: false }
-                    let strokeColor = 'none'
-
-                    if (hoveredSlot === addressableArea.id) {
-                      strokeColor = COLORS.purple50
-                    }
 
                     return cutoutId != null ? (
                       <SingleSlotFixture
@@ -188,10 +183,17 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         deckDefinition={deckDef}
                         showExpansion={cutoutId === 'cutoutA1'}
                         fixtureBaseColor={
-                          isActiveLayerVisible ? COLORS.purple30 : lightFill
+                          isActiveLayerVisible ||
+                          isCutoutA1Active(
+                            labware,
+                            modules,
+                            cutoutId,
+                            selectedRunTimeCommand
+                          )
+                            ? COLORS.purple30
+                            : lightFill
                         }
                         slotClipColor={darkFill}
-                        stroke={strokeColor}
                       />
                     ) : null
                   })}
@@ -241,12 +243,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                               onClick={() => {
                                 setSelectedSlot(slot)
                               }}
-                              onMouseEnter={() => {
-                                setHoveredSlot(slot)
-                              }}
-                              onMouseLeave={() => {
-                                setHoveredSlot(null)
-                              }}
                             />
                           </Fragment>
                         )
@@ -277,7 +273,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                 hoveredSlot={hoveredSlot}
                 setHoveredSlot={setHoveredSlot}
                 robotType={robotType}
-                selectedSlot={selectedSlot}
                 setSelectedSlot={setSelectedSlot}
                 robotState={robotState}
                 invariantContext={invariantContext}
