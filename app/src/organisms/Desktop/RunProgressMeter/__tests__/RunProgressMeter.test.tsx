@@ -119,16 +119,14 @@ describe('RunProgressMeter', () => {
       reportModuleCommand: vi.fn(),
     } as any)
     render(props)
-    expect(screen.getByText('Current Step N/A:')).toBeTruthy()
+    expect(screen.getByText('Step N/A:')).toBeTruthy()
     expect(screen.queryByText('MOCK PROGRESS BAR')).toBeFalsy()
   })
-  it('should give the correct info when run status is idle', () => {
+  it('should give no step info when run status is idle', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
     render(props)
-    screen.getByText('Current Step:')
-    screen.getByText('Not started yet')
-    screen.getByText('Download run log')
+    expect(screen.queryByText(/Step/)).toBeNull()
   })
 
   it('should render an intervention modal when showInterventionModal is true', () => {
@@ -144,7 +142,7 @@ describe('RunProgressMeter', () => {
     screen.getByText('MOCK_INTERVENTION_MODAL')
   })
 
-  it('should render the correct run status when run status is completed', () => {
+  it('should render no text when run status is completed', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_SUCCEEDED)
     vi.mocked(useRunningStepCounts).mockReturnValue({
@@ -153,13 +151,13 @@ describe('RunProgressMeter', () => {
       hasRunDiverged: false,
     })
     render(props)
-    screen.getByText('Final Step 10/10:')
+    expect(screen.queryByText(/Step/)).toBeNull()
   })
 
-  it('should render the correct step info when the run is cancelled before running', () => {
+  it('should render no text when the run is cancelled before running', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(props)
-    screen.getByText('Final Step: N/A')
+    expect(screen.queryByText(/Step/)).toBeNull()
   })
 })

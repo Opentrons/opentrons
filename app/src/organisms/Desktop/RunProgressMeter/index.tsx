@@ -4,28 +4,21 @@ import { css } from 'styled-components'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  CURSOR_DEFAULT,
-  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  Link,
+  SecondaryButton,
   SIZE_1,
   SPACING,
-  Tooltip,
-  TOOLTIP_LEFT,
-  TYPOGRAPHY,
-  useHoverTooltip,
+  StyledText,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 
@@ -62,9 +55,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const robotType = useRobotType(robotName)
   const runStatus = useRunStatus(runId)
   const { play } = useRunControls(runId)
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
   const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
 
@@ -84,15 +74,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { currentStepNumber, totalStepCount, hasRunDiverged } =
     useRunningStepCounts(runId, mostRecentCommandData)
 
-  const downloadIsDisabled =
-    runStatus === RUN_STATUS_RUNNING ||
-    runStatus === RUN_STATUS_IDLE ||
-    runStatus === RUN_STATUS_FINISHING
+  const downloadEnabled =
+    runStatus === RUN_STATUS_SUCCEEDED || runStatus === RUN_STATUS_FAILED
 
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
-  const onDownloadClick: MouseEventHandler<HTMLAnchorElement> = e => {
-    if (downloadIsDisabled) return false
+  const onDownloadClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
@@ -120,6 +107,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       hasRunDiverged,
     })
 
+  console.log('🚀 ~ RunProgressMeter ~ downloadEnabled:', downloadEnabled)
   return (
     <>
       {showIntervention
@@ -131,41 +119,23 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <LegacyStyledText
-              as="h2"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            <StyledText
+              color={COLORS.black90}
+              desktopStyle={'bodyDefaultSemiBold'}
             >
               {stepCountStr}
-            </LegacyStyledText>
-
+            </StyledText>
             {currentStepContents}
           </Flex>
-          <Link
-            {...targetProps}
-            role="button"
-            css={css`
-              ${TYPOGRAPHY.darkLinkH4SemiBold}
-              &:hover {
-                color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
-              }
-              cursor: ${downloadIsDisabled ? CURSOR_DEFAULT : CURSOR_POINTER};
-            `}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={onDownloadClick}
-          >
-            <Flex
-              gridGap={SPACING.spacing2}
-              alignItems={ALIGN_CENTER}
-              color={COLORS.grey60}
-            >
-              <Icon name="download" size={SIZE_1} />
-              {t('download_run_log')}
+          {downloadEnabled ? (
+            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+              <SecondaryButton border-width={1} onClick={onDownloadClick}>
+                <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+                  <Icon name="download" size={SIZE_1} />
+                  {t('download_run_log')}
+                </Flex>
+              </SecondaryButton>
             </Flex>
-          </Link>
-          {downloadIsDisabled ? (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('complete_protocol_to_download')}
-            </Tooltip>
           ) : null}
         </Flex>
         {!hasRunDiverged ? (
