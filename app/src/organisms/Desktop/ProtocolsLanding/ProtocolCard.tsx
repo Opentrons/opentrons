@@ -366,7 +366,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                       <Flex flexWrap={WRAP}>
                         <Icon
                           color={COLORS.grey50}
-                          name="photo-camera"
+                          name="camera"
                           height="1rem"
                         />
                       </Flex>
