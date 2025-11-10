@@ -9,6 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import { getShellUpdateState } from '/app/redux/shell'
+import { useCurrentRun } from '/app/resources/runs'
 
 import {
   DeviceReset,
@@ -55,16 +56,12 @@ vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 vi.mock('../AdvancedTab/DisableStackerSensors')
-
-const mockUpdateRobotStatus = vi.fn()
+vi.mock('/app/resources/runs')
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsAdvanced
-        robotName="otie"
-        updateRobotStatus={mockUpdateRobotStatus}
-      />
+      <RobotSettingsAdvanced robotName="otie" isRobotBusy={false} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -122,6 +119,7 @@ describe('RobotSettings Advanced tab', () => {
       <div>Mock DisableStackerSensors Section</div>
     )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useCurrentRun).mockReturnValue(null)
   })
 
   afterEach(() => {
