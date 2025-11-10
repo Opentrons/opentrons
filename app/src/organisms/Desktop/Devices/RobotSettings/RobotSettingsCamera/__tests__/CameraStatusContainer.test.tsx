@@ -22,6 +22,7 @@ describe('CameraStatusContainer', () => {
     mockProps = {
       toggleCameraEnabled: vi.fn(),
       isCameraEnabled: false,
+      toggleDisabled: false,
     }
   })
 
@@ -63,5 +64,12 @@ describe('CameraStatusContainer', () => {
     await user.click(toggleButton)
 
     expect(mockProps.toggleCameraEnabled).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables toggle button when toggleDisabled is true', () => {
+    render({ ...mockProps, toggleDisabled: true })
+
+    const toggleButton = screen.getByRole('switch')
+    expect(toggleButton).toBeDisabled()
   })
 })

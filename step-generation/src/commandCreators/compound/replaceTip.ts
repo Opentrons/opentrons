@@ -3,20 +3,20 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  SINGLE,
 } from '@opentrons/shared-data'
 
+import { AUTOMATIC, MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
+  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
-  PRIMARY_NOZZLE,
   reduceCommandCreators,
 } from '../../utils'
 import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
@@ -31,11 +31,17 @@ import type { CommandCreator, CurriedCommandCreator } from '../../types'
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
+  // tipRack URI with which to automatically find next tip
   tipRack: string | null
   nozzles?: NozzleConfigurationStyle
   //  we need to emit atomic commands for python
   //  if this replaceTip is for the mix compound command
   isFromMixCommand?: boolean
+  // optional explicit tiprack id and well name to pickup from (if not provided, will automatically find next tip from tipRack URI)
+  tipSelectionArgs?: {
+    tipRackId: string
+    tipWell: string
+  }
 }
 
 /**
@@ -54,43 +60,58 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     nozzles,
     tipRack,
     isFromMixCommand = false,
+    tipSelectionArgs,
   } = args
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles
   const stateTiprack = prevRobotState.pipettes[pipette].tiprackId
-  if (tipRack == null) {
-    return {
-      errors: [errorCreators.noTipSelected()],
-    }
-  }
-  const { nextTiprack, tipracks } = getNextTiprack(
-    pipette,
-    tipRack,
-    invariantContext,
-    prevRobotState,
-    nozzles
-  )
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const channels = pipetteSpec?.channels
 
-  const excludedBy96Channel = tipracks?.excludedBy96Channel
-  const excludedByLid = tipracks?.excludedByLid
+  let nextTiprack: { tiprackId: string; well: string } | null = null
 
-  const is96ChannelTipracksAvailable =
-    nextTiprack == null && channels === 96 && excludedBy96Channel > 0
-  if (nozzles === ALL && is96ChannelTipracksAvailable) {
-    return {
-      errors: [errorCreators.missingAdapter()],
+  if (tipSelectionArgs == null) {
+    // automatic tip selection (legacy)
+    if (tipRack == null) {
+      return {
+        errors: [errorCreators.noTipSelected()],
+      }
     }
-  }
+    const nextTiprackResult = getNextTiprack(
+      pipette,
+      tipRack,
+      invariantContext,
+      prevRobotState,
+      nozzles
+    )
 
-  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
-    return {
-      errors: [errorCreators.removeAdapter()],
+    nextTiprack = nextTiprackResult.nextTiprack
+    const tipracks = nextTiprackResult.tipracks
+
+    const { excludedBy96Channel, excludedByLid } = tipracks ?? {}
+
+    const is96ChannelTipracksAvailable =
+      nextTiprack == null && channels === 96 && excludedBy96Channel > 0
+    if (nozzles === ALL && is96ChannelTipracksAvailable) {
+      return {
+        errors: [errorCreators.missingAdapter()],
+      }
     }
-  }
-  if (excludedByLid > 0 && nextTiprack == null) {
-    return {
-      errors: [errorCreators.nextTiprackHasLid()],
+
+    if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
+      return {
+        errors: [errorCreators.removeAdapter()],
+      }
+    }
+    if (excludedByLid > 0 && nextTiprack == null) {
+      return {
+        errors: [errorCreators.nextTiprackHasLid()],
+      }
+    }
+  } else {
+    // manual tip selection
+    nextTiprack = {
+      tiprackId: tipSelectionArgs.tipRackId,
+      well: tipSelectionArgs.tipWell,
     }
   }
 
@@ -181,14 +202,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  let primaryNozzle
-  if (nozzles === COLUMN) {
-    primaryNozzle = PRIMARY_NOZZLE
-  } else if (nozzles === SINGLE && channels === 96) {
-    primaryNozzle = 'H12'
-  } else if (nozzles === SINGLE && channels === 8) {
-    primaryNozzle = 'H1'
-  }
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels,
+  })
 
   const curryCommand = isFromMixCommand
     ? curryCommandCreator
@@ -210,6 +227,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         ]
       : []
 
+  const tipTrackingOption = tipSelectionArgs ? MANUAL : AUTOMATIC
+
   let commandCreators: CurriedCommandCreator[] = [
     curryCommand(dropTip, {
       pipette,
@@ -221,6 +240,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       labwareId: nextTiprack.tiprackId,
       wellName: nextTiprack.well,
       nozzles: args.nozzles,
+      tipTrackingOption,
     }),
   ]
   if (isWasteChute) {
@@ -236,6 +256,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,
         nozzles: args.nozzles,
+        tipTrackingOption,
       }),
     ]
   }
@@ -252,6 +273,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         labwareId: nextTiprack.tiprackId,
         wellName: nextTiprack.well,
         nozzles: args.nozzles,
+        tipTrackingOption,
       }),
     ]
   }

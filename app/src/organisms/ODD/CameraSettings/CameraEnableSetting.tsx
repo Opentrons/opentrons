@@ -4,8 +4,7 @@ import { ListButton, StyledText } from '@opentrons/components'
 
 import styles from './preferences.module.css'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 
 export interface CameraEnableSettingProps {
   isCameraEnabled: UseCameraUsageSettingsResult['isCameraEnabled']

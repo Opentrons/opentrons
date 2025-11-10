@@ -240,7 +240,7 @@ describe('update driver', () => {
   })
 
   it('checks updates when told to check updates', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(fakeProvider.refreshUpdateCache)
       .calledWith(expect.any(Function))
       .thenDo(
@@ -279,7 +279,7 @@ describe('update driver', () => {
       })
   })
   it('forwards in-progress downloads when no USB updates are present', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(fakeProvider.refreshUpdateCache)
       .calledWith(expect.any(Function))
       .thenDo(
@@ -363,7 +363,7 @@ describe('update driver', () => {
       })
   })
   it('creates a usb provider when it gets a message that a usb device was added', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -397,7 +397,7 @@ describe('update driver', () => {
       })
   })
   it('does not create a usb provider if it already has one for a path', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -485,7 +485,7 @@ describe('update driver', () => {
       })
   })
   it('tears down a usb provider when it is removed', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -528,7 +528,7 @@ describe('update driver', () => {
       })
   })
   it('re-adds a usb provider if it is inserted after being removed', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -582,7 +582,7 @@ describe('update driver', () => {
       })
   })
   it('prefers usb updates to web updates', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -658,7 +658,7 @@ describe('update driver', () => {
       })
   })
   it('selects the highest version usb update', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,

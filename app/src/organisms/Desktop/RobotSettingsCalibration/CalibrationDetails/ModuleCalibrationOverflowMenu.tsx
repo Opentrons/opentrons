@@ -22,7 +22,6 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -46,7 +45,7 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const {
     menuOverlay,

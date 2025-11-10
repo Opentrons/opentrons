@@ -36,6 +36,8 @@ import type { QuickTransferSummaryState } from '../types'
 
 const uuid: () => string = uuidv1
 
+const QUICK_TRANSFER_VERSION = '2.1.0'
+
 export function createQuickTransferFile(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration,
@@ -277,7 +279,7 @@ export function createQuickTransferPythonFile(
     description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
     source: 'Quick Transfer',
     //  see QuickTransferFlow/README.md for versioning details
-    version: '2.0.0',
+    version: QUICK_TRANSFER_VERSION,
     category: null,
     subcategory: null,
     tags: [],
@@ -285,7 +287,7 @@ export function createQuickTransferPythonFile(
 
   const designerApplication = {
     name: 'opentrons/quick-transfer',
-    version: '2.0.0',
+    version: QUICK_TRANSFER_VERSION,
     data: quickTransferState,
   }
   const stringifiedDesignerApplication = JSON.stringify(designerApplication)

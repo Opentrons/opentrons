@@ -33,7 +33,6 @@ import type {
   SetStateAction,
 } from 'react'
 import type { IconName } from '@opentrons/components'
-import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
 
 const STARTING_DECK_STATE = 'Starting deck'
@@ -132,6 +131,8 @@ export function ConnectedStepContainer(
   const onDeleteClickAction = (): void => {
     if (multiSelectItemIds) {
       dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
+      // todo(mm, 2025-10-31): Why are we doing deselectAllSteps here?
+      // deleteMultipleSteps already adjusts the selection when any of them are deleted.
       dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
     } else {
       console.warn(
@@ -146,13 +147,9 @@ export function ConnectedStepContainer(
     cancel: cancelMultiDelete,
   } = useConditionalConfirm(onDeleteClickAction, true)
 
-  const deleteStep = (stepId: StepIdType): void => {
-    dispatch(steplistActions.deleteStep(stepId))
-  }
-
   const handleDelete = (): void => {
     if (stepId != null) {
-      deleteStep(stepId)
+      dispatch(steplistActions.deleteMultipleSteps([stepId]))
     } else {
       console.warn(
         'something went wrong, cannot delete a step without a step id'

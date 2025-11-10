@@ -15,7 +15,7 @@ export interface UseCameraUsageSettingsResult {
   toggleRecoveryCaptureEnabled: () => void
 }
 
-// general camera usage settings.
+// general camera usage settings. inteded for out of run setup use only.
 export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
   const { data: cameraData } = useCamera({
     refetchInterval: CAMERA_POLLING_INTERVAL_MS,

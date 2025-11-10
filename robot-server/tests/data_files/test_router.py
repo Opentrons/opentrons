@@ -940,6 +940,7 @@ async def test_get_data_files_by_run_id(
 
         for response_file, expected_file in zip(result.content.data, all_files):
             assert response_file.id == expected_file.id
+            assert response_file.filename == expected_file.name
             assert response_file.stored == expected_file.stored
             assert response_file.generated == expected_file.generated
             assert response_file.mimeType == expected_file.mime_type

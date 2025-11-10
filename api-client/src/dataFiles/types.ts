@@ -17,6 +17,7 @@ export interface CsvFileData {
 
 export interface ImageFileData {
   id: string
+  filename: string
   createdAt: string
   cameraId: string
   commandId?: string
@@ -38,6 +39,7 @@ export interface ImageFilesDataResponse {
 }
 export interface RunDataFileMetadata {
   id: string
+  filename: string
   stored: boolean
   generated: boolean
   mimeType: MimeType

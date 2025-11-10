@@ -32,16 +32,16 @@ function buildCaptureImageCmdText(
       })
     )
   }
-  if (zoom) {
+  if (zoom !== undefined) {
     options.push(t('capture_image_zoom', { zoom }))
   }
-  if (contrast) {
+  if (contrast !== undefined) {
     options.push(t('capture_image_contrast', { contrast }))
   }
-  if (brightness) {
+  if (brightness !== undefined) {
     options.push(t('capture_image_brightness', { brightness }))
   }
-  if (saturation) {
+  if (saturation !== undefined) {
     options.push(t('capture_image_saturation', { saturation }))
   }
   if (options.length === 0) {

@@ -21,6 +21,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean
   isRobotOnWrongVersionOfSoftware: boolean
   isClosingCurrentRun: boolean
+  isCameraReadyToRun: boolean
 }
 
 type UseActionButtonDisabledUtilsResult =
@@ -98,10 +99,13 @@ function useDisabledReason({
   runStatus,
   isResetRunLoading,
   isClosingCurrentRun,
+  isCameraReadyToRun,
 }: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
 
-  if (
+  if (!isCameraReadyToRun) {
+    return t('enable_camera')
+  } else if (
     isCurrentRun &&
     (!isSetupComplete || isFixtureMismatch) &&
     !isValidRunAgain

@@ -7,10 +7,6 @@
     "title": "Disable module placement restrictions",
     "description": "Turn off all restrictions on module placement and related pipette crash guidance."
   },
-  "OT_PD_ALLOW_ALL_TIPRACKS": {
-    "title": "Allow all tip rack options",
-    "description": "Enable selection of all tip racks for each pipette."
-  },
   "OT_PD_ENABLE_COMMENT": {
     "title": "Enable comment step",
     "description": "You can add comments anywhere between timeline steps."
@@ -62,9 +58,5 @@
   "OT_PD_ENABLE_TIP_SELCTION": {
     "title": "Enable tip selection",
     "description": "Enables the ability to select tips manually"
-  },
-  "OT_PD_ENABLE_CAMERA_SUPPORT": {
-    "title": "Enable camera support",
-    "description": "Enables developmental camera support"
   }
 }

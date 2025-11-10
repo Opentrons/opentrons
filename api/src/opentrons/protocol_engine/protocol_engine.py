@@ -599,6 +599,7 @@ class ProtocolEngine:
 
         try:
             await camera.update_live_stream_status(
+                self.state_view.config.robot_type,
                 False,
                 self._camera_provider,
                 self.state_view.camera.get_enablement_settings(),

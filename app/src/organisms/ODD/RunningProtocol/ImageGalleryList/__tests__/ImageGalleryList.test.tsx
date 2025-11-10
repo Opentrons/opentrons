@@ -8,6 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { GalleryListItem } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem'
 import { ProtocolPlayPauseHeader } from '/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader'
+import { useFeatureFlag } from '/app/redux/config'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryList } from '..'
@@ -17,6 +18,7 @@ import type { ImageGalleryListProps } from '..'
 vi.mock('/app/resources/dataFiles/useImageInfo')
 vi.mock('/app/organisms/ODD/RunningProtocol/ImageGalleryList/GalleryListItem')
 vi.mock('/app/organisms/ODD/RunningProtocol/shared/ProtocolPlayPauseHeader')
+vi.mock('/app/redux/config')
 
 const render = (props: ImageGalleryListProps) => {
   return renderWithProviders(<ImageGalleryList {...props} />, {
@@ -36,12 +38,14 @@ const mockImagesInfo = {
       stepCommandId: 'commandId1',
       previousStepCommandId: 'previouscommandId1',
       timestamp: '2024-01-01 10:00:00',
+      filename: 'test-name',
     },
     {
       imageId: 'imageId2',
       stepCommandId: 'commandId2',
       previousStepCommandId: 'previouscommandId2',
       timestamp: '2024-01-01 11:00:00',
+      filename: 'test-name-2',
     },
   ],
   protocolAnalysis: mockProtocolAnalysis,
@@ -65,12 +69,13 @@ describe('ImageGalleryList', () => {
     }
 
     vi.mocked(useImageInfo).mockReturnValue(mockImagesInfo)
-    vi.mocked(GalleryListItem).mockImplementation(({ timestamp }) => (
-      <div>MOCK_GALLERY_LIST_ITEM_{timestamp}</div>
+    vi.mocked(GalleryListItem).mockImplementation(({ item }) => (
+      <div>MOCK_GALLERY_LIST_ITEM_{item.timestamp}</div>
     ))
     vi.mocked(ProtocolPlayPauseHeader).mockImplementation(() => (
       <div>MOCK_PROTOCOL_PLAY_PAUSE_HEADER</div>
     ))
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
   })
 
   it('renders ProtocolPlayPauseHeader with correct props', () => {
@@ -119,5 +124,12 @@ describe('ImageGalleryList', () => {
 
     const captureButton = screen.getByText('Image capture')
     await user.click(captureButton)
+  })
+
+  it('renders no images copy when no images are present', () => {
+    vi.mocked(useImageInfo).mockReturnValue({ items: [] } as any)
+    render(mockProps)
+
+    screen.getByText('No images available')
   })
 })

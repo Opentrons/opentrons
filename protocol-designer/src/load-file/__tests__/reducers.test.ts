@@ -20,7 +20,6 @@ describe('unsavedChanges', () => {
       'REMOVE_WELLS_CONTENTS',
       'SET_WELL_CONTENTS',
       'ADD_STEP',
-      'DELETE_STEP',
       'DELETE_MULTIPLE_STEPS',
       'REORDER_STEPS',
       'REORDER_SELECTED_STEP',

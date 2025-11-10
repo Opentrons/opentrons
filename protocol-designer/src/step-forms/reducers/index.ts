@@ -82,7 +82,6 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteMultipleStepsAction,
-  DeleteStepAction,
   FormPatch,
   PopulateFormAction,
   ReorderStepsAction,
@@ -129,7 +128,6 @@ export type UnsavedFormActions =
   | PopulateFormAction
   | CancelStepFormAction
   | SaveStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | CreateModuleAction
   | DeleteModuleAction
@@ -195,7 +193,6 @@ export const unsavedForm = (
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'CREATE_DECK_FIXTURE':
     case 'DELETE_DECK_FIXTURE':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
@@ -259,7 +256,6 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 export type SavedStepFormsActions =
   | SaveStepFormAction
   | SaveStepFormsMultiAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | LoadFileAction
   | CreateContainerAction
@@ -362,10 +358,6 @@ export const savedStepForms = (
         }),
         { ...savedStepForms }
       )
-    }
-
-    case 'DELETE_STEP': {
-      return omit(savedStepForms, action.payload)
     }
 
     case 'DELETE_MULTIPLE_STEPS': {
@@ -1588,8 +1580,6 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
 
       return state
     },
-    DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
-      state.filter(stepId => stepId !== action.payload),
     DELETE_MULTIPLE_STEPS: (
       state: OrderedStepIdsState,
       action: DeleteMultipleStepsAction
@@ -1669,7 +1659,6 @@ export type PresavedStepFormState = {
 export type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | SaveStepFormAction
   | SelectTerminalItemAction
@@ -1689,7 +1678,6 @@ export const presavedStepForm = (
       return action.payload === PRESAVED_STEP_ID ? state : null
 
     case 'CANCEL_STEP_FORM':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':

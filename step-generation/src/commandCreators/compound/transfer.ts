@@ -589,20 +589,31 @@ export const transfer: CommandCreator<TransferArgs> = (
                 }),
               ]
             : []
-
-          const tipCommands = changeTipNow
-            ? [
-                curryCommandCreator(replaceTip, {
-                  pipette,
-                  dropTipLocation:
-                    isReturnTip && fallBackTrashLikeId != null
-                      ? fallBackTrashLikeId
-                      : dropTipLocation,
-                  tipRack,
-                  ...(nozzles != null ? { nozzles } : {}),
-                }),
-              ]
-            : []
+          let tipCommands: CurriedCommandCreator[] = []
+          if (changeTipNow) {
+            const nextTip = targetTips?.shift()
+            tipCommands = [
+              curryCommandCreator(replaceTip, {
+                pipette,
+                dropTipLocation:
+                  isReturnTip && fallBackTrashLikeId != null
+                    ? fallBackTrashLikeId
+                    : dropTipLocation,
+                tipRack,
+                ...(nozzles != null ? { nozzles } : {}),
+                ...(tipTracking === MANUAL &&
+                nextTip != null &&
+                tiprackSelected != null
+                  ? {
+                      tipSelectionArgs: {
+                        tipRackId: tiprackSelected,
+                        tipWell: nextTip,
+                      },
+                    }
+                  : {}),
+              }),
+            ]
+          }
 
           const aspirateWellDepth =
             labwareEntities[sourceLabware]?.def.wells[sourceWell]?.depth ?? null

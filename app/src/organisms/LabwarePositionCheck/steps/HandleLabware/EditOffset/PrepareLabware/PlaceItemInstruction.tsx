@@ -28,8 +28,6 @@ import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
   LabwareStackupDetail,
-  LPCWizardState,
-  OffsetLocationDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
@@ -41,16 +39,13 @@ export function PlaceItemInstruction(
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
   const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
+    (state: State) => state.protocolRuns[runId]?.lpc!
   )
   const isActivePipette96ch =
     useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(runId)
-  ) as SelectedLwOverview
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))!
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
   const isDefaultOffset = offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
 
   const buildHeader = (): string =>
@@ -144,7 +139,7 @@ function ClearDeckCopy({
   const { t } = useTranslation('labware_position_check')
 
   const { kind: offsetKind, closestBeneathModuleModel } =
-    labwareInfo.offsetLocationDetails as OffsetLocationDetails
+    labwareInfo.offsetLocationDetails!
 
   return offsetKind === OFFSET_KIND_DEFAULT ||
     closestBeneathModuleModel == null ? (

@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
+import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -53,6 +54,7 @@ export function ProtocolRunHeader(
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
@@ -90,6 +92,7 @@ export function ProtocolRunHeader(
     isResetRunLoadingRef.current = false
   }
 
+  useInitializeCameraState(runId)
   useRunAnalytics({ runId, robotName, enteredER })
   const outputFileIds = useRunGeneratedDataFiles(runId)
 
@@ -115,6 +118,7 @@ export function ProtocolRunHeader(
           {...props}
         />
         <RunHeaderContent
+          runRecord={runRecord ?? null}
           runStatus={runStatus}
           isResetRunLoadingRef={isResetRunLoadingRef}
           attachedModules={attachedModules}

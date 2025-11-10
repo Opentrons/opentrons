@@ -3,24 +3,37 @@ import Hls from 'hls.js'
 
 import { useHost } from '@opentrons/react-api-client'
 
+import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
+
 import type { RefObject } from 'react'
+import type { RunStatus } from '@opentrons/api-client'
 
 // TODO(jh, 09-05-25): /GET this from the /stream endpoint eventually.
 const STREAM_URL = (robotIp: string): string =>
   `http://${robotIp}:31950/hls/stream.m3u8`
+
+const RETRY_DELAY_MS = 3000
 
 export interface UseHlsVideoResult {
   videoRef: RefObject<HTMLVideoElement>
   videoError: string | null
 }
 
-// Sets up and manages an HLS video stream player that receives
-// camera stream URLs from the main Electron process and displays them.
-export function useHlsVideo(): UseHlsVideoResult {
+export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
   const host = useHost()
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const retryCountRef = useRef(0)
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const setupHls = useRef<() => void>()
+
+  useEffect(() => {
+    if (error) {
+      console.error(error)
+    }
+  }, [error])
 
   useEffect(() => {
     if (videoRef.current == null || host == null) {
@@ -29,7 +42,12 @@ export function useHlsVideo(): UseHlsVideoResult {
 
     const video = videoRef.current
 
-    if (Hls.isSupported()) {
+    setupHls.current = () => {
+      if (!Hls.isSupported()) {
+        setError('HLS streaming not supported in this browser.')
+        return
+      }
+
       if (hlsRef.current) {
         hlsRef.current.destroy()
       }
@@ -54,28 +72,25 @@ export function useHlsVideo(): UseHlsVideoResult {
       hls.attachMedia(video)
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        retryCountRef.current = 0
+        setError(null)
         video.play().catch(e => {
           console.error('Auto-play failed:', e)
           setError('Auto-play failed. Please close and reopen the stream.')
         })
       })
 
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error('HLS error:', event, data)
-        if (data.fatal) {
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              setError(
-                `Network error: Cannot connect to ${STREAM_URL(host.hostname)}`
-              )
-              break
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              setError('Media error in stream')
-              break
-            default:
-              setError('Fatal error loading stream')
-              break
-          }
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        // `fatal` prevents refetching over-aggressively, ex, when the buffer is temporarily depleted.
+        if (data.fatal && !isTerminalRunStatus(runStatus)) {
+          retryCountRef.current++
+          setError(
+            `Service unavailable. Retrying (${retryCountRef.current})...`
+          )
+
+          retryTimeoutRef.current = setTimeout(() => {
+            setupHls.current?.()
+          }, RETRY_DELAY_MS)
         }
       })
 
@@ -84,18 +99,23 @@ export function useHlsVideo(): UseHlsVideoResult {
       }
 
       video.addEventListener('error', handleVideoError)
-
-      return () => {
-        video.removeEventListener('error', handleVideoError)
-        if (hlsRef.current) {
-          hlsRef.current.destroy()
-          hlsRef.current = null
-        }
-      }
-    } else {
-      setError('HLS streaming not supported in this browser.')
     }
-  }, [host])
+
+    setupHls.current()
+
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
+
+      if (hlsRef.current) {
+        hlsRef.current.destroy()
+        hlsRef.current = null
+      }
+
+      retryCountRef.current = 0
+    }
+  }, [host, runStatus])
 
   return { videoRef, videoError: error }
 }

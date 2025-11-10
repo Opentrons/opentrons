@@ -346,6 +346,9 @@ export interface LabwareDefinition3 {
 // I'm pretty sure nothing in the frontend needs to deal with it anymore.
 export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
 
+export interface LabwareDefinitionsByURI {
+  [defURI: string]: LabwareDefinition
+}
 export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }

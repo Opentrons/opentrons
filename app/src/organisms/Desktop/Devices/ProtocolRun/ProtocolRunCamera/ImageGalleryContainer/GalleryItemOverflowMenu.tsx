@@ -1,5 +1,5 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
 
 import {
   MenuItem,
@@ -7,26 +7,35 @@ import {
   useMenuHandleClickOutside,
 } from '@opentrons/components'
 
+import { GalleryItemErrorModal } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemErrorModal'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
+
 import styles from './gallery.module.css'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
+
 export interface GalleryItemOverflowMenuProps {
+  runId: string
+  currentCommand: RunTimeCommand | null
   imagePath: string | null
-  commandStep: number | null
-  imageTimestamp: string
-  runTimestamp: string
+  imageFilename: string
   robotName: string
-  protocolName: string
 }
 
 export function GalleryItemOverflowMenu({
+  runId,
+  currentCommand,
   imagePath,
-  commandStep,
-  imageTimestamp,
-  runTimestamp,
+  imageFilename,
   robotName,
-  protocolName,
 }: GalleryItemOverflowMenuProps): JSX.Element {
   const { t } = useTranslation('run_details')
+
+  const [showErrorModal, setShowErrorModal] = useState(false)
   const {
     menuOverlay,
     handleOverflowClick,
@@ -34,21 +43,29 @@ export function GalleryItemOverflowMenu({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
+  const isErroredCommand = currentCommand?.error != null
+  const robotType = useRobotType(robotName)
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType,
+  })
+
   const onDownloadImage = (): void => {
     setShowOverflowMenu(false)
     const a = document.createElement('a')
-    a.download = buildFileName()
+    a.download = imageFilename
     a.href = imagePath ?? ''
     a.click()
-
+    reportPhotoAccessUsage({
+      action: 'download',
+    })
     a.remove()
   }
 
-  const formattedRunTs = format(new Date(runTimestamp), 'M/d/yy_HH:mm:ss')
-  const formattedImgTs = format(new Date(imageTimestamp), 'M/d/yy_HH:mm:ss')
-
-  const buildFileName = (): string =>
-    `${robotName}_${protocolName}_${formattedRunTs}_${commandStep}_${formattedImgTs}.jpeg`
+  const toggleErrorModal = (): void => {
+    setShowOverflowMenu(false)
+    setShowErrorModal(!showErrorModal)
+  }
 
   return (
     <div className={styles.overflow_container}>
@@ -56,9 +73,22 @@ export function GalleryItemOverflowMenu({
       {showOverflowMenu && (
         <div className={styles.overflow_menu_container}>
           <MenuItem onClick={onDownloadImage}>{t('download_image')}</MenuItem>
+          {isErroredCommand && (
+            <MenuItem onClick={toggleErrorModal}>
+              {t('view_error_details')}
+            </MenuItem>
+          )}
         </div>
       )}
       {menuOverlay}
+      {isErroredCommand && showErrorModal && (
+        <GalleryItemErrorModal
+          erroredCommand={currentCommand}
+          runId={runId}
+          robotName={robotName}
+          toggleModal={toggleErrorModal}
+        />
+      )}
     </div>
   )
 }

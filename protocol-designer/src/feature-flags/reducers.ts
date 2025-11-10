@@ -26,8 +26,6 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: _FF_ENV_VARS_.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     _FF_ENV_VARS_.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
-  OT_PD_ALLOW_ALL_TIPRACKS:
-    _FF_ENV_VARS_.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
   OT_PD_ENABLE_COMMENT: _FF_ENV_VARS_.OT_PD_ENABLE_COMMENT === '1' || false,
   OT_PD_ENABLE_HOT_KEYS_DISPLAY:
     _FF_ENV_VARS_.OT_PD_ENABLE_HOT_KEYS_DISPLAY === '1' || true,
@@ -48,8 +46,6 @@ const initialFlags: Flags = {
     _FF_ENV_VARS_.OT_PD_ENABLE_BY_VOLUME_BUILDER === '1' || false,
   OT_PD_ENABLE_TIP_SELCTION:
     _FF_ENV_VARS_.OT_PD_ENABLE_TIP_SELCTION === '1' || false,
-  OT_PD_ENABLE_CAMERA_SUPPORT:
-    _FF_ENV_VARS_.OT_PD_ENABLE_CAMERA_SUPPORT === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

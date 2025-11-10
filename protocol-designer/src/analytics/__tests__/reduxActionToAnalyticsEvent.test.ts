@@ -95,17 +95,6 @@ describe('reduxActionToAnalyticsEvent', () => {
       properties: { stepDetails: 'mockStepDetails', stepName: 'mockStepName' },
     })
   })
-  it('should render event for SET_FEATURE_FLAGS', () => {
-    const action = {
-      type: 'SET_FEATURE_FLAGS',
-      payload: { OT_PD_ALLOW_ALL_TIPRACKS: true },
-    }
-    const result = reduxActionToAnalyticsEvent(fooState, action)
-    expect(result).toEqual({
-      name: 'allowAllTipracks',
-      properties: {},
-    })
-  })
   it('should render event for CREATE_PIPETTES', () => {
     const action = {
       type: 'CREATE_PIPETTES',

@@ -24,8 +24,8 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { useRobot } from '/app/redux-resources/robots'
-import { getDevtoolsEnabled, useFeatureFlag } from '/app/redux/config'
+import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import { getDevtoolsEnabled } from '/app/redux/config'
 import {
   CONNECTABLE,
   OPENTRONS_USB,
@@ -34,6 +34,7 @@ import {
 } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellRequestor } from '/app/redux/shell/remote'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
 
@@ -43,11 +44,16 @@ export function RobotSettings(): JSX.Element | null {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
+  const robotType = useRobotType(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
-  const isCameraEnabled = useFeatureFlag('camera')
+  const doesRunExist = useCurrentRunId() != null
+
+  if (!showRobotBusyBanner && doesRunExist) {
+    setShowRobotBusyBanner(true)
+  }
 
   const updateRobotStatus = (isRobotBusy: boolean): void => {
     if (isRobotBusy) setShowRobotBusyBanner(true)
@@ -68,7 +74,7 @@ export function RobotSettings(): JSX.Element | null {
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    camera: <RobotSettingsCamera />,
+    camera: <RobotSettingsCamera robotType={robotType} />,
     advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}
@@ -137,13 +143,11 @@ export function RobotSettings(): JSX.Element | null {
             tabName={t('networking')}
             disabled={isNetworkingDisabled}
           />
-          {isCameraEnabled ? (
-            <RoundTab
-              to={`/devices/${robotName}/robot-settings/camera`}
-              tabName={t('camera')}
-              disabled={false}
-            />
-          ) : null}
+          <RoundTab
+            to={`/devices/${robotName}/robot-settings/camera`}
+            tabName={t('camera')}
+            disabled={false}
+          />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/advanced`}
             tabName={t('advanced')}

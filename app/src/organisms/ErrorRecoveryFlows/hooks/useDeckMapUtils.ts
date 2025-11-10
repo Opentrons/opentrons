@@ -23,7 +23,7 @@ import type {
   CutoutConfigProtocolSpec,
   DeckDefinition,
   LabwareDefinition,
-  LabwareDefinitionsByUri,
+  LabwareDefinitionsByURI,
   LabwareLocation,
   LoadedLabware,
   LoadedModule,
@@ -415,7 +415,7 @@ export function getRunCurrentLabwareInfo({
 
 const getLabwareDefinition = (
   labware: LoadedLabware,
-  protocolLabwareDefinitionsByUri: LabwareDefinitionsByUri
+  protocolLabwareDefinitionsByUri: LabwareDefinitionsByURI
 ): LabwareDefinition => {
   if (labware.id === 'fixedTrash') {
     return getFixedTrashLabwareDefinition()

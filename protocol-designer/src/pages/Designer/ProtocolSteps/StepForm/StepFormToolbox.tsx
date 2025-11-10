@@ -39,6 +39,7 @@ import {
   getRobotType,
 } from '/protocol-designer/file-data/selectors'
 import { stepIconsByType } from '/protocol-designer/form-types'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   getAdditionalEquipmentEntities,
   getCurrentFormIsPresaved,
@@ -59,6 +60,7 @@ import {
 import { useAbsorbanceReaderCommandType } from './hooks'
 import {
   AbsorbanceReaderTools,
+  CameraTools,
   CommentTools,
   HeaterShakerTools,
   MagnetTools,
@@ -103,6 +105,7 @@ const STEP_FORM_MAP: StepFormMap = {
   thermocycler: ThermocyclerTools,
   heaterShaker: HeaterShakerTools,
   comment: CommentTools,
+  camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
 }
 
@@ -155,10 +158,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
 
-  const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
+  const { pipetteEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
   const formWarningsForSelectedStep = useSelector(
     getFormWarningsForSelectedStep
   )
@@ -309,8 +313,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       propsForFields,
       rawForm: formData,
       pipetteEntities,
-      labwareEntities,
       additionalEquipmentEntities,
+      allLabwareDefs,
       robotType,
     })
     setToolboxStep(currentStep => currentStep + strideForContinueOrBack)

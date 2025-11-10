@@ -22,16 +22,16 @@ import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-fla
 import { getOrderedSavedForms } from '/protocol-designer/step-forms/selectors'
 import * as steplistActions from '/protocol-designer/steplist/actions'
 import {
+  computeStepMove,
+  convertStepArrayToHierarchy,
+  convertStepHierarchyToArray,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
+import {
   getMultiSelectItemIds,
   getSelectedStepId,
 } from '/protocol-designer/ui/steps/selectors'
 
 import { ConnectedStepInfo } from './ConnectedStepInfo'
-import {
-  computeStepMove,
-  convertStepArrayToHierarchy,
-  convertStepHierarchyToArray,
-} from './stepHierarchyUtils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'

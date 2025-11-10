@@ -29,7 +29,6 @@ import type {
   NormalizedPipetteById,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { SetFeatureFlagAction } from '../feature-flags/actions'
 import type { FormData, StepIdType, StepType } from '../form-types'
 import type { RenameStepAction } from '../labware-ingred/actions'
 import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
@@ -402,15 +401,6 @@ export const reduxActionToAnalyticsEvent = (
     }
   }
 
-  if (action.type === 'SET_FEATURE_FLAGS') {
-    const a: SetFeatureFlagAction = action
-    if (a.payload.OT_PD_ALLOW_ALL_TIPRACKS === true) {
-      return {
-        name: 'allowAllTipracks',
-        properties: {},
-      }
-    }
-  }
   if (action.type === 'CREATE_PIPETTES') {
     const a: CreatePipettesAction = action
 

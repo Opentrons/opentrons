@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Chip,
   Divider,
@@ -17,13 +16,17 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
 import systemCameraOT2 from '/app/assets/images/system_camera_ot2.png'
+import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
-import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
-
-const RUN_REFETCH_INTERVAL_MS = 5000
 
 export interface CameraCardProps {
   isFlex: boolean
@@ -45,14 +48,8 @@ export function CameraCard({
   }
 
   const runId = useCurrentRunId()
-  const run = useNotifyRunQuery(runId, {
-    refetchInterval: RUN_REFETCH_INTERVAL_MS,
-  })
-
-  // TODO (jh, 09-26-25): This disabled check will eventually be replaced with
-  //  "have settings been confirmed during run setup" logic.
+  const robotType = useRobotType(robotName)
   const doesRunExist = runId != null
-  const isRunIdle = run?.data?.data.status === RUN_STATUS_IDLE
 
   const cardOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -60,12 +57,29 @@ export function CameraCard({
     },
   })
 
-  const { isCameraEnabled, toggleCameraEnabled } = useCameraUsageSettings()
+  const {
+    isCameraEnabled,
+    toggleCameraEnabled,
+    isLiveVideoEnabled,
+    isRecoveryCaptureEnabled,
+  } = useCameraUsageSettings()
 
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
 
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_ROBOT_SETTINGS,
+    robotType,
+  })
+  const handleToggleCamera = (): void => {
+    toggleCameraEnabled()
+    reportCameraEnablementSettings({
+      cameraEnabled: !isCameraEnabled,
+      liveFeedEnabled: isLiveVideoEnabled,
+      recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+    })
+  }
   const navigateToUsageSettings = (): void => {
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
@@ -99,7 +113,7 @@ export function CameraCard({
         <OverflowBtn
           aria-label="overflow"
           onClick={handleOverflowClick}
-          disabled={doesRunExist && !isRunIdle}
+          disabled={doesRunExist}
         />
       </div>
       {showOverflowMenu && (
@@ -111,7 +125,7 @@ export function CameraCard({
         >
           <CameraCardOverflowMenu
             cameraEnabled={isCameraEnabled}
-            toggleCameraEnabled={toggleCameraEnabled}
+            handleToggleCamera={handleToggleCamera}
             toggleControls={toggleControls}
             navigateToUsageSettings={navigateToUsageSettings}
           />
@@ -128,24 +142,27 @@ export function CameraCard({
 
 function CameraCardOverflowMenu({
   cameraEnabled,
-  toggleCameraEnabled,
+  handleToggleCamera,
   toggleControls,
   navigateToUsageSettings,
 }: {
   cameraEnabled: boolean
-  toggleCameraEnabled: () => void
+  handleToggleCamera: () => void
   toggleControls: () => void
   navigateToUsageSettings: () => void
 }): JSX.Element {
   const { t } = useTranslation('device_details')
+  const cameraControlsEnabled = useFeatureFlag('camera')
 
   return (
     <div className={styles.card_overflow_menu_container}>
       <div className={styles.card_overflow_menu_content_container}>
-        <MenuItem onClick={toggleCameraEnabled}>
+        <MenuItem onClick={handleToggleCamera}>
           {cameraEnabled ? t('disable_camera') : t('enable_camera')}
         </MenuItem>
-        <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
+        {cameraControlsEnabled && (
+          <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
+        )}
         <Divider />
         <MenuItem onClick={navigateToUsageSettings}>
           {t('usage_settings')}

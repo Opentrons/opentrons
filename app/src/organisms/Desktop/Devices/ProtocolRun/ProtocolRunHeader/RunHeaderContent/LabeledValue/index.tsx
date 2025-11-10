@@ -1,10 +1,6 @@
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
+
+import styles from './labeledvalue.module.css'
 
 import type { ReactNode } from 'react'
 
@@ -15,8 +11,8 @@ interface LabeledValueProps {
 
 export function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6" color={COLORS.grey60}>
+    <div className={styles.container}>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {props.label}
       </StyledText>
       {typeof props.value === 'string' ? (
@@ -24,6 +20,6 @@ export function LabeledValue(props: LabeledValueProps): JSX.Element {
       ) : (
         props.value
       )}
-    </Flex>
+    </div>
   )
 }

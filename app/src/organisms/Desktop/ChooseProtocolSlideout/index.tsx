@@ -135,7 +135,8 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
     )
-  }, [selectedProtocol])
+  }, [selectedProtocol?.protocolKey])
+
   useEffect(() => {
     setHasParamError(errors.length > 0)
     setHasMissingFileParam(

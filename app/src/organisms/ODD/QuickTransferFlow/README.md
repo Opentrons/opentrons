@@ -189,3 +189,7 @@ commands
 Note that the `designerApplicationData` is not included in the generated Python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
 
 You can still generate JSON behind a feature flag.
+
+## Version 2.1.0
+
+Introduction of return tip in robot stack v8.8.0, mirroring return tip support introducted in Protocol Designer 8.6.0: Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing.

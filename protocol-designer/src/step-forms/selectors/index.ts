@@ -17,6 +17,8 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
+import { convertStepArrayToHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -48,6 +50,7 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
   HydratedFormData,
@@ -448,10 +451,13 @@ export const getStepGroups: Selector<
 
 export const getUnsavedForm: Selector<BaseState, FormData | null | undefined> =
   createSelector(rootSelector, state => state.unsavedForm)
+
 export const getOrderedStepIds: Selector<BaseState, StepIdType[]> =
   createSelector(rootSelector, state => state.orderedStepIds)
+
 export const getSavedStepForms: Selector<BaseState, SavedStepFormState> =
   createSelector(rootSelector, state => state.savedStepForms)
+
 export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
   createSelector(
     getOrderedStepIds,
@@ -462,6 +468,19 @@ export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
         .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
     }
   )
+
+export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
+  createSelector(
+    getOrderedSavedForms,
+    featureFlagSelectors.getEnableConcurrentModuleActions,
+    (orderedSavedForms, enableConcurrentModuleActions) => {
+      return convertStepArrayToHierarchy(
+        orderedSavedForms,
+        enableConcurrentModuleActions
+      )
+    }
+  )
+
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
     getUnsavedForm,
@@ -573,15 +592,13 @@ export const getInvariantContext: Selector<BaseState, InvariantContext> =
     getLiquidEntities,
     getAdditionalEquipmentEntities,
     featureFlagSelectors.getDisableModuleRestrictions,
-    featureFlagSelectors.getAllowAllTipracks,
     (
       labwareEntities,
       moduleEntities,
       pipetteEntities,
       liquidEntities,
       additionalEquipmentEntities,
-      disableModuleRestrictions,
-      allowAllTipracks
+      disableModuleRestrictions
     ) => {
       const stagingAreaEntities = Object.values(
         additionalEquipmentEntities
@@ -648,7 +665,6 @@ export const getInvariantContext: Selector<BaseState, InvariantContext> =
         stagingAreaEntities,
         gripperEntities,
         config: {
-          OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
           OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
         },
       }
@@ -660,11 +676,14 @@ export const getHydratedUnsavedForm: Selector<
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, invariantContext) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, invariantContext, allLabwareDefs) => {
     if (unsavedForm == null) return null
-
-    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      invariantContext,
+      allLabwareDefs
+    )
     return hydratedForm ?? null
   }
 )
@@ -718,12 +737,16 @@ export const getArgsAndErrorsByStepId: Selector<
 > = createSelector(
   getOrderedSavedForms,
   getInvariantContext,
-  (stepForms, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (stepForms, contextualState, allLabwareDefs) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
-        const hydratedForm = getHydratedForm(stepForm, contextualState)
-
+        const hydratedForm = getHydratedForm(
+          stepForm,
+          contextualState,
+          allLabwareDefs
+        )
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
@@ -774,11 +797,14 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, contextualState, allLabwareDefs) => {
     if (!unsavedForm) return []
-
-    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      contextualState,
+      allLabwareDefs
+    )
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
@@ -788,12 +814,15 @@ export const getFormLevelWarningsPerStep: Selector<
 > = createSelector(
   getSavedStepForms,
   getInvariantContext,
-  (forms, contextualState) =>
+  labwareDefSelectors.getLabwareDefsByURI,
+  (forms, contextualState, allLabwareDefs) =>
     mapValues(forms, (form, stepId) => {
       if (!form) return []
-
-      const hydratedForm = getHydratedForm(form, contextualState)
-
+      const hydratedForm = getHydratedForm(
+        form,
+        contextualState,
+        allLabwareDefs
+      )
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )

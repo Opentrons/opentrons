@@ -300,6 +300,7 @@ export const selectAllSteps =
   }
 export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
   'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
+// todo(mm, 2025-10-31): "deselectAllSteps" is a bit of a misnomer, since this also selects a step.
 export const deselectAllSteps =
   (
     meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS

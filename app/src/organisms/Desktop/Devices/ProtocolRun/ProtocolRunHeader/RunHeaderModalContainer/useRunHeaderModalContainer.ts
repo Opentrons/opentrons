@@ -1,11 +1,14 @@
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
@@ -16,6 +19,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import {
+  getCameraUsageState,
   OFFSETS_CONFLICT,
   selectAreOffsetsApplied,
   selectOffsetSource,
@@ -38,6 +42,7 @@ import {
 import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
 import type { RunControls } from '/app/organisms/RunTimeControl'
+import type { State } from '/app/redux/types'
 import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type {
@@ -96,14 +101,31 @@ export function useRunHeaderModalContainer({
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
   const isThisRunCurrent = runId === useCurrentRunId()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
+  const { mutateAsync: addCameraSettingsToRun } =
+    useAddCameraSettingsToRunMutation()
+  const runCameraSettings = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
 
   function proceedToRun(): void {
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    reportCameraEnablementSettings({
+      cameraEnabled: enabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
+
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -116,12 +138,31 @@ export function useRunHeaderModalContainer({
     protocolRunControls.play()
   }
 
-  function handleProceedToRunClick(): Promise<void> {
+  const handlePlay = (): Promise<void> => {
     if (robotType === FLEX_ROBOT_TYPE && !flexOffsetsApplied) {
       return applyOffsets().then(proceedToRun)
     } else {
       proceedToRun()
       return Promise.resolve()
+    }
+  }
+
+  function handleProceedToRunClick(): Promise<void> {
+    // Camera settings do not require explicit confirmation by *any* user,
+    // so if the settings haven't been confirmed, use this user's settings
+    // before starting the run.
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    if (!areCameraPreferencesConfirmed) {
+      return addCameraSettingsToRun({
+        runId,
+        settings: {
+          liveStreamEnabled,
+          cameraEnabled: enabled,
+          errorRecoveryCameraEnabled: recoveryEnabled,
+        },
+      }).then(() => handlePlay())
+    } else {
+      return handlePlay()
     }
   }
 

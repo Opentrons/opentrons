@@ -34,8 +34,8 @@ import {
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
 import { canPipetteUseLabware, getMaxConditioningVolume } from '../../utils'
-import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
+import { getWellRatio } from '../utils/getWellRatio'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
@@ -774,7 +774,8 @@ export const volumeTooHigh = (
   }
   const volume = Number(fields.volume)
 
-  const pipetteCapacity = getPipetteCapacity(pipette, tipRack)
+  // TODO: change getPipetteCapacity() to use tipRack definition directly
+  const pipetteCapacity = getPipetteCapacity(pipette, tipRack?.tiprackDefURI)
   if (
     !Number.isNaN(volume) &&
     !Number.isNaN(pipetteCapacity) &&
@@ -1429,8 +1430,7 @@ export const conditioningVolumeOutOfRange = (
     disposalVolume:
       disposalVolume_checkbox === true ? Number(disposalVolume_volume) : 0,
     pipetteSpecs: pipette.spec,
-    labwareEntities: labwareEntities ?? {},
-    tiprackDefUri: tipRack,
+    tiprackDef: tipRack,
   })
   return conditioning_checkbox && conditioning_volume > maxConditioningVolume
     ? CONDITIONING_VOLUME_OUT_OF_RANGE

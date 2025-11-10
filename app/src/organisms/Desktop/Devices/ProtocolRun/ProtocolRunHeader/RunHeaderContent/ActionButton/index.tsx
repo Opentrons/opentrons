@@ -18,7 +18,10 @@ import {
 
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { selectIsAnyNecessaryDefaultOffsetMissing } from '/app/redux/protocol-runs'
+import {
+  getCameraUsageState,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+} from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useCurrentRunId,
@@ -35,6 +38,7 @@ import {
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
+import type { State } from '/app/redux/types'
 import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
@@ -47,6 +51,7 @@ interface ActionButtonProps extends BaseActionButtonProps {
 export function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
+    runRecord,
     robotName,
     runStatus,
     isResetRunLoadingRef,
@@ -75,10 +80,21 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
 
+  const { enabled: isCameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
+  const isCameraRequiredForRun =
+    protocolData != null &&
+    'commandPreconditions' in protocolData &&
+    protocolData.commandPreconditions?.isCameraUsed
+  const isCameraReadyToRun = isCameraRequiredForRun ? isCameraEnabled : true
+  const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
+
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
-    missingModuleIds.length === 0
+    missingModuleIds.length === 0 &&
+    isCameraReadyToRun
   const isRobotTypeSetupComplete = isFlex
     ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
@@ -95,6 +111,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isValidRunAgain,
+    isCameraReadyToRun,
     ...props,
   })
 
@@ -118,6 +135,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       isValidRunAgain,
       isOtherRunCurrent,
       isRobotOnWrongVersionOfSoftware,
+      areCameraPreferencesConfirmed,
       ...props,
     })
 

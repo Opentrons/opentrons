@@ -92,6 +92,7 @@ class ImageFileMetadata(BaseModel):
         description="The id of the camera image file."
         " This id is identical to the filename of the camera image file.",
     )
+    filename: str = Field(..., description="The name of the data file.")
     cameraId: str = Field(
         ..., description="The ID of the camera used to capture the image file."
     )
@@ -113,6 +114,7 @@ class DataFileMetadataResponse(BaseModel):
     """Response model for data file metadata without command information."""
 
     id: str = Field(..., description="A unique identifier for this file.")
+    filename: str = Field(..., description="The name of the data file.")
     stored: bool = Field(..., description="Whether the file is currently stored.")
     generated: bool = Field(
         ..., description="Whether the file was generated as output during a run."

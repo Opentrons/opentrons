@@ -68,6 +68,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/organisms/ErrorRecoveryFlows')
 vi.mock('/app/organisms/InterventionModal')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
+vi.mock('/app/local-resources/images/hooks/useToastOnErrorImage')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'

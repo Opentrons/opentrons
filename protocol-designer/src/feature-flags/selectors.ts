@@ -22,10 +22,6 @@ export const getDisableModuleRestrictions: Selector<
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-export const getAllowAllTipracks: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
-)
 export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
@@ -70,9 +66,4 @@ export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
 export const getEnableTipSelection: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
-)
-// @ts-expect-error -- Will be utilized in development soon!
-export const getEnableCameraSupport: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_CAMERA_SUPPORT
 )

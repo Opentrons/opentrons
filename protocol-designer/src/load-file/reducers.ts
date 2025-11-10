@@ -55,7 +55,6 @@ const unsavedChanges = (state: boolean = false, action: Action): boolean => {
     case 'REMOVE_WELLS_CONTENTS':
     case 'SET_WELL_CONTENTS':
     case 'ADD_STEP':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'REORDER_STEPS':
     case 'REORDER_SELECTED_STEP':

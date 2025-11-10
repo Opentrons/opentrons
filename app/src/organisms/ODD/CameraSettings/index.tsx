@@ -3,8 +3,12 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useCameraUsageSettings } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useCameraUsageSettings'
+import {
+  SOURCE_ROBOT_SETTINGS,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
+import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraControls } from './CameraControls'
 import { CameraEnableSetting } from './CameraEnableSetting'
@@ -19,36 +23,90 @@ export interface CameraSettingsProps {
   /* A header element for the page content. */
   headerElement: ReactNode
   sectionHeadingText: string
-  /* We only utilize storage info in a run context, not general settings context. */
+  isCameraEnabled: boolean
+  isLiveVideoEnabled: boolean
+  isRecoveryCaptureEnabled: boolean
+  robotName: string
+  toggleCameraEnabled: () => void
+  toggleRecoveryEnabled: () => void
+  toggleLiveStreamEnabled: () => void
+  /* We only utilize this info in a run context,
+  not general settings context. */
   storageInfo: RobotStorageInfo | null
+  isCameraRequired: boolean | null
 }
 
 export function CameraSettings({
   headerElement,
   sectionHeadingText,
   storageInfo,
+  isCameraRequired,
+  isCameraEnabled,
+  robotName,
+  toggleCameraEnabled,
+  toggleRecoveryEnabled,
+  toggleLiveStreamEnabled,
+  isRecoveryCaptureEnabled,
+  isLiveVideoEnabled,
 }: CameraSettingsProps): JSX.Element {
-  const {
-    isCameraEnabled,
-    toggleCameraEnabled,
-    toggleLiveVideoEnabled,
-    isLiveVideoEnabled,
-    isRecoveryCaptureEnabled,
-    toggleRecoveryCaptureEnabled,
-  } = useCameraUsageSettings()
-
+  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
   }
+  const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    robotType: robotType,
+    source: SOURCE_ROBOT_SETTINGS,
+  })
 
+  const handleToggleCamera = (): void => {
+    toggleCameraEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: !isCameraEnabled,
+        liveFeedEnabled: isLiveVideoEnabled,
+        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+      })
+    }
+  }
+  const handleToggleLiveStream = (): void => {
+    toggleLiveStreamEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: isCameraEnabled,
+        liveFeedEnabled: !isLiveVideoEnabled,
+        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+      })
+    }
+  }
+
+  const handleToggleRecovery = (): void => {
+    toggleRecoveryEnabled()
+    if (isCameraRequired === null) {
+      reportCameraEnablementSettings({
+        cameraEnabled: isCameraEnabled,
+        liveFeedEnabled: isLiveVideoEnabled,
+        recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
+      })
+    }
+  }
   if (showControls) {
     return <CameraControls toggleShowControls={toggleShowControls} />
   } else {
     return (
-      <div className={styles.container}>
+      <div
+        className={
+          isCameraRequired === null
+            ? styles.container_settings
+            : styles.container_run
+        }
+      >
         {headerElement}
         <div className={styles.content_container}>
+          {!isCameraEnabled && isCameraRequired && (
+            <CameraRequiredNotification />
+          )}
           {storageInfo != null &&
             !storageInfo.isLoading &&
             storageInfo.isImageStorageLow && <StorageAlmostFullNotification />}
@@ -57,19 +115,22 @@ export function CameraSettings({
           </StyledText>
           <CameraEnableSetting
             isCameraEnabled={isCameraEnabled}
-            toggleCameraEnabled={toggleCameraEnabled}
+            toggleCameraEnabled={handleToggleCamera}
           />
           {isCameraEnabled && (
             <>
               <UsagePreferencesSettings
-                toggleLiveVideoEnabled={toggleLiveVideoEnabled}
-                toggleRecoveryCaptureEnabled={toggleRecoveryCaptureEnabled}
+                toggleLiveVideoEnabled={handleToggleLiveStream}
+                toggleRecoveryCaptureEnabled={handleToggleRecovery}
                 isLiveVideoEnabled={isLiveVideoEnabled}
                 isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
+                robotName={robotName}
               />
-              <ControlPreferencesSettings
-                toggleShowControls={toggleShowControls}
-              />
+              {isCameraSettingsEnabled && (
+                <ControlPreferencesSettings
+                  toggleShowControls={toggleShowControls}
+                />
+              )}
             </>
           )}
         </div>
@@ -80,11 +141,24 @@ export function CameraSettings({
 
 function StorageAlmostFullNotification(): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'branded'])
+
   return (
     <InlineNotification
       type="alert"
       heading={t('protocol_setup:image_storage_almost_full')}
       message={t('branded:clear_images_on_desktop')}
+    />
+  )
+}
+
+function CameraRequiredNotification(): JSX.Element {
+  const { t } = useTranslation('device_settings')
+
+  return (
+    <InlineNotification
+      type="error"
+      heading={t('camera_required')}
+      message={t('enable_camera_to_run')}
     />
   )
 }

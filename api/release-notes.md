@@ -8,6 +8,19 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.8.0
+
+Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.  
+
+### New Features
+
+- Use new non-blocking commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously. 
+-  Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action. 
+- Capture images of the Flex or OT-2 deck during a protocol. 
+- Choose where your Flex pipette will select a new tip when perfomring a transfer with a liquid class.
+
+---
+
 ## Opentrons Robot Software Changes in 8.7.0
 
 Welcome to the v8.7.0 release of the Opentrons robot software! This release adds improvements and bug fixes.

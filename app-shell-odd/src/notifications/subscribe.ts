@@ -109,7 +109,7 @@ function waitUntilActiveOrErrored(
       const hasReceivedAck =
         connection === 'client'
           ? connectionStore.isConnectedToBroker()
-          : connectionStore.isActiveSub(topic as NotifyTopic)
+          : connectionStore.isActiveSub(topic!)
       if (hasReceivedAck) {
         clearInterval(intervalId)
         resolve()

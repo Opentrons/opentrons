@@ -22,6 +22,15 @@ export interface WellLocation {
   offset?: WellOffset
 }
 
+export interface KnownWellOffset {
+  x: number
+  y: number
+  z: number
+}
+export interface KnownWellLocation {
+  origin: WellOrigin
+  offset: WellOffset
+}
 export type DropTipWellOrigin = BaseWellOrigin | 'default'
 
 export interface DropTipWellLocation {

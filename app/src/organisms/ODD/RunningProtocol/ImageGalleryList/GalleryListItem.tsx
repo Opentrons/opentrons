@@ -11,32 +11,29 @@ import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
 
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
-export interface GalleryListItemProps extends UseImagesInfoItem {
-  protocolAnalysis: any
+export interface GalleryListItemProps {
+  protocolAnalysis: CompletedProtocolAnalysis | null
   runId: string
-  robotType: any
-  allRunDefs: any
+  robotType: RobotType
+  allRunDefs: LabwareDefinition[]
+  item: UseImagesInfoItem
 }
 
 export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const {
-    timestamp,
-    imageId,
-    stepCommandId,
-    previousStepCommandId,
-    runId,
-    protocolAnalysis,
-    robotType,
-    allRunDefs,
-  } = props
+  const { item, runId, protocolAnalysis, robotType, allRunDefs } = props
 
-  const imagePath = useImage(imageId)
+  const imagePath = useImage(item.imageId)
   const { previousCommandString, isLoading, currentCommand } =
     useImageGalleryData({
-      item: { imageId, stepCommandId, previousStepCommandId, timestamp },
+      item,
       protocolAnalysis,
       runId,
       robotType,
@@ -65,7 +62,9 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
       <div className={styles.list_item_container}>
         <div className={styles.list_item_content_container}>
           <div>
-            <StyledText oddStyle="bodyTextSemiBold">{timestamp}</StyledText>
+            <StyledText oddStyle="bodyTextSemiBold">
+              {item.timestamp}
+            </StyledText>
           </div>
           <div className={styles.list_item_step}>
             {!isSkeleton && isCurrentCmdError && (
@@ -102,7 +101,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
               onClick={() => {
                 handleCameraPhotoModal({
                   imagePath,
-                  timestamp,
+                  timestamp: item.timestamp,
                   stepCountStr: modalStepCountStr,
                 })
               }}

@@ -34,9 +34,9 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { CLEAN, EMPTY, ZERO_OFFSET } from '../constants'
+import { CLEAN, EMPTY, STAGING_AREA_SLOTS, ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators } from './index'
+import { reduceCommandCreators, uuid } from './index'
 
 import type {
   AddressableAreaName,
@@ -44,6 +44,10 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
+  LabwareLocationSequence,
+  LoadLabwareRunTimeCommand,
+  LoadLidParams,
+  LoadLidStackRunTimeCommand,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
@@ -62,6 +66,7 @@ import type {
   PipetteEntity,
   RobotState,
   SourceAndDest,
+  StagingAreaEntities,
   TrashBinEntities,
   TrashBinEntity,
   WasteChuteEntities,
@@ -1285,4 +1290,58 @@ export const getIsRetractSafeForAirGap = (args: {
   }
   const retractZOffsetFromTop = retractMmFromBottom - wellDepth
   return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
+}
+
+export const getStackForLabwareLocation = (
+  locationSequence: LabwareLocationSequence
+): string[] =>
+  locationSequence.reduce<string[]>((acc, item) => {
+    const { kind } = item
+    if (kind === 'onCutoutFixture') {
+      return acc
+    }
+    if (kind === 'onLabware') {
+      return [...acc, item.labwareId]
+    }
+    if (kind === 'onModule' || kind === 'inStackerHopper') {
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'onAddressableArea') {
+      return [...acc, item.addressableAreaName]
+    }
+    return [...acc, item.logicalLocationName]
+  }, [])
+
+const FOURTH_COLUMN_TO_CUTOUT_MAP = {
+  A4: 'cutoutA3',
+  B4: 'cutoutB3',
+  C4: 'cutoutC3',
+  D4: 'cutoutD3',
+}
+
+export function createStagingAreaForInvariantContext(
+  params:
+    | LoadLidStackRunTimeCommand['params']
+    | LoadLabwareRunTimeCommand['params']
+    | LoadLidParams
+): StagingAreaEntities {
+  if (
+    params.location !== 'offDeck' &&
+    params.location !== 'systemLocation' &&
+    params.location !== 'wasteChuteLocation' &&
+    'addressableAreaName' in params.location &&
+    STAGING_AREA_SLOTS.includes(params.location.addressableAreaName)
+  ) {
+    const id = uuid()
+    const addressableAreaName = params.location.addressableAreaName
+    const location =
+      FOURTH_COLUMN_TO_CUTOUT_MAP[
+        addressableAreaName as keyof typeof FOURTH_COLUMN_TO_CUTOUT_MAP
+      ] ?? addressableAreaName // fallback if the addressableArea name doesn't match the map, but shoudln't run into this
+
+    return {
+      [id]: { id, location },
+    }
+  }
+  return {}
 }

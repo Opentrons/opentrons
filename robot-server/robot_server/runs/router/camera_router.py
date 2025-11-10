@@ -7,6 +7,7 @@ from fastapi import Depends, status
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.system import camera
 
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api import (
@@ -14,6 +15,12 @@ from robot_server.service.json_api import (
     SimpleBody,
     PydanticResponse,
 )
+from robot_server.hardware import get_robot_type
+from opentrons_shared_data.robot.types import RobotType
+from robot_server.camera.fastapi_dependencies import (
+    get_camera_provider,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 from ..run_models import Run
 from ..run_orchestrator_store import RunOrchestratorStore
@@ -48,6 +55,8 @@ async def add_camera_settings(
         RunOrchestratorStore, Depends(get_run_orchestrator_store)
     ],
     run: Annotated[Run, Depends(get_run_data_from_url)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+    camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
 ) -> PydanticResponse[SimpleBody[CameraEnable]]:
     """Add unique camera settings to a run to be used in place of the global camera settings.
 
@@ -55,6 +64,8 @@ async def add_camera_settings(
         request_body: New camera settings from request body.
         run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
+        robot_type: Used to validate robot type for live stream service.
+        camera_provider: Access to the camera settings and related services.
     """
     if run.current is False:
         raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
@@ -77,6 +88,16 @@ async def add_camera_settings(
         camera_settings
     )
     log.info(f'Added unique camera settings "{request_body.data}" to run "{run.id}".')
+
+    # Restart the stream with any the newest live stream settings
+    await camera.update_live_stream_status(
+        robot_type=robot_type,
+        stream_status=response_data.liveStreamEnabled
+        if response_data.cameraEnabled is True
+        else False,
+        camera_provider=camera_provider,
+        override_settings=camera_settings,
+    )
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(

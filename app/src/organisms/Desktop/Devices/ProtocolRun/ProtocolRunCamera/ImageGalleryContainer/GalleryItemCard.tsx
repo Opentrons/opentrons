@@ -22,7 +22,7 @@ export interface GalleryItemCardProps extends UseImageGalleryDataProps {
 }
 
 export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
-  const { item, protocolAnalysis } = props
+  const { item, protocolAnalysis, runId } = props
   const {
     currentCommand,
     currentCommandString,
@@ -144,12 +144,11 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
         )}
       </div>
       <GalleryItemOverflowMenu
+        runId={runId}
+        currentCommand={currentCommand}
         imagePath={imagePath}
+        imageFilename={item.filename}
         robotName={props.robotName}
-        runTimestamp={props.runTimestamp}
-        commandStep={commandStep}
-        imageTimestamp={item.timestamp}
-        protocolName={props.protocolName}
       />
     </div>
   )

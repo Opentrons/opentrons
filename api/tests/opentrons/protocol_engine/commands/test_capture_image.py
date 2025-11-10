@@ -8,6 +8,7 @@ from typing import Tuple
 from opentrons.system import camera
 from opentrons.system import ffmpeg
 from opentrons.protocol_engine.resources import FileProvider, CameraProvider
+from opentrons.protocol_engine.resources.file_provider import SPECIAL_CHARACTERS
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
@@ -24,6 +25,7 @@ from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
+    FileNameInvalidError,
 )
 from opentrons.system.camera import image_capture, ZOOM_DEFAULT, RESOLUTION_DEFAULT
 
@@ -330,3 +332,60 @@ async def test_capture_image_returns_expected_params(
             ),
             state_update=result.state_update,
         )
+
+
+async def test_capture_image_result_has_clean_defaults(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+) -> None:
+    """It should return the successful result of an image capture with all expected defaults."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(
+        fileName="coolpic",
+        resolution=None,
+        zoom=None,
+        pan=None,
+        contrast=None,
+        brightness=None,
+        saturation=None,
+    )
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        result = await subject.execute(params=params)
+        assert result == SuccessData(
+            public=CaptureImageResult(
+                fileId=None,
+                resolution=(1920, 1080),
+                zoom=1.0,
+                pan=None,
+                contrast=50,
+                brightness=50,
+                saturation=50,
+            ),
+            state_update=result.state_update,
+        )
+
+
+async def test_raises_filename_error(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+) -> None:
+    """It should raise FileNameInvalidError when the capture image command is provided a bad file name."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider,
+    )
+    for char in SPECIAL_CHARACTERS:
+        params = CaptureImageParams(fileName="badname" + char)
+        with pytest.raises(FileNameInvalidError):
+            await subject.execute(params=params)

@@ -486,10 +486,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
         result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteRetracted=False),
     )
+    start_set_shake_cmd = hs_commands.SetShakeSpeed.model_construct(  # type: ignore[call-arg]
+        params=hs_commands.SetShakeSpeedParams(moduleId="module-id", rpm=111),
+        result=hs_commands.SetShakeSpeedResult(pipetteRetracted=False, taskId="taskId"),
+    )
     deactivate_cmd = hs_commands.DeactivateShaker.model_construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
         deck_fixed_labware=[],
@@ -508,6 +513,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         )
     )
     subject.handle_action(actions.SucceedCommandAction(command=set_shake_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
+            is_plate_shaking=True,
+            plate_target_temperature=None,
+        )
+    }
+    subject.handle_action(actions.SucceedCommandAction(command=start_set_shake_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),

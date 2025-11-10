@@ -142,17 +142,4 @@ describe('selectedItem reducer', () => {
       })
     })
   })
-
-  it('should deselect on DELETE_STEP', () => {
-    const action = {
-      type: 'DELETE_STEP',
-      payload: 'someStepId',
-    }
-    expect(
-      selectedItem(
-        { selectionType: SINGLE_STEP_SELECTION_TYPE, id: 'anyId' },
-        action
-      )
-    ).toEqual(null)
-  })
 })

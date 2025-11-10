@@ -39,18 +39,21 @@ const mockImagesInfo: UseImagesInfoItem[] = [
     stepCommandId: 'Step 1 command',
     previousStepCommandId: 'Previous step 1',
     timestamp: '2024-01-01 10:00:00',
+    filename: 'filename-1',
   },
   {
     imageId: '/path/to/image2.jpg',
     stepCommandId: 'Step 2 command',
     previousStepCommandId: 'Previous step 2',
     timestamp: '2024-01-01 11:00:00',
+    filename: 'filename-2',
   },
   {
     imageId: '/path/to/image3.jpg',
     stepCommandId: 'Step 3 command',
     previousStepCommandId: 'Previous step 3',
     timestamp: '2024-01-01 12:00:00',
+    filename: 'filename-3',
   },
 ]
 
@@ -78,7 +81,7 @@ describe('ImageGalleryContainer', () => {
     screen.getByText('Image Gallery')
     screen.getByText('3 photos')
     screen.getByText(
-      'Protocol images can be viewed once captured and downloaded when the run is complete.'
+      'Images can be viewed immediately after capture and downloaded once the run is complete.'
     )
   })
 

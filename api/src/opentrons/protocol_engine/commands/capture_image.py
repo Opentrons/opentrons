@@ -19,6 +19,7 @@ from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     CameraDisabledError,
+    FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
@@ -26,6 +27,7 @@ from ..resources.file_provider import (
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
+from ..resources.file_provider import SPECIAL_CHARACTERS
 from ..resources import CameraProvider
 from ..resources.camera_provider import ImageParameters
 from ..state import update_types
@@ -79,7 +81,7 @@ class CaptureImageResult(BaseModel):
     """Result data from running an image capture."""
 
     fileId: Optional[str] = Field(
-        ...,
+        None,
         description="File ID for image files output as a result of an image capture action.",
     )
     resolution: Tuple[int, int] = Field(
@@ -91,7 +93,7 @@ class CaptureImageResult(BaseModel):
         description="Multiplier used when cropping and scaling the captured image. Scale is 1.0 to 2.0.",
     )
     pan: Optional[Tuple[int, int]] = Field(
-        ...,
+        None,
         description="X/Y (pixels) position panned to.",
     )
     contrast: float = Field(
@@ -183,6 +185,14 @@ class CaptureImageImpl(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
 
+        # Validate the filename param provided to fail analysis
+        if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
+            set(params.fileName)
+        ):
+            raise FileNameInvalidError(
+                message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+            )
+
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
         engine_camera_settings = self._state_view.camera.get_enablement_settings()
@@ -197,7 +207,9 @@ class CaptureImageImpl(
             )
 
         parameters = _converted_image_params(params=params)
-        camera_data = await self._camera_provider.capture_image(parameters)
+        camera_data = await self._camera_provider.capture_image(
+            self._state_view.config.robot_type, parameters
+        )
 
         # Conditionally save file if camera data was returned - in simulation we don't return anything.
         file_id: str | None = None

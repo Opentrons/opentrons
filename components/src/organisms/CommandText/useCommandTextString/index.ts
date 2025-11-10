@@ -94,6 +94,8 @@ export function useCommandTextString(
     case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
+    case 'aspirateWhileTracking':
+    case 'dispenseWhileTracking':
     case 'blowout':
     case 'blowOutInPlace':
     case 'dropTip':
