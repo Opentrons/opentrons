@@ -146,7 +146,7 @@ export function PipetteShadow(props: {
         ? t('tip_accessible.deselect')
         : t('tip_accessible.select')
     }
-    console.warn('No label text found')
+    console.error('No label text found')
     return ''
   })()
 
