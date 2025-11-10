@@ -24,6 +24,7 @@ describe('Peripherals', () => {
     mockProps = {
       isFlex: false,
       robotName: 'test-otie',
+      isRobotBusy: false,
     }
     vi.mocked(CameraCard).mockReturnValue(<div>MOCK_CAMERA_CARD</div>)
   })
@@ -42,6 +43,7 @@ describe('Peripherals', () => {
       {
         isFlex: false,
         robotName: 'test-otie',
+        isRobotBusy: false,
       },
       {}
     )
@@ -60,6 +62,7 @@ describe('Peripherals', () => {
       {
         isFlex: true,
         robotName: 'test-flex',
+        isRobotBusy: false,
       },
       {}
     )

@@ -2,7 +2,7 @@
   "allowedRoles": ["labware", "lid"],
   "ordering": [],
   "brand": {
-    "brand": "Greiner",
+    "brand": "greiner",
     "brandId": []
   },
   "metadata": {

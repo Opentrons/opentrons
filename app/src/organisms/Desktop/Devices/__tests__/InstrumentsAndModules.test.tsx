@@ -61,6 +61,7 @@ describe('InstrumentsAndModules', () => {
     props = {
       robotName: ROBOT_NAME,
       isRobotViewable: true,
+      isRobotBusy: false,
     }
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useRunStatuses).mockReturnValue({
@@ -124,9 +125,9 @@ describe('InstrumentsAndModules', () => {
   })
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
-    render(props)
+    render({ ...props, isRobotBusy: true })
     screen.getByText(
-      'Some robot controls are not available when run is in progress'
+      'Some robot controls are not available when run is in progress or robot is busy'
     )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {

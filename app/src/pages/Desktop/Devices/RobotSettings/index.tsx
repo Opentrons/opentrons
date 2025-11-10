@@ -24,7 +24,11 @@ import { RobotSettingsCamera } from '/app/organisms/Desktop/Devices/RobotSetting
 import { RobotSettingsFeatureFlags } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsFeatureFlags'
 import { RobotSettingsNetworking } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
-import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import {
+  useIsRobotBusy,
+  useRobot,
+  useRobotType,
+} from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
 import {
   CONNECTABLE,
@@ -34,29 +38,47 @@ import {
 } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
 import { appShellRequestor } from '/app/redux/shell/remote'
-import { useCurrentRunId } from '/app/resources/runs'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '/app/App/types'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
-export function RobotSettings(): JSX.Element | null {
+export function RobotSettings(): JSX.Element {
+  const { robotName } = useParams<
+    keyof DesktopRouteParams
+  >() as DesktopRouteParams
+  const robot = useRobot(robotName)
+
+  return (
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      port={robot?.port ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
+      <RobotSettingsComponent robot={robot} />
+    </ApiHostProvider>
+  )
+}
+
+export function RobotSettingsComponent({
+  robot,
+}: {
+  robot: DiscoveredRobot | null
+}): JSX.Element | null {
   const { t } = useTranslation('device_settings')
   const { robotName, robotSettingsTab } = useParams<
     keyof DesktopRouteParams
   >() as DesktopRouteParams
-  const robot = useRobot(robotName)
   const robotType = useRobotType(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = useState<boolean>(false)
   const robotUpdateSession = useSelector(getRobotUpdateSession)
-  const doesRunExist = useCurrentRunId() != null
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
-  if (!showRobotBusyBanner && doesRunExist) {
+  if (isRobotBusy && !showRobotBusyBanner) {
     setShowRobotBusyBanner(true)
-  }
-
-  const updateRobotStatus = (isRobotBusy: boolean): void => {
-    if (isRobotBusy) setShowRobotBusyBanner(true)
+  } else if (!isRobotBusy && showRobotBusyBanner) {
+    setShowRobotBusyBanner(false)
   }
 
   const robotSettingsContentByTab: {
@@ -65,21 +87,20 @@ export function RobotSettings(): JSX.Element | null {
     calibration: (
       <RobotSettingsCalibration
         robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
+        isRobotBusy={isRobotBusy}
       />
     ),
     networking: (
       <RobotSettingsNetworking
         robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
+        isRobotBusy={isRobotBusy}
       />
     ),
-    camera: <RobotSettingsCamera robotType={robotType} />,
+    camera: (
+      <RobotSettingsCamera robotType={robotType} isRobotBusy={isRobotBusy} />
+    ),
     advanced: (
-      <RobotSettingsAdvanced
-        robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
-      />
+      <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
   }
@@ -163,26 +184,18 @@ export function RobotSettings(): JSX.Element | null {
         </Flex>
       </Box>
       <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
-        <ApiHostProvider
-          hostname={robot?.ip ?? null}
-          port={robot?.port ?? null}
-          requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-          }
+        <Flex
+          width="100%"
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_AROUND}
+          backgroundColor={COLORS.white}
+          borderRadius={BORDERS.borderRadius8}
+          marginBottom={SPACING.spacing16}
+          paddingX={SPACING.spacing16}
+          paddingY={SPACING.spacing16}
         >
-          <Flex
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_AROUND}
-            backgroundColor={COLORS.white}
-            borderRadius={BORDERS.borderRadius8}
-            marginBottom={SPACING.spacing16}
-            paddingX={SPACING.spacing16}
-            paddingY={SPACING.spacing16}
-          >
-            {robotSettingsContent}
-          </Flex>
-        </ApiHostProvider>
+          {robotSettingsContent}
+        </Flex>
       </Box>
     </>
   )
