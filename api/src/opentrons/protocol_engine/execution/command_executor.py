@@ -155,6 +155,7 @@ class CommandExecutor:
         log.debug(
             f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
         )
+        error_occurred = False
         try:
             result = await command_impl.execute(
                 running_command.params  # type: ignore[arg-type]
@@ -191,7 +192,7 @@ class CommandExecutor:
                     type=error_recovery_type,
                 )
             )
-            await self.capture_error_image(running_command)
+            error_occurred = True
 
         else:
             if isinstance(result, SuccessData):
@@ -227,6 +228,10 @@ class CommandExecutor:
                         type=error_recovery_type,
                     )
                 )
+                error_occurred = True
+        finally:
+            # Handle error image capture if appropriate
+            if error_occurred:
                 await self.capture_error_image(running_command)
 
     def cancel_tasks(self, message: str | None = None) -> None:
