@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
@@ -72,8 +72,8 @@ export function useRunProgressCopy({
   )
 
   const currentStepContents = ((): JSX.Element | null => {
-    if (runHasNotBeenStarted) {
-      return <LegacyStyledText as="h2">{t('not_started_yet')}</LegacyStyledText>
+    if (runStatus === RUN_STATUS_SUCCEEDED || runHasNotBeenStarted) {
+      return null
     } else if (analysis != null && !hasRunDiverged) {
       return (
         <CommandText
@@ -106,30 +106,29 @@ export function useRunProgressCopy({
     : ((currentStepNumber as number) / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
-    if (runStatus == null) {
+    if (
+      runStatus == null ||
+      runStatus === RUN_STATUS_SUCCEEDED ||
+      runHasNotBeenStarted
+    ) {
       return null
+    }
+
+    const isTerminalStatus = TERMINAL_RUN_STATUSES.includes(runStatus)
+    const stepType = isTerminalStatus ? '' : t('current_step')
+
+    if (isTerminalStatus && currentStepNumber == null) {
+      return `${stepType}: ${t('na')}`
+    } else if (hasRunDiverged) {
+      return `${stepType} ${t('na')}:`
     } else {
-      const isTerminalStatus = TERMINAL_RUN_STATUSES.includes(runStatus)
-      const stepType = isTerminalStatus ? t('final_step') : t('current_step')
-
-      if (runStatus === RUN_STATUS_IDLE) {
-        return `${stepType}:`
-      } else if (isTerminalStatus && currentStepNumber == null) {
-        return `${stepType}: ${t('na')}`
-      } else if (hasRunDiverged) {
-        return `${stepType} ${t('na')}:`
-      } else {
-        const getCountString = (): string => {
-          const current = currentStepNumber ?? '?'
-          const total = totalStepCount ?? '?'
-
-          return `${current}/${total}`
-        }
-
-        const countString = getCountString()
-
-        return `${stepType} ${countString}:`
+      const getCountString = (): string => {
+        const current = currentStepNumber ?? '?'
+        const total = totalStepCount ?? '?'
+        return `${current}/${total}`
       }
+
+      return `${stepType} ${getCountString()}:`
     }
   })()
   const { reportModuleCommand } = useModuleCommandAnalytics()
