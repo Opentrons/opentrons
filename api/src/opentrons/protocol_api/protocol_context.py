@@ -135,7 +135,7 @@ class ProtocolContext(CommandPublisher):
     See the [Tutorial](run-function) for more information.
 
     Use [`get_protocol_api()`][opentrons.execute.get_protocol_api] to instantiate a `ProtocolContext` when
-    using Jupyter Notebook. See [advanced control][advanced-control].
+    using Jupyter Notebook. See [Advanced Control](../advanced-control.md).
 
     *New in version 2.0*
     """
@@ -273,7 +273,7 @@ class ProtocolContext(CommandPublisher):
         The values of runtime parameters, as set during run setup.
 
         Each attribute of this object corresponds to the `variable_name` of a parameter.
-        See [using-rtp][using-rtp] for details.
+        See [Using Parameter Values](../runtime-parameters/using-values.md) for details.
 
         Parameter values can only be set during run setup. If you try to alter the value
             of any attribute of `params`, the API will raise an error.
@@ -434,7 +434,7 @@ class ProtocolContext(CommandPublisher):
                 [Labware Library](https://labware.opentrons.com).
 
             location (Union[int, str, `OFF_DECK`]): Either a [deck slot](deck-slots.md),
-                like `1`, `"1"`, or `"D1"`, or the special value [`OFF_DECK`][opentrons.protocol_api.OffDeckType].
+                like `1`, `"1"`, or `"D1"`, or the special value [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
             !!! note
                 You can now specify a deck slot as a coordinate, like `"D1"`.
@@ -815,7 +815,7 @@ class ProtocolContext(CommandPublisher):
         """
         Move a loaded labware to a new location.
 
-        See [Moving Labware][moving-labware] for more details.
+        See [Moving Labware](../moving-labware.md) for more details.
 
         Args:
             labware: The labware to move. It should be a labware already loaded
@@ -1111,7 +1111,7 @@ class ProtocolContext(CommandPublisher):
                 [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip]
                 without arguments.
             replace (bool): If `True`, replace the currently loaded instrument in
-                `mount`, if any. This is intended for [advanced control][advanced-control]
+                `mount`, if any. This is intended for [advanced control](../advanced-control.md)
                 applications. You cannot replace an instrument in the middle of a
                 protocol being run from the Opentrons App or touchscreen.
             liquid_presence_detection (bool): If `True`, enable automatic
@@ -1374,7 +1374,7 @@ class ProtocolContext(CommandPublisher):
         a dict of labwares and [`loaded_modules`][opentrons.protocol_api.ProtocolContext.loaded_modules] 
         to get a dict of modules.
 
-        For [advanced control][advanced-control] *only*, you can delete an element 
+        For [advanced control](../advanced-control.md) *only*, you can delete an element 
         of the `deck` dict. This only works for deck slots that contain labware objects. 
         For example, if slot 1 contains a labware, `del protocol.deck["1"]` will free the 
         slot so you can load another labware there.
@@ -1406,7 +1406,7 @@ class ProtocolContext(CommandPublisher):
         In API version 2.16 and later, the fixed trash only exists in OT-2 protocols.
         It is a [`TrashBin`][opentrons.protocol_api.TrashBin] object, which doesn't
         have any wells. Trying to access `fixed_trash` in a Flex protocol will raise
-        an error. See [configure-trash-bin][configure-trash-bin] for details on using
+        an error. See [Trash Bin][trash-bin-api] for details on using
         the movable trash in Flex protocols.
 
         *Changed in version 2.16:* Returns a `TrashBin` object.

@@ -345,8 +345,7 @@ def execute(
                 'payload': {
                     'text': string_command_text,
                     # The rest of this struct is
-                    # command-dependent; see
-                    # [`commands`][opentrons.legacy_commands.commands].
+                    # command-dependent; see `commands`.
                 }
             }
             ```

@@ -554,7 +554,7 @@ class Labware:
 
                 If the labware is on a labware or adapter, a [`Labware`][opentrons.protocol_api.labware.Labware].
 
-                If the labware is off-deck, [`OFF_DECK`][opentrons.protocol_api.labware.OFF_DECK].
+                If the labware is off-deck, [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
         *Changed in version 2.14:* Return type for module parent changed.
         Formerly, the API returned an internal geometry interface.
@@ -1370,8 +1370,7 @@ class Labware:
 
         If you need to physically replace an empty tip rack in the middle of your
         protocol, use [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware]
-        instead. See [off-deck location][opentrons.protocol_api.labware.OFF_DECK] for
-        an example.
+        instead. See [The Off-Deck Location][the-off-deck-location] for an example.
 
         *Changed in version 2.14:* This method will raise an exception if you call it
         on a labware that isn't a tip rack. Formerly, it would do nothing.

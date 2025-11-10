@@ -94,7 +94,7 @@ pipette.aspirate(200, plate["A1"], flow_rate=50)
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
-## Dispense
+## Dispense {#dispense-building-block}
 
 To dispense liquid from a pipette tip, call the [`InstrumentContext.dispense()`][opentrons.protocol_api.InstrumentContext.dispense] method. Using this method, you can specify the dispense volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to dispense 200 µL into well location B1.
 

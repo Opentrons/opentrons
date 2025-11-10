@@ -1291,8 +1291,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
                 If neither `rate` nor `flow_rate` is specified, the pipette will aspirate
                 at a rate of 1.0 * `InstrumentContext.flow_rate.aspirate`. See
-                [new-plunger-flow-rates][new-plunger-flow-rates].
-                flow_rate (float, optional): The rate, in µL/s, at which the pipette will draw
+                [Pipette Flow Rates][pipette-flow-rates].
+            flow_rate (float, optional): The rate, in µL/s, at which the pipette will draw
                 in air.
 
         Raises:
@@ -1855,8 +1855,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 - `disposal_volume`: Aspirates additional liquid to improve the accuracy
                 of each dispense. Defaults to the minimum volume of the pipette. See
-                [disposal volume][opentrons.protocol_api.param-disposal-volume] for
-                details.
+                [Disposal Volume][disposal-volume] for details.
 
                 - `mix_after`: Ignored.
 
@@ -3124,7 +3123,7 @@ class InstrumentContext(publisher.CommandPublisher):
         pipettes. (e.g., `"p1000_single_flex"`).
 
         In API version 2.23 and later, this property returns the Python Protocol API
-        [load name][api-load-name] of Flex pipettes
+        [load name][api-load-names] of Flex pipettes
         (e.g., `"flex_1channel_1000"`).
         """
         return self._core.get_pipette_name()
@@ -3142,7 +3141,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def min_volume(self) -> float:
         """
         The minimum volume, in µL, that the pipette can hold. This value may change
-        based on the [volume mode][volume-modes] that the pipette is
+        based on the [volume mode](../pipettes/volume-modes.md) that the pipette is
         currently configured for.
         """
         return self._core.get_min_volume()
@@ -3301,7 +3300,7 @@ class InstrumentContext(publisher.CommandPublisher):
         The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a
         low-volume mode to accurately dispense very small volumes of liquid. Low-volume
         mode can only be set by calling `configure_for_volume()`. See
-        [Volume Modes][volume-modes].
+        [Volume Modes](../pipettes/volume-modes.md).
 
         !!! note
             Changing a pipette's mode will reset its
