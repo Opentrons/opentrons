@@ -58,7 +58,11 @@ export function RunHeaderSectionLower({
 
   const handleVisualizeClick = (): void => {
     if (!isSupportedProtocol) {
-      makeSnackbar(t('out_of_date_protocol') as string)
+      const snackbarText: string =
+        config?.protocolType === 'python'
+          ? t('out_of_date_protocol_python')
+          : t('out_of_date_protocol_json')
+      makeSnackbar(snackbarText)
       return
     }
     // need to encode URL to avoid spaces and slashes

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -16,13 +16,6 @@ import { RunHeaderSectionLower } from '../RunHeaderContent/RunHeaderSectionLower
 import type { ComponentProps } from 'react'
 
 vi.mock('react-router-dom')
-// vi.mock('react-router-dom', async importOriginal => {
-//   const reactRouterDom = await importOriginal<NavigateFunction>()
-//   return {
-//     ...reactRouterDom,
-//     useNavigate: () => mockNavigate,
-//   }
-// })
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/analysis/hooks/useStoredProtocolAnalysis')
 vi.mock('/app/organisms/ToasterOven')
@@ -88,6 +81,9 @@ describe('RunHeaderSectionLower', () => {
       .calledWith('protocolTimeline')
       .thenReturn(false)
   })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it('should render text', () => {
     render(props)
@@ -131,7 +127,9 @@ describe('RunHeaderSectionLower', () => {
     }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Visualize' }))
-    expect(mockMakeSnackbar).toHaveBeenCalled()
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      "Can't visualize. Update protocol to API level 2.14 or higher."
+    )
   })
 
   it('should call makeSnackbar when protocol is not supported json protocol', () => {
@@ -154,7 +152,9 @@ describe('RunHeaderSectionLower', () => {
     }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Visualize' }))
-    expect(mockMakeSnackbar).toHaveBeenCalled()
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      "Can't visualize. Re-export from Protocol Designer."
+    )
   })
 
   it('should call mock function when clicking visualize button', () => {
