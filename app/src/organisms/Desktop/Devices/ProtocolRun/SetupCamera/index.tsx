@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  Chip,
   InlineNotification,
   PrimaryButton,
   StyledText,
@@ -168,19 +169,9 @@ function CameraStatus({
             {t('camera_status')}
           </StyledText>
           {isCameraEnabled ? (
-            <StyledText
-              desktopStyle="captionRegular"
-              className={styles.camera_status_enabled}
-            >
-              {t('enabled')}
-            </StyledText>
+            <Chip text={t('enabled')} type={'success'} hasIcon={false} />
           ) : (
-            <StyledText
-              desktopStyle="captionRegular"
-              className={styles.camera_status_disabled}
-            >
-              {t('disabled')}
-            </StyledText>
+            <Chip text={t('disabled')} type={'neutral'} hasIcon={false} />
           )}
         </div>
         <StyledText desktopStyle="bodyDefaultRegular">

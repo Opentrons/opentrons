@@ -74,7 +74,7 @@ describe('SetupCamera', () => {
 
     screen.getByText('Camera Status')
     screen.getByText(
-      'The deck camera provides live video during protocol runs, allows manual or automated image capture of the deck, and records images automatically when errors occur for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
     )
   })
 
@@ -112,7 +112,7 @@ describe('SetupCamera', () => {
     render(mockProps)
 
     screen.getByText('Camera is required.')
-    screen.getByText('Enable the camera to run this protocol.')
+    screen.getByText('Enable the camera to start the run.')
   })
 
   it('does not render SetupRunCameraUsage when camera is disabled', () => {
