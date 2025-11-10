@@ -107,6 +107,7 @@
   "not_started_yet": "Not started yet",
   "num_photos": "{{count}} photos",
   "off_deck": "Off deck",
+  "out_of_date_protocol": "Cannot visualize. Update protocol to API level 2.14 or higher, or re-export from Protocol Designer.",
   "parameters": "Parameters",
   "pause": "Pause",
   "pause_protocol": "Pause protocol",

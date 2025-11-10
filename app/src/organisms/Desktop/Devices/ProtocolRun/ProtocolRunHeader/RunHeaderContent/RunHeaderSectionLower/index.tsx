@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { SecondaryButton } from '@opentrons/components'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useFeatureFlag } from '/app/redux/config'
+import { useStoredProtocolAnalysis } from '/app/resources/analysis/hooks/useStoredProtocolAnalysis'
 import {
   EMPTY_TIMESTAMP,
   useProtocolDetailsForRun,
@@ -13,10 +15,14 @@ import {
 } from '/app/resources/runs'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import { isSupportedVersion } from '../../utils'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionlower.module.css'
 
 import type { RunHeaderContentProps } from '..'
+
+const MIN_SUPPORTED_JSON_SCHEMA_VERSION = 6
+const MIN_SUPPORTED_PYTHON_API_VERSION = [2, 14]
 
 // The lower row of Protocol Run Header.
 export function RunHeaderSectionLower({
@@ -28,16 +34,33 @@ export function RunHeaderSectionLower({
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const navigate = useNavigate()
   const { startedAt, completedAt } = useRunTimestamps(runId)
-
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
-
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const { protocolKey } = useProtocolDetailsForRun(runId)
+  const { makeSnackbar } = useToaster()
+
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const config = storedProtocolAnalysis?.config
+
+  const isSupportedProtocol =
+    config != null
+      ? (config.protocolType === 'python' &&
+          isSupportedVersion(
+            config.apiVersion as [number, number],
+            MIN_SUPPORTED_PYTHON_API_VERSION
+          )) ||
+        (config.protocolType === 'json' &&
+          config.schemaVersion >= MIN_SUPPORTED_JSON_SCHEMA_VERSION)
+      : false
 
   const handleVisualizeClick = (): void => {
+    if (!isSupportedProtocol) {
+      makeSnackbar(t('out_of_date_protocol') as string)
+      return
+    }
     // need to encode URL to avoid spaces and slashes
     const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
     const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
