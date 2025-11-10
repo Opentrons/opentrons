@@ -214,10 +214,6 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: 'build api distributables'
-        shell: bash
-        run: make -C api sdist wheel
-
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
