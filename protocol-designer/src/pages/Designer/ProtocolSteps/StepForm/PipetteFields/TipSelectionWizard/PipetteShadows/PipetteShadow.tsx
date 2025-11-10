@@ -79,12 +79,29 @@ export function PipetteShadow(props: {
   const labelRef = useRef<HTMLDivElement>(null)
   const [labelWidth, setLabelWidth] = useState(0)
   const [labelHeight, setLabelHeight] = useState(0)
+
+  const labelText = (() => {
+    if (!hasPickupsRemaining && !isHoveredWellSelected) {
+      return t('all_pickups_selected')
+    }
+    if (!isAccessible && inaccessibleReason != null) {
+      return t(`tip_inaccessible.${inaccessibleReason}`)
+    }
+    if (isAccessible) {
+      return isHoveredWellSelected
+        ? t('tip_accessible.deselect')
+        : t('tip_accessible.select')
+    }
+    console.error('No label text found')
+    return ''
+  })()
+
   useEffect(() => {
     if (labelRef.current) {
       setLabelWidth(labelRef.current.offsetWidth)
       setLabelHeight(labelRef.current.offsetHeight)
     }
-  }, [hoveredWell])
+  }, [hoveredWell, labelText])
 
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
     selectedTiprackId,
@@ -127,28 +144,15 @@ export function PipetteShadow(props: {
     channels,
   })
   const ShadowComponent = SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
+  const isOt2EightChannel = robotType === OT2_ROBOT_TYPE && channels === 8
   const { x: labelOffsetX, y: labelOffsetY } = getLabelOffsetByPlacement({
     labelPlacement,
     labelWidth,
     labelHeight,
     shadowWidth: width,
     shadowHeight: height,
+    isOt2EightChannel,
   })
-  const labelText = (() => {
-    if (!hasPickupsRemaining && !isHoveredWellSelected) {
-      return t('all_pickups_selected')
-    }
-    if (!isAccessible && inaccessibleReason != null) {
-      return t(`tip_inaccessible.${inaccessibleReason}`)
-    }
-    if (isAccessible) {
-      return isHoveredWellSelected
-        ? t('tip_accessible.deselect')
-        : t('tip_accessible.select')
-    }
-    console.error('No label text found')
-    return ''
-  })()
 
   return (
     <g className={styles.shadow_overlay}>
