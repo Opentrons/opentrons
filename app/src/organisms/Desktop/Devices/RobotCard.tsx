@@ -20,7 +20,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -37,6 +36,7 @@ import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
@@ -173,7 +173,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data } = useCamera()
+  const { data } = useNotifyCamera()
 
   return data?.cameraEnabled ? (
     <Flex
