@@ -30,14 +30,9 @@ The OT-2 deck also slides in and out of the enclosure. Pull it out part way, or 
 
 ## Side and back
 
+![test](../images/power-ethernet.png)
+
 Status indicator lights on the front and back of the OT-2 provide at-a-glance information about the robot.
-
-### Front LED
-
-
-
-!!!note
-    This feature is not the power button. The on/off switch is on the left side of the robot.
 
 ### Rear LEDs
 
