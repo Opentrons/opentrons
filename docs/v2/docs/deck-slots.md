@@ -124,7 +124,7 @@ staging_plate = protocol.load_labware(
 )  # deck conflict error
 ```
 
-It is possible to use slot D4 along with the waste chute. See the [Waste Chute](#waste-chute) section below for details.
+It is possible to use slot D4 along with the waste chute. See the [Waste Chute](#waste-chute-api) section below for details.
 
 ### Trash Bin { #trash-bin-api }
 

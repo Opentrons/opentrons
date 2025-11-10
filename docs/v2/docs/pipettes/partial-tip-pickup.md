@@ -354,7 +354,7 @@ The following table summarizes the limitations in place along each side of the d
 
 To visualize these limitations, the below deck map shades all wells that have a single limitation in light blue, and all wells that have two limitations in dark blue.
 
-![Partial Pickup Deck Extents](../../img/partial-pickup-deck-extents.png)
+![Partial Pickup Deck Extents](../img/partial-pickup-deck-extents.png)
 
 Multiple limitations occur when you use a `SINGLE` configuration that uses the innermost corner nozzle, with respect to the pipette's position on the deck. For example, using nozzle A1 on the 96-channel pipette has multiple limitations in slot D3.
 

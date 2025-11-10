@@ -83,7 +83,7 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 5. Drop the tip in the trash.
 
 <figure markdown>
-![Transfer](../../img/complex_commands/transfer.png)
+![Transfer](../img/complex_commands/transfer.png)
 <figcaption>This transfer aspirates six times and dispenses six times.</figcaption>
 </figure>
 
@@ -98,7 +98,7 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 See [Tip Refilling][tip-refilling] below for cases where the total amount to be dispensed is greater than the capacity of the tip.
 
 <figure markdown>
-![Distribute](../../img/complex_commands/robot_distribute.png)
+![Distribute](../img/complex_commands/robot_distribute.png)
 <figcaption>This distribute aspirates one time and dispenses three times.</figcaption>
 </figure>
 
@@ -113,7 +113,7 @@ See [Tip Refilling][tip-refilling] below for cases where the total amount to be 
 See [Tip Refilling][tip-refilling] below for cases where the total amount to be aspirated is greater than the capacity of the tip.
 
 <figure markdown>
-![Consolidate](../../img/complex_commands/robot_consolidate.png)
+![Consolidate](../img/complex_commands/robot_consolidate.png)
 <figcaption>This consolidate aspirates three times and dispenses one time.</figcaption>
 </figure>
 

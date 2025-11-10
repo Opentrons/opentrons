@@ -32,7 +32,7 @@ def run(protocol: protocol_api.ProtocolContext):
 The Temperature Modules are connected as shown here:
 
 <figure markdown style="width: 50%;">
-![Flex USB Order](../../img/modules/flex-usb-order.png)
+![Flex USB Order](../img/modules/flex-usb-order.png)
 </figure>
 
 ## Multiple Modules on OT-2
@@ -57,5 +57,5 @@ def run(protocol: protocol_api.ProtocolContext):
 The Temperature Modules are connected as shown here:
 
 <figure markdown style="width: 50%;">
-![Multiples of a Module](../../img/modules/multiples_of_a_module.svg)
+![Multiples of a Module](../img/modules/multiples_of_a_module.svg)
 </figure>

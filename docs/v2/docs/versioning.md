@@ -144,7 +144,7 @@ This version introduces new features for Flex and adds and improves methods for 
     - Use `configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [Partial Tip Pickup](pipettes/partial_tip_pickup.md).
     - Specify the trash containers attached to your Flex with `load_waste_chute` and `load_trash_bin`.
     - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling `move_labware` with `use_gripper=True`.
-    - Perform actions in staging area slots by referencing slots A4 through D4. See [deck-slots](deck_slots.md).
+    - Perform actions in staging area slots by referencing slots A4 through D4. See [Deck Slots](deck_slots.md).
     - Explicitly command a pipette to `prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
 - Improved features
     - `aspirate`, `dispense`, and `mix` will not move any liquid when called with `volume=0`.
@@ -223,7 +223,7 @@ Several older parts of the Protocol API were deprecated as part of this switchov
 - Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
 
 ### Version 2.9
-- You can now access certain geometry data regarding a labware's well via a Well Object. See [new-labware-well-properties](labware.md#well-properties) for more information.
+- You can now access certain geometry data regarding a labware's well via a Well Object. See [Well Dimensions](labware.md#well-dimensions) for more information.
 
 ### Version 2.8
 - You can now pass in a list of volumes to distribute and consolidate. See [distribute-consolidate-volume-list](pipettes.md#distribute-consolidate-volume-list) for more information.

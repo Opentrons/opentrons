@@ -137,7 +137,7 @@ Liquid class definitions automatically include a disposal volume for liquid clas
    
     [`consolidate`][opentrons.protocol_api.InstrumentContext.consolidate] ignores `disposal_volume` completely.
 
-## Touch Tip
+## Touch Tip {#touch-tip-complex}
 
 The `touch_tip` parameter accepts a Boolean value. When `True`, a touch tip step occurs after every aspirate and dispense.
 
@@ -156,14 +156,14 @@ pipette.transfer(
 
 Touch tip occurs after every aspiration, including when [tip refilling][tip-refilling] is required.
 
-This parameter always uses default motion behavior for touch tip. Use the [touch tip building block command](../building-block-commands/liquids.md#touch-tip) if you need to:
+This parameter always uses default motion behavior for touch tip. Use the [touch tip building block command][touch-tip-building-block] if you need to:
 
 - Only touch the tip after aspirating or dispensing, but not both.
 - Control the speed, radius, or height of the touch tip motion.
 
 Liquid class definitions determine touch tip behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
-## Air Gap
+## Air Gap {#air-gap-complex}
 
 The `air_gap` parameter controls how much air to aspirate and hold in the bottom of the tip when it contains liquid. The parameter's value is the amount of air to aspirate in µL.
 
@@ -264,7 +264,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 !!! note
     [`distribute`][opentrons.protocol_api.InstrumentContext.distribute] ignores any value of `mix_after`. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
 
-## Blow Out
+## Blow Out {#blow-out-complex}
 
 There are two parameters that control whether and where the pipette blows out liquid. The `blow_out` parameter accepts a Boolean value. When `True`, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The `blowout_location` parameter controls in which of three locations these blowout actions occur.
 
@@ -293,7 +293,7 @@ pipette.transfer(
 
 Set `blowout_location` when you don't want to waste any liquid by blowing it out into the trash. For example, you may want to make sure that every last bit of a sample is moved into a destination well. Or you may want to return every last bit of an expensive reagent to the source for use in later pipetting.
 
-If you need to blow out in a different well, or at a specific location within a well, use the [blow out building block command](../building-block-commands/liquids.md#blow-out) instead.
+If you need to blow out in a different well, or at a specific location within a well, use the [blow out building block command][blow-out-building-block] instead.
 
 When setting a blowout location, you *must* also set `blow_out=True`, or the location will be ignored:
 
