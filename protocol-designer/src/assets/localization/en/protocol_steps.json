@@ -37,7 +37,7 @@
     "volume": "Recommended between 0.1 and {{max}}"
   },
   "camera": {
-    "capture_image": "Capture image of deck"
+    "capture_image": "Capture image of the deck"
   },
   "change_tips": "Change tips",
   "column": "Column",
