@@ -55,7 +55,14 @@ nav:
       - Robot Motors: api-reference/robot-motors.md
       - Labware and Trash Containers: api-reference/labware.md
       - Wells and Liquids: api-reference/wells-liquids.md
-      - Modules: api-reference/modules.md
+      - Modules:
+        - Absorbance Plate Reader: api-reference/absorbance-plate-reader.md
+        - Flex Stacker: api-reference/flex-stacker.md
+        - Heater-Shaker: api-reference/heater-shaker.md
+        - Magnetic Block: api-reference/magnetic-block.md
+        - Magnetic Module: api-reference/magnetic-module.md
+        - Temperature Module: api-reference/temperature-module.md
+        - Thermocycler: api-reference/thermocycler.md
       - Useful Types: api-reference/types.md
       - Execute and Simulate: api-reference/execute-simulate.md
 
