@@ -175,6 +175,7 @@ class FixtureSettings:
     disc_ver_cuttoff: int
     lld_every_tip: bool
     single_tip_96: bool
+    cavity_test: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -260,6 +261,7 @@ class FixtureSettings:
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
         lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
+        cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -382,10 +384,10 @@ class FixtureSettings:
             t50_str += f"{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
         t200_str = f"{ctx.params.cavity_200}"  # type: ignore [attr-defined]
         if ctx.params.cavity_200 != "Unused":  # type: ignore [attr-defined]
-            t50_str += f"{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
+            t200_str += f"{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
         t1000_str = f"{ctx.params.cavity_1000}"  # type: ignore [attr-defined]
         if ctx.params.cavity_1000 != "Unused":  # type: ignore [attr-defined]
-            t50_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
+            t1000_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
         report.store_serial_numbers(
             test_report,
             robot=robot_name,
@@ -445,6 +447,7 @@ class FixtureSettings:
             disc_ver_cuttoff=disc_ver_cuttoff,
             lld_every_tip=lld_every_tip,
             single_tip_96=single_tip_96,
+            cavity_test=cavity_test,
         )
 
     def validate_settings(self) -> bool:
@@ -511,6 +514,25 @@ def _get_tips_for_test_single_multi(
                 fixture_settings.ctx, tip
             )
             return [t for t in a_row_tips if t.has_tip]
+        elif fixture_settings.cavity_test:
+            # This should only ever be called once so hopefully this doesn't break anything
+            # consume tips bottom to top, left to right
+            if len(tipracks_lw) != 0:
+                for rack in tipracks_lw:
+                    for col in range(1, 13):  # H->A
+                        for row in range(72, 64, -1):  # 1->12
+                            wells.append(rack[f"{chr(row)}{col}"])
+                return wells
+            else:
+                for rack_slot in partially_used:
+                    rack = loaded_labwares[DeckSlotName.from_primitive(rack_slot).as_int()]
+                    for col in range(1, 13):  # H->A
+                        for row in range(72, 64, -1):  # 1->12
+                            next_tip = rack[f"{chr(row)}{col}"]
+                            if next_tip.has_tip:
+                                wells.append(next_tip)
+                return wells
+
         else:
             return tips.get_tips_for_individual_channel_on_multi(
                 fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
@@ -613,6 +635,7 @@ def _get_tips_for_test(
         fixture_settings.pipette_channels == 8
         and len(fixture_settings.channels) == 1
         and fixture_settings.channels[0] == 0
+        and not fixture_settings.cavity_test
     ):
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
@@ -1203,23 +1226,20 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
-def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
-    """Run."""
-    first_tip = _get_tips_for_test(
-        fixture_settings, fixture_settings.tip_sizes[0], True
-    )[0]
-    print_info("Picking up first tip.")
-    _configure_tip_count(fixture_settings, 0)
-    pick_up_tip_for_channel(fixture_settings, first_tip, 0)
+def calculate_evaporation(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    liq: SupportedLiquid,
+    tip: Well,
+) -> Tuple[List[List[MeasurementData]], float, float]:
+    """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
-    last_probed_tip_size = fixture_settings.tip_sizes[0]
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
     fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
-    measurements: Dict[float, List[List[MeasurementData]]] = {}
     ctx.delay(
         seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
@@ -1232,10 +1252,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 fixture_settings.tip_sizes[0],
                 fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
                 i,
-                first_tip,
+                tip,
             )
         )
-    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     asp_evaps = [
         calculate_change_in_volume(blank[0], blank[1], liq)
         for blank in blank_measurments
@@ -1260,8 +1279,25 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
             - volume_lost_during_blank,
         )
+    return blank_measurments, avg_asp_evap, avg_disp_evap
+
+
+def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
+    """Run."""
+    first_tip = _get_tips_for_test(
+        fixture_settings, fixture_settings.tip_sizes[0], True
+    )[0]
+    print_info("Picking up first tip.")
+    _configure_tip_count(fixture_settings, 0)
+    pick_up_tip_for_channel(fixture_settings, first_tip, 0)
+    last_probed_tip_size = fixture_settings.tip_sizes[0]
+    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
+        ctx, fixture_settings, liq, first_tip
+    )
     remove_tip(fixture_settings)
 
+    measurements: Dict[float, List[List[MeasurementData]]] = {}
     last_measurement = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
@@ -1293,9 +1329,22 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
+                print_info(tips)
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
+
                 for trial in range(fixture_settings.trials):
+                    if fixture_settings.cavity_test and trial != 0 and trial % 15 == 0:
+                        pick_up_tip_for_channel(fixture_settings, tips[0], 0)
+                        print_info("calculating evap.")
+                        (
+                            blank_measurments,
+                            avg_asp_evap,
+                            avg_disp_evap,
+                        ) = calculate_evaporation(
+                            ctx, fixture_settings, liq, tips.pop(0)
+                        )
+                        remove_tip(fixture_settings)
                     print_header(
                         f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
                     )
