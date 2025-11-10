@@ -114,12 +114,14 @@ export function PipetteShadow(props: {
     channels,
   })
   const ShadowComponent = SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
+  const isOt2EightChannel = robotType === OT2_ROBOT_TYPE && channels === 8
   const { x: labelOffsetX, y: labelOffsetY } = getLabelOffsetByPlacement({
     labelPlacement,
     labelWidth,
     labelHeight,
     shadowWidth: width,
     shadowHeight: height,
+    isOt2EightChannel,
   })
   const labelText =
     !isAccessible && inaccessibleReason != null
