@@ -9,7 +9,8 @@ from server_utils.fastapi_utils.light_router import LightRouter
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.system import camera
 
-from robot_server.errors.error_responses import ErrorBody
+from opentrons_shared_data.errors import ErrorCodes
+from robot_server.errors.error_responses import ErrorBody, LegacyErrorResponse
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -47,6 +48,7 @@ camera_router = LightRouter()
         status.HTTP_201_CREATED: {"model": SimpleBody[CameraSettings]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
     },
 )
 async def add_camera_settings(
@@ -67,6 +69,11 @@ async def add_camera_settings(
         robot_type: Used to validate robot type for live stream service.
         camera_provider: Access to the camera settings and related services.
     """
+    if not camera.camera_exists():
+        raise LegacyErrorResponse(
+            message="Video device is unavailable.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
     if run.current is False:
         raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
             status.HTTP_409_CONFLICT

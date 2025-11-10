@@ -363,3 +363,9 @@ def get_boot_id() -> str:
         return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     else:
         return "SIMULATED_BOOT_ID"
+
+
+def camera_exists() -> bool:
+    """Validate whether or not the camera device exists."""
+    return os.path.exists(DEFAULT_SYSTEM_CAMERA)
+    # todo(chb, 2025-11-10): Eventually when we support multiple cameras this should accept a camera parameter to check for
