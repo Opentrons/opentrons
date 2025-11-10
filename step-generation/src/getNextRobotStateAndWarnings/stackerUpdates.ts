@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { uuid } from '../utils'
+import { getSlotInLocationStack, uuid } from '../utils'
 
 import type {
   FlexStackerEmptyParams,
@@ -19,6 +19,7 @@ import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
+  TimelineFrame,
 } from '../types'
 
 const _getStackerModuleState = (
@@ -92,6 +93,7 @@ export const forFlexStackerFill = (
       count > 0 &&
       maxStorableLabware > count + (moduleState.labwareInStacker?.length ?? 0)
     ) {
+      // create labware entities for the new labware
       const newLabwareIdList = Array.from({ length: count }, () => uuid())
       moduleState.labwareInStacker = [
         ...(moduleState.labwareInStacker ?? []),
@@ -112,8 +114,26 @@ export const forFlexStackerRetrieve = (
   if (moduleState != null) {
     // do i need to know the state of every stacker and every stacker in the labware or do we match step by step?
     const labwareToRetrieve = moduleState.labwareInStacker?.[0]
-    const labwareLocation = robotState.labware[labwareToRetrieve ?? '']?.stack[robotState.labware[labwareToRetrieve ?? '']?.stack.length - 1]
-    
+    const labwareLocation =
+      robotState.labware[labwareToRetrieve ?? '']?.stack[
+        robotState.labware[labwareToRetrieve ?? '']?.stack.length - 1
+      ]
+    if (labwareLocation == null) {
+      throw new Error('Labware location is null')
+    }
+    console.log('labwareLocation: ', labwareLocation)
+    console.log('robotState: ', robotState)
+    console.log('invariantContext: ', invariantContext)
+    // check if slot is occupied
+    const deck = getIsSlotOccupied(robotState)
+    if (deck.slots[labwareLocation.slotName]?.occupied) {
+      throw new Error('Slot is occupied')
+    }
+    // update shuttle position
+    moduleState.shuttlePosition = 'retrieved'
+    // update labware batch
+    // robotState.labware[labwareToRetrieve ?? '']?.stack = robotState.labware[labwareToRetrieve ?? '']?.stack.slice(0, -1)
+    // robotState.labware[labwareToRetrieve ?? '']?.stack = [labwareLocation]
   }
 }
 
@@ -128,4 +148,20 @@ export const forFlexStackerStore = (
   if (moduleState != null) {
     moduleState.shuttlePosition = 'stored'
   }
+}
+function getIsSlotOccupied(robotState: TimelineFrame, slot: string) {
+  for (const labware of Object.values(robotState.labware)) {
+    if (labware.stack.length > 0) {
+      const slot = getSlotInLocationStack(labware.stack)
+      if (slot === slot) {
+        return true
+      }
+    }
+  }
+  for (const module of Object.values(robotState.modules)) {
+    if (module.slot === slot) {
+      return true
+    }
+  }
+  return false
 }

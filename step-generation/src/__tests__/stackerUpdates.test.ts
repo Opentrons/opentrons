@@ -150,7 +150,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
   })
 })
 
-
 describe('flex stacker state updates forFlexStackerRetrieve', () => {
   const invariantContext = makeContext()
   const robotState = getInitialRobotStateStandard(invariantContext)
