@@ -4,10 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
   Chip,
+  COLORS,
+  DIRECTION_ROW,
   Divider,
+  Flex,
+  Icon,
   MenuItem,
   OverflowBtn,
+  SPACING,
   StyledText,
   useMenuHandleClickOutside,
   useOnClickOutside,
@@ -98,15 +104,26 @@ export function CameraCard({
             >
               {t('on_deck')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('camera')}
-            </StyledText>
+            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+              <Icon
+                size="1rem"
+                name="camera"
+                color={COLORS.grey50}
+                marginRight={SPACING.spacing8}
+              />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {isFlex ? t('flex_camera') : t('ot2_camera')}
+              </StyledText>
+            </Flex>
           </div>
-          {isCameraEnabled ? (
-            <Chip type="success" hasIcon={false} text={t('enabled')} />
-          ) : (
-            <Chip type="neutral" hasIcon={false} text={t('disabled')} />
-          )}
+          <Flex width="fit-content">
+            <Chip
+              type={isCameraEnabled ? 'success' : 'neutral'}
+              hasIcon={false}
+              text={isCameraEnabled ? t('enabled') : t('disabled')}
+              chipSize="small"
+            />
+          </Flex>
         </div>
       </div>
       <div className={styles.card_overflow_btn}>
