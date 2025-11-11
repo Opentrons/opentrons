@@ -147,55 +147,50 @@ export function Controls(props: ControlsProps): JSX.Element {
   ]
 
   return (
-    <>
-      <div className={styles.container}>
-        <div className={styles.controls_container}>
-          <div className={styles.all_controls_info}>
-            <div className={styles.controls_info}>
-              <div className={styles.heading_text}>{protocolName}</div>
-              <div className={styles.max_content_size}>
-                {numErrors === 0 ? (
-                  <Chip type="success" chipSize="small" text="No errors" />
-                ) : (
-                  <Chip type="error" text={`${numErrors} error`} />
-                )}
-              </div>
-            </div>
-            <div className={styles.buttons}>
-              <div className={styles.per_step_button_wrapper}>
-                <TertiaryButton
-                  buttonType="white"
-                  onClick={handlePerStepOverflowClick}
-                >
-                  <StyledText
-                    desktopStyle="captionSemiBold"
-                    whiteSpace={NO_WRAP}
-                  >
-                    {t('seconds_per_step', {
-                      seconds: milliSecondsPerFrame / 1000,
-                    })}
-                  </StyledText>
-                </TertiaryButton>
-                {showPerStepOverflowMenu ? (
-                  <PerStepOverflowMenu
-                    setShowPerStepOverflowMenu={setShowPerStepOverflowMenu}
-                    setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-                  />
-                ) : null}
-              </div>
-              <NewIconButton
-                variant="primary"
-                iconName={isPlaying ? 'pause' : 'play'}
-                iconSize="1.5rem"
-                iconColor={COLORS.white}
-                size="3rem"
-                onClick={handlePlayPause}
-              />
+    <div className={styles.container}>
+      <div className={styles.controls_container}>
+        <div className={styles.all_controls_info}>
+          <div className={styles.controls_info}>
+            <div className={styles.heading_text}>{protocolName}</div>
+            <div className={styles.max_content_size}>
+              {numErrors === 0 ? (
+                <Chip type="success" chipSize="small" text="No errors" />
+              ) : (
+                <Chip type="error" text={`${numErrors} error`} />
+              )}
             </div>
           </div>
+          <div className={styles.buttons_container}>
+            <div className={styles.per_step_button_wrapper}>
+              <TertiaryButton
+                buttonType="white"
+                onClick={handlePerStepOverflowClick}
+              >
+                <StyledText desktopStyle="captionSemiBold" whiteSpace={NO_WRAP}>
+                  {t('seconds_per_step', {
+                    seconds: milliSecondsPerFrame / 1000,
+                  })}
+                </StyledText>
+              </TertiaryButton>
+              {showPerStepOverflowMenu ? (
+                <PerStepOverflowMenu
+                  setShowPerStepOverflowMenu={setShowPerStepOverflowMenu}
+                  setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+                />
+              ) : null}
+            </div>
+            <NewIconButton
+              variant="primary"
+              iconName={isPlaying ? 'pause' : 'play'}
+              iconSize="1.5rem"
+              iconColor={COLORS.white}
+              size="3rem"
+              onClick={handlePlayPause}
+            />
+          </div>
         </div>
-        <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
       </div>
-    </>
+      <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
+    </div>
   )
 }
