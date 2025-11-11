@@ -154,9 +154,9 @@ export function Controls(props: ControlsProps): JSX.Element {
             <div className={styles.heading_text}>{protocolName}</div>
             <div className={styles.max_content_size}>
               {numErrors === 0 ? (
-                <Chip type="success" chipSize="small" text="No errors" />
+                <Chip type="success" chipSize="small" text={t('no_errors')} />
               ) : (
-                <Chip type="error" text={`${numErrors} error`} />
+                <Chip type="error" text={t('errors', { count: numErrors })} />
               )}
             </div>
           </div>
