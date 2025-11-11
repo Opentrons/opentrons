@@ -26,7 +26,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.21.1"
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
@@ -80,7 +80,7 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "33.2.1",
+    "electron": "39.1.2",
     "electron-builder": "26.0.15",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^8.1.0",
