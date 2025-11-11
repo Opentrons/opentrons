@@ -44,7 +44,7 @@ export const locationIsOnAddressableArea = (
 ): labwareLocation is { addressableAreaName: AddressableAreaName } =>
   locationIsOnDeck(labwareLocation) && 'addressableAreaName' in labwareLocation
 
-export const getIsSlotValid = (slot: string): boolean => {
+export const getIsValidSlotName = (slot: string): boolean => {
   return (
     STANDARD_OT2_SLOTS.includes(slot as AddressableAreaName) ||
     STANDARD_FLEX_SLOTS.includes(slot as AddressableAreaName) ||

@@ -104,7 +104,7 @@ export const forFlexStackerFill = (
 }
 
 export const forFlexStackerRetrieve = (
-  params: FlexStackerRetrieveParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -112,28 +112,36 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
-    // do i need to know the state of every stacker and every stacker in the labware or do we match step by step?
-    const labwareToRetrieve = moduleState.labwareInStacker?.[0]
-    const labwareLocation =
-      robotState.labware[labwareToRetrieve ?? '']?.stack[
-        robotState.labware[labwareToRetrieve ?? '']?.stack.length - 1
-      ]
-    if (labwareLocation == null) {
-      throw new Error('Labware location is null')
+    if (moduleState.shuttlePosition === 'retrieved') {
+      throw new Error(
+        'Cannot retrieve labware bc there is labware in the shuttle'
+      )
     }
-    console.log('labwareLocation: ', labwareLocation)
-    console.log('robotState: ', robotState)
-    console.log('invariantContext: ', invariantContext)
-    // check if slot is occupied
-    const deck = getIsSlotOccupied(robotState)
-    if (deck.slots[labwareLocation.slotName]?.occupied) {
-      throw new Error('Slot is occupied')
+    if (moduleState.labwareInStacker == null) {
+      throw new Error(
+        'Cannot retrieve labware bc there is no labware in the stacker'
+      )
     }
-    // update shuttle position
-    moduleState.shuttlePosition = 'retrieved'
-    // update labware batch
-    // robotState.labware[labwareToRetrieve ?? '']?.stack = robotState.labware[labwareToRetrieve ?? '']?.stack.slice(0, -1)
-    // robotState.labware[labwareToRetrieve ?? '']?.stack = [labwareLocation]
+    if (
+      moduleState.storedLabwareDetails == null ||
+      moduleState.storedLabwareDetails.primaryLabware == null
+    )
+      throw new Error(
+        'Cannot retrieve labware bc there is no stored labware details or primary labware'
+      )
+  }
+
+  moduleState!.shuttlePosition = 'retrieved'
+
+  const retrievedLabware = moduleState?.labwareInStacker?.[0]
+  if (retrievedLabware == null) {
+    throw new Error(
+      'Cannot retrieve labware bc there is no labware in the stacker'
+    )
+  }
+  robotState.labware[retrievedLabware] = {
+    ...robotState.labware[retrievedLabware],
+    stack: robotState.labware[retrievedLabware]?.stack?.slice(0, -1) ?? [],
   }
 }
 
