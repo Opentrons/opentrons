@@ -8,7 +8,6 @@ nav:
       - System Description: system-description/index.md
       - Robot Components: system-description/robot-components.md
       - Pipettes: system-description/pipettes.md
-  - Product Elements: box-contents.md
   - Installation and Relocation:
       - Installation and Relocation: installation/index.md
       - Installation Requirements: installation/requirements.md
@@ -16,7 +15,6 @@ nav:
       - First Run: installation/first-run.md
       - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
-
   - Instruments and Modules: modules.md
   - Labware: labware.md
   - Software: software.md

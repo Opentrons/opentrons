@@ -28,7 +28,7 @@ In turn, the pipette carriage is attached to the gantry. The pipette carriage ho
 
 The electronics contained in the gantry provide power and communications to the pipettes, when attached.
 
-## Deck and working area
+## OT-2 deck and working area
 
 The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
 
@@ -61,7 +61,7 @@ The following table lists and describes these status lights.
   </thead>
   <tbody>
     <tr>
-      <td><img src="../../images/ot2-power.png" alt="power" width="50%"></td>
+      <td><img src="../../images/power-symbol.png" alt="power" width="50%"></td>
       <td>Power light<br>Light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
     </tr>
     <tr>
