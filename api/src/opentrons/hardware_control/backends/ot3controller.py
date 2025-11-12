@@ -433,7 +433,7 @@ class OT3Controller(FlexBackend):
     async def get_serial_number(self) -> Optional[str]:
         if not self.initialized:
             return None
-        return cast(Optional[str], self.eeprom_data.serial_number)
+        return self.eeprom_data.serial_number
 
     @property
     def initialized(self) -> bool:
@@ -1342,7 +1342,7 @@ class OT3Controller(FlexBackend):
                 wrapping=[PythonException(ke)],
             ) from ke
         self._engaged_axes.update({axis: engaged})
-        return cast(bool, engaged)
+        return engaged
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
@@ -1599,10 +1599,7 @@ class OT3Controller(FlexBackend):
         )
 
         self._position[axis_to_node(moving)] = status.motor_position
-        return cast(
-            bool,
-            status.move_ack == MoveCompleteAck.stopped_by_condition,
-        )
+        return status.move_ack == MoveCompleteAck.stopped_by_condition
 
     async def capacitive_pass(
         self,
@@ -1621,7 +1618,7 @@ class OT3Controller(FlexBackend):
             sensor_id_for_instrument(probe),
         )
         self._position[axis_to_node(moving)] += distance_mm
-        return cast(List[float], data)
+        return data
 
     async def release_estop(self) -> None:
         if self._gpio_dev is None:
@@ -1850,13 +1847,10 @@ class OT3Controller(FlexBackend):
             )
 
     async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
-        return cast(
-            bool,
-            await set_hepa_fan_state_fw(
-                self._messenger,
-                fan_on,
-                duty_cycle,
-            ),
+        return await set_hepa_fan_state_fw(
+            self._messenger,
+            fan_on,
+            duty_cycle,
         )
 
     async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
@@ -1871,13 +1865,10 @@ class OT3Controller(FlexBackend):
         )
 
     async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
-        return cast(
-            bool,
-            await set_hepa_uv_state_fw(
-                self._messenger,
-                light_on,
-                uv_duration_s,
-            ),
+        return await set_hepa_uv_state_fw(
+            self._messenger,
+            light_on,
+            uv_duration_s,
         )
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
