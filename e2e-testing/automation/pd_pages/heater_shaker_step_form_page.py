@@ -69,3 +69,35 @@ class HeaterShakerStepPage(BasePage):
     def pause_confirm(self) -> None:
         """Confirm the pause in the step editor."""
         self.page.get_by_role("button", name="Add pause step").click()
+
+    ## Composite step
+
+
+def _add_heater_shaker_step(page: Page, temp: str, speed: str, timer: str) -> None:
+    """Add a Heater-Shaker step configured with temperature, speed, and timer.
+
+    Args:
+        editor: The initialized ProtocolEditorPage object for adding steps.
+        page: The Playwright Page object for raw interactions.
+        temp: The target temperature for the module (e.g., "50").
+        speed: The target RPM speed for the shaker (e.g., "300").
+        timer: The optional timer duration in HH:MM format (e.g., "00:30").
+    """
+    hs_page = HeaterShakerStepPage(page)
+    hs_page.wait_for_form_load()
+
+    hs_page.set_target_temperature(temp)
+    hs_page.set_target_speed(speed)
+
+    try:
+        timer_input = hs_page.locator('input[name="heaterShakerTimer"]')
+        timer_input.click()
+        timer_input.fill(timer)
+        print(f"✓ Heater-Shaker timer set to {timer}")
+    except Exception as e:  # noqa: BLE001
+        print(f"Warning: Could not set Heater-Shaker timer. Error: {e}")
+
+    hs_page.save_step()
+    hs_page.pause_confirm()
+
+    print(f"✓ Heater-Shaker step added (T:{temp}°C, S:{speed}rpm).")

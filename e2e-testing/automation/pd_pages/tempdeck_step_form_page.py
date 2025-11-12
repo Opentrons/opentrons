@@ -42,3 +42,19 @@ class TemperatureStepPage(BasePage):
         """Click the button to add a pause step after the temperature setpoint is reached."""
         # self.wait_for_visible(self._pause_button)
         self._pause_button.click()
+
+
+def _add_temperature_module_step(page: Page, temp: str) -> None:
+    """Add a Temperature Module step and an immediate Pause step to the protocol.
+
+    Args:
+        editor: The initialized ProtocolEditorPage object for adding steps.
+        page: The Playwright Page object for raw interactions.
+        temp: The target temperature for the module (e.g., "50" for 50°C).
+    """
+
+    temp_page = TemperatureStepPage(page)
+    temp_page.set_target_temperature(temp)
+    temp_page.save_step()
+    temp_page.add_pause()
+    print(f"✓ Temperature step set to {temp}°C and Pause step added.")

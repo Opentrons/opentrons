@@ -1,6 +1,7 @@
 """Module for interactions within the Thermocycler Step configuration form."""
 
 import re
+from typing import Optional
 
 from playwright.sync_api import Page
 
@@ -385,3 +386,148 @@ class ThermocyclerProfileModal(BasePage):
         modal = self.page.get_by_label("ModalShell_ModalArea")
         cancel_button = modal.get_by_role("button", name="Cancel")
         cancel_button.click()
+
+
+# Composite steps
+
+
+def _add_thermocycler_state_step(
+    page: Page,
+    block_temp: Optional[str] = None,
+    lid_temp: Optional[str] = None,
+    lid_position: str = "open",
+) -> None:
+    """Add a Thermocycler step in STATE mode with configurable parameters.
+
+    Args:
+        page: The Playwright Page object for raw interactions.
+        block_temp: Block target temperature (e.g., "40"). If None, block is not toggled.
+        lid_temp: Lid target temperature (e.g., "110"). If None, lid is not toggled.
+        lid_position: Lid position ("open" or "closed"). Defaults to "open".
+    """
+    tc_page = ThermocyclerStepPage(page)
+
+    print("✓ Thermocycler step form loaded (State mode)")
+
+    tc_page.select_state_mode()
+    print("✓ State mode selected")
+
+    if block_temp is not None:
+        tc_page.toggle_block_temperature(enable=True)
+        tc_page.set_block_temperature(block_temp)
+        print(f"✓ Block temperature: ON at {block_temp}°C")
+    else:
+        print("⊘ Block temperature: not configured")
+
+    if lid_temp is not None:
+        tc_page.toggle_lid_temperature(enable=True)
+        tc_page.set_lid_temperature(lid_temp)
+        print(f"✓ Lid temperature: ON at {lid_temp}°C")
+    else:
+        print("⊘ Lid temperature: not configured")
+
+    tc_page.set_lid_position(lid_position)
+    print(f"✓ Lid position: {lid_position.upper()}")
+
+    tc_page.save_step()
+    print("✅ Thermocycler state step saved")
+
+
+def _add_thermocycler_profile_step(
+    page: Page,
+    well_volume: str = "100",
+    lid_temp: str = "50",
+    cycles: Optional[list] = None,
+) -> None:
+    """Add a Thermocycler step in PROFILE mode with configurable cycle definition.
+
+    Args:
+        page: The Playwright Page object for raw interactions.
+        well_volume: Well volume in µL (e.g., "100").
+        lid_temp: Lid temperature (e.g., "50").
+        cycles: List of cycle dictionaries. Each dict should contain:
+            {
+                "repeat_count": "2",
+                "steps": [
+                    {
+                        "name": "Cycle 1",
+                        "temperature": "40",
+                        "time": "1:00"
+                    },
+                    ...
+                ]
+            }
+            If None, defaults to a single cycle with 2 steps repeating 2 times.
+
+    Example:
+        _add_thermocycler_profile_step(
+            well_volume="100",
+            lid_temp="50",
+            cycles=[{
+                "repeat_count": "35",
+                "steps": [
+                    {"name": "Denature", "temperature": "95", "time": "0:30"},
+                    {"name": "Anneal", "temperature": "60", "time": "0:30"},
+                ]
+            }]
+        )
+    """
+    if cycles is None:
+        cycles = [
+            {
+                "repeat_count": "2",
+                "steps": [
+                    {"name": "Cycle 1", "temperature": "40", "time": "1:00"},
+                    {"name": "Cycle 2", "temperature": "4", "time": "0:01"},
+                ],
+            }
+        ]
+
+    tc_page = ThermocyclerStepPage(page)
+
+    print("✓ Thermocycler step form loaded (Profile mode)")
+
+    tc_page.select_profile_mode()
+    print("✓ Profile mode selected")
+
+    tc_page.set_well_volume(well_volume)
+    print(f"✓ Well volume: {well_volume} µL")
+
+    tc_page.set_profile_lid_temperature(lid_temp)
+    print(f"✓ Lid temperature: {lid_temp}°C")
+
+    profile_modal = tc_page.open_profile_programmer()
+    profile_modal.wait_for_modal_load()
+
+    for cycle_idx, cycle_config in enumerate(cycles):
+        profile_modal.add_cycle()
+        profile_modal.delete_thermocycler_step(step_index=0)
+        print(f"✓ Cycle {cycle_idx} added")
+
+        steps = cycle_config.get("steps", [])
+        for step_idx, step_config in enumerate(steps):
+            # to avoid arbitrary
+            profile_modal.add_cycle_step(cycle_index=cycle_idx)
+            profile_modal.fill_cycle_step(
+                cycle_index=cycle_idx,
+                step_index=step_idx,
+                step_name=step_config["name"],
+                temperature=step_config["temperature"],
+                time=step_config["time"],
+            )
+            print(
+                f"  ✓ Step {step_idx}: {step_config['name']} @ {step_config['temperature']}°C for {step_config['time']}"
+            )
+
+        repeat_count = cycle_config.get("repeat_count", "1")
+        profile_modal.set_cycle_count(cycle_index=cycle_idx, count=repeat_count)
+        print(f"✓ Cycle {cycle_idx} repeat count: {repeat_count}")
+
+        profile_modal.save_cycle(cycle_index=cycle_idx)
+        print(f"✓ Cycle {cycle_idx} saved")
+
+    profile_modal.save_and_close_profile()
+    print("✓ Profile modal saved and closed")
+
+    tc_page.save_step()
+    print("✅ Thermocycler profile step saved")
