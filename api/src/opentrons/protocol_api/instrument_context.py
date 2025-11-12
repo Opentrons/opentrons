@@ -245,8 +245,18 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
                 If not specified, defaults to 1.0. See
                 [Pipette Flow Rates][pipette-flow-rates].
-                flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
+            flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
+            end_location (`Location`): Tells the robot to move between `location` and
+                `end_location` while aspirating liquid. When this argument is used, the
+                `location` and `end_location` must both be
+                [`Location`][opentrons.types.Location].
+            movement_delay (float, optional): Delay the x/y/z movement during a dynamic
+                aspirate. This option is only valid when using `end_location`. When this
+                argument is used, the x/y/z movement will wait `movement_delay` seconds
+                after the pipette starts to aspirate before moving. This may help when
+                dispensing very viscous liquids that need to build up some pressure
+                before liquid starts to flow.
 
         Returns:
             InstrumentContext: This instance.
@@ -255,7 +265,7 @@ class InstrumentContext(publisher.CommandPublisher):
             If `aspirate()` is called with a single, unnamed argument, it will treat
             that argument as `volume`. If you want to call `aspirate()` with only
             `location`, specify it as a keyword argument:
-            `pipette.aspirate(location=plate['A1'])`
+            `pipette.aspirate(location=plate['A1'])`.
 
         *Changed in version 2.24*: Added the `flow_rate` parameter.
         """
@@ -428,10 +438,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 In API version 2.16 and earlier, dispense all liquid in the pipette. In
                 API version 2.17 and later, raise an error.
 
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin], [`WasteChute`][opentrons.protocol_api.WasteChute], optional):
-                Tells the robot
-                where to dispense liquid held in the pipette. The location can be a `Well`,
-                `Location`, `TrashBin`, or `WasteChute`.
+            location:
+                Tells the robot where to dispense liquid held in the pipette. The location can be a
+                `Well`, `Location`, `TrashBin`, or `WasteChute`.
 
                 - If a `Well`, the pipette will dispense at or above the bottom center of
                 the well. The distance (in mm) from the well bottom is specified by
@@ -444,7 +453,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 - If a trash container, the pipette will dispense at a location relative
                 to its center and the trash container's top center. See
-                [Position Relative to Trash Containers][position-relative-to-trash-containers] for details.
+                [Position Relative to Trash Containers][position-relative-to-trash-containers]
+                for details.
 
                 - If unspecified, the pipette will dispense at its current position.
 
@@ -470,6 +480,18 @@ class InstrumentContext(publisher.CommandPublisher):
 
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
+
+            end_location (`Location`): Tells the robot to move between `location` and
+                `end_location` while dispensing liquid held in the pipette. When this
+                argument is used, the `location` and `end_location` must both be a
+                [`Location`][opentrons.types.Location].
+
+            movement_delay (float): Delay the x/y/z movement during a dynamic dispense.
+                This option is only valid when using `end_location`. When this argument
+                is used, the x/y/z movement will wait `movement_delay` seconds after the
+                pipette starts to dispense before moving. This may help when dispensing
+                very viscous liquids that need to build up some pressure before liquid
+                starts to flow.
 
         Returns:
             InstrumentContext: This instance.
@@ -670,7 +692,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 behave the same as a volume of `None`/unspecified: mix the full working
                 volume of the pipette. On API levels at or above 2.16, no liquid will
                 be mixed.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional): 
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional):
                 The location where the
                 pipette will mix. If unspecified, the pipette will mix at its current
                 position.
@@ -835,56 +857,72 @@ class InstrumentContext(publisher.CommandPublisher):
         movement_delay: Optional[float] = None,
     ) -> InstrumentContext:
         """
-        Mix a volume of liquid by repeatedly aspirating and dispensing it in a multiple locations.
+        Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
+        locations.
 
-        See :ref:`dynamic-mix` for examples.
+        See [Dynamic Mix][dynamix-mix] for examples.
 
-        :param repetitions: Number of times to mix (default is 1).
-        :param volume: The volume to mix, measured in µL. If unspecified, defaults
-                       to the maximum volume for the pipette and its attached tip.
+        Args:
+            repetitions (int, optional): Number of times to mix (default is 1).
+            volume (float, optional): The volume to mix, measured in µL. If unspecified,
+                defaults to the maximum volume for the pipette and its attached tip.
 
-                       If ``mix`` is called with a volume of precisely 0, its behavior
-                       depends on the API level of the protocol. On API levels below 2.16,
-                       it will behave the same as a volume of ``None``/unspecified: mix
-                       the full working volume of the pipette. On API levels at or above 2.16,
-                       no liquid will be mixed.
-        :param aspirate_start_location: The :py:class:`~.types.Location` where the pipette will start aspirating from.
-        :param aspirate_end_location: A :py:class:`~.types.Location`. If specified,
-                    the pipette will move between the ``aspirate_start_location`` and the ``aspirate_end_location``
-                    while performing the aspirate.
-        :param dispense_start_location: The :py:class:`~.types.Location` where the pipette will start dispensing to.
-        :param dispense_end_location: A :py:class:`~.types.Location`. If specified,
-                    the pipette will move between the ``dispense_start_location`` and the ``dispense_end_location``
-                    while performing the dispense.
-        :param rate: How quickly the pipette aspirates and dispenses liquid while
-                     mixing. The aspiration flow rate is calculated as ``rate``
-                     multiplied by :py:attr:`flow_rate.aspirate <flow_rate>`. The
-                     dispensing flow rate is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense <flow_rate>`. See
-                     :ref:`new-plunger-flow-rates`.
-        :param aspirate_flow_rate: The absolute flow rate for each aspirate in the mix, in µL/s.
-                                   If this is specified, ``rate`` must not be set.
-        :param dispense_flow_rate: The absolute flow rate for each dispense in the mix, in µL/s.
-                                   If this is specified, ``rate`` must not be set.
-        :param aspirate_delay: How long to wait after each aspirate in the mix, in seconds.
-        :param dispense_delay: How long to wait after each dispense in the mix, in seconds.
-        :param final_push_out: How much volume to push out after the final mix repetition. The
-                               pipette will not push out after earlier repetitions. If
-                               not specified or ``None``, the pipette will push out the
-                               default non-zero amount. See :ref:`push-out-dispense`.
-        :param movement_delay: Time in seconds to delay after the pipette starts aspirating or dispensing and before it begins moving from the ``aspirate_start_location`` or ``dispense_start_location`` to the ``aspirate_end_location`` or ``dispense_end_location``.
-            This option is only valid when using ``aspirate_end_location`` or ``dispense_end_location``.
-            When this argument is used, the pipette will wait the specified time
-            after the pipette starts to aspirate or dispense before moving. This may help when mixing
-            very viscous liquids that need to build up some pressure before liquid starts to flow.
-        :type movement_delay: float
-        :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
-        :returns: This instance.
+                If `mix()` is called with a volume of precisely 0, its behavior depends
+                on the API level of the protocol. On API levels below 2.16, it will
+                behave the same as a volume of `None`/unspecified: mix the full working
+                volume of the pipette. On API levels at or above 2.16, no liquid will
+                be mixed.
+            aspirate_start_location (opentrons.types.Location): The location where the
+                pipette will aspirate from.
+            aspirate_end_location (opentrons.types.Location, optional): If this argument
+                is supplied, the pipette will move between `aspirate_start_location` and
+                `aspirate_end_location` while performing the aspirate.
+            dispense_start_location (opentrons.types.Location): The location where the
+                pipette will dispense to.
+            dispense_end_location (opentrons.types.Location, optional): If this argument
+                is supplied, the pipette will move between `dispense_start_location` and
+                `dispense_end_location` while performing the dispense.
+            rate (float, optional): How quickly the pipette aspirates and dispenses
+                liquid while mixing. The aspiration flow rate is calculated as `rate`
+                multiplied by
+                [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                The dispensing flow rate is calculated as `rate` multiplied by
+                [`flow_rate.dispense`][opentrons.protocol_api.InstrumentContext.flow_rate].
+                See [new plunger flow rates][opentrons.protocol_api.InstrumentContext.flow_rate].
+            aspirate_flow_rate (float, optional): The absolute flow rate for each
+                aspirate in the mix, in µL/s. If this is specified, `rate` must not be
+                set.
+            dispense_flow_rate (float, optional): The absolute flow rate for each
+                dispense in the mix, in µL/s. If this is specified, `rate` must not be
+                set.
+            aspirate_delay (float, optional): How long to wait after each aspirate in
+                the mix, in seconds.
+            dispense_delay (float, optional): How long to wait after each dispense in
+                the mix, in seconds.
+            final_push_out (float, optional): How much volume to push out after the
+                final mix repetition. The pipette will not push out after earlier
+                repetitions. If not specified or `None`, the pipette will push out the
+                default non-zero amount. See
+                [push out dispense][opentrons.protocol_api.InstrumentContext.dispense].
+            movement_delay (float, optional): Delay the x/y/z movement during a dynamic
+                mix. This option is only valid when using `aspirate_end_location` or
+                `dispense_end_location`. When this argument is used, the x/y/z movement
+                will wait `movement_delay` seconds after the pipette starts to
+                aspirate/dispense before moving. This may help when mixing very viscous
+                liquids that need to build up some pressure before liquid starts to
+                flow.
 
-        .. note::
+        Raises:
+            UnexpectedTipRemovalError: If no tip is attached to the pipette.
 
-            The ``aspirate_start_location`` and ``dispense_start_location`` arguments of ``dynamic_mix`` are required.
+        Returns:
+            InstrumentContext: This instance.
 
+        !!! note
+            All the arguments of `mix()` are optional. However, if you omit one of them,
+            all subsequent arguments must be passed as keyword arguments. For instance,
+            `pipette.mix(1, location=wellplate['A1'])` is a valid call, but
+            `pipette.mix(1, wellplate['A1'])` is not.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} and {} at rate={}".format(
@@ -2195,15 +2233,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 locations in the tip rack, instead of the trash.
 
             group_wells (bool, optional): For multi-channel transfers only. If set to
-                `True`, group together contiguous wells given into a single transfer
-                step, taking into account the tip configuration. If `False`, target each
-                well given with the primary nozzle. Defaults to `True`.
+                `True`, group together contiguous wells given into a single transfer step,
+                taking into account the tip configuration. If `False`, target each well
+                given with the primary nozzle. Defaults to `True`.
 
             keep_last_tip (bool, optional): When `True`, the pipette keeps the last tip
                 used in the transfer attached. When `False`, the last tip will be dropped
                 or returned. If not set, behavior depends on the value of `new_tip`.
-                `new_tip="never"` keeps the tip, and all other values of `new_tip` drop
-                or return the tip.
+                `new_tip="never"` keeps the tip, and all other values of `new_tip` drop or
+                return the tip.
 
             tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
                 from for this command. If not provided, the pipette will pick up from its
@@ -2211,7 +2249,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
-        *Changed in version 2.25*: Added the `tip_racks` parameter.
+            tips (Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]], optional):
+                An ordered list of tips to use for the transfer. If the list contains
+                fewer tips than needed to complete the transfer, the API will raise an
+                error. The pipette will use only these tips even if
+                [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks]
+                or the `tip_racks` parameter of this method is set.
+
+        *New in version 2.25*: Added the `tip_racks` parameter.
+
+        *New in version 2.27*: Added the `tips` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -2342,8 +2389,8 @@ class InstrumentContext(publisher.CommandPublisher):
         Args:
             liquid_class (LiquidClass): The type of liquid to move. You must specify the
                 liquid class, even if you have used
-                [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]
-                to indicate what liquid the source contains.
+                [`Labware.load_liquid()`][opentrons.protocol_api.Labware.load_liquid] to
+                indicate what liquid the source contains.
 
             volume (float): The amount, in µL, to dispense to each destination.
 
@@ -2351,12 +2398,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 pipette to target, or a group of wells to target in a single aspirate for
                 a multi-channel pipette.
 
-            dest (Union[labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]]):
-                A list of wells to dispense liquid into.
+            dest (Sequence[labware.Well]): A list of wells to dispense liquid into.
 
             new_tip (str, optional): When to pick up and drop tips during the command.
                 Defaults to `"once"`.
 
+                - `"once"`: Use one tip for the entire command.
+                - `"always"`: Use a new tip before each aspirate.
+                - `"never"`: Do not pick up or drop tips at all.
                 - `"once"`: Use one tip for the entire command.
                 - `"always"`: Use a new tip before each aspirate.
                 - `"never"`: Do not pick up or drop tips at all.
@@ -2389,7 +2438,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
-        *Changed in version 2.25*: Added the `tip_racks` parameter.
+            tips (Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]], optional):
+                An ordered list of tips to use for the transfer. If the list contains
+                fewer tips than needed to complete the transfer, the API will raise an
+                error. The pipette will use only these tips even if
+                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] or the
+                `tip_racks` parameter of this method is set.
+
+        *New in version 2.25*: Added the `tip_racks` parameter.
+
+        *New in version 2.27*: Added the `tips` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -2528,8 +2586,8 @@ class InstrumentContext(publisher.CommandPublisher):
         Args:
             liquid_class (LiquidClass): The type of liquid to move. You must specify the
                 liquid class, even if you have used
-                [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]
-                to indicate what liquid the source contains.
+                [`Labware.load_liquid()`][opentrons.protocol_api.Labware.load_liquid] to
+                indicate what liquid the source contains.
 
             volume (float): The amount, in µL, to aspirate from each source well.
 
@@ -2577,7 +2635,16 @@ class InstrumentContext(publisher.CommandPublisher):
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
-        *Changed in version 2.25*: Added the `tip_racks` parameter.
+            tips (Union[Sequence[labware.Well], Sequence[Sequence[labware.Well]]], optional):
+                An ordered list of tips to use for the transfer. If the list contains
+                fewer tips than needed to complete the transfer, the API will raise an
+                error. The pipette will use only these tips even if
+                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] or the
+                `tip_racks` parameter of this method is set.
+
+        *New in version 2.25*: Added the `tip_racks` parameter.
+
+        *New in version 2.27*: Added the `tips` parameter.
         """
         if volume == 0.0:
             _log.info(

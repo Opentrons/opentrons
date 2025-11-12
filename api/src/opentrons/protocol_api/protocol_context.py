@@ -473,16 +473,15 @@ class ProtocolContext(CommandPublisher):
             adapter_version (Optional[int]): The version of the adapter being loaded.
                 Applies to `adapter` the same way that `version` applies to `load_name`.
 
-                *New in version 2.26:* `adapter_version` may now be specified explicitly. Also, when it's unspecified,
-                the algorithm to select a version automatically has improved to avoid
-                selecting versions that do not exist.
+                *New in version 2.26:* `adapter_version` may now be specified explicitly.
+                When unspecified, the API uses the newest version available for your protocol's API level.
 
-            lid (Optional[str]): A lid to load on the top of the main labware. Accepts the same
-                values as the `load_name` parameter of [`load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack]. The
-                lid will use the same namespace as the labware, and the API will
-                choose the lid's version automatically.
+            lid (Optional[str]): A lid to load on the top of the main labware.
+                Accepts the same values as the `load_name` parameter of [`load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack].
+                The lid will use the same namespace as the labware, and the API will choose
+                the lid's version automatically.
 
-                *New in version 2.23:*.
+                *New in version 2.23*
 
             lid_namespace (Optional[str]): The namespace of the lid being loaded.
                 Applies to `lid` the same way that `namespace` applies to `load_name`.
@@ -495,9 +494,8 @@ class ProtocolContext(CommandPublisher):
             lid_version (Optional[int]): The version of the adapter being loaded.
                 Applies to `lid` the same way that `version` applies to `load_name`.
 
-                *New in version 2.26:* `lid_version` may now be specified explicitly. Also, when it's unspecified,
-                the algorithm to select a version automatically has improved to avoid
-                selecting versions that do not exist.
+                *New in version 2.26:* `lid_version` may now be specified explicitly.
+                When unspecified, the API uses the newest version available for your protocol's API level.
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -628,7 +626,7 @@ class ProtocolContext(CommandPublisher):
         version: int = 1,
     ) -> Labware:
         """
-        *Deprecated in version 2.0:* Use :py:meth:`load_labware` instead.
+        *Deprecated in version 2.0:* Use [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] instead.
         """
         logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
@@ -1096,7 +1094,7 @@ class ProtocolContext(CommandPublisher):
         Gripper to use it in protocols. See [automatic-manual-moves].
 
         Args:
-            instrument_name (str): The instrument to load. 
+            instrument_name (str): The instrument to load.
                 See [API Load Names](../pipettes/loading.md#api-load-names) for the valid values.
             mount (types.Mount or str or None): The mount where the instrument should
                 be attached. This can either be an instance of
@@ -1332,7 +1330,7 @@ class ProtocolContext(CommandPublisher):
     def location_cache(self) -> Optional[Union[Location, TrashBin, WasteChute]]:
         """The cache used by the robot to determine where it last was.
 
-        _Changed in version 2.24:_ Can return a [`TrashBin`][opentrons.protocol_api.TrashBin] 
+        _Changed in version 2.24:_ Can return a [`TrashBin`][opentrons.protocol_api.TrashBin]
         or [`WasteChute`][opentrons.protocol_api.WasteChute] object.
         """
         last_loc = self._core.get_last_location()
@@ -1351,8 +1349,8 @@ class ProtocolContext(CommandPublisher):
         An interface to provide information about what's currently loaded on the deck.
         This object is useful for determining if a slot on the deck is free.
 
-        This object behaves like a dictionary whose keys are the 
-        [deck slot](../deck-slots.md) names. For instance, `deck[1]`, `deck["1"]`, 
+        This object behaves like a dictionary whose keys are the
+        [deck slot](../deck-slots.md) names. For instance, `deck[1]`, `deck["1"]`,
         and `deck["D1"]` will all return the object loaded in the front-left slot.
 
         The value for each key depends on what is loaded in the slot:
@@ -1363,26 +1361,26 @@ class ProtocolContext(CommandPublisher):
 
         A module that occupies multiple slots is set as the value for all of the
         relevant slots. Currently, the only multiple-slot module is the Thermocycler.
-        When loaded, the [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext] 
-        object is the value for `deck` keys `"A1"` and `"B1"` on Flex, and `7`, `8`, `10`, 
-        and `11` on OT-2. In API version 2.13 and earlier, only slot 7 keyed to the 
+        When loaded, the [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext]
+        object is the value for `deck` keys `"A1"` and `"B1"` on Flex, and `7`, `8`, `10`,
+        and `11` on OT-2. In API version 2.13 and earlier, only slot 7 keyed to the
         Thermocycler object, and slots 8, 10, and 11 keyed to `None`.
 
-        Rather than filtering the objects in the deck map yourself, you can also use 
-        [`loaded_labwares`][opentrons.protocol_api.ProtocolContext.loaded_labwares] to get 
-        a dict of labwares and [`loaded_modules`][opentrons.protocol_api.ProtocolContext.loaded_modules] 
+        Rather than filtering the objects in the deck map yourself, you can also use
+        [`loaded_labwares`][opentrons.protocol_api.ProtocolContext.loaded_labwares] to get
+        a dict of labwares and [`loaded_modules`][opentrons.protocol_api.ProtocolContext.loaded_modules]
         to get a dict of modules.
 
-        For [advanced control](../advanced-control.md) *only*, you can delete an element 
-        of the `deck` dict. This only works for deck slots that contain labware objects. 
-        For example, if slot 1 contains a labware, `del protocol.deck["1"]` will free the 
+        For [advanced control](../advanced-control.md) *only*, you can delete an element
+        of the `deck` dict. This only works for deck slots that contain labware objects.
+        For example, if slot 1 contains a labware, `del protocol.deck["1"]` will free the
         slot so you can load another labware there.
 
         !!! warning
             Deleting labware from a deck slot does not pause the protocol. Subsequent
             commands continue immediately. If you need to physically move the labware to
-            reflect the new deck state, add a 
-            [`pause()`][opentrons.protocol_api.ProtocolContext.pause] or use 
+            reflect the new deck state, add a
+            [`pause()`][opentrons.protocol_api.ProtocolContext.pause] or use
             [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] instead.
 
         *Changed in version 2.14:* Includes the Thermocycler in all of the slots it occupies.
@@ -1646,9 +1644,9 @@ class ProtocolContext(CommandPublisher):
                 Applies to `adapter` the same way that `namespace` applies to `load_name`.
 
                 *Changed in version 2.26:* `adapter_namespace` may now be specified explicitly.
-                Also, when you've specified `namespace` but not `adapter_namespace`,
-                `adapter_namespace` will now independently follow the same search rules
-                described in `namespace`. Formerly, it took `namespace`'s exact value.
+                When you've specified `namespace` for `load_name` but not `adapter_namespace`,
+                `adapter_namespace` now independently follows the same search rules
+                described in `namespace`. Formerly, it took the exact `namespace` value.
 
             adapter_version: The version of the adapter being loaded.
                 Applies to `adapter` the same way that `version` applies to `load_name`.
@@ -1753,7 +1751,7 @@ class ProtocolContext(CommandPublisher):
 
                 * A deck slot like `1`, `"1"`, or `"D1"`. See [deck slots](../deck-slots.md).
                 * A labware or adapter that's already been loaded on the deck
-                with [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] 
+                with [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]
                 or [`load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter].
                 * A lid stack that's already been loaded on the deck with
                 [`load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack].
@@ -1764,7 +1762,7 @@ class ProtocolContext(CommandPublisher):
                 * A hardware module that's already been loaded on the deck
                 with [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
                 * A labware or adapter that's already been loaded on the deck
-                with [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] 
+                with [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]
                 or [`load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter].
                 * The special constant [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
@@ -1859,16 +1857,22 @@ class ProtocolContext(CommandPublisher):
         brightness: Optional[float] = None,
         saturation: Optional[float] = None,
     ) -> None:
-        """Capture an image using the camera. Captured images are saved as during the protocol run.
+        """Capture an image using the camera. Captured images get saved as a result
+        of the protocol run.
 
-        :param home_before: If ``True``, homes the pipette before capturing an image.
-        :param filename: Custom name to use when saving the captured image as a file. The custom name is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, the step number, and a timestamp for the command running when the image was captured.
-        :param resolution: Accepts a width and height (as a tuple) to determine the camera's resolution when capturing the image.
-        :param zoom: Zoom level the camera will use. Defaults to the minimum of 1x zoom (``1.0``) and has a maximum of 2x zoom (``2.0``).
-        :param contrast: The contrast level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
-        :param brightness: The brightness level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
-        :param saturation: The saturation level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
-
+        Args:
+            home_before (bool): Boolean to home the pipette before capturing an image.
+            filename (str): Filename to use when saving the captured image as a file.
+            resolution (Tuple[int, int]): Width/height tuple to determine the resolution
+                to use when capturing an image.
+            zoom (float): Optional zoom level, with minimum/default of 1x zoom and
+                maximum of 2x zoom.
+            contrast (float): Contrast level to be applied to an image, range is 0% to
+                100%.
+            brightness (float): Brightness level to be applied to an image, range is 0%
+                to 100%.
+            saturation (float): Saturation level to be applied to an image, range is 0%
+                to 100%.
         """
         if home_before is True:
             self._core.home()
