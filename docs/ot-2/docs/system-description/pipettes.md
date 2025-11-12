@@ -2,13 +2,13 @@
 title: "Opentrons OT-2: Pipettes"
 ---
 
-Opentrons OT-2 pipettes are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several OT-2 pipettes to choose from, which can handle volumes from 1 µL to 1000 µL in single- or multi-channel (8 channel) configurations:
+Opentrons OT-2 pipettes are configurable devices used to move liquids throughout the working area during protocol execution. There are several OT-2 pipettes to choose from, which can handle volumes from 1 µL to 1000 µL in single- or multi-channel (8-channel) configurations:
 
-- P20 Single-Channel 1–20 µL
-- P300 Single-Channel 20–300 µL
-- P1000 Single-Channel 100–1000 µL
-- P20 Multi-Channel 1–20 µL
-- P300 Multi-Channel 20–300 µL
+- P20 Single-Channel (1–20 µL)
+- P300 Single-Channel (20–300 µL)
+- P1000 Single-Channel (100–1000 µL)
+- P20 Multi-Channel (1–20 µL)
+- P300 Multi-Channel (20–300 µL)
 
 <font color="red">PLACEHOLDER FOR GEN2 IMAGES ADD AFTER MERGE TO MAIN BRANCH</font>
 
@@ -20,7 +20,7 @@ For details on installing pipettes, see <font color="red">LINK REMIDNER Instrume
 
 ## Picking up and dropping tips
 
-The pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously.
+The pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then aspirate and dispense liquids using the tips. The total force required for pickup increases as more tips get picked up simultaneously.
 
 To discard tips (or return them to their rack), the pipette ejector mechanism pushes the tips off of the nozzles.
 
@@ -127,6 +127,8 @@ The following tables list the accuracy and precision specifications for OT-2 pip
 </table>
 
 ### Multi-channel pipettes
+
+These instruments have 8 pipette channels.
 
 <table>
   <thead>
