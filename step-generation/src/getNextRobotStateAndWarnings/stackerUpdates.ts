@@ -130,12 +130,13 @@ export const forFlexStackerRetrieve = (
 
   moduleState!.shuttlePosition = 'retrieved'
 
-  const retrievedLabware = moduleState?.labwareInStacker?.[0]
+  const retrievedLabware = moduleState?.labwareInStacker?.shift()
   if (retrievedLabware == null) {
     throw new Error(
       'Cannot retrieve labware bc there is no labware in the stacker'
     )
   }
+  // change slot to shuttle slot
   robotState.labware[retrievedLabware] = {
     ...robotState.labware[retrievedLabware],
     stack: robotState.labware[retrievedLabware]?.stack?.slice(0, -1) ?? [],

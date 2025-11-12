@@ -162,7 +162,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
     } as any)
   })
 
-  it.only('should raise an error if there is no labware in the stacker', () => {
+  it('should raise an error if there is no labware in the stacker', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: [],
@@ -202,5 +202,31 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
     }).toThrow(
       'Cannot retrieve labware bc there is no stored labware details or primary labware'
     )
+  })
+
+  it.only('should retrieve the labware from the stacker', () => {
+    vi.mocked(getModuleState).mockReturnValue({
+      type: FLEX_STACKER_MODULE_TYPE,
+      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      max_pool_count: 6,
+      labwareStored: LABWARE_ID,
+      shuttlePosition: 'home',
+      storedLabwareDetails: {
+        primaryLabware: LABWARE_ID,
+      },
+    } as any)
+
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+
+    const moduleState = getModuleState(
+      robotState,
+      FLEX_STACKER_ID
+    ) as FlexStackerModuleState
+    expect(moduleState?.shuttlePosition).toBe('retrieved')
+    expect(moduleState?.labwareInStacker).toHaveLength(2)
+    expect(robotState.labware['tiprack1Id']?.stack).toHaveLength(1)
   })
 })
