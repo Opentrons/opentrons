@@ -107,7 +107,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       hasRunDiverged,
     })
 
-  console.log('🚀 ~ RunProgressMeter ~ downloadEnabled:', downloadEnabled)
   return (
     <>
       {showIntervention
