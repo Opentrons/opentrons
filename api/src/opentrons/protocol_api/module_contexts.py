@@ -735,18 +735,20 @@ class ThermocyclerContext(ModuleContext):
         """Starts to set the target temperature for the well block, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param temperature: A value between 4 and 99, representing the target
-                            temperature in °C.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
-                                 After API version 2.27 it will attempt to use
-                                 the liquid tracking of the labware first and
-                                 then fall back to the 25 if there is no probed
-                                 or loaded liquid.
+        Args:
+            temperature: A value between 4 and 99, representing the target
+                temperature in °C.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified,
+                the default is 25 µL.
+
+                *Changed in version 2.27:* After API version
+                2.27 it will attempt to use the liquid tracking of the labware
+                first and then fall back to the 25 if there is no probed or loaded
+                liquid.
         """
 
         if block_max_volume is None:
@@ -764,17 +766,16 @@ class ThermocyclerContext(ModuleContext):
         """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
-        :param temperature: A value between 37 and 110, representing the target
-                            temperature in °C.
+        Args:
+            temperature: A value between 37 and 110, representing the target
+                temperature in °C.
 
-        .. note::
-
+        !!! note
             The Thermocycler will proceed to the next command immediately after
-            ``temperature`` is reached.
-
+            `temperature` is reached.
         """
         self._core.set_target_lid_temperature(celsius=temperature)
         self._core.wait_for_lid_temperature()
@@ -785,8 +786,8 @@ class ThermocyclerContext(ModuleContext):
         """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        Pass the task object to [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the preheat to complete.
 
         !!! note
             The Thermocycler will proceed to the next command immediately after
@@ -1143,21 +1144,21 @@ class HeaterShakerContext(ModuleContext):
 
         Sets the Heater-Shaker's target temperature and returns immediately without
         waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use 
+        target temperature has reached. Use
         [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
         to delay protocol execution for API levels below 2.27.
 
-        *Changed in version 2.25:* Removed the minimum temperature limit of 37 °C. 
+        *Changed in version 2.25:* Removed the minimum temperature limit of 37 °C.
         Note that temperatures under ambient are not achievable.
 
-        *Changed in version 2.27:* Returns a task object that represents concurrent 
-        preheating. Pass the task object to 
-        [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] 
+        *Changed in version 2.27:* Returns a task object that represents concurrent
+        preheating. Pass the task object to
+        [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
         to wait for the preheat to complete.
 
         Args:
             celsius: A value under 95, representing the target temperature in °C.
-                Values are automatically truncated to two decimal places, and the 
+                Values are automatically truncated to two decimal places, and the
                 Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         validated_temp = validate_heater_shaker_temperature(
@@ -1649,7 +1650,7 @@ class FlexStackerContext(ModuleContext):
 
                 - `"opentrons"`, to load standard Opentrons labware definitions.
                 - `"custom_beta"`, to load custom labware definitions created with the
-                    [Custom Labware Creator](https://labware.opentrons.com/create).
+                [Custom Labware Creator](https://labware.opentrons.com/create).
 
                 You might need to specify an explicit `namespace` if you have a custom
                 definition whose `load_name` is the same as an Opentrons-verified
@@ -1671,19 +1672,12 @@ class FlexStackerContext(ModuleContext):
                 `adapter_namespace` now independently follows the same search rules described
                 in `namespace`. Formerly, it took the exact `namespace` value.
 
-            .. versionchanged:: 2.26
-                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+            adapter_version (int): Applies to `adapter` the same way that `version`
+                applies to `load_name`.
 
-        :param adapter_version: Applies to ``adapter`` the same way that ``version``
-            applies to ``load_name``.
-
-            .. versionchanged:: 2.26
-               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
-
-        :param lid: A lid to load the on top of the main labware. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
-            lid will use the same namespace as the labware, and the API will
-            choose the lid's version automatically.
+                *Changed in version 2.26:* `adapter_version` may now be specified explicitly.
+                When unspecified, improved search rules prevent selecting a version that does
+                not exist.
 
             lid (str): A lid to load on top of the main labware. Accepts the same
                 values as the `load_name` parameter of
@@ -1691,20 +1685,15 @@ class FlexStackerContext(ModuleContext):
                 The lid will use the same namespace as the labware, and the API will
                 choose the lid's version automatically.
 
-            .. versionchanged:: 2.26
-               ``lid_namespace`` may now be specified explicitly.
-               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
-               ``lid_namespace`` now independently follows the same search rules
-               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
+                *New in version 2.23*
 
-        :param lid_version: Applies to ``lid`` the same way that ``version``
-            applies to ``load_name``.
+            lid_namespace (str): The namespace of the lid being loaded.
+                Applies to lid the same way that namespace applies to load_name.
 
-            .. versionchanged:: 2.26
-               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
-
-        :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
-            labware that the Flex Stacker is capable of storing.
+                *Changed in version 2.26:* `lid_namespace` may now be specified explicitly.
+                When you've specified `namespace` for `load_name` but not `lid_namespace`,
+                `lid_namespace` now independently follows the same search rules
+                described in `namespace`. Formerly, it took the exact `namespace` value.
 
             lid_version (int): Applies to `lid` the same way that `version`
                 applies to `load_name`.
@@ -1726,16 +1715,16 @@ class FlexStackerContext(ModuleContext):
                     units can fit in the Stacker and calculates the `z` position of the shuttle when retrieving
                     or storing labware.
 
-                There are four possible stacking configurations, each with a different method of calculating
-                the stacking offset:
+                    There are four possible stacking configurations, each with a different method of calculating
+                    the stacking offset:
 
-                - Bare labware: labware (bottom side) overlaps with the top side of the labware below.
-                - Labware on adapter: the adapter (bottom side) of the upper labware unit overlaps with the
-                top side of the labware below.
-                - Labware with lid: the labware (bottom side) of the upper unit overlaps with the lid (top
-                side) of the unit below.
-                - Labware with lid and adapter: the adapter (bottom side) of the upper unit overlaps with
-                the lid (top side) of the unit below.
+                    - Bare labware: labware (bottom side) overlaps with the top side of the labware below.
+                    - Labware on adapter: the adapter (bottom side) of the upper labware unit overlaps with the
+                    top side of the labware below.
+                    - Labware with lid: the labware (bottom side) of the upper unit overlaps with the lid (top
+                    side) of the unit below.
+                    - Labware with lid and adapter: the adapter (bottom side) of the upper unit overlaps with
+                    the lid (top side) of the unit below.
         """
 
         if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
