@@ -16,7 +16,6 @@ export type DevInternalFlag =
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
   | 'reactScan'
-  | 'quickTransferExportJSON'
   | 'camera'
   | 'quickTransferProtocolContentsLog'
 
