@@ -101,9 +101,16 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: Test
-        run: make -C shared-data test-py
+        run: |
+          # Ensure uv is in PATH (should already be there from setup action via $GITHUB_PATH)
+          # On Windows, $HOME maps to the user profile, so this works cross-platform
+          export PATH="$HOME/.cargo/bin:$PATH"
+          make -C shared-data test-py
       - name: Ensure assets build
-        run: make -C shared-data dist-py
+        run: |
+          # Ensure uv is in PATH (should already be there from setup action via $GITHUB_PATH)
+          export PATH="$HOME/.cargo/bin:$PATH"
+          make -C shared-data dist-py
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
