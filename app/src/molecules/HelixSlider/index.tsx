@@ -2,21 +2,21 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import styles from './helixslider.module.css'
+import styles from './slider.module.css'
 
-interface HelixSliderProps {
+interface SliderProps {
   title: string
   subtext: string
   value: number
   adjustValue: (value: number) => void
 }
 
-export function HelixSlider({
+export function Slider({
   value,
   title,
   subtext,
   adjustValue,
-}: HelixSliderProps): JSX.Element {
+}: SliderProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (

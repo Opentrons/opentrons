@@ -1,12 +1,12 @@
 import { Flex, SPACING } from '@opentrons/components'
 
-import { HelixSlider } from './index'
+import { Slider } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof HelixSlider> = {
-  title: 'App/Molecules/HelixSlider',
-  component: HelixSlider,
+const meta: Meta<typeof Slider> = {
+  title: 'Helix/Molecules/Slider',
+  component: Slider,
   decorators: [
     Story => (
       <Flex
@@ -24,13 +24,13 @@ const meta: Meta<typeof HelixSlider> = {
 
 export default meta
 
-type Story = StoryObj<typeof HelixSlider>
+type Story = StoryObj<typeof Slider>
 
-export const HelixSliderComponent: Story = {
+export const SliderComponent: Story = {
   args: {
     title: 'Brightness',
     subtext: 'Adjust the brightness of the camera feed',
-    value: 50,
+    value: 70,
     adjustValue: () => {},
   },
 }

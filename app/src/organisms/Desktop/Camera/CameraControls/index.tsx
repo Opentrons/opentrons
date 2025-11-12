@@ -4,7 +4,7 @@ import { Modal, PrimaryButton } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
-import { HelixSlider } from '/app/molecules/HelixSlider'
+import { Slider } from '/app/molecules/HelixSlider'
 
 import styles from './cameracontrols.module.css'
 import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
@@ -60,21 +60,21 @@ function CameraControlSettings({
     <div className={styles.settings_container}>
       <ZoomSettings zoom={settings.zoom} adjustZoom={settings.adjustZoom} />
       <Divider />
-      <HelixSlider
+      <Slider
         title={t('brightness')}
         subtext={t('adjust_brightness')}
         adjustValue={settings.adjustBrightness}
         value={settings.brightness}
       />
       <Divider />
-      <HelixSlider
+      <Slider
         title={t('contrast')}
         subtext={t('adjust_contrast')}
         adjustValue={settings.adjustContrast}
         value={settings.contrast}
       />
       <Divider />
-      <HelixSlider
+      <Slider
         title={t('saturation')}
         subtext={t('adjust_saturation')}
         adjustValue={settings.adjustSaturation}
