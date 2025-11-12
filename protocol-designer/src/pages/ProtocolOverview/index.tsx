@@ -29,10 +29,7 @@ import {
   EditProtocolMetadataModal,
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import {
-  getEnableJsonExport,
-  getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
+import { getEnableTimelineScrubber } from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
@@ -81,7 +78,6 @@ export function ProtocolOverview(): JSX.Element {
   const navigate = useNavigate()
   const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
     useState<boolean>(false)
-  const enableJsonExport = useSelector(getEnableJsonExport)
   const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] =
     useState<boolean>(false)
@@ -216,21 +212,6 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
-            {enableJsonExport ? (
-              <LargeButton
-                buttonType="stroke"
-                buttonText="Export JSON"
-                onClick={() => {
-                  dispatch(loadFileActions.saveJSONProtocolFile())
-                }}
-                whiteSpace={NO_WRAP}
-                height="3.5rem"
-                iconName="arrow-right"
-                css={css`
-                  border: 2px solid ${COLORS.blue50};
-                `}
-              />
-            ) : null}
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>

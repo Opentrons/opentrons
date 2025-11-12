@@ -47,10 +47,6 @@
     "title": "Enable concurrent module actions",
     "description": "Features and design changes for running steps while waiting for modules to do stuff."
   },
-  "OT_PD_ENABLE_JSON_EXPORT": {
-    "title": "Enable exporting JSON",
-    "description": "Enables the ability to export JSON for internal usages only"
-  },
   "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
     "title": "Enable by-volume builder",
     "description": "Enables the ability to build by-volume curves"
