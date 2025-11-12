@@ -1,11 +1,12 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
-import { COLORS, Modal, StyledText } from '@opentrons/components'
+import { Chip, StyledText } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
+import { cameraPhotoOpenAction } from '/app/redux/shell'
 
-import styles from './gallery.module.css'
+import styles from './media.module.css'
 
 import type { ReactNode } from 'react'
 
@@ -14,9 +15,12 @@ export interface MediaContainerContentProps {
   centerPrimaryText: string
   centerSecondaryText: string
   rightPrimaryText: string
-  state: 'loading' | 'error' | 'neutral'
+  imagePath: string
+  robotName: string | null
+  state: 'loading' | 'error' | null
   overflowMenu: JSX.Element | null
   hoverText: string | null
+  isCurrentCommandError: boolean | null
 }
 
 export function MediaContainerContent(
@@ -28,43 +32,55 @@ export function MediaContainerContent(
     centerSecondaryText,
     rightPrimaryText,
     state,
+    robotName,
     overflowMenu,
+    imagePath,
+    isCurrentCommandError,
   } = props
   const { t } = useTranslation(['run_details', 'branded'])
-  const [showModal, setShowModal] = useState(false)
-
+  const dispatch = useDispatch()
+  const isLoading = state === 'loading' || state === 'error'
   const onClick = (): void => {
-    if (state === 'loading' || state === 'error') return
-    setShowModal(true)
+    if (isLoading) return
+    const img = new Image()
+    img.src = imagePath
+    img.onload = () => {
+      if (robotName) {
+        dispatch(
+          cameraPhotoOpenAction({
+            robotName: robotName,
+            photoUrl: imagePath,
+            windowTitle: t('branded:image_capture_window_title', {
+              step: centerPrimaryText,
+              rightPrimaryText,
+            }),
+          })
+        )
+      }
+    }
   }
 
   return (
     <>
-      <div className={styles.gallery_card}>
+      <div className={styles.media_card}>
         <div
-          className={styles.gallery_card_thumbnail}
+          className={styles.media_card_thumbnail}
           onClick={() => {
-            if (state === 'loading' || state === 'error') return
+            if (isLoading) return
             onClick()
           }}
-          role={state === 'loading' || state === 'error' ? undefined : 'button'}
-          style={
-            state === 'loading' || state === 'error'
-              ? { cursor: 'default' }
-              : undefined
-          }
         >
-          {state ? (
+          {isLoading ? (
             <Skeleton width="100%" height="100%" backgroundSize="47rem" />
           ) : (
             mediaContent
           )}
 
-          {!state && (
-            <div className={styles.gallery_img_overlay}>
+          {!isLoading && (
+            <div className={styles.media_img_overlay}>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                className={styles.gallery_overlay_text}
+                className={styles.media_overlay_text}
               >
                 {t('view_image')}
               </StyledText>
@@ -72,33 +88,36 @@ export function MediaContainerContent(
           )}
         </div>
 
-        <div className={styles.gallery_card_cmd_txt_container}>
-          {state ? (
+        <div className={styles.media_card_cmd_txt_container}>
+          {!isLoading && isCurrentCommandError ? (
+            <Chip
+              text={t('error_event')}
+              type="error"
+              width="fit-content"
+              chipSize="small"
+            />
+          ) : null}
+          {isLoading ? (
             <Skeleton width="100%" height="1.25rem" backgroundSize="47rem" />
           ) : (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              color={COLORS.black90}
-            >
+            <StyledText desktopStyle="bodyDefaultRegular">
               {centerPrimaryText}
             </StyledText>
           )}
-
-          {state ? (
+          {isLoading ? (
             <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
           ) : (
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              className={styles.gallery_cmd_txt_subtext}
-              color={COLORS.grey60}
+              className={styles.media_cmd_txt_subtext}
             >
               {centerSecondaryText}
             </StyledText>
           )}
         </div>
 
-        <div className={styles.gallery_card_timestamp}>
-          {state ? (
+        <div className={styles.media_card_timestamp}>
+          {isLoading ? (
             <Skeleton width="80%" height="1rem" backgroundSize="47rem" />
           ) : (
             <StyledText desktopStyle="bodyDefaultRegular">
@@ -108,15 +127,6 @@ export function MediaContainerContent(
         </div>
         {overflowMenu ?? null}
       </div>
-
-      {showModal && (
-        <Modal
-          title={t('branded:image_capture_window_title', { rightPrimaryText })}
-          onClose={() => setShowModal(false)}
-        >
-          <div className={styles.modal_image_container}>{mediaContent}</div>
-        </Modal>
-      )}
     </>
   )
 }

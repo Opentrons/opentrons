@@ -1,19 +1,14 @@
-import {
-  Flex,
-  SPACING,
-  VIEWPORT,
-} from '@opentrons/components'
+import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
 
 import { MediaContainerContent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-
 const meta: Meta<typeof MediaContainerContent> = {
-    title: 'Desktop/Molecules/MediaContainer',
-    component: MediaContainerContent,
-    parameters:VIEWPORT.touchScreenViewport,
-   argTypes: {
+  title: 'App/Molecules/MediaContainer',
+  component: MediaContainerContent,
+  parameters: VIEWPORT.touchScreenViewport,
+  argTypes: {
     state: {
       control: {
         type: 'radio',
@@ -60,8 +55,9 @@ export const MediaContainerContentComponent: Story = {
     centerPrimaryText: 'Example Image Title',
     centerSecondaryText: 'Taken during experiment',
     rightPrimaryText: '2:45 PM',
-    state: undefined, 
+    state: undefined,
     overflowMenu: null,
     hoverText: 'Click to view image',
+    isCurrentCommandError: false,
   },
 }
