@@ -40,17 +40,9 @@ The OT-2 deck slides in and out of the enclosure. You can pull it out part way, 
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
-## USB ports
+## Other connections
 
-The OT-2 has 4 USB ports, located in the right rear of the enclosure, behind the gantry. These ports, numbered USB-1 through USB-4, are used to connect Opentrons modules to the robot.
-
-![USB ports](../images/usb-ports.png)
-
-See the <font color="red">MODULES CHAPTER PLACEHOLDER AND LINK</font> for more information on connecting these devices and using them in your protocols.
-
-## Status LEDs, power, and network connections
-
-When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot.
+When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot. The robot also provides USB ports inside the enclosure behind the gantry.
 
 ### Rear LEDs
 
@@ -101,13 +93,19 @@ See <font color="red">PLACEHOLDER TEXT AND LINK TO INSTALLATION DOC</font> for i
 
 ### Power supply
 
-<!-- this might be better in the regulatory section? -->
-
 The OT-2 uses an external [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply's maximum consumption is 220 W (6.1 A, 36 V).
 
 Total power consumption depends on the specifics of the protocols run on the robot. The Opentrons OT-2 Liquid Handler generally consumes around 90-120 W when idle.
 
 Power consumption may range from approximately 100 to 180 W when running a protocol. Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the Opentrons OT-2 Liquid Handler and how many pipettes are attached.
+
+### USB ports
+
+The OT-2 has 4 USB ports, located in the right rear of the enclosure, behind the gantry. These ports, labeled USB-1 through USB-4, are used for communication between connected Opentrons modules and the robot.
+<!-- potato quality from originals -->
+![USB ports](../images/usb-ports.png)
+
+See the <font color="red">MODULES CHAPTER PLACEHOLDER AND LINK</font> for more information on connecting these devices and using them in your protocols.
 
 ## Serial number
 
