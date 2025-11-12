@@ -10,12 +10,12 @@ describe('getIsSlotOccupied', () => {
   beforeEach(() => {})
 
   it('getIsSlotOccupied gets a labware occupied slot', () => {
-    const slotOccupied = getIsSlotOccupied(robotState, '1')
+    const slotOccupied = getIsSlotOccupied(robotState, { slotName: '1' })
     expect(slotOccupied).toBe(true)
   })
 
   it('getIsSlotOccupied gets a labware not occupied slot', () => {
-    const slotOccupied = getIsSlotOccupied(robotState, '6')
+    const slotOccupied = getIsSlotOccupied(robotState, { slotName: '6' })
     expect(slotOccupied).toBe(false)
   })
 })

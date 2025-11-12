@@ -1,9 +1,11 @@
+import { LabwareLocation, locationIsOnModule } from '@opentrons/shared-data'
 import { TimelineFrame } from '../types'
 import { getSlotInLocationStack } from '../utils'
 
+// write tests for module section
 export function getIsSlotOccupied(
   robotState: TimelineFrame,
-  slotIpnut: string
+  slotIpnut: LabwareLocation
 ) {
   console.log('robotState: ', robotState)
   console.log('slot: ', slotIpnut)
@@ -16,13 +18,13 @@ export function getIsSlotOccupied(
       }
     }
   }
-  console.log('in between')
-  console.log('modules: ', robotState.modules)
+  const isModuleOnSlot = locationIsOnModule(slotIpnut)
+  console.log('isModuleOnSlot: ', isModuleOnSlot)
+  // should check if the slot is occupied by a module
   for (const module of Object.values(robotState.modules)) {
-    console.log('module: ', module)
     if (module.slot === slotIpnut) {
-      return true
+      return true;
     }
   }
-  return false
+  return false;
 }
