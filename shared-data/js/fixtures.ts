@@ -868,6 +868,7 @@ export function getFixtureDisplayName(
   }
 }
 
+// TODO: Move to helpers/deckDeclarationHelpers.ts
 export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
@@ -882,6 +883,7 @@ export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
+// TODO: Move to helpers
 export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
