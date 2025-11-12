@@ -54,7 +54,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
 
   return (
     <ODDMediaContainerContent
-      leftPrimaryText={modalStepCountStr}
+      leftPrimaryText={item.timestamp}
       centerPrimaryText={currentCommand?.commandType ?? ''}
       centerSecondaryText={previousCommandString}
       rightButtonOnClick={() => {
