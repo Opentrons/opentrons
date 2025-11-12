@@ -1853,7 +1853,9 @@ class OT3Controller(FlexBackend):
         return cast(
             bool,
             await set_hepa_fan_state_fw(
-                self._messenger, fan_on, duty_cycle
+                self._messenger,
+                fan_on,
+                duty_cycle,
             ),
         )
 
@@ -1872,7 +1874,9 @@ class OT3Controller(FlexBackend):
         return cast(
             bool,
             await set_hepa_uv_state_fw(
-                self._messenger, light_on, uv_duration_s
+                self._messenger,
+                light_on,
+                uv_duration_s,
             ),
         )
 
