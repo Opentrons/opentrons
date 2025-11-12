@@ -19,7 +19,6 @@ description = "The Opentrons API is a simple framework designed to make writing 
 
 dependencies = [
    "opentrons-shared-data==0.0.0",
-    "opentrons-hardware[FLEX]==0.0.0",
     "aionotify==0.3.1",
     "anyio>=4.9.0,<5.0.0",
     "jsonschema>=3.0.1,<4.18.0",
@@ -81,6 +80,8 @@ dev = [
     "hypothesis>=6.96.1,<7",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "build~=1.2.0",
+    # opentrons-hardware is needed for tests but not for package installation
+    "opentrons-hardware[FLEX]==0.0.0",
 ]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]
 "flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
