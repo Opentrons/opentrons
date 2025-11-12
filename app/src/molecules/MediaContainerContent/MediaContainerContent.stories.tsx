@@ -41,9 +41,9 @@ const meta: Meta<typeof MediaContainerContent> = {
 
 export default meta
 
-type Story = StoryObj<typeof MediaContainerContentComponent>
+type Story = StoryObj<typeof MediaContainerContent>
 
-export const MediaContainerContent: Story = {
+export const MediaContainerContentComponent: Story = {
   args: {
     mediaContent: (
       <img
@@ -60,7 +60,7 @@ export const MediaContainerContent: Story = {
     centerPrimaryText: 'Example Image Title',
     centerSecondaryText: 'Taken during experiment',
     rightPrimaryText: '2:45 PM',
-    state: undefined, // use 'loading' | 'error' | undefined
+    state: undefined, 
     overflowMenu: null,
     hoverText: 'Click to view image',
   },

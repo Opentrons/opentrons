@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, Modal, StyledText } from '@opentrons/components'
@@ -7,12 +7,14 @@ import { Skeleton } from '/app/atoms/Skeleton'
 
 import styles from './gallery.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface MediaContainerContentProps {
   mediaContent: ReactNode
   centerPrimaryText: string
   centerSecondaryText: string
   rightPrimaryText: string
-  state: 'loading' | 'error'
+  state: 'loading' | 'error' | 'neutral'
   overflowMenu: JSX.Element | null
   hoverText: string | null
 }
@@ -41,9 +43,16 @@ export function MediaContainerContent(
       <div className={styles.gallery_card}>
         <div
           className={styles.gallery_card_thumbnail}
-          onClick={state ? undefined : onClick}
-          role={state ? undefined : 'button'}
-          style={state ? { cursor: 'default' } : undefined}
+          onClick={() => {
+            if (state === 'loading' || state === 'error') return
+            onClick()
+          }}
+          role={state === 'loading' || state === 'error' ? undefined : 'button'}
+          style={
+            state === 'loading' || state === 'error'
+              ? { cursor: 'default' }
+              : undefined
+          }
         >
           {state ? (
             <Skeleton width="100%" height="100%" backgroundSize="47rem" />
