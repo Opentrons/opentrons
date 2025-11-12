@@ -101,9 +101,9 @@ See <font color="red">PLACEHOLDER TEXT AND LINK TO INSTALLATION DOC</font> for i
 
 ### Power supply
 
-<!-- this ought to be in the regulatory section -->
+<!-- this might be better in the regulatory section? -->
 
-The OT-2 uses an external [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply maximum consumption is 220 W (6.1 A, 36 V).
+The OT-2 uses an external [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply's maximum consumption is 220 W (6.1 A, 36 V).
 
 Total power consumption depends on the specifics of the protocols run on the robot. The Opentrons OT-2 Liquid Handler generally consumes around 90-120 W when idle.
 
