@@ -21,7 +21,7 @@ import { pythonDef } from './pythonDef'
 
 import type {
   CommandAnnotationV1Mixin,
-  CommandV14Mixin,
+  CommandV15Mixin,
   CreateCommand,
   DeckConfiguration,
   LabwareDefinition2,
@@ -206,8 +206,8 @@ export function createQuickTransferFile(
     liquids: {},
   }
 
-  const commandv8Mixin: CommandV14Mixin = {
-    commandSchemaId: 'opentronsCommandSchemaV14',
+  const commandv8Mixin: CommandV15Mixin = {
+    commandSchemaId: 'opentronsCommandSchemaV15',
     commands,
   }
 
