@@ -175,6 +175,24 @@ export function getInvariantContextAndRobotState(
   let trashBinEntities: TrashBinEntities = {}
   let wasteChuteEntities: WasteChuteEntities = {}
 
+  // If the drop tip location is the tip rack, still a protocols needs to define a trash bin entity
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  if (dropTipIsTiprack) {
+    const defaultTrashLocation = 'cutoutA3'
+    const trashId = `${uuid()}_trashBin`
+    trashBinEntities = {
+      [trashId]: {
+        id: trashId,
+        location: defaultTrashLocation,
+        pythonName: pythonTrashBinName,
+      },
+    }
+  }
+
   if (
     typeof quickTransferState.dropTipLocation !== 'string' &&
     quickTransferState.dropTipLocation.cutoutFixtureId ===
