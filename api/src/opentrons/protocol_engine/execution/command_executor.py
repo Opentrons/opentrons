@@ -241,7 +241,10 @@ class CommandExecutor:
     async def capture_error_image(self, running_command: Command) -> None:
         """Capture an image of an error event."""
         try:
-            camera_enablement = await self._camera_provider.get_camera_settings()
+            camera_enablement = self._state_store.camera.get_enablement_settings()
+            if camera_enablement is None:
+                # Utilize the global camera settings
+                camera_enablement = await self._camera_provider.get_camera_settings()
             # Only capture photos of errors if the setting to do so is enabled
             if (
                 camera_enablement.cameraEnabled
