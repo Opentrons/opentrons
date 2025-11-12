@@ -8,6 +8,7 @@ from time import time
 import importlib
 import copy
 import json
+import traceback
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -1486,6 +1487,7 @@ def run(ctx: ProtocolContext) -> None:
         _run(ctx, fixture_settings)
     except Exception as e:
         print_error(f"error during run {e}")
+        print_error(f"Captured traceback:\n{traceback.format_exc()}")
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")
