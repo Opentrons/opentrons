@@ -7,7 +7,6 @@ import {
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
   OT2_ROBOT_TYPE,
-  protocolSchemaV8,
 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
@@ -47,20 +46,6 @@ const ajv = new Ajv({
 // and add v8 command schema
 ajv.addSchema(labwareSchemaV2)
 ajv.addSchema(commandSchemaV8)
-
-const validateProtocol = ajv.compile(protocolSchemaV8)
-
-const expectResultToMatchSchema = (result: any): void => {
-  const valid = validateProtocol(result)
-  const validationErrors = validateProtocol.errors
-
-  if (validationErrors) {
-    console.log(JSON.stringify(validationErrors, null, 4))
-  }
-
-  expect(valid).toBe(true)
-  expect(validationErrors).toBe(null)
-}
 
 describe('createFile selector', () => {
   beforeEach(() => {
