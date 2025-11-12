@@ -25,7 +25,6 @@ describe('FeatureFlag', () => {
         PRERELEASE_MODE: true,
         OT_PD_ENABLE_COMMENT: true,
         OT_PD_ENABLE_REACT_SCAN: true,
-        OT_PD_ENABLE_TIMELINE_SCRUBBER: true,
         OT_PD_ENABLE_TIP_SELCTION: true,
       },
     }
@@ -40,11 +39,9 @@ describe('FeatureFlag', () => {
     screen.getByText('You can add comments anywhere between timeline steps.')
     screen.getByText('Enable React Scan')
     screen.getByText('Enable React Scan support for components rendering check')
-    screen.getByText('Enable timeline scrubber')
-    screen.getByText('See the protocol timeline visualization in overview')
     screen.getByText('Enable tip selection')
     screen.getByText('Enables the ability to select tips manually')
-    expect(screen.getAllByRole('switch').length).toBe(5)
+    expect(screen.getAllByRole('switch').length).toBe(4)
   })
   it('should call function when clicking toggle switches', () => {
     render(props)
@@ -66,11 +63,6 @@ describe('FeatureFlag', () => {
     })
 
     fireEvent.click(toggleButtons[3])
-    expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
-      OT_PD_ENABLE_TIMELINE_SCRUBBER: false,
-    })
-
-    fireEvent.click(toggleButtons[4])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_TIP_SELCTION: false,
     })
