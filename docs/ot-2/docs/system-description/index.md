@@ -4,7 +4,7 @@ title: "Opentrons OT-2: System Description"
 
 This chapter describes the hardware systems and features of the OT-2.
 
-- Robot components
+- [Robot Components][robot-components.md] 
 
 - Pipettes
 
