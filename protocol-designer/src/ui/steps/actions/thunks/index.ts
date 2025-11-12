@@ -231,8 +231,7 @@ export const duplicateMultipleSteps: (
   stepIds => (dispatch, getState) => {
     const orderedStepIds = getOrderedStepIds(getState())
     const lastSelectedItemId = getMultiSelectLastSelected(getState())
-    // @ts-expect-error(sa, 2021-6-15): lastSelectedItemId might be null, which you cannot pass to indexOf
-    const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
+    const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId!)
     stepIds.sort(
       (a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b)
     )
@@ -254,8 +253,7 @@ export const duplicateMultipleSteps: (
       type: 'SELECT_MULTIPLE_STEPS',
       payload: {
         stepIds: duplicateIds,
-        // @ts-expect-error(sa, 2021-6-15): last might return undefined
-        lastSelected: last(duplicateIds),
+        lastSelected: last(duplicateIds)!,
       },
     }
     dispatch(duplicateMultipleStepsAction)
