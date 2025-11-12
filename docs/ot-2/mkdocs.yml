@@ -7,7 +7,7 @@ nav:
   - System Description:
       - System Description: system-description/index.md
       - Robot Components: system-description/robot-components.md
-      - Pipettes: system-description/pipettes.md
+      - OT-2 Pipettes: system-description/pipettes.md
   - Instruments and Modules: modules.md
   - Labware: labware.md
   - Software: software.md
