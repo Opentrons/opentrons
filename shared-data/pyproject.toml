@@ -23,6 +23,7 @@ dependencies = [
     "jsonschema>=4.0.0,<5",
     "typing-extensions>=4.0.0,<5",
     "pydantic>=2.0.0,<3.0.0",
+    "numpy>=1.20.0,<2",
 ]
 dynamic = ['version']
 
@@ -53,6 +54,8 @@ dev = [
     "black==22.3.0",
     "pytest-clarity~=1.0.0",
     "build~=1.2.0",
+    "pillow",
+    "types-Pillow",
 ]
 
 [project.urls]
