@@ -18,5 +18,7 @@ runs:
         else
           curl -LsSf https://astral.sh/uv/install.sh | sh
         fi
+        # Add uv to PATH - $GITHUB_PATH works the same on all platforms
+        # This will be available in subsequent steps
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
