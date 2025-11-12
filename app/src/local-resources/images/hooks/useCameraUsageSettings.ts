@@ -22,9 +22,10 @@ export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
   })
   const { mutateAsync: updateCamera } = useUpdateCamera()
 
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true)
-  const [isLiveVideoEnabled, setIsLiveVideoEnabled] = useState(true)
-  const [isRecoveryCaptureEnabled, setIsRecoveryCaptureEnabled] = useState(true)
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false)
+  const [isLiveVideoEnabled, setIsLiveVideoEnabled] = useState(false)
+  const [isRecoveryCaptureEnabled, setIsRecoveryCaptureEnabled] =
+    useState(false)
 
   useEffect(() => {
     if (cameraData) {

@@ -168,7 +168,7 @@
   "reset_estop": "Reset E-stop",
   "resume_operation": "Resume operation",
   "right": "right",
-  "robot_control_not_available": "Some robot controls are not available when run is in progress",
+  "robot_control_not_available": "Some robot controls are not available when run is in progress or robot is busy",
   "robot_initializing": "Initializing...",
   "run": "Run",
   "run_a_protocol": "Run a protocol",

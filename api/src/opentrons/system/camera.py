@@ -21,8 +21,7 @@ from opentrons.system import ffmpeg
 log = logging.getLogger(__name__)
 
 # Default System Cameras
-FLEX_EMBEDDED_CAMERA = "/dev/video2"
-OT2_CAMERA = "/dev/video0"
+DEFAULT_SYSTEM_CAMERA = "/dev/ot_system_camera"
 
 # Stream Globals
 DEFAULT_CONF_FILE = (
@@ -246,6 +245,10 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
         )
         # We don't want to write bad or incomplete data to the file
         return None
+
+    # Migrate old camera default file data to new uniform default
+    if contents[StreamConfigurationKeys.SOURCE] == "NONE":
+        contents[StreamConfigurationKeys.SOURCE] = DEFAULT_SYSTEM_CAMERA
     return contents
 
 
@@ -278,9 +281,7 @@ async def image_capture(
     robot_type: RobotType, parameters: ImageParameters
 ) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
-    camera = (
-        FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA
-    )
+    camera = DEFAULT_SYSTEM_CAMERA
 
     # We must always validate the camera exists
     if not os.path.exists(camera):
@@ -362,3 +363,9 @@ def get_boot_id() -> str:
         return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     else:
         return "SIMULATED_BOOT_ID"
+
+
+def camera_exists() -> bool:
+    """Validate whether or not the camera device exists."""
+    return os.path.exists(DEFAULT_SYSTEM_CAMERA)
+    # todo(chb, 2025-11-10): Eventually when we support multiple cameras this should accept a camera parameter to check for

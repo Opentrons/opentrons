@@ -135,11 +135,10 @@ export const notifySubscribeAction = (
 export const cameraStreamOpenAction = (
   hostname: string,
   robotName: string,
-  runId: string,
   windowTitle: string
 ): CameraStreamOpenAction => ({
   type: CAMERA_STREAM_OPEN,
-  payload: { hostname, robotName, runId, windowTitle },
+  payload: { hostname, robotName, windowTitle },
   meta: { shell: true },
 })
 

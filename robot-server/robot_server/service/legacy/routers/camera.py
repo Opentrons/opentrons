@@ -221,6 +221,7 @@ async def get_live_stream(
     RTMP:
         The full RTMP stream URL is formatted as: rtmp://{ROBOT_IP}/live/stream
     """
+    _validate_camera_present()
     enable_status = camera_settings_store.get_live_stream_enabled()
     return LiveStreamData(
         enabled=enable_status,
@@ -252,6 +253,7 @@ async def post_live_stream_settings(
     Arguments:
         request_body: Input payload from the request body.
     """
+    _validate_camera_present()
     if camera.robot_supports_livestream(robot_type) is False:
         raise LegacyErrorResponse(
             message="Opentrons Live Stream service is not available on OT-2.",
@@ -347,6 +349,7 @@ async def get_live_stream_settings(
 
 
 def _get_stream_settings() -> LiveStreamSettings:
+    _validate_camera_present()
     contents = camera.load_stream_configuration_file_data()
     if contents is None:
         raise LegacyErrorResponse(
@@ -411,7 +414,7 @@ def _live_stream_settings_to_configuration_file(
 
 
 def _validate_camera_present() -> None:
-    if IS_ROBOT and not os.path.exists(DEFAULT_CAMERA_PATH):
+    if IS_ROBOT and not camera.camera_exists():
         # todo(chb, 2025-09-19): for the time being we will just be checking that the embedded flex camera exists to satisfy requirements
         # incase the camera isn't present, however eventually we can change this to support dynamically set third party cameras
         raise LegacyErrorResponse(

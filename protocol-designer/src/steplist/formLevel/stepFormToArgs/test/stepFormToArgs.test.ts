@@ -4,7 +4,11 @@ import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
 
 import { _castForm } from '../index'
 
-import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import type {
+  LabwareEntity,
+  PipetteEntity,
+  TipRackWithDef,
+} from '@opentrons/step-generation'
 import type {
   HydratedMagnetFormData,
   HydratedMixFormData,
@@ -62,7 +66,7 @@ describe('form casting', () => {
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       aspirate_submerge_mmFromBottom: 1,
@@ -113,7 +117,7 @@ describe('form casting', () => {
       dropTip_location: 'some location',
       mix_touchTip_checkbox: false,
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,

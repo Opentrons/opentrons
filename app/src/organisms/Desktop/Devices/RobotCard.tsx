@@ -119,7 +119,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <AttachedInstruments robotName={robotName} />
               <Flex
                 gridGap={SPACING.spacing4}
-                flexWrap={WRAP}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <AttachedModules robotName={robotName} />
@@ -151,12 +150,12 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      width="85px"
+      width="100%"
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
       </StyledText>
-      <Flex flexWrap={WRAP}>
+      <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
             key={`${String(module.moduleModel)}_${i}_${robotName}`}
@@ -175,6 +174,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const { data } = useCamera()
+
   return data?.cameraEnabled ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -218,12 +218,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const leftAndRightMountsPipetteDisplayName = null
 
   return (
-    <Flex
-      flex="1"
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      minWidth="24rem"
-    >
+    <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {i18n.format(t('shared:instruments'), 'capitalize')}
       </StyledText>

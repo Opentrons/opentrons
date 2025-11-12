@@ -8,6 +8,7 @@ import type {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TipRackWithDef,
   TipTrackingOption,
   TrashBinEntity,
   WasteChuteEntity,
@@ -286,8 +287,9 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   liquidClassesSupported: boolean
   nozzles: NozzleConfigurationStyle | null
   path: PathOption
+  // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
@@ -384,7 +386,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   wells: string[]
   aspirate_delay_seconds?: number | null
