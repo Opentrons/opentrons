@@ -53,7 +53,9 @@ export function pythonImports(): string {
 }
 
 export function pythonMetadata(
-  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string }
+  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string } & {
+    internalAppBuildDate?: string
+  }
 ): string {
   // FileMetadataFields has timestamps, lists, etc., but Python metadata dict can only contain strings
   function formatTimestamp(timestamp: number | null | undefined): string {
@@ -65,6 +67,7 @@ export function pythonMetadata(
       author: fileMetadata.author,
       description: fileMetadata.description,
       created: formatTimestamp(fileMetadata.created),
+      internalAppBuildDate: fileMetadata.internalAppBuildDate,
       lastModified: formatTimestamp(fileMetadata.lastModified),
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,

@@ -22,18 +22,13 @@ import {
   fileMetadata,
   ingredients,
   ingredLocations,
-  labwareDefsByURI,
   labwareEntities,
   labwareNicknamesById,
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import {
-  createFile,
-  createJSONFile,
-  getLabwareDefinitionsInUse,
-} from '../selectors'
+import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -98,29 +93,6 @@ describe('createFile selector', () => {
     pipetteEntities,
     liquidEntities: ingredients,
   }
-  it('should return a schema-valid JSON V8 protocol', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-    const result = createJSONFile.resultFunc(
-      fileMetadata,
-      v7Fixture.initialRobotState,
-      v7Fixture.robotStateTimeline,
-      OT2_ROBOT_TYPE,
-      dismissedWarnings,
-      ingredLocations,
-      v7Fixture.savedStepForms,
-      v7Fixture.orderedStepIds,
-      labwareNicknamesById,
-      labwareDefsByURI,
-      {},
-      entities
-    )
-    expectResultToMatchSchema(result)
-
-    expect(vi.mocked(getLoadLiquidCommands)).toHaveBeenCalledWith(
-      ingredients,
-      ingredLocations
-    )
-  })
 
   it('should return a valid Python protocol file', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
