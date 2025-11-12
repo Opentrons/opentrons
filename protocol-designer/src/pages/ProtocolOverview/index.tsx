@@ -29,7 +29,6 @@ import {
   EditProtocolMetadataModal,
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import { getEnableTimelineScrubber } from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
@@ -44,7 +43,6 @@ import { HardwareInfo } from './HardwareInfo'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { ProtocolMetadata } from './ProtocolMetadata'
-import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
 
@@ -78,7 +76,6 @@ export function ProtocolOverview(): JSX.Element {
   const navigate = useNavigate()
   const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
     useState<boolean>(false)
-  const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] =
     useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -247,7 +244,6 @@ export function ProtocolOverview(): JSX.Element {
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
-            {enableTimelineScrubber ? <ScrubberContainer /> : null}
             <StartingDeck
               robotType={robotType}
               setShowMaterialsListModal={setShowMaterialsListModal}
