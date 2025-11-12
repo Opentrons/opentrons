@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import { Modal, PrimaryButton } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { HelixSlider } from '/app/molecules/HelixSlider'
 
 import styles from './cameracontrols.module.css'
 import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
@@ -59,73 +60,26 @@ function CameraControlSettings({
     <div className={styles.settings_container}>
       <ZoomSettings zoom={settings.zoom} adjustZoom={settings.adjustZoom} />
       <Divider />
-      <SliderSetting
+      <HelixSlider
         title={t('brightness')}
         subtext={t('adjust_brightness')}
         adjustValue={settings.adjustBrightness}
         value={settings.brightness}
       />
       <Divider />
-      <SliderSetting
+      <HelixSlider
         title={t('contrast')}
         subtext={t('adjust_contrast')}
         adjustValue={settings.adjustContrast}
         value={settings.contrast}
       />
       <Divider />
-      <SliderSetting
+      <HelixSlider
         title={t('saturation')}
         subtext={t('adjust_saturation')}
         adjustValue={settings.adjustSaturation}
         value={settings.saturation}
       />
-    </div>
-  )
-}
-
-interface SliderSettingProps {
-  title: string
-  subtext: string
-  value: number
-  adjustValue: (value: number) => void
-}
-
-function SliderSetting({
-  value,
-  title,
-  subtext,
-  adjustValue,
-}: SliderSettingProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
-  return (
-    <div className={styles.slider_setting_container}>
-      <div className={styles.slider_setting_text_container}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">{title}</StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">{subtext}</StyledText>
-      </div>
-      <div className={styles.slider_value_container}>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={value}
-          onChange={e => {
-            adjustValue(Number(e.target.value))
-          }}
-          className={styles.slider_basic}
-          // @ts-expect-error Expected. We want to use style here to avoid more complex
-          //  data-attribute CSS calculations.
-          style={{ '--slider-progress': `${value}%` }}
-          aria-label={title}
-        />
-        <StyledText
-          className={styles.slider_percentage}
-          desktopStyle="bodyDefaultSemiBold"
-        >
-          {t('value_percent', { value })}
-        </StyledText>
-      </div>
     </div>
   )
 }
