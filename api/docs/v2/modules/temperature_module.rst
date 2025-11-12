@@ -117,45 +117,35 @@ This command loads the same physical adapter and labware as the example in the S
 Temperature Control
 ===================
 
-The primary function of the module is to control the temperature of its deck. As with the Heater-Shaker Module, the API lets you choose between *blocking* and non-blocking module commands. When you use a blocking command, the robot won't perform other protocol steps until the Temperature Module reaches the required temperature. 
+The primary function of the module is to control the temperature of its deck. As with the Heater-Shaker Module, you can use either a blocking or non-blocking command to control how your protocol proceeds. 
 
-.. list-table::
-    :header-rows: 1
+Both examples below set the target temperature to 4 °C. Each takes one parameter: ``celsius``.  
 
-    * - **Command**
-      - **API version**
-      - **Module action**
-    * - ``set_temperature()``
-      - Added in API 2.13
-      - Blocking
-    * ``start_set_temperature()``
-      - Added in API 2.27
-      - Non-blocking
+.. tabs::
 
+    .. tab:: Blocking
 
-Let's take a look at a blocking command first. We'll use :py:meth:`~.TemperatureModuleContext.set_temperature`, which takes one parameter: ``celsius``. For example, to set the Temperature Module to 4 °C:
+      .. code-block:: python
+        temp_mod.set_temperature(celsius=4)
 
-.. code-block:: python
+    .. tab:: Non-blocking 
 
-    temp_mod.set_temperature(celsius=4)
-
-When using ``set_temperature()``, your protocol will wait until the target temperature is reached before proceeding to further commands. Using this blocking command, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
+      .. code-block:: python
+        temp_mod.start_set_temperature(celsius=4)
+        pipette.pick_up_tip()   
+        pipette.aspirate(50, plate["A1"])
+        pipette.dispense(50, plate["B1"])
+        pipette.drop_tip()
 
 .. versionadded:: 2.0
+.. versionchanged:: 2.27
+  Choose to use the non-blocking :py:meth:`.TemperatureContext.start_set_temperature` method to perform other protocol steps while the Temperature Module reaches its target temperature. 
 
-Beginning with API 2.27, you can use the non-blocking :py:meth:`~.TemperatureModuleContext.start_set_temperature` method to move onto further commands while the module reaches the target temperature. 
+When you use the blocking :py:meth:`.TemperatureContext.set_temperature` command, the robot won't perform other protocol steps until the Temperature Module reaches the required temperature. You can pipette to or from the module only when it is holding at a temperature or idle. 
 
-.. code-block:: python
+Beginning with API version 2.27, you can use the non-blocking :py:meth:`~.TemperatureModuleContext.start_set_temperature` method to move onto further commands while the module reaches the target temperature. The method also allows some other simultaneous module actions. For more, see the :ref:`concurrent-module` section. 
 
-  temp_mod.start_set_temperature()
-  pipette.pick_up_tip()
-  pipette.aspirate(50, temp_plate["A1"])
-  pipette.dispense(50, temp_plate["B1"])
-  pipette.drop_tip
-
-Here, the non-blocking ``start_set_temperature()`` lets you pipette in the ``temp_plate`` loaded on the Temperature Module. The method also allows other simultaneous pipetting actions and some other module actions. For more, see the :ref:`concurrent-module` section. 
-
-
+Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 
