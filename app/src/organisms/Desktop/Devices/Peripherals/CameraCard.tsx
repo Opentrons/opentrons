@@ -4,16 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  ALIGN_CENTER,
   Chip,
-  COLORS,
-  DIRECTION_ROW,
   Divider,
   Flex,
   Icon,
   MenuItem,
   OverflowBtn,
-  SPACING,
   StyledText,
   useMenuHandleClickOutside,
   useOnClickOutside,
@@ -103,17 +99,12 @@ export function CameraCard({
             >
               {t('on_deck')}
             </StyledText>
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-              <Icon
-                size="1rem"
-                name="camera"
-                color={COLORS.grey50}
-                marginRight={SPACING.spacing8}
-              />
+            <div className={styles.card_photo_content_container}>
+              <Icon className={styles.icon_container} name="photo-camera" />
               <StyledText desktopStyle="bodyDefaultRegular">
                 {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
               </StyledText>
-            </Flex>
+            </div>
           </div>
           <Flex width="fit-content">
             <Chip
