@@ -66,7 +66,10 @@ export const forFlexStackerFill = (
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
-  const labwareDefinition = invariantContext.labwareEntities[moduleState?.labwareIdsInStacker?.[0] ?? '']?.def
+  const labwareDefinition =
+    invariantContext.labwareEntities[
+      moduleState?.labwareIdsInStacker?.[0] ?? ''
+    ]?.def
   const listOfLabwareDefinitions = Array.from(
     { length: moduleState?.labwareIdsInStacker?.length ?? 0 },
     _ => labwareDefinition
@@ -88,7 +91,8 @@ export const forFlexStackerFill = (
     if (
       count != null &&
       count > 0 &&
-      maxStorableLabware > count + (moduleState.labwareIdsInStacker?.length ?? 0)
+      maxStorableLabware >
+        count + (moduleState.labwareIdsInStacker?.length ?? 0)
     ) {
       // create labware entities for the new labware
       const newLabwareIdList = Array.from({ length: count }, () => uuid())
@@ -171,10 +175,24 @@ export const forFlexStackerStore = (
     }
     // get labware id on module from the move labware command
     const newLabwareId = uuid()
+    const moduleOnSlot = robotState.modules[moduleId].slot
+    // move labware should update the labware id on the shuttle
+    const labwareToStore = Object.entries(robotState.labware).find(
+      ([id, labware]) => labware.stack.includes(moduleOnSlot)
+    )?.[0]
+    console.log('labwareToStore: ', labwareToStore)
+    if (labwareToStore == null) {
+      throw new Error(
+        'Cannot store labware bc there is no labware on the module'
+      )
+    }
     moduleState.shuttlePosition = 'stored'
     moduleState.labwareIdsInStacker = [
       newLabwareId,
       ...(moduleState.labwareIdsInStacker ?? []),
     ]
+    // remove labware from entities and from shuttle
+    // update stack of labware on the module
+    console.log('robotState after storing labware: ', robotState)
   }
 }

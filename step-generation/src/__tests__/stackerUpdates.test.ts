@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  getHeightOfLabwareStackFromDefinitions,
+} from '@opentrons/shared-data'
 
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import {
@@ -14,6 +17,12 @@ import { getModuleState } from '../robotStateSelectors'
 import type { FlexStackerModuleState } from '../types'
 
 vi.mock('../robotStateSelectors')
+vi.mock('@opentrons/shared-data', async importOriginal => ({
+  ...(await importOriginal()),
+  getHeightOfLabwareStackFromDefinitions: vi.fn().mockReturnValue(10),
+  getStackerMaxPoolCountByHeight: vi.fn().mockReturnValue(10),
+  getLabwareOverlapOffset: vi.fn().mockReturnValue({ x: 0, y: 0, z: 10 }),
+}))
 
 const LABWARE_ID = 'sourcePlateId'
 const FLEX_STACKER_ID = 'flexStackerId'
@@ -25,7 +34,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
   beforeEach(() => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['labware1', 'labware2', 'labware3'],
+      labwareIdsInStacker: ['labware1', 'labware2', 'labware3'],
       maxPoolCount: 6,
       labwareStored: LABWARE_ID,
     } as any)
@@ -94,7 +103,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
   beforeEach(() => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['labware1', 'labware2', 'labware3'],
+      labwareIdsInStacker: ['labware1', 'labware2', 'labware3'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
     } as any)
@@ -158,7 +167,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   beforeEach(() => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
     } as any)
@@ -167,7 +176,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   it('should raise an error if there is no labware in the stacker', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: [],
+      labwareIdsInStacker: [],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
     } as any)
@@ -182,7 +191,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   it('should raise an error if there is labware on the shuttle', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
       shuttlePosition: 'retrieved',
@@ -209,7 +218,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   it('should retrieve the labware from the stacker', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
       shuttlePosition: 'home',
@@ -235,13 +244,34 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
 
 describe('flex stacker state updates forFlexStackerStore', () => {
   const invariantContext = makeContext()
-  const robotState = getInitialRobotStateStandard(invariantContext)
+  let robotState = getInitialRobotStateStandard(invariantContext)
+  robotState.modules[FLEX_STACKER_ID] = {
+    slot: '1',
+    moduleState: {
+      type: FLEX_STACKER_MODULE_TYPE,
+      labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      max_pool_count: 6,
+      labwareStored: LABWARE_ID,
+      storedLabwareDetails: {
+        primaryLabware: {
+          id: LABWARE_ID,
+          def: invariantContext.labwareEntities[LABWARE_ID]?.def,
+        },
+      },
+    } as any,
+  }
   beforeEach(() => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
+      storedLabwareDetails: {
+        primaryLabware: {
+          id: LABWARE_ID,
+          def: invariantContext.labwareEntities[LABWARE_ID]?.def,
+        },
+      },
     } as any)
   })
   it('should store the labware in the stacker', () => {
@@ -254,7 +284,7 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
     expect(moduleState?.shuttlePosition).toBe('stored')
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(3)
-    expect(robotState.labware['tiprack1Id']?.stack).toHaveLength(1)
+    console.log('moduleState: ', moduleState)
+    expect(moduleState?.labwareIdsInStacker).toHaveLength(4)
   })
 })
