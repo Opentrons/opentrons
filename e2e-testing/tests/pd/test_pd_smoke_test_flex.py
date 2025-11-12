@@ -14,8 +14,7 @@ from pathlib import Path
 from typing import Optional
 
 import pytest
-from playwright.sync_api import Error as PlaywrightError
-from playwright.sync_api import Page, TimeoutError, expect
+from playwright.sync_api import Page, expect
 
 # Make the automation package importable in tests (same pattern as other tests)
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -68,42 +67,35 @@ def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
     If any Playwright action or assertion fails, the test will pause for debugging.
     """
 
-    try:
-        editor = import_protocol_onboarding_flow(page, base_url)
-        print("✓ File uploaded, ready for module steps")
+    editor = import_protocol_onboarding_flow(page, base_url)
+    print("✓ File uploaded, ready for module steps")
 
-        _add_temperature_module_step(editor, page, "50")
+    _add_temperature_module_step(editor, page, "50")
 
-        _add_heater_shaker_step(editor, page, "50", "300", "00:30")
-        print("✓ Heater-Shaker step: 50°C, 300 rpm, timer 00:30")
+    _add_heater_shaker_step(editor, page, "50", "300", "00:30")
+    print("✓ Heater-Shaker step: 50°C, 300 rpm, timer 00:30")
 
-        _add_thermocycler_state_step(editor, page, block_temp="40", lid_temp="110", lid_position="open")
+    _add_thermocycler_state_step(editor, page, block_temp="40", lid_temp="110", lid_position="open")
 
-        _add_thermocycler_profile_step(
-            editor,
-            page,
-            well_volume="100",
-            lid_temp="50",
-            cycles=[
-                {
-                    "repeat_count": "2",
-                    "steps": [
-                        {"name": "Cycle 1", "temperature": "40", "time": "1:00"},
-                        {"name": "Cycle 2", "temperature": "4", "time": "0:01"},
-                    ],
-                }
-            ],
-        )
+    _add_thermocycler_profile_step(
+        editor,
+        page,
+        well_volume="100",
+        lid_temp="50",
+        cycles=[
+            {
+                "repeat_count": "2",
+                "steps": [
+                    {"name": "Cycle 1", "temperature": "40", "time": "1:00"},
+                    {"name": "Cycle 2", "temperature": "4", "time": "0:01"},
+                ],
+            }
+        ],
+    )
 
-        expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
+    expect(page.get_by_role("button", name="Export")).to_be_visible(timeout=10000)
 
-        print("✅ Combined smoke flow completed successfully")
-
-    except (AssertionError, PlaywrightError, TimeoutError, Exception) as e:
-        print(f"\n🛑 Test failed due to: {type(e).__name__} - {e}")
-        print("Pausing execution for debugging...")
-        page.pause()
-        raise
+    print("✅ Combined smoke flow completed successfully")
 
 
 def _add_temperature_module_step(editor: ProtocolEditorPage, page: Page, temp: str) -> None:

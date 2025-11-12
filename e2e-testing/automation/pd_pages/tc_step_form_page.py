@@ -1,7 +1,6 @@
 """Module for interactions within the Thermocycler Step configuration form."""
 
 import re
-from typing import Literal
 
 from playwright.sync_api import Page
 
@@ -80,7 +79,7 @@ class ThermocyclerStepPage(BasePage):
 
     # ========== Lid Position ==========
 
-    def set_lid_position(self, position: Literal["open", "closed"]) -> None:
+    def set_lid_position(self, position: str) -> None:
         """
         Set the lid position (open or closed).
 
