@@ -4,7 +4,7 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/AnnotatedSteps'
 
-import styles from './visualization.module.css'
+import styles from './commandsteps.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
@@ -20,12 +20,12 @@ interface CommandStepsProps {
 }
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
   const {
-    currentCommandIndex,
     groupedCommands,
     analysis,
     setSelectedCommand,
-    handlePause,
     percentComplete,
+    handlePause,
+    currentCommandIndex,
   } = props
   const { t } = useTranslation('protocol_visualization')
   return (

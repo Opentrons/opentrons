@@ -9,7 +9,8 @@
 .left_column {
   position: relative;
   display: flex;
-  min-width: 200px;
+  min-width: 9.25rem; /* 148px */
+  max-width: 37.5rem; /* 600px */
   flex-direction: column;
   flex-shrink: 0;
   overflow-y: auto;
