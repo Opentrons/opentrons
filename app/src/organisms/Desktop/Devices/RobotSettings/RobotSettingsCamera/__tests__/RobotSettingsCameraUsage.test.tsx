@@ -46,7 +46,7 @@ describe('RobotSettingsCameraUsage', () => {
   it('renders error recovery section with correct text', () => {
     render(mockProps)
 
-    screen.getByText('Error Recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
       'Automatically capture an image of the deck in the event of an error.'
     )

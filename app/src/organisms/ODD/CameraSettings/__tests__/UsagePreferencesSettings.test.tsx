@@ -52,7 +52,7 @@ describe('UsagePreferencesSettings', () => {
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
       'Automatically capture an image of the deck in the event of an error.'
     )
