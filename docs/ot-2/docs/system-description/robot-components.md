@@ -8,7 +8,7 @@ title: "Opentrons OT-2: Robot Components"
 
 The frame of the OT-2 provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed of sheet metal and aluminum extrusions.
 
-The metal frame has openings for side windows and a front door made of transparent polycarbonate that let you see what's going on inside the robot. The lower-half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare the deck before a protocol or manipulate the state of the deck during a protocol.
+The metal frame has openings for side windows and a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower-half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare and manipulate the deck before and during a protocol run.
 
 Other frame elements include:
 
@@ -16,31 +16,49 @@ Other frame elements include:
 - A built-in camera can photograph the deck and working area for recording and tracking protocol execution.
 - A front LED indicates the robot's status. It turns solid blue when your OT-2 powered on and fully booted up.
 
+## Gantry
+
+Attached to the frame is the gantry, which is the robot's movement and positioning system.
+
+![Gantry with labeled features](../images/gantry.png)
+
+The gantry moves separately along the x- and y-axis to position the pipettes and gripper at precise locations for protocol execution. Movement along these axes is precise to the nearest 0.1 mm.
+
+In turn, the pipette carriage is attached to the gantry. The pipette carriage holds mounting points for single- and multi-channel pipettes. The mounting points move along the z-axis to position pipettes at precise locations for protocol execution.
+
+The electronics contained in the gantry provide power and communications to the pipettes, when attached.
+
 ## Deck and working area
 
-The deck is the machined aluminum surface on which automated science protocols are executed. It provides  11 ANSI/SLAS-complaint slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
+The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
 
 ![deck and working area](../images/ot2-deck-working-area.png)
 
 The working area is the physical space on and above the deck that is accessible for pipetting. Labware placed in slots 1–11 are in the working area.
 
-The OT-2 deck also slides in and out of the enclosure. Pull it out part way, or remove it completely, to more easily place labware in a slot or for cleaning.
+The OT-2 deck slides in and out of the enclosure. You can pull it out part way, or remove it completely, to more easily place labware or clean the deck.
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
-## Side and back
+## USB ports
 
-![test](../images/power-ethernet.png)
+The OT-2 has 4 USB ports, located in the right rear of the enclosure, behind the gantry. These ports, numbered USB-1 through USB-4, are used to connect Opentrons modules to the robot.
 
-Status indicator lights on the front and back of the OT-2 provide at-a-glance information about the robot.
+![USB ports](../images/usb-ports.png)
+
+See the <font color="red">MODULES CHAPTER PLACEHOLDER AND LINK</font> for more information on connecting these devices and using them in your protocols.
+
+## Status LEDs, power, and network connections
+
+When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot.
 
 ### Rear LEDs
 
-The OT-2 has five (5) status LEDs, on the back panel of the robot.
+These status lights allow you to quickly assess the state of your OT-2.
 
 ![Side panel showing 5 led status lights](../images/side-LEDs.png)
 
-These status lights allow a user to quickly assess the Opentrons Liquid Handler's operating status.
+The following table lists and describes these status lights.
 
 <table>
   <thead>
@@ -73,35 +91,38 @@ These status lights allow a user to quickly assess the Opentrons Liquid Handler'
   </tbody>
 </table>
 
-### Ethernet connection
+### Power and network
 
-### Serial number
+On the side panel below the LED status indicators, you can find the on/off switch, an Ethernet port, and the power connection from the robot's external power supply.
 
-### The res of that miscellaneous crap
+![Switch, Ethernet, and power connection](../images/power-ethernet.png)
 
-## Power supply and consumption
-
-Something something
+See <font color="red">PLACEHOLDER TEXT AND LINK TO INSTALLATION DOC</font> for information and instruction on how to connect your OT-2 to a network and power it on.
 
 ### Power supply
 
-The OT-2 uses a [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply maximum consumption is 220 W (6.1 A, 36 V).
+<!-- this ought to be in the regulatory section -->
+
+The OT-2 uses an external [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply maximum consumption is 220 W (6.1 A, 36 V).
 
 Total power consumption depends on the specifics of the protocols run on the robot. The Opentrons OT-2 Liquid Handler generally consumes around 90-120 W when idle.
 
 Power consumption may range from approximately 100 to 180 W when running a protocol. Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the Opentrons OT-2 Liquid Handler and how many pipettes are attached.
 
-### Power consumption
+## Serial number
 
-## Robot components
+Every OT-2 has a unique serial number. The format of the serial number provides additional information, including the robot's date of production. For example, the serial number OT2CEP20220927R04 would indicate:
 
-- Labeled parts of the OT-2
-- Gantry and deck
-- Back panel
-- Door switch
-- LED status lights
+| Characters | Category | Description |
+|----|----|----|
+| OT2 | Model | The robot is an OT-2. |
+| CEP | Version | A code for the production version of the robot. |
+| 2022 | Year | This robot was made in 2022. |
+| 09 | Month | This robot was made in September. |
+| 27 | Day | This robot was made on the 27th day of the month. |
+| R04 | Unit | A unique code for robots made during a certain time interval. |
 
+You can find the serial number for your OT-2:
 
-
-## UV compatibility
-
+- On the certification sticker on the back of the robot.
+- In the Opentrons App under **Devices** > your OT-2 > **Robot settings** > **Advanced**.
