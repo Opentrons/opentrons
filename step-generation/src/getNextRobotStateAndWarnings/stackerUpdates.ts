@@ -76,7 +76,6 @@ export const forFlexStackerFill = (
   const poolHeight = getHeightOfLabwareStackFromDefinitions(
     listOfLabwareDefinitions
   )
-  console.log('poolHeight: ', poolHeight)
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
     FLEX_STACKER_MODULE_V1,
     poolHeight,
@@ -137,6 +136,7 @@ export const forFlexStackerRetrieve = (
     )
   }
   // change slot to shuttle slot
+  // create labware entity for retrieved labware
   robotState.labware[retrievedLabware] = {
     ...robotState.labware[retrievedLabware],
     stack: robotState.labware[retrievedLabware]?.stack?.slice(0, -1) ?? [],

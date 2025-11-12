@@ -134,9 +134,9 @@ describe('flex stacker state updates forFlexStackerFill', () => {
     expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
 
-  it('should not add labware to the list if count is greater than max_pool_count', () => {
+  it('should not add labware to the list if count is greater than maxPoolCount', () => {
     const props = {
-      count: 7,
+      count: 15,
       moduleId: FLEX_STACKER_ID,
       strategy: 'logical' as const,
     }
@@ -146,6 +146,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
+    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareInStacker).toHaveLength(3)
   })
 })
@@ -204,7 +205,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
     )
   })
 
-  it.only('should retrieve the labware from the stacker', () => {
+  it('should retrieve the labware from the stacker', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
