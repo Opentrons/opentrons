@@ -90,7 +90,7 @@ def _add_heater_shaker_step(page: Page, temp: str, speed: str, timer: str) -> No
     hs_page.set_target_speed(speed)
 
     try:
-        timer_input = hs_page.locator('input[name="heaterShakerTimer"]')
+        timer_input = page.locator('input[name="heaterShakerTimer"]')
         timer_input.click()
         timer_input.fill(timer)
         print(f"✓ Heater-Shaker timer set to {timer}")
