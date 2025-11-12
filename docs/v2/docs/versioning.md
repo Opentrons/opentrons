@@ -105,8 +105,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 - `air_gap`, `blow_out`, `dispense`, `mix`, and `touch_tip` have new parameters for advanced settings that are also available in Protocol Designer.
 
 ### Version 2.23
-- Wells now have a `Well.meniscus` location that corresponds to the top of the liquid, either as set in the protocol or measured by probing with a pipette tip. See [well-meniscus](robot_position.md#meniscus).
-- Load and move labware lids with a new `lid` parameter of `ProtocolContext.load_labware` and standalone methods. See [loading-lids](loading_labware.md#loading-lids) and [moving-lids](moving_labware.md#moving-lids).
+- Wells now have a `Well.meniscus` location that corresponds to the top of the liquid, either as set in the protocol or measured by probing with a pipette tip. See [Meniscus][meniscus].
+- Load and move labware lids with a new `lid` parameter of `ProtocolContext.load_labware` and standalone methods. See [Loading Lids][loading-lids] and [Moving Lids][moving-lids].
 - Updated `set_offset` to match new Labware Position Check behavior in Opentrons App v8.4.0.
 
 ### Version 2.22
@@ -114,14 +114,14 @@ This table lists the correspondence between Protocol API versions and robot soft
 - Beta features for our commercial partners.
 
 ### Version 2.21
-- Adds `AbsorbanceReaderContext` to support the [Absorbance Plate Reader Module](absorbance-plate-reader-module.md). Use the load name `absorbanceReaderV1` with `ProtocolContext.load_module` to add an Absorbance Plate Reader to a protocol.
-- [Liquid presence detection](robot_position.md#liquid-presence-detection) now only checks on the first aspiration of the `mix` cycle.
+- Adds `AbsorbanceReaderContext` to support the [Absorbance Plate Reader Module](modules/absorbance-plate-reader.md). Use the load name `absorbanceReaderV1` with `ProtocolContext.load_module` to add an Absorbance Plate Reader to a protocol.
+- [Liquid presence detection][liquid-presence-detection] now only checks on the first aspiration of the `mix` cycle.
 - Improved the run log output of `ThermocyclerContext.execute_profile`.
 
 ### Version 2.20
-- Detect liquid presence within a well. The `InstrumentContext.detect_liquid_presence()` and `InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also [enable liquid presence detection](robot_position.md#liquid-presence-detection) for all aspirations when loading a pipette, although this will add significant time to your protocol.
-- Define CSV runtime parameters and use their contents in a protocol with new [data manipulation methods](runtime_parameters.md#csv-data). See the [cherrypicking use case](cherrypicking.md) for a full example.
-- `configure_nozzle_layout` now accepts row, single, and partial column layout constants. See [partial-tip-pickup](pipettes/partial_tip_pickup.md).
+- Detect liquid presence within a well. The `InstrumentContext.detect_liquid_presence()` and `InstrumentContext.require_liquid_presence()` building block commands check for liquid any point in your protocol. You can also enable [liquid presence detection][liquid-presence-detection] for all aspirations when loading a pipette, although this will add significant time to your protocol.
+- Define CSV runtime parameters and use their contents in a protocol with new [data manipulation methods][manipulating-csv-data]. See the [cherrypicking use case](runtime-parameters/use-case-cherrypicking.md) for a full example.
+- `configure_nozzle_layout` now accepts row, single, and partial column layout constants. See [Partial Tip Pickup](pipettes/partial-tip-pickup.md).
 - You can now call `ProtocolContext.define_liquid()` without supplying a `description` or `display_color`.
 
 ### Version 2.19
@@ -129,8 +129,8 @@ Opentrons recommends updating protocols from `apiLevel` 2.18 to 2.19 to take adv
 - This version uses new values for how much a tip overlaps with the pipette nozzle when the pipette picks up tips. This can correct errors caused by the robot positioning the tip slightly lower than intended, potentially making contact with labware. See `pick_up_tip` for additional details.
 
 ### Version 2.18
-- Define customizable parameters with the new `add_parameters()` function, and access their values on the `ProtocolContext.params` object during a protocol run. See [runtime-parameters](runtime_parameters.md) and related pages for more information.
-- Move the pipette to positions relative to the top of a trash container. See [position-relative-trash](robot_position.md#position-relative-to-trash-containers). The default behavior of `drop_tip` also accounts for this new possibility.
+- Define customizable parameters with the new `add_parameters()` function, and access their values on the `ProtocolContext.params` object during a protocol run. See [Runtime Parameters](runtime-parameters/index.md) and related pages for more information.
+- Move the pipette to positions relative to the top of a trash container. See [Position Relative to Trash Containers][position-relative-to-trash-containers]. The default behavior of `drop_tip` also accounts for this new possibility.
 - `set_offset` has been restored to the API with new behavior that applies to labware type–location pairs.
 - Automatic tip tracking is now available for all nozzle configurations.
 
@@ -141,10 +141,10 @@ Opentrons recommends updating protocols from `apiLevel` 2.18 to 2.19 to take adv
 This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you *must* load a trash container before dropping tips.
 
 - New features
-    - Use `configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [Partial Tip Pickup](pipettes/partial_tip_pickup.md).
+    - Use `configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [Partial Tip Pickup](pipettes/partial-tip-pickup.md).
     - Specify the trash containers attached to your Flex with `load_waste_chute` and `load_trash_bin`.
     - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling `move_labware` with `use_gripper=True`.
-    - Perform actions in staging area slots by referencing slots A4 through D4. See [Deck Slots](deck_slots.md).
+    - Perform actions in staging area slots by referencing slots A4 through D4. See [Deck Slots](deck-slots.md).
     - Explicitly command a pipette to `prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
 - Improved features
     - `aspirate`, `dispense`, and `mix` will not move any liquid when called with `volume=0`.
@@ -157,16 +157,16 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
 - Flex features
     - Write protocols for Opentrons Flex by declaring `"robotType": "Flex"` in the new `requirements` dictionary. See the [examples in the Tutorial](tutorial.md#requirements).
-    - `load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See [new-create-pipette](new_pipette.md).
+    - `load_instrument` supports loading Flex 1-, 8-, and 96-channel pipettes. See [Loading Pipettes](pipettes/loading.md).
     - The new `move_labware` method can move labware automatically using the Flex Gripper. You can also move labware manually on Flex.
-    - `load_module` supports loading the [Magnetic Block](magnetic_block.md).
+    - `load_module` supports loading the [Magnetic Block](modules/magnetic-block.md).
     - The API does not enforce placement restrictions for the Heater-Shaker module on Flex, because it is installed below-deck in a module caddy. Pipetting restrictions are still in place when the Heater-Shaker is shaking or its labware latch is open.
-    - The new `configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See [pipette-volume-modes](pipettes/volume_modes.md).
+    - The new `configure_for_volume` method can place Flex 50 µL pipettes in a low-volume mode for dispensing very small volumes of liquid. See [Volume Modes](pipettes/volume-modes.md).
 - Flex and OT-2 features
     - Optionally specify `apiLevel` in the new `requirements` dictionary (otherwise, specify it in `metadata`).
     - Optionally specify `"robotType": "OT-2"` in `requirements`.
-    - Use coordinates or numbers to specify [deck slots](deck_slots.md). These formats match physical labels on Flex and OT-2, but you can use either system, regardless of `robotType`.
-    - The new module context `load_adapter()` methods let you load adapters and labware separately on modules, and `ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See [labware-on-adapters](labware_on_adapters.md).
+    - Use coordinates or numbers to specify [deck slots](deck-slots.md). These formats match physical labels on Flex and OT-2, but you can use either system, regardless of `robotType`.
+    - The new module context `load_adapter()` methods let you load adapters and labware separately on modules, and `ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See [Loading Labware on Adapters][loading-labware-on-adapters].
     - Move labware manually using `move_labware`, without having to stop your protocol.
     - Manual labware moves support moving to or from the new `OFF_DECK` location (outside of the robot).
     - `ProtocolContext.load_labware` also accepts `OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
@@ -226,8 +226,8 @@ Several older parts of the Protocol API were deprecated as part of this switchov
 - You can now access certain geometry data regarding a labware's well via a Well Object. See [Well Dimensions](labware.md#well-dimensions) for more information.
 
 ### Version 2.8
-- You can now pass in a list of volumes to distribute and consolidate. See [distribute-consolidate-volume-list](pipettes.md#distribute-consolidate-volume-list) for more information.
-  - Passing in a zero volume to any [complex command](pipettes.md#complex-commands) will result in no actions taken for aspirate or dispense
+- You can now pass in a list of volumes to distribute and consolidate. See [List of Volumes][list-of-volumes] for more information.
+  - Passing in a zero volume to any [complex command](complex-commands/index.md) will result in no actions taken for aspirate or dispense
 - `Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
   - Note that you will need to create a location object to use this function in a protocol. See [protocol-api-labware](labware.md) for more information.
 - You can now pass in a blowout location to transfer, distribute, and consolidate with the `blowout_location` parameter. See `InstrumentContext.transfer` for more detail!
@@ -241,10 +241,10 @@ Several older parts of the Protocol API were deprecated as part of this switchov
 ### Version 2.6
 - GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger speeds
   - Protocols that manually configure pipette flow rates will be unaffected
-  - For a comparison between API Versions, see [ot2-flow-rates](pipettes.md#ot2-flow-rates)
+  - For a comparison between API Versions, see [OT-2 Pipette Flow Rates][ot-2-pipette-flow-rates]
 
 ### Version 2.5
-- New [utility commands](runtime_parameters.md#utility-commands) were added:
+- New [utility commands](building-block-commands/utilities.md) were added:
   - `ProtocolContext.set_rail_lights`: turns robot rail lights on or off
   - `ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
   - `ProtocolContext.door_closed`: describes whether the robot door is closed
@@ -262,9 +262,9 @@ Several older parts of the Protocol API were deprecated as part of this switchov
 - You can now access the Temperature Module's status via `TemperatureModuleContext.status`.
 
 ### Version 2.2
-- You should now specify Magnetic Module engage height using the `height_from_base` parameter, which specifies the height of the top of the magnet from the base of the labware. For more, see [magnetic-module-engage](magnetic_module.md#engage).
-- Return tip will now use pre-defined heights from hardware testing. For more information, see [pipette-return-tip](pipettes.md#return-tip).
-- When using the return tip function, tips are no longer added back into the tip tracker. For more information, see [pipette-return-tip](pipettes.md#return-tip).
+- You should now specify Magnetic Module engage height using the `height_from_base` parameter, which specifies the height of the top of the magnet from the base of the labware. For more, see [Engaging and Disengaging](modules/magnetic-module.md#engaging-and-disengaging).
+- Return tip will now use pre-defined heights from hardware testing. For more information, see [Returning a Tip](building-block-commands/pipette-tips.md#returning-a-tip).
+- When using the return tip function, tips are no longer added back into the tip tracker. For more information, see [Returning a Tip](building-block-commands/pipette-tips.md#returning-a-tip).
 
 ### Version 2.1
 - When loading labware onto a module, you can now specify a label with the `label` parameter of `MagneticModuleContext.load_labware`, `TemperatureModuleContext.load_labware`, or `ThermocyclerContext.load_labware`, just like you can when loading labware onto the deck with `ProtocolContext.load_labware`.

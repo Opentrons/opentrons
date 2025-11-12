@@ -132,7 +132,7 @@ class ProtocolContext(CommandPublisher):
 
     Do not instantiate a `ProtocolContext` directly.
     The `run()` function of your protocol does that for you.
-    See the [Tutorial](run-function) for more information.
+    See the [Tutorial](../tutorial.md#the-run-function) for more information.
 
     Use [`get_protocol_api()`][opentrons.execute.get_protocol_api] to instantiate a `ProtocolContext` when
     using Jupyter Notebook. See [Advanced Control](../advanced-control.md).
@@ -219,14 +219,14 @@ class ProtocolContext(CommandPublisher):
         is initialized.
 
         - When the context is the argument of `run()`, the `"apiLevel"` key of the
-          [metadata](tutorial-metadata) or [requirements](tutorial-requirements)
+          [metadata](../tutorial.md#metadata) or [requirements](../tutorial.md#requirements)
           dictionary determines `api_version`.
         - When the context is instantiated with
           [`opentrons.execute.get_protocol_api`][opentrons.execute.get_protocol_api] or
           [`opentrons.simulate.get_protocol_api`][opentrons.simulate.get_protocol_api], the value of its
           `version` argument determines `api_version`.
 
-        It may be lower than the [maximum version](max-version) supported by the
+        It may be lower than the [maximum version][maximum-supported-versions] supported by the
         robot software, which is accessible via the
         `protocol_api.MAX_SUPPORTED_VERSION` constant.
         """
@@ -301,7 +301,7 @@ class ProtocolContext(CommandPublisher):
         reset an axis's speed to default, delete the entry for that axis
         or assign it to `None`.
 
-        See [`axis_speed_limits`](axis_speed_limits) for examples.
+        See [Axis Speed Limits][axis-speed-limits] for examples.
 
         !!! note
             This property is not yet supported in API version 2.14 or higher.
@@ -388,7 +388,7 @@ class ProtocolContext(CommandPublisher):
         Args:
             labware_def: The labware's definition.
             location: The slot into which to load the labware,
-                such as `1`, `"1"`, or `"D1"`. See [Deck Slots](deck-slots.md).
+                such as `1`, `"1"`, or `"D1"`. See [Deck Slots](../deck-slots.md).
             label (str): An optional special name to give the labware. If specified,
                 this is how the labware will appear in the run log, Labware Position
                 Check, and elsewhere in the Opentrons App and on the touchscreen.
@@ -433,11 +433,10 @@ class ProtocolContext(CommandPublisher):
                 You can find the `load_name` for any Opentrons-verified labware on the
                 [Labware Library](https://labware.opentrons.com).
 
-            location (Union[int, str, `OFF_DECK`]): Either a [deck slot](deck-slots.md),
+            location (Union[int, str, `OFF_DECK`]): Either a [deck slot](../deck-slots.md),
                 like `1`, `"1"`, or `"D1"`, or the special value [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
-            !!! note
-                You can now specify a deck slot as a coordinate, like `"D1"`.
+                *Changed in version 2.15:* You can now specify a deck slot as a coordinate, like `"D1"`.
 
             label (Optional[str]): An optional special name to give the labware. If specified,
                 this is how the labware will appear in the run log, Labware Position
@@ -648,7 +647,7 @@ class ProtocolContext(CommandPublisher):
         Args:
             adapter_def: The adapter's labware definition.
             location: The slot into which to load the labware,
-                such as `1`, `"1"`, or `"D1"`. See [Deck Slots](deck-slots.md).
+                such as `1`, `"1"`, or `"D1"`. See [Deck Slots](../deck-slots.md).
         """
         load_params = self._core.add_labware_definition(adapter_def)
 
@@ -727,7 +726,7 @@ class ProtocolContext(CommandPublisher):
                 [Labware Library](https://labware.opentrons.com).
 
             location (Union[int, str, OffDeckType]): Either a
-                [deck slot](deck-slots.md), like `1`, `"1"`, or `"D1"`, or the special value
+                [deck slot](../deck-slots.md), like `1`, `"1"`, or `"D1"`, or the special value
                 [`OFF_DECK`][opentrons.protocol_api.OFF_DECK].
 
             namespace (Optional[str]): The namespace that the labware definition belongs to.

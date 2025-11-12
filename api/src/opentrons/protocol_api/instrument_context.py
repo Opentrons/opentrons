@@ -224,8 +224,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 will behave the same as a volume of `None`/unspecified: aspirate until
                 the pipette is full. On API levels at or above 2.16, no liquid will be
                 aspirated.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], 
-                [`Location`][opentrons.types.Location], optional): Tells the robot where
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional): 
+                Tells the robot where
                 to aspirate from. The location can be a `Well` or a `Location`.
 
                 - If the location is a `Well`, the robot will aspirate at or above the
@@ -428,9 +428,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 In API version 2.16 and earlier, dispense all liquid in the pipette. In
                 API version 2.17 and later, raise an error.
 
-            location (Union[`Well`][opentrons.protocol_api.labware.Well],
-                [`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin],
-                [`WasteChute`][opentrons.protocol_api.WasteChute], optional): Tells the robot
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin], [`WasteChute`][opentrons.protocol_api.WasteChute], optional):
+                Tells the robot
                 where to dispense liquid held in the pipette. The location can be a `Well`,
                 `Location`, `TrashBin`, or `WasteChute`.
 
@@ -445,7 +444,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 - If a trash container, the pipette will dispense at a location relative
                 to its center and the trash container's top center. See
-                [position-relative-trash](position-relative-trash) for details.
+                [Position Relative to Trash Containers][position-relative-to-trash-containers] for details.
 
                 - If unspecified, the pipette will dispense at its current position.
 
@@ -671,8 +670,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 behave the same as a volume of `None`/unspecified: mix the full working
                 volume of the pipette. On API levels at or above 2.16, no liquid will
                 be mixed.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well],
-                [`Location`][opentrons.types.Location], optional): The location where the
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional): 
+                The location where the
                 pipette will mix. If unspecified, the pipette will mix at its current
                 position.
             rate (float, optional): How quickly the pipette aspirates and dispenses
@@ -1030,8 +1029,8 @@ class InstrumentContext(publisher.CommandPublisher):
         all liquid from the pipette tip. See [Blow Out][blow-out-building-block].
 
         Args:
-            location (Union[`Well`][opentrons.protocol_api.labware.Well],
-                [`Location`][opentrons.types.Location], optional): The blowout location.
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional):
+                The blowout location.
                 If no location is specified, the pipette will blow out from its current
                 position.
 
@@ -1456,9 +1455,8 @@ class InstrumentContext(publisher.CommandPublisher):
               parameter of pipetting actions to achieve the desired result.
 
         Args:
-            location (Union[`Well`][opentrons.protocol_api.labware.Well],
-                [`Labware`][opentrons.protocol_api.labware.Labware],
-                [`Location`][opentrons.types.Location], optional): The location from
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Labware`][opentrons.protocol_api.labware.Labware], [`Location`][opentrons.types.Location], optional):
+                The location from
                 which to pick up a tip. The `location` argument can be specified in
                 several ways:
 
@@ -1934,7 +1932,7 @@ class InstrumentContext(publisher.CommandPublisher):
         [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and
         [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense]. It makes
         writing a protocol easier at the cost of specificity. See
-        [Complex Commands](../../complex-commands.md) for details on how transfer and
+        [Complex Commands](../complex-commands/index.md) for details on how transfer and
         other complex commands perform their component steps.
 
         Args:
@@ -1947,11 +1945,13 @@ class InstrumentContext(publisher.CommandPublisher):
             source: A single well or a list of wells to aspirate liquid from.
             dest: A single well or a list of wells to dispense liquid into.
 
-        Keyword Args:
-            Transfer accepts a number of optional parameters that give you greater control
-            over the exact steps it performs. See [Complex Liquid Handling Parameters](../complex-commands/parameters.md)
-            or the links under each argument's entry below for additional details and examples.
+        ---
 
+        Transfer accepts a number of optional parameters that give you greater control
+        over the exact steps it performs. See [Complex Liquid Handling Parameters](../complex-commands/parameters.md)
+        or the links under each argument's entry below for additional details and examples.
+
+        Keyword Args:
             new_tip (str): When to pick up and drop tips during the command. Defaults to
                 `"once"`.
 
@@ -2726,8 +2726,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See [Move To][move-to] for examples.
 
         Args:
-            location (Union[`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin],
-                [`WasteChute`][opentrons.protocol_api.WasteChute]):
+            location (Union[`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin], [`WasteChute`][opentrons.protocol_api.WasteChute]):
                 Where to move to.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
@@ -2840,14 +2839,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Args:
             location (types.Location): A location that can accept tips.
-
-            home_after (bool, optional): Whether to home the pipette after dropping the
-                tip. If not specified, defaults to `True` on a Flex. The plunger will not
-                home on an unseal.
-
-                When `False`, the pipette does not home its plunger. This can save a few
-                seconds, but is not recommended. Homing helps the robot track the
-                pipette's position.
         """
         if isinstance(location, labware.Labware):
             well = location.wells()[0]
@@ -3428,9 +3419,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 should be of the same format used when identifying wells by name.
                 Required unless setting `style=ALL`.
 
-            !!! note
-                If possible, don't use both `start="A1"` and `start="A12"` to pick up
-                tips *from the same rack*. Doing so can affect positional accuracy.
+                !!! note
+                    If possible, don't use both `start="A1"` and `start="A12"` to pick up
+                    tips *from the same rack*. Doing so can affect positional accuracy.
 
                 end (str or None): The nozzle at the end of a linear layout, which is used
                 to determine how many tips will be picked up by a pipette. The string

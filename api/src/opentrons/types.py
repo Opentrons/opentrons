@@ -116,8 +116,7 @@ class Location:
     """
     A location to target as a motion.
 
-    The location contains a [`Point`][opentrons.types.Point] (in
-    [protocol-api-deck-coords](protocol-api-deck-coords)) and possibly an associated
+    The location contains a [`Point`][opentrons.types.Point]and possibly an associated
     [`Labware`][opentrons.protocol_api.labware.Labware] or 
     [`Well`][opentrons.protocol_api.labware.Well] instance.
 

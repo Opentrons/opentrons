@@ -464,10 +464,9 @@ def main() -> int:
     """
     Handler for command line invocation to run a protocol.
 
-    Args:
-        argv: The arguments the program was invoked with; this is usually
-            [`sys.argv`](https://docs.python.org/3/library/sys.html#sys.argv)
-            but if you want to override that you can.
+    The arguments the program was invoked with are usually
+    [`sys.argv`](https://docs.python.org/3/library/sys.html#sys.argv)
+    but if you want to override that you can.
 
     Returns:
         int: A success or failure value suitable for use as a shell return code

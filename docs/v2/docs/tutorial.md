@@ -51,7 +51,7 @@ For this tutorial, you’ll write very little Python outside of the `run()` func
 
 ## Metadata
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what [version of the API](../versioning.md) the protocol requires. The scripts for this tutorial were validated against API version 2.16, so specify:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what [version of the API](versioning.md) the protocol requires. The scripts for this tutorial were validated against API version 2.16, so specify:
 ```python
 metadata = {"apiLevel": "2.16"}
 ```
@@ -99,7 +99,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 Now the robot will expect to find labware in a configuration that looks like this:
 
-![Initial Deck State – Flex](../img/tutorial/initial-deck-map-flex.png)
+![Initial Deck State – Flex](img/tutorial/initial-deck-map-flex.png)
 
 === "OT-2"
 ```python
@@ -110,21 +110,21 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 Now the robot will expect to find labware in a configuration that looks like this:
 
-![Initial Deck State – OT-2](../img/tutorial/initial-deck-map.png)
+![Initial Deck State – OT-2](img/tutorial/initial-deck-map.png)
 
-You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Wells](../new_labware.md#labeling-liquids-in-wells). (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Labware][labeling-liquids-in-labware]. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
 ### Trash Bin
 Flex and OT-2 both come with a trash bin for disposing used tips.
 
 - The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is.
-- Flex lets you put a [trash bin](../modules/setup.md#configure-trash-bin) in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the [waste chute](../modules/setup.md#configure-waste-chute) instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the `load_trash_bin` method:
+- Flex lets you put a [trash bin][trash-bin-api] in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the [waste chute][waste-chute-api] instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the `load_trash_bin` method:
 ```python
 trash = protocol.load_trash_bin("A3")
 ```
 
 ### Pipettes
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the `load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its [standard pipette name](../new_pipette.md). Here’s how to load the pipette in the left mount and instantiate it as a variable named `left_pipette`:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the `load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its [standard pipette name](pipettes/loading.md#api-load-names). Here’s how to load the pipette in the left mount and instantiate it as a variable named `left_pipette`:
 
 #### Flex
 ```python
@@ -145,7 +145,7 @@ Finally, all of your labware and hardware is in place, so it’s time to give th
 2. Measure out equal amounts of solution from the reservoir into wells in the first column of the plate.
 3. Move a portion of the combined liquid from column 1 to 2, then from column 2 to 3, and so on all the way to column 12.
 
-Thanks to the flexibility of the API's `transfer` method, which combines many [building block commands](../new_building-block-commands.md) into one call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
+Thanks to the flexibility of the API's `transfer` method, which combines many [building block commands](building-block-commands/index.md) into one call, each of these phases can be accomplished with a single line of code! You’ll just have to write a few more lines of code to repeat the process for as many rows as you want to fill.
 
 Let’s start with the diluent. This phase takes a larger quantity of liquid and spreads it equally to many wells. `transfer()` can handle this all at once, because it accepts either a single well or a list of wells for its source and destination:
 ```python
@@ -219,7 +219,7 @@ On the Run tab, you can double-check the Run Preview, which is similar to the co
 
 When it’s all done, check the results of your serial dilution procedure — you should have a beautiful dye gradient running across the plate!
 
-![Result of Serial Dilution](../img/tutorial/serial-dilution-result.jpg)
+![Result of Serial Dilution](img/tutorial/serial-dilution-result.jpg)
 
 ## Next Steps
-This tutorial has relied heavily on the `transfer()` method, but there's much more that the Python Protocol API can do. Many advanced applications use [building block commands](../new_building-block-commands.md) for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use [Opentrons hardware modules](../modules/new_modules.md), there are methods to control their behavior. And all of the API's classes and methods are catalogued in the [API Reference](../protocol-api-reference.md).
+This tutorial has relied heavily on the `transfer()` method, but there's much more that the Python Protocol API can do. Many advanced applications use [building block commands](building-block-commands/index.md) for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use [Opentrons hardware modules](modules/index.md), there are methods to control their behavior. And all of the API's classes and methods are catalogued in the [API Reference](api-reference/protocols.md).

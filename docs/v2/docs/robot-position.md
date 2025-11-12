@@ -23,7 +23,7 @@ Let's look at the [`Well.top()`][opentrons.protocol_api.labware.Well.top] method
 plate["A1"].top()  # the top center of the well
 ```
 
-This is a good position to use for a [blow out operation](new-blow-out.md) or an activity where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` numbers move the position up, negative `z` numbers move it down.
+This is a good position to use for a [blow out operation][blow-out-building-block] or an activity where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` numbers move the position up, negative `z` numbers move it down.
 
 ```python
 plate["A1"].top(z=1)  # 1 mm above the top center of the well
@@ -124,7 +124,7 @@ pipette.dispense(50, plate["A1"])
 
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
-You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See [Setting Labware Offsets](setting-labware-offsets) in the Advanced Control section for information.
+You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See [Setting Labware Offsets][setting-labware-offsets] in the Advanced Control section for information.
 
 ## Position Relative to Trash Containers
 
