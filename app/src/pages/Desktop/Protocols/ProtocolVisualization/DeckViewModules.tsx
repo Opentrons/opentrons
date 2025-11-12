@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 
 import { COLORS, Module, StyledText } from '@opentrons/components'
 import {
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
@@ -11,9 +12,13 @@ import {
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { ModuleCommandSummary } from './ModuleCommandSummary'
-import { getActiveLayer, getTopmostLabwareOnModuleFromStack } from './utils'
+import {
+  getActiveLayer,
+  getModuleInnerProps,
+  getTopmostLabwareOnModuleFromStack,
+} from './utils'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   DeckDefinition,
@@ -21,11 +26,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  ModuleTemporalProperties,
-  RobotState,
-} from '@opentrons/step-generation'
+import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { LabwareEntityExtended } from './DeckView'
 
 interface DeckViewModulesProps {
@@ -56,7 +57,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
   } = props
   const { moduleEntities } = invariantContext
   const { modules, labware } = robotState
-
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS
   return (
     <>
       {Object.entries(modules).map(([id, { slot, moduleState }]) => {
@@ -79,34 +80,6 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         )
         const moduleDef = getModuleDef(moduleEntities[id].model)
         const moduleType = moduleEntities[id].type
-
-        const getModuleInnerProps = (
-          moduleState: ModuleTemporalProperties['moduleState']
-        ): ComponentProps<typeof Module>['innerProps'] => {
-          if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
-            let lidMotorState = 'unknown'
-            if (moduleState.lidOpen) {
-              lidMotorState = 'open'
-            } else if (moduleState.lidOpen === false) {
-              lidMotorState = 'closed'
-            }
-            return {
-              lidMotorState,
-              blockTargetTemp: moduleState.blockTargetTemp,
-            }
-          } else if (
-            'targetTemperature' in moduleState &&
-            moduleState.type === 'temperatureModuleType'
-          ) {
-            return {
-              targetTemperature: moduleState.targetTemperature,
-            }
-          } else if ('targetTemp' in moduleState) {
-            return {
-              targetTemp: moduleState.targetTemp,
-            }
-          }
-        }
         const tempInnerProps = getModuleInnerProps(moduleState)
         const innerTCProps = {
           ...tempInnerProps,
@@ -121,121 +94,119 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
 
         return (
           <Fragment key={id}>
-            {
-              <>
-                <Module
-                  key={id}
-                  x={slotPosition[0]}
-                  y={slotPosition[1]}
-                  def={moduleDef}
+            <>
+              <Module
+                key={id}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                def={moduleDef}
+                orientation={inferModuleOrientationFromXCoordinate(
+                  slotPosition[0]
+                )}
+                innerProps={
+                  moduleType === THERMOCYCLER_MODULE_TYPE
+                    ? innerTCProps
+                    : tempInnerProps
+                }
+                targetSlotId={slot}
+                targetDeckId={deckDef.otId}
+                childrenPositioningMode="offsetToSlot"
+                setSelectedSlot={setSelectedSlot}
+                setHoveredSlot={setHoveredSlot}
+              >
+                {labwareLoadedOnModuleId != null ? (
+                  <>
+                    <LabwareOnDeck
+                      robotState={robotState}
+                      labwareDef={
+                        labwareEntitiesExtended[labwareLoadedOnModuleId].def
+                      }
+                      liquids={liquids}
+                      labwareId={labwareLoadedOnModuleId}
+                      x={0}
+                      y={0}
+                      setSelectedSlot={setSelectedSlot}
+                      setHoveredSlot={setHoveredSlot}
+                    />
+                    {moduleType === THERMOCYCLER_MODULE_TYPE ? (
+                      <DeckViewOverlay
+                        key={slot}
+                        slotId={slot}
+                        slotPosition={[0, 0, 0]}
+                        slotFillColor={COLORS.purple50}
+                        robotType={robotType}
+                        invariantContext={invariantContext}
+                        robotState={robotState}
+                        setSelectedSlot={setSelectedSlot}
+                        setHoveredSlot={setHoveredSlot}
+                        hover={hoveredSlot}
+                      >
+                        {showModuleCommandSummary ? null : (
+                          <StyledText
+                            desktopStyle="captionRegular"
+                            color={COLORS.white}
+                          >
+                            {
+                              labwareEntitiesExtended[labwareLoadedOnModuleId]
+                                .def.metadata.displayName
+                            }
+                          </StyledText>
+                        )}
+                      </DeckViewOverlay>
+                    ) : (
+                      <DeckViewOverlay
+                        key={slot}
+                        slotId={slot}
+                        slotPosition={slotPosition}
+                        slotFillColor={COLORS.purple50}
+                        robotType={robotType}
+                        invariantContext={invariantContext}
+                        robotState={robotState}
+                        setSelectedSlot={setSelectedSlot}
+                        setHoveredSlot={setHoveredSlot}
+                        hover={hoveredSlot}
+                      >
+                        {showModuleCommandSummary ? null : (
+                          <StyledText
+                            desktopStyle="captionRegular"
+                            color={COLORS.white}
+                          >
+                            {labwareEntitiesExtended[id].nickName ??
+                              labwareEntitiesExtended[labwareLoadedOnModuleId]
+                                .def.metadata.displayName}
+                          </StyledText>
+                        )}
+                      </DeckViewOverlay>
+                    )}
+                  </>
+                ) : null}
+                <DeckViewOverlay
+                  key={slot}
+                  slotId={slot}
+                  slotPosition={[0, 0, 0]}
+                  slotFillColor={COLORS.purple50}
+                  robotType={robotType}
+                  invariantContext={invariantContext}
+                  robotState={robotState}
+                  setSelectedSlot={setSelectedSlot}
+                  setHoveredSlot={setHoveredSlot}
+                  hover={hoveredSlot}
+                />
+              </Module>
+              {showModuleCommandSummary ? (
+                <ModuleCommandSummary
+                  robotType={robotType}
+                  moduleModel={moduleDef.model}
+                  commandType={selectedRunTimeCommand.commandType}
+                  position={slotPosition}
+                  showModuleIcon={false}
+                  slot={slot}
                   orientation={inferModuleOrientationFromXCoordinate(
                     slotPosition[0]
                   )}
-                  innerProps={
-                    moduleType === THERMOCYCLER_MODULE_TYPE
-                      ? innerTCProps
-                      : tempInnerProps
-                  }
-                  targetSlotId={slot}
-                  targetDeckId={deckDef.otId}
-                  childrenPositioningMode="offsetToSlot"
-                  setSelectedSlot={setSelectedSlot}
-                  setHoveredSlot={setHoveredSlot}
-                >
-                  {labwareLoadedOnModuleId != null ? (
-                    <>
-                      <LabwareOnDeck
-                        robotState={robotState}
-                        labwareDef={
-                          labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                        }
-                        liquids={liquids}
-                        labwareId={labwareLoadedOnModuleId}
-                        x={0}
-                        y={0}
-                        setSelectedSlot={setSelectedSlot}
-                        setHoveredSlot={setHoveredSlot}
-                      />
-                      {moduleType === THERMOCYCLER_MODULE_TYPE ? (
-                        <DeckViewOverlay
-                          key={slot}
-                          slotId={slot}
-                          slotPosition={[0, 0, 0]}
-                          slotFillColor={COLORS.purple50}
-                          robotType={robotType}
-                          invariantContext={invariantContext}
-                          robotState={robotState}
-                          setSelectedSlot={setSelectedSlot}
-                          setHoveredSlot={setHoveredSlot}
-                          hover={hoveredSlot}
-                        >
-                          {showModuleCommandSummary ? null : (
-                            <StyledText
-                              desktopStyle="captionRegular"
-                              color={COLORS.white}
-                            >
-                              {
-                                labwareEntitiesExtended[labwareLoadedOnModuleId]
-                                  .def.metadata.displayName
-                              }
-                            </StyledText>
-                          )}
-                        </DeckViewOverlay>
-                      ) : (
-                        <DeckViewOverlay
-                          key={slot}
-                          slotId={slot}
-                          slotPosition={slotPosition}
-                          slotFillColor={COLORS.purple50}
-                          robotType={robotType}
-                          invariantContext={invariantContext}
-                          robotState={robotState}
-                          setSelectedSlot={setSelectedSlot}
-                          setHoveredSlot={setHoveredSlot}
-                          hover={hoveredSlot}
-                        >
-                          {showModuleCommandSummary ? null : (
-                            <StyledText
-                              desktopStyle="captionRegular"
-                              color={COLORS.white}
-                            >
-                              {labwareEntitiesExtended[id].nickName ??
-                                labwareEntitiesExtended[labwareLoadedOnModuleId]
-                                  .def.metadata.displayName}
-                            </StyledText>
-                          )}
-                        </DeckViewOverlay>
-                      )}
-                    </>
-                  ) : null}
-                  <DeckViewOverlay
-                    key={slot}
-                    slotId={slot}
-                    slotPosition={[0, 0, 0]}
-                    slotFillColor={COLORS.purple50}
-                    robotType={robotType}
-                    invariantContext={invariantContext}
-                    robotState={robotState}
-                    setSelectedSlot={setSelectedSlot}
-                    setHoveredSlot={setHoveredSlot}
-                    hover={hoveredSlot}
-                  />
-                </Module>
-                {showModuleCommandSummary ? (
-                  <ModuleCommandSummary
-                    robotType={robotType}
-                    moduleModel={moduleDef.model}
-                    commandType={selectedRunTimeCommand.commandType}
-                    position={slotPosition}
-                    showModuleIcon={false}
-                    slot={slot}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      slotPosition[0]
-                    )}
-                  />
-                ) : null}
-              </>
-            }
+                />
+              ) : null}
+            </>
           </Fragment>
         )
       })}

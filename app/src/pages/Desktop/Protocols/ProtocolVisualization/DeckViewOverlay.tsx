@@ -100,7 +100,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
           cursor: CURSOR_POINTER,
           textAlign: ALIGN_CENTER,
           border: `3px solid ${COLORS.purple50}`,
-          borderRadius: '6px',
+          borderRadius: '6px', // no const but matches the labware svg radius
         }}
         foreignObjectEvents={{
           onClick: () => {

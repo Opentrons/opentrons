@@ -26,7 +26,11 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
-import { getActiveLayer, getBackgroundColor, isCutoutA1Active } from './utils'
+import {
+  getActiveLayer,
+  getBackgroundColor,
+  getIsCutoutA1Active,
+} from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -184,7 +188,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         showExpansion={cutoutId === 'cutoutA1'}
                         fixtureBaseColor={
                           isActiveLayerVisible ||
-                          isCutoutA1Active(
+                          getIsCutoutA1Active(
                             labware,
                             modules,
                             cutoutId,

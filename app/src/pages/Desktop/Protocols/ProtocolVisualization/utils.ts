@@ -22,7 +22,8 @@ import {
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
-import type { WellGroup } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import type { Module, WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -37,6 +38,7 @@ import type {
   DeckSlot,
   LabwareTemporalProperties,
   ModuleEntities,
+  ModuleTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
@@ -312,7 +314,7 @@ export const getThermocyclerOverlayText = (
   }
 }
 
-export const isCutoutA1Active = (
+export const getIsCutoutA1Active = (
   labware: RobotState['labware'],
   modules: RobotState['modules'],
   cutoutId: CutoutId,
@@ -331,4 +333,32 @@ export const isCutoutA1Active = (
       : { isActiveLayerVisible: false }
 
   return isThermocyclerActive && hasThermocycler && cutoutId === 'cutoutA1'
+}
+
+export const getModuleInnerProps = (
+  moduleState: ModuleTemporalProperties['moduleState']
+): ComponentProps<typeof Module>['innerProps'] => {
+  if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+    let lidMotorState = 'unknown'
+    if (moduleState.lidOpen) {
+      lidMotorState = 'open'
+    } else if (moduleState.lidOpen === false) {
+      lidMotorState = 'closed'
+    }
+    return {
+      lidMotorState,
+      blockTargetTemp: moduleState.blockTargetTemp,
+    }
+  } else if (
+    'targetTemperature' in moduleState &&
+    moduleState.type === 'temperatureModuleType'
+  ) {
+    return {
+      targetTemperature: moduleState.targetTemperature,
+    }
+  } else if ('targetTemp' in moduleState) {
+    return {
+      targetTemp: moduleState.targetTemp,
+    }
+  }
 }

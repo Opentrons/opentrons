@@ -43,28 +43,25 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
   } = props
   return (
     <>
-      {deckDef.locations.addressableAreas
-        .filter(addressableArea => {
+      {deckDef.locations.addressableAreas.reduce<JSX.Element[]>(
+        (acc, addressableArea) => {
           const stagingAreaAddressableAreas =
             getStagingAreaAddressableAreas(stagingAreaCutoutIds)
-
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
             stagingAreaAddressableAreas.includes(addressableArea.id)
-          return (
-            addressableArea.id === 'fixedTrash' ||
-            (addressableAreas &&
-              !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
-              getSlotIsEmpty(robotState, addressableArea.id))
-          )
-        })
-        .map(addressableArea => {
           const slotPosition = getPositionFromSlotId(
             addressableArea.id,
             deckDef
           )
-          return (
-            <Fragment key={addressableArea.id}>
+          if (
+            addressableArea.id === 'fixedTrash' ||
+            (addressableAreas &&
+              !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
+              getSlotIsEmpty(robotState, addressableArea.id))
+          ) {
+            return [
+              ...acc,
               <DeckViewOverlay
                 key={`${addressableArea.id}_hoveredSlot_labware`}
                 slotId={addressableArea.id}
@@ -76,10 +73,13 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
-              />
-            </Fragment>
-          )
-        })}
+              />,
+            ]
+          }
+          return acc
+        },
+        []
+      )}
     </>
   )
 }
