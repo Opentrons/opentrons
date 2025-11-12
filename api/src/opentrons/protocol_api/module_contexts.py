@@ -478,7 +478,7 @@ class TemperatureModuleContext(ModuleContext):
 
         Args:
             celsius: A value between 4 and 95, representing the target
-            temperature in °C.
+                temperature in °C.
         """
         task = self._core.set_target_temperature(celsius)
         if self._api_version >= APIVersion(2, 27):
@@ -493,7 +493,7 @@ class TemperatureModuleContext(ModuleContext):
 
         Args:
             celsius: A value between 4 and 95, representing the target temperature
-            in °C.
+                in °C.
         """
         self._core.wait_for_target_temperature(celsius)
 
@@ -1687,11 +1687,11 @@ class FlexStackerContext(ModuleContext):
             stacking_offset_z (float): Stacking `z` offset in mm of stored labware. If specified, this
                 overrides the calculated value in the labware definition.
 
-            !!! note
-                The stacking offset is the amount of vertical overlap (in mm) between the bottom side of a
-                labware unit and the top side of the unit below. This offset is used to determine how many
-                units can fit in the Stacker and calculates the `z` position of the shuttle when retrieving
-                or storing labware.
+                !!! note
+                    The stacking offset is the amount of vertical overlap (in mm) between the bottom side of a
+                    labware unit and the top side of the unit below. This offset is used to determine how many
+                    units can fit in the Stacker and calculates the `z` position of the shuttle when retrieving
+                    or storing labware.
 
                 There are four possible stacking configurations, each with a different method of calculating
                 the stacking offset:

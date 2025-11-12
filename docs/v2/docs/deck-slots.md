@@ -16,11 +16,11 @@ Deck slots are where you place hardware items on the deck surface of your Opentr
 
 Flex uses a coordinate labeling system for slots A1 (back left) through D4 (front right). Columns 1 through 3 are in the *working area* and are accessible by pipettes and the gripper. Column 4 is in the *staging area* and is only accessible by the gripper. For more information on staging area slots, see [Deck Configuration](#deck-configuration) below.
 
-![Flex Deck](../img/flex-deck.svg)
+![Flex Deck](img/flex-deck.svg)
 
 OT-2 uses a numeric labeling system for slots 1 (front left) through 11 (back center). The back right slot is occupied by the fixed trash.
 
-![OT-2 Deck](../img/OT-2-deck.svg)
+![OT-2 Deck](img/OT-2-deck.svg)
 
 ## API Deck Labels
 

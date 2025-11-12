@@ -201,10 +201,7 @@ class RobotContext(publisher.CommandPublisher):
             self._core.close_gripper(force)
 
     def open_gripper_jaw(self) -> None:
-        """Opens the Flex Gripper jaws with a specified force.
-
-        Args:
-            force: Force with which to open the gripper jaws in newtons.
+        """Fully opens the Flex Gripper jaws.
         """
         with publisher.publish_context(
             broker=self.broker,

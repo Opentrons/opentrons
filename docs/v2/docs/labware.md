@@ -141,7 +141,7 @@ Rows of wells on a labware have labels that are capital letters starting with A.
 
 All well-accessing functions start with the well at the top left corner of the labware. The ending well is in the bottom right. The order of travel from top left to bottom right depends on which function you use.
 
-![Well Iteration](../img/well_iteration/Well_Iteration.png)
+![Well Iteration](img/well_iteration/Well_Iteration.png)
 
 The code in this section assumes that `plate` is a 24-well plate. For example:
 
