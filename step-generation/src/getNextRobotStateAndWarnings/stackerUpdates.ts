@@ -114,18 +114,15 @@ export const forFlexStackerRetrieve = (
   if (moduleState != null) {
     if (moduleState.shuttlePosition === 'retrieved') {
       throw new Error(
-        'Cannot retrieve labware bc there is labware in the shuttle'
+        'Cannot retrieve labware bc there is labware on the shuttle'
       )
     }
-    if (moduleState.labwareInStacker == null) {
+    if (moduleState.labwareInStacker?.length === 0) {
       throw new Error(
         'Cannot retrieve labware bc there is no labware in the stacker'
       )
     }
-    if (
-      moduleState.storedLabwareDetails == null ||
-      moduleState.storedLabwareDetails.primaryLabware == null
-    )
+    if (moduleState.storedLabwareDetails?.primaryLabware == null)
       throw new Error(
         'Cannot retrieve labware bc there is no stored labware details or primary labware'
       )
