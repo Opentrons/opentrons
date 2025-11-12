@@ -49,7 +49,6 @@ export function VisualizerContainer(
   const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
     INITIAL_MILLISECONDS_PER_FRAME
   )
-
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
   )
