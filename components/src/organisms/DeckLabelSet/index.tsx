@@ -95,7 +95,7 @@ interface StyledBoxProps {
 }
 
 const StyledBox = styled(Box).withConfig({
-  shouldForwardProp: prop => prop != 'isZoomed' && prop != 'showBorder',
+  shouldForwardProp: prop => prop !== 'isZoomed' && prop !== 'showBorder',
 })<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
   border: ${({ isZoomed, showBorder }) => {
