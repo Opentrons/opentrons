@@ -57,7 +57,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
   } = props
   const { moduleEntities } = invariantContext
   const { modules, labware } = robotState
-  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS
+
   return (
     <>
       {Object.entries(modules).map(([id, { slot, moduleState }]) => {

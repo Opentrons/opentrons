@@ -1,5 +1,3 @@
-import { Fragment } from 'react'
-
 import { COLORS } from '@opentrons/components'
 import {
   getPositionFromSlotId,
