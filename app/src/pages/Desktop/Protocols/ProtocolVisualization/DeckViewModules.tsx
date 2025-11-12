@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 
 import { COLORS, Module, StyledText } from '@opentrons/components'
 import {
-  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
