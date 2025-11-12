@@ -109,7 +109,6 @@ from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: 
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
     clear_pipette_ul_per_mm,
 )  # noqa: E402
-from hardware_testing.gravimetric.tips import MULTI_CHANNEL_TEST_ORDER  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -197,7 +196,9 @@ class FixtureSettings:
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
         if pipette_channels == 8 and not increment:
-            channels = MULTI_CHANNEL_TEST_ORDER
+            channels = [
+                int(ch) for ch in lookup_key("multi_channels_to_test", csv_params)
+            ]
         else:
             channels = [0]
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
@@ -313,8 +314,7 @@ class FixtureSettings:
 
         test_report = report.create_csv_test_report(
             volumes=volumes_flat,
-            pipette_channels=pipette_channels,
-            increment=increment,
+            pipette_channels=channels,
             trials=trials,
             name=name,
             run_id=run_id,
@@ -608,6 +608,12 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
+    if (
+        fixture_settings.pipette_channels == 8
+        and len(fixture_settings.channels) == 1
+        and fixture_settings.channels[0] == 0
+    ):
+        return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
