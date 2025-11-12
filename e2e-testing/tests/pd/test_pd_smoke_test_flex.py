@@ -267,8 +267,7 @@ def _add_thermocycler_profile_step(
 
     profile_modal = tc_page.open_profile_programmer()
     profile_modal.wait_for_modal_load()
-    print("✓ Profile programmer modal opened")
-    
+
     for cycle_idx, cycle_config in enumerate(cycles):
         profile_modal.add_cycle()
         profile_modal.delete_thermocycler_step(step_index=0)

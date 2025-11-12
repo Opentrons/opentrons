@@ -15,7 +15,6 @@ class ThermocyclerStepPage(BasePage):
         """Initialize the ThermocyclerStepPage."""
         super().__init__(page)
 
-
     # ========== Part 1: State vs Profile Selection ==========
 
     def select_state_mode(self) -> None:
