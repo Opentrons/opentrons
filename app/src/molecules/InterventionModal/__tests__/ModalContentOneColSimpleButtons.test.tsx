@@ -7,8 +7,8 @@ import type { ChangeEventHandler } from 'react'
 
 /* eslint-disable testing-library/no-node-access */
 const inputElForButtonFromButtonText = (text: string): HTMLInputElement =>
-  ((screen.getByText(text)?.parentElement?.parentElement
-    ?.firstChild as any) as HTMLInputElement) ||
+  (screen.getByText(text)?.parentElement?.parentElement
+    ?.firstChild as any as HTMLInputElement) ||
   (() => {
     throw new Error(`Could not find el for ${text}`)
   })()

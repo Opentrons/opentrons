@@ -48,19 +48,20 @@ import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
   stepNumber: number
-  dragHovered?: boolean
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
 }
 
+// This debounce reduces flickering when the cursor moves across steps in the timeline.
+// Although there's no hover gap between adjacent `StepContainer`s (they have a visual
+// gap but it's made out of internal padding), there are hover gaps in `ConcurrentStepGroup`s.
 const DEBOUNCE_DURATION_MS = 500
 
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
     stepNumber,
-    dragHovered = false,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -95,9 +96,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
-  const selected: boolean = multiSelectItemIds?.length
-    ? multiSelectItemIds.includes(stepId)
-    : selectedStepId === stepId
+  const selected: boolean =
+    multiSelectItemIds != null && multiSelectItemIds.length > 0
+      ? multiSelectItemIds.includes(stepId)
+      : selectedStepId === stepId
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -249,7 +251,6 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         stepNumber={stepNumber}
         text={text}
         subtext={subtext}
-        dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}
       />
     </>

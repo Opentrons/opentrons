@@ -111,20 +111,17 @@ export const updateInitialDeckState = (
       matchingFixture != null &&
       matchingFixture.name === 'stagingArea' &&
       fourthColumnSlot != null
-        ? Object.values(labwareOnDeck).find(labware =>
+        ? (Object.values(labwareOnDeck).find(labware =>
             labware.stack.includes(fourthColumnSlot)
-          ) ?? null
+          ) ?? null)
         : null
-    const {
-      moduleId,
-      fixtureIds,
-      fourthColumnSlotLabwareId,
-    } = getHardwareInSlotInUse(
-      savedSteps,
-      matching4thColumnLabware,
-      matchingModule,
-      matchingFixture != null ? [matchingFixture] : undefined
-    )
+    const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
+      getHardwareInSlotInUse(
+        savedSteps,
+        matching4thColumnLabware,
+        matchingModule,
+        matchingFixture != null ? [matchingFixture] : undefined
+      )
 
     //  updating fixtures only
     if (fixtureName != null) {

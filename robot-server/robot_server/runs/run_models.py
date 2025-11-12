@@ -29,6 +29,7 @@ from opentrons.protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
 )
+from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
@@ -172,6 +173,10 @@ class Run(ResourceModel):
     startedAt: Optional[datetime] = Field(
         None,
         description="Run started at timestamp.",
+    )
+    cameraSettings: Optional[CameraSettings] = Field(
+        None,
+        description="Override Camera Settings provided during a run.",
     )
 
 

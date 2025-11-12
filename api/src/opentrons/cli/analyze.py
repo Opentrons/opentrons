@@ -60,7 +60,7 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.types import CommandAnnotation
+from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
 
 from opentrons_shared_data.robot.types import RobotType
 
@@ -367,6 +367,7 @@ async def _do_analyze(
             ),
             parameters=[],
             command_annotations=[],
+            command_preconditions=None,
         )
         return analysis
     return await orchestrator.run(deck_configuration=[])
@@ -465,6 +466,7 @@ async def _analyze(  # noqa: C901
         liquids=analysis.state_summary.liquids,
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
+        commandPreconditions=analysis.command_preconditions,
     )
 
     _call_for_output_of_kind(
@@ -555,3 +557,4 @@ class AnalyzeResults(BaseModel):
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
+    commandPreconditions: Optional[CommandPreconditions]

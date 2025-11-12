@@ -587,7 +587,7 @@ export const getAAByAAId = (
   // there should be a match with addressableAreaId
   const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
     (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
-  ) as AddressableAreaWithFakes
+  )!
   if (aaItem == null) {
     console.error(`Could not find AddressableArea for ${addressableAreaId}`)
   }
@@ -1016,7 +1016,7 @@ export const getVisualSlotIdFromAAId = (
   const vsId = Object.entries(VS_TO_AA).find(([key, value]) =>
     value.includes(aaId)
   )?.[0]
-  return vsId as string // should always find a match
+  return vsId! // should always find a match
 }
 
 export const getAAWithFakesFromVSId = (
@@ -1155,7 +1155,7 @@ export const getMainAAForAFixture = (
       const singleSlotId = getAAWithFakesFromVSId(vsId)
       return singleSlotId === addressableAreaId
     })
-    return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
+    return aa! // we can cast this bc there should me a match for every fixtureId
   }
 }
 
@@ -1443,11 +1443,8 @@ export const getWasteChuteComboFixture = (
   aaCutoutItem: CutoutConfigMap,
   deckConfigWithAA: CutoutConfigMap[]
 ): CutoutConfig | null => {
-  const {
-    cutoutId,
-    cutoutFixtureId,
-    opentronsModuleSerialNumber,
-  } = aaCutoutItem
+  const { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber } =
+    aaCutoutItem
   // Check if this is a valid waste chute cutout with compatible fixtures
   if (
     cutoutId !== WASTE_CHUTE_CUTOUT ||
@@ -1525,9 +1522,9 @@ export const replaceCutoutFixtureWithComboFixture = (
     }
 
     // Filter potential combo fixture options
-    const comboFixturesOptions = Object.entries(
-      addressableAreasById
-    ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
+    const comboFixturesOptions = Object.entries(addressableAreasById).filter(
+      ([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId)
+    )
     // Try to match with deck config
     for (const dc of deckConfigWithAA) {
       const match = comboFixturesOptions.find(([, areaIds]) =>
@@ -1676,20 +1673,24 @@ export const getFlexStackerD3Compatibility = (
       )
     ) {
       return {
-        comboFixtureId: deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
-        comboFixtureConflict: !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-          deckConfigCompatabilityD3.cutoutFixtureId
-        ),
+        comboFixtureId:
+          deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
+        comboFixtureConflict:
+          !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+            deckConfigCompatabilityD3.cutoutFixtureId
+          ),
       }
     }
 
-    const comboFixtureId = deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
-      fixtureId => !fixtureId.startsWith('fake')
-    ) as CutoutFixtureId | undefined
+    const comboFixtureId =
+      deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
+        fixtureId => !fixtureId.startsWith('fake')
+      ) as CutoutFixtureId | undefined
 
-    const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-      deckConfigCompatabilityD3.cutoutFixtureId
-    )
+    const comboFixtureConflict =
+      !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+        deckConfigCompatabilityD3.cutoutFixtureId
+      )
 
     return {
       comboFixtureId,
@@ -1718,9 +1719,8 @@ export const getCutoutConfigReplacmentForModule = (
   moduleModel: ModuleModel,
   deckConfig: CutoutConfig[]
 ): CutoutFixtureId => {
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
   const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
   const addedCutoutConfigs: CutoutConfigMap[] = [
     {

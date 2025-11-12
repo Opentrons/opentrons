@@ -165,7 +165,7 @@ class AbstractThermocyclerCore(
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> AbstractTaskCore:
+    ) -> None:
         """Set the target temperature for the well block, in °C.
 
         Note:
@@ -181,12 +181,35 @@ class AbstractThermocyclerCore(
         """
 
     @abstractmethod
+    def start_set_target_block_temperature(
+        self,
+        celsius: float,
+        ramp_rate: Optional[float],
+        block_max_volume: Optional[float] = None,
+    ) -> AbstractTaskCore:
+        """Start setting the target temperature for the well block, in °C.
+
+        Note:
+            If ``hold_time_seconds`` is not specified, the Thermocycler
+            will proceed to the next command after ``temperature`` is reached.
+        Args:
+            celsius: The target temperature, in °C.
+            block_max_volume: The maximum volume of any individual well
+                of the loaded labware. If not supplied, the thermocycler
+                will default to 25µL/well.
+        """
+
+    @abstractmethod
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
 
     @abstractmethod
-    def set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
+    def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
+
+    @abstractmethod
+    def start_set_target_lid_temperature(self, celsius: float) -> AbstractTaskCore:
+        """Start setting the target temperature for the heated lid, in °C."""
 
     @abstractmethod
     def wait_for_lid_temperature(self) -> None:

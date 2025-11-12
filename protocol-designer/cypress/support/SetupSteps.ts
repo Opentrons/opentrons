@@ -28,6 +28,7 @@ export enum SetupContent {
   FullP50TiprackName = 'Opentrons Flex 96 Filter Tip Rack 50 µL',
   GoBack = 'Go back',
   Confirm = 'Confirm',
+  Camera = 'Camera',
   OpentronsFlex = 'Opentrons Flex',
   OpentronsOT2 = 'Opentrons OT-2',
   LetsGetStarted = 'Let’s start with the basics',
@@ -1008,8 +1009,6 @@ export const SetupVerifications = {
       cy.contains('Select source wells')
       cy.contains('Destination labware')
       cy.contains('Volume per well')
-      cy.contains('Tip management')
-      cy.contains('Tip drop location')
     },
   }),
 

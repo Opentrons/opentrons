@@ -18,13 +18,8 @@ interface Props {
 }
 
 export const UploadExisting = (props: Props): JSX.Element => {
-  const {
-    disabled,
-    labwareTypeChildFields,
-    lastUploaded,
-    onClick,
-    onUpload,
-  } = props
+  const { disabled, labwareTypeChildFields, lastUploaded, onClick, onUpload } =
+    props
   return (
     <div className={styles.upload_existing_section}>
       <h2 className={styles.setup_heading}>

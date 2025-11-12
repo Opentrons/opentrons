@@ -5,10 +5,10 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   Flex,
   LegacyStyledText,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
   WRAP,
@@ -128,7 +128,7 @@ function HardwareItem({
   )
   if (hardware.hardwareType === 'module') {
     location = (
-      <DeckInfoLabel
+      <RobotInfoLabel
         deckLabel={getModuleDeckLabel(
           getModuleType(hardware.moduleModel),
           hardware.slot
@@ -141,7 +141,7 @@ function HardwareItem({
       hardware.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
         ? `${cutoutDisplayName[0]}4`
         : cutoutDisplayName
-    location = <DeckInfoLabel deckLabel={slotName} />
+    location = <RobotInfoLabel deckLabel={slotName} />
   }
   const isMagneticBlockFixture =
     hardware.hardwareType === 'fixture' &&

@@ -7,7 +7,7 @@ from logging import getLogger
 from dataclasses import dataclass
 
 import sqlalchemy
-import anyio
+import anyio.to_thread
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from robot_server.persistence.database import sqlite_rowid
@@ -57,7 +57,7 @@ class CompletedAnalysisResource:
             serialize_completed_analysis,
             # Cancellation may orphan the worker thread,
             # but that should be harmless in this case.
-            cancellable=True,
+            abandon_on_cancel=True,
         )
         return {
             "id": self.id,
@@ -98,7 +98,7 @@ class CompletedAnalysisResource:
             parse_completed_analysis,
             # Cancellation may orphan the worker thread,
             # but that should be harmless in this case.
-            cancellable=True,
+            abandon_on_cancel=True,
         )
 
         return cls(

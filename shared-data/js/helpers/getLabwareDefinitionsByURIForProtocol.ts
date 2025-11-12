@@ -7,11 +7,7 @@ import type {
   LoadLidStackRunTimeCommand,
   RunTimeCommand,
 } from '../../protocol'
-import type { LabwareDefinition } from '../types'
-
-export interface LabwareDefinitionsByURI {
-  [labwareDefURI: string]: LabwareDefinition
-}
+import type { LabwareDefinition, LabwareDefinitionsByURI } from '../types'
 
 const defPair = (
   maybeDef?: LabwareDefinition
@@ -35,11 +31,14 @@ export function getLabwareDefinitionsByURIForProtocol(
       }
     }, {})
   return commands
-    .filter((command): command is
-      | LoadLabwareRunTimeCommand
-      | LoadLidStackRunTimeCommand
-      | LoadLidRunTimeCommand =>
-      ['loadLabware', 'loadLidStack', 'loadLid'].includes(command.commandType)
+    .filter(
+      (
+        command
+      ): command is
+        | LoadLabwareRunTimeCommand
+        | LoadLidStackRunTimeCommand
+        | LoadLidRunTimeCommand =>
+        ['loadLabware', 'loadLidStack', 'loadLid'].includes(command.commandType)
     )
     .reduce<LabwareDefinitionsByURI>((acc, command) => {
       const definition = command.result?.definition

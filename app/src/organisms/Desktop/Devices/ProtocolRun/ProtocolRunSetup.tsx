@@ -29,12 +29,16 @@ import {
 
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { InfoMessage } from '/app/molecules/InfoMessage'
+import { SetupCamera } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { INCOMPATIBLE, INEXACT_MATCH } from '/app/redux/pipettes'
 import {
   appliedOffsetsToRun,
+  CAMERA_SETUP_STEP_KEY,
+  getCameraUsageState,
   getMissingSetupSteps,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
@@ -52,6 +56,7 @@ import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
 } from '/app/resources/deck_configuration/utils'
+import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import {
   useModuleCalibrationStatus,
   useMostRecentCompletedAnalysis,
@@ -75,6 +80,8 @@ import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { Dispatch, State } from '/app/redux/types'
 
+const RUN_RECORD_REFETCH_MS = 5000
+
 interface ProtocolRunSetupProps {
   protocolRunHeaderRef: RefObject<HTMLDivElement> | null
   robotName: string
@@ -91,10 +98,9 @@ export function ProtocolRunSetup({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const {
-    orderedSteps,
-    orderedApplicableSteps,
-  } = useRequiredSetupStepsInOrder({ runId, protocolAnalysis })
+  const { orderedSteps, orderedApplicableSteps } = useRequiredSetupStepsInOrder(
+    { runId, protocolAnalysis }
+  )
   const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
@@ -110,7 +116,10 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: RUN_RECORD_REFETCH_MS,
+  })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -127,6 +136,9 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  const { enabled: cameraEnabled } = useSelector((state: State) =>
+    getCameraUsageState(state, runId)
+  )
 
   const missingSteps = useSelector<State, StepKey[]>(
     (state: State): StepKey[] => getMissingSetupSteps(state, runId)
@@ -207,9 +219,40 @@ export function ProtocolRunSetup({
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
 
+  const isCameraRequired =
+    protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
+  const isCameraConfirmed =
+    !missingSteps.includes(CAMERA_SETUP_STEP_KEY) || runHasStarted
+  const cameraSettingsApplied = runRecord?.data.cameraSettings != null
+  const storageInfo = useRobotStorageInfo()
+  const baseProps = {
+    source: 'runRecord' as const,
+    robotType: robotType,
+  }
+  const { reportPhotoAccessUsage } = useCameraAnalytics(baseProps)
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        ...baseProps,
+        transactionId: runId,
+        action: 'storageWarning',
+      })
+    }
+  }, [storageInfo.isImageStorageLow !== null])
+  // A separate app can apply camera settings.
+  // We need to update the missing steps as a side effect.
+  useEffect(() => {
+    if (cameraSettingsApplied && !isCameraConfirmed) {
+      dispatch(
+        updateRunSetupStepsComplete(runId, { [CAMERA_SETUP_STEP_KEY]: true })
+      )
+    }
+  }, [cameraSettingsApplied, dispatch, isCameraConfirmed, runId])
+
   if (robot == null) {
     return null
   }
+
   const StepDetailMap: Record<
     StepKey,
     {
@@ -250,6 +293,7 @@ export function ProtocolRunSetup({
         incompleteText: t('calibration_needed'),
         missingHardwareText: t('action_needed'),
         incompleteElement: null,
+        disabledHardware: false,
       },
     },
     [MODULE_SETUP_STEP_KEY]: {
@@ -278,6 +322,7 @@ export function ProtocolRunSetup({
           ? t('modules_and_fixtures_ready')
           : t('modules_ready'),
         incompleteText: t('action_needed'),
+        disabledHardware: false,
         missingHardware: isMissingModule || isFixtureMismatch,
         missingHardwareText: t('action_needed'),
         incompleteElement: null,
@@ -333,7 +378,7 @@ export function ProtocolRunSetup({
               })
             )
             if (confirmed) {
-              setExpandedStepKey(null)
+              setExpandedStepKey(CAMERA_SETUP_STEP_KEY)
             }
           }}
         />
@@ -356,6 +401,36 @@ export function ProtocolRunSetup({
             {t('check_locations_and_volumes')}
           </StyledText>
         ),
+      },
+    },
+    [CAMERA_SETUP_STEP_KEY]: {
+      stepInternals: (
+        <SetupCamera
+          runId={runId}
+          robotName={robotName}
+          isCameraRequired={isCameraRequired}
+          cameraConfirmed={isCameraConfirmed}
+          confirmCameraSettings={() => {
+            dispatch(
+              updateRunSetupStepsComplete(runId, {
+                [CAMERA_SETUP_STEP_KEY]: true,
+              })
+            )
+            setExpandedStepKey(null)
+          }}
+        />
+      ),
+      description: t(`${CAMERA_SETUP_STEP_KEY}_description`),
+      descriptionElement: null,
+      rightElProps: {
+        stepKey: CAMERA_SETUP_STEP_KEY,
+        complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
+        completeText: t('camera_enabled'),
+        incompleteText: t('check_preferences'),
+        incompleteElement: null,
+        disabledHardware: !cameraEnabled,
+        missingHardware: !!storageInfo?.isImageStorageLow,
+        missingHardwareText: t('check_preferences'),
       },
     },
   }
@@ -446,9 +521,13 @@ interface NoHardwareRequiredStepCompletion {
 }
 
 interface HardwareRequiredStepCompletion {
-  stepKey: typeof ROBOT_CALIBRATION_STEP_KEY | typeof MODULE_SETUP_STEP_KEY
+  stepKey:
+    | typeof ROBOT_CALIBRATION_STEP_KEY
+    | typeof MODULE_SETUP_STEP_KEY
+    | typeof CAMERA_SETUP_STEP_KEY
   complete: boolean
   missingHardware: boolean
+  disabledHardware: boolean
   incompleteText: string | null
   incompleteElement: JSX.Element | null
   completeText: string
@@ -463,7 +542,8 @@ const stepRequiresHW = (
   props: StepRightElementProps
 ): props is HardwareRequiredStepCompletion =>
   props.stepKey === ROBOT_CALIBRATION_STEP_KEY ||
-  props.stepKey === MODULE_SETUP_STEP_KEY
+  props.stepKey === MODULE_SETUP_STEP_KEY ||
+  props.stepKey === CAMERA_SETUP_STEP_KEY
 
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
   if (props.complete) {
@@ -490,23 +570,37 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
         </StyledText>
       </Flex>
     )
-  } else if (stepRequiresHW(props) && props.missingHardware) {
+  } else if (stepRequiresHW(props)) {
     return (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={COLORS.yellow60}
+          color={
+            props.disabledHardware
+              ? COLORS.red60
+              : props.missingHardware
+                ? COLORS.yellow60
+                : COLORS.grey60
+          }
           marginRight={SPACING.spacing8}
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={COLORS.yellow60}
+          color={
+            props.disabledHardware
+              ? COLORS.red60
+              : props.missingHardware
+                ? COLORS.yellow60
+                : COLORS.grey60
+          }
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >
-          {props.missingHardwareText}
+          {props.missingHardware
+            ? props.missingHardwareText
+            : props.incompleteText}
         </StyledText>
       </Flex>
     )
@@ -515,14 +609,14 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={COLORS.yellow60}
+          color={COLORS.grey60}
           marginRight={SPACING.spacing8}
           name="alert-circle"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          color={COLORS.yellow60}
+          color={COLORS.grey60}
           marginRight={SPACING.spacing16}
           id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >

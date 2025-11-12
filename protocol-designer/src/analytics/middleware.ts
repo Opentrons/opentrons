@@ -29,7 +29,6 @@ import type {
   NormalizedPipetteById,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { SetFeatureFlagAction } from '../feature-flags/actions'
 import type { FormData, StepIdType, StepType } from '../form-types'
 import type { RenameStepAction } from '../labware-ingred/actions'
 import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
@@ -72,9 +71,8 @@ export const reduxActionToAnalyticsEvent = (
     // to get nice cleaned-up data instead of the raw form data.
     const a: SaveStepFormAction = action
 
-    const argsAndErrors: StepArgsAndErrors = getArgsAndErrorsByStepId(state)[
-      a.payload.id
-    ]
+    const argsAndErrors: StepArgsAndErrors =
+      getArgsAndErrorsByStepId(state)[a.payload.id]
 
     const { stepArgs } = argsAndErrors
 
@@ -87,7 +85,7 @@ export const reduxActionToAnalyticsEvent = (
       // (these fields are prefixed with double underscore only to make sure they
       // never accidentally overlap with actual fields)
       const additionalProperties = flattenNestedProperties(
-        (stepArgs as unknown) as Record<string, unknown>
+        stepArgs as unknown as Record<string, unknown>
       )
 
       // Mixpanel wants YYYY-MM-DDTHH:MM:SS for Date type
@@ -331,13 +329,8 @@ export const reduxActionToAnalyticsEvent = (
   if (action.type === 'SAVE_PROTOCOL_FILE') {
     const file = createFile(state)
     const { metadata, robot, designerApplication } = file.designerApplication
-    const {
-      ingredients,
-      savedStepForms,
-      modules,
-      pipettes,
-      labware,
-    } = designerApplication.data
+    const { ingredients, savedStepForms, modules, pipettes, labware } =
+      designerApplication.data
 
     const robotType = { robotType: robot.model }
     const pipetteDisplayNames = Object.values(pipettes).map(
@@ -408,15 +401,6 @@ export const reduxActionToAnalyticsEvent = (
     }
   }
 
-  if (action.type === 'SET_FEATURE_FLAGS') {
-    const a: SetFeatureFlagAction = action
-    if (a.payload.OT_PD_ALLOW_ALL_TIPRACKS === true) {
-      return {
-        name: 'allowAllTipracks',
-        properties: {},
-      }
-    }
-  }
   if (action.type === 'CREATE_PIPETTES') {
     const a: CreatePipettesAction = action
 
@@ -447,21 +431,21 @@ export const reduxActionToAnalyticsEvent = (
   return null
 }
 
-export const trackEventMiddleware: Middleware<BaseState, any> = ({
-  getState,
-  dispatch,
-}) => next => action => {
-  const result = next(action)
+export const trackEventMiddleware: Middleware<BaseState, any> =
+  ({ getState, dispatch }) =>
+  next =>
+  action => {
+    const result = next(action)
 
-  // NOTE: this is the Redux state AFTER the action has been fully dispatched
-  const state = getState()
+    // NOTE: this is the Redux state AFTER the action has been fully dispatched
+    const state = getState()
 
-  const optedIn = getHasOptedIn(state as BaseState)?.hasOptedIn ?? false
-  const event = reduxActionToAnalyticsEvent(state as BaseState, action)
+    const optedIn = getHasOptedIn(state as BaseState)?.hasOptedIn ?? false
+    const event = reduxActionToAnalyticsEvent(state as BaseState, action)
 
-  if (event != null) {
-    // actually report to analytics (trackEvent is responsible for using optedIn)
-    trackEvent(event, optedIn)
+    if (event != null) {
+      // actually report to analytics (trackEvent is responsible for using optedIn)
+      trackEvent(event, optedIn)
+    }
+    return result
   }
-  return result
-}

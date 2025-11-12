@@ -16,9 +16,9 @@ export const getSetupStepsComplete: (
   if (setup == null) {
     return null
   }
-  return (Object.entries(setup) as Array<
-    [Types.StepKey, Types.StepState]
-  >).reduce<Partial<Types.StepMap<boolean>>>(
+  return (
+    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
+  ).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({
       ...acc,
       [step]: state.complete,
@@ -42,9 +42,9 @@ export const getSetupStepsRequired: (
   if (setup == null) {
     return null
   }
-  return (Object.entries(setup) as Array<
-    [Types.StepKey, Types.StepState]
-  >).reduce<Partial<Types.StepMap<boolean>>>(
+  return (
+    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
+  ).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({ ...acc, [step]: state.required }),
     {}
   ) as Types.StepMap<boolean>
@@ -65,9 +65,9 @@ export const getSetupStepsMissing: (
   if (setup == null) {
     return null
   }
-  return (Object.entries(setup) as Array<
-    [Types.StepKey, Types.StepState]
-  >).reduce<Partial<Types.StepMap<boolean>>>(
+  return (
+    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
+  ).reduce<Partial<Types.StepMap<boolean>>>(
     (acc, [step, state]) => ({
       ...acc,
       [step]: state.required && !state.complete,
@@ -83,9 +83,9 @@ export const getMissingSetupSteps: (
 ) => Types.StepKey[] = (state, runId) => {
   const missingStepMap = getSetupStepsMissing(state, runId)
   if (missingStepMap == null) return []
-  const missingStepList = (Object.entries(missingStepMap) as Array<
-    [Types.StepKey, boolean]
-  >)
+  const missingStepList = (
+    Object.entries(missingStepMap) as Array<[Types.StepKey, boolean]>
+  )
     .map(([step, missing]) => (missing ? step : null))
     .filter(stepName => stepName != null)
   return missingStepList as Types.StepKey[]

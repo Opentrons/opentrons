@@ -27,7 +27,7 @@
   "disabled_cannot_connect": "Cannot connect to robot",
   "disabled_connect_to_robot": "Connect to robot to control",
   "disabled_no_pipette_attached": "Attach a pipette to proceed",
-  "disabled_protocol_is_running": "Protocol is running",
+  "disabled_robot_is_busy": "Robot is busy",
   "dont_show_me_again": "Don’t show me again",
   "drag_and_drop": "Drag and drop or <a>browse</a> your files",
   "empty": "empty",

@@ -61,6 +61,8 @@ Follow the instructions to add a total of six Absorbance Plate Reader steps to y
 
 </div>
 
+Protocol Designer includes Absorbance Plate Reader step details to help you keep track of all six steps. Hover over each step in the timeline to view details below the deck map. 
+
 ## Heater-Shaker Module steps
 
 Adding a Heater-Shaker Module step to your protocol displays any labware and adapters currently on the module. 
@@ -70,26 +72,22 @@ Adding a Heater-Shaker Module step to your protocol displays any labware and ada
   <figcaption>Add a temperature, shake speed, and timer for a Heater-Shaker step.</figcaption>
 </figure>
 
-In this example, a Corning 96-well flat plate is placed on top of an Opentrons universal flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](../warnings-errors.md#errors) could occur. 
+In this example, a Corning 96-well flat plate is placed on top of an Opentrons Universal Flat Heater-Shaker adapter. Both are on the Heater-Shaker in deck slot D1. 
 
-In the Heater-Shaker step form, set the temperature or shake functions to **Active** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 37 and 95° C, and shake samples between 200 and 3000 rpm. 
+Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](../warnings-errors.md#errors) could occur. 
+
+In the Heater-Shaker step form, set the heater or shaker functions to **On** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 20° C,and 95° C, and shake samples between 200 and 3000 rpm. 
 
 Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. 
 
-If your Heater-Shaker Step doesn't include a set time, Protocol Designer will ask how to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
+If your Heater-Shaker step doesn't include a set time, Protocol Designer will ask if you'd like to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
 
 <figure class="screenshot" markdown>
   ![Heater-Shaker pause](../images/heater_shaker_pause.png)
   <figcaption>Build a pause step now or later in your protocol.</figcaption>
 </figure>
 
-You can choose to:
-
-* pause your protocol until the Heater-Shaker reaches the set temperature. 
-* build a pause step later in your protocol. 
-
-Building a pause step later allows the robot to continue
-your protocol while the module reaches the set temperature. 
+Click **Skip pause step** to resume your protocol while the Heater-Shaker reaches the target temperature. 
 
 After your Heater-Shaker step, follow the same steps to deactivate
 the temperature and shake functions, open the labware latch, and
@@ -106,8 +104,7 @@ Click to set the module state and enter a temperature between
 After your Temperature module step, add a second step to
 deactivate the module. Just like in a Heater-Shaker step, you
 can choose to pause your protocol until the Temperature module
-reaches the set temperature, or build a pause step later in
-your protocol.
+reaches the set temperature. 
 
 ## Thermocycler Module steps 
 

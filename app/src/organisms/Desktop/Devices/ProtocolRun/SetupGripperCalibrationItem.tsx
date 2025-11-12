@@ -31,14 +31,12 @@ export function SetupGripperCalibrationItem({
   runId,
 }: SetupGripperCalibrationItemProps): JSX.Element | null {
   const { t, i18n } = useTranslation('protocol_setup')
-  const [
-    openWizardFlowType,
-    setOpenWizardFlowType,
-  ] = useState<GripperWizardFlowType | null>(null)
+  const [openWizardFlowType, setOpenWizardFlowType] =
+    useState<GripperWizardFlowType | null>(null)
 
   const gripperCalLastModified =
     gripperData != null
-      ? gripperData.data.calibratedOffset?.last_modified ?? null
+      ? (gripperData.data.calibratedOffset?.last_modified ?? null)
       : null
 
   let button: JSX.Element | undefined
@@ -81,7 +79,7 @@ export function SetupGripperCalibrationItem({
         button={button}
         calibratedDate={
           gripperData != null
-            ? gripperData.data.calibratedOffset?.last_modified ?? null
+            ? (gripperData.data.calibratedOffset?.last_modified ?? null)
             : null
         }
         label={t('extension_mount')}

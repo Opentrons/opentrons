@@ -78,9 +78,8 @@ export function ProtocolTimelineScrubber(
   const [isPlaying, setIsPlaying] = useState<boolean>(true)
 
   const currentCommandsSlice = commands.slice(0, currentCommandIndex + 1)
-  const invariantContextFromRunCommands = constructInvariantContextFromRunCommands(
-    commands
-  )
+  const invariantContextFromRunCommands =
+    constructInvariantContextFromRunCommands(commands)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromRunCommands

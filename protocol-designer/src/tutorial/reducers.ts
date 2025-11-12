@@ -77,6 +77,5 @@ export interface RootState {
   hints: HintReducerState
   dismissedHints: DismissedHintReducerState
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

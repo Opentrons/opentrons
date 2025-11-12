@@ -21,3 +21,18 @@
   border-radius: var(--border-radius-8);
   object-fit: cover;
 }
+
+.chip_overlay {
+  position: absolute;
+  z-index: 10;
+  top: 16px;
+  left: 16px;
+}
+
+.video_active {
+  display: block;
+}
+
+.video_inactive {
+  display: none;
+}

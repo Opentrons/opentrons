@@ -109,7 +109,8 @@ export type NormalizedLabwareById = Record<
     displayCategory: string
   }
 >
-export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]
+export type NormalizedLabware =
+  NormalizedLabwareById[keyof NormalizedLabwareById]
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {

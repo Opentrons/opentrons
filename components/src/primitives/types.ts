@@ -118,5 +118,5 @@ export interface StyleProps
 
 export type PrimitiveComponent<
   Instance extends keyof JSX.IntrinsicElements | ComponentType<any>,
-  Props extends StyleProps = StyleProps
+  Props extends StyleProps = StyleProps,
 > = StyledComponent<Instance, any, Props, any>

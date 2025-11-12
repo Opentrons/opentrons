@@ -346,6 +346,9 @@ export interface LabwareDefinition3 {
 // I'm pretty sure nothing in the frontend needs to deal with it anymore.
 export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
 
+export interface LabwareDefinitionsByURI {
+  [defURI: string]: LabwareDefinition
+}
 export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }
@@ -598,7 +601,7 @@ export type AffineTransformMatrix = [
   AffineTransformRow,
   AffineTransformRow,
   AffineTransformRow,
-  AffineTransformRow
+  AffineTransformRow,
 ]
 
 export interface SlotTransforms {
@@ -1033,6 +1036,10 @@ export type RunTimeParameter =
   | NumberParameter
   | CsvFileParameter
 
+export interface CommandPreconditions {
+  isCameraUsed: boolean
+}
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -1047,6 +1054,7 @@ export interface CompletedProtocolAnalysis {
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
 }
 
 export interface ResourceFile {

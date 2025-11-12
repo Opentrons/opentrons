@@ -16,7 +16,7 @@ type CommandResult = 'succeeded' | 'failed'
 
 export interface UseRecoveryAnalyticsResult<
   RecoveryRouteType,
-  RecoveryRouteStepType
+  RecoveryRouteStepType,
 > {
   /* Report the error which occurs error recovery is currently handling. */
   reportErrorEvent: (
@@ -44,7 +44,7 @@ export interface UseRecoveryAnalyticsResult<
 
 export function useRecoveryAnalytics<
   RecoveryRouteType,
-  RecoveryRouteStepType
+  RecoveryRouteStepType,
 >(): UseRecoveryAnalyticsResult<RecoveryRouteType, RecoveryRouteStepType> {
   const doTrackEvent = useTrackEvent()
 

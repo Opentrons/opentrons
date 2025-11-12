@@ -208,7 +208,8 @@ export function UpdateProtocol(): JSX.Element {
           text.includes('DESIGNER_APPLICATION = """')
         ) {
           // Remove DESIGNER_APPLICATION variable from PD protocols
-          const designerAppRegex = /^DESIGNER_APPLICATION\s*=\s*"""[\s\S]*?"""\s*$/gm
+          const designerAppRegex =
+            /^DESIGNER_APPLICATION\s*=\s*"""[\s\S]*?"""\s*$/gm
           cleanedText = text.replace(designerAppRegex, '')
 
           // Also change the source in metadata to avoid protocol format detection issues

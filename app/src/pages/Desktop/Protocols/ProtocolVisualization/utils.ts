@@ -17,7 +17,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   _wellContentsForLabware,
-  AIR,
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
   getVolumesPerLiquid,
@@ -38,9 +37,7 @@ import type {
   ContentsByWell,
   DeckSlot,
   LabwareTemporalProperties,
-  LocationLiquidState,
   ModuleEntities,
-  PipetteTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
@@ -237,19 +234,13 @@ export const getBackgroundColor = (
 }
 
 interface ActiveLayer {
-  copy: string
   isActiveLayerVisible: boolean
 }
 
 export const getActiveLayer = (
-  isTiprack: boolean,
-  pipettes: PipetteTemporalProperties[],
   id: string,
   selectedRunTimeCommand?: RunTimeCommand
 ): ActiveLayer => {
-  const isStepAssosciatedWithLabwareState = pipettes.some(
-    pipette => pipette.entityId === id || pipette.tiprackId === id
-  )
   const isStepAssosciatedWithLabwareId =
     selectedRunTimeCommand != null &&
     'labwareId' in selectedRunTimeCommand.params &&
@@ -259,46 +250,11 @@ export const getActiveLayer = (
     selectedRunTimeCommand.commandType === 'moveLabware' &&
     'labwareId' in selectedRunTimeCommand.params &&
     selectedRunTimeCommand.params.labwareId === id
-  const isLoadStepAssosciatedWithLabwareId =
-    selectedRunTimeCommand != null &&
-    'labwareId' in selectedRunTimeCommand.params &&
-    selectedRunTimeCommand.params.labwareId === id &&
-    selectedRunTimeCommand.commandType === 'loadLabware'
 
   const isStepAssosciatedWithLabware =
-    isStepAssosciatedWithLabwareState ||
-    isStepAssosciatedWithLabwareId ||
-    isMoveStepAssosciatedWithLabwareId
-
-  let activeCopy = isTiprack
-    ? 'Tiprack used in pipetting step'
-    : 'Labware used in pipetting step'
-  if (isLoadStepAssosciatedWithLabwareId) {
-    activeCopy = 'Loading labware'
-  } else if (isMoveStepAssosciatedWithLabwareId) {
-    activeCopy = 'Moving plate'
-  } else if (
-    isTiprack &&
-    isStepAssosciatedWithLabwareId &&
-    selectedRunTimeCommand?.commandType === 'pickUpTip'
-  ) {
-    activeCopy = 'Picking up tips'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'aspirateInPlace'
-  ) {
-    activeCopy = 'Aspirating'
-  } else if (
-    !isTiprack &&
-    isStepAssosciatedWithLabwareState &&
-    selectedRunTimeCommand?.commandType === 'dispenseInPlace'
-  ) {
-    activeCopy = 'Dispensing'
-  }
+    isStepAssosciatedWithLabwareId || isMoveStepAssosciatedWithLabwareId
 
   return {
-    copy: activeCopy,
     isActiveLayerVisible: isStepAssosciatedWithLabware,
   }
 }
@@ -325,36 +281,6 @@ export const getChannels = (
     numChannels = 12
   }
   return numChannels
-}
-
-interface TipSvgInfo {
-  tipColor: string
-  tipCurrentVolume: number
-}
-
-export const getTipSvgInfo = (
-  pipetteLocationLiquidState: LocationLiquidState,
-  liquids: Liquid[]
-): TipSvgInfo => {
-  const ingredIds = Object.keys(pipetteLocationLiquidState)
-  const colorsInTip = liquids
-    .filter(liquid => ingredIds.includes(liquid.id))
-    ?.map(liquid => liquid.displayColor)
-  const tipColor =
-    colorsInTip.length > 1 ? COLORS.grey40 : colorsInTip[0] ?? COLORS.grey40
-  const tipCurrentVolume = Object.values(pipetteLocationLiquidState).reduce(
-    (sum, { volume }) => sum + volume,
-    0
-  )
-  return { tipColor, tipCurrentVolume }
-}
-
-export const getWellVolume = (
-  labwareLocationLiquidState: LocationLiquidState
-): number => {
-  return Object.entries(labwareLocationLiquidState)
-    .filter(([id, _]) => id !== AIR) // filter out air gap volume
-    .reduce((sum, [_, volume]) => sum + volume.volume, 0)
 }
 
 export function getNextGroupFirstCommandId(

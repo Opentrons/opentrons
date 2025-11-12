@@ -115,26 +115,26 @@ export function WellOrderModal(props: WellOrderModalProps): JSX.Element | null {
     closeModal()
   }
 
-  const makeOnChange = (ordinality: 'first' | 'second') => (
-    value: string
-  ): void => {
-    let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
+  const makeOnChange =
+    (ordinality: 'first' | 'second') =>
+    (value: string): void => {
+      let nextState: State = { ...wellOrder, [`${ordinality}Value`]: value }
 
-    if (ordinality === 'first') {
-      if (
-        VERTICAL_VALUES.includes(value as WellOrderOption) &&
-        VERTICAL_VALUES.includes(wellOrder.secondValue)
-      ) {
-        nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
-      } else if (
-        HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
-        HORIZONTAL_VALUES.includes(wellOrder.secondValue)
-      ) {
-        nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
+      if (ordinality === 'first') {
+        if (
+          VERTICAL_VALUES.includes(value as WellOrderOption) &&
+          VERTICAL_VALUES.includes(wellOrder.secondValue)
+        ) {
+          nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
+        } else if (
+          HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
+          HORIZONTAL_VALUES.includes(wellOrder.secondValue)
+        ) {
+          nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
+        }
       }
+      setWellOrder(nextState)
     }
-    setWellOrder(nextState)
-  }
 
   const isSecondOptionDisabled = (value: WellOrderOption): boolean => {
     if (VERTICAL_VALUES.includes(wellOrder.firstValue)) {

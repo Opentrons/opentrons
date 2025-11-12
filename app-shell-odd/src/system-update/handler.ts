@@ -42,9 +42,8 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
     currentVersion: CURRENT_SYSTEM_VERSION,
   })
   const usbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {}
-  let currentBestUsbUpdate:
-    | (ReadyUpdate & { providerName: string })
-    | null = null
+  let currentBestUsbUpdate: (ReadyUpdate & { providerName: string }) | null =
+    null
 
   const updateBestUsbUpdate = (): void => {
     currentBestUsbUpdate = null
@@ -240,7 +239,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
             } else if (webUpdate.files?.system != null) {
               return {
                 systemFile: webUpdate.files.system,
-                version: webUpdate.version as string, // version is string if files is not null
+                version: webUpdate.version!, // version is string if files is not null
                 isManualFile: false,
               }
             } else {

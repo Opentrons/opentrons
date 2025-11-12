@@ -39,25 +39,25 @@ describe('useWifiList', () => {
   it('getWifiList returns wifiList from state', () => {
     when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .thenReturn(({
+      .thenReturn({
         data: { list: [mockWifiNetwork] },
-      } as unknown) as UseQueryResult<WifiListResponse>)
+      } as unknown as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList dedupes duplicate SSIDs', () => {
     when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .thenReturn(({
+      .thenReturn({
         data: { list: [mockWifiNetwork, mockWifiNetwork] },
-      } as unknown) as UseQueryResult<WifiListResponse>)
+      } as unknown as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([mockWifiNetwork])
   })
   it('getWifiList sorts by active then ssid', () => {
     when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .thenReturn(({
+      .thenReturn({
         data: {
           list: [
             { ...mockWifiNetwork, ssid: 'bbb' },
@@ -65,7 +65,7 @@ describe('useWifiList', () => {
             { ...mockWifiNetwork, active: true, ssid: 'zzz' },
           ],
         },
-      } as unknown) as UseQueryResult<WifiListResponse>)
+      } as unknown as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([
       { ...mockWifiNetwork, active: true, ssid: 'zzz' },
@@ -76,7 +76,7 @@ describe('useWifiList', () => {
   it('getWifiList sorts by active then ssid then dedupes', () => {
     when(useWifiQuery)
       .calledWith(expect.anything(), null)
-      .thenReturn(({
+      .thenReturn({
         data: {
           list: [
             { ...mockWifiNetwork, ssid: 'bbb' },
@@ -84,7 +84,7 @@ describe('useWifiList', () => {
             { ...mockWifiNetwork, active: true, ssid: 'aaa' },
           ],
         },
-      } as unknown) as UseQueryResult<WifiListResponse>)
+      } as unknown as UseQueryResult<WifiListResponse>)
     const wifiList = useWifiList()
     expect(wifiList).toEqual([
       { ...mockWifiNetwork, active: true, ssid: 'aaa' },

@@ -97,265 +97,260 @@ export interface TextAreaFieldProps {
 export const TextAreaField = forwardRef<
   HTMLTextAreaElement,
   TextAreaFieldProps
->(
-  (props, ref): JSX.Element => {
-    const {
-      placeholder,
-      textAlign = TYPOGRAPHY.textAlignLeft,
-      title,
-      tooltipText,
-      tabIndex = 0,
-      showDeleteIcon = false,
-      hasBackgroundError = false,
-      onDelete,
-      borderRadius,
-      padding,
-      height,
-      ...textAreaProps
-    } = props
-    const hasError = props.error != null
-    const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
-    const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
-    const [targetProps, tooltipProps] = useHoverTooltip()
+>((props, ref): JSX.Element => {
+  const {
+    placeholder,
+    textAlign = TYPOGRAPHY.textAlignLeft,
+    title,
+    tooltipText,
+    tabIndex = 0,
+    showDeleteIcon = false,
+    hasBackgroundError = false,
+    onDelete,
+    borderRadius,
+    padding,
+    height,
+    ...textAreaProps
+  } = props
+  const hasError = props.error != null
+  const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
+  const placeHolder = (props.isIndeterminate ?? false) ? '-' : props.placeholder
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
-    const OUTER_CSS = css`
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        grid-gap: ${SPACING.spacing8};
-        &:focus-within {
-          filter: ${hasError
-            ? 'none'
-            : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
-        }
+  const OUTER_CSS = css`
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      grid-gap: ${SPACING.spacing8};
+      &:focus-within {
+        filter: ${hasError
+          ? 'none'
+          : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
       }
-    `
+    }
+  `
 
-    const TEXTAREA_FIELD = css`
-      display: flex;
-      background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
-      border-radius: ${borderRadius ?? BORDERS.borderRadius4};
-      padding: ${padding ?? SPACING.spacing8};
-      border: ${hasBackgroundError
-        ? 'none'
-        : `1px ${BORDERS.styleSolid}
+  const TEXTAREA_FIELD = css`
+    display: flex;
+    background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
+    border-radius: ${borderRadius ?? BORDERS.borderRadius4};
+    padding: ${padding ?? SPACING.spacing8};
+    border: ${hasBackgroundError
+      ? 'none'
+      : `1px ${BORDERS.styleSolid}
         ${hasError ? COLORS.red50 : COLORS.grey50}`};
-      font-size: ${TYPOGRAPHY.fontSizeP};
+    font-size: ${TYPOGRAPHY.fontSizeP};
+    width: 100%;
+    height: ${height};
+
+    &:active:enabled {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+    }
+
+    & textarea {
+      border-radius: inherit;
+      color: ${COLORS.black90};
+      border: none;
+      flex: 1 1 auto;
       width: 100%;
-      height: ${height};
+      height: ${SPACING.spacing16};
+      text-align: ${textAlign};
+    }
+    & textarea:focus {
+      outline: none;
+    }
 
-      &:active:enabled {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
-      }
+    &:hover {
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey60};
+    }
 
-      & textarea {
-        border-radius: inherit;
-        color: ${COLORS.black90};
-        border: none;
-        flex: 1 1 auto;
-        width: 100%;
-        height: ${SPACING.spacing16};
-        text-align: ${textAlign};
-      }
-      & textarea:focus {
-        outline: none;
-      }
+    &:focus-visible {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 2px;
+    }
 
-      &:hover {
-        border: 1px ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.grey60};
-      }
+    &:focus-within {
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.blue50};
+    }
 
-      &:focus-visible {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
-        outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
-        outline-offset: 2px;
-      }
+    &:disabled {
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+    }
+    textarea[type='number']::-webkit-inner-spin-button,
+    textarea[type='number']::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
+      border: 2px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50};
 
       &:focus-within {
-        border: 1px ${BORDERS.styleSolid}
+        box-shadow: none;
+        border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
           ${hasError ? COLORS.red50 : COLORS.blue50};
       }
 
-      &:disabled {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+      & textarea {
+        color: ${COLORS.black90};
+        flex: 1 1 auto;
+        width: 100%;
+        height: 100%;
       }
-      textarea[type='number']::-webkit-inner-spin-button,
-      textarea[type='number']::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+    }
+  `
 
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        padding: ${SPACING.spacing16} ${SPACING.spacing24};
-        border: 2px ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.grey50};
+  const FORM_BOTTOM_SPACE_STYLE = css`
+    padding-top: ${SPACING.spacing4};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing8} 0rem;
+      padding-bottom: 0;
+    }
+  `
 
-        &:focus-within {
-          box-shadow: none;
-          border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
-            ${hasError ? COLORS.red50 : COLORS.blue50};
-        }
+  const TITLE_STYLE = css`
+    color: ${COLORS.grey60};
+    padding-bottom: ${SPACING.spacing4};
+    text-align: ${textAlign};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize22};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
+      line-height: ${TYPOGRAPHY.lineHeight28};
+      justify-content: ${textAlign};
+    }
+  `
 
-        & textarea {
-          color: ${COLORS.black90};
-          flex: 1 1 auto;
-          width: 100%;
-          height: 100%;
-        }
-      }
-    `
-
-    const FORM_BOTTOM_SPACE_STYLE = css`
-      padding-top: ${SPACING.spacing4};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        padding: ${SPACING.spacing8} 0rem;
-        padding-bottom: 0;
-      }
-    `
-
-    const TITLE_STYLE = css`
-      color: ${COLORS.grey60};
-      padding-bottom: ${SPACING.spacing4};
-      text-align: ${textAlign};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-size: ${TYPOGRAPHY.fontSize22};
-        font-weight: ${TYPOGRAPHY.fontWeightRegular};
-        line-height: ${TYPOGRAPHY.lineHeight28};
-        justify-content: ${textAlign};
-      }
-    `
-
-    const ERROR_TEXT_STYLE = css`
+  const ERROR_TEXT_STYLE = css`
+    color: ${COLORS.red50};
+    padding-top: ${SPACING.spacing4};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize22};
       color: ${COLORS.red50};
-      padding-top: ${SPACING.spacing4};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-size: ${TYPOGRAPHY.fontSize22};
-        color: ${COLORS.red50};
-        padding-top: ${SPACING.spacing8};
-      }
-    `
+      padding-top: ${SPACING.spacing8};
+    }
+  `
 
-    const UNITS_STYLE = css`
+  const UNITS_STYLE = css`
+    color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
+    font: ${TYPOGRAPHY.bodyTextRegular};
+    text-align: ${TYPOGRAPHY.textAlignRight};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
-      font: ${TYPOGRAPHY.bodyTextRegular};
-      text-align: ${TYPOGRAPHY.textAlignRight};
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
-        font-size: ${TYPOGRAPHY.fontSize22};
-        font-weight: ${TYPOGRAPHY.fontWeightRegular};
-        line-height: ${TYPOGRAPHY.lineHeight28};
-        justify-content: ${textAlign};
-      }
-    `
+      font-size: ${TYPOGRAPHY.fontSize22};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
+      line-height: ${TYPOGRAPHY.lineHeight28};
+      justify-content: ${textAlign};
+    }
+  `
 
-    return (
-      <Flex
-        width="100%"
-        alignItems={ALIGN_CENTER}
-        lineHeight={1}
-        fontSize={TYPOGRAPHY.fontSizeP}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={props.disabled ?? false ? 0.5 : ''}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-          {title != null ? (
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing8}
-              alignItems={ALIGN_CENTER}
-            >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE}
-              >
-                {title}
-              </StyledText>
-              {tooltipText != null ? (
-                <>
-                  <Flex {...targetProps}>
-                    <Icon
-                      name="information"
-                      size={SPACING.spacing12}
-                      color={COLORS.grey60}
-                    />
-                  </Flex>
-                  <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
-                </>
-              ) : null}
-            </Flex>
-          ) : null}
+  return (
+    <Flex
+      width="100%"
+      alignItems={ALIGN_CENTER}
+      lineHeight={1}
+      fontSize={TYPOGRAPHY.fontSizeP}
+      fontWeight={TYPOGRAPHY.fontWeightRegular}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
+      opacity={(props.disabled ?? false) ? 0.5 : ''}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+        {title != null ? (
           <Flex
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            css={OUTER_CSS}
-            onClick={!props.disabled ? props.onClick : null}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing8}
+            alignItems={ALIGN_CENTER}
           >
-            <Flex
-              tabIndex={tabIndex}
-              alignItems={ALIGN_CENTER}
-              onClick={() => {
-                if (props.id != null) {
-                  document.getElementById(props.id)?.focus()
-                }
-              }}
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              htmlFor={props.id}
+              css={TITLE_STYLE}
             >
-              {props.leftIcon != null ? (
-                <Flex marginRight={SPACING.spacing8}>
+              {title}
+            </StyledText>
+            {tooltipText != null ? (
+              <>
+                <Flex {...targetProps}>
                   <Icon
-                    name={props.leftIcon}
+                    name="information"
+                    size={SPACING.spacing12}
                     color={COLORS.grey60}
-                    size="1.25rem"
                   />
                 </Flex>
-              ) : null}
-              <StyledTextArea
-                {...textAreaProps}
-                css={TEXTAREA_FIELD}
-                data-testid={props.id}
-                value={value}
-                placeholder={placeHolder}
-                onWheel={event => {
-                  event.currentTarget.blur()
-                }} // prevent value change with scrolling
-                ref={ref}
-              />
-              {props.units != null ? (
-                <Flex css={UNITS_STYLE}>{props.units}</Flex>
-              ) : null}
-              {showDeleteIcon ? (
-                <Flex
-                  alignSelf={TEXT_ALIGN_RIGHT}
-                  onClick={onDelete}
-                  cursor="pointer"
-                >
-                  <Icon name="close" size="1.75rem" />
-                </Flex>
-              ) : null}
-            </Flex>
+                <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+              </>
+            ) : null}
           </Flex>
-          {props.caption != null ? (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              css={FORM_BOTTOM_SPACE_STYLE}
-              color={COLORS.grey60}
-            >
-              {props.caption}
-            </StyledText>
-          ) : null}
-          {hasError ? (
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              css={ERROR_TEXT_STYLE}
-            >
-              {props.error}
-            </StyledText>
-          ) : null}
+        ) : null}
+        <Flex
+          width="100%"
+          flexDirection={DIRECTION_COLUMN}
+          css={OUTER_CSS}
+          onClick={!props.disabled ? props.onClick : null}
+        >
+          <Flex
+            tabIndex={tabIndex}
+            alignItems={ALIGN_CENTER}
+            onClick={() => {
+              if (props.id != null) {
+                document.getElementById(props.id)?.focus()
+              }
+            }}
+          >
+            {props.leftIcon != null ? (
+              <Flex marginRight={SPACING.spacing8}>
+                <Icon
+                  name={props.leftIcon}
+                  color={COLORS.grey60}
+                  size="1.25rem"
+                />
+              </Flex>
+            ) : null}
+            <StyledTextArea
+              {...textAreaProps}
+              css={TEXTAREA_FIELD}
+              data-testid={props.id}
+              value={value}
+              placeholder={placeHolder}
+              onWheel={event => {
+                event.currentTarget.blur()
+              }} // prevent value change with scrolling
+              ref={ref}
+            />
+            {props.units != null ? (
+              <Flex css={UNITS_STYLE}>{props.units}</Flex>
+            ) : null}
+            {showDeleteIcon ? (
+              <Flex
+                alignSelf={TEXT_ALIGN_RIGHT}
+                onClick={onDelete}
+                cursor="pointer"
+              >
+                <Icon name="close" size="1.75rem" />
+              </Flex>
+            ) : null}
+          </Flex>
         </Flex>
+        {props.caption != null ? (
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            css={FORM_BOTTOM_SPACE_STYLE}
+            color={COLORS.grey60}
+          >
+            {props.caption}
+          </StyledText>
+        ) : null}
+        {hasError ? (
+          <StyledText desktopStyle="bodyDefaultRegular" css={ERROR_TEXT_STYLE}>
+            {props.error}
+          </StyledText>
+        ) : null}
       </Flex>
-    )
-  }
-)
+    </Flex>
+  )
+})
 
 const StyledTextArea = styled.textarea`
   background-color: transparent;

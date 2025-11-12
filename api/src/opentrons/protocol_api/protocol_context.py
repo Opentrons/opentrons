@@ -11,6 +11,7 @@ from typing import (
     Union,
     Mapping,
     cast,
+    Tuple,
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -471,17 +472,18 @@ class ProtocolContext(CommandPublisher):
                 `adapter_namespace` will now independently follow the same search rules
                 described in `namespace`. Formerly, it took `namespace`'s exact value.
 
-            adapter_version (Optional[int]): The version of the adapter being loaded.
-                Applies to `adapter` the same way that `version` applies to `load_name`.
+            .. versionchanged:: 2.26
+               ``adapter_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``,
+               ``adapter_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
                 *New in version 2.26:* `adapter_version` may now be specified explicitly. Also, when it's unspecified,
                 the algorithm to select a version automatically has improved to avoid
                 selecting versions that do not exist.
 
-            lid (Optional[str]): A lid to load on the top of the main labware. Accepts the same
-                values as the `load_name` parameter of [`load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack]. The
-                lid will use the same namespace as the labware, and the API will
-                choose the lid's version automatically.
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explicitly. When unspecified, the API uses the newest version available for your protocol's API level.
 
                 *New in version 2.23:*.
 
@@ -493,12 +495,17 @@ class ProtocolContext(CommandPublisher):
                 `lid_namespace` will now independently follow the same search rules
                 described in `namespace`. Formerly, it took `namespace`'s exact value.
 
-            lid_version (Optional[int]): The version of the adapter being loaded.
-                Applies to `lid` the same way that `version` applies to `load_name`.
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
-                *New in version 2.26:* `lid_version` may now be specified explicitly. Also, when it's unspecified,
-                the algorithm to select a version automatically has improved to avoid
-                selecting versions that do not exist.
+        :param lid_version: The version of the adapter being loaded.
+            Applies to ``lid`` the same way that ``version`` applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, the API uses the newest version available for your protocol's API level.
         """
 
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -1523,11 +1530,11 @@ class ProtocolContext(CommandPublisher):
         Args:
             name: Name of an Opentrons-verified liquid class. Must be one of:
 
-                - `water`: an Opentrons-verified liquid class based on deionized water.
-                - `glycerol_50`: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
-                - `ethanol_80`: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
-            version: The version of the liquid class to retrieve. If left unspecified, the latest definition for the
-                protocol's API version will be loaded.
+            - ``"water"``: an Opentrons-verified liquid class based on deionized water.
+            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
+            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+        :param version: Version of the liquid class to retrieve. If left unspecified, defaults to the latest version for the
+            protocol's API level.
 
         Raises:
             LiquidClassDefinitionDoesNotExist: If the specified liquid class does not exist.
@@ -1648,10 +1655,11 @@ class ProtocolContext(CommandPublisher):
             adapter_namespace: The namespace of the adapter being loaded.
                 Applies to `adapter` the same way that `namespace` applies to `load_name`.
 
-                *Changed in version 2.26:* `adapter_namespace` may now be specified explicitly.
-                Also, when you've specified `namespace` but not `adapter_namespace`,
-                `adapter_namespace` will now independently follow the same search rules
-                described in `namespace`. Formerly, it took `namespace`'s exact value.
+            .. versionchanged:: 2.26
+               ``adapter_namespace`` may now be specified explicitly.
+                When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``,
+               ``adapter_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
             adapter_version: The version of the adapter being loaded.
                 Applies to `adapter` the same way that `version` applies to `load_name`.
@@ -1848,6 +1856,53 @@ class ProtocolContext(CommandPublisher):
                 api_version=self._api_version,
                 protocol_core=self._core,
                 core_map=self._core_map,
+            )
+        return None
+
+    @requires_version(2, 27)
+    def capture_image(
+        self,
+        home_before: Optional[bool] = False,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using the camera. Captured images get saved as a result of the protocol run.
+
+        :param home_before: Boolean to home the pipette before capturing an image.
+        :param filename: Filename to use when saving the captured image as a file.
+        :param resolution: Width/height tuple to determine the resolution to use when capturing an image.
+        :param zoom: Optional zoom level, with minimum/default of 1x zoom and maximum of 2x zoom.
+        :param contrast: Contrast level to be applied to an image, range is 0% to 100%.
+        :param brightness: Brightness level to be applied to an image, range is 0% to 100%.
+        :param saturation: Saturation level to be applied to an image, range is 0% to 100%.
+
+        .. versionadded:: 2.27
+
+        """
+        if home_before is True:
+            self._core.home()
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.capture_image(
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
+            ),
+        ):
+            self._core.capture_image(
+                filename=filename,
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
             )
         return None
 

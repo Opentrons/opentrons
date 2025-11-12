@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import AspiratedFluid, FluidKind
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from .command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.state.update_types import StateUpdate
-
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     from ..execution.pipetting import PipettingHandler
@@ -241,10 +241,12 @@ async def aspirate_while_tracking(
     well_name: str,
     volume: float,
     flow_rate: float,
+    end_point: Point,
     location_if_error: ErrorLocationInfo,
     command_note_adder: CommandNoteAdder,
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
+    movement_delay: Optional[float] = None,
 ) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
     """Execute an aspirate while tracking microoperation."""
     try:
@@ -254,6 +256,7 @@ async def aspirate_while_tracking(
             well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
+            end_point=end_point,
             command_note_adder=command_note_adder,
         )
     except PipetteOverpressureError as e:
@@ -290,10 +293,12 @@ async def dispense_while_tracking(
     well_name: str,
     volume: float,
     flow_rate: float,
+    end_point: Point,
     push_out: float | None,
     location_if_error: ErrorLocationInfo,
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
+    movement_delay: Optional[float] = None,
 ) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
     """Execute an dispense while tracking microoperation."""
     # The current volume won't be none since it passed validation
@@ -309,6 +314,7 @@ async def dispense_while_tracking(
             well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
+            end_point=end_point,
             push_out=push_out,
             is_full_dispense=is_full_dispense,
         )

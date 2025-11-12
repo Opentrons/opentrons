@@ -153,8 +153,8 @@ export const SetupModuleAndDeck = ({
           {runHasStarted
             ? t('protocol_run_started')
             : missingModuleIds.length > 0
-            ? t('plug_in_required_module', { count: missingModuleIds.length })
-            : t('calibrate_module_failure_reason')}
+              ? t('plug_in_required_module', { count: missingModuleIds.length })
+              : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

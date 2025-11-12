@@ -14,6 +14,7 @@ import { getTransferPlanAndReferenceVolumes } from '@opentrons/step-generation'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
 
@@ -49,7 +50,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const [isPristine, setIsPristine] = useState<boolean>(true)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
-  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const tiprackDef = useSelector(getLabwareDefsByURI)[tiprack as string]
   const robotType = useSelector(getRobotType)
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassDef =
@@ -65,13 +66,9 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   )
 
   const matchingTipLiquidSpecs =
-    pipette != null
-      ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprack as string)
+    pipette != null && tiprack != null
+      ? getMatchingTipLiquidSpecs(pipette.spec, volume as number, tiprackDef)
       : null
-  const tiprackDef =
-    Object.values(labwareEntities).find(
-      ({ labwareDefURI }) => labwareDefURI === tiprack
-    )?.def ?? null
 
   let airGapByVolume: Array<[number, number]> = []
   // no air gap included for mix step
@@ -87,10 +84,10 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
         formData.path === 'multiDispense' &&
         liquidClassValuesForTip != null &&
         'multiDispense' in liquidClassValuesForTip
-          ? (liquidClassValuesForTip.multiDispense?.retract
-              .airGapByVolume as Array<[number, number]>) ?? []
-          : (liquidClassValuesForTip?.singleDispense.retract
-              .airGapByVolume as Array<[number, number]>) ?? []
+          ? ((liquidClassValuesForTip.multiDispense?.retract
+              .airGapByVolume as Array<[number, number]>) ?? [])
+          : ((liquidClassValuesForTip?.singleDispense.retract
+              .airGapByVolume as Array<[number, number]>) ?? [])
     }
   }
 
@@ -115,12 +112,12 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           // multi-dispense is valid on OT-2, even though liquid class values are null
           conditioningByVolume: isOT2
             ? []
-            : (liquidClassValuesForTip?.multiDispense
-                ?.conditioningByVolume as Array<[number, number]>) ?? null,
+            : ((liquidClassValuesForTip?.multiDispense
+                ?.conditioningByVolume as Array<[number, number]>) ?? null),
           disposalByVolume: isOT2
             ? []
-            : (liquidClassValuesForTip?.multiDispense
-                ?.disposalByVolume as Array<[number, number]>) ?? null,
+            : ((liquidClassValuesForTip?.multiDispense
+                ?.disposalByVolume as Array<[number, number]>) ?? null),
           aspirateAirGapByVolume: airGapByVolume,
         }).referenceVolumes
       : null
@@ -134,13 +131,21 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           referenceVolumesForByVolumeInterpolation?.flowRate.dispense,
           referenceVolumesForByVolumeInterpolation?.correction.dispense,
         ]
+  const dispenseKeyForCorrectionVolumeInterpolation =
+    formData?.path === 'multiDispense' &&
+    liquidClassValuesForTip != null &&
+    'multiDispense' in liquidClassValuesForTip
+      ? 'multiDispense'
+      : 'singleDispense'
   const correctionVolume =
     referenceVolumeCorrection != null && liquidClassValuesForTip != null
       ? linearInterpolate(
           referenceVolumeCorrection,
           liquidClassValuesForTip[
-            flowRateType === 'aspirate' ? 'aspirate' : 'singleDispense'
-          ].correctionByVolume as Array<[number, number]>
+            flowRateType === 'aspirate'
+              ? 'aspirate'
+              : dispenseKeyForCorrectionVolumeInterpolation
+          ]?.correctionByVolume as Array<[number, number]>
         )
       : 0
 
@@ -193,7 +198,7 @@ export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
           t('step_edit_form.field.flow_rate.error_out_of_bounds'),
           'capitalize'
         )
-      : passThruProps.errorToShow ?? null
+      : (passThruProps.errorToShow ?? null)
 
   useEffect(() => {
     if (isPristine && passThruProps.value == null) {

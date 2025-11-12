@@ -62,6 +62,11 @@
       "x": 0,
       "y": 0,
       "z": 1
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 34
     }
   },
   "stackLimit": 5,

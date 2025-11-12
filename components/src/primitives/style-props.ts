@@ -169,8 +169,8 @@ const layoutStyles = (props: Types.StyleProps): CSSObject => {
   const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
   if (size != null) {
-    styles.width = styles.width ?? ((size as unknown) as typeof styles.width)
-    styles.height = styles.height ?? ((size as unknown) as typeof styles.height)
+    styles.width = styles.width ?? (size as unknown as typeof styles.width)
+    styles.height = styles.height ?? (size as unknown as typeof styles.height)
   }
 
   return styles
@@ -197,4 +197,4 @@ export const styleProps = (props: Types.StyleProps): CSSObject => ({
 })
 
 export const isntStyleProp = (prop: string | Text): boolean =>
-  !STYLE_PROPS.includes(prop as typeof STYLE_PROPS[number])
+  !STYLE_PROPS.includes(prop as (typeof STYLE_PROPS)[number])

@@ -74,8 +74,8 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
         nozzle_map=result.nozzle_map,
-        back_left_corner_offset=Point(0, 0, 10.45),
-        front_right_corner_offset=Point(0, 0, 10.45),
+        back_left_corner_offset=Point(-16, 22.25, 10.45),
+        front_right_corner_offset=Point(16, -22.25, 10.45),
         pipette_lld_settings={},
         plunger_positions={
             "top": 19.5,
@@ -86,6 +86,7 @@ def test_get_virtual_pipette_static_config(
         shaft_ul_per_mm=0.785,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={VolumeModes.default: 1.0},
     )
 
 
@@ -113,8 +114,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
         nozzle_map=result1.nozzle_map,
-        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
-        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        back_left_corner_offset=Point(-38, 0.0, -259.15),
+        front_right_corner_offset=Point(11.5, -64.0, -259.15),
         pipette_lld_settings={
             "t20": {"minHeight": 1.5, "minVolume": 0.0},
             "t50": {"minHeight": 1.0, "minVolume": 0.0},
@@ -128,6 +129,10 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={
+            VolumeModes.default: 5.0,
+            VolumeModes.lowVolumeDefault: 1.0,
+        },
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -151,8 +156,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
         nozzle_map=result2.nozzle_map,
-        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
-        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        back_left_corner_offset=Point(-38, 0.0, -259.15),
+        front_right_corner_offset=Point(11.5, -64.0, -259.15),
         pipette_lld_settings={
             "t20": {"minHeight": 1.5, "minVolume": 0.0},
             "t50": {"minHeight": 1.0, "minVolume": 0.0},
@@ -166,6 +171,10 @@ def test_configure_virtual_pipette_for_volume(
         shaft_ul_per_mm=0.785,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
+        available_volume_modes_min_vol={
+            VolumeModes.default: 5.0,
+            VolumeModes.lowVolumeDefault: 1.0,
+        },
     )
 
 
@@ -205,6 +214,9 @@ def test_load_virtual_pipette_by_model_string(
         shaft_ul_per_mm=9.621,
         available_sensors=AvailableSensorDefinition(sensors=[]),
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={
+            VolumeModes.default: 20.0,
+        },
     )
 
 
@@ -307,6 +319,7 @@ def pipette_dict(
         "shaft_ul_per_mm": 5.0,
         "available_sensors": available_sensors,
         "volume_mode": VolumeModes.lowVolumeDefault,
+        "available_volume_modes": {},
     }
 
 
@@ -358,6 +371,7 @@ def test_get_pipette_static_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.lowVolumeDefault,
+        available_volume_modes_min_vol={},
     )
 
 

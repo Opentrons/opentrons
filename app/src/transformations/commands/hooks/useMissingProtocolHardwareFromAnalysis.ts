@@ -15,10 +15,8 @@ export const useMissingProtocolHardwareFromAnalysis = (
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const {
-    requiredProtocolHardware,
-    isLoading,
-  } = useRequiredProtocolHardwareFromAnalysis(analysis)
+  const { requiredProtocolHardware, isLoading } =
+    useRequiredProtocolHardwareFromAnalysis(analysis)
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,

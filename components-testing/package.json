@@ -1,0 +1,24 @@
+{
+  "name": "components-testing",
+  "version": "1.0.0",
+  "description": "Minimal React app with Vite for testing components and shared-data packages",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:update-snapshots": "playwright test --update-snapshots"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/react": "18.2.51",
+    "@types/react-dom": "18.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.3.3",
+    "vite": "7.1.1"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

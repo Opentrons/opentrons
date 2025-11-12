@@ -44,7 +44,7 @@ from .module_validation_and_errors import (
 from .labware import Labware
 from . import validation
 from . import Task
-
+from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MIN, BLOCK_VOL_MAX
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
@@ -685,31 +685,31 @@ class ThermocyclerContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> None:
-        """
-        Set the target temperature for the well block, in °C.
+        """Set the target temperature for the well block, in °C.
 
-        Args:
-            temperature: A value between 4 and 99, representing the target
-                temperature in °C.
-            hold_time_minutes: The number of minutes to hold, after reaching
-                `temperature`, before proceeding to the next command. If
-                `hold_time_seconds` is also specified, the times are added
-                together.
-            hold_time_seconds: The number of seconds to hold, after reaching
-                `temperature`, before proceeding to the next command. If
-                `hold_time_minutes` is also specified, the times are added
-                together.
-            block_max_volume: The greatest volume of liquid contained in any
-                individual well of the loaded labware, in µL. If not specified,
-                the default is 25 µL. *Changed in version 2.27:* After API
-                version 2.27 it will attempt to use the liquid tracking of the
-                labware first and then fall back to the 25 if there is no
-                probed or loaded liquid.
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
+        :param hold_time_minutes: The number of minutes to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_seconds`` is also
+                                  specified, the times are added together.
+        :param hold_time_seconds: The number of seconds to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_minutes`` is also
+                                  specified, the times are added together.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
 
-        !!! note
-            If `hold_time_minutes` and `hold_time_seconds` are not specified,
-            the Thermocycler will proceed to the next command immediately after
-            `temperature` is reached.
+        .. note::
+
+            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
+            specified, the Thermocycler will proceed to the next command
+            immediately after ``temperature`` is reached.
         """
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes
@@ -735,20 +735,18 @@ class ThermocyclerContext(ModuleContext):
         """Starts to set the target temperature for the well block, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
-        Args:
-            temperature: A value between 4 and 99, representing the target
-                temperature in °C.
-            block_max_volume: The greatest volume of liquid contained in any
-                individual well of the loaded labware, in µL. If not specified,
-                the default is 25 µL.
-                
-                *Changed in version 2.27:* After API version
-                2.27 it will attempt to use the liquid tracking of the labware
-                first and then fall back to the 25 if there is no probed or loaded
-                liquid.
+        :param temperature: A value between 4 and 99, representing the target
+                            temperature in °C.
+        :param block_max_volume: The greatest volume of liquid contained in any
+                                 individual well of the loaded labware, in µL.
+                                 If not specified, the default is 25 µL.
+                                 After API version 2.27 it will attempt to use
+                                 the liquid tracking of the labware first and
+                                 then fall back to the 25 if there is no probed
+                                 or loaded liquid.
         """
 
         if block_max_volume is None:
@@ -766,12 +764,29 @@ class ThermocyclerContext(ModuleContext):
         """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
-        Args:
-            temperature: A value between 37 and 110, representing the target
-                temperature in °C.
+        :param temperature: A value between 37 and 110, representing the target
+                            temperature in °C.
+
+        .. note::
+
+            The Thermocycler will proceed to the next command immediately after
+            ``temperature`` is reached.
+
+        """
+        self._core.set_target_lid_temperature(celsius=temperature)
+        self._core.wait_for_lid_temperature()
+
+    @publish(command=cmds.thermocycler_start_set_lid_temperature)
+    @requires_version(2, 27)
+    def start_set_lid_temperature(self, temperature: float) -> Task:
+        """Set the target temperature for the heated lid, in °C.
+
+        Returns a task object that represents concurrent preheating.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
+        the preheat to complete.
 
         !!! note
             The Thermocycler will proceed to the next command immediately after
@@ -1002,6 +1017,10 @@ class ThermocyclerContext(ModuleContext):
                     # ignore simulated probe results
                     if isinstance(well_vol, float):
                         max_vol = max(max_vol, well_vol)
+                    if max_vol > BLOCK_VOL_MAX:
+                        max_vol = BLOCK_VOL_MAX
+                    elif max_vol < BLOCK_VOL_MIN:
+                        max_vol = BLOCK_VOL_MIN
         return max_vol
 
 
@@ -1652,12 +1671,19 @@ class FlexStackerContext(ModuleContext):
                 `adapter_namespace` now independently follows the same search rules described
                 in `namespace`. Formerly, it took the exact `namespace` value.
 
-            adapter_version (int): Applies to `adapter` the same way that `version`
-                applies to `load_name`.
+            .. versionchanged:: 2.26
+                ``adapter_namespace`` may now be specified explicitly. When you've specified ``namespace`` for ``load_name`` but not ``adapter_namespace``, ``adapter_namespace`` now independently follows the same search rules described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
-                *Changed in version 2.26:* `adapter_version` may now be specified explicitly.
-                When unspecified, improved search rules prevent selecting a version that does
-                not exist.
+        :param adapter_version: Applies to ``adapter`` the same way that ``version``
+            applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``adapter_version`` may now be specified explictly. When unspecified, improved search rules prevent selecting a version that does not exist.
+
+        :param lid: A lid to load the on top of the main labware. Accepts the same
+            values as the ``load_name`` parameter of :py:meth:`~.ProtocolContext.load_lid_stack`. The
+            lid will use the same namespace as the labware, and the API will
+            choose the lid's version automatically.
 
             lid (str): A lid to load on top of the main labware. Accepts the same
                 values as the `load_name` parameter of
@@ -1665,13 +1691,20 @@ class FlexStackerContext(ModuleContext):
                 The lid will use the same namespace as the labware, and the API will
                 choose the lid's version automatically.
 
-            lid_namespace (str): Applies to `lid` the same way that `namespace`
-                applies to `load_name`.
+            .. versionchanged:: 2.26
+               ``lid_namespace`` may now be specified explicitly.
+               When you've specified ``namespace`` for ``load_name`` but not ``lid_namespace``,
+               ``lid_namespace`` now independently follows the same search rules
+               described in ``namespace``. Formerly, it took the exact ``namespace`` value.
 
-                *Changed in version 2.26:* `lid_namespace` may now be specified explicitly.
-                When you've specified `namespace` for `load_name` but not `lid_namespace`,
-                `lid_namespace` now independently follows the same search rules described
-                in `namespace`. Formerly, it took the exact `namespace` value.
+        :param lid_version: Applies to ``lid`` the same way that ``version``
+            applies to ``load_name``.
+
+            .. versionchanged:: 2.26
+               ``lid_version`` may now be specified explicitly. When unspecified, improved search rules prevent selecting a version that does not exist.
+
+        :param count: The number of labware that the Flex Stacker should store. If not specified, this will be the maximum amount of this kind of
+            labware that the Flex Stacker is capable of storing.
 
             lid_version (int): Applies to `lid` the same way that `version`
                 applies to `load_name`.

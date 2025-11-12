@@ -81,7 +81,7 @@ const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   thermocyclerModuleType: 'thermocycler',
 }
 
-const THERMOCYCLER_SLOTS = ['8', '9', '10', '11']
+const THERMOCYCLER_SLOTS = ['7', '8', '10', '11']
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -109,9 +109,8 @@ export function Ot2Modules(): JSX.Element {
   const [entityToDelete, setDeleteEntityInUseModal] = useState<string | null>(
     null
   )
-  const [changeModuleWarningInfo, displayModuleWarning] = useState<boolean>(
-    false
-  )
+  const [changeModuleWarningInfo, displayModuleWarning] =
+    useState<boolean>(false)
   const { modules, pipettes, labware } = initialDeckSetup
   const hasMagneticModuleSteps = Object.values(savedSteps).find(
     step => step.stepType === 'magnet'
@@ -120,14 +119,12 @@ export function Ot2Modules(): JSX.Element {
     module => module.type === MAGNETIC_MODULE_TYPE
   )?.model
 
-  const [
-    magnetModuleModel,
-    setMagnetModuleModel,
-  ] = useState<MagneticModuleModels | null>(
-    hasMagneticModuleSteps && magModModel
-      ? (magModModel as MagneticModuleModels)
-      : null
-  )
+  const [magnetModuleModel, setMagnetModuleModel] =
+    useState<MagneticModuleModels | null>(
+      hasMagneticModuleSteps && magModModel
+        ? (magModModel as MagneticModuleModels)
+        : null
+    )
   const supportedModules = OT2_SUPPORTED_MODULE_MODELS
   const hasThermocycler = Object.values(modules).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
@@ -172,11 +169,15 @@ export function Ot2Modules(): JSX.Element {
           COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
         ).includes(lw.def.parameters.loadName)
     )?.def.metadata.displayName
-    const incompatibleLabwareSlots = Object.values(labware)
-      .filter(lw =>
-        THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
-      )
-      ?.map(lw => getSlotInLocationStack(lw.stack))
+    const incompatibleLabwareSlots = [
+      ...new Set(
+        Object.values(labware)
+          .filter(lw =>
+            THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
+          )
+          .map(lw => getSlotInLocationStack(lw.stack))
+      ),
+    ]
     if (somethingInSlotModule) {
       makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
     } else if (
@@ -287,9 +288,10 @@ export function Ot2Modules(): JSX.Element {
   const showGen1MultichannelCollisionWarnings =
     !disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
-    ? getSlotsWithCollisions(deckDef, Object.values(modules))
-    : []
+  const multichannelWarningSlotIds: AddressableAreaName[] =
+    showGen1MultichannelCollisionWarnings
+      ? getSlotsWithCollisions(deckDef, Object.values(modules))
+      : []
 
   //  for switch magnetic module models since the units are 1/2mm and mm
   const changeModuleWarning = useBlockingHint({

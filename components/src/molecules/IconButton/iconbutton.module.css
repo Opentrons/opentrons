@@ -6,10 +6,11 @@
   justify-content: center;
   padding: var(--spacing-12);
   border-radius: 50%;
+  background-color: var(--variant-default);
 }
 
 .icon_button:active {
-  background-color: var(--active-color);
+  background-color: var(--variant-active);
 }
 
 .icon_button:hover {

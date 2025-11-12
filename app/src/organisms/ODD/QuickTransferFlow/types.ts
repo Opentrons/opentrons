@@ -27,7 +27,7 @@ export interface QuickTransferWizardState {
   // Note added for liquid classes in Quick Transfer
   path?: PathOption
   changeTip?: ChangeTipOptions
-  dropTipLocation?: CutoutConfig
+  dropTipLocation?: CutoutConfig | string
   liquidClassName?: string
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
@@ -39,8 +39,10 @@ export type ChangeTipOptions =
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
-export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
-export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export type AspirateSettingOption =
+  (typeof ASPIRATE_SETTING_OPTIONS)[keyof typeof ASPIRATE_SETTING_OPTIONS]
+export type DispenseSettingOption =
+  (typeof DISPENSE_SETTING_OPTIONS)[keyof typeof DISPENSE_SETTING_OPTIONS]
 export interface SettingItem {
   option: string
   copy: string
@@ -118,7 +120,7 @@ export interface QuickTransferSummaryState {
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
-  dropTipLocation: CutoutConfig
+  dropTipLocation: CutoutConfig | string
   liquidClassName: string
   conditionAspirate?: number
   disposalVolumeDispenseSettings?: {
@@ -288,7 +290,7 @@ interface SetChangeTip {
 }
 interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
-  location: CutoutConfig
+  location: CutoutConfig | string
 }
 
 interface SetLiquidClassAction {

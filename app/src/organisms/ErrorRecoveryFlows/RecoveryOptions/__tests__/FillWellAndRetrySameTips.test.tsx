@@ -84,8 +84,8 @@ describe('FillWellAndRetrySameTips', () => {
       ...props,
       recoveryMap: {
         ...props.recoveryMap,
-        step:
-          RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
+        step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS
+          .RETRY_SAME_TIPS,
       },
     }
     render(props)

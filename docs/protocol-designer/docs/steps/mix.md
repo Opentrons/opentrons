@@ -11,4 +11,9 @@ You can customize settings for your mix step in a two-part form. Just like in a 
   <figcaption>Select wells, volume, repetitions, and tip management settings in the first mix step form.</figcaption>
 </figure>
 
-In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing, and blowout and touch tip after dispensing. See the advanced settings table in [Transfer steps](transfer.md) for descriptions of each.
+!!! Note
+    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol. 
+
+In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing, and blowout and touch tip after dispensing. See the advanced settings for [Transfer steps](transfer.md#additional-settings) for descriptions of each.
+
+Like a transfer step, mix steps are blocked by lids on labware. Use a move step to remove lids, then add a mix step to your protocol. 

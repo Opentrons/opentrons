@@ -18,6 +18,7 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   getNextTiprack,
@@ -29,9 +30,11 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -141,6 +144,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
     sourceLabware,
     sourceWell,
     tipRack,
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -162,9 +168,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const isMultiChannelPipette = pipetteEntities[pipette]?.spec.channels !== 1
-  const isTouchTipDisabled = labwareEntities[
-    sourceLabware
-  ]?.def.parameters.quirks?.includes('touchTipDisabled')
+  const isTouchTipDisabled =
+    labwareEntities[sourceLabware]?.def.parameters.quirks?.includes(
+      'touchTipDisabled'
+    )
   const aspirateAirGapVolume = args.aspirateAirGapVolume ?? 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume ?? 0
   const disposalVolume =
@@ -436,6 +443,33 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
+
   const pythonArgs = [
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
@@ -454,6 +488,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ]
       : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
@@ -594,19 +631,31 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ]
         : []
 
-      const tipCommands = changeTipNow
-        ? [
-            curryCommandCreator(replaceTip, {
-              pipette,
-              dropTipLocation:
-                isReturnTip && fallBackTrashLikeId != null
-                  ? fallBackTrashLikeId
-                  : dropTipLocation,
-              tipRack,
-              ...(nozzles != null ? { nozzles } : {}),
-            }),
-          ]
-        : []
+      let tipCommands: CurriedCommandCreator[] = []
+      if (changeTipNow) {
+        const nextTip = targetTips?.shift()
+        tipCommands = [
+          curryCommandCreator(replaceTip, {
+            pipette,
+            dropTipLocation:
+              isReturnTip && fallBackTrashLikeId != null
+                ? fallBackTrashLikeId
+                : dropTipLocation,
+            tipRack,
+            ...(nozzles != null ? { nozzles } : {}),
+            ...(tipTracking === MANUAL &&
+            nextTip != null &&
+            tiprackSelected != null
+              ? {
+                  tipSelectionArgs: {
+                    tipRackId: tiprackSelected,
+                    tipWell: nextTip,
+                  },
+                }
+              : {}),
+          }),
+        ]
+      }
       // TODO (nd, 05/20/2025): uncomment and refine below logic once meniscus-relative pipetting is supported in PD
       // let liquidProbeCommand: CurriedCommandCreator[] = []
       // if (changeTipNow && !probedWells.has(sourceWell)) {
@@ -657,7 +706,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: dispenseAirGapDispenseFlowRate,
                 ...(dispenseCorrectionVolumeForDispenseAirGap > 0
                   ? {
-                      correctionVolume: dispenseCorrectionVolumeForDispenseAirGap,
+                      correctionVolume:
+                        dispenseCorrectionVolumeForDispenseAirGap,
                     }
                   : {}),
                 pushOut: 0,
@@ -798,7 +848,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateAirGapAspirateFlowRate,
                 ...(aspirateCorrectionVolumeForAspirateAirGap > 0
                   ? {
-                      correctionVolume: aspirateCorrectionVolumeForAspirateAirGap,
+                      correctionVolume:
+                        aspirateCorrectionVolumeForAspirateAirGap,
                     }
                   : {}),
               }),
@@ -1061,7 +1112,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     flowRate: dispenseAirGapAspirateFlowRate,
                     ...(aspirateCorrectionVolumeForDispenseAirGap > 0
                       ? {
-                          correctionVolume: aspirateCorrectionVolumeForDispenseAirGap,
+                          correctionVolume:
+                            aspirateCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
                   }),
@@ -1126,9 +1178,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               ...getAirGapAfterDispenseCommands(true),
             ]
           } else if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-            const finalAirGapAfterDispenseCommands = getAirGapAfterDispenseCommands(
-              true
-            )
+            const finalAirGapAfterDispenseCommands =
+              getAirGapAfterDispenseCommands(true)
             advancedDispenseArgsCommands = [
               ...getTouchTipAfterDispenseRetractCommands(false),
               ...getAirGapAfterDispenseCommands(false),

@@ -17,24 +17,26 @@ export const mockPipetteOffsetTipRack: CalibrationLabware = {
   definition: fixtureTiprack300ul as CalibrationLabware['definition'],
 }
 
-export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails = {
-  instrument: {
-    model: 'fake_pipette_model' as any,
-    name: 'fake_pipette_name',
-    tipLength: 42,
-    mount: 'right',
-    serial: 'fake serial 2',
-    defaultTipracks: [],
-  },
-  currentStep: 'labwareLoaded',
-  labware: [mockPipetteOffsetTipRack],
-  shouldPerformTipLength: false,
-  supportedCommands: [],
-}
+export const mockPipetteOffsetCalibrationSessionDetails: PipetteOffsetCalibrationSessionDetails =
+  {
+    instrument: {
+      model: 'fake_pipette_model' as any,
+      name: 'fake_pipette_name',
+      tipLength: 42,
+      mount: 'right',
+      serial: 'fake serial 2',
+      defaultTipracks: [],
+    },
+    currentStep: 'labwareLoaded',
+    labware: [mockPipetteOffsetTipRack],
+    shouldPerformTipLength: false,
+    supportedCommands: [],
+  }
 
-export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams = {
-  mount: 'left',
-  shouldRecalibrateTipLength: true,
-  tipRackDefinition: null,
-  hasCalibrationBlock: true,
-}
+export const mockPipetteOffsetCalibrationSessionParams: PipetteOffsetCalibrationSessionParams =
+  {
+    mount: 'left',
+    shouldRecalibrateTipLength: true,
+    tipRackDefinition: null,
+    hasCalibrationBlock: true,
+  }

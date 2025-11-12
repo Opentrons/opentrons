@@ -26,7 +26,7 @@ from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
-from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.resources import FileProvider, CameraProvider
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -307,3 +307,9 @@ def mock_command_note_adder(decoy: Decoy) -> CommandNoteAdder:
 def file_provider(decoy: Decoy) -> FileProvider:
     """Get a mocked out FileProvider."""
     return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture
+def camera_provider(decoy: Decoy) -> CameraProvider:
+    """Get a mocked out CameraProvider."""
+    return decoy.mock(cls=CameraProvider)

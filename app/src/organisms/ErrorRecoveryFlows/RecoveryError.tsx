@@ -97,11 +97,8 @@ export function RecoveryDropTipFlowErrors({
 }: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
-  const {
-    ERROR_WHILE_RECOVERING,
-    OPTION_SELECTION,
-    DROP_TIP_FLOWS,
-  } = RECOVERY_MAP
+  const { ERROR_WHILE_RECOVERING, OPTION_SELECTION, DROP_TIP_FLOWS } =
+    RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
 

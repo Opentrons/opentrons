@@ -108,24 +108,33 @@ const updatePatchOnPipetteChannelChange = (
 const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates to null
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
     let nozzles: NozzleConfigurationStyle | null = null
+    let firstDefaultTiprackURIOnDeck: string | null = null
     const newPipette = patch.pipette
 
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
       const hasPartialTipSupportedChannel =
         pipetteEntities[newPipette].spec.channels !== 1
       nozzles = hasPartialTipSupportedChannel ? ALL : null
+      const pipetteTipracks = pipetteEntities[newPipette].tiprackDefURI
+      const labwareURIsOnDeck = new Set(
+        Object.values(labwareEntities).map(({ labwareDefURI }) => labwareDefURI)
+      )
+      firstDefaultTiprackURIOnDeck =
+        pipetteTipracks?.find(uri => labwareURIsOnDeck.has(uri)) ?? null
     }
 
     return {
       ...patch,
       ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate'),
       nozzles,
+      tipRack: firstDefaultTiprackURIOnDeck,
     }
   }
 
@@ -143,6 +152,19 @@ const updatePatchOnTiprackChange = (
     }
   }
 
+  return patch
+}
+
+const updatePatchOnNozzlesChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'nozzles')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
   return patch
 }
 
@@ -169,7 +191,13 @@ export function dependentFieldsUpdateMix(
         pipetteEntities
       ),
     chainPatch =>
-      updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+      updatePatchOnPipetteChange(
+        chainPatch,
+        rawForm,
+        pipetteEntities,
+        labwareEntities
+      ),
     chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
   ])
 }

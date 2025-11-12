@@ -15,7 +15,6 @@ from opentrons.legacy_commands import publisher
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.pipette.types import PipetteNameType
 
 from . import validation
 from .core.common import ProtocolCore, RobotCore
@@ -132,7 +131,7 @@ class RobotContext(publisher.CommandPublisher):
 
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
@@ -171,7 +170,7 @@ class RobotContext(publisher.CommandPublisher):
                 axes in mm/s.
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
 
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
@@ -327,7 +326,7 @@ class RobotContext(publisher.CommandPublisher):
         Note that capitalization does not matter.
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
 
         return validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel

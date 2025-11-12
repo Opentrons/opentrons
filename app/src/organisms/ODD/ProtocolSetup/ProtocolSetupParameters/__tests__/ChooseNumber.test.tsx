@@ -16,8 +16,10 @@ import type { NumberParameter } from '@opentrons/shared-data'
 vi.mock('/app/organisms/ToasterOven')
 
 const mockHandleGoBack = vi.fn()
-const mockIntNumberParameterData = mockRunTimeParameterData[5] as NumberParameter
-const mockFloatNumberParameterData = mockRunTimeParameterData[6] as NumberParameter
+const mockIntNumberParameterData =
+  mockRunTimeParameterData[5] as NumberParameter
+const mockFloatNumberParameterData =
+  mockRunTimeParameterData[6] as NumberParameter
 const mockSetParameter = vi.fn()
 const mockMakeSnackbar = vi.fn()
 

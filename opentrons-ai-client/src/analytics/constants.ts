@@ -25,4 +25,4 @@ export const ANALYTICS = {
   FEEDBACK_SENT: 'feedback-sent',
 } as const
 
-export type AnalyticsTrackEvent = typeof ANALYTICS[keyof typeof ANALYTICS]
+export type AnalyticsTrackEvent = (typeof ANALYTICS)[keyof typeof ANALYTICS]

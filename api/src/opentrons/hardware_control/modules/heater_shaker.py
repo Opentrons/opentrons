@@ -9,6 +9,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, Poller
@@ -425,6 +426,7 @@ class HeaterShakerReader(Reader):
         await self.read_temperature()
         await self.read_rpm()
         await self.read_labware_latch()
+        await self._read_errors()
         self._set_error(None)
 
     def on_error(self, exception: Exception) -> None:
@@ -449,3 +451,13 @@ class HeaterShakerReader(Reader):
                 self.error = str(exception.args[0])
             except Exception:
                 self.error = repr(exception)
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.

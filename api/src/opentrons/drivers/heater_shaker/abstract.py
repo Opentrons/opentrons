@@ -74,3 +74,8 @@ class AbstractHeaterShakerDriver(ABC):
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
         ...
+
+    @abstractmethod
+    async def get_error_state(self) -> None:
+        """Raise if the module is in an error state."""
+        ...

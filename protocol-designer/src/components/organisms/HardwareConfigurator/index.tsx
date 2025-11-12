@@ -40,13 +40,8 @@ interface HardwareConfiguratorProps {
 export function HardwareConfigurator(
   props: HardwareConfiguratorProps
 ): JSX.Element {
-  const {
-    modules,
-    setValue,
-    hasGripper,
-    fixtures,
-    updateInitialDeckState,
-  } = props
+  const { modules, setValue, hasGripper, fixtures, updateInitialDeckState } =
+    props
   const dispatch = useDispatch()
   const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -71,15 +66,12 @@ export function HardwareConfigurator(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
       const defaultModuleConfig: CutoutConfig = {
-        cutoutId: getCutoutIdFromAddressableArea(
-          module.slot,
-          deckDef
-        ) as CutoutId,
+        cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
         cutoutFixtureId: hasThermocycler
           ? THERMOCYCLER_V2_FRONT_FIXTURE
           : 'cutoutFixtureId' in module
-          ? module.cutoutFixtureId ?? 'singleStandardSlot'
-          : 'singleStandardSlot',
+            ? (module.cutoutFixtureId ?? 'singleStandardSlot')
+            : 'singleStandardSlot',
       }
       const thermocyclerA1Config: CutoutConfig = {
         cutoutId: 'cutoutA1',

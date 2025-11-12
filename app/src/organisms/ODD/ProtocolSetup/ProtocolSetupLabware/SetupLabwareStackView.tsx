@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -13,6 +12,7 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -76,9 +76,8 @@ export function SetupLabwareStackView({
     lw => lw.definitionUri === firstDefUri
   )
 
-  const [showLiquidDetailsModal, setShowLiquidDetailsModal] = useState<boolean>(
-    false
-  )
+  const [showLiquidDetailsModal, setShowLiquidDetailsModal] =
+    useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
   const selectedLabwareStackPosition =
     labwareInStack.length -
@@ -93,9 +92,8 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
-  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
-    labwareDefinition
-  )
+  const labwareCornerOffsetFromSlot =
+    getSchema2CornerOffsetFromSlot(labwareDefinition)
   const labwareDimensions = getSchema2Dimensions(labwareDefinition)
 
   return (
@@ -131,7 +129,7 @@ export function SetupLabwareStackView({
           >
             {t('labware_in')}
           </StyledText>
-          <DeckInfoLabel
+          <RobotInfoLabel
             deckLabel={
               slotName === 'offDeck'
                 ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')

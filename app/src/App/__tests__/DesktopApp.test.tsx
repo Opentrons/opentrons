@@ -82,11 +82,9 @@ describe('DesktopApp', () => {
     )
     vi.mocked(AlertsModal).mockReturnValue(<></>)
     vi.mocked(useIsFlex).mockReturnValue(true)
-    vi.mocked(
-      LocalizationProvider
-    ).mockImplementation((props: LocalizationProviderProps) => (
-      <>{props.children}</>
-    ))
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
+    )
     when(vi.mocked(useFeatureFlag)).calledWith('reactScan').thenReturn(false)
   })
   afterEach(() => {

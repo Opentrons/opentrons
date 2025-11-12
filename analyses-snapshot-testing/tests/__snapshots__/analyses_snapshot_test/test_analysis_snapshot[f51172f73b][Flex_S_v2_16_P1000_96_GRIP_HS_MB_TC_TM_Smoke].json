@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -9200,7 +9203,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -24142,11 +24145,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForBlockTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0e5240552623cbac7620f3b8279476d9",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/setTargetLidTemperature",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ada6e165c6943970043725000ccc9aee",
+      "key": "73002ee44850f6486afefca588db3bc1",
       "notes": [],
       "params": {
         "celsius": 80.0,
@@ -24160,11 +24177,25 @@
       "status": "succeeded"
     },
     {
+      "commandType": "thermocycler/waitForLidTemperature",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d0147a3cf60eb9f34683f38475f5971f",
+      "notes": [],
+      "params": {
+        "moduleId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
       "commandType": "thermocycler/deactivateBlock",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "50354430941e0cc3b86fb1535a9af003",
+      "key": "da6fc3d109a7944c03f7239704d5961a",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24178,7 +24209,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "af7043b176f7b89b797994de9f87e604",
+      "key": "cd884c4e3733db40753853ea0887ead8",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24192,7 +24223,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "abd3ce2b776e30cbc95fb8670f750cdb",
+      "key": "1abc253d00dbde0e4dc744e49dfc064a",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24208,7 +24239,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "93093a45d760c905347c17f5cc50ca49",
+      "key": "c942409b57eecf27ed020b00fa4d9b8b",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24222,7 +24253,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ebbb4ef3bfa602ffeef94f5289e6307a",
+      "key": "9b43a03bed4d3b80142cb23f17439b4b",
       "notes": [],
       "params": {
         "celsius": 75.0,
@@ -24239,7 +24270,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c63ddb11a2965a1e358d29b034165672",
+      "key": "b3d2f5857c8a58275b9e9d2ea17b0563",
       "notes": [],
       "params": {
         "moduleId": "UUID",
@@ -24256,7 +24287,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "63c73c067e4980de83abedbe1191f275",
+      "key": "86d5c55608ead64ddf06400ca3b3a189",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24270,7 +24301,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b13419968251c8dc4a79f6c9306a9c6c",
+      "key": "b0db60ce1d84cd6eb59f62065501af0e",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24284,7 +24315,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a8591557dc06283eb0949f6d77e24b7e",
+      "key": "a9203f5d2273b2cf5cef50b46ae9761d",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24298,7 +24329,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2aee139b58f1afa4cbc37c3ed1529fe3",
+      "key": "7ed0e63a0dcc608abc0611beaff9636a",
       "notes": [],
       "params": {
         "celsius": 80.0,
@@ -24316,7 +24347,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "0a4feddd863abbbdf2e741abd7a71b71",
+      "key": "00d09dc9d220ac1fc3f0f460b9e64de3",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24330,7 +24361,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9ae7476df17deda3f5d9fbca43bb4243",
+      "key": "bf1a8c5b060ae8a31e373af1228d018d",
       "notes": [],
       "params": {
         "celsius": 10.0,
@@ -24348,7 +24379,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "898cf079f43f67134c075e9280ad7993",
+      "key": "278c2295398480138f573a815accc9f7",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24362,7 +24393,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "40df1bd56aa000942d034568938ecff1",
+      "key": "7c582f04399ff30a49217a15572296da",
       "notes": [],
       "params": {
         "moduleId": "UUID"
@@ -24376,7 +24407,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a03ed0aec13ef82829404b6709b164d9",
+      "key": "444e73ff9ad9ceb2eb4ad431b000db65",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -24491,7 +24522,7 @@
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

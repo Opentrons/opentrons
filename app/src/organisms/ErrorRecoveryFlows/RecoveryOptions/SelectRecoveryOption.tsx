@@ -60,7 +60,7 @@ export function SelectRecoveryOptionHome({
     failedCommand?.byRunRecord.commandType
   )
   const [selectedRoute, setSelectedRoute] = useState<RecoveryRoute>(
-    head(validRecoveryOptions) as RecoveryRoute
+    head(validRecoveryOptions)!
   )
 
   useCurrentTipStatus(determineTipStatus)

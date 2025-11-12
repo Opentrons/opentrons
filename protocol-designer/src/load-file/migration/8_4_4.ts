@@ -11,13 +11,8 @@ import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>
 ): ProtocolFile<PDMetadata> => {
-  const {
-    designerApplication,
-    commands,
-    labwareDefinitions,
-    liquids,
-    robot,
-  } = appData
+  const { designerApplication, commands, labwareDefinitions, liquids, robot } =
+    appData
 
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')

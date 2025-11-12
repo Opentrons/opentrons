@@ -9,7 +9,7 @@ When you're finished creating and editing your protocol, click **Back to overvie
 
     As of Protocol Designer 8.5.0, you can still import any .json protocol created in Protocol Designer and make changes. When you're finished, export and download your new .py protocol.
 
-If your protocol contains unused hardware or labware, Protocol Designer will ask if you'd like to remove it before exporting the protocol.
+If your protocol contains unused hardware or labware, Protocol Designer will ask you to remove it before exporting the protocol. Protocols can't be run on the Flex or OT-2 with unattached hardware, like modules. 
 
 <figure class="screenshot" markdown>
   ![Protocol overview](images/protocol_overview.png)

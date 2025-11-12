@@ -51,8 +51,8 @@ export function Delay(props: DelayProps): JSX.Element {
   )
   const [delayDuration, setDelayDuration] = useState<number | null>(
     kind === 'aspirate'
-      ? state.delayAspirate?.delayDuration ?? null
-      : state.delayDispense?.delayDuration ?? null
+      ? (state.delayAspirate?.delayDuration ?? null)
+      : (state.delayDispense?.delayDuration ?? null)
   )
 
   const action =

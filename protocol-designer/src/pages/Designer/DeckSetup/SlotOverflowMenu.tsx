@@ -83,13 +83,10 @@ export function SlotOverflowMenu(
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const [showDeleteLabwareModal, setShowDeleteLabwareModal] = useState<boolean>(
-    false
-  )
-  const [
-    showDeleteEntityInUseModal,
-    setShowDeleteEntityInUseModal,
-  ] = useState<boolean>(false)
+  const [showDeleteLabwareModal, setShowDeleteLabwareModal] =
+    useState<boolean>(false)
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
+    useState<boolean>(false)
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -141,12 +138,7 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-
-    labwareStackOnSlot.forEach(labware => {
-      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
-        dispatch(duplicateLabware(deckSetupLabware[labware].id))
-      }
-    })
+    dispatch(duplicateLabware(labwareStackOnSlot))
     setShowMenuList(false)
   }
 

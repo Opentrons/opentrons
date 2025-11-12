@@ -12,9 +12,10 @@ import { formatTime } from '../../utils'
 
 import type { FormData } from '/protocol-designer/form-types'
 
-export function useStepText(
-  step: FormData
-): { text: string; subtext: string | null } {
+export function useStepText(step: FormData): {
+  text: string
+  subtext: string | null
+} {
   const { i18n, t } = useTranslation(['application', 'protocol_steps'])
   const enableConcurrentModuleActions = useSelector(
     getEnableConcurrentModuleActions

@@ -22,13 +22,13 @@ import type { FormattedPipetteOffsetCalibration } from '.'
 interface RobotSettingsPipetteOffsetCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function RobotSettingsPipetteOffsetCalibration({
   formattedPipetteOffsetCalibrations,
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -37,7 +37,8 @@ export function RobotSettingsPipetteOffsetCalibration({
     enabled: isFlex,
   })
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
-  const attachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipettesFromInstrumentsQuery =
+    useAttachedPipettesFromInstrumentsQuery()
   const ot3AttachedLeftPipetteOffsetCal =
     attachedPipettesFromInstrumentsQuery.left?.data?.calibratedOffset ?? null
   const ot3AttachedRightPipetteOffsetCal =
@@ -75,10 +76,10 @@ export function RobotSettingsPipetteOffsetCalibration({
       {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
+          isRobotBusy={isRobotBusy}
           formattedPipetteOffsetCalibrations={
             formattedPipetteOffsetCalibrations
           }
-          updateRobotStatus={updateRobotStatus}
         />
       ) : (
         <LegacyStyledText as="label" marginTop={SPACING.spacing8}>

@@ -61,12 +61,12 @@ snapshot-test:
 	@echo "ANALYSIS_REF is $(ANALYSIS_REF)"
 	@echo "PROTOCOL_NAMES is $(PROTOCOL_NAMES)"
 	@echo "OVERRIDE_PROTOCOL_NAMES is $(OVERRIDE_PROTOCOL_NAMES)"
-	uv run python -m pytest -k analyses_snapshot_test -vv
+	uv run python -m pytest -k analyses_snapshot_test -v --tb=line
 
 .PHONY: snapshot-audit-test
 snapshot-audit-test:
 	@echo "validate that analysis outcome matches the test intention"
-	uv run python -m pytest -k audit_snapshot_test -vv
+	uv run python -m pytest -k audit_snapshot_test -v --tb=line
 
 .PHONY: snapshot-test-update
 snapshot-test-update:

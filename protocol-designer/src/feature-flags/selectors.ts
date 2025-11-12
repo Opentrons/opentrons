@@ -14,26 +14,17 @@ export const getFeatureFlagData: Selector<Flags> = createSelector(
     ...queryParamsFlags,
   })
 )
-export const getEnabledPrereleaseMode: Selector<
-  boolean | null | undefined
-> = createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
+export const getEnabledPrereleaseMode: Selector<boolean | null | undefined> =
+  createSelector(getFeatureFlagData, flags => flags.PRERELEASE_MODE)
 export const getDisableModuleRestrictions: Selector<
   boolean | null | undefined
 > = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-export const getAllowAllTipracks: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
-)
 export const getEnableComment: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_COMMENT ?? false
-)
-export const getEnableTipPickupLocation: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_TIP_PICKUP_LOCATION ?? false
 )
 export const getEnableHotKeysDisplay: Selector<boolean> = createSelector(
   getFeatureFlagData,
@@ -59,10 +50,11 @@ export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
 )
-export const getEnableConcurrentModuleActions: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
-)
+export const getEnableConcurrentModuleActions: Selector<boolean> =
+  createSelector(
+    getFeatureFlagData,
+    flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
+  )
 export const getEnableJsonExport: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false
@@ -70,4 +62,8 @@ export const getEnableJsonExport: Selector<boolean> = createSelector(
 export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
+)
+export const getEnableTipSelection: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
 )

@@ -86,9 +86,8 @@ export const SetupModulesMap = ({
     })
   )
 
-  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
-    protocolAnalysis
-  )
+  const simplestProtocolDeckConfig =
+    getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex

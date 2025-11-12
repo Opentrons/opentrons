@@ -126,3 +126,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             if angle < 0
             else ThermocyclerLidStatus.OPEN
         )
+
+    @ensure_yield
+    async def get_error_state(self) -> None:
+        return

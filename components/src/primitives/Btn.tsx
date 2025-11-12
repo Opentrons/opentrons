@@ -50,18 +50,14 @@ const BUTTON_VARIANT_STYLE = css`
  *
  * @component
  */
-export const Btn: StyledComponent<
-  'button',
-  any,
-  StyleProps,
-  any
-> = styled.button
-  .withConfig({
-    shouldForwardProp: isntStyleProp,
-  })
-  .attrs((props: HTMLProps<HTMLButtonElement>) => ({
-    type: props.type ?? BUTTON_TYPE_BUTTON,
-  }))`
+export const Btn: StyledComponent<'button', any, StyleProps, any> =
+  styled.button
+    .withConfig({
+      shouldForwardProp: isntStyleProp,
+    })
+    .attrs((props: HTMLProps<HTMLButtonElement>) => ({
+      type: props.type ?? BUTTON_TYPE_BUTTON,
+    }))`
   ${BUTTON_BASE_STYLE}
   ${styleProps}
 `

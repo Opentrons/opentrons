@@ -3,6 +3,7 @@ import type {
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  Height,
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
@@ -18,12 +19,15 @@ import type {
   ShakeSpeedParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  Width,
 } from '@opentrons/shared-data'
 import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AUTOMATIC,
   CLEAN,
   DIRTY,
   EMPTY,
+  MANUAL,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -183,7 +187,8 @@ export interface NormalizedAdditionalEquipmentById {
   }
 }
 
-export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export type AdditionalEquipmentEntity =
+  NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
@@ -219,10 +224,22 @@ export interface GripperEntities {
   [gripperId: string]: GripperEntity
 }
 
-export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
+export type NormalizedPipette =
+  NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
 // when they are de-normalized, the definitions they reference are baked in
+
+// Use this when you need to refer to a particular TYPE of tip rack (such as
+// the opentrons_flex_96_tiprack_200ul). This is used in e.g. the hydrated step
+// forms, where the user selects a tip rack type rather than a specific tip
+// rack on the deck.
+// This interfaces packages together the tip rack URI and the tip rack labware
+// definition for convenience.
+export interface TipRackWithDef extends LabwareDefinition2 {
+  tiprackDefURI: string
+}
+
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
   tiprackLabwareDef: LabwareDefinition2[]
@@ -362,6 +379,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseRetractZOffset: number
   dispenseRetractPositionReference: PositionReference
   dispenseRetractDelay: InnerDelayArgs | null
+  tipTracking: TipTrackingOption
+  tipsSelected: string[][]
+  tiprackSelected: string | null
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -441,6 +461,9 @@ export type MixArgs = CommonArgs & {
   aspirateDelaySeconds: number | null | undefined
   dispenseDelaySeconds: number | null | undefined
   finalPushOut: number
+  tipTracking: TipTrackingOption
+  tipsSelected: string[][]
+  tiprackSelected: string | null
 }
 
 export type PauseArgs = CommonArgs & {
@@ -594,11 +617,23 @@ export interface CommentArgs extends CommonArgs {
   message: string
 }
 
+export interface CaptureImageArgs extends CommonArgs {
+  commandCreatorFnName: 'captureImage'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
+}
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
   | AbsorbanceReaderLidArgs
   | ConsolidateArgs
+  | CaptureImageArgs
   | DistributeArgs
   | MixArgs
   | PauseArgs
@@ -819,3 +854,5 @@ export interface WellContents {
 export interface WellContentsByNumber {
   [wellName: string]: number
 }
+
+export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL

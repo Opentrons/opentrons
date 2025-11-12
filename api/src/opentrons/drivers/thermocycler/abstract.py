@@ -98,3 +98,8 @@ class AbstractThermocyclerDriver(ABC):
     async def jog_lid(self, angle: float) -> None:
         """Send the Jog Lid command."""
         ...
+
+    @abstractmethod
+    async def get_error_state(self) -> None:
+        """Raise if the thermocycler is in an error state."""
+        ...

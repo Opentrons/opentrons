@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
   LegacyStyledText,
@@ -14,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { CodeBlock } from '/app/atoms/CodeBlock'
 import { useProtocolAnalysisErrors } from '/app/resources/runs'
 
 import type { AnalysisError } from '@opentrons/shared-data'
@@ -81,17 +83,17 @@ export function ProtocolAnalysisErrorModal({
       title="Protocol analysis failure"
       onClose={onClose}
     >
-      <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-        {t('analysis_failure_on_robot', {
-          protocolName: displayName,
-          robotName,
-        })}
-      </LegacyStyledText>
-      {errors?.map((error, index) => (
-        <LegacyStyledText as="p" key={index} marginTop={SPACING.spacing16}>
-          {error?.detail}
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          {t('analysis_failure_on_robot', {
+            protocolName: displayName,
+            robotName,
+          })}
         </LegacyStyledText>
-      ))}
+        {errors.map((error, index) => (
+          <CodeBlock key={`error-${index}`}>{error?.detail}</CodeBlock>
+        ))}
+      </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <PrimaryButton
           role="button"

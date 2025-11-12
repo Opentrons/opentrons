@@ -17,10 +17,10 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     vi.mocked(useCurrentRunId).mockReturnValue('123')
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [],
       links: null,
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -33,7 +33,7 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
 
   it('returns false when run status is idle or sessions are not empty', () => {
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
-    vi.mocked(useAllSessionsQuery).mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
           id: 'test',
@@ -44,7 +44,7 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
         },
       ],
       links: {},
-    } as unknown) as UseQueryResult<Sessions, Error>)
+    } as unknown as UseQueryResult<Sessions, Error>)
     const result = useRunStartedOrLegacySessionInProgress()
     expect(result).toBe(false)
   })

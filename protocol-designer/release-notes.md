@@ -8,6 +8,22 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.6.3
+
+**Welcome to Protocol Designer 8.6.3!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer crashes when uploading protocols containing custom labware.
+- Protocol Designer allows scrolling to view details of a transfer step using a "consolidate" pipette path.
+- Eliminates some crashes when deleting liquids that are already used in the protocol.
+
+## Opentrons Protocol Designer Changes in 8.6.1
+
+**Welcome to Protocol Designer 8.6.1!**
+
+This hotfix release updates user information for protocol generation and software versions.
+
 ## Opentrons Protocol Designer Changes in 8.6.0
 
 **Welcome to Protocol Designer 8.6.0!**
@@ -33,6 +49,22 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
 
+### Known Issues
+
+- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.
+
+## Opentrons Protocol Designer Changes in 8.5.6
+
+**Welcome to Protocol Designer 8.5.6!**
+
+This hotfix release addresses a bug when dispensing into a trash bin or waste chute.
+
+## Opentrons Protocol Designer Changes in 8.5.5
+
+**Welcome to Protocol Designer 8.5.5!**
+
+This hotfix release addresses a bug to allow full use of pipettes and tip racks during liquid class transfers.
+
 ## Opentrons Protocol Designer Changes in 8.5.4
 
 **Welcome to Protocol Designer 8.5.4!**
@@ -55,11 +87,6 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
-- Crashes and protocol loss no longer occur when:
-
-  - deleting a pipette involved in a mix step.
-  - deleting a Protocol Designer step title.
-  - checking labware details after deleting a liquid.
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.

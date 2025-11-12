@@ -148,6 +148,7 @@ export interface TCSetTargetBlockTemperatureRunTimeCommand
     TCSetTargetBlockTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
@@ -158,6 +159,7 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
     TCSetTargetLidTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'

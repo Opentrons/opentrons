@@ -1,6 +1,7 @@
 import type { CreateCommand } from '../../../command/types'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type {
+  CommandPreconditions,
   Liquid,
   LoadedLabware,
   LoadedModule,
@@ -135,22 +136,21 @@ export interface ProtocolBase<DesignerApplicationData> {
 }
 
 // NOTE: must be kept in sync with '../schemas/8.json'
-export type ProtocolFile<
-  DesignerApplicationData = {}
-> = ProtocolBase<DesignerApplicationData> &
-  (OT2RobotMixin | OT3RobotMixin) &
-  LabwareV2Mixin &
-  LiquidV1Mixin &
-  (
-    | CommandV8Mixin
-    | CommandV9Mixin
-    | CommandV10Mixin
-    | CommandV11Mixin
-    | CommandV12Mixin
-    | CommandV13Mixin
-    | CommandV14Mixin
-  ) &
-  CommandAnnotationV1Mixin
+export type ProtocolFile<DesignerApplicationData = {}> =
+  ProtocolBase<DesignerApplicationData> &
+    (OT2RobotMixin | OT3RobotMixin) &
+    LabwareV2Mixin &
+    LiquidV1Mixin &
+    (
+      | CommandV8Mixin
+      | CommandV9Mixin
+      | CommandV10Mixin
+      | CommandV11Mixin
+      | CommandV12Mixin
+      | CommandV13Mixin
+      | CommandV14Mixin
+    ) &
+    CommandAnnotationV1Mixin
 
 export type ProtocolStructure = ProtocolBase<{}> &
   RobotStructure &
@@ -179,6 +179,7 @@ export interface ProtocolAnalysisOutput {
   runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
   result: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 

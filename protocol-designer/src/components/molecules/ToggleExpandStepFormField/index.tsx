@@ -70,7 +70,7 @@ export function ToggleExpandStepFormField(
     }
   }
 
-  const label = isSelected ? onLabel : offLabel ?? null
+  const label = isSelected ? onLabel : (offLabel ?? null)
   return (
     <ListButton
       type="noActive"
@@ -87,7 +87,7 @@ export function ToggleExpandStepFormField(
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.grey60}
               >
-                {isSelected ? onLabel : offLabel ?? null}
+                {isSelected ? onLabel : (offLabel ?? null)}
               </StyledText>
             ) : null}
             {toggleElement === 'toggle' ? (

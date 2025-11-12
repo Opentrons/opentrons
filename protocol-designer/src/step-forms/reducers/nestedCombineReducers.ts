@@ -49,7 +49,7 @@ const assertReducerShape = <S extends Record<string, any>, A extends Action>(
 
 export function nestedCombineReducers<
   S extends Record<string, any>,
-  A extends Action
+  A extends Action,
 >(getNextState: GetNextState<S, A>): Reducer<S, A> {
   assertReducerShape(getNextState)
   return (state, action) => {

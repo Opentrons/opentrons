@@ -24,6 +24,7 @@ from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..errors import ErrorOccurrence
 from ..notes.notes import CommandNote
 from ..state.update_types import StateUpdate
+from ..resources.camera_provider import CameraSettings
 from ..types import (
     LabwareOffsetCreateInternal,
     ModuleDefinition,
@@ -237,6 +238,13 @@ class AddLabwareDefinitionAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class AddCameraSettingsAction:
+    """Add Camera settings to be used in place of the Camera Provider accessible settings."""
+
+    enablement_settings: CameraSettings
+
+
+@dataclasses.dataclass(frozen=True)
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
@@ -305,6 +313,7 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddCameraSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,

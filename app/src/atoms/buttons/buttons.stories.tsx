@@ -16,6 +16,7 @@ import {
   TertiaryButton,
   TextOnlyButton,
   ToggleButton,
+  TouchControlButton,
 } from './index'
 
 import type { Meta, Story } from '@storybook/react'
@@ -23,6 +24,21 @@ import type { Meta, Story } from '@storybook/react'
 export default {
   title: 'App/Atoms/Buttons',
 } as Meta
+
+const TouchControlButtonTemplate: Story<
+  React.ComponentProps<typeof TouchControlButton>
+> = args => {
+  return (
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <TouchControlButton {...args} />
+    </Flex>
+  )
+}
+
+export const TouchControl = TouchControlButtonTemplate.bind({})
+TouchControl.args = {
+  children: 'touch control button',
+}
 
 const TertiaryButtonTemplate: Story<
   React.ComponentProps<typeof TertiaryButton>

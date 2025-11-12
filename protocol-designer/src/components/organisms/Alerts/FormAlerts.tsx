@@ -139,7 +139,7 @@ function FormAlertsComponent(props: FormAlertsProps): JSX.Element | null {
 
   const filteredFormErrorsForBanner = visibleFormErrors.reduce<WarningType[]>(
     (acc, error) => {
-      return error.location === 'form'
+      return error.location.includes('form')
         ? [
             ...acc,
             {

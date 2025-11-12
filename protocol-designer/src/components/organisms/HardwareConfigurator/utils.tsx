@@ -76,15 +76,11 @@ export function useDeckConfigurationEditing(
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const dispatch = useDispatch()
   const [targetCutoutId, setTargetCutoutId] = useState<CutoutId | null>(null)
-  const [
-    addressableAreaId,
-    setAddressableAreaId,
-  ] = useState<AddressableAreaNamesWithFakes | null>(null)
+  const [addressableAreaId, setAddressableAreaId] =
+    useState<AddressableAreaNamesWithFakes | null>(null)
 
-  const [
-    existingCutoutFixtureId,
-    setExistingCutoutFixtureId,
-  ] = useState<CutoutFixtureId | null>(null)
+  const [existingCutoutFixtureId, setExistingCutoutFixtureId] =
+    useState<CutoutFixtureId | null>(null)
 
   const addFixtureToCutout = (
     cutoutId: CutoutId,
@@ -301,7 +297,7 @@ export const getThermocyclerFixtures = (
     fixtureGroupKeys.map(cutout => ({
       cutoutId: cutout,
       addressableAreaId: THERMOCYCLER_MODULE_V2,
-      cutoutFixtureId: fixtureGroupMatch[cutout] as CutoutFixtureId,
+      cutoutFixtureId: fixtureGroupMatch[cutout]!,
     }))
   )
 }

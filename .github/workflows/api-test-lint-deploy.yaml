@@ -186,6 +186,9 @@ jobs:
     needs: [test]
     runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read   # Required for checkout
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -221,8 +224,7 @@ jobs:
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to real pypi'
-        uses: './.github/actions/python/pypi-deploy'
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          project: 'api'
-          repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS }}'
+          packages-dir: api/dist/
+          repository-url: https://upload.pypi.org/legacy/

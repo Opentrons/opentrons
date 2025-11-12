@@ -38,10 +38,8 @@ export function RecoveryDoorOpen({
   recoveryCommands,
   currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element {
-  const {
-    resumeRecovery,
-    isResumeRecoveryLoading,
-  } = recoveryActionMutationUtils
+  const { resumeRecovery, isResumeRecoveryLoading } =
+    recoveryActionMutationUtils
   const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')

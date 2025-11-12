@@ -4,11 +4,11 @@ import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   ListItem,
   ListItemDescriptor,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -65,7 +65,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
       width="100%"
     >
       <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-        {isOffDeck ? null : <DeckInfoLabel deckLabel={modifiedLocation} />}
+        {isOffDeck ? null : <RobotInfoLabel deckLabel={modifiedLocation} />}
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t(isOffDeck ? 'labware_detail' : 'slot_detail')}
         </StyledText>

@@ -21,6 +21,7 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
@@ -126,7 +127,9 @@ export function DeckSetupContainer(
     (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
     2
   )
-
+  const hasFlexStacker = Object.values(activeDeckSetup.modules).some(
+    module => module.type === FLEX_STACKER_MODULE_TYPE
+  )
   const isZoomed = Object.values(zoomIn).some(val => val != null)
   const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
   const viewBoxAdjustedNumerical = [
@@ -248,6 +251,7 @@ export function DeckSetupContainer(
               }
               outline="auto"
               zoomed={zoomIn.slot != null}
+              adjustViewBoxForStacker={hasFlexStacker}
               borderRadius={BORDERS.borderRadius12}
             >
               {() => (

@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.26",
 }
 
 
@@ -95,6 +95,7 @@ def run(protocol: ProtocolContext) -> None:
     ONDECK_THERMO = True  # Default True    | On Deck Thermocycler
     ONDECK_TEMP = True
     NOLABEL = False  # Default False   | True = Do not include Liquid Labeling,
+    helpers.comment_protocol_version(protocol, "02")
 
     # =============================== PIPETTE ===============================
     p1000 = protocol.load_instrument("flex_96channel_1000", "left")

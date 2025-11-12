@@ -15,6 +15,7 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import { formatPyStr, PAPI_VERSION } from '@opentrons/step-generation'
 
 import {
   dismissedWarnings,
@@ -152,7 +153,7 @@ metadata = {
     "source": "Protocol Designer",
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.26"}
+requirements = {"robotType": "OT-2", "apiLevel": ${formatPyStr(PAPI_VERSION)}}
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Labware:
@@ -284,7 +285,7 @@ CUSTOM_LABWARE = json.loads("""{"fixture/fixture_trash/1":{"ordering":[["A1"]],"
             },
           },
         },
-        version: '8.6.0',
+        version: '8.7.0',
         name: 'opentrons/protocol-designer',
       },
       robot: { model: OT2_ROBOT_TYPE },
@@ -323,9 +324,12 @@ describe('getLabwareDefinitionsInUse util', () => {
     }
     const allLabwareDefsByURI: LabwareDefByDefURI = {
       assignedTiprackOnDeckURI: assignedTiprackOnDeckDef as LabwareDefinition2,
-      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef as LabwareDefinition2,
-      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
-      nonTiprackLabwareNotOnDeckURI: nonTiprackLabwareNotOnDeckDef as LabwareDefinition2,
+      assignedTiprackNotOnDeckURI:
+        assignedTiprackNotOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareOnDeckURI:
+        nonTiprackLabwareOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareNotOnDeckURI:
+        nonTiprackLabwareNotOnDeckDef as LabwareDefinition2,
     }
     const pipetteEntities: PipetteEntities = {
       somePipetteId: {

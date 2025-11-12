@@ -14,7 +14,7 @@ export interface ProfileFormError {
   title: string
   dependentProfileFields: string[]
   //  location the error appears in the form
-  location: FormErrorLocationType
+  location: FormErrorLocationType[]
   body?: ReactNode
   page?: number
   showOnReopen?: boolean
@@ -24,7 +24,7 @@ const PROFILE_FORM_ERRORS: Record<ProfileFormErrorKey, ProfileFormError> = {
   INVALID_PROFILE_DURATION: {
     title: 'Invalid profile duration',
     dependentProfileFields: ['durationMinutes', 'durationSeconds'],
-    location: 'field',
+    location: ['field'],
   },
 }
 // TC Profile multi-field error fns

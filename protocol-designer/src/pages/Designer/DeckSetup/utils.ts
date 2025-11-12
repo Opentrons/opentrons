@@ -66,10 +66,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)
@@ -421,12 +419,8 @@ export interface SwapBlockedModuleArgs {
 }
 
 export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
-  const {
-    hoveredLabware,
-    draggedLabware,
-    modulesById,
-    customLabwareDefs,
-  } = args
+  const { hoveredLabware, draggedLabware, modulesById, customLabwareDefs } =
+    args
 
   if (!hoveredLabware || !draggedLabware) {
     return false
@@ -508,18 +502,18 @@ interface HoverDimensions {
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 export const getFlexHoverDimensions = (
-  stagingAreaLocations: string[],
+  columnFourLocations: string[],
   cutoutId: CutoutId,
   slotId: string,
   hasTCOnSlot: boolean,
   slotPosition: CoordinateTuple
 ): HoverDimensions => {
-  const hasStagingArea = stagingAreaLocations.includes(cutoutId)
+  const columnFourIsOccupied = columnFourLocations.includes(cutoutId)
 
   const X_ADJUSTMENT_LEFT_SIDE = -101.5
   const X_ADJUSTMENT = -17
   const X_DIMENSION_MIDDLE_SLOTS = 160.3
-  const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
+  const X_DIMENSION_OUTER_SLOTS = columnFourIsOccupied ? 160.0 : 246.5
   const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
   const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
 

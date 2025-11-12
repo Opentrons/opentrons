@@ -66,38 +66,40 @@ def crop_image(image_path: str) -> str:
     return cropped_image_path
 
 
-def resize_image(image_path: str, new_width: int = 1024) -> str:
-    """Resize JPG image by downscaling until it's under target size (in KB)."""
-    print("📏 Beginning resize Steps.")
+def resize_image(image_path: str, new_width: int = 1024, target_kb: int = 250) -> str:
+    """Resize JPG image and adjust quality to stay under target size (in KB)."""
+    print("📏 Beginning resize steps.")
     img = Image.open(image_path).convert("RGB")
     # Calculate new height to maintain aspect ratio
     original_width, original_height = img.size
     aspect_ratio = original_height / original_width
     new_height = int(new_width * aspect_ratio)
     # Resize the image
+    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
     resize_image_path = rename_image_path(image_path, "resize")
-    resized_img = img.resize(
-        (new_width, new_height), Image.Resampling.LANCZOS
-    )  # LANCZOS for high-quality downsampling
     quality = 98
-    min_quality = 90
-    target_kb = 250
+    min_quality = 30
+    step = 5
     buffer = io.BytesIO()
     while quality >= min_quality:
         buffer.seek(0)
         buffer.truncate()
+        # Save resized image to buffer with current quality
+        resized_img.save(buffer, "JPEG", quality=quality, optimize=True)
         size_kb = buffer.tell() // 1024
+        print(f"🔍 Trying quality={quality} → {size_kb} KB")
         if size_kb <= target_kb:
             break
-        print(f"🔍 Trying quality={quality} → {size_kb} KB")
-        quality -= 5
-
+        quality -= step
     if quality < min_quality:
         print(
             "⚠️ Warning: Could not reach target size without going below minimum quality."
         )
-    resized_img.save(resize_image_path, "JPEG", quality=quality, optimize=True)
-    print(f"✅ Final image size: {os.path.getsize(image_path) // 1024} KB")
+    # Save final image to disk
+    with open(resize_image_path, "wb") as f:
+        f.write(buffer.getvalue())
+    final_size_kb = os.path.getsize(resize_image_path) // 1024
+    print(f"✅ Final image saved: {resize_image_path} → {final_size_kb} KB")
     return resize_image_path
 
 

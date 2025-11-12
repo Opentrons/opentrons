@@ -25,24 +25,24 @@ describe('useIncompatibleModulesAttached', () => {
     wrapper = clientProvider
   })
   it('treats older endpoint responses as if the module were compatible', () => {
-    vi.mocked(useModulesQuery).mockReturnValue(({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: {
         data: Fixtures.v2MockModulesResponse,
         meta: {},
       },
       error: null,
-    } as any) as UseQueryResult<Modules>)
+    } as any as UseQueryResult<Modules>)
     const { result } = renderHook(useIncompatibleModulesAttached, { wrapper })
     expect(result.current).toHaveLength(0)
   })
   it('pulls incompatible modules out of endpoint responses', () => {
-    vi.mocked(useModulesQuery).mockReturnValue(({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: {
         data: Fixtures.mockModulesWithOneIncompatibleResponse,
         meta: {},
       },
       error: null,
-    } as any) as UseQueryResult<Modules>)
+    } as any as UseQueryResult<Modules>)
     const { result } = renderHook(useIncompatibleModulesAttached, { wrapper })
     expect(result.current).toHaveLength(1)
     expect(result.current).toContain(
@@ -50,23 +50,23 @@ describe('useIncompatibleModulesAttached', () => {
     )
   })
   it('treats modules under new schema without compatibility as compatible', () => {
-    vi.mocked(useModulesQuery).mockReturnValue(({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: {
         data: Fixtures.mockModulesAllNotImplementedResponse,
         meta: {},
       },
       error: null,
-    } as any) as UseQueryResult<Modules>)
+    } as any as UseQueryResult<Modules>)
     const { result } = renderHook(useIncompatibleModulesAttached, { wrapper })
     expect(result.current).toHaveLength(0)
   })
   it('passes all compatible modules', () => {
-    vi.mocked(useModulesQuery).mockReturnValue(({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: {
         data: Fixtures.mockModulesAllCompatibleResponse,
         meta: {},
       },
-    } as any) as UseQueryResult<Modules>)
+    } as any as UseQueryResult<Modules>)
     const { result } = renderHook(useIncompatibleModulesAttached, { wrapper })
     expect(result.current).toHaveLength(0)
   })

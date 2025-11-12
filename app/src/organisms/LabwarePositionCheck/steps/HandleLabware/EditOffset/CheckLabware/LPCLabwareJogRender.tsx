@@ -25,7 +25,6 @@ import {
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
 
-import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.
@@ -36,7 +35,7 @@ export function LPCLabwareJogRender({
 }: EditOffsetContentProps): JSX.Element {
   const pipetteName =
     useSelector(selectActivePipette(runId))?.pipetteName ?? 'p1000_single'
-  const itemLwDef = useSelector(selectSelectedLwDef(runId)) as LabwareDefinition
+  const itemLwDef = useSelector(selectSelectedLwDef(runId))!
 
   return (
     <Flex css={RENDER_CONTAINER_STYLE}>

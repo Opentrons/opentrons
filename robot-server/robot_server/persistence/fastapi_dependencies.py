@@ -25,7 +25,7 @@ from .persistence_directory import (
     prepare_active_subdirectory,
     prepare_root,
 )
-
+from .images_directory import prepare_images_directory, ImagesResetter
 
 _log = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ _active_persistence_directory_init_task_accessor = AppStateAccessor[
 _sql_engine_init_task_accessor = AppStateAccessor["asyncio.Task[SQLEngine]"](
     "persistence_sql_engine_init_task"
 )
+_images_directory_accessor = AppStateAccessor[Path]("images_directory")
 
 
 class DatabaseNotYetInitialized(ErrorDetails):
@@ -288,3 +289,41 @@ async def get_persistence_resetter(
 ) -> PersistenceResetter:
     """Get a `PersistenceResetter` to reset the robot-server's stored data."""
     return PersistenceResetter(directory_to_reset)
+
+
+async def initialize_images_directory(
+    app_state: AppState,
+    images_directory_root: Optional[Path],
+) -> None:
+    """Initialize the images directory and store it in app state.
+
+    This should be called exactly once, as part of server startup.
+    """
+    assert (
+        _images_directory_accessor.get_from(app_state) is None
+    ), "Cannot initialize images directory more than once."
+
+    try:
+        prepared_directory = await prepare_images_directory(images_directory_root)
+        _images_directory_accessor.set_on(app_state=app_state, value=prepared_directory)
+    except Exception:
+        _log.exception("Exception initializing images directory.")
+        raise
+
+
+async def get_images_directory(
+    app_state: Annotated[AppState, Depends(get_app_state)],
+) -> Path:
+    """Return the path to the server's images directory."""
+    images_directory = _images_directory_accessor.get_from(app_state)
+    assert (
+        images_directory is not None
+    ), "Forgot to initialize images directory as part of server startup?"
+    return images_directory
+
+
+async def get_images_resetter(
+    directory_to_reset: Annotated[Path, Depends(get_images_directory)],
+) -> ImagesResetter:
+    """Get an `ImagesResetter` to reset the robot-server's stored data."""
+    return ImagesResetter(directory_to_reset)

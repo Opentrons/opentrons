@@ -152,7 +152,7 @@
   "stacker_latch_is_jammed": "Stacker latch is jammed",
   "stacker_latch_jammed_errors_occur_when": "Stacker latch jammed errors occur when labware gets stuck in between the stacker latch. This is usually caused by improperly placed labware or inaccurate labware definitions",
   "stacker_latch_will_reengage": "The stacker latch will re-engage so that you can reload the stacker. Make sure that any obstructions have been cleared.",
-  "stacker_shuttle_full": "Stacker shuttle full",
+  "stacker_shuttle_full": "Stacker shuttle in use",
   "stacker_shuttle_missing_error_occurs_when": "Stacker shuttle missing errors occur when the shuttle is not placed correctly on the track",
   "stacker_stall_or_collision_error": "Stacker stalled",
   "stacker_shuttle_store_empty": "Shuttle empty",
@@ -182,5 +182,9 @@
   "view_recovery_options": "View recovery options",
   "you_can_still_drop_tips": "You can still drop the attached tips before proceeding to tip selection.",
   "stacker_shuttle_store_empty_error_occurs_when": "Shuttle empty errors occur when the robot tries to store labware into a stacker from an empty shuttle",
-  "load_labware_shuttle_to_proceed": "Load the shuttle with the correct labware to complete the stacker store step"
+  "load_labware_shuttle_to_proceed": "Load the shuttle with the correct labware to complete the stacker store step",
+  "stacker_shuttle_occupied_error_occurs_when": "The shuttle has labware when it should be empty",
+  "remove_labware_from_shuttle_to_proceed": "Remove the labware from the shuttle to complete the stacker retrieve step",
+  "stacker_hopper_or_shuttle_empty_error_occurs_when": "Stacker errors occur when the stacker is empty when the robot expects the stacker to be filled, or when labware is stuck on the labware latch",
+  "troubleshoot_issue_complete_retrieve_step": "Troubleshoot the issue to complete the stacker retrieve step"
 }

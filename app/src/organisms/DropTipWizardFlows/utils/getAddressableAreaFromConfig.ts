@@ -38,9 +38,9 @@ export function getAddressableAreaFromConfig(
 
   const providedAddressableAreas =
     cutoutIdForAddressableArea != null
-      ? deckDef.cutoutFixtures.find(
+      ? (deckDef.cutoutFixtures.find(
           fixture => fixture.id === configuredCutoutFixture
-        )?.providesAddressableAreas[cutoutIdForAddressableArea] ?? []
+        )?.providesAddressableAreas[cutoutIdForAddressableArea] ?? [])
       : []
 
   // check if configured cutout fixture id provides target addressableArea
@@ -82,7 +82,8 @@ export function getAddressableAreaFromConfig(
         NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
       )
     ) {
-      addressableAreaFromConfig = NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+      addressableAreaFromConfig =
+        NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
     }
   }
 

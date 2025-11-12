@@ -11,6 +11,7 @@ import type {
 import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
+  OpenIngredientSelectorAction,
   RenameLabwareAction,
   ZoomedIntoSlotAction,
 } from '../../labware-ingred/actions'
@@ -26,15 +27,19 @@ export interface CreateContainerAboveModuleArgs {
 export const createContainerAboveModule: (
   args: CreateContainerAboveModuleArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const { slot, labwareDefURIStack } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
 
-  const moduleId = Object.values(modules).find(module => module.slot === slot)
-    ?.id
+  const moduleId = Object.values(modules).find(
+    module => module.slot === slot
+  )?.id
   dispatch(
     createContainer({
       slot: moduleId,
@@ -52,37 +57,35 @@ interface ModuleAndChangeFormArgs {
 }
 export const createModuleEntityAndChangeForm: (
   args: ModuleAndChangeFormArgs
-) => ThunkAction<CreateModuleAction | ChangeSavedStepFormAction> = args => (
-  dispatch,
-  getState
-) => {
-  const { slot, model, type, moduleSteps, pauseSteps } = args
-  const moduleId = `${uuid()}:${type}`
+) => ThunkAction<CreateModuleAction | ChangeSavedStepFormAction> =
+  args => (dispatch, getState) => {
+    const { slot, model, type, moduleSteps, pauseSteps } = args
+    const moduleId = `${uuid()}:${type}`
 
-  dispatch({
-    type: 'CREATE_MODULE',
-    payload: { slot, model, type, id: moduleId },
-  })
+    dispatch({
+      type: 'CREATE_MODULE',
+      payload: { slot, model, type, id: moduleId },
+    })
 
-  //  if steps are created with the module that has been regenerated, migrate them to use the correct moduleId
-  moduleSteps.forEach(step => {
-    dispatch(
-      changeSavedStepForm({
-        stepId: step.id,
-        update: {
-          moduleId,
-        },
-      })
-    )
-  })
-  pauseSteps.forEach(step => {
-    dispatch(
-      changeSavedStepForm({
-        stepId: step.id,
-        update: {
-          moduleId,
-        },
-      })
-    )
-  })
-}
+    //  if steps are created with the module that has been regenerated, migrate them to use the correct moduleId
+    moduleSteps.forEach(step => {
+      dispatch(
+        changeSavedStepForm({
+          stepId: step.id,
+          update: {
+            moduleId,
+          },
+        })
+      )
+    })
+    pauseSteps.forEach(step => {
+      dispatch(
+        changeSavedStepForm({
+          stepId: step.id,
+          update: {
+            moduleId,
+          },
+        })
+      )
+    })
+  }

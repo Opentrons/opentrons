@@ -1,4 +1,5 @@
 import type {
+  CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
@@ -11,12 +12,14 @@ export type RobotCalibrationStepKey = typeof ROBOT_CALIBRATION_STEP_KEY
 export type ModuleSetupStepKey = typeof MODULE_SETUP_STEP_KEY
 export type LPCStepKey = typeof LPC_STEP_KEY
 export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
+export type CameraSetupStepKey = typeof CAMERA_SETUP_STEP_KEY
 
 export type StepKey =
   | RobotCalibrationStepKey
   | ModuleSetupStepKey
   | LPCStepKey
   | LabwareSetupStepKey
+  | CameraSetupStepKey
 
 export interface StepState {
   required: boolean

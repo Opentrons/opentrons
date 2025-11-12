@@ -49,6 +49,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
     LoadableLabwareLocation,
+    WASTE_CHUTE_LOCATION,
     NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -1168,8 +1169,37 @@ class ProtocolCore(
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):
             return self._labware_cores_by_id[labware_location.labwareId]
-
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
+
+    def capture_image(
+        self,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using a camera.
+        Args:
+            resolution: Width by height resolution in pixels for the image to be captured with.
+            zoom: Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.
+            contrast: The contrast to use when processing an image. Scale is 0% to 100%
+            brightness: The brightness to use when processing an image. Scale is 0% to 100%.
+            saturation: The saturation to use when processing an image. Scale is 0% to 100%.
+        """
+        self._engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=filename,
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
+            )
+        )
 
     def _convert_labware_location(
         self,
@@ -1205,6 +1235,8 @@ class ProtocolCore(
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:
             return OFF_DECK_LOCATION
+        elif location is OffDeckType.WASTE_CHUTE:
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):

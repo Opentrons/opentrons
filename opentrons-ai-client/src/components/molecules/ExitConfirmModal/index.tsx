@@ -16,10 +16,8 @@ import {
 import { displayExitConfirmModalAtom } from '/ai-client/resources/atoms'
 
 export function ExitConfirmModal(): JSX.Element {
-  const [
-    displayExitConfirmModalState,
-    setDisplayExitConfirmModalState,
-  ] = useAtom(displayExitConfirmModalAtom)
+  const [displayExitConfirmModalState, setDisplayExitConfirmModalState] =
+    useAtom(displayExitConfirmModalAtom)
   const navigate = useNavigate()
   const { t } = useTranslation('protocol_generator')
 

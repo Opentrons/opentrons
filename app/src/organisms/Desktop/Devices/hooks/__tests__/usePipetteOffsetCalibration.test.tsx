@@ -47,7 +47,7 @@ describe('usePipetteOffsetCalibration hook', () => {
     vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
-      .thenReturn(({ status: 'chill' } as unknown) as DiscoveredRobot)
+      .thenReturn({ status: 'chill' } as unknown as DiscoveredRobot)
   })
   afterEach(() => {
     vi.resetAllMocks()

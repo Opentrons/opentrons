@@ -12,6 +12,8 @@ dependencies = [
     "mkdocstrings[python]>=0.29.1",
     "mkdocs-parent-css-plugin",
     "opentrons",
+    "mkdocs-print-site-plugin>=2.8",
+    "playwright>=1.55"
 ]
 
 [tool.uv.sources]

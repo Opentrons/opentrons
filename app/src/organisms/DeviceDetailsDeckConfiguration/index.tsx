@@ -64,10 +64,8 @@ export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['device_details', 'deck_configuration'])
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const deckConfig =
     useNotifyDeckConfigurationQuery({
@@ -87,11 +85,8 @@ export function DeviceDetailsDeckConfiguration({
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
   const isRobotViewable = useIsRobotViewable(robotName)
 
-  const {
-    addFixtureToCutout,
-    removeFixtureFromCutout,
-    addFixtureModal,
-  } = useDeckConfigurationEditingTools(false)
+  const { addFixtureToCutout, removeFixtureFromCutout, addFixtureModal } =
+    useDeckConfigurationEditingTools(false)
 
   // do not show standard slot in fixture display list
   const { displayList: fixtureDisplayList } = deckConfigWithAA.reduce<{

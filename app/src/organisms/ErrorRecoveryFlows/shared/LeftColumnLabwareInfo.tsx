@@ -69,7 +69,8 @@ export function LeftColumnLabwareInfo({
         labwareName: relevantPickUpTipLwNames.name ?? '',
         labwareNickname: relevantPickUpTipLwNames.nickName,
         currentLocationProps: {
-          deckLabel: relevantPickUpTipLwLocs.displayNameCurrentLoc.toUpperCase(),
+          deckLabel:
+            relevantPickUpTipLwLocs.displayNameCurrentLoc.toUpperCase(),
         },
       }
     } else {
@@ -111,7 +112,8 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
+              deckLabel:
+                failedLabwareLocations.displayNameCurrentLoc.toUpperCase(),
             },
           }
       }

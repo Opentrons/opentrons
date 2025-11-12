@@ -94,6 +94,8 @@ export function useCommandTextString(
     case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
+    case 'aspirateWhileTracking':
+    case 'dispenseWhileTracking':
     case 'blowout':
     case 'blowOutInPlace':
     case 'dropTip':
@@ -351,6 +353,16 @@ export function useCommandTextString(
       return {
         kind: 'generic',
         commandText: utils.getConcurrentCommandText({ ...fullParams, command }),
+      }
+    }
+
+    case 'captureImage': {
+      return {
+        kind: 'generic',
+        commandText: utils.getRobotDevicesCommandText({
+          ...fullParams,
+          command,
+        }),
       }
     }
 

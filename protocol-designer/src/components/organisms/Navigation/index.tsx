@@ -47,6 +47,9 @@ export function Navigation(): JSX.Element | null {
     }
   }
 
+  // todo(mm, 2025-10-27): Unlike the "create new" button, the "import" button
+  // will not warn you if you're overwriting a protocol with unsaved changes.
+  // Should it?
   const handleImport = (): void => {
     if (fileInputRef.current != null) {
       fileInputRef.current.click()

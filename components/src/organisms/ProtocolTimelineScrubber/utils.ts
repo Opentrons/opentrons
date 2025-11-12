@@ -155,6 +155,8 @@ export function getCommandTextData(
 ): CommandTextData {
   const { pipettes, labware, modules, liquids } = protocolData
   const commands =
-    'commands' in protocolData ? protocolData.commands : protocolCommands ?? []
+    'commands' in protocolData
+      ? protocolData.commands
+      : (protocolCommands ?? [])
   return { commands, pipettes, labware, modules, liquids }
 }

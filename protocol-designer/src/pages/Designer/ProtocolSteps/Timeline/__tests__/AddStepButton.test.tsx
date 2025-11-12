@@ -179,6 +179,7 @@ describe('AddStepButton', () => {
     screen.getByText('Heater-Shaker')
     screen.getByText('Temperature')
     screen.getByText('Magnet')
+    screen.getByText('Camera')
   })
 
   it('should not render texts if hasText is false', () => {

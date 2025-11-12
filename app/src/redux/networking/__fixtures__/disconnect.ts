@@ -18,17 +18,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  NetworkingDisconnectResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: POST,
-  path: '/wifi/disconnect',
-  successStatus: 200,
-  successBody: mockNetworkingDisconnect,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<NetworkingDisconnectResponse, { message: string }> =
+  makeResponseFixtures({
+    method: POST,
+    path: '/wifi/disconnect',
+    successStatus: 200,
+    successBody: mockNetworkingDisconnect,
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockNetworkingDisconnectSuccessMeta,

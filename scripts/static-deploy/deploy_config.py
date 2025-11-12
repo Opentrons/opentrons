@@ -49,6 +49,7 @@ class EnvironmentConfig:
     protocol_designer: ApplicationConfig
     docs: ApplicationConfig
     mkdocs: ApplicationConfig
+    components: ApplicationConfig
 
 
 @dataclass(frozen=True)
@@ -117,7 +118,7 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="sandbox.designer.opentrons.com",
+            s3_bucket="opentrons.sandbox.designer",
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.designer.opentrons.com/",
         ),
@@ -133,6 +134,12 @@ def get_deploy_config() -> DeployConfig:
             cloudfront_id=None,  # No CloudFront invalidation on sandbox
             url="http://sandbox.docs.opentrons.com/",
         ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",
+            cloudfront_id=None,  # No CloudFront invalidation on sandbox
+            url="http://sandbox.components.opentrons.com/",
+        ),
     )
 
     # Staging configuration
@@ -145,21 +152,27 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.staging.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.staging.designer",
+            cloudfront_id="EO925AKFD33ZG",  # Add CloudFront ID when available
             url="https://staging.protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",
+            cloudfront_id="E2DBE0K9VT8YB9",
             url="https://staging.docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
             s3_bucket="opentrons.staging.docs",
-            cloudfront_id="E8IWASMDOWHYP",
+            cloudfront_id="E2DBE0K9VT8YB9",
             url="https://staging.docs.opentrons.com/",
+        ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            cloudfront_id=None,
+            url="http://sandbox.components.opentrons.com/",
         ),
     )
 
@@ -173,21 +186,27 @@ def get_deploy_config() -> DeployConfig:
         ),
         protocol_designer=ApplicationConfig(
             name="protocol_designer",
-            s3_bucket="opentrons.production.protocol-designer",
-            cloudfront_id="",  # Add CloudFront ID when available
+            s3_bucket="opentrons.production.designer",
+            cloudfront_id="E2D3NFAZUK9GIG",  # Add CloudFront ID when available
             url="https://protocol-designer.opentrons.com/",
         ),
         docs=ApplicationConfig(
             name="docs",
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",
+            cloudfront_id="E2PSPUXND1RQWG",
             url="https://docs.opentrons.com/",
         ),
         mkdocs=ApplicationConfig(
             name="mkdocs",
             s3_bucket="opentrons.production.docs",
-            cloudfront_id="E16BZZXDTINN0S",
+            cloudfront_id="E2PSPUXND1RQWG",
             url="https://docs.opentrons.com/",
+        ),
+        components=ApplicationConfig(
+            name="components",
+            s3_bucket="opentrons.sandbox.components",  # Components only available in sandbox
+            cloudfront_id=None,
+            url="http://sandbox.components.opentrons.com/",
         ),
     )
 
@@ -213,7 +232,7 @@ def get_config(environment: str, application: str) -> ApplicationConfig:
     application = application.lower()
 
     valid_environments = ["sandbox", "staging", "production"]
-    valid_applications = ["labware_library", "protocol_designer", "docs", "mkdocs"]
+    valid_applications = ["labware_library", "protocol_designer", "docs", "mkdocs", "components"]
 
     if environment not in valid_environments:
         raise InvalidEnvironmentError(f"Invalid environment '{environment}'. Valid environments are: {', '.join(valid_environments)}")

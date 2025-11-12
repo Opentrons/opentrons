@@ -75,7 +75,7 @@ describe('useCalibrationError', () => {
       useCalibrationError(mockRequestIds, mockSessionId)
     )
     expect(result.current).toEqual({
-      title: 'robot_calibration:error',
+      title: 'error',
       subText: 'Test Message',
     })
   })
@@ -92,8 +92,8 @@ describe('useCalibrationError', () => {
       useCalibrationError(mockRequestIds, mockSessionId)
     )
     expect(result.current).toEqual({
-      title: 'robot_calibration:error',
-      subText: 'branded:unexpected_error',
+      title: 'error',
+      subText: 'unexpected_error',
     })
   })
 })

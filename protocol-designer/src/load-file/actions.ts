@@ -38,97 +38,99 @@ export const loadFileAction = (
   payload: migration(payload),
 })
 // load file thunk, handles file loading errors
-export const loadProtocolFile = (
-  event: SyntheticEvent<HTMLInputElement>
-): ThunkAction<any> => (dispatch: ThunkDispatch<any>, getState: GetState) => {
-  const fileError = (
-    errorType: FileUploadErrorType,
-    errorMessage?: string
-  ): void =>
-    dispatch(
-      fileUploadMessage({
-        isError: true,
-        errorType,
-        errorMessage,
-      })
-    )
+export const loadProtocolFile =
+  (event: SyntheticEvent<HTMLInputElement>): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    const fileError = (
+      errorType: FileUploadErrorType,
+      errorMessage?: string
+    ): void =>
+      dispatch(
+        fileUploadMessage({
+          isError: true,
+          errorType,
+          errorMessage,
+        })
+      )
 
-  // @ts-expect-error need null checking
-  const file = event.currentTarget.files[0]
-  const reader = new FileReader()
-  // reset the state of the input to allow file re-uploads
-  event.currentTarget.value = ''
+    // @ts-expect-error need null checking
+    const file = event.currentTarget.files[0]
+    const reader = new FileReader()
+    // reset the state of the input to allow file re-uploads
+    event.currentTarget.value = ''
 
-  if (!file.name.endsWith('.json') && !file.name.endsWith('.py')) {
-    fileError('INVALID_FILE_TYPE')
-  } else if (file.name.endsWith('.json')) {
-    reader.onload = readEvent => {
-      const result = ((readEvent.currentTarget as any) as FileReader).result
-      let parsedProtocol: PDProtocolFile | null | undefined
+    if (!file.name.endsWith('.json') && !file.name.endsWith('.py')) {
+      fileError('INVALID_FILE_TYPE')
+    } else if (file.name.endsWith('.json')) {
+      reader.onload = readEvent => {
+        const result = (readEvent.currentTarget as any as FileReader).result
+        let parsedProtocol: PDProtocolFile | null | undefined
 
-      try {
-        parsedProtocol = JSON.parse((result as any) as string)
-        // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
-        parsedProtocol && dispatch(loadFileAction(parsedProtocol))
-      } catch (error) {
-        console.error(error)
-        if (error instanceof Error) {
-          fileError('INVALID_JSON_FILE', error.message)
-        }
-      }
-    }
-
-    reader.readAsText(file)
-  } else {
-    reader.onload = readEvent => {
-      const result = (readEvent.currentTarget as FileReader).result as string
-
-      try {
-        // Extract designer application blob
-        const designerApplication = result.match(
-          /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
-        )
-        if (designerApplication != null && designerApplication[1]) {
-          const designerApplicationString = designerApplication[1]
-          const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
-
-          const customLabwareRegex = new RegExp(
-            `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)`,
-            'm'
-          )
-          const customLabware = result.match(customLabwareRegex)
-          let customLabwareJson
-          if (customLabware != null && customLabware[1]) {
-            const customLabwareString = customLabware[1]
-            customLabwareJson = JSON.parse(customLabwareString)
+        try {
+          parsedProtocol = JSON.parse(result as any as string)
+          // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
+          parsedProtocol && dispatch(loadFileAction(parsedProtocol))
+        } catch (error) {
+          console.error(error)
+          if (error instanceof Error) {
+            fileError('INVALID_JSON_FILE', error.message)
           }
-          dispatch(
-            loadFileAction(
-              (customLabwareJson != null
-                ? {
-                    ...designerApplicationJson,
-                    //  NOTE: labwareDefinitions contain custom labware only
-                    //  other labwareDefinitions are populated via mapping through
-                    //  the labware key in the labwareInvariantProperties reducer
-                    labwareDefinitions: customLabwareJson,
-                  }
-                : designerApplicationJson) as PythonDesignerApplication
-            )
-          )
-        } else {
-          fileError('INVALID_PYTHON_FILE')
-        }
-      } catch (error) {
-        console.error('Error extracting blob:', error)
-        if (error instanceof Error) {
-          fileError('INVALID_PYTHON_FILE', error.message)
         }
       }
-    }
 
-    reader.readAsText(file)
+      reader.readAsText(file)
+    } else {
+      reader.onload = readEvent => {
+        const result = (readEvent.currentTarget as FileReader).result as string
+
+        try {
+          // Extract designer application blob
+          const designerApplication = result.match(
+            /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
+          )
+          if (designerApplication != null && designerApplication[1]) {
+            const designerApplicationString = designerApplication[1]
+            const designerApplicationJson = JSON.parse(
+              designerApplicationString
+            ) // Convert to JSON
+
+            const customLabwareRegex = new RegExp(
+              `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)`,
+              'm'
+            )
+            const customLabware = result.match(customLabwareRegex)
+            let customLabwareJson
+            if (customLabware != null && customLabware[1]) {
+              const customLabwareString = customLabware[1]
+              customLabwareJson = JSON.parse(customLabwareString)
+            }
+            dispatch(
+              loadFileAction(
+                (customLabwareJson != null
+                  ? {
+                      ...designerApplicationJson,
+                      //  NOTE: labwareDefinitions contain custom labware only
+                      //  other labwareDefinitions are populated via mapping through
+                      //  the labware key in the labwareInvariantProperties reducer
+                      labwareDefinitions: customLabwareJson,
+                    }
+                  : designerApplicationJson) as PythonDesignerApplication
+              )
+            )
+          } else {
+            fileError('INVALID_PYTHON_FILE')
+          }
+        } catch (error) {
+          console.error('Error extracting blob:', error)
+          if (error instanceof Error) {
+            fileError('INVALID_PYTHON_FILE', error.message)
+          }
+        }
+      }
+
+      reader.readAsText(file)
+    }
   }
-}
 export interface UndoLoadFile {
   type: 'UNDO_LOAD_FILE'
 }
@@ -150,38 +152,34 @@ export const createNewProtocol = (
 export interface SaveProtocolFileAction {
   type: 'SAVE_PROTOCOL_FILE'
 }
-export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
-  dispatch,
-  getState
-) => {
-  // dispatching this should update the state, eg lastModified timestamp
-  dispatch({
-    type: 'SAVE_PROTOCOL_FILE',
-  })
-  const state = getState()
-  const fileData = fileDataSelectors.createFile(state)
-  const protocolName =
-    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
-  const fileName = `${protocolName
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^\p{L}\p{N}_]/gu, '')}.py`
-  saveFile(fileData, fileName)
-}
+export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> =
+  () => (dispatch, getState) => {
+    // dispatching this should update the state, eg lastModified timestamp
+    dispatch({
+      type: 'SAVE_PROTOCOL_FILE',
+    })
+    const state = getState()
+    const fileData = fileDataSelectors.createFile(state)
+    const protocolName =
+      fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
+    const fileName = `${protocolName
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/[^\p{L}\p{N}_]/gu, '')}.py`
+    saveFile(fileData, fileName)
+  }
 
 // Eventually this will be deprecated:
-export const saveJSONProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
-  dispatch,
-  getState
-) => {
-  // dispatching this should update the state, eg lastModified timestamp
-  dispatch({
-    type: 'SAVE_PROTOCOL_FILE',
-  })
-  const state = getState()
-  const fileData = fileDataSelectors.createJSONFile(state)
-  const protocolName =
-    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
-  const fileName = `${protocolName}.json`
-  saveJSONFile(fileData, fileName)
-}
+export const saveJSONProtocolFile: () => ThunkAction<SaveProtocolFileAction> =
+  () => (dispatch, getState) => {
+    // dispatching this should update the state, eg lastModified timestamp
+    dispatch({
+      type: 'SAVE_PROTOCOL_FILE',
+    })
+    const state = getState()
+    const fileData = fileDataSelectors.createJSONFile(state)
+    const protocolName =
+      fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
+    const fileName = `${protocolName}.json`
+    saveJSONFile(fileData, fileName)
+  }

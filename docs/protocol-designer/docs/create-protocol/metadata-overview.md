@@ -19,7 +19,7 @@ The protocol overview summarizes details you've added for your protocol. The pro
 The protocol overview shows instruments, including pipettes and the gripper, added to your protocol. In this example, a 1- and 8-channel Flex pipette are in the left and right mounts, respectively. By default, Protocol Designer adds your first 1- or 8-channel pipette to the left mount. Click **Edit** at the top right of the section to swap mounts or add, edit, or remove pipettes or the gripper. 
 
 
-The protocol overivew also includes a preview of your protocol starting deck. The initial deck state for a protocol includes all the labware, modules, and fixtures you've added. Protocol Designer automatically adds modules, fixtures, and tip racks to deck slots. You can edit their locations on the starting deck and add labware and liquids by clicking  **Edit protocol** in the upper right. 
+The protocol overview also includes a preview of your protocol starting deck. The initial deck state for a protocol includes all the labware, modules, and fixtures you've added. Protocol Designer automatically adds modules, fixtures, and tip racks to deck slots. You can edit their locations on the starting deck and add labware and liquids by clicking  **Edit protocol** in the upper right. 
 
 Hover over a deck slot to see individual details beneath the deck map, like labware and liquids. In the example below, slot C2 contains an Opentrons Flex filter tip rack. 
 

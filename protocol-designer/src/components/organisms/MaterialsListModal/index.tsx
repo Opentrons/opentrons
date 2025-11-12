@@ -6,7 +6,6 @@ import sum from 'lodash/sum'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,6 +15,7 @@ import {
   ListItemDescriptor,
   Modal,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -94,7 +94,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={fixture.location.replace('cutout', '')}
                             />
                           </Flex>
@@ -124,7 +124,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={formatLocation(hw.slot)}
                             />
                           </Flex>
@@ -167,7 +167,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel deckLabel={deckLabelSlot} />
+                            <RobotInfoLabel deckLabel={deckLabelSlot} />
                           </Flex>
                         }
                         content={

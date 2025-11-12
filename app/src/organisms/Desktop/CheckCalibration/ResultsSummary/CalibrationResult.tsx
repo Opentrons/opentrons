@@ -36,8 +36,8 @@ export function CalibrationResult({
     return calType === 'deck'
       ? 'deck_calibration'
       : calType === 'pipetteOffset'
-      ? 'pipette_offset_title'
-      : 'tip_length'
+        ? 'pipette_offset_title'
+        : 'tip_length'
   }
   return (
     <Flex

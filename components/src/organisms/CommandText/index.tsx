@@ -164,7 +164,7 @@ function ThermocyclerRunProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText
@@ -231,7 +231,7 @@ function ThermocyclerRunExtendedProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText
@@ -321,7 +321,7 @@ function ThermocyclerStartRunExtendedProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText

@@ -17,10 +17,11 @@ import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueVa
 
 const REFETCH_OFFSET_SEARCH_MS = 5000
 
-export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParams & {
-  runId: string | null
-  robotType: RobotType
-}
+export type UseLPCLabwareInfoProps =
+  GetUniqueValidLwLocationInfoByAnalysisParams & {
+    runId: string | null
+    robotType: RobotType
+  }
 
 export interface UseLPCLabwareInfoResult {
   labwareInfo: LPCLabwareInfo

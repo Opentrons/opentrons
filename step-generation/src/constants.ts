@@ -90,3 +90,8 @@ export const GRIPPER_LOCATION: 'mounted' = 'mounted'
 export const CLEAN: 'CLEAN' = 'CLEAN'
 export const DIRTY: 'DIRTY' = 'DIRTY'
 export const EMPTY: 'EMPTY' = 'EMPTY'
+
+export const AUTOMATIC: 'automatic' = 'automatic'
+export const MANUAL: 'manual' = 'manual'
+
+export const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']

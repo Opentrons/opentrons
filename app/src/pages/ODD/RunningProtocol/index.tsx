@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
@@ -43,7 +44,6 @@ import {
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   useLastRunCommand,
@@ -82,10 +82,8 @@ export function RunningProtocol(): JSX.Element {
   const [currentOption, setCurrentOption] = useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
-  const [
-    showConfirmCancelRunModal,
-    setShowConfirmCancelRunModal,
-  ] = useState<boolean>(false)
+  const [showConfirmCancelRunModal, setShowConfirmCancelRunModal] =
+    useState<boolean>(false)
   const lastAnimatedCommand = useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -116,23 +114,20 @@ export function RunningProtocol(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
-  const isCameraEnabled = useFeatureFlag('camera')
   const { isERActive, failedCommand, runLwDefsByUri } = useErrorRecoveryFlows(
     runId,
     runStatus
   )
   const doorStatus = useIsDoorOpen(robotName)
-  const {
-    showModal: showIntervention,
-    modalProps: interventionProps,
-  } = useInterventionModal({
-    runStatus,
-    lastRunCommand,
-    runData: runRecord?.data ?? null,
-    robotName,
-    analysis: robotSideAnalysis,
-    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  })
+  const { showModal: showIntervention, modalProps: interventionProps } =
+    useInterventionModal({
+      runStatus,
+      lastRunCommand,
+      runData: runRecord?.data ?? null,
+      robotName,
+      analysis: robotSideAnalysis,
+      doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+    })
 
   useEffect(() => {
     if (swipeType === '') {
@@ -140,9 +135,7 @@ export function RunningProtocol(): JSX.Element {
     }
 
     const currentIndex = SCREEN_ORDER.indexOf(currentOption)
-    const maxIndex = isCameraEnabled
-      ? SCREEN_ORDER.length - 1
-      : SCREEN_ORDER.length - 2
+    const maxIndex = SCREEN_ORDER.length - 1
     let newIndex: number
 
     if (swipeType === 'swipe-left') {
@@ -276,16 +269,14 @@ export function RunningProtocol(): JSX.Element {
                   : styles.bullet_inactive
               )}
             />
-            {isCameraEnabled ? (
-              <div
-                className={clsx(
-                  styles.bullet,
-                  currentOption === 'ImageGallery'
-                    ? styles.bullet_active
-                    : styles.bullet_inactive
-                )}
-              />
-            ) : null}
+            <div
+              className={clsx(
+                styles.bullet,
+                currentOption === 'ImageGallery'
+                  ? styles.bullet_active
+                  : styles.bullet_inactive
+              )}
+            />
           </div>
         </div>
       </div>
@@ -300,6 +291,8 @@ function CurrentOptionView({
   currentOption,
   ...rest
 }: CurrentOptionViewProps): JSX.Element {
+  useToastOnErrorImage(rest.runId)
+
   switch (currentOption) {
     case 'CurrentRunningProtocolCommand':
       return <CurrentRunningProtocolCommand {...rest} />
@@ -315,7 +308,10 @@ function CurrentOptionView({
     case 'ImageGallery':
       return (
         <>
-          <ImageGalleryList {...rest} />
+          <ImageGalleryList
+            {...rest}
+            protocolAnalysis={rest.robotSideAnalysis}
+          />
           <div className={styles.gradient_overlay} />
         </>
       )
