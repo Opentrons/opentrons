@@ -1,0 +1,3 @@
+{
+  "setup-worktree": ["pyenv local 3.10", "make setup || make setup"]
+}
