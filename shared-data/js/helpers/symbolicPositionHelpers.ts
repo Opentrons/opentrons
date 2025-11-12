@@ -1,3 +1,4 @@
+import { AddressableAreaName } from '../../deck'
 import { STANDARD_FLEX_SLOTS, STANDARD_OT2_SLOTS } from '../fixtures'
 
 import type {
@@ -44,9 +45,6 @@ export const locationIsOnAddressableArea = (
   locationIsOnDeck(labwareLocation) && 'addressableAreaName' in labwareLocation
 
 export const getIsValidSlotName = (slot: string): boolean => {
-  console.log('slot: ', slot)
-  console.log('STANDARD_OT2_SLOTS: ', STANDARD_OT2_SLOTS)
-  console.log('STANDARD_FLEX_SLOTS: ', STANDARD_FLEX_SLOTS)
   return (
     STANDARD_OT2_SLOTS.includes(slot as AddressableAreaName) ||
     STANDARD_FLEX_SLOTS.includes(slot as AddressableAreaName) ||

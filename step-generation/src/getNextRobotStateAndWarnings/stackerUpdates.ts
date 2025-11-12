@@ -8,7 +8,6 @@ import {
 
 import { getModuleState } from '../robotStateSelectors'
 import { uuid } from '../utils'
-import { getIsSlotOccupied } from '../utils/stackerUtils'
 
 import type {
   FlexStackerEmptyParams,
@@ -49,12 +48,12 @@ export const forFlexStackerEmpty = (
 
   if (moduleState != null) {
     if (count != null && count > 0) {
-      moduleState.labwareInStacker =
-        moduleState?.labwareInStacker?.splice(
-          moduleState?.labwareInStacker?.length - 1 - count
+      moduleState.labwareIdsInStacker =
+        moduleState?.labwareIdsInStacker?.splice(
+          moduleState?.labwareIdsInStacker?.length - 1 - count
         ) ?? null
     } else {
-      moduleState.labwareInStacker = null
+      moduleState.labwareIdsInStacker = null
     }
   }
 }
@@ -67,10 +66,9 @@ export const forFlexStackerFill = (
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
-  const labwareDefinition =
-    invariantContext.labwareEntities[moduleState?.labwareStored ?? '']?.def
+  const labwareDefinition = invariantContext.labwareEntities[moduleState?.labwareIdsInStacker?.[0] ?? '']?.def
   const listOfLabwareDefinitions = Array.from(
-    { length: moduleState?.labwareInStacker?.length ?? 0 },
+    { length: moduleState?.labwareIdsInStacker?.length ?? 0 },
     _ => labwareDefinition
   )
   const poolHeight = getHeightOfLabwareStackFromDefinitions(
@@ -90,12 +88,12 @@ export const forFlexStackerFill = (
     if (
       count != null &&
       count > 0 &&
-      maxStorableLabware > count + (moduleState.labwareInStacker?.length ?? 0)
+      maxStorableLabware > count + (moduleState.labwareIdsInStacker?.length ?? 0)
     ) {
       // create labware entities for the new labware
       const newLabwareIdList = Array.from({ length: count }, () => uuid())
-      moduleState.labwareInStacker = [
-        ...(moduleState.labwareInStacker ?? []),
+      moduleState.labwareIdsInStacker = [
+        ...(moduleState.labwareIdsInStacker ?? []),
         ...newLabwareIdList,
       ]
     }
@@ -116,7 +114,7 @@ export const forFlexStackerRetrieve = (
         'Cannot retrieve labware bc there is labware on the shuttle'
       )
     }
-    if (moduleState.labwareInStacker?.length === 0) {
+    if (moduleState.labwareIdsInStacker?.length === 0) {
       throw new Error(
         'Cannot retrieve labware bc there is no labware in the stacker'
       )
@@ -129,7 +127,7 @@ export const forFlexStackerRetrieve = (
 
   moduleState!.shuttlePosition = 'retrieved'
 
-  const retrievedLabware = moduleState?.labwareInStacker?.shift()
+  const retrievedLabware = moduleState?.labwareIdsInStacker?.shift()
   if (retrievedLabware == null) {
     throw new Error(
       'Cannot retrieve labware bc there is no labware in the stacker'
@@ -152,6 +150,31 @@ export const forFlexStackerStore = (
   const { moduleId } = params
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
+    if (moduleState.shuttlePosition === 'stored') {
+      throw new Error('Cannot store labware bc there is labware on the shuttle')
+    }
+    // get module location
+    const moduleLocation = robotState.modules[moduleId]?.slot
+    if (moduleLocation == null) {
+      throw new Error('Cannot store labware bc there is no module location')
+    }
+    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
+      throw new Error('Cannot store labware bc there is no labware stored')
+    }
+    if (
+      (moduleState.labwareIdsInStacker?.length ?? 0) + 1 >
+      moduleState.maxPoolCount
+    ) {
+      throw new Error(
+        'Cannot store labware bc there is no space in the stacker'
+      )
+    }
+    // get labware id on module from the move labware command
+    const newLabwareId = uuid()
     moduleState.shuttlePosition = 'stored'
+    moduleState.labwareIdsInStacker = [
+      newLabwareId,
+      ...(moduleState.labwareIdsInStacker ?? []),
+    ]
   }
 }

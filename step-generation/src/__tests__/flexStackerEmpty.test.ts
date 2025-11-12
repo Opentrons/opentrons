@@ -47,10 +47,7 @@ describe('flexStackerEmpty', () => {
         latchOpen: false,
         storedLabwareDetails: null,
         shuttlePosition: 'home',
-        labwareInStacker: null,
-        labwareInShuttle: null,
-        labwareRetrieved: null,
-        labwareStored: null,
+        labwareIdsInStacker: null,
       },
     }
     vi.mocked(flexStackerStateGetter).mockReturnValue(

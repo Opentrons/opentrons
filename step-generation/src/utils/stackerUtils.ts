@@ -3,7 +3,7 @@ import { LabwareLocation, locationIsOnModule } from '@opentrons/shared-data'
 import { TimelineFrame } from '../types'
 import { getSlotInLocationStack } from '../utils'
 
-// write tests for module section
+// remove if not used write tests for module section
 export function getIsSlotOccupied(
   robotState: TimelineFrame,
   slotIpnut: LabwareLocation
@@ -14,7 +14,7 @@ export function getIsSlotOccupied(
     if (labware.stack.length > 0) {
       const slot = getSlotInLocationStack(labware.stack)
       console.log('slot: ', slot)
-      if (slot === slotIpnut.slotName) {
+      if ('slotName' in slotIpnut && slot === slotIpnut.slotName) {
         return true
       }
     }
