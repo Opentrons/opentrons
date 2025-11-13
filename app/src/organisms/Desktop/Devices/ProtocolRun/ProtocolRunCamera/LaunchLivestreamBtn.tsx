@@ -35,7 +35,9 @@ export function LaunchLivestreamBtn({
       cameraStreamOpenAction(
         host?.hostname ?? 'UNKNOWN',
         host?.robotName ?? 'UNKNOWN',
-        t('branded:livestream_window_title') as string
+        t('branded:livestream_window_title', {
+          robotName: host?.robotName ?? '',
+        }) as string
       )
     )
     reportLiveFeedUsage({

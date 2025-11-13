@@ -52,7 +52,7 @@ describe('UsagePreferencesSettings', () => {
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
       'Automatically capture an image of the deck in the event of an error.'
     )
@@ -70,7 +70,7 @@ describe('UsagePreferencesSettings', () => {
   it('calls toggleRecoveryCaptureEnabled when recovery capture button is clicked', async () => {
     render(mockProps)
 
-    const listButton = screen.getByText('Error recovery')
+    const listButton = screen.getByText('Error image capture')
     fireEvent.click(listButton)
 
     expect(mockProps.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)
