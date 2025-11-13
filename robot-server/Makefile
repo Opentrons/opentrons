@@ -71,12 +71,12 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) sync --dev $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) sync --dev $(pipenv_opts)
 	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
 

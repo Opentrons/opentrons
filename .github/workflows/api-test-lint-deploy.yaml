@@ -65,6 +65,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          install-dev-deps: 'true'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
