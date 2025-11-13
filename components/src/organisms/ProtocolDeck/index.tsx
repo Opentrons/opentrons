@@ -162,7 +162,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const labwareOnDeckFiltered: LabwareOnDeck[] = labwareOnDeck.filter(
     (labware): labware is LabwareOnDeck => labware != null
   )
-
   return (
     <BaseDeck
       deckConfig={deckConfig}

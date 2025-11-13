@@ -11,7 +11,7 @@
   align-items: start;
   justify-content: space-between;
   -webkit-box-orient: vertical;
-  font-size: var(--font-size-caption);
+  font-size: 0.625rem;
   gap: var(--spacing-4);
   text-transform: none;
   white-space: initial;
