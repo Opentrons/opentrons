@@ -122,6 +122,7 @@ describe('RunProgressMeter', () => {
     expect(screen.getByText('Step N/A:')).toBeTruthy()
     expect(screen.queryByText('MOCK PROGRESS BAR')).toBeFalsy()
   })
+
   it('should give no step info when run status is idle', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
-  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
   CommandText,
@@ -14,7 +13,7 @@ import {
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
-import { TERMINAL_RUN_STATUSES } from '../constants'
+import { isTerminalRunStatus } from '../../Devices/ProtocolRun/ProtocolRunHeader/utils'
 
 import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
@@ -72,7 +71,7 @@ export function useRunProgressCopy({
   )
 
   const currentStepContents = ((): JSX.Element | null => {
-    if (runStatus === RUN_STATUS_SUCCEEDED || runHasNotBeenStarted) {
+    if (isTerminalRunStatus(runStatus) || runHasNotBeenStarted) {
       return null
     } else if (analysis != null && !hasRunDiverged) {
       return (
@@ -106,21 +105,14 @@ export function useRunProgressCopy({
     : (currentStepNumber! / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
-    if (
-      runStatus == null ||
-      runStatus === RUN_STATUS_SUCCEEDED ||
-      runHasNotBeenStarted
-    ) {
+    if (isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_IDLE) {
       return null
     }
 
-    const isTerminalStatus = TERMINAL_RUN_STATUSES.includes(runStatus)
-    const stepType = isTerminalStatus ? '' : t('current_step')
-
-    if (isTerminalStatus && currentStepNumber == null) {
-      return `${stepType}: ${t('na')}`
+    if (isTerminalRunStatus(runStatus) && currentStepNumber == null) {
+      return `${t(`current_step`)}: ${t('na')}`
     } else if (hasRunDiverged) {
-      return `${stepType} ${t('na')}:`
+      return `${t(`current_step`)} ${t('na')}:`
     } else {
       const getCountString = (): string => {
         const current = currentStepNumber ?? '?'
@@ -128,7 +120,7 @@ export function useRunProgressCopy({
         return `${current}/${total}`
       }
 
-      return `${stepType} ${getCountString()}:`
+      return `${t(`current_step`)} ${getCountString()}:`
     }
   })()
   const { reportModuleCommand } = useModuleCommandAnalytics()

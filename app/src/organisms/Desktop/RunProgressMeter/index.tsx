@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -39,6 +37,7 @@ import {
 } from '/app/resources/runs'
 
 import { useDownloadRunLog } from '../Devices/hooks'
+import { isTerminalRunStatus } from '../Devices/ProtocolRun/ProtocolRunHeader/utils'
 import { useRunProgressCopy } from './hooks'
 import { InterventionTicks } from './InterventionTicks'
 
@@ -74,8 +73,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { currentStepNumber, totalStepCount, hasRunDiverged } =
     useRunningStepCounts(runId, mostRecentCommandData)
 
-  const downloadEnabled =
-    runStatus === RUN_STATUS_SUCCEEDED || runStatus === RUN_STATUS_FAILED
+  const downloadEnabled = isTerminalRunStatus(runStatus)
 
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
