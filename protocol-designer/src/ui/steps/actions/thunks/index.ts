@@ -12,13 +12,19 @@ import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
 import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import {
   getInitialDeckSetup,
-  getOrderedStepIds,
+  getSavedStepHierarchy,
   getUnsavedForm,
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
 } from '/protocol-designer/step-forms/selectors'
 import { changeFormInput } from '/protocol-designer/steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+import { getStepHierarchyAfterDuplication } from '/protocol-designer/steplist/utils/getStepHierarchyAfterDuplication'
+import { getStepsToSelectAfterDuplication } from '/protocol-designer/steplist/utils/getStepsToSelect'
+import {
+  convertStepHierarchyToArray,
+  getPairedSteps,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
@@ -41,6 +47,7 @@ import type { ThunkAction } from '/protocol-designer/types'
 import type {
   DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
+  SelectStepAction,
 } from '../types'
 
 export const addAndSelectStep: (arg: {
@@ -214,9 +221,89 @@ export const reorderSelectedStep: (
 }
 
 export const duplicateSelectedSteps: () => ThunkAction<
-  DuplicateSelectedStepsAction | SelectMultipleStepsAction
+  DuplicateSelectedStepsAction | SelectStepAction | SelectMultipleStepsAction
 > = () => (dispatch, getState) => {
-  // TODO BEFORE MERGE: Implement this.
+  const originalStepHierarchy = getSavedStepHierarchy(getState())
+
+  // todo(mm, 2025-11-05): This input gathering is a bit tedious because the state and
+  // selectors have a firm separation between single-select mode and multi-select mode.
+  // We probably want to combine the two modes into one.
+  const rawMultiSelectedStepIds = getMultiSelectItemIds(getState())
+  const rawSingleSelectedStepId = getSelectedStepId(getState())
+  const rawSelectedStepIds =
+    rawMultiSelectedStepIds ??
+    (rawSingleSelectedStepId != null ? [rawSingleSelectedStepId] : [])
+  const lastSelectedStepId =
+    getMultiSelectLastSelected(getState()) ?? rawSingleSelectedStepId
+
+  const stepIdsToDuplicate = new Set([
+    ...rawSelectedStepIds,
+    ...getPairedSteps(originalStepHierarchy, new Set(rawSelectedStepIds)),
+  ])
+  const duplicateIdsZipped = [...stepIdsToDuplicate].map(originalStepId => ({
+    originalStepId,
+    duplicateStepId: uuid(),
+  }))
+  const originalIdsToDuplicateIds = Object.fromEntries(
+    duplicateIdsZipped.map(({ originalStepId, duplicateStepId }) => [
+      originalStepId,
+      duplicateStepId,
+    ])
+  )
+
+  if (lastSelectedStepId == null) {
+    // Nothing selected, apparently, so nothing to do.
+    return
+  }
+
+  const stepHierarchyAfterDuplication = getStepHierarchyAfterDuplication(
+    originalStepHierarchy,
+    originalIdsToDuplicateIds,
+    lastSelectedStepId
+  )
+  const stepOrderAfterDuplication = convertStepHierarchyToArray(
+    stepHierarchyAfterDuplication
+  )
+
+  const stepIdsToSelect = getStepsToSelectAfterDuplication(
+    stepHierarchyAfterDuplication,
+    new Set(Object.values(originalIdsToDuplicateIds))
+  )
+
+  const duplicateSelectedStepsAction: DuplicateSelectedStepsAction = {
+    type: 'DUPLICATE_SELECTED_STEPS',
+    payload: {
+      steps: duplicateIdsZipped,
+      newStepOrder: stepOrderAfterDuplication,
+    },
+  }
+  const selectNewStepsAction = (():
+    | SelectStepAction
+    | SelectMultipleStepsAction
+    | null => {
+    // If we have multiple step IDs to select, dispatch a SELECT_MULTIPLE_STEPS; if we
+    // have just one, dispatch a SELECT_STEP. This just preserves prior behavior and
+    // I'm not sure the distinction actually matters. We might be able to simplify this
+    // by returning one action type always.
+    if (stepIdsToSelect.length > 1) {
+      return {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: {
+          stepIds: stepIdsToSelect,
+          lastSelected: last(stepIdsToSelect)!,
+        },
+      }
+    } else if (stepIdsToSelect.length === 1) {
+      return {
+        type: 'SELECT_STEP',
+        payload: stepIdsToSelect[0],
+      }
+    } else {
+      return null
+    }
+  })()
+  dispatch(duplicateSelectedStepsAction)
+  if (selectNewStepsAction != null) dispatch(selectNewStepsAction)
 }
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
 export interface SaveStepFormAction {

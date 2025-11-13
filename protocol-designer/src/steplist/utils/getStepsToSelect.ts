@@ -37,6 +37,23 @@ export function getStepToSelectAfterDeletion(
   return nextSelectable?.stepId ?? prevSelectable?.stepId ?? null
 }
 
+/**
+ * When the user duplicates steps, this chooses which steps we should automatically
+ * select after the duplication.
+ *
+ * @param stepHierarchyAfterDuplication: The steps after the duplication operation.
+ * @param newStepIds: The IDs of the steps that the duplication operation added.
+ * @return The steps we should select, in timeline order.
+ */
+export function getStepsToSelectAfterDuplication(
+  stepHierarchyAfterDuplication: StepHierarchy,
+  newStepIds: Set<StepIdType>
+): StepIdType[] {
+  return getFlatSteps(stepHierarchyAfterDuplication)
+    .filter(step => step.isVisibleToUser && newStepIds.has(step.stepId))
+    .map(step => step.stepId)
+}
+
 interface Step {
   stepId: StepIdType
   /**

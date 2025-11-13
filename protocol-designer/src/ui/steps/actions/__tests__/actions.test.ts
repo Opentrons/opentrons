@@ -8,7 +8,11 @@ import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
 import * as utils from '/protocol-designer/utils'
 
-import { getMultiSelectLastSelected } from '../../selectors'
+import {
+  getMultiSelectItemIds,
+  getMultiSelectLastSelected,
+  getSelectedStepId,
+} from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
   duplicateSelectedSteps,
@@ -17,6 +21,11 @@ import {
 } from '../thunks'
 
 import type { RobotState, Timeline } from '@opentrons/step-generation/src/types'
+import type {
+  DuplicateSelectedStepsAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+} from '../types'
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../../selectors')
@@ -145,96 +154,128 @@ describe('steps actions', () => {
     })
   })
   describe('duplicateSelectedSteps', () => {
-    let ids
     beforeEach(() => {
-      ids = ['id_1', 'id_2', 'id_3']
-      when(vi.mocked(stepFormSelectors.getOrderedStepIds))
+      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
         .calledWith(expect.anything())
-        .thenReturn(ids)
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn('id_3')
+        .thenReturn({
+          topLevelItems: [
+            {
+              type: 'standaloneStep',
+              stepId: 'id_1',
+            },
+            {
+              type: 'thermocyclerProfileGroup',
+              thermocyclerProfileStepId: 'id_2',
+              concurrentSteps: [
+                {
+                  type: 'standaloneStep',
+                  stepId: 'id_3',
+                },
+              ],
+              waitForThermocyclerProfileStepId: 'id_4',
+            },
+            {
+              type: 'standaloneStep',
+              stepId: 'id_5',
+            },
+          ],
+        })
     })
     afterEach(() => {
       vi.resetAllMocks()
       vi.restoreAllMocks()
     })
-    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
-      vi.spyOn(utils, 'uuid')
-        .mockReturnValueOnce('dup_1')
-        .mockReturnValueOnce('dup_2')
-        .mockReturnValueOnce('dup_3')
+    it('should duplicate a single-selected step', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn('id_3')
+      when(vi.mocked(getMultiSelectItemIds))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      when(vi.mocked(getMultiSelectLastSelected))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      vi.spyOn(utils, 'uuid').mockReturnValueOnce('dup')
       const store: any = mockStore()
-      store.dispatch(duplicateSelectedSteps(['id_1', 'id_2', 'id_3']))
-      const duplicateStepsAction = {
+      store.dispatch(duplicateSelectedSteps())
+      const expectedDuplicateAction: DuplicateSelectedStepsAction = {
         type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
-              stepId: 'id_1',
-              duplicateStepId: 'dup_1',
-            },
-            {
-              stepId: 'id_2',
-              duplicateStepId: 'dup_2',
-            },
-            {
-              stepId: 'id_3',
-              duplicateStepId: 'dup_3',
+              originalStepId: 'id_3',
+              duplicateStepId: 'dup',
             },
           ],
-          indexToInsert: 3,
+          newStepOrder: ['id_1', 'id_2', 'id_3', 'dup', 'id_4', 'id_5'],
         },
       }
-      const selectMultipleStepsAction = {
-        type: 'SELECT_MULTIPLE_STEPS',
-        payload: {
-          stepIds: ['dup_1', 'dup_2', 'dup_3'],
-          lastSelected: 'dup_3',
-        },
+      const expectedSelectAction: SelectStepAction = {
+        type: 'SELECT_STEP',
+        payload: 'dup',
       }
       expect(store.getActions()).toEqual([
-        duplicateStepsAction,
-        selectMultipleStepsAction,
+        expectedDuplicateAction,
+        expectedSelectAction,
       ])
     })
-    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps even when provided in a non linear order', () => {
+    it('should duplicate multi-selected steps', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      when(vi.mocked(getMultiSelectItemIds))
+        .calledWith(expect.anything())
+        .thenReturn(['id_2', 'id_3'])
+      when(vi.mocked(getMultiSelectLastSelected))
+        .calledWith(expect.anything())
+        .thenReturn('id_3')
       vi.spyOn(utils, 'uuid')
-        .mockReturnValueOnce('dup_1')
-        .mockReturnValueOnce('dup_2')
-        .mockReturnValueOnce('dup_3')
+        .mockReturnValueOnce('dup_of_2')
+        .mockReturnValueOnce('dup_of_3')
+        .mockReturnValueOnce('dup_of_4')
       const store: any = mockStore()
-      store.dispatch(duplicateSelectedSteps(['id_3', 'id_1', 'id_2']))
-      const duplicateStepsAction = {
+      store.dispatch(duplicateSelectedSteps())
+      const expectedDuplicateAction: DuplicateSelectedStepsAction = {
         type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
-              stepId: 'id_1',
-              duplicateStepId: 'dup_1',
+              originalStepId: 'id_2',
+              duplicateStepId: 'dup_of_2',
             },
             {
-              stepId: 'id_2',
-              duplicateStepId: 'dup_2',
+              originalStepId: 'id_3',
+              duplicateStepId: 'dup_of_3',
             },
             {
-              stepId: 'id_3',
-              duplicateStepId: 'dup_3',
+              originalStepId: 'id_4',
+              duplicateStepId: 'dup_of_4',
             },
           ],
-          indexToInsert: 3,
+          newStepOrder: [
+            'id_1',
+            'id_2',
+            'id_3',
+            'id_4',
+            'dup_of_2',
+            'dup_of_3',
+            'dup_of_4',
+            'id_5',
+          ],
         },
       }
-      const selectMultipleStepsAction = {
+      const expectedSelectAction: SelectMultipleStepsAction = {
         type: 'SELECT_MULTIPLE_STEPS',
         payload: {
-          stepIds: ['dup_1', 'dup_2', 'dup_3'],
-          lastSelected: 'dup_3',
+          // dup_of_4 is the new "wait for profile to complete" step, which is hidden
+          // in the UI and should not be selected.
+          stepIds: ['dup_of_2', 'dup_of_3'],
+          lastSelected: 'dup_of_3',
         },
       }
       expect(store.getActions()).toEqual([
-        duplicateStepsAction,
-        selectMultipleStepsAction,
+        expectedDuplicateAction,
+        expectedSelectAction,
       ])
     })
   })
