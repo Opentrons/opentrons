@@ -35,6 +35,7 @@ import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalE
 import type { CreatePipettesAction } from '../step-forms/actions'
 import type { StepArgsAndErrors } from '../steplist'
 import type { BaseState } from '../types'
+import type { DuplicateSelectedStepsAction } from '../ui/steps'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -296,10 +297,13 @@ export const reduxActionToAnalyticsEvent = (
       properties: {},
     }
   }
-  if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
-    return {
-      name: 'duplicateMultipleSteps',
-      properties: {},
+  if (action.type === 'DUPLICATE_SELECTED_STEPS') {
+    const a: DuplicateSelectedStepsAction = action
+    if (a.payload.steps.length > 1) {
+      return {
+        name: 'duplicateMultipleSteps',
+        properties: {},
+      }
     }
   }
   if (action.type === 'LOAD_FILE') {

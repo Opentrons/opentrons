@@ -25,7 +25,11 @@ import {
 } from '/protocol-designer/tutorial'
 import { uuid } from '/protocol-designer/utils'
 
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import {
+  getMultiSelectItemIds,
+  getMultiSelectLastSelected,
+  getSelectedStepId,
+} from '../../selectors'
 import { addStep, selectDropdownItem } from '../actions'
 
 import type {
@@ -35,8 +39,7 @@ import type {
 } from '/protocol-designer/form-types'
 import type { ThunkAction } from '/protocol-designer/types'
 import type {
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
+  DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
 } from '../types'
 
@@ -210,55 +213,11 @@ export const reorderSelectedStep: (
   }
 }
 
-export const duplicateStep: (
-  stepId: StepIdType
-) => ThunkAction<DuplicateStepAction> = stepId => (dispatch, getState) => {
-  const duplicateStepId = uuid()
-
-  if (stepId != null) {
-    dispatch({
-      type: 'DUPLICATE_STEP',
-      payload: {
-        stepId,
-        duplicateStepId,
-      },
-    })
-  }
+export const duplicateSelectedSteps: () => ThunkAction<
+  DuplicateSelectedStepsAction | SelectMultipleStepsAction
+> = () => (dispatch, getState) => {
+  // TODO BEFORE MERGE: Implement this.
 }
-export const duplicateMultipleSteps: (
-  stepIds: StepIdType[]
-) => ThunkAction<DuplicateMultipleStepsAction | SelectMultipleStepsAction> =
-  stepIds => (dispatch, getState) => {
-    const orderedStepIds = getOrderedStepIds(getState())
-    const lastSelectedItemId = getMultiSelectLastSelected(getState())
-    const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId!)
-    stepIds.sort(
-      (a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b)
-    )
-    const duplicateIdsZipped = stepIds.map(stepId => ({
-      stepId: stepId,
-      duplicateStepId: uuid(),
-    }))
-    const duplicateIds = duplicateIdsZipped.map(
-      ({ duplicateStepId }) => duplicateStepId
-    )
-    const duplicateMultipleStepsAction: DuplicateMultipleStepsAction = {
-      type: 'DUPLICATE_MULTIPLE_STEPS',
-      payload: {
-        steps: duplicateIdsZipped,
-        indexToInsert: indexOfLastSelected + 1,
-      },
-    }
-    const selectMultipleStepsAction: SelectMultipleStepsAction = {
-      type: 'SELECT_MULTIPLE_STEPS',
-      payload: {
-        stepIds: duplicateIds,
-        lastSelected: last(duplicateIds)!,
-      },
-    }
-    dispatch(duplicateMultipleStepsAction)
-    dispatch(selectMultipleStepsAction)
-  }
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
 export interface SaveStepFormAction {
   type: typeof SAVE_STEP_FORM

@@ -11,8 +11,7 @@ import * as utils from '/protocol-designer/utils'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
-  duplicateMultipleSteps,
-  duplicateStep,
+  duplicateSelectedSteps,
   saveHeaterShakerFormWithAddedPauseUntilTemp,
   saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
@@ -145,26 +144,7 @@ describe('steps actions', () => {
       consoleWarnSpy.mockRestore()
     })
   })
-  describe('duplicateStep', () => {
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
-    it('should duplicate a step with a new step id', () => {
-      vi.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
-      const store: any = mockStore()
-      store.dispatch(duplicateStep('id_1'))
-      expect(store.getActions()).toEqual([
-        {
-          type: 'DUPLICATE_STEP',
-          payload: {
-            stepId: 'id_1',
-            duplicateStepId: 'duplicate_id',
-          },
-        },
-      ])
-    })
-  })
-  describe('duplicateMultipleSteps', () => {
+  describe('duplicateSelectedSteps', () => {
     let ids
     beforeEach(() => {
       ids = ['id_1', 'id_2', 'id_3']
@@ -185,9 +165,9 @@ describe('steps actions', () => {
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
       const store: any = mockStore()
-      store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
+      store.dispatch(duplicateSelectedSteps(['id_1', 'id_2', 'id_3']))
       const duplicateStepsAction = {
-        type: 'DUPLICATE_MULTIPLE_STEPS',
+        type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
@@ -224,9 +204,9 @@ describe('steps actions', () => {
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
       const store: any = mockStore()
-      store.dispatch(duplicateMultipleSteps(['id_3', 'id_1', 'id_2']))
+      store.dispatch(duplicateSelectedSteps(['id_3', 'id_1', 'id_2']))
       const duplicateStepsAction = {
-        type: 'DUPLICATE_MULTIPLE_STEPS',
+        type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
