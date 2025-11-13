@@ -97,6 +97,24 @@ Click the three-dot menu (⋮) on the module card to choose from available comma
 | **Temperature**   | <ul><li>Set module temperature / Deactivate module</li></ul>                            |
 | **Thermocycler**  | <ul><li>Set lid temperature / Deactivate lid</li><li>Open lid / Close lid</li><li>Set block temperature / Deactivate block</li></ul> |
 
+## Camera features and controls
+
+Since their first day of production, every Flex has shipped with a built in camera. Even though these cameras were functional, they have always been disabled but this state changes starting with robot software version 8.8. In that release, you can now control and use the camera in the Opentrons App. When enabled, the built-in camera provides:
+
+- Live, in-app video monitoring during protocol runs.
+- Automatic image capture at intervals you set in a protocol.
+- Automatic image capture during a crash or in response to a runtime error.
+- The ability to download compressed image files (`.zip` format) after a protocol run ends.
+
+The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
+
+![Image showing robot front and interior camera](./images/camera-location-xray.png)
+
+### Controlling the camera
+
+The Opentrons App gives you full control over the camera. The camera is disabled by default.
+
+
 ## Recent protocol runs
 
 The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
