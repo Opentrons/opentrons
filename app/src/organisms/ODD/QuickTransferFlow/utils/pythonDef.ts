@@ -1,5 +1,6 @@
 import upperCase from 'lodash/upperCase'
 
+import { getIsTiprack } from '@opentrons/shared-data'
 import {
   consolidate,
   distribute,
@@ -70,12 +71,13 @@ export function quickTransferStepCommands(
 
   let finalDropTipCommand = ''
 
-  const dropTipIsTiprack = stepArgs?.dropTipLocation
+  const dropTipLocation = stepArgs?.dropTipLocation
+  const matchingDropTipLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
   const isReturnTip =
-    typeof dropTipIsTiprack === 'string' &&
-    Object.values(labwareEntities).some(
-      ({ labwareDefURI }) => labwareDefURI === dropTipIsTiprack
-    )
+    matchingDropTipLabwareEntity != null &&
+    getIsTiprack(matchingDropTipLabwareEntity.def)
 
   // if the drop tip location is not a tip rack, a protocol needs to add a drop tip command
   if (!isReturnTip) {

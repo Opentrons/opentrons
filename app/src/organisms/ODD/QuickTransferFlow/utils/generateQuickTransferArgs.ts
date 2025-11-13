@@ -187,17 +187,32 @@ export function getInvariantContextAndRobotState(
     const installedTrashBin = deckConfig.find(
       config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
     )
-
+    const installedWasteChute = deckConfig.find(config =>
+      WASTE_CHUTE_FIXTURES.includes(config.cutoutFixtureId)
+    )
     const trashBinLocation =
       installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
-
+    const wasteChuteLocation =
+      installedWasteChute != null ? installedWasteChute.cutoutId : ''
     const trashId = `${uuid()}_trashBin`
-    trashBinEntities = {
-      [trashId]: {
-        id: trashId,
-        location: trashBinLocation,
-        pythonName: pythonTrashBinName,
-      },
+    const wasteChuteId = `${uuid()}_wasteChute`
+
+    if (installedTrashBin != null) {
+      trashBinEntities = {
+        [trashId]: {
+          id: trashId,
+          location: trashBinLocation,
+          pythonName: pythonTrashBinName,
+        },
+      }
+    } else if (installedWasteChute != null) {
+      wasteChuteEntities = {
+        [wasteChuteId]: {
+          id: wasteChuteId,
+          location: installedWasteChute.cutoutId,
+          pythonName: pythonWasteChuteName,
+        },
+      }
     }
   }
 
