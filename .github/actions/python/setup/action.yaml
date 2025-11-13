@@ -48,10 +48,11 @@ runs:
       id: project-type
       shell: bash
       run: |
-        if [ -f "${{ inputs.project }}/Pipfile" ]; then
-          echo "type=pipenv" >> $GITHUB_OUTPUT
-        elif [ -f "${{ inputs.project }}/uv.lock" ] || [ -f "${{ inputs.project }}/pyproject.toml" ]; then
+        # Check for UV projects first (uv.lock or pyproject.toml takes precedence over Pipfile)
+        if [ -f "${{ inputs.project }}/uv.lock" ] || [ -f "${{ inputs.project }}/pyproject.toml" ]; then
           echo "type=uv" >> $GITHUB_OUTPUT
+        elif [ -f "${{ inputs.project }}/Pipfile" ]; then
+          echo "type=pipenv" >> $GITHUB_OUTPUT
         else
           echo "type=make" >> $GITHUB_OUTPUT
         fi
@@ -76,11 +77,8 @@ runs:
       run: |
         START_TIME=$(date +%s)
         echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
-        # Check for Pipfile first (non-migrated projects use pipenv via make setup)
-        if [ -f "${{ inputs.project }}/Pipfile" ]; then
-          # Original behavior: just call make setup (pipenv already installed above)
-          make -C ${{ inputs.project }} setup
-        elif [ -f "${{ inputs.project }}/uv.lock" ]; then
+        # Check for UV projects first (uv.lock or pyproject.toml takes precedence over Pipfile)
+        if [ -f "${{ inputs.project }}/uv.lock" ]; then
           echo "::notice::Using UV for dependency management"
           # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
           LINUX_EXTRA=""
@@ -120,6 +118,9 @@ runs:
           if [ -n "$DEV_EXTRA" ]; then
             uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
           fi
+        elif [ -f "${{ inputs.project }}/Pipfile" ]; then
+          # Original behavior: just call make setup (pipenv already installed above)
+          make -C ${{ inputs.project }} setup
         else
           # Fall back to make setup for projects with no Pipfile, uv.lock, or pyproject.toml
           make -C ${{ inputs.project }} setup
