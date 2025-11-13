@@ -26,11 +26,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
-import {
-  getActiveLayer,
-  getBackgroundColor,
-  getIsCutoutA1Active,
-} from './utils'
+import { getActiveLayer, getIsCutoutA1Active } from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -232,18 +228,15 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                               cutoutId={cutoutId}
                               deckDefinition={deckDef}
                               slotClipColor={COLORS.transparent}
-                              fixtureBaseColor={lightFill}
+                              fixtureBaseColor={
+                                isPipetteOverTrash ? COLORS.purple30 : lightFill
+                              }
                             />
                             <FlexTrash
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={getBackgroundColor(
-                                hoveredSlot,
-                                selectedSlot,
-                                slot,
-                                isPipetteOverTrash
-                              )}
+                              backgroundColor={COLORS.grey50}
                               onClick={() => {
                                 setSelectedSlot(slot)
                               }}
@@ -252,14 +245,26 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         )
                       })
                     : null}
-                  {Object.values(wasteChuteEntities).map(entity => (
-                    <WasteChuteFixture
-                      key={entity.id}
-                      cutoutId={entity.location as typeof WASTE_CHUTE_CUTOUT}
-                      deckDefinition={deckDef}
-                      fixtureBaseColor={lightFill}
-                    />
-                  ))}
+                  {Object.values(wasteChuteEntities).map(({ id, location }) => {
+                    const isPipetteOverTrash =
+                      Object.values(robotState.pipettes).some(
+                        pipette => pipette.entityId === id
+                      ) &&
+                      selectedRunTimeCommand != null &&
+                      POTENTIAL_TRASH_COMMAND_TYPES.includes(
+                        selectedRunTimeCommand.commandType
+                      )
+                    return (
+                      <WasteChuteFixture
+                        key={id}
+                        cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
+                        deckDefinition={deckDef}
+                        fixtureBaseColor={
+                          isPipetteOverTrash ? COLORS.purple30 : lightFill
+                        }
+                      />
+                    )
+                  })}
                   {wasteChuteStagingAreaFixtures.map(fixture => (
                     <WasteChuteStagingAreaFixture
                       key={fixture.id}

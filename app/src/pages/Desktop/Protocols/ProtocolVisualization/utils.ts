@@ -161,27 +161,6 @@ export const getMissingTips = (
   return missingTips
 }
 
-export const getBackgroundColor = (
-  hoveredSlot: string | null,
-  selectedSlot: string | null,
-  slot: string,
-  isSlotSelected: boolean
-): string => {
-  let backgroundColor = COLORS.grey50
-  if (hoveredSlot === slot && isSlotSelected) {
-    backgroundColor = COLORS.purple60
-  } else if (hoveredSlot === slot && !isSlotSelected) {
-    backgroundColor = COLORS.grey60
-  } else if (selectedSlot === slot && isSlotSelected) {
-    backgroundColor = COLORS.purple60
-  } else if (selectedSlot === slot && !isSlotSelected) {
-    backgroundColor = COLORS.grey60
-  } else if (isSlotSelected) {
-    backgroundColor = COLORS.purple50
-  }
-  return backgroundColor
-}
-
 interface ActiveLayer {
   isActiveLayerVisible: boolean
 }

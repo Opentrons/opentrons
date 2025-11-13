@@ -135,6 +135,7 @@ export function getResultingTimelineFrameFromRunCommands(
     moduleLocations,
     pipetteLocations,
   })
+  console.log('initialRobotState',initialRobotState)
   return {
     frame: {
       ...getNextRobotStateAndWarnings(
