@@ -100,9 +100,9 @@ export function ProtocolDetailsHeader({
   const creationMethod =
     mostRecentAnalysis != null
       ? (getCreationMethod(
-          mostRecentAnalysis.config,
-          mostRecentAnalysis.metadata
-        ) ?? t('shared:no_data'))
+        mostRecentAnalysis.config,
+        mostRecentAnalysis.metadata
+      ) ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const author =
@@ -139,11 +139,11 @@ export function ProtocolDetailsHeader({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
+        padding={`${SPACING.spacing20} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
         width="100%"
       >
         {analysisStatus !== 'loading' &&
-        mostRecentAnalysis?.result === 'parameter-value-required' ? (
+          mostRecentAnalysis?.result === 'parameter-value-required' ? (
           <ProtocolStatusBanner />
         ) : null}
         {mostRecentAnalysis != null && analysisStatus === 'error' ? (
@@ -156,12 +156,12 @@ export function ProtocolDetailsHeader({
           <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
             <Flex
               flexDirection={DIRECTION_ROW}
-              gap={SPACING.spacing4}
+              gap={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
               paddingRight={SPACING.spacing24}
             >
-              <StyledText desktopStyle="headingSmallBold">
+              <StyledText desktopStyle="headingSmallBold" style={{ overflowWrap: 'anywhere' }}>
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
@@ -223,7 +223,7 @@ export function ProtocolDetailsHeader({
                 type="default"
               />
               <Tag text={creationMethod} type="default" />
-              <Tag text={`Author:${author}`} type="default" />
+              <Tag text={`Author: ${author}`} type="default" />
             </Flex>
           </Flex>
         </Flex>
