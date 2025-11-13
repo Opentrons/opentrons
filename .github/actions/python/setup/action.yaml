@@ -48,20 +48,8 @@ runs:
       id: project-type
       shell: bash
       run: |
-        # Projects that should not use UV yet (even if they have uv.lock)
-        EXCLUDE_UV_PROJECTS="docs analyses-snapshot-testing"
-        # Check for UV projects: uv.lock is definitive, or pyproject.toml without Pipfile (fully migrated)
-        # If both Pipfile and pyproject.toml exist, Pipfile takes precedence (not yet migrated)
-        if [[ " $EXCLUDE_UV_PROJECTS " =~ " ${{ inputs.project }} " ]]; then
-          # Explicitly excluded from UV, check for Pipfile
-          if [ -f "${{ inputs.project }}/Pipfile" ]; then
-            echo "type=pipenv" >> $GITHUB_OUTPUT
-          else
-            echo "type=make" >> $GITHUB_OUTPUT
-          fi
-        elif [ -f "${{ inputs.project }}/uv.lock" ]; then
-          echo "type=uv" >> $GITHUB_OUTPUT
-        elif [ -f "${{ inputs.project }}/pyproject.toml" ] && [ ! -f "${{ inputs.project }}/Pipfile" ]; then
+        # Only api and shared-data use UV for now
+        if [ "${{ inputs.project }}" == "api" ] || [ "${{ inputs.project }}" == "shared-data" ]; then
           echo "type=uv" >> $GITHUB_OUTPUT
         elif [ -f "${{ inputs.project }}/Pipfile" ]; then
           echo "type=pipenv" >> $GITHUB_OUTPUT
@@ -78,16 +66,6 @@ runs:
     - name: Install UV
       if: steps.project-type.outputs.type == 'uv'
       uses: ./.github/actions/python/install-uv
-    - name: Install UV for excluded projects (their Makefiles use uv directly)
-      if: steps.project-type.outputs.type != 'uv'
-      shell: bash
-      run: |
-        # Check if project has uv.lock (excluded projects like docs, analyses-snapshot-testing)
-        if [ -f "${{ inputs.project }}/uv.lock" ]; then
-          # Install uv so their Makefiles can use it
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-        fi
     - name: Cache UV packages
       if: steps.project-type.outputs.type == 'uv'
       uses: ./.github/actions/python/cache-uv
@@ -99,8 +77,9 @@ runs:
       run: |
         START_TIME=$(date +%s)
         echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
-        # Check for UV projects: uv.lock is definitive, or pyproject.toml without Pipfile (fully migrated)
-        if [ -f "${{ inputs.project }}/uv.lock" ]; then
+        # Use the project type determined earlier
+        PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
+        if [ "$PROJECT_TYPE" == "uv" ]; then
           echo "::notice::Using UV for dependency management"
           # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
           LINUX_EXTRA=""
@@ -111,62 +90,18 @@ runs:
             fi
           fi
           echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
-          # Migrated projects with uv.lock use uv
           # Add dev extra if requested
           DEV_EXTRA=""
           if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
             DEV_EXTRA="--extra dev"
           fi
-          cd ${{ inputs.project }} && uv sync --frozen $DEV_EXTRA $LINUX_EXTRA
-        elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
-          echo "::notice::Using UV for dependency management"
-          # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
-          LINUX_EXTRA=""
-          if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
-            # Check if project has linux optional dependency defined
-            if [ -f "${{ inputs.project }}/pyproject.toml" ] && grep -q '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" && grep -A 5 '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" | grep -q 'linux'; then
-              LINUX_EXTRA="--extra linux"
-            fi
+          if [ -f "${{ inputs.project }}/uv.lock" ]; then
+            cd ${{ inputs.project }} && uv sync --frozen $DEV_EXTRA $LINUX_EXTRA
+          else
+            cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
           fi
-          echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
-          # Migrated projects with pyproject.toml (but no Pipfile) use uv
-          # Add dev extra if requested
-          DEV_EXTRA=""
-          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-            DEV_EXTRA="--extra dev"
-          fi
-          cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
-          # Verify dev dependencies are installed if dev extra was used
-          if [ -n "$DEV_EXTRA" ]; then
-            uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
-          fi
-        elif [ -f "${{ inputs.project }}/pyproject.toml" ] && [ ! -f "${{ inputs.project }}/Pipfile" ]; then
-          echo "::notice::Using UV for dependency management"
-          # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
-          LINUX_EXTRA=""
-          if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
-            # Check if project has linux optional dependency defined
-            if [ -f "${{ inputs.project }}/pyproject.toml" ] && grep -q '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" && grep -A 5 '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" | grep -q 'linux'; then
-              LINUX_EXTRA="--extra linux"
-            fi
-          fi
-          echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
-          # Migrated projects with pyproject.toml (but no Pipfile) use uv
-          # Add dev extra if requested
-          DEV_EXTRA=""
-          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-            DEV_EXTRA="--extra dev"
-          fi
-          cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
-          # Verify dev dependencies are installed if dev extra was used
-          if [ -n "$DEV_EXTRA" ]; then
-            uv pip list | grep -E "(mypy|pytest|black)" || echo "Warning: Dev dependencies may not be installed"
-          fi
-        elif [ -f "${{ inputs.project }}/Pipfile" ]; then
-          # Original behavior: just call make setup (pipenv already installed above)
-          make -C ${{ inputs.project }} setup
         else
-          # Fall back to make setup for projects with no Pipfile, uv.lock, or pyproject.toml
+          # For pipenv or make projects, just call make setup
           make -C ${{ inputs.project }} setup
         fi
         END_TIME=$(date +%s)
