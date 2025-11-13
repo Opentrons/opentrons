@@ -256,10 +256,10 @@ async def run(api: OT3API, report: CSVReport, section: str, sku: str | None = No
 
             # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
             print(f"Writing SKU {sku} to EEPROM.")
-            eeprom_data = api._backend.eeprom_data
+            eeprom_data = api._backend.eeprom_data # type: ignore
             eeprom_data.sku = sku
             eeprom_set = eeprom_data.to_set()
-            sku_result = api._backend.eeprom_driver.property_write(eeprom_set)
+            sku_result = api._backend.eeprom_driver.property_write(eeprom_set) # type: ignore
             assert PropId.SKU in sku_result
             
             removed_result = CSVResult.PASS
