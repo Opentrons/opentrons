@@ -37,6 +37,8 @@ STREAM_CONF_FILE_KEYS = [
 ]
 
 # Camera Parameter Globals
+RESOLUTION_MIN = (320, 240)
+RESOLUTION_MAX = (7680, 4320)
 RESOLUTION_DEFAULT = (1920, 1080)
 ZOOM_MIN = 1.0
 ZOOM_MAX = 2.0
@@ -277,7 +279,7 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
         fd.writelines(file_lines)
 
 
-async def image_capture(
+async def image_capture(  # noqa: C901
     robot_type: RobotType, parameters: ImageParameters
 ) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
@@ -305,8 +307,16 @@ async def image_capture(
         parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX
     ):
         potential_invalid_param = "Saturation"
+    elif parameters.resolution is not None and (
+        parameters.resolution[0] < RESOLUTION_MIN[0]
+        or parameters.resolution[1] < RESOLUTION_MIN[1]
+        or parameters.resolution[0] > RESOLUTION_MAX[0]
+        or parameters.resolution[1] > RESOLUTION_MAX[1]
+    ):
+        potential_invalid_param = "Resolution"
     else:
         potential_invalid_param = None
+
     if potential_invalid_param is not None:
         return CameraError(
             message=f"{potential_invalid_param} parameter is outside the boundaries allowed for image capture.",
