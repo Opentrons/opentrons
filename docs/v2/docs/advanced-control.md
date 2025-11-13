@@ -168,7 +168,7 @@ To disable the robot server, open a Jupyter terminal session by going to **New >
 
 ## Command Line
 
-The robot's command line is accessible either by going to **New > Terminal** in Jupyter or [via SSH][command-line-operation-over-ssh].
+The robot's command line is accessible either by going to **New > Terminal** in Jupyter or [via SSH](../flex/advanced-operation/command-line.md).
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with `scp` and then run the protocol with `opentrons_execute`:
 

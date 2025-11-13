@@ -199,6 +199,7 @@ dependencies = [
     { name = "mkdocs-print-site-plugin" },
     { name = "mkdocstrings", extra = ["python"] },
     { name = "opentrons" },
+    { name = "opentrons-shared-data" },
     { name = "playwright" },
 ]
 
@@ -212,6 +213,7 @@ requires-dist = [
     { name = "mkdocs-print-site-plugin", specifier = ">=2.8" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.29.1" },
     { name = "opentrons", editable = "../api" },
+    { name = "opentrons-shared-data", editable = "../shared-data" },
     { name = "playwright", specifier = ">=1.55" },
 ]
 
@@ -663,9 +665,9 @@ requires-dist = [
     { name = "importlib-metadata", marker = "python_full_version < '3.8'", specifier = ">=1.0" },
     { name = "jsonschema", specifier = ">=3.0.1,<4.18.0" },
     { name = "numpy", specifier = ">=1.20.0,<2" },
-    { name = "opentrons-hardware", marker = "extra == 'ot2-hardware'", specifier = "==8.7.0a2" },
-    { name = "opentrons-hardware", extras = ["flex"], marker = "extra == 'flex-hardware'", specifier = "==8.7.0a2" },
-    { name = "opentrons-shared-data", specifier = "==8.7.0a2" },
+    { name = "opentrons-hardware", marker = "extra == 'ot2-hardware'", specifier = "==8.8.0a3" },
+    { name = "opentrons-hardware", extras = ["flex"], marker = "extra == 'flex-hardware'", specifier = "==8.8.0a3" },
+    { name = "opentrons-shared-data", specifier = "==8.8.0a3" },
     { name = "packaging", specifier = ">=21.0" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2,<3" },
@@ -677,16 +679,18 @@ provides-extras = ["flex-hardware", "ot2-hardware"]
 
 [[package]]
 name = "opentrons-shared-data"
-version = "8.7.0a2"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../shared-data" }
 dependencies = [
     { name = "jsonschema" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/60/c2b5dd739879fc428b617fa244bd56dd9f1ae54bd13afbbd72ea1bb393bb/opentrons_shared_data-8.7.0a2.tar.gz", hash = "sha256:c45320d0a4e8578d8e60f76037fd349365bba404fc31f1505484d00f8a80061a", size = 602219, upload-time = "2025-09-17T22:14:18.806Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bb/18/2775d44bcfca117b3a1c6da755434863973b03f1af0587c7cc53e95e121a/opentrons_shared_data-8.7.0a2-py3-none-any.whl", hash = "sha256:8c8d0bd5a7cdfaabb1854def36abead0de8b5d52eee31e91027c87b95c85ff63", size = 1114419, upload-time = "2025-09-17T22:14:16.736Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "jsonschema", specifier = ">=4.0.0,<5" },
+    { name = "pydantic", specifier = ">=2.0.0,<3.0.0" },
+    { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 
 [[package]]

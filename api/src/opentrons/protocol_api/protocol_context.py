@@ -473,7 +473,7 @@ class ProtocolContext(CommandPublisher):
                 described in `namespace`. Formerly, it took `namespace`'s exact value.
 
             adapter_version (Optional[int]): The version of the adapter being loaded.
-            Applies to adapter the same way that version applies to load_name.
+                Applies to adapter the same way that version applies to load_name.
 
                 *New in version 2.26:* `adapter_version` may now be specified explicitly.
                 When unspecified, the API uses the newest version available for your protocol's API level.
@@ -1522,11 +1522,11 @@ class ProtocolContext(CommandPublisher):
         Args:
             name: Name of an Opentrons-verified liquid class. Must be one of:
 
-            - ``"water"``: an Opentrons-verified liquid class based on deionized water.
-            - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
-            - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
-        :param version: Version of the liquid class to retrieve. If left unspecified, defaults to the latest version for the
-            protocol's API level.
+                - ``"water"``: an Opentrons-verified liquid class based on deionized water.
+                - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
+                - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+            version: Version of the liquid class to retrieve. If left unspecified, defaults to the latest version for the
+                protocol's API level.
 
         Raises:
             LiquidClassDefinitionDoesNotExist: If the specified liquid class does not exist.

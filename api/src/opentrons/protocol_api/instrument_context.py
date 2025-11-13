@@ -220,8 +220,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 it will behave the same as a volume of `None`/unspecified: aspirate
                 until the pipette is full. On API levels at or above 2.16, no liquid
                 will be aspirated.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well],
-                [`Location`][opentrons.types.Location], optional): Tells the robot where
+            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional): 
+                Tells the robot where
                 to aspirate from. The location can be a `Well` or a `Location`.
 
                 - If the location is a `Well`, the robot will aspirate at or above the
@@ -2182,9 +2182,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 - `"once"`: Use one tip for the entire command.
                 - `"always"`: Use a new tip for each set of aspirate and dispense steps.
                 - `"per source"`: Use one tip for each source well, even if
-                [`tip refilling`][complex-tip-refilling] is required.
+                [tip refilling][tip-refilling] is required.
                 - `"per destination"`: Use one tip for each destination well, even if
-                [`tip refilling`][complex-tip-refilling] is required.
+                [tip refilling][tip-refilling] is required.
                 - `"never"`: Do not pick up or drop tips at all.
 
                 See [Tip Handling][tip-handling] for details.

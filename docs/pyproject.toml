@@ -11,11 +11,13 @@ dependencies = [
     "mkdocs-monorepo-plugin>=1.1.2",
     "mkdocstrings[python]>=0.29.1",
     "mkdocs-parent-css-plugin",
-    "opentrons",
     "mkdocs-print-site-plugin>=2.8",
+    "opentrons",
+    "opentrons-shared-data",
     "playwright>=1.55"
 ]
 
 [tool.uv.sources]
 mkdocs-parent-css-plugin = { path = "mkdocs-parent-css-plugin", editable = true }
 opentrons = { path = "../api", editable = true }
+opentrons-shared-data = { path = "../shared-data", editable = true }

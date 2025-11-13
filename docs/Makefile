@@ -19,7 +19,7 @@ clean:
 
 .PHONY: serve
 serve:
-	uv run mkdocs serve -f ./mkdocs.yml
+	uv run mkdocs serve -f ./mkdocs.yml --livereload
 
 .PHONY: pdf-flex
 pdf-flex:
