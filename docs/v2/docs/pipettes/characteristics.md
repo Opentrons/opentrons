@@ -12,7 +12,7 @@ Finally, the volume ranges of pipettes affect what you can do with them. The vol
 
 ## Multi-Channel Movement
 
-All [atomic commands](../building-block-commands/index.md) and [complex commands](../complex-commands/index.md) work with single- and multi-channel pipettes.
+All [building block](../building-block-commands/index.md) and [complex commands](../complex-commands/index.md) work with single- and multi-channel pipettes.
 
 To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
 
@@ -37,7 +37,9 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 
 ```python
 from opentrons import protocol_api
+
 requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     # Load a tiprack for 1000 µL tips
     tiprack1 = protocol.load_labware(
@@ -171,6 +173,8 @@ These flow rates will remain in effect until you change the `flow_rate` attribut
 
 ### Flex Pipette Flow Rates
 
+The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for Flex pipettes. Default flow rates for each pipette-tip combination are the same across all three actions.
+
 <table>
     <thead>
         <tr>
@@ -181,16 +185,16 @@ These flow rates will remain in effect until you change the `flow_rate` attribut
     </thead>
     <tbody>
         <tr>
-            <td rowspan="2">1- and 8-channel (50 µL)</td>
+            <td>1- and 8-channel (50 µL)</td>
             <td>50</td>
             <td>35</td>
         </tr>
         <tr>
+            <td rowspan="3">1- and 8-channel (1000 µL)</td>
             <td>50</td>
             <td>478</td>
         </tr>
         <tr>
-            <td rowspan="3">1- and 8-channel (1000 µL)</td>
             <td>200</td>
             <td>716</td>
         </tr>
@@ -199,11 +203,11 @@ These flow rates will remain in effect until you change the `flow_rate` attribut
             <td>716</td>
         </tr>
         <tr>
+            <td rowspan="3">96-channel (5-1000 µL)</td>
             <td>50</td>
             <td>6</td>
         </tr>
         <tr>
-            <td rowspan="3">96-channel (5-1000 µL)</td>
             <td>200</td>
             <td>80</td>
         </tr>
@@ -220,6 +224,8 @@ Additionally:
 - All Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
 ### OT-2 Pipette Flow Rates
+
+The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for OT-2 GEN2 pipettes. Default flow rates are the same across all three actions.
 
 <table>
     <thead>

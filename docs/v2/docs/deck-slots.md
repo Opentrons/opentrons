@@ -10,7 +10,7 @@ title: "Python API: Deck Slots"
 }
 </style>
 
-Deck slots are where you place hardware items on the deck surface of your Opentrons robot. In the API, you load the corresponding items into your protocol with methods like [`ProtocolContext.load_labware`][opentrons.protocol_api.ProtocolContext.load_labware], [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_module], or [`ProtocolContext.load_trash_bin`][opentrons.protocol_api.ProtocolContext.load_trash_bin]. When you call these methods, you need to specify which slot to load the item in.
+Deck slots are where you place hardware items on the deck surface of your Opentrons robot. In the API, you load the corresponding items into your protocol with methods like [`ProtocolContext.load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware], [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module], or [`ProtocolContext.load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin]. When you call these methods, you need to specify which slot to load the item in.
 
 ## Physical Deck Labels
 
@@ -28,8 +28,6 @@ The API accepts values that correspond to the physical deck slot labels on a Fle
 
 - A coordinate like `"A1"`. This format must be a string.
 - A number like `"10"` or `10`. This format can be a string or an integer.
-
-*New in version 2.15*
 
 As of API version 2.15, the Flex and OT-2 formats are interchangeable. You can use either format, regardless of which robot your protocol is for. You could even mix and match formats within a protocol, although this is not recommended.
 
@@ -129,8 +127,6 @@ It is possible to use slot D4 along with the waste chute. See the [Waste Chute](
 ### Trash Bin { #trash-bin-api }
 
 In version 2.15 of the API, Flex can only have a single trash bin in slot A3. You do not have to (and cannot) load the trash in version 2.15 protocols.
-
-*New in version 2.16*
 
 Starting in API version 2.16, you must load trash bin fixtures in your protocol in order to use them. Use [`load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin] to load a movable trash bin. This example loads a single bin in the default location:
 
