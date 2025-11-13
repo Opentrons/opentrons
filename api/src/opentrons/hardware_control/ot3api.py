@@ -52,6 +52,7 @@ from opentrons_shared_data.errors.exceptions import (
     InvalidActuator,
     FirmwareUpdateFailedError,
     PipetteLiquidNotFoundError,
+    PipetteOverpressureError,
 )
 
 from .util import use_or_initialize_loop, check_motion_bounds
@@ -3136,6 +3137,11 @@ class OT3API(
                     home_flagged_axes=False,
                     delay=delay,
                 )
+        except PipetteOverpressureError:
+            self._log.exception("Aspirate failed with overpressure")
+            # refresh positions during an over pressure here so we know where the gantry stopped.
+            await self.refresh_positions()
+            raise
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -3201,6 +3207,11 @@ class OT3API(
                     home_flagged_axes=False,
                     delay=delay,
                 )
+        except PipetteOverpressureError:
+            self._log.exception("Aspirate failed with overpressure")
+            # refresh positions during an over pressure here so we know where the gantry stopped.
+            await self.refresh_positions()
+            raise
         except Exception:
             self._log.exception("dispense failed")
             dispense_spec.instr.set_current_volume(0)
