@@ -2,9 +2,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import {
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR
-} from '@opentrons/api-client'
+import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
