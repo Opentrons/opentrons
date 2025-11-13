@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE, SINGLE } from '@opentrons/shared-data'
 
 import styles from '../tipselectionwizard.module.css'
 import {
@@ -20,6 +20,7 @@ import { SingleChannelFlexShadow } from './SingleChannelShadow'
 import type { Channels } from '@opentrons/components'
 import type {
   CoordinateTuple,
+  NozzleConfigurationStyle,
   PipetteV2Specs,
   RobotType,
 } from '@opentrons/shared-data'
@@ -59,6 +60,7 @@ export function PipetteShadow(props: {
   primaryNozzle: string
   robotType: RobotType
   enclosingViewbox: string | null
+  nozzles: NozzleConfigurationStyle
 }): JSX.Element {
   const {
     pipetteSpec,
@@ -73,12 +75,15 @@ export function PipetteShadow(props: {
     primaryNozzle,
     robotType,
     enclosingViewbox,
+    nozzles,
   } = props
   const [slotX, slotY] = slotPosition
   const { t } = useTranslation('tip_selection')
   const labelRef = useRef<HTMLDivElement>(null)
   const [labelWidth, setLabelWidth] = useState(0)
   const [labelHeight, setLabelHeight] = useState(0)
+
+  const isSingleTipPickup = nozzles === SINGLE
 
   const labelText = (() => {
     if (!hasPickupsRemaining && !isHoveredWellSelected) {
@@ -87,10 +92,11 @@ export function PipetteShadow(props: {
     if (!isAccessible && inaccessibleReason != null) {
       return t(`tip_inaccessible.${inaccessibleReason}`)
     }
+    const pluralKey = isSingleTipPickup ? 'one' : 'multiple'
     if (isAccessible) {
       return isHoveredWellSelected
-        ? t('tip_accessible.deselect')
-        : t('tip_accessible.select')
+        ? t(`tip_accessible.deselect_${pluralKey}`)
+        : t(`tip_accessible.select_${pluralKey}`)
     }
     console.error('No label text found')
     return ''
