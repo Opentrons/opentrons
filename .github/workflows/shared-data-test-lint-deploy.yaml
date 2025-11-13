@@ -59,6 +59,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data'
+          install-dev-deps: 'true'
       - name: Lint
         run: make -C shared-data lint-py
 
