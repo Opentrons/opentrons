@@ -89,6 +89,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          install-dev-deps: 'true'
       - name: 'Build docs'
         run: |
           make -C api docs
