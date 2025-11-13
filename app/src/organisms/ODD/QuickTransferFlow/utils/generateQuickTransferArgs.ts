@@ -58,7 +58,8 @@ function getOrderedWells(
 }
 
 export function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState
+  quickTransferState: QuickTransferSummaryState,
+  deckConfig: DeckConfiguration
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -182,12 +183,19 @@ export function getInvariantContextAndRobotState(
       getLabwareDefURI(quickTransferState.tipRack)
 
   if (dropTipIsTiprack) {
-    const defaultTrashLocation = 'cutoutA3'
+    // check deck config for trash bin
+    const installedTrashBin = deckConfig.find(
+      config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    )
+
+    const trashBinLocation =
+      installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
+
     const trashId = `${uuid()}_trashBin`
     trashBinEntities = {
       [trashId]: {
         id: trashId,
-        location: defaultTrashLocation,
+        location: trashBinLocation,
         pythonName: pythonTrashBinName,
       },
     }
@@ -326,8 +334,10 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } =
-    getInvariantContextAndRobotState(quickTransferState)
+  const { invariantContext, robotState } = getInvariantContextAndRobotState(
+    quickTransferState,
+    deckConfig
+  )
 
   let blowoutLocation: string | undefined
   if (
