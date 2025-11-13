@@ -84,6 +84,7 @@
   "live_camera": "Live camera",
   "live_video": "Live video",
   "live_video_ended": "Live video has ended",
+  "live_video_unavailable": "Live video is unavailable",
   "load_labware_info_protocol_setup_plural": "Load {{labware}} in {{module_name}}",
   "load_module_protocol_setup_plural": "Load {{module}}",
   "loading": "Loading...",

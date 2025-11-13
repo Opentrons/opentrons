@@ -38,7 +38,7 @@ describe('LivestreamInfoScreen', () => {
 
   it('renders run-setup state', () => {
     render('run-setup')
-    screen.getByText('Confirm camera preferences')
+    screen.getByText('Live video is unavailable')
     screen.getByText(
       'Confirm camera preferences to view the livestream during run setup'
     )
