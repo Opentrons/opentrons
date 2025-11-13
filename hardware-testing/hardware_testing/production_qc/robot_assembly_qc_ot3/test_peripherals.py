@@ -177,7 +177,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def run(api: OT3API, report: CSVReport, section: str, sku: str | None = None) -> None:
+async def run(
+    api: OT3API, report: CSVReport, section: str, sku: str | None = None
+) -> None:
     """Run."""
     await api.set_lights(rails=True)
     await api.set_status_bar_state(StatusBarState.IDLE)
@@ -256,15 +258,17 @@ async def run(api: OT3API, report: CSVReport, section: str, sku: str | None = No
 
             # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
             print(f"Writing SKU {sku} to EEPROM.")
-            eeprom_data = api._backend.eeprom_data # type: ignore
+            eeprom_data = api._backend.eeprom_data  # type: ignore
             eeprom_data.sku = sku
             eeprom_set = eeprom_data.to_set()
-            sku_result = api._backend.eeprom_driver.property_write(eeprom_set) # type: ignore
+            sku_result = api._backend.eeprom_driver.property_write(eeprom_set)  # type: ignore
             assert PropId.SKU in sku_result
-            
+
             removed_result = CSVResult.PASS
         except Exception as e:
-            print(f"Confirming camera not attached failed with the following error: {e}")
+            print(
+                f"Confirming camera not attached failed with the following error: {e}"
+            )
             removed_result = CSVResult.FAIL
         report(section, "camera-image", [removed_result])
     else:

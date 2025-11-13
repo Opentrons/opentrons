@@ -68,5 +68,5 @@ if __name__ == "__main__":
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, use_sku=args.sku, tests=_t_sections) # type: ignore
+    _config = TestConfig(simulate=args.simulate, use_sku=args.sku, tests=_t_sections)  # type: ignore
     asyncio.run(_main(_config))
