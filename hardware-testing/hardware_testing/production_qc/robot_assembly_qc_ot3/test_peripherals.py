@@ -12,6 +12,7 @@ from opentrons_hardware.hardware_control.rear_panel_settings import set_ui_color
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import StatusBarState, DoorState
+from opentrons_hardware.drivers.eeprom.types import PropId
 from opentrons.system import nmcli
 
 from hardware_testing.data import create_datetime_string
@@ -32,6 +33,8 @@ CAM_CMD_OT3 = (
     "v4l2-ctl --device /dev/ot_system_camera --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
+
+FLEX_SKUS_NO_CAMERA = ["999-00279"]
 
 COLOR_TO_STATE: Dict[str, Tuple[int, int, int, int]] = {
     "off": (
@@ -174,7 +177,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def run(api: OT3API, report: CSVReport, section: str, camera_removed: bool) -> None:
+async def run(api: OT3API, report: CSVReport, section: str, sku: str | None = None) -> None:
     """Run."""
     await api.set_lights(rails=True)
     await api.set_status_bar_state(StatusBarState.IDLE)
@@ -245,10 +248,20 @@ async def run(api: OT3API, report: CSVReport, section: str, camera_removed: bool
 
     # CAMERA
     ui.print_header("CAMERA")
-    if camera_removed:
+    if sku and sku in FLEX_SKUS_NO_CAMERA:
         try:
-            # Assert there is no camera device at /dev/video2, the traditional device where the embedded camera appears
+            # Assert there is no camera device at /dev/video2 to ensure it is removed
+            print("Verifying camera not attached.")
             assert not os.path.exists("/dev/video2")
+
+            # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
+            print(f"Writing SKU {sku} to EEPROM.")
+            eeprom_data = api._backend.eeprom_data
+            eeprom_data.sku = sku
+            eeprom_set = eeprom_data.to_set()
+            sku_result = api._backend.eeprom_driver.property_write(eeprom_set)
+            assert PropId.SKU in sku_result
+            
             removed_result = CSVResult.PASS
         except Exception as e:
             print(f"Confirming camera not attached failed with the following error: {e}")
