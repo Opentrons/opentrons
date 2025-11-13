@@ -1,11 +1,10 @@
-# Pipenv is used for Python dependency management (for projects not yet migrated to uv)
-pipenv ?= pipenv
-pipenv_opts ?=
+# UV is required for Python dependency management
+UV ?= uv
 
-# Python/pip/pytest commands using pipenv
-python := $(pipenv) run python
-pip := $(pipenv) run pip
-pytest := $(pipenv) run pytest
+# Python/pip/pytest commands using UV
+python := $(UV) run python
+pip := $(UV) pip
+pytest := $(UV) run pytest
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
 
@@ -93,3 +92,4 @@ endef
 define python_get_git_version
 $(shell $(python) $(if $(4),$(4),../scripts/python_build_utils.py) $(1) $(2) dump_br_version $(if $(3),-e $(3)))
 endef
+

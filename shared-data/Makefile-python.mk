@@ -1,6 +1,6 @@
 # shared-data python code makefile
 
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 include ../scripts/push.mk
 
 # Host key location for robot

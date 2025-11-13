@@ -66,14 +66,23 @@ runs:
           fi
         fi
         echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
-        # Add dev extra if requested
-        DEV_EXTRA=""
-        if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-          DEV_EXTRA="--extra dev"
-        fi
-        if [ -f "${{ inputs.project }}/uv.lock" ]; then
+        # Check if project uses Pipfile (not migrated to uv yet)
+        if [ -f "${{ inputs.project }}/Pipfile" ]; then
+          # Use pipenv for projects that still have Pipfile
+          cd ${{ inputs.project }} && pipenv sync && pipenv run pip freeze
+        elif [ -f "${{ inputs.project }}/uv.lock" ]; then
+          # Add dev extra if requested
+          DEV_EXTRA=""
+          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
+            DEV_EXTRA="--extra dev"
+          fi
           cd ${{ inputs.project }} && uv sync --frozen $DEV_EXTRA $LINUX_EXTRA
         elif [ -f "${{ inputs.project }}/pyproject.toml" ]; then
+          # Add dev extra if requested
+          DEV_EXTRA=""
+          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
+            DEV_EXTRA="--extra dev"
+          fi
           cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
           # Verify dev dependencies are installed if dev extra was used
           if [ -n "$DEV_EXTRA" ]; then
