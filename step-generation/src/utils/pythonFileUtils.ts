@@ -2,6 +2,7 @@ import max from 'lodash/max'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
@@ -12,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getLiquidClassName } from './liquidClassUtils'
-import { getSlotInLocationStack } from './misc'
+import { getLargestStackInSlot, getSlotInLocationStack } from './misc'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
@@ -297,6 +298,25 @@ export function getLoadLabware(
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
         parentName = moduleEntities[labwareSlot].pythonName
+        if (moduleEntities[labwareSlot].type === FLEX_STACKER_MODULE_TYPE) {
+          const largestStack = getLargestStackInSlot(
+            labwareRobotState,
+            labwareSlot
+          )
+          // Count only labware items (excluding slot, module, and adapters)
+          const labwareCount = largestStack.filter(
+            itemId =>
+              itemId in allLabwareEntities &&
+              !allLabwareEntities[itemId].def.allowedRoles?.includes(
+                'adapter'
+              ) &&
+              !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
+          ).length
+          return [
+            ...acc,
+            `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`,
+          ]
+        }
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
@@ -365,6 +385,23 @@ export function getLoadPipettes(
     .join('\n')
 
   return pythonPipette ? `# Load Pipettes:\n${pythonPipette}` : ''
+}
+
+export function getFlexStackerSetStoredLabware(
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities,
+  labwareRobotState: TimelineFrame['labware']
+): string {
+  return ''
+  const pythonFlexStackerSetStoredLabware = Object.values(moduleEntities)
+    .map(module => {
+      const { id, pythonName } = module
+      return `${pythonName}.set_stored_labware(${labwareEntities[id].pythonName})`
+    })
+    .join('\n')
+  return pythonFlexStackerSetStoredLabware
+    ? `# Flex Stacker Set Stored Labware:\n${pythonFlexStackerSetStoredLabware}`
+    : ''
 }
 
 export function getDefineLiquids(liquidEntities: LiquidEntities): string {
@@ -574,6 +611,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
+    getFlexStackerSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

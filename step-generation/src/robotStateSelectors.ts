@@ -258,15 +258,15 @@ export function getPipetteWithTipMaxVol(
 }
 export function getModuleState(
   robotState: RobotState,
-  module: string
+  moduleId: string
 ): ModuleTemporalProperties['moduleState'] {
-  if (!(module in robotState.modules)) {
+  if (!(moduleId in robotState.modules)) {
     console.warn(
-      `getModuleState expected module id "${module}" to be in robot state`
+      `getModuleState expected module id "${moduleId}" to be in robot state`
     )
   }
 
-  return robotState.modules[module]?.moduleState
+  return robotState.modules[moduleId]?.moduleState
 }
 export const thermocyclerStateGetter = (
   robotState: RobotState,

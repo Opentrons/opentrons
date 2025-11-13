@@ -23,9 +23,9 @@ import type {
 
 const _getStackerModuleState = (
   robotState: RobotState,
-  module: string
+  moduleId: string
 ): FlexStackerModuleState | null => {
-  const moduleState = getModuleState(robotState, module)
+  const moduleState = getModuleState(robotState, moduleId)
 
   if (moduleState.type === FLEX_STACKER_MODULE_TYPE) {
     return moduleState
@@ -194,6 +194,5 @@ export const forFlexStackerStore = (
     ]
     // remove labware from entities and from shuttle
     // update stack of labware on the module
-    console.log('robotState after storing labware: ', robotState)
   }
 }
