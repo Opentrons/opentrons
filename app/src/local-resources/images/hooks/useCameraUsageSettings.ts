@@ -17,16 +17,17 @@ export interface UseCameraUsageSettingsResult {
   toggleRecoveryCaptureEnabled: () => void
 }
 
-// general camera usage settings. inteded for out of run setup use only.
+// general camera usage settings. intended for out of run setup use only.
 export function useCameraUsageSettings(): UseCameraUsageSettingsResult {
   const { data: cameraData } = useNotifyCamera({
     refetchInterval: CAMERA_POLLING_INTERVAL_MS,
   })
   const { mutateAsync: updateCamera } = useUpdateCamera()
 
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true)
-  const [isLiveVideoEnabled, setIsLiveVideoEnabled] = useState(true)
-  const [isRecoveryCaptureEnabled, setIsRecoveryCaptureEnabled] = useState(true)
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false)
+  const [isLiveVideoEnabled, setIsLiveVideoEnabled] = useState(false)
+  const [isRecoveryCaptureEnabled, setIsRecoveryCaptureEnabled] =
+    useState(false)
 
   useEffect(() => {
     if (cameraData) {

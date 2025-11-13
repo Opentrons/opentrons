@@ -664,11 +664,11 @@ class OT3Controller(FlexBackend):
             return None, False
         # Create a target that doesn't incorporate the plunger into a joint axis with the gantry
         plunger_axes = [Axis.P_L, Axis.P_R]
-        move_target = self._move_manager.devectorize_axes(
-            origin, target, speed, plunger_axes
-        )
 
         try:
+            move_target = self._move_manager.devectorize_axes(
+                origin, target, speed, plunger_axes
+            )
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
             )
