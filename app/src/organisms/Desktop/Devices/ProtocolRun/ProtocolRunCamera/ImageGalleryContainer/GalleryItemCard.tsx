@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { MediaContainerContent } from '/app/molecules/MediaContainerContent'
 import { GalleryItemOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemOverflowMenu'
+import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
 import styles from './gallery.module.css'
@@ -45,6 +47,32 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       total: totalStepStr,
     })
   }
+  const state = isSkeleton ? 'loading' : null
+  const centerPrimaryText = t('step_command', {
+    step: buildStepText(),
+    command: currentCommandString,
+  })
+
+  const dispatch = useDispatch()
+  const onClick = (): void => {
+    if (isLoading) return
+    const img = new Image()
+    const imagePathUrl = img.src
+    img.onload = () => {
+      if (robotName) {
+        dispatch(
+          cameraPhotoOpenAction({
+            robotName: robotName,
+            photoUrl: imagePathUrl,
+            windowTitle: t('branded:image_capture_window_title', {
+              step: centerPrimaryText,
+              timestamp,
+            }),
+          })
+        )
+      }
+    }
+  }
 
   return (
     <MediaContainerContent
@@ -55,25 +83,21 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
           alt="camera-photo"
         />
       }
-      centerPrimaryText={t('step_command', {
-        step: buildStepText(),
-        command: currentCommandString,
-      })}
+      centerPrimaryText={centerPrimaryText}
       centerSecondaryText={previousCommandString}
       rightPrimaryText={timestamp}
-      state={isSkeleton ? 'loading' : null}
+      state={state}
       overflowMenu={
         <GalleryItemOverflowMenu
           runId={runId}
           currentCommand={currentCommand}
           imagePath={imagePath}
           imageFilename={item.filename}
-          robotName={props.robotName}
+          robotName={robotName}
         />
       }
-      robotName={robotName}
       hoverText={t('view_image')}
-      imagePath={imagePath ?? ''}
+      onClick={onClick}
       isCurrentCommandError={isCurrentCmdError}
     />
   )

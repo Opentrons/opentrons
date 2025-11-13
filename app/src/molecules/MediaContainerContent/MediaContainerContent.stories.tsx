@@ -1,4 +1,4 @@
-import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
+import { VIEWPORT } from '@opentrons/components'
 
 import { MediaContainerContent } from './index'
 
@@ -13,25 +13,9 @@ const meta: Meta<typeof MediaContainerContent> = {
       control: {
         type: 'radio',
       },
-      options: ['loading', 'error'],
-    },
-    hoverText: {
-      control: 'text',
+      options: ['loading', 'neutral'],
     },
   },
-  decorators: [
-    Story => (
-      <Flex
-        marginTop={SPACING.spacing16}
-        width="20rem"
-        height="22rem"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Story />
-      </Flex>
-    ),
-  ],
 }
 
 export default meta
@@ -57,6 +41,7 @@ export const MediaContainerContentComponent: Story = {
     rightPrimaryText: '2:45 PM',
     state: undefined,
     overflowMenu: null,
+    onClick: () => {},
     hoverText: 'Click to view image',
     isCurrentCommandError: false,
   },

@@ -35,6 +35,8 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
       allRunDefs,
     })
   const isSkeleton = imagePath == null || isLoading
+  const state = isSkeleton ? 'loading' : null
+
   const isCurrentCmdError = currentCommand?.error != null
   const { commandStep, totalSteps } = useCommandStepNumbers({
     currentCommand,
@@ -51,22 +53,20 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
     })
   }
   const modalStepCountStr = buildStepText().toLowerCase()
-
   return (
     <ODDMediaContainerContent
       leftPrimaryText={item.timestamp}
       centerPrimaryText={currentCommand?.commandType ?? ''}
       centerSecondaryText={previousCommandString}
       rightButtonOnClick={() => {
-        !isSkeleton &&
-          handleCameraPhotoModal({
-            imagePath,
-            timestamp: item.timestamp,
-            stepCountStr: modalStepCountStr,
-          })
+        handleCameraPhotoModal({
+          imagePath: '',
+          timestamp: item.timestamp,
+          stepCountStr: modalStepCountStr,
+        })
       }}
       rightButtonText={t('view_image')}
-      state={isSkeleton ? 'loading' : null}
+      state={state}
       isCurrentCmdError={isCurrentCmdError}
     />
   )

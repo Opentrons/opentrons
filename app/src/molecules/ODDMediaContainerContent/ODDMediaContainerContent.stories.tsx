@@ -1,4 +1,4 @@
-import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
+import { VIEWPORT } from '@opentrons/components'
 
 import { ODDMediaContainerContent } from './index'
 
@@ -13,22 +13,9 @@ const meta: Meta<typeof ODDMediaContainerContent> = {
       control: {
         type: 'radio',
       },
-      options: ['loading', 'error', 'neutral'],
+      options: ['loading', 'neutral'],
     },
   },
-  decorators: [
-    Story => (
-      <Flex
-        marginTop={SPACING.spacing16}
-        width="20rem"
-        height="22rem"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Story />
-      </Flex>
-    ),
-  ],
 }
 
 export default meta

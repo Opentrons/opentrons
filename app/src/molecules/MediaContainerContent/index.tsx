@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import { Chip, StyledText } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
-import { cameraPhotoOpenAction } from '/app/redux/shell'
 
 import styles from './media.module.css'
 
@@ -15,8 +13,7 @@ export interface MediaContainerContentProps {
   centerPrimaryText: string
   centerSecondaryText: string
   rightPrimaryText: string
-  imagePath: string
-  robotName: string | null
+  onClick?: () => void
   state: 'loading' | 'error' | null
   overflowMenu: JSX.Element | null
   hoverText: string | null
@@ -32,41 +29,22 @@ export function MediaContainerContent(
     centerSecondaryText,
     rightPrimaryText,
     state,
-    robotName,
+    hoverText,
     overflowMenu,
-    imagePath,
+    onClick,
     isCurrentCommandError,
   } = props
   const { t } = useTranslation(['run_details', 'branded'])
-  const dispatch = useDispatch()
-  const isLoading = state === 'loading' || state === 'error'
-  const onClick = (): void => {
-    if (isLoading) return
-    const img = new Image()
-    img.src = imagePath
-    img.onload = () => {
-      if (robotName) {
-        dispatch(
-          cameraPhotoOpenAction({
-            robotName: robotName,
-            photoUrl: imagePath,
-            windowTitle: t('branded:image_capture_window_title', {
-              step: centerPrimaryText,
-              rightPrimaryText,
-            }),
-          })
-        )
-      }
-    }
-  }
-
+  const isLoading = state === 'loading'
   return (
     <>
       <div className={styles.media_card}>
         <div
           className={styles.media_card_thumbnail}
           onClick={() => {
-            if (isLoading) return
+            if (isLoading || !onClick) {
+              return
+            }
             onClick()
           }}
         >
@@ -76,13 +54,13 @@ export function MediaContainerContent(
             mediaContent
           )}
 
-          {!isLoading && (
+          {!isLoading && hoverText != null && (
             <div className={styles.media_img_overlay}>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 className={styles.media_overlay_text}
               >
-                {t('view_image')}
+                {hoverText}
               </StyledText>
             </div>
           )}
@@ -125,7 +103,7 @@ export function MediaContainerContent(
             </StyledText>
           )}
         </div>
-        {overflowMenu ?? null}
+        {overflowMenu}
       </div>
     </>
   )

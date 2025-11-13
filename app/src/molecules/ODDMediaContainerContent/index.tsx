@@ -11,7 +11,7 @@ export interface ODDMEdiaContainerContentProps {
   leftPrimaryText: string
   centerPrimaryText: string
   rightButtonOnClick: () => void
-  state: 'loading' | 'error' | null
+  state: 'loading' | null
   rightButtonText: string
   centerSecondaryText: string | null
   isCurrentCmdError: boolean | null
@@ -30,8 +30,7 @@ export function ODDMediaContainerContent(
     isCurrentCmdError,
   } = props
   const { t } = useTranslation(['run_details', 'branded'])
-  const isLoading = state === 'loading' || state === 'error'
-
+  const isLoading = state === 'loading'
   return (
     <>
       <ListItem type="default">
