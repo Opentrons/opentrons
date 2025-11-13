@@ -220,10 +220,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 currently attached tip.
 
                 If `aspirate()` is called with a volume of precisely 0, its behavior
-                depends on the API level of the protocol. On API levels below 2.16, it
-                will behave the same as a volume of `None`/unspecified: aspirate until
-                the pipette is full. On API levels at or above 2.16, no liquid will be
-                aspirated.
+                depends on the API level of the protocol. On API levels below 2.16,
+                it will behave the same as a volume of `None`/unspecified: aspirate
+                until the pipette is full. On API levels at or above 2.16, no liquid
+                will be aspirated.
             location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional): 
                 Tells the robot where
                 to aspirate from. The location can be a `Well` or a `Location`.
