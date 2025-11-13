@@ -101,6 +101,9 @@ def _migrate_data_files_tables(
     old_data_files: List[sqlalchemy.engine.Row],
 ) -> None:
     """Migrate data_files table to new schema with separate input/output tables."""
+    # these tables are associated with the data_files table, so we need to drop them before we can create the new tables
+    schema_11.analysis_csv_rtp_table.drop(connection)
+    schema_11.run_csv_rtp_table.drop(connection)
     schema_11.data_files_table.drop(connection)
 
     schema_13.data_files_table.create(connection)
