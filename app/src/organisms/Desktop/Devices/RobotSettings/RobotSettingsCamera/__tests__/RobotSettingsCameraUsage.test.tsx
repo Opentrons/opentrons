@@ -37,7 +37,7 @@ describe('RobotSettingsCameraUsage', () => {
   it('renders live video section with correct text', () => {
     render(mockProps)
 
-    screen.getByText('Live Video')
+    screen.getByText('Live video')
     screen.getByText(
       'View real-time video of the deck while a running a protocol.'
     )

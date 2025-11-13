@@ -38,7 +38,7 @@ export function SetupRunCameraUsage({
           isToggleDisabled={cameraConfirmed}
         />
         <SettingCard
-          title={t('error_recovery')}
+          title={t('error_recovery_lc')}
           subtext={t('automatically_capture_image')}
           toggleLabelText={t('error_recovery')}
           enabled={recoveryEnabled}

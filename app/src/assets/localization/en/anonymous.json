@@ -48,7 +48,7 @@
   "language_preference_description": "The app matches your system language unless you select another language below. You can change the language later in the app settings.",
   "learn_uninstalling": "Learn more about uninstalling the app",
   "livestream_window_title": "Robot {{robotName}} Live Camera",
-  "live_video_description_odd": "View real-time video of the deck in the App while running a protocol.",
+  "live_video_description_odd": "View real-time video of the deck in the desktop app while running a protocol.",
   "loosen_screws_and_detach": "Loosen screws and detach gripper",
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box.",
   "module_calibration_failed": "<block>Module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact support.</block><block>{{error}}</block>",

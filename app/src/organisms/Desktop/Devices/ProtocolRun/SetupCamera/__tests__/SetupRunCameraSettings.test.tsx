@@ -37,7 +37,7 @@ describe('SetupRunCameraUsage', () => {
   it('renders live video setting card', () => {
     render(mockProps)
 
-    screen.getByText('Live Video')
+    screen.getByText('Live video')
     screen.getByText(
       'View real-time video of the deck while a running a protocol.'
     )
@@ -46,7 +46,7 @@ describe('SetupRunCameraUsage', () => {
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error Recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
       'Automatically capture an image of the deck in the event of an error.'
     )
