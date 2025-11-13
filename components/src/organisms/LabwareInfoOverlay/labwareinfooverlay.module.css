@@ -1,7 +1,7 @@
 .labware_info_container {
   padding: var(--spacing-4);
   border-radius: 0 0 0.4rem 0.4rem;
-  color: #ffffff;
+  color: #fff;
 }
 
 .labware_info_text_container {
