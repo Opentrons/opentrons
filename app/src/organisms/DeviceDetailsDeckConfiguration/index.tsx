@@ -18,6 +18,7 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -186,9 +187,9 @@ export function DeviceDetailsDeckConfiguration({
           width="100%"
           borderBottom={BORDERS.lineBorder}
         >
-          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {`${robotName} ${t('deck_configuration')}`}
-          </LegacyStyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('deck_configuration')}
+          </StyledText>
           <Link
             role="button"
             css={TYPOGRAPHY.linkPSemiBold}
