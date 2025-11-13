@@ -95,6 +95,7 @@ jobs:
         with:
           project: 'shared-data'
           python-version: ${{ matrix.python }}
+          install-dev-deps: 'true'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
