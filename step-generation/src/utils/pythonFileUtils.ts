@@ -312,6 +312,7 @@ export function getLoadLabware(
               ) &&
               !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
           ).length
+          // should I return this here? or join it with the other return statements?
           return [
             ...acc,
             `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`,
