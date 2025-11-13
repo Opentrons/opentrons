@@ -44,24 +44,29 @@ class Migration12to13(Migration):  # noqa: D101
                 engine, schema_13.run_table.name, schema_13.run_table.c.output_file_ids
             )
 
-            with engine.begin() as transaction:
-                old_data_files = transaction.execute(
-                    sqlalchemy.select(schema_11.data_files_table)
-                ).fetchall()
+            with engine.connect() as connection:
+                connection.execute(sqlalchemy.text("PRAGMA foreign_keys = OFF"))
 
-                old_analysis_csv = transaction.execute(
-                    sqlalchemy.select(schema_11.analysis_csv_rtp_table)
-                ).fetchall()
+                with connection.begin():
+                    old_data_files = connection.execute(
+                        sqlalchemy.select(schema_11.data_files_table)
+                    ).fetchall()
 
-                old_run_csv = transaction.execute(
-                    sqlalchemy.select(schema_11.run_csv_rtp_table)
-                ).fetchall()
+                    old_analysis_csv = connection.execute(
+                        sqlalchemy.select(schema_11.analysis_csv_rtp_table)
+                    ).fetchall()
 
-                _migrate_boolean_settings_table(transaction)
-                _migrate_data_files_tables(transaction, old_data_files)
-                _update_foreign_key_references(
-                    transaction, old_analysis_csv, old_run_csv
-                )
+                    old_run_csv = connection.execute(
+                        sqlalchemy.select(schema_11.run_csv_rtp_table)
+                    ).fetchall()
+
+                    _migrate_boolean_settings_table(connection)
+                    _migrate_data_files_tables(connection, old_data_files)
+                    _update_foreign_key_references(
+                        connection, old_analysis_csv, old_run_csv
+                    )
+
+                connection.execute(sqlalchemy.text("PRAGMA foreign_keys = ON"))
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
