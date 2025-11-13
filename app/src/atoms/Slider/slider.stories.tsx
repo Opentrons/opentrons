@@ -5,7 +5,7 @@ import { Slider } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Slider> = {
-  title: 'Helix/Molecules/Slider',
+  title: 'Helix/Atoms/Slider',
   component: Slider,
   decorators: [
     Story => (

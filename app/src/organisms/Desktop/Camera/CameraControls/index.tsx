@@ -4,8 +4,8 @@ import { Modal, PrimaryButton } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
-import { Slider } from '/app/molecules/HelixSlider'
 
+import { Slider } from '../../../../atoms/Slider'
 import styles from './cameracontrols.module.css'
 import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
 import { PreviewSettings } from './PreviewSettings'
