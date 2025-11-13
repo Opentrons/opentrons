@@ -39,21 +39,51 @@ The pipette's API load name (`instrument_name`) is the first parameter of the `l
                 <td><code>flex_8channel_1000</code></td>
             </tr>
             <tr>
-                <td>Flex 96-Channel Pipette</td>
+                <td rowspan="2">Flex 96-Channel Pipette</td>
+                <td>1-200</td>
+                <td><code>flex_96channel_200</code></td>
+            </tr>
+            <tr>
                 <td>5–1000</td>
                 <td><code>flex_96channel_1000</code></td>
             </tr>
         </tbody>
     </table>
-
 === "OT-2 Pipettes"
-    | Pipette Model               | Volume (µL)        | API Load Name         |
-    |----------------------------|--------------------|-----------------------|
-    | P20 Single-Channel GEN2     | 1-20               | `p20_single_gen2`     |
-    | P20 Multi-Channel GEN2      |                    | `p20_multi_gen2`      |
-    | P300 Single-Channel GEN2    | 20-300             | `p300_single_gen2`    |
-    | P300 Multi-Channel GEN2     |                    | `p300_multi_gen2`     |
-    | P1000 Single-Channel GEN2   | 100-1000           | `p1000_single_gen2`   |
+    <table>
+        <thead>
+            <tr>
+                <th>Pipette Model</th>
+                <th>Volume (µL)</th>
+                <th>API Load Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>P20 Single-Channel GEN2</td>
+                <td rowspan="2">1-20</td>
+                <td><code>p20_single_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P20 Multi-Channel GEN2</td>
+                <td><code>p20_multi_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P300 Single-Channel GEN2</td>
+                <td rowspan="2">20-300</td>
+                <td><code>p300_single_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P300 Multi-Channel GEN2</td>
+                <td><code>p300_multi_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P1000 Single-Channel GEN2</td>
+                <td>100-1000</td>
+                <td><code>p1000_single_gen2</code></td>
+            </tr>
+        </tbody>
+    </table>
 
     See the [OT-2 Pipette Generations](characteristics.md#ot-2-pipette-generations) section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
 
@@ -63,7 +93,9 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
 
 ```python
 from opentrons import protocol_api
+
 requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     tiprack1 = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
@@ -79,7 +111,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tip_racks=[tiprack2])
 ```
 
-If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require `load_instrument`! Whether your gripper requires a protocol is determined by the presence of [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] commands. See [Moving Labware](../moving-labware.md) for more details.
+If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require `load_instrument()`! Whether your gripper requires a protocol is determined by the presence of [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] commands. See [Moving Labware](../moving-labware.md) for more details.
 
 ## Loading a Flex 96-Channel Pipette
 
@@ -91,10 +123,11 @@ def run(protocol: protocol_api.ProtocolContext):
         instrument_name="flex_96channel_1000"
     )
 ```
+In protocols specifying API version 2.15, also include `mount="left"` as a parameter of `load_instrument()`.
 
 *New in version 2.15*
 
-*Changed in version 2.16: The `mount` parameter is optional.*
+*Changed in version 2.16:* The `mount` parameter is optional.
 
 ## Loading OT-2 Pipettes
 
@@ -102,7 +135,9 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
 ```python
 from opentrons import protocol_api
+
 metadata = {"apiLevel": "|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     tiprack1 = protocol.load_labware(
         load_name="opentrons_96_tiprack_1000ul", location=1)
@@ -159,7 +194,7 @@ left_pipette.pick_up_tip(tiprack_left["A3"])
 left_pipette.drop_tip()
 ```
 
-However, because you specified a tip rack location for the right pipette, the robot will automatically pick up from location `A1` of its associated tiprack:
+However, because you specified a tip rack location for the right pipette, the robot will automatically pick up from location A1 of its associated tiprack:
 
 ```python
 right_pipette.pick_up_tip()
@@ -177,7 +212,7 @@ right_pipette.drop_tip()
 
 *New in version 2.0*
 
-See also [Atomic Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
+See also [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
 ## Adding Trash Containers
 
@@ -212,7 +247,7 @@ pipette.trash_container = trash  # overrides default
 
 *New in version 2.0*
 
-*Changed in version 2.16: Added support for `TrashBin` and `WasteChute` objects.*
+*Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` objects.
 
 ## Liquid Presence Detection
 

@@ -11,4 +11,4 @@ Pages in this section of the documentation cover:
 - [Partial tip pickup](partial-tip-pickup.md) configurations for multi-channel pipettes. Full and partial tip pickup configurations can be combined in a single protocol.
 - The [volume modes](volume-modes.md) of Flex 50 µL pipettes, which must operate in low-volume mode to accurately dispense very small volumes of liquid.
 
-For information about liquid handling, see [Atomic Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
+For information about liquid handling, see [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
