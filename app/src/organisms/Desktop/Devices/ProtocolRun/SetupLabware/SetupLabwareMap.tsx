@@ -6,6 +6,7 @@ import {
   Box,
   DIRECTION_COLUMN,
   Flex,
+  LabwareInfoOverlay,
   LabwareRender,
   SPACING,
   STACKER_HOPPER_LABWARE_X_OFFSET,
@@ -29,7 +30,6 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { SlotDetailModal } from './SlotDetailModal'
 
@@ -154,7 +154,6 @@ export function SetupLabwareMap({
                   definition={topLabwareDefinition}
                   labwareId={topLabwareInfo.labwareId}
                   displayName={topLabwareInfo.displayName}
-                  runId={runId}
                   labwareHasLiquid={
                     wellFill != null && Object.values(wellFill).length > 0
                   }
@@ -221,7 +220,6 @@ export function SetupLabwareMap({
               definition={topLabwareDefinition}
               labwareId={topLabwareInfo.labwareId}
               displayName={topLabwareInfo.displayName}
-              runId={runId}
               labwareHasLiquid={Object.values(wellFill).length > 0}
             />
           </g>

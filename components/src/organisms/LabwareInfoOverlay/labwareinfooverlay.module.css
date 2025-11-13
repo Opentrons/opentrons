@@ -1,0 +1,19 @@
+.labware_info_container {
+  padding: 4px;
+  border-radius: 0 0 0.4rem 0.4rem;
+  color: #ffffff;
+}
+
+.labware_info_text_container {
+  display: -webkit-box;
+  overflow: hidden;
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-between;
+  -webkit-box-orient: vertical;
+  font-size: 0.625rem;
+  gap: 4px;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: initial;
+}
