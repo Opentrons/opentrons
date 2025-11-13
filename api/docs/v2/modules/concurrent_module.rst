@@ -19,7 +19,7 @@ This section covers module tasks and how to run multiple module tasks in the sam
 Module tasks 
 -------------
 
-When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, the API gives you the flexibility to perform module actions with a blocking or non-blocking methods. If you use a blocking method to set the Temperature Module to 4 °C, the robot won't perform the next protocol step until the module cools to 4 °C. When you use one of the non-blocking methods shown below, the robot will continue to perform the next protocol steps, regardless of when the module reaches the target temperature or completes another action.  
+When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, the API gives you the flexibility to perform module actions with a blocking or non-blocking method. If you use a blocking method to set the Temperature Module to 4 °C, the robot won't perform the next protocol step until the module cools to 4 °C. When you use one of the non-blocking methods shown below, the robot will continue to perform the next protocol steps, regardless of when the module reaches the target temperature or completes another action.  
 
 .. list-table::
    :header-rows: 1
@@ -38,36 +38,53 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
        - :py:meth:`.ThermocyclerContext.start_set_block_temperature`
        - :py:meth:`.ThermocyclerContext.start_execute_profile`
 
-*what is a task; each command returns a task*
-*tasks can run in the background- example; running a thermocycler profile and the temperature module holds samples at a specific temp*
-*you can wait for a task to complete but don't need to*
-*if you do need to know when a task finishes, you can use wait_for_tasks. example; need to wait for a thermocycler profile to be completed before the plate moves to the temperature module to infinite hold*
+Each command returns a :py:class:`ProtocolContext.task` that runs in the background of a protocol. Your protocol can include multiple module tasks that run parallel to one another: 
 
+.. code-block:: python 
+    temp_mod.start_set_temperature(celsius=4)
 
-text used elsewhere originally; might use here:
+    profile = [
+        {"temperature":95, "hold_time_seconds":30},
+        {"temperature":57, "hold_time_seconds":30},
+        {"temperature":72, "hold_time_seconds":60}
+    ]
+    tc_mod.start_execute_profile(
+        steps=profile, 
+        repetitions=20,
+        block_max_volume=32)
+    
+    pipette.pick_up_tip()   
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
+    pipette.drop_tip()
 
-In some cases, the amount of time it takes the Heater-Shaker to reach a temperature or shake speed is still important to your protocol. For example, you might need to wait for samples to reach a given temperature before moving to the next step in your protocol. You can still use the Heater-Shaker's non-blocking commands, each of which returns a ``task``, to accomplish this. The example below uses  :py:meth:`.ProtocolContext.wait_for_tasks` to prevent the Flex Gripper from moving the plate from the Heater-Shaker Module until the target temperature is reached: 
+In this example, two tasks are created: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. With non-blocking commands like :py:meth:`.~TemperatureModuleContext.start_set_temperature`, there's no need to wait for a module task to finish. 
+
+Timing module tasks
+--------------------
+
+Sometimes, the amount of time it takes for a module to finish a task is still important to your protocol. 
+
+You might need to wait for samples on the Temperature Module to reach a target temperature before moving to the next step. The example below combines a non-blocking module command with :py:meth:`.ProtocolContext.wait_for_tasks` to prevent the Flex Gripper from moving a plate until the target temperature is reached::
+
+    temp_adapter = temp_mod.load_adapter("opentrons_96_well_aluminum_block")
+    temp_plate = temp_adapter.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
+    temp_task=temp_mod.start_set_temperature(75)
+    protocol.wait_for_tasks(temp_task)
+    protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper=True)
+    
+    
+Let's say your samples not only have to reach a target temperature, but need to incubate for a specific amount of time. The example below uses non-blocking commands to heat and shake samples, and :py:meth:`.ProtocolContext.create_timer` to set an incubation time. 
 
 .. code-block:: python
 
-  hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
-  hs_plate = hs_mod.load_labware("nest_96_wellplate_200ul_flat")
-  temp_task=hs_mod.set_target_temperature(75)
-  ctx.wait_for_tasks([temp_task])
-  protocol.move_labware(labware=hs_plate, new_location="D3", use_gripper=True)
+    hs_timer = create_timer(seconds=300)
+    hs_mod.start_set_temperature(75)
+    hs_mod.set_shake_speed(300)
+    protocol.wait_for_tasks(hs_timer)
+    hs_mod.deactivate_heater()
 
-Timers
---------
+Here, the Heater-Shaker Module will heats and shakes samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Keep in mind that this timer isn't attached to a specific module action, and will start to run as soon as the robot sets the Heater-Shaker's shake speed. And, if the Heater-Shaker takes longer than 5 minutes to reach the target temperature, your samples might not incubate at all. To prevent this, you can: 
 
-In some cases, the amount of time it takes for a module action to complete is still important... or rather, samples have to be maintained at a given temp for a certain amount of time... 
-
-example: use create_timer to shake samples for a specific amount of time
-
-
-Using multiple tasks 
----------------------
-
-*example could be 1 module action + 1 timer*
-*give a larger example of managing more than one module action - thermocycler runs a profile while the heater-shaker shakes. when the profile is done, remove the plate from the heater-shaker?*
-
-
+- use :py:meth:`~.ProtocolContext.wait_for_tasks` to wait for the Heater-Shaker to reach the target temperature before the ``hs_timer`` runs.
+- insert pipetting or other module actions before the ``hs_timer`` runs, giving the module time to heat.
