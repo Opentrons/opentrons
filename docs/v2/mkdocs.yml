@@ -11,6 +11,7 @@ nav:
       - Hardware Modules: modules/index.md
       - Module Setup: modules/setup.md
       - Absorbance Plate Reader Module: modules/absorbance-plate-reader.md
+      - Flex Stacker Module: modules/flex-stacker.md
       - Heater-Shaker Module: modules/heater-shaker.md
       - Magnetic Block: modules/magnetic-block.md
       - Magnetic Module: modules/magnetic-module.md

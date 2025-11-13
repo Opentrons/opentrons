@@ -11,6 +11,7 @@ Pages in this section of the documentation cover:
 - [Setting up modules and their labware](setup.md)
 - Working with the module contexts for each type of module:
     - [Absorbance Plate Reader Module](absorbance-plate-reader.md)
+    - [Flex Stacker Module](flex-stacker.md)
     - [Heater-Shaker Module](heater-shaker.md)
     - [Magnetic Block](magnetic-block.md)
     - [Magnetic Module](magnetic-module.md)

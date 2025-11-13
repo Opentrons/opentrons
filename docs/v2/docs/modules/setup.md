@@ -6,7 +6,7 @@ title: "Python API: Module Setup"
 
 Similar to labware and pipettes, you must inform the API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules that use power are connected via USB and turned on.
 
-Use [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_module] to load a module.
+Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to load a module.
 
 === "Flex"
     ```python
@@ -46,9 +46,9 @@ Use [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_
 
 ## Available Modules
 
-The first parameter of [`ProtocolContext.load_module`][opentrons.protocol_api.ProtocolContext.load_module] is the module's *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
+The first parameter of [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] is the module's *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-| Module | API Load Name | Introduced in API Version |
+| Module {width="40%"}| API Load Name | Introduced in API Version |
 |--------|---------------|--------------------------|
 | Temperature Module GEN1 | `temperature module` or `tempdeck` | 2.0 |
 | Temperature Module GEN2 | `temperature module gen2` | 2.3 |
@@ -59,6 +59,7 @@ The first parameter of [`ProtocolContext.load_module`][opentrons.protocol_api.Pr
 | Heater-Shaker Module GEN1 | `heaterShakerModuleV1` | 2.13 |
 | Magnetic Block GEN1 | `magneticBlockV1` | 2.15 |
 | Absorbance Plate Reader Module | `absorbanceReaderV1` | 2.21 |
+| Flex Stacker Module | `flexStackerModuleV1` | 2.25 |
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your `requirements` or `metadata` code block specifies an [API version](../versioning.md) high enough to support all the module generations you want to use.
 
@@ -88,4 +89,4 @@ It's your responsibility to ensure the labware and module combinations you load 
 
 ### Additional Labware Parameters
 
-In addition to the mandatory `load_name` argument, you can also specify additional parameters. For example, if you specify a `label`, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify `version` and `namespace` (though most of the time you won't have to). The [`ProtocolContext.load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] methods of all module contexts accept these additional parameters.
+In addition to the mandatory `load_name` argument, you can also specify additional parameters. For example, if you specify a `label`, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify `version` and `namespace` (though most of the time you won't have to). The `load_labware()` methods of all module contexts accept these additional parameters.
