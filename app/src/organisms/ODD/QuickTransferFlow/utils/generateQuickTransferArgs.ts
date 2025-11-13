@@ -183,7 +183,7 @@ export function getInvariantContextAndRobotState(
       getLabwareDefURI(quickTransferState.tipRack)
 
   if (dropTipIsTiprack) {
-    // check deck config for trash bin
+    // check deck config for trash bin and waste chute
     const installedTrashBin = deckConfig.find(
       config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
     )
@@ -192,8 +192,6 @@ export function getInvariantContextAndRobotState(
     )
     const trashBinLocation =
       installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
-    const wasteChuteLocation =
-      installedWasteChute != null ? installedWasteChute.cutoutId : ''
     const trashId = `${uuid()}_trashBin`
     const wasteChuteId = `${uuid()}_wasteChute`
 
