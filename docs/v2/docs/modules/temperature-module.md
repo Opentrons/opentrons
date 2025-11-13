@@ -23,7 +23,7 @@ The [Opentrons Labware Library](https://labware.opentrons.com/) includes definit
 
 You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Temperature Module.
 
-| Adapter Type | API Load Name |
+| Adapter Type | API Load Name {width="50%"}|
 |--------------|--------------|
 | Opentrons Aluminum Flat Bottom Plate | `opentrons_aluminum_flat_bottom_plate` |
 | Opentrons 96 Well Aluminum Block | `opentrons_96_well_aluminum_block` |
@@ -38,7 +38,7 @@ temp_plate = temp_adapter.load_labware(
     "nest_96_wellplate_100ul_pcr_full_skirt"
 )
 ```
-*New in version 2.15*
+*New in version 2.15:* The `load_adapter()` method.
 
 !!! note
     You can also load labware directly onto the Temperature Module. In API version 2.14 and earlier, this was the correct way to load labware on top of the flat bottom plate. In API version 2.15 and later, you should load both the adapter and the labware with separate commands.
@@ -86,7 +86,7 @@ temp_combo = temp_mod.load_labware(
 
 ## Temperature Control
 
-The primary function of the module is to control the temperature of its deck, using [`set_temperature`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
+The primary function of the module is to control the temperature of its deck, using [`set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
 ```python
 temp_mod.set_temperature(celsius=4)
 ```

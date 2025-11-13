@@ -105,7 +105,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.25
 
-- Adds [`FlexStackerContext`][opentrons.protocol_api.FlexStackerContext] to support the [Flex Stacker Module](modules/stacker.md). Use the load name `flexStackerModuleV1` with [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to add a Flex Stacker and automate labware storage in a protocol.
+- Adds [`FlexStackerContext`][opentrons.protocol_api.FlexStackerContext] to support the [Flex Stacker Module](modules/flex-stacker.md). Use the load name `flexStackerModuleV1` with [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to add a Flex Stacker and automate labware storage in a protocol.
 - Use the load name `flex_96channel_200` with [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] to add the Opentrons Flex 96-Channel Pipette (1–200 μL) to a protocol. Note that this pipette does not work with liquid class commands in this API version.
 
 ### Version 2.24

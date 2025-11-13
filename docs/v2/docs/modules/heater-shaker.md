@@ -133,6 +133,11 @@ protocol.delay(minutes=1)
 hs_mod.deactivate_heater()
 ```
 
+*New in version 2.13:* The Heater-Shaker can heat samples from 37 to 95 °C.
+
+*Changed in version 2.25:* The Heater-Shaker accepts target temperatures lower than 37 °C. Set the Heater-Shaker’s temperature at least 1.5 °C above ambient temperature.
+
+
 This may take much longer, depending on the thermal block used, the volume and type of liquid contained in the labware, and the initial temperature of the module.
 
 ### Non-blocking commands
@@ -168,7 +173,7 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 
 ## Deactivating
 
-Deactivate the heater and shaker separately using [`deactivate_heater`][opentrons.protocol_api.HeaterShakerContext.deactivate_heater] and [`deactivate_shaker`][opentrons.protocol_api.HeaterShakerContext.deactivate_shaker], respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
+Deactivate the heater and shaker separately using the [`deactivate_heater()`][opentrons.protocol_api.HeaterShakerContext.deactivate_heater] and [`deactivate_shaker()`][opentrons.protocol_api.HeaterShakerContext.deactivate_shaker] methods, respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
 
 !!! note
     The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.

@@ -698,7 +698,9 @@ class ThermocyclerContext(ModuleContext):
                 together.
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
-                the default is 25 µL. *Changed in version 2.27:* After API
+                the default is 25 µL.
+                
+                *Changed in version 2.27:* After API
                 version 2.27 it will attempt to use the liquid tracking of the
                 labware first and then fall back to the 25 if there is no
                 probed or loaded liquid.
