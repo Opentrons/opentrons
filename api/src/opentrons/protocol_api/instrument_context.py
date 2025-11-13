@@ -856,7 +856,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
 
-        See [Dynamic Mix][dynamix-mix] for examples.
+        See Dynamic Mix for examples.
 
         Args:
             repetitions (int, optional): Number of times to mix (default is 1).
