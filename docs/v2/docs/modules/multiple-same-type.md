@@ -8,8 +8,6 @@ When working with multiple modules of the same type, load them in your protocol 
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
 
-See the support article [Using Modules of the Same Type](https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2) for more information.
-
 ## Multiple Modules on Flex
 
 In this example, `temperature_module_1` loads first because it's connected to USB port 2. `temperature_module_2` loads next because it's connected to USB port 6.
@@ -37,7 +35,7 @@ The Temperature Modules are connected as shown here:
 
 ## Multiple Modules on OT-2
 
-In this example, `temperature_module_1` loads first because it's connected to USB port 1. `temperature_module_2` loads next because it's connected to USB port 3.
+In this example, `temperature_module_1` loads first because it's connected to USB port 1. `temperature_module_2` loads next because it's connected to USB port 2.
 ```python
 from opentrons import protocol_api
 

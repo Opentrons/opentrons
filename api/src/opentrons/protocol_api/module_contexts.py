@@ -687,29 +687,30 @@ class ThermocyclerContext(ModuleContext):
     ) -> None:
         """Set the target temperature for the well block, in °C.
 
-        :param temperature: A value between 4 and 99, representing the target
-                            temperature in °C.
-        :param hold_time_minutes: The number of minutes to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_seconds`` is also
-                                  specified, the times are added together.
-        :param hold_time_seconds: The number of seconds to hold, after reaching
-                                  ``temperature``, before proceeding to the
-                                  next command. If ``hold_time_minutes`` is also
-                                  specified, the times are added together.
-        :param block_max_volume: The greatest volume of liquid contained in any
-                                 individual well of the loaded labware, in µL.
-                                 If not specified, the default is 25 µL.
-                                 After API version 2.27 it will attempt to use
-                                 the liquid tracking of the labware first and
-                                 then fall back to the 25 if there is no probed
-                                 or loaded liquid.
+        Args:
+            temperature: A value between 4 and 99, representing the target
+                temperature in °C.
+            hold_time_minutes: The number of minutes to hold, after reaching
+                `temperature`, before proceeding to the next command. If
+                `hold_time_seconds` is also specified, the times are added
+                together.
+            hold_time_seconds: The number of seconds to hold, after reaching
+                `temperature`, before proceeding to the next command. If
+                `hold_time_minutes` is also specified, the times are added
+                together.
+            block_max_volume: The greatest volume of liquid contained in any
+                individual well of the loaded labware, in µL. If not specified,
+                the default is 25 µL.
+                
+                *Changed in version 2.27:* After API
+                version 2.27 it will attempt to use the liquid tracking of the
+                labware first and then fall back to the 25 if there is no
+                probed or loaded liquid.
 
-        .. note::
-
-            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
-            specified, the Thermocycler will proceed to the next command
-            immediately after ``temperature`` is reached.
+        !!! note
+            If `hold_time_minutes` and `hold_time_seconds` are not specified,
+            the Thermocycler will proceed to the next command immediately after
+            `temperature` is reached.
         """
         seconds = validation.ensure_hold_time_seconds(
             seconds=hold_time_seconds, minutes=hold_time_minutes

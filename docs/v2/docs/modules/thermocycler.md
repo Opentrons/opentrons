@@ -4,7 +4,7 @@ title: "Python API: Thermocycler"
 
 The Thermocycler Module provides on-deck, fully automated thermocycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
-The Thermocycler is represented in code by a [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext] object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be repeated automatically.
+The Thermocycler is represented in code by a [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext] object, which has methods for controlling the lid, controlling the block, and setting *profiles*: timed heating and cooling routines that can be repeated automatically.
 
 The examples in this section will use a Thermocycler Module GEN2 loaded as follows:
 
@@ -31,7 +31,7 @@ The protocol will only proceed once the lid temperature reaches 50 °C. This is 
 You can turn off the lid heater at any time with [`deactivate_lid()`][opentrons.protocol_api.ThermocyclerContext.deactivate_lid].
 
 !!!note
-    Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See [Thermocycler Profiles](#) for more information on defining and executing profiles.
+    Lid temperature is not affected by Thermocycler profiles. Therefore you should set an appropriate lid temperature to hold during your profile *before* executing it. See [Thermocycler Profiles](#thermocycler-profiles-api) for more information on defining and executing profiles.
 
 *New in version 2.0*
 
@@ -115,7 +115,7 @@ for i in range(20):
 However, this code would generate 60 lines in the protocol’s run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
 !!! note
-    Temperature profiles only control the temperature of the block in the Thermocycler. You should set a lid temperature before executing the profile using [`set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_lid_temperature].
+    Temperature profiles only control the temperature of the *block* in the Thermocycler. You should set a lid temperature before executing the profile using [`set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_lid_temperature].
 
 *New in version 2.0*
 
@@ -129,7 +129,7 @@ Use the following API load names for the auto-sealing lid and deck riser:
 | Opentrons Tough PCR Auto-sealing Lid | `opentrons_tough_pcr_auto_sealing_lid` |
 | Opentrons Flex Deck Riser | `opentrons_flex_deck_riser` |
 
-Load the riser directly onto the deck with [`ProtocolContext.load_adapter`][opentrons.protocol_api.ProtocolContext.load_adapter].
+Load the riser directly onto the deck with [`ProtocolContext.load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter].
 
 You can load auto-sealing lids in a few ways:
 
@@ -137,7 +137,7 @@ You can load auto-sealing lids in a few ways:
 - Use [`ProtocolContext.load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack] to create a stack of up to five auto-sealing lids directly on the deck.
 - Use [`Labware.load_lid_stack()`][opentrons.protocol_api.Labware.load_lid_stack] to create a stack of up to five auto-sealing lids on the riser.
 
-If you try to stack more than five lids, the API will raise an error.
+If you try to stack more than five lids, either by loading or moving them, the API will raise an error.
 
 Setting up the riser and preparing a lid to use on the Thermocycler generally consists of the following steps:
 
@@ -176,7 +176,7 @@ tc_mod.close_lid()
 ```
 
 !!! warning
-    When using the auto-sealing lids, do not affix a rubber automation seal to the inside of the Thermocycler lid. The Thermocycler will not close properly.
+    When using the auto-sealing lids, *do not* affix a rubber automation seal to the inside of the Thermocycler lid. The Thermocycler will not close properly.
 
 When you're finished with a lid, use the gripper to dispose of it in either the waste chute or a trash bin:
 
@@ -188,9 +188,9 @@ protocol.move_lid(
     use_gripper=True)
 ```
 
-*New in version 2.16: [`TrashBin`][opentrons.protocol_api.TrashBin] and [`WasteChute`][opentrons.protocol_api.WasteChute] objects can accept lids.*
+*New in version 2.16:* [`TrashBin`][opentrons.protocol_api.TrashBin] and [`WasteChute`][opentrons.protocol_api.WasteChute] objects can accept lids.
 
-*New in version 2.23: Use [`ProtocolContext.load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack] and [`ProtocolContext.move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to stack and move auto-sealing lids in your protocol.*
+*New in version 2.23:* Use [`ProtocolContext.load_lid_stack()`][opentrons.protocol_api.ProtocolContext.load_lid_stack] and [`ProtocolContext.move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to stack and move auto-sealing lids in your protocol.
 
 You can then move the PCR plate off of the Thermocycler. The Flex Gripper can't move a plate that has a lid on top of it. Always move the lid first, then the plate.
 
