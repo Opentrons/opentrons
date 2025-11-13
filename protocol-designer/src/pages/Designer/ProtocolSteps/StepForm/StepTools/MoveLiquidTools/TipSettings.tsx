@@ -8,7 +8,6 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getEnableTipSelection } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getPipetteEntities,
@@ -35,7 +34,6 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableTipSelection = useSelector(getEnableTipSelection)
 
   const isDisposalLocation =
     stepType === 'moveLiquid' &&
@@ -84,7 +82,7 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
           />
         </Flex>
       </Flex>
-      {enableTipSelection && formData.changeTip !== 'never' ? (
+      {formData.changeTip !== 'never' ? (
         <TipTrackingField
           propsForFields={propsForFields}
           padding={`0 ${SPACING.spacing16}`}
