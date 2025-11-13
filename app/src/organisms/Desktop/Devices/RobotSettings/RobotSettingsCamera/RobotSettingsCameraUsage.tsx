@@ -57,7 +57,7 @@ export function RobotSettingsCameraUsage({
       <div className={styles.usage_item_container}>
         <div className={styles.usage_item_text_container}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('error_recovery')}
+            {t('error_recovery_lc')}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('automatically_capture_image')}
