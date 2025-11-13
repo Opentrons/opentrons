@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getHeightOfLabwareStackFromDefinitions,
+  getLabwareOverlapOffset,
+  getStackerMaxPoolCountByHeight,
 } from '@opentrons/shared-data'
 
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
@@ -19,9 +21,9 @@ import type { FlexStackerModuleState } from '../types'
 vi.mock('../robotStateSelectors')
 vi.mock('@opentrons/shared-data', async importOriginal => ({
   ...(await importOriginal()),
-  getHeightOfLabwareStackFromDefinitions: vi.fn().mockReturnValue(10),
-  getStackerMaxPoolCountByHeight: vi.fn().mockReturnValue(10),
-  getLabwareOverlapOffset: vi.fn().mockReturnValue({ x: 0, y: 0, z: 10 }),
+  getHeightOfLabwareStackFromDefinitions: vi.fn(),
+  getStackerMaxPoolCountByHeight: vi.fn(),
+  getLabwareOverlapOffset: vi.fn(),
 }))
 
 const LABWARE_ID = 'sourcePlateId'
@@ -101,6 +103,9 @@ describe('flex stacker state updates forFlexStackerFill', () => {
   const invariantContext = makeContext()
   const robotState = getInitialRobotStateStandard(invariantContext)
   beforeEach(() => {
+    vi.mocked(getLabwareOverlapOffset).mockReturnValue({ x: 0, y: 0, z: 10 })
+    vi.mocked(getHeightOfLabwareStackFromDefinitions).mockReturnValue(10)
+    vi.mocked(getStackerMaxPoolCountByHeight).mockReturnValue(10)
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareIdsInStacker: ['labware1', 'labware2', 'labware3'],
@@ -274,6 +279,11 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       },
     } as any)
   })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('should store the labware in the stacker', () => {
     forFlexStackerStore({ moduleId: FLEX_STACKER_ID }, invariantContext, {
       robotState,

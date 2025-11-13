@@ -77,14 +77,15 @@ export const forFlexStackerFill = (
   const poolHeight = getHeightOfLabwareStackFromDefinitions(
     listOfLabwareDefinitions
   )
+  const poolOverlap = getLabwareOverlapOffset(
+    FLEX_STACKER_MODULE_V1,
+    labwareDefinition,
+    'default'
+  )
   const maxStorableLabware = getStackerMaxPoolCountByHeight(
     FLEX_STACKER_MODULE_V1,
     poolHeight,
-    getLabwareOverlapOffset(
-      FLEX_STACKER_MODULE_V1,
-      labwareDefinition,
-      'default'
-    ).z
+    poolOverlap.z
   )
 
   if (moduleState != null) {
