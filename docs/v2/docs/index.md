@@ -68,14 +68,16 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
     1. Gives the name, contact information, and a brief description for the protocol.
     2. Indicates the protocol should run on a Flex robot, using API version |apiLevel|.
     3. Tells the robot that there is:
-        a. A 96-well flat plate in slot D1.
-        b. A rack of 300 µL tips in slot D2.
-        c. A 1-channel 1000 µL pipette attached to the left mount, which should pick up tips from the aforementioned rack.
+
+        1. A 96-well flat plate in slot D1.
+        2. A rack of 300 µL tips in slot D2.
+        3. A 1-channel 1000 µL pipette attached to the left mount, which should pick up tips from the aforementioned rack.
     4. Tells the robot to act by:
-        a. Picking up the first tip from the tip rack.
-        b. Aspirating 100 µL of liquid from well A1 of the plate.
-        c. Dispensing 100 µL of liquid into well B1 of the plate.
-        d. Dropping the tip in the trash.
+
+        1. Picking up the first tip from the tip rack.
+        2. Aspirating 100 µL of liquid from well A1 of the plate.
+        3. Dispensing 100 µL of liquid into well B1 of the plate.
+        4. Dropping the tip in the trash.
 
 === "OT-2"
     ```python
@@ -117,16 +119,18 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
     1. Gives the name, contact information, and a brief description for the protocol.
     2. Indicates the protocol should run on an OT-2 robot, using API version |apiLevel|.
     3. Tells the robot that there is:
-        a. A 96-well flat plate in slot 1.
-        b. A rack of 300 µL tips in slot 2.
-        c. A single-channel 300 µL pipette attached to the left mount, which should pick up tips from the aforementioned rack.
-    4. Tells the robot to act by:
-        a. Picking up the first tip from the tip rack.
-        b. Aspirating 100 µL of liquid from well A1 of the plate.
-        c. Dispensing 100 µL of liquid into well B1 of the plate.
-        d. Dropping the tip in the trash.
 
-There is much more that Opentrons robots and the API can do! The [Atomic Commands](building-block-commands/index.md), [Complex Commands](complex-commands/index.md), and [Modules](modules/index.md) pages cover many of these functions.
+        1. A 96-well flat plate in slot 1.
+        2. A rack of 300 µL tips in slot 2.
+        3. A single-channel 300 µL pipette attached to the left mount, which should pick up tips from the aforementioned rack.
+    4. Tells the robot to act by:
+
+        1. Picking up the first tip from the tip rack.
+        2. Aspirating 100 µL of liquid from well A1 of the plate.
+        3. Dispensing 100 µL of liquid into well B1 of the plate.
+        4. Dropping the tip in the trash.
+
+There is much more that Opentrons robots and the API can do! The [Building Block Commands](building-block-commands/index.md), [Complex Commands](complex-commands/index.md), and [Modules](modules/index.md) pages cover many of these functions.
 
 ## More Resources
 
@@ -136,7 +140,7 @@ The [Opentrons App](https://opentrons.com/ot-app/) is the easiest way to run you
 
 ### Support
 
-Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out our [support articles](https://support.opentrons.com/s/) or [contact Opentrons Support directly](mailto:support@opentrons.com).
+Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](/) or [contact Opentrons Support directly](mailto:support@opentrons.com).
 
 ### Custom Protocol Service
 
