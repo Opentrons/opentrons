@@ -28,8 +28,8 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
      - **Non-blocking command**
    * - Heater-Shaker Module 
      - 
-       - :py:meth:`.HeaterShakerContext.set_target_temperaure`
-       - :py:meth:`.HeaterShakerContext.set_shake_speed`
+       - :py:meth:`.HeaterShakerContext.set_target_temperature`
+       - :py:meth:`~.HeaterShakerContext.set_shake_speed`
    * - Temperature Module
      - :py:meth:`.TemperatureModuleContext.start_set_temperature`
    * - Thermocycler Module
@@ -38,9 +38,10 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
        - :py:meth:`.ThermocyclerContext.start_set_block_temperature`
        - :py:meth:`.ThermocyclerContext.start_execute_profile`
 
-Each command returns a :py:class:`ProtocolContext.task` that runs in the background of a protocol. Your protocol can include multiple module tasks that run parallel to one another: 
+Each command returns a :py:class:`.Task` that runs in the background of a protocol. Your protocol can include multiple module tasks that run parallel to one another: 
 
 .. code-block:: python 
+
     temp_mod.start_set_temperature(celsius=4)
 
     profile = [
@@ -58,7 +59,7 @@ Each command returns a :py:class:`ProtocolContext.task` that runs in the backgro
     pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
 
-In this example, two tasks are created: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. With non-blocking commands like :py:meth:`.~TemperatureModuleContext.start_set_temperature`, there's no need to wait for a module task to finish. 
+In this example, two tasks are created: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. With non-blocking commands like :py:meth:`~.TemperatureModuleContext.start_set_temperature`, there's no need to wait for a module task to finish. 
 
 Timing module tasks
 --------------------

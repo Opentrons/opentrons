@@ -35,11 +35,13 @@ You can also control the temperature of the lid. Acceptable target temperatures 
     .. tab:: Blocking
 
       .. code-block:: python
+    
         tc_mod.set_lid_temperature(temperature=50)
 
     .. tab:: Non-blocking 
 
       .. code-block:: python
+    
         tc_mod.start_set_lid_temperature(temperature=50)
 
 .. versionadded:: 2.13
@@ -74,11 +76,13 @@ To set the block temperature inside the Thermocycler, you can use either a block
     .. tab:: Blocking
 
       .. code-block:: python
+    
         tc_mod.set_block_temperature(temperature=4)
 
     .. tab:: Non-blocking 
 
       .. code-block:: python
+    
         tc_mod.start_set_block_temperature(temperature=50)
 
 .. versionadded:: 2.13
@@ -99,6 +103,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     .. tab:: Blocking
 
       .. code-block:: python
+    
         tc_mod.set_block_temperature(
             temperature=4,
             hold_time_minutes=4,
@@ -107,6 +112,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     .. tab:: Non-blocking 
 
       .. code-block:: python
+    
         block_timer = create_timer(seconds=255)
         tc_mod.start_set_block_temperature(celsius=4)
         pipette.pick_up_tip()   
@@ -117,7 +123,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
 .. versionadded:: 2.0
 .. versionchanged:: 2.27
-    Choose to use the non-blocking :py:meth:`.TemperatureContext.start_set_block_temperature` method to perform other protocol steps while the block reaches its target temperature. 
+    Choose to use the non-blocking :py:meth:`.ThermocyclerContext.start_set_block_temperature` method to perform other protocol steps while the block reaches its target temperature. 
 
 You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together) for the non-blocking :py:meth:`~.ThermocyclerContext.set_block_temperature`. Your protocol won't proceed to further commands while holding at a temperature. If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
 
@@ -136,6 +142,7 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
     .. tab:: Blocking
 
       .. code-block:: python
+    
         tc_mod.set_block_temperature(
             temperature=4,
             hold_time_seconds=20,
@@ -144,6 +151,7 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
     .. tab:: Non-blocking 
 
       .. code-block:: python
+    
         block_timer = create_timer(seconds=20)
         tc_mod.start_set_block_temperature(
             temperature=4,
@@ -183,6 +191,7 @@ For instance, a PCR prep protocol might define and execute a profile like this:
     .. tab:: Blocking
 
       .. code-block:: python
+    
         profile = [
             {"temperature":95, "hold_time_seconds":30},
             {"temperature":57, "hold_time_seconds":30},
@@ -196,6 +205,7 @@ For instance, a PCR prep protocol might define and execute a profile like this:
     .. tab:: Non-blocking 
 
       .. code-block:: python
+    
         profile = [
             {"temperature":95, "hold_time_seconds":30},
             {"temperature":57, "hold_time_seconds":30},

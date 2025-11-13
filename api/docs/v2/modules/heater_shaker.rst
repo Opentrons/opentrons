@@ -167,7 +167,7 @@ In both cases, the API lets you choose whether to perform other protocol steps w
         - ``set_and_wait_for_shake_speed()``
       - Added in API 2.13
       - Blocking
-    * ``set_target_temperature()``
+    * - ``set_target_temperature()``
       - 
         - Added in API 2.13
         - Updated in API 2.27; returns a ``task``
@@ -188,12 +188,14 @@ The examples below use a blocking or non-blocking command to set the Heater-Shak
     .. tab:: Blocking
 
       .. code-block:: python
+    
         hs_mod.set_and_wait_for_temperature(75)
         protocol.delay(minutes=1)
 
     .. tab:: Non-blocking 
 
       .. code-block:: python
+      
         hs_mod.set_target_temperature(75)
         pipette.pick_up_tip()   
         pipette.aspirate(50, plate["A1"])
@@ -226,12 +228,14 @@ The examples below use a blocking or non-blocking command to set the Heater-Shak
     .. tab:: Blocking
 
       .. code-block:: python
+      
         hs_mod.set_and_wait_for_shake_speed(500)
         protocol.delay(minutes=1)
 
     .. tab:: Non-blocking 
 
       .. code-block:: python
+      
         hs_mod.set_shake_speed(500)
         pipette.pick_up_tip()   
         pipette.aspirate(50, plate["A1"])
