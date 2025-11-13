@@ -245,6 +245,10 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
         )
         # We don't want to write bad or incomplete data to the file
         return None
+
+    # Migrate old camera default file data to new uniform default
+    if contents[StreamConfigurationKeys.SOURCE] == "NONE":
+        contents[StreamConfigurationKeys.SOURCE] = DEFAULT_SYSTEM_CAMERA
     return contents
 
 
