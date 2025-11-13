@@ -119,7 +119,7 @@ describe('RunProgressMeter', () => {
       reportModuleCommand: vi.fn(),
     } as any)
     render(props)
-    expect(screen.getByText('Step N/A:')).toBeTruthy()
+    expect(screen.getByText('Step: N/A')).toBeTruthy()
     expect(screen.queryByText('MOCK PROGRESS BAR')).toBeFalsy()
   })
 

@@ -108,8 +108,7 @@ export function useRunProgressCopy({
     if (isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_IDLE) {
       return null
     }
-
-    if (isTerminalRunStatus(runStatus) && currentStepNumber == null) {
+    if (currentStepNumber == null) {
       return `${t(`current_step`)}: ${t('na')}`
     } else if (hasRunDiverged) {
       return `${t(`current_step`)} ${t('na')}:`
