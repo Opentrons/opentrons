@@ -25,8 +25,7 @@ interface IconState {
   showCopied: boolean
 }
 
-function IconListComponent(
-): JSX.Element {
+function IconListComponent(): JSX.Element {
   const ICON_NAMES = Object.keys(ICON_DATA_BY_NAME) as IconName[]
   const [icons, setIcons] = React.useState<IconState[]>(() =>
     ICON_NAMES.map(name => ({
@@ -118,7 +117,10 @@ function IconListComponent(
             >
               copy
             </StyledText>
-            <StyledText fontSize={TYPOGRAPHY.fontSizeCaption} color={COLORS.grey50}>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+              color={COLORS.grey50}
+            >
               |
             </StyledText>
             <StyledText
@@ -137,10 +139,7 @@ function IconListComponent(
           </Flex>
           <Flex height="1rem" alignItems={ALIGN_CENTER}>
             {showCopied ? (
-              <StyledText
-                desktopStyle="captionRegular"
-                color={COLORS.green50}
-              >
+              <StyledText desktopStyle="captionRegular" color={COLORS.green50}>
                 copied!
               </StyledText>
             ) : null}
@@ -150,7 +149,6 @@ function IconListComponent(
     </Flex>
   )
 }
-
 
 const meta: Meta<typeof IconListComponent> = {
   title: 'Helix/Atoms/IconList',
