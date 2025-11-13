@@ -161,7 +161,7 @@ export function ProtocolDetailsHeader({
               alignItems={ALIGN_CENTER}
               paddingRight={SPACING.spacing24}
             >
-              <StyledText desktopStyle="headingSmallBold" style={{ overflowWrap: 'anywhere' }}>
+              <StyledText desktopStyle="headingSmallBold" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
