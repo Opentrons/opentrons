@@ -77,6 +77,7 @@ REAR_CHANNELS = [0, 1, 2, 3]
 FRONT_CHANNELS = [4, 5, 6, 7]
 REAR_CHANNELS_TIP_SLOTS = {
     50: {
+        20: [2, 3, 5],
         50: [2, 3, 5],
     },
     1000: {
@@ -87,6 +88,7 @@ REAR_CHANNELS_TIP_SLOTS = {
 }
 FRONT_CHANNELS_TIP_SLOTS = {
     50: {
+        20: [8, 9, 6],
         50: [8, 9, 6],
     },
     1000: {
