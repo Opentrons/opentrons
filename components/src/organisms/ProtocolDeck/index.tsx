@@ -113,7 +113,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
               />
             </AlignControlToModule>
           ) : null
-        ) : undefined,
+        ) : null,
       }
     }
   )
