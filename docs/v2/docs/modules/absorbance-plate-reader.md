@@ -19,7 +19,8 @@ This page explains the actions necessary for using the Absorbance Plate Reader. 
 
 The Absorbance Plate Reader can only be loaded in slots A3–D3. If you try to load it in any other slot, the API will raise an error. The module's caddy is designed such that the detection unit is in deck column 3 and the special staging area for the lid/illumination unit is in deck column 4. You can't load or move other labware on the Absorbance Plate Reader caddy in deck column 4, even while the lid is in the closed position (on top of the detection unit in deck column 3).
 
-Example:
+The examples in this section will use an Absorbance Plate Reader Module loaded as follows:
+
 ```python
 pr_mod = protocol.load_module(
     module_name="absorbanceReaderV1",
@@ -48,21 +49,26 @@ Initializing the reader prepares it to read a plate later in your protocol. The 
 
 The module uses these parameters immediately to perform the physical initialization. Additionally, the API preserves these values and uses them when you read the plate later in your protocol.
 
-The simplest reading measures one wavelength, with no reference wavelength:
+Let’s take a look at examples of how to combine these parameters to prepare different types of readings. The simplest reading measures one wavelength, with no reference wavelength:
+
 ```python
 pr_mod.initialize(mode="single", wavelengths=[450])
 ```
 *New in version 2.21*
 
-You can add a reference wavelength:
+Now the reader is prepared to read at 450 nm. Note that the `wavelengths` parameter always takes a list of integer wavelengths, even when only reading a single wavelength.
+
+This example can be extended by adding a reference wavelength:
+
 ```python
 pr_mod.initialize(
     mode="single", wavelengths=[450], reference_wavelength=562
 )
 ```
-When configured this way, the module will read twice. In the output data, the values read for `reference_wavelength` will be subtracted from the values read for the single member of `wavelengths`. This is useful for normalization, or to correct for background interference in wavelength measurements.
+When configured this way, the module will read twice. In the [output data][using-plate-reader-data], the values read for `reference_wavelength` will be subtracted from the values read for the single member of `wavelengths`. This is useful for normalization, or to correct for background interference in wavelength measurements.
 
-The reader can also be initialized to take multiple measurements. When `mode="multi"`, the `wavelengths` list can have up to six elements:
+The reader can also be initialized to take multiple measurements. When `mode="multi"`, the `wavelengths` list can have up to six elements. This example will initialize the reader to read at three wavelengths:
+
 ```python
 pr_mod.initialize(mode="multi", wavelengths=[450, 562, 600])
 ```
@@ -87,12 +93,15 @@ In the above example, the API both saves the data to a variable and outputs a CS
 ## Using Plate Reader Data
 
 There are two ways to use output data from the Absorbance Plate Reader:
+
 - Within your protocol as a nested dictionary object.
 - Outside of your protocol, as a tabular CSV file.
 
+The two formats are structured differently, even though they contain the same measurement data.
+
 ### Dictionary Data
 
-The dictionary object returned by `read()` has two nested levels. The keys at the top level are the wavelengths you provided to `initialize()`. The keys at the second level are string names of each of the 96 wells, "A1" through "H12". The values at the second level are the measured values for each well. These values are floating point numbers, representing the optical density (OD) of the samples in each well. OD ranges from 0.0 (low sample concentration) to 4.0 (high sample concentration).
+The dictionary object returned by `read()` has two nested levels. The keys at the top level are the wavelengths you provided to `initialize()`. The keys at the second level are string names of each of the 96 wells, `"A1"` through `"H12"`. The values at the second level are the measured values for each well. These values are floating point numbers, representing the optical density (OD) of the samples in each well. OD ranges from 0.0 (low sample concentration) to 4.0 (high sample concentration).
 
 The nested dictionary structure allows you to access results by index later in your protocol. This example initializes a multiple read and then accesses different portions of the results:
 ```python
@@ -121,4 +130,4 @@ Additional information, starting with one blank labware grid, is output at the e
 
 Each output file for your protocol is available in the Opentrons App by going to your Flex and viewing Recent Protocol Runs. After downloading the file from your Flex, you can read it with any software that reads CSV files, and you can write additional code to parse and act upon its contents.
 
-You can also select the output CSV as the value of a CSV runtime parameter in a subsequent protocol. When you parse the CSV data, make sure to set `detect_dialect=False`, or the API will raise an error.
+You can also select the output CSV as the value of a CSV runtime parameter in a subsequent protocol. When you [parse the CSV data][manipulating-csv-data], make sure to set `detect_dialect=False`, or the API will raise an error.
