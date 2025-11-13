@@ -60,7 +60,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
       centerSecondaryText={previousCommandString}
       rightButtonOnClick={() => {
         handleCameraPhotoModal({
-          imagePath: '',
+          imagePath: imagePath ?? '',
           timestamp: item.timestamp,
           stepCountStr: modalStepCountStr,
         })
