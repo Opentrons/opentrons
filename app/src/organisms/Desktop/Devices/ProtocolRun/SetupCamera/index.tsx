@@ -92,6 +92,7 @@ export function SetupCamera({
       {cameraEnabled && (
         <>
           <SetupRunCameraUsage
+            robotName={robotName}
             liveStreamEnabled={liveStreamEnabled}
             recoveryEnabled={recoveryEnabled}
             toggleRecoveryEnabled={toggleRecoveryEnabled}

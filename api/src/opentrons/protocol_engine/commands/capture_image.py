@@ -19,6 +19,7 @@ from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     CameraDisabledError,
+    CameraSettingsInvalidError,
     FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
@@ -191,6 +192,26 @@ class CaptureImageImpl(
         ):
             raise FileNameInvalidError(
                 message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+            )
+
+        # Validate the image filter parameters
+        if params.brightness is not None and (
+            params.brightness < 0 or params.brightness > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image brightness must be a percentage from 0% to 100%."
+            )
+        if params.contrast is not None and (
+            params.contrast < 0 or params.contrast > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image contrast must be a percentage from 0% to 100%."
+            )
+        if params.saturation is not None and (
+            params.saturation < 0 or params.saturation > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image saturation must be a percentage from 0% to 100%."
             )
 
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
