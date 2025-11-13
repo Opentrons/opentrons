@@ -6,7 +6,7 @@ You can move an entire labware (and all of its contents) from one deck slot to a
 
 ## Basic Movement
 
-Use the [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] method to initiate a move, regardless of whether it uses the gripper.
+Use the [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] method to initiate a move, regardless of whether it uses the gripper.
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
@@ -39,10 +39,13 @@ The `use_gripper` parameter of [`move_labware()`][opentrons.protocol_api.Protoco
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
+
     # have the gripper move the plate from D1 to D2
     protocol.move_labware(labware=plate, new_location="D2", use_gripper=True)
+
     # pause to move the plate manually from D2 to D3
     protocol.move_labware(labware=plate, new_location="D3", use_gripper=False)
+
     # pause to move the plate manually from D3 to C1
     protocol.move_labware(labware=plate, new_location="C1")
 ```
@@ -133,6 +136,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.15*
 
+If you try to move the plate to slot C1 or the Heater-Shaker module, the API will raise an error, because C1 is occupied by the Heater-Shaker, and the Heater-Shaker is occupied by the adapter. Only the adapter, as the topmost item in that stack, is unoccupied.
+
 Also note the `hs_mod.open_labware_latch()` command in the above example. To move labware onto or off of a module, you have to make sure that it's physically accessible:
 
 - For the Heater-Shaker, use [`open_labware_latch()`][opentrons.protocol_api.HeaterShakerContext.open_labware_latch].
@@ -157,7 +162,7 @@ Always specify `use_gripper=True` when moving labware into the waste chute. The 
 
 ## Moving Lids
 
-You can use [`move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler) and the Opentrons Flex Tip Rack Lid.
+You can use [`ProtocolContext.move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough Universal Lid, the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler), and the Opentrons Flex Tip Rack Lid.
 
 You can move the auto-sealing lids between deck slots, lid stacks, or compatible labware loaded in your protocol. This example loads a stack of lids and then moves one to a PCR plate on the Thermocycler.
 
@@ -165,6 +170,7 @@ You can move the auto-sealing lids between deck slots, lid stacks, or compatible
 # load Thermocycler and plate
 tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
 plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
+
 # load lid stack
 lid_stack = protocol.load_lid_stack(
     load_name="opentrons_tough_pcr_auto_sealing_lid",
@@ -212,8 +218,10 @@ You can also load labware off-deck, in preparation for a `move_labware()` comman
 
 ```python
 from opentrons import protocol_api
+
 metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
 requirements = {"robotType": "OT-2"}
+
 def run(protocol: protocol_api.ProtocolContext):
     tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
     # load another tip rack but don't put it in a slot yet
