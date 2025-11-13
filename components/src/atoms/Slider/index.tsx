@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
-
+import { StyledText } from '../StyledText'
 import styles from './slider.module.css'
 
 interface SliderProps {

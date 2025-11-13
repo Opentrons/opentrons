@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { Modal, PrimaryButton } from '@opentrons/components'
+import { Modal, PrimaryButton, Slider } from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 
-import { Slider } from '../../../../atoms/Slider'
 import styles from './cameracontrols.module.css'
 import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
 import { PreviewSettings } from './PreviewSettings'
