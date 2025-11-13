@@ -100,9 +100,9 @@ export function ProtocolDetailsHeader({
   const creationMethod =
     mostRecentAnalysis != null
       ? (getCreationMethod(
-        mostRecentAnalysis.config,
-        mostRecentAnalysis.metadata
-      ) ?? t('shared:no_data'))
+          mostRecentAnalysis.config,
+          mostRecentAnalysis.metadata
+        ) ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const author =
@@ -143,7 +143,7 @@ export function ProtocolDetailsHeader({
         width="100%"
       >
         {analysisStatus !== 'loading' &&
-          mostRecentAnalysis?.result === 'parameter-value-required' ? (
+        mostRecentAnalysis?.result === 'parameter-value-required' ? (
           <ProtocolStatusBanner />
         ) : null}
         {mostRecentAnalysis != null && analysisStatus === 'error' ? (
@@ -161,7 +161,10 @@ export function ProtocolDetailsHeader({
               alignItems={ALIGN_CENTER}
               paddingRight={SPACING.spacing24}
             >
-              <StyledText desktopStyle="headingSmallBold" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+              <StyledText
+                desktopStyle="headingSmallBold"
+                style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
+              >
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
