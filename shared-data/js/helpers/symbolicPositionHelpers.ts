@@ -1,10 +1,10 @@
-import type { AddressableAreaName } from '../../deck'
 import { STANDARD_FLEX_SLOTS, STANDARD_OT2_SLOTS } from '../fixtures'
 
 import type {
   LabwareLocation,
   OnDeckLabwareLocation,
 } from '../../command/types/setup'
+import type { AddressableAreaName } from '../../deck'
 
 export const changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName =
   (quoteUnquoteSlotName: string): boolean =>

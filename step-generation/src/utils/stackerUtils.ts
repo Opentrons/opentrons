@@ -1,7 +1,9 @@
-import { type LabwareLocation, locationIsOnModule } from '@opentrons/shared-data'
+import { locationIsOnModule } from '@opentrons/shared-data'
 
-import type { TimelineFrame } from '../types'
 import { getSlotInLocationStack } from '../utils'
+
+import type { LabwareLocation } from '@opentrons/shared-data'
+import type { TimelineFrame } from '../types'
 
 // remove if not used write tests for module section
 export const getIsSlotOccupied = (

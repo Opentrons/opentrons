@@ -294,6 +294,7 @@ export function getLoadLabware(
 
       let parentName: string
       let locationArg: string | undefined
+      let pythonFlexStackerSetStoredLabware: string | undefined
       if (onAdapter) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
@@ -312,11 +313,7 @@ export function getLoadLabware(
               ) &&
               !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
           ).length
-          // should I return this here? or join it with the other return statements?
-          return [
-            ...acc,
-            `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`,
-          ]
+          pythonFlexStackerSetStoredLabware = `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`
         }
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
@@ -343,6 +340,9 @@ export function getLoadLabware(
           `${pythonName} = ${parentName}.load_labware(\n` +
             `${indentPyLines(loadLabwareArgs)},\n` +
             `)`,
+          ...(pythonFlexStackerSetStoredLabware != null
+            ? [pythonFlexStackerSetStoredLabware]
+            : []),
         ]
       } else {
         // custom labware

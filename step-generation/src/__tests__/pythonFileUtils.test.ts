@@ -483,6 +483,11 @@ well_plate_3 = protocol.load_labware_from_definition(
     location="C2",
     label="sample plate",
 )
+well_plate_4 = flex_stacker_1.load_labware(
+    "fixture_96_plate",
+    namespace="opentrons",
+    version=1,
+)
 well_plate_4 = flex_stacker_1.set_stored_labware(fixture_96_plate, opentrons, 1, count=0)`.trimStart()
     )
   })
