@@ -104,7 +104,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	rm -rf .venv
+	$(UV) venv --remove
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
