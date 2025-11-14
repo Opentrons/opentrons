@@ -69,6 +69,7 @@ if __name__ == "__main__":
     arg_parser = build_arg_parser()
     options = arg_parser.parse_args()
     df = pd.read_csv(options.file_name)
+    print(f'file_name: {options.file_name}')
     headers = pd.read_csv(options.file_name).columns.tolist()
     value_cols = [c for c in df.columns if c.endswith("_FILTERED") or c.endswith("_RAW")]
     app.layout = html.Div([

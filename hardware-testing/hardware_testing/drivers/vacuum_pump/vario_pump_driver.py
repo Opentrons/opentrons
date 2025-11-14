@@ -9,8 +9,17 @@ import asyncio
 import csv
 
 
-COMMANDS = {'Pump_State': 'TurnOnPump', 
-            'Set_Pressure': 'SetPressure'}
+COMMANDS = {'Start': 'START', 
+            'STOP': 'STOP',
+            }
+
+RESPONSE =  {'Start': '1', 
+            'STOP': '0',
+            'REMOTE': '0',
+            'IN_PV_1': 'hPa',
+            'IN_PV_3': 'h:m',
+            'IN_PV_X': None,
+            }
 
 # This value may need to be found through trial and error
 DEVICE_NAME = "dev/ttyUSB0"
@@ -18,6 +27,8 @@ DEVICE_NAME = "dev/ttyUSB0"
 # These values should be in the device documentation
 V_BAUDRATE = 19200
 SERIAL_ACK = "\n"
+READ_TIMEOUT = 0.5
+WRITE_TIMEOUT = 0.5
 
 class VarioPump():
     """Vario Pump Driver"""
@@ -25,7 +36,7 @@ class VarioPump():
         self.connection = connection
         self._stop_requested = False
         self._csv_initialized = False
-        self._csv_path = csv_path
+        self.csv_path = csv_path
         self.pressure_set = None
         self.st = time.perf_counter()
 
@@ -34,10 +45,11 @@ class VarioPump():
         """Create a Vacuum Pump Driver"""
         conn = Serial(port=port, 
                       baudrate=baudrate, 
-                      timeout=1.0,
                       bytesize=serial.EIGHTBITS,  # Set data bits to 8
                       parity=serial.PARITY_NONE,
                       stopbits=serial.STOPBITS_ONE,
+                      timeout=READ_TIMEOUT,
+                      write_timeout=WRITE_TIMEOUT,
                       rtscts=False)
         return VarioPump(connection=conn)
 
@@ -61,42 +73,57 @@ class VarioPump():
         self.connection.reset_input_buffer()
         self.connection.reset_output_buffer()
 
-    async def _read_response(self):
-        # output_lines = self.connection.readlines()
-        # print(f"output_lines {output_lines}")
-        # output_string = ""
-
-        # for l in output_lines:
-        #     output_string += l.decode("utf-8")
-
-        # return output_string
-        try:
-            output_lines=(await asyncio.to_thread(self.connection.readlines))
-            output_string = ""
-            for l in output_lines:
-                output_string += l.decode("utf-8")
-            return output_string
-        except Exception as e:
-            raise(e)
-
+    
     async def _send_command(self, my_command: str):
         await self._reset_buffers()
         command = my_command
         command += SERIAL_ACK
         commands = bytes(command.encode('utf-8'))
-        print(f"writing {command}")
+        # print(f"writing {command}")
         try:
             await asyncio.to_thread(self.connection.write, commands)
         except Exception as e:
             raise(e)
         self.connection.flush()
-    
+
     async def _select_vacuum_control(self):
         await self._send_command("OUT_APP 6")
         response = await self._read_response()
-
         return response
+    
+    def _decode_lines(self, lines: List[bytes]) -> str:
+        """Fast decode of a list of byte lines into a single string.
 
+        Uses a single bytes join followed by a single decode to avoid
+        O(n^2) string concatenation in a loop.
+        """
+        if not lines:
+            return ""
+        return b"".join(lines).decode("utf-8", errors="ignore")
+
+    async def _read_response(self):
+        try:
+            output_lines = await asyncio.to_thread(self.connection.readlines)
+            decoded = self._decode_lines(output_lines)
+            if decoded:
+                print(f"message: {decoded!r}", flush=True)
+            await self._reset_buffers()
+            return decoded
+        except Exception as e:
+            raise e
+
+    async def _read_pressure_response(self):
+        try:
+            output_lines = await asyncio.to_thread(self.connection.readlines)
+            decoded = self._decode_lines(output_lines)
+            if decoded:
+                print(f"message: {decoded!r}", flush=True)
+            await self._reset_buffers()
+            return decoded
+        except Exception as e:
+            raise e
+        # self.connection.flush()
+    
     async def _set_vacuum_pressure(self, setpoint):
         await self._send_command(f"OUT_SP_1 {setpoint}")
         response = await self._read_response()
@@ -106,58 +133,52 @@ class VarioPump():
     async def _set_pump_speed(self, speed): #speed in percent (ex. 85.3)
         await self._send_command(f"OUT_SP_2 {speed}")
         response = await self._read_response()
-        print(response)
-
         return response
 
     async def _select_pumpdown(self):
         await self._send_command("OUT_APP 0")
         response = await self._read_response()
-        print(response)
-
         return response
     
     async def _select_pumpdown_and_hold(self):
         await self._send_command("OUT_APP 4")
         response = await self._read_response()
-        print(response)
-
         return response
+    
+    async def change_pressure_units(self):
+        pass
+        # await self._send_command("OUT_CFG_")
     
     async def _start_process(self):
         await self._send_command("START")
         response = await self._read_response()
-        print(response)
-
+        print(f"Start: {response}", flush=True)
         return response
     
     async def _stop_process(self):
         await self._send_command("STOP")
         response = await self._read_response()
-
         return response
     
     async def read_pressure_sensor(self):
         await self._send_command("IN_PV_1")
         response = await self._read_response()
-        print(response)
         return response
     
     async def echo_mode(self):
-        await self._send_command("ECHO 1")
+        await self._send_command("ECHO 0")
         response = await self._read_response()
-
         return response
     
     async def set_comms_mode(self):
         await self._send_command("CVC 4")
         response = await self._read_response()
-
         return response
     
     async def set_remote_control(self):
         await self._send_command("REMOTE 2")
         response = await self._read_response()
+        # print(response)
         return response
     
     async def pump_down(self, speed: int = 100):
@@ -196,7 +217,7 @@ class VarioPump():
         Expects `data` to have at least 4 numeric elements: [PA_FILTERED, PA_RAW, PB_FILTERED, PB_RAW].
         Adds the current `pressure_set` as the last column (may be None).
         """
-        if len(data) < 4:
+        if len(data) == 0:
             # Skip malformed/short lines quietly; caller should already filter, but be defensive
             return
 
@@ -205,14 +226,11 @@ class VarioPump():
             with open(self.csv_path, "a", newline="") as f:
                 writer = csv.writer(f)
                 if write_header:
-                    writer.writerow(["timestamp", "PA_RAW", "PA_FILTERED",  "PB_RAW", "PB_FILTERED",  "SET_PRESSURE"])
+                    writer.writerow(["timestamp", "PA_FILTERED", "PB_FILTERED","SET_PRESSURE"])
                     self._csv_initialized = True
                 writer.writerow([
                     f"{timestamp:.2f}",
                     f"{data[0]:.2f}",
-                    f"{data[1]:.2f}",
-                    f"{data[2]:.2f}",
-                    f"{data[3]:.2f}",
                     self.pressure_set if self.pressure_set is not None else 0,
                 ])
 
@@ -236,16 +254,17 @@ class VarioPump():
             except ValueError:
                 # Likely a leading label; ignore it
                 continue
-        if len(nums) < 4:
-            return None
+        # if len(nums) < 1:
+        #     return None
         # Keep the first 4 values in expected order
-        return nums[:4]
+        return nums
     
     async def read_continuous_data(self):
         """Read and print continuous data from the vacuum pump for the specified timeout duration."""
         try:
             while True:
                 line = await self.read_pressure_sensor()
+                # print(line)
                 if not line.strip():
                     # No data -> possible end of stream or timeout
                     if self._stop_requested:
@@ -253,8 +272,7 @@ class VarioPump():
                         break
                     await asyncio.sleep(0.1)
                     continue
-                # print(line)
-                tokens = line.strip().split(',')
+                tokens = line.strip().split()
                 data = self.data_to_cells(tokens)
                 if data is None:
                     # Not enough numeric data on this line; skip
@@ -267,21 +285,22 @@ class VarioPump():
         except Exception as e:
             raise(e)
     
-async def main():
-    pump  = await VarioPump.create('COM5', V_BAUDRATE, loop=asyncio.get_running_loop())
-    await pump.connect()
-    await pump.initiate_pump_control()
-    # await pump.vacuum_program(speed=100, seconds = 10)
-    await pump.read_pressure_sensor()
-    # await pump._set_vacuum_pressure(800)
-    # await pump.close_vent()
-    # await pump._select_pumpdown()
-    # await pump._start_process()
-    # await asyncio.sleep(10)
-    # await pump._stop_process()
-    await pump._stop_process()
-    await pump.open_vent()
+# async def main():
+#     pump  = await VarioPump.create('COM5', V_BAUDRATE, loop=asyncio.get_running_loop())
+#     await pump.connect()
+#     await pump.initiate_pump_control()
+#     # pump.csv_path = 'C:/Users/cfern/Documents/Github/0pentrons/hardware-testing/hardware_testing/drivers/vacuum_pump/scripts/pump.csv'
+#     # await pump.vacuum_program(speed=100, seconds = 10)
+#     await pump.read_continuous_data()
+#     # await pump._set_vacuum_pressure(800)
+#     # await pump.close_vent()
+#     # await pump._select_pumpdown()
+#     # await pump._start_process()
+#     # await asyncio.sleep(10)
+#     # await pump._stop_process()
+#     await pump._stop_process()
+#     await pump.open_vent()
 
-if __name__ == '__main__':
-    print('Hello')
-    asyncio.run(main())
+# if __name__ == '__main__':
+#     print('Hello')
+#     asyncio.run(main())
