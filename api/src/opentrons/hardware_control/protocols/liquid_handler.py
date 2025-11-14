@@ -129,15 +129,17 @@ class LiquidHandler(
         volume: float,
         flow_rate: float = 1.0,
         movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
 
         :param mount: A robot mount that the instrument is on.
-        :param z_distance: The distance the z axis will move during apsiration.
+        :param end_point: The deck coordinate point to move the tip to during the aspirate.
         :param volume: The volume of liquid to be aspirated.
         :param flow_rate: The flow rate to aspirate with.
         :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
+        :param end_critical_point: The critical point for the end_point position.
         """
         ...
 
@@ -172,15 +174,17 @@ class LiquidHandler(
         flow_rate: float = 1.0,
         is_full_dispense: bool = False,
         movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
 
         :param mount: A robot mount that the instrument is on.
-        :param z_distance: The distance the z axis will move during dispensing.
+        :param end_point: The deck coordinate point to move the tip to during the dispense.
         :param volume: The volume of liquid to be dispensed.
         :param flow_rate: The flow rate to dispense with.
         :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
+        :param end_critical_point: The critical point for the end_point position.
         """
         ...
 
