@@ -10,8 +10,8 @@ Before getting started with partial tip pickup, make sure your protocol specifie
 |--------------------------|----------------------|--------------------|
 | Flex 96-Channel Pipette  | Column               | 2.16               |
 | Flex 96-Channel Pipette  | Single, row          | 2.20               |
-| Flex 8-Channel Pipettes  | Single, partial col. | 2.20               |
-| OT-2 Multi-Channel Pips  | Single, partial col. | 2.20               |
+| Flex 8-Channel Pipettes  | Single, partial column | 2.20               |
+| OT-2 Multi-Channel Pipettes  | Single, partial column | 2.20               |
 
 ## Nozzle Layouts
 
@@ -42,7 +42,9 @@ Here is the start of a protocol that imports the `COLUMN` and `ALL` layout const
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import COLUMN, ALL
+
 requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul",
@@ -89,7 +91,9 @@ Here is the start of a protocol that imports the `ROW` and `ALL` layout constant
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import ROW, ALL
+
 requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul",
@@ -147,7 +151,9 @@ Here is the start of a protocol that imports the `SINGLE` and `ALL` layout const
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import SINGLE, ALL
+
 requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul",
@@ -166,7 +172,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.20*
 
-To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use `sum` to flatten the list of lists returned by [`Labware.rows()`][opentrons.protocol_api.labware.Labware.rows]:
+To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use [`sum()`](https://docs.python.org/3/library/functions.html#sum) to flatten the list of lists returned by [`Labware.rows()`][opentrons.protocol_api.labware.Labware.rows]:
 
 ```python
 tips_by_row = sum(partial_rack.rows(), [])
@@ -225,7 +231,9 @@ Here is the start of a protocol that imports the `PARTIAL_COLUMN` and `ALL` layo
 ```python
 from opentrons import protocol_api
 from opentrons.protocol_api import PARTIAL_COLUMN, ALL
+
 requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul",
@@ -315,6 +323,7 @@ pipette.configure_nozzle_layout(
     tip_racks=partial_tip_racks
 )
 # partial pipetting commands go here
+
 pipette.configure_nozzle_layout(
     style=ALL,
     tip_racks=full_tip_racks
@@ -332,7 +341,7 @@ The API will raise errors for potential crashes when using a partial nozzle conf
 
 - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
 - Simulate your protocol and compare the output to your expectations of where the pipette will travel.
-- Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
+- Perform a dry run with only tip racks on the deck. Have the [Emergency Stop Pendant](../../flex/system-description/e-stop.md) handy in case you see an impending crash.
 
 ### Deck Extents
 

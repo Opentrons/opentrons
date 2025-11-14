@@ -32,7 +32,7 @@ For more, see [Push Out After Dispense][push-out-after-dispense].
     
     Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling `configure_for_volume()` *before* `pick_up_tip()` helps to avoid this situation.
 
-In a protocol that handles many different volumes, it's a good practice to call `configure_for_volume()` once for each [transfer][opentrons.protocol_api.InstrumentContext.transfer] or [aspirate][opentrons.protocol_api.InstrumentContext.aspirate], specifying the volume that you are about to handle. When operating with a list of volumes, nest `configure_for_volume()` inside a `for` loop to ensure that the pipette is properly configured for each volume:
+In a protocol that handles many different volumes, it's a good practice to call `configure_for_volume()` once for each [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] or [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], specifying the volume that you are about to handle. When operating with a list of volumes, nest `configure_for_volume()` inside a `for` loop to ensure that the pipette is properly configured for each volume:
 
 ```python
 volumes = [1, 2, 3, 4, 1, 5, 2, 8]
