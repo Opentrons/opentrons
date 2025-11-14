@@ -147,7 +147,7 @@ test-ot2:
 	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
-lint:
+lint: setup
 	$(python) -m mypy src tests integration_testing
 	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
 	$(python) -m flake8 src tests integration_testing

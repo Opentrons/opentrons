@@ -98,7 +98,7 @@ sdist: $(py_sources) $(json_sources)
 
 
 .PHONY: lint
-lint: $(py_sources)
+lint: setup-py $(py_sources)
 	$(python) -m mypy python/opentrons_shared_data python_tests tools
 	$(python) -m black --check python/opentrons_shared_data python_tests tools
 	$(python) -m flake8 python/opentrons_shared_data python_tests tools
