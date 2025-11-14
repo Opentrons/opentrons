@@ -3,19 +3,19 @@ title: "Python API: Pipette Tips"
 description: Basic commands for working with pipette tips.
 ---
 
-Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are [`InstrumentContext.pick_up_tip`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.drop_tip`][opentrons.protocol_api.InstrumentContext.drop_tip], and [`InstrumentContext.return_tip`][opentrons.protocol_api.InstrumentContext.return_tip]. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
+Your robot needs to attach a disposable tip to the pipette before it can aspirate or dispense liquids. The API provides three basic functions that help the robot attach and manage pipette tips during a protocol run. These methods are [`InstrumentContext.pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`InstrumentContext.drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip], and [`InstrumentContext.return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip]. Respectively, these methods tell the robot to pick up a tip from a tip rack, drop a tip into the trash (or another location), and return a tip to its location in the tip rack.
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
 ## Picking Up a Tip
 
-To pick up a tip, call the `pick_up_tip` method without any arguments:
+To pick up a tip, call the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] method without any arguments:
 
 ```python
 pipette.pick_up_tip()
 ```
 
-When added to the protocol template, this simple statement works because the API knows which tip rack is associated with `pipette`, as indicated by `tip_racks=[tiprack_1]` in the `load_instrument` call. And it knows the on-deck location of the tip rack (slot D3 on Flex, slot 3 on OT-2) from the `location` argument of `load_labware`. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to `pick_up_tip()`, the robot will use the next available tip. For example:
+When added to the protocol template, this simple statement works because the API knows which tip rack is associated with `pipette`, as indicated by `tip_racks=[tiprack_1]` in the [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] call. And it knows the on-deck location of the tip rack (slot D3 on Flex, slot 3 on OT-2) from the `location` argument of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Given this information, the robot moves to the tip rack and picks up a tip from position A1 in the rack. On subsequent calls to `pick_up_tip()`, the robot will use the next available tip. For example:
 
 ```python
 pipette.pick_up_tip()  # picks up tip from rack location A1
@@ -38,7 +38,7 @@ In most cases, it's best to associate tip racks with a pipette and let the API a
 
 ## Automating Tip Pick Up
 
-When used with Python's `range` class, a `for` loop brings automation to the tip pickup and tracking process. It also eliminates the need to call `pick_up_tip()` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack:
+When used with Python's [`range`](https://docs.python.org/3/library/stdtypes.html#range) class, a `for` loop brings automation to the tip pickup and tracking process. It also eliminates the need to call `pick_up_tip()` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack:
 
 ```python
 for i in range(96):

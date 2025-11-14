@@ -29,7 +29,7 @@ protocol.delay(minutes=5, seconds=10)
 
 ## Pause Until Resumed
 
-Call the [`ProtocolContext.pause`][opentrons.protocol_api.ProtocolContext.pause] method to stop a protocol at a specific step. Unlike a delay, `pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message:
+Call the [`ProtocolContext.pause()`][opentrons.protocol_api.ProtocolContext.pause] method to stop a protocol at a specific step. Unlike a delay, `pause()` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message:
 
 ```python
 protocol.pause("Remember to get more pipette tips")
@@ -41,20 +41,20 @@ protocol.pause("Remember to get more pipette tips")
 
 Homing commands the robot to move the gantry, a pipette, or a pipette plunger to a defined position. For example, homing the gantry moves it to the back right of the working area. With the available homing methods you can home the gantry, home the mounted pipette and plunger, and home the pipette plunger. These functions take no arguments.
 
-To home the gantry, call [`ProtocolContext.home`][opentrons.protocol_api.ProtocolContext.home]:
+To home the gantry, call [`ProtocolContext.home()`][opentrons.protocol_api.ProtocolContext.home]:
 
 ```python
 protocol.home()
 ```
 
-To home a specific pipette's Z axis and plunger, call [`InstrumentContext.home`][opentrons.protocol_api.InstrumentContext.home]:
+To home a specific pipette's Z axis and plunger, call [`InstrumentContext.home()`][opentrons.protocol_api.InstrumentContext.home]:
 
 ```python
 pipette = protocol.load_instrument("flex_1channel_1000", "right")
 pipette.home()
 ```
 
-To home a specific pipette's plunger only, you can call [`InstrumentContext.home_plunger`][opentrons.protocol_api.InstrumentContext.home_plunger]:
+To home a specific pipette's plunger only, you can call [`InstrumentContext.home_plunger()`][opentrons.protocol_api.InstrumentContext.home_plunger]:
 
 ```python
 pipette = protocol.load_instrument("flex_1channel_1000", "right")
@@ -65,7 +65,7 @@ pipette.home_plunger()
 
 ## Comment
 
-Call the [`ProtocolContext.comment`][opentrons.protocol_api.ProtocolContext.comment] method if you want to write and display a brief message in the Opentrons App during a protocol run:
+Call the [`ProtocolContext.comment()`][opentrons.protocol_api.ProtocolContext.comment] method if you want to write and display a brief message in the Opentrons App during a protocol run:
 
 ```python
 protocol.comment("Hello, world!")
@@ -75,7 +75,7 @@ protocol.comment("Hello, world!")
 
 ## Rail Lights
 
-Call the [`ProtocolContext.set_rail_lights`][opentrons.protocol_api.ProtocolContext.set_rail_lights] method to turn the robot's rail lights on or off during a protocol. This method accepts Boolean `True` (lights on) or `False` (lights off) arguments. Rail lights are off by default.
+Call the [`ProtocolContext.set_rail_lights()`][opentrons.protocol_api.ProtocolContext.set_rail_lights] method to turn the robot's rail lights on or off during a protocol. This method accepts Boolean `True` (lights on) or `False` (lights off) arguments. Rail lights are off by default.
 
 This example turns the rail lights on:
 
@@ -91,7 +91,7 @@ protocol.set_rail_lights(False)
 
 *New in version 2.5*
 
-You can also check whether the rail lights are on or off in the protocol by using [`ProtocolContext.rail_lights_on`][opentrons.protocol_api.ProtocolContext.rail_lights_on]. This method returns `True` when lights are on and `False` when the lights are off.
+You can also check whether the rail lights are on or off in the protocol by using [`ProtocolContext.rail_lights_on`][opentrons.protocol_api.ProtocolContext.rail_lights_on]. This property is `True` when lights are on and `False` when the lights are off.
 
 *New in version 2.5*
 
