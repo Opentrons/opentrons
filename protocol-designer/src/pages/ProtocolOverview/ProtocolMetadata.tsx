@@ -61,6 +61,11 @@ export function ProtocolMetadata({
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {metaDataInfo.map(info => {
           const [title, value] = Object.entries(info)[0]
+          const displayValue =
+            value == null ||
+            (typeof value === 'object' && Object.keys(value).length === 0)
+              ? t('na')
+              : String(value)
 
           return (
             <ListItem type="default" key={`ProtocolOverview_${title}`}>
@@ -81,7 +86,7 @@ export function ProtocolMetadata({
                     desktopStyle="bodyDefaultRegular"
                     css={LINE_CLAMP_TEXT_STYLE(2)}
                   >
-                    {value ?? t('na')}
+                    {displayValue}
                   </StyledText>
                 }
               />
