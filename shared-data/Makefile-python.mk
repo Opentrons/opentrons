@@ -1,6 +1,6 @@
 # shared-data python code makefile
 
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 include ../scripts/push.mk
 
 # Host key location for robot
@@ -19,11 +19,6 @@ PATH := $(shell cd ../ && yarn bin):$(PATH)
 # empty, no .dev extension is appended, so this definition is here only as
 # documentation
 BUILD_NUMBER ?=
-
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
 
 BUILD_DIR := dist
 
@@ -52,20 +47,28 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
+endef
+
 .PHONY: setup
 setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	-$(pipenv) --rm
+	rm -rf .venv
 
 
 .PHONY: clean
@@ -92,7 +95,7 @@ sdist: $(py_sources) $(json_sources)
 
 
 .PHONY: lint
-lint: $(py_sources)
+lint: setup-py $(py_sources)
 	$(python) -m mypy python/opentrons_shared_data python_tests tools
 	$(python) -m black --check python/opentrons_shared_data python_tests tools
 	$(python) -m flake8 python/opentrons_shared_data python_tests tools

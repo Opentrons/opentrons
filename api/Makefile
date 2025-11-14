@@ -1,21 +1,21 @@
 # opentrons api makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 
-# python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+# python and sphinx config
+sphinx_build := $(python) -m sphinx -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(pipenv) run sphinx-build
+sphinx_build_allow_warnings := $(python) -m sphinx
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -61,19 +61,27 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
+endef
+
 .PHONY: all
 all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip uninstall python-can
+	@uv pip list
 
 .PHONY: clean
 clean: docs-clean
@@ -82,7 +90,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(UV) venv --remove
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -125,7 +133,7 @@ test-ot2:
 	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
-lint:
+lint: setup
 	$(python) -m mypy src tests integration_testing
 	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
 	$(python) -m flake8 src tests integration_testing
@@ -171,7 +179,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(UV) run $(SHELL)
 
 .PHONY: push-no-restart
 push-no-restart: wheel

@@ -8,10 +8,26 @@ inputs:
     description: "What Python version to use to create the project's virtual environment"
     required: false
     default: "false"
+  install-system-deps:
+    description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
+    required: false
+    default: 'true'
+  install-dev-deps:
+    description: 'Whether to install dev optional dependencies (UV projects only: --extra dev)'
+    required: false
+    default: 'true'
+outputs:
+  start-time:
+    description: 'Start time of the setup process (Unix timestamp)'
+    value: ${{ steps.setup-env.outputs.start-time }}
+  duration:
+    description: 'Duration of the setup process in seconds'
+    value: ${{ steps.setup-env.outputs.duration }}
 runs:
   using: 'composite'
   steps:
     - shell: bash
+      if: inputs.install-system-deps == 'true'
       run: |
         if [[ "${OSTYPE}" =~ "linux" ]]; then
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
@@ -19,20 +35,75 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
-    - name: If provided set the OT_VIRTUALENV_VERSION env variable
-      shell : bash
-      if: ${{ inputs.python-version != 'false' }}
-      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: npm install --global shx@0.3.3
-    - shell: bash
-      run: $OT_PYTHON -m pip install --upgrade pip
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user pipenv==2023.12.1
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user virtualenv==20.30.0
-    - shell: bash
-      run: 'make -C ${{ inputs.project }} setup || make -C ${{ inputs.project }} setup'
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
+    - name: Check project type
+      id: project-type
+      shell: bash
+      run: |
+        # Only api and shared-data use UV for now
+        if [ "${{ inputs.project }}" == "api" ] || [ "${{ inputs.project }}" == "shared-data" ]; then
+          echo "type=uv" >> $GITHUB_OUTPUT
+        elif [ -f "${{ inputs.project }}/Pipfile" ]; then
+          echo "type=pipenv" >> $GITHUB_OUTPUT
+        else
+          echo "type=make" >> $GITHUB_OUTPUT
+        fi
+    - name: Install pipenv and virtualenv (original behavior - always installed)
+      if: steps.project-type.outputs.type != 'uv'
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --user pipenv==2023.12.1
+        python -m pip install --user virtualenv==20.30.0
+    - name: Install UV
+      if: steps.project-type.outputs.type == 'uv'
+      uses: astral-sh/setup-uv@v7
+    - name: Cache UV packages
+      if: steps.project-type.outputs.type == 'uv'
+      uses: ./.github/actions/python/cache-uv
+      with:
+        lockfile-path: ${{ inputs.project }}/uv.lock
+    - name: Setup Python Environment
+      id: setup-env
+      shell: bash
+      run: |
+        START_TIME=$(date +%s)
+        echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
+        # Use the project type determined earlier
+        PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
+        if [ "$PROJECT_TYPE" == "uv" ]; then
+          echo "::notice::Using UV for dependency management"
+          # Add dev extra if requested
+          DEV_EXTRA=""
+          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
+            DEV_EXTRA="--extra dev"
+          fi
+          if [ -f "${{ inputs.project }}/uv.lock" ]; then
+            # Use --frozen to ensure exact versions from lockfile
+            cd ${{ inputs.project }} && uv sync --frozen $DEV_EXTRA
+            # Verify dev dependencies are installed if dev extra was used
+            if [ -n "$DEV_EXTRA" ]; then
+              echo "::notice::Verifying dev dependencies are installed..."
+              uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+            fi
+          else
+            cd ${{ inputs.project }} && uv sync $DEV_EXTRA
+            # Verify dev dependencies are installed if dev extra was used
+            if [ -n "$DEV_EXTRA" ]; then
+              echo "::notice::Verifying dev dependencies are installed..."
+              uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+            fi
+          fi
+        else
+          # For pipenv or make projects, just call make setup
+          make -C ${{ inputs.project }} setup
+        fi
+        END_TIME=$(date +%s)
+        DURATION=$((END_TIME - START_TIME))
+        echo "duration=$DURATION" >> $GITHUB_OUTPUT
+        echo "::notice::Setup completed in ${DURATION} seconds"
