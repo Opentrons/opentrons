@@ -19,7 +19,11 @@ import {
 } from '/protocol-designer/components/molecules'
 import { DND_TYPES } from '/protocol-designer/constants'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
-import { getOrderedSavedForms } from '/protocol-designer/step-forms/selectors'
+import {
+  getOrderedSavedForms,
+  getSavedStepHierarchy,
+  getUserVisibleStepNumbers,
+} from '/protocol-designer/step-forms/selectors'
 import * as steplistActions from '/protocol-designer/steplist/actions'
 import {
   computeStepMove,
@@ -46,37 +50,22 @@ interface DraggableStepsProps {
  * terminal steps. The steps in here can be dragged and dropped to reorder them.
  */
 export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
-  const enableConcurrentModuleActions = useSelector(
-    getEnableConcurrentModuleActions
-  )
   const { sidebarWidth } = props
   const [openedOverflowMenuId, setOpenedOverflowMenuId] = useState<
     string | null
   >(null)
 
-  const orderedSavedForms = useSelector(getOrderedSavedForms)
-  const orderedStepIds = orderedSavedForms.map(form => form.id)
-
-  // todo(mm, 2025-10-27): nestedSteps and findStepIndex probably ought to be Redux selectors, for efficiency.
-  const nestedSteps = convertStepArrayToHierarchy(
-    orderedSavedForms,
-    enableConcurrentModuleActions
-  )
-  // todo(mm, 2025-10-27): This implementation of findStepIndex returns the wrong number for steps that
-  // come after Thermocycler profiles, because it counts the invisible pause step. We want the numbering to
-  // skip over invisible steps.
-  const findStepIndex = (stepId: StepIdType): number =>
-    orderedStepIds.findIndex(id => stepId === id)
+  const stepHierarchy = useSelector(getSavedStepHierarchy)
+  const stepNumbers = useSelector(getUserVisibleStepNumbers)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {nestedSteps.topLevelItems.map(nestedStepElement => {
+      {stepHierarchy.topLevelItems.map(nestedStepElement => {
         if (nestedStepElement.type === 'standaloneStep') {
-          const index = findStepIndex(nestedStepElement.stepId)
           return (
             <DragDropStep
-              key={`${nestedStepElement.stepId}_${index}`}
-              stepNumber={index + 1}
+              key={`${nestedStepElement.stepId}`}
+              stepNumber={stepNumbers[nestedStepElement.stepId]}
               stepId={nestedStepElement.stepId}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
@@ -96,7 +85,6 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
               concurrentStepIds={nestedStepElement.concurrentSteps.map(
                 step => step.stepId
               )}
-              findStepIndex={findStepIndex}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
               sidebarWidth={sidebarWidth}
@@ -116,7 +104,7 @@ interface DropType {
 
 interface ConnectedStepItemProps {
   stepId: StepIdType
-  stepNumber: number
+  stepNumber: number | null
   onStepContextMenu?: () => void
 }
 
@@ -241,8 +229,6 @@ interface ThermocyclerProfileProps {
   thermocyclerProfileStepId: StepIdType
   concurrentStepIds: StepIdType[]
 
-  findStepIndex: (stepId: StepIdType) => number
-
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
 
@@ -259,7 +245,6 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
   const {
     thermocyclerProfileStepId,
     concurrentStepIds,
-    findStepIndex,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -271,6 +256,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
     multiSelectItemIds != null && multiSelectItemIds.length > 0
       ? multiSelectItemIds.includes(thermocyclerProfileStepId)
       : selectedStepId === thermocyclerProfileStepId
+  const stepNumbers = useSelector(getUserVisibleStepNumbers)
 
   const { t } = useTranslation()
 
@@ -278,7 +264,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
     <div>
       <DragDropStep
         stepId={thermocyclerProfileStepId}
-        stepNumber={findStepIndex(thermocyclerProfileStepId) + 1}
+        stepNumber={stepNumbers[thermocyclerProfileStepId]}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -302,7 +288,7 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
           <ConcurrentGroupChild key={concurrentStepId} type="step">
             <DragDropStep
               stepId={concurrentStepId}
-              stepNumber={findStepIndex(concurrentStepId) + 1}
+              stepNumber={stepNumbers[concurrentStepId]}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
               sidebarWidth={sidebarWidth}
