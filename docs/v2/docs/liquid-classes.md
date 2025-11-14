@@ -10,7 +10,7 @@ This page covers the properties of Opentrons-verified liquid classes, how to use
 
 Opentrons-verified liquid classes are based on the properties of common liquids: water, ethanol, and glycerol.
 
-| Opentrons-verified liquid class | Description              | Load name      |
+| Opentrons-verified liquid class | Description              | Load name {width="25%"} |
 |---------------------------------|--------------------------|---------------|
 | Aqueous                        | Based on deionized water | `water`       |
 | Volatile                       | Based on 80% ethanol     | `ethanol_80`  |
@@ -161,7 +161,7 @@ You'll use a [liquid class definition](liquid-class-definitions.md) in your prot
 
 This section covers selecting a liquid class and using the [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method. For more details, including using the [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class] and [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class] methods, see [Complex Commands](complex-commands/index.md).
 
-Start by defining the tips, trash, pipette, and labware used in your transfers. Then, use [`ProtocolContext.get_liquid_class`][opentrons.protocol_api.ProtocolContext.get_liquid_class] to select an Opentrons-verified liquid class and save its results to a variable. `get_liquid_class()` takes into account the pipette and tip racks in your protocol and only loads the relevant portion of the liquid class definition.
+Start by defining the tips, trash, pipette, and labware used in your transfers. Then, use [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] to select an Opentrons-verified liquid class and save its results to a variable. `get_liquid_class()` takes into account the pipette and tip racks in your protocol and only loads the relevant portion of the liquid class definition.
 
 ```python
 from opentrons import protocol_api
@@ -193,11 +193,11 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 *New in version 2.24*
 
-Next, use the [`InstrumentContext.transfer_with_liquid_class`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method to transfer an aqueous, volatile, or viscous liquid defined in a Flex protocol. This method requires the stored set of properties defined earlier, `viscous_liquid`, instead of the `glycerol_50` load name. It accepts additional arguments that let you specify your liquid, volume, source and destination wells, tip handling preferences, and trash location.
+Next, use the [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] method to transfer an aqueous, volatile, or viscous liquid defined in a Flex protocol. This method requires the stored set of properties defined earlier, `viscous_liquid`, instead of the `glycerol_50` load name. It accepts additional arguments that let you specify your liquid, volume, source and destination wells, tip handling preferences, and trash location.
 
 Opentrons-verified liquid class definitions are based on Flex pipette and tip combinations. The API will raise an error if you try to perform a liquid class transfer with an OT-2 pipette and tips.
 
-In the example below, a Flex P50 1-channel pipette will transfer 50 µL of your `viscous_liquid` from well A1 of the reservoir to well A1 of the destination plate. A new tip is used for each well transfer, and each tip is dropped in the trash bin loaded in slot A3.
+In the example below, a Flex 1-channel pipette will transfer 50 µL of your `viscous_liquid` from well A1 of the reservoir to well A1 of the destination plate. A new tip is used for each well transfer, and each tip is dropped in the trash bin loaded in slot A3.
 
 ```python
 # transfer with the viscous liquid class
@@ -229,7 +229,7 @@ And for each dispense, the pipette:
 - Delays for 0.5 second.
 - Retracts to 2 mm above the top of the well at 4 mm/sec.
 
-In many cases, the liquid class definition represents fine-tuned changes optimized for each liquid class. If you instead use the Flex P50 1-channel pipette to transfer 50 µL of the volatile `liquid_2`, transfer behavior would include:
+In many cases, the liquid class definition represents fine-tuned changes optimized for each liquid class. If you instead used the same pipette to transfer 50 µL of the volatile `liquid_2`, transfer behavior would include:
 
 - Submerging into and retracting from the volatile `liquid_2` at 100 mm/sec.
 - Adding larger air gaps after aspirating *and* dispensing to prevent dripping onto the deck.
@@ -245,10 +245,14 @@ You can create your own liquid class to customize transfer behavior for any liqu
 To customize an Opentrons-verified liquid class, first add your pipettes, tips, trash, and labware. Then, use [`get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] to specify the liquid class you'll make changes to:
 
 ```python
-custom_water = protocol.get_liquid_class(name="water")
+custom_water = protocol.get_liquid_class(name="water", version=1)
 custom_water_properties = custom_water.get_for(pipette, tiprack)
 ```
+
+Here, you can also use the optional `version` parameter to specify which version of the liquid class definition you’d like to customize. If unspecified, the API loads the latest version.
+
 *New in version 2.24*
+*Changed in version 2.26:* The `version` parameter lets you apply a previous liquid class definition version.
 
 Next, edit individual liquid class properties based on your Flex pipette and tip combination.
 
@@ -274,69 +278,69 @@ You can also create a new liquid class for your Flex protocols. Instead of using
 
 ```python
 custom_liquid_class_properties = {
-   "p20_single_gen2": {
-       "opentrons/opentrons_96_tiprack_20ul/1": {
-           "aspirate": {
-               "aspirate_position": {
-                   "offset": {"x": 1, "y": 2, "z": 3},
-                   "position_reference": "well-bottom",
-               },
-               "correction_by_volume": [(0.0, 0.0)],
-               "delay": {"enabled": False},
-               "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
-               "mix": {"enabled": False},
-               "pre_wet": True,
-               "retract": {
-                   "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                   "delay": {"enabled": False},
-                   "end_position": {
-                       "offset": {"x": 1, "y": 2, "z": 3},
-                       "position_reference": "well-bottom",
-                   },
-                   "speed": 40,
-                   "touch_tip": {"enabled": False},
-               },
-               "submerge": {
-                   "delay": {"enabled": False},
-                   "speed": 100,
-                   "start_position": {
-                      "offset": {"x": 1, "y": 2, "z": 3},
-                      "position_reference": "well-bottom",
-                   },
-               },
-           },
-           "dispense": {
-               "correction_by_volume": [(0.0, 0.0)],
-               "delay": {"enabled": False},
-               "dispense_position": {
-                   "offset": {"x": 1, "y": 2, "z": 3},
-                   "position_reference": "well-bottom",
-               },
-               "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
-               "mix": {"enabled": False},
-               "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
-               "retract": {
-                   "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                   "blowout": {"enabled": False},
-                   "delay": {"enabled": False},
-                   "end_position": {
-                       "offset": {"x": 1, "y": 2, "z": 3},
-                       "position_reference": "well-bottom",
-                   },
-                   "speed": 40,
-                   "touch_tip": {"enabled": False},
-               },
-               "submerge": {
-                   "delay": {"enabled": False},
-                   "speed": 100,
-                   "start_position": {
-                       "offset": {"x": 1, "y": 2, "z": 3},
-                       "position_reference": "well-bottom",
-                   },
-               },
-           },
-       }
-   }
+    "p20_single_gen2": {
+        "opentrons/opentrons_96_tiprack_20ul/1": {
+            "aspirate": {
+                "aspirate_position": {
+                    "offset": {"x": 1, "y": 2, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "correction_by_volume": [(0.0, 0.0)],
+                "delay": {"enabled": False},
+                "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                "mix": {"enabled": False},
+                "pre_wet": True,
+                "retract": {
+                    "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                    "speed": 40,
+                    "touch_tip": {"enabled": False},
+                },
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 100,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                },
+            },
+            "dispense": {
+                "correction_by_volume": [(0.0, 0.0)],
+                "delay": {"enabled": False},
+                "dispense_position": {
+                    "offset": {"x": 1, "y": 2, "z": 3},
+                    "position_reference": "well-bottom",
+                },
+                "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
+                "mix": {"enabled": False},
+                "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
+                "retract": {
+                    "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
+                    "blowout": {"enabled": False},
+                    "delay": {"enabled": False},
+                    "end_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                    "speed": 40,
+                    "touch_tip": {"enabled": False},
+                },
+                "submerge": {
+                    "delay": {"enabled": False},
+                    "speed": 100,
+                    "start_position": {
+                        "offset": {"x": 1, "y": 2, "z": 3},
+                        "position_reference": "well-bottom",
+                    },
+                },
+            },
+        }
+    }
 }
 ```
 
