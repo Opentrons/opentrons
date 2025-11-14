@@ -634,7 +634,9 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
             labware_schema_v2.get("$id", "labware_schema"),
             Resource.from_contents(labware_schema_v2, default_specification=DRAFT7),
         )
-        validator = jsonschema.Draft7Validator(labware_schema_v2, registry=labware_registry)
+        validator = jsonschema.Draft7Validator(
+            labware_schema_v2, registry=labware_registry
+        )
         validator.validate(protocol_json)
     except jsonschema.ValidationError:
         pass
