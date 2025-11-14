@@ -672,7 +672,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
         labware_schema_id,
         Resource.from_contents(labware_schema_v2, default_specification=DRAFT7),
     )
-    # Add protocol schema to registry (needed for same-document and cross-schema refs)
+    # Add protocol schema to registry (needed for same-document and
+    # cross-schema refs)
     protocol_schema_id = protocol_schema.get("$id", "")
     if protocol_schema_id:
         registry = registry.with_resource(
