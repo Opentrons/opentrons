@@ -243,13 +243,13 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
     ) as FlexStackerModuleState
     expect(moduleState?.shuttlePosition).toBe('retrieved')
     expect(moduleState?.labwareIdsInStacker).toHaveLength(2)
-    expect(robotState.labware['tiprack1Id']?.stack).toHaveLength(1)
+    expect(robotState.labware.tiprack1Id?.stack).toHaveLength(1)
   })
 })
 
 describe('flex stacker state updates forFlexStackerStore', () => {
   const invariantContext = makeContext()
-  let robotState = getInitialRobotStateStandard(invariantContext)
+  const robotState = getInitialRobotStateStandard(invariantContext)
   robotState.modules[FLEX_STACKER_ID] = {
     slot: '1',
     moduleState: {

@@ -388,23 +388,6 @@ export function getLoadPipettes(
   return pythonPipette ? `# Load Pipettes:\n${pythonPipette}` : ''
 }
 
-export function getFlexStackerSetStoredLabware(
-  moduleEntities: ModuleEntities,
-  labwareEntities: LabwareEntities,
-  labwareRobotState: TimelineFrame['labware']
-): string {
-  return ''
-  const pythonFlexStackerSetStoredLabware = Object.values(moduleEntities)
-    .map(module => {
-      const { id, pythonName } = module
-      return `${pythonName}.set_stored_labware(${labwareEntities[id].pythonName})`
-    })
-    .join('\n')
-  return pythonFlexStackerSetStoredLabware
-    ? `# Flex Stacker Set Stored Labware:\n${pythonFlexStackerSetStoredLabware}`
-    : ''
-}
-
 export function getDefineLiquids(liquidEntities: LiquidEntities): string {
   const pythonDefineLiquids = Object.values(liquidEntities)
     .map(liquid => {
@@ -612,7 +595,6 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    getFlexStackerSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =

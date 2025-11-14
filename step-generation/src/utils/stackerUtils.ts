@@ -1,13 +1,13 @@
-import { LabwareLocation, locationIsOnModule } from '@opentrons/shared-data'
+import { type LabwareLocation, locationIsOnModule } from '@opentrons/shared-data'
 
-import { TimelineFrame } from '../types'
+import type { TimelineFrame } from '../types'
 import { getSlotInLocationStack } from '../utils'
 
 // remove if not used write tests for module section
-export function getIsSlotOccupied(
+export const getIsSlotOccupied = (
   robotState: TimelineFrame,
   slotIpnut: LabwareLocation
-) {
+): boolean => {
   console.log('robotState: ', robotState)
   console.log('slotIpnut: ', slotIpnut)
   for (const labware of Object.values(robotState.labware)) {

@@ -1,4 +1,4 @@
-import { AddressableAreaName } from '../../deck'
+import type { AddressableAreaName } from '../../deck'
 import { STANDARD_FLEX_SLOTS, STANDARD_OT2_SLOTS } from '../fixtures'
 
 import type {

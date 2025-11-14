@@ -23,9 +23,9 @@ import type {
 
 const _getStackerModuleState = (
   robotState: RobotState,
-  moduleId: string
+  module: string
 ): FlexStackerModuleState | null => {
-  const moduleState = getModuleState(robotState, moduleId)
+  const moduleState = getModuleState(robotState, module)
 
   if (moduleState.type === FLEX_STACKER_MODULE_TYPE) {
     return moduleState
