@@ -20,6 +20,7 @@ import {
   SPACING,
   StyledText,
   Tag,
+  WRAP,
 } from '@opentrons/components'
 
 import {
@@ -207,7 +208,11 @@ export function ProtocolDetailsHeader({
               </StyledText>
             </Flex>
             {/* tag section */}
-            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing4}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gap={SPACING.spacing4}
+              flexWrap={WRAP}
+            >
               <Tag
                 text={`${i18n.format(t('date_added'), 'titleCase')}:  ${format(
                   new Date(modified),
