@@ -21,7 +21,7 @@ dependencies = [
    "opentrons-shared-data==0.0.0",
     "aionotify==0.3.1",
     "anyio==4.9.0",
-    "jsonschema==4.21.1",
+    "jsonschema==4.17.3",
     "numpy==1.22.3",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
@@ -31,7 +31,6 @@ dependencies = [
     "pyusb==1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
     "packaging==22.0",
-    "referencing==0.37.0",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -39,7 +38,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
-    "jsonschema==4.21.1",
+    "jsonschema==4.17.3",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "anyio==4.9.0",
