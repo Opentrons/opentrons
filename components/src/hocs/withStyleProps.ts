@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 
-import { styleProps } from '../primitives'
+import { isntStyleProp, styleProps } from '../primitives'
 
 import type { ComponentProps, ComponentType } from 'react'
 import type { StyleProps } from '../primitives'
@@ -39,8 +39,18 @@ export function withStyleProps<T extends ComponentType<any>>(
     const stylePropsStyles = styleProps(props)
     const combinedStyles = { ...stylePropsStyles, ...style }
 
+    const forwardedProps = Object.entries(props).reduce(
+      (acc, [prop, value]) => {
+        if (isntStyleProp(prop)) {
+          acc[prop] = value
+        }
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
+
     return createElement(Component, {
-      ...props,
+      ...(forwardedProps as ComponentProps<T>),
       style: combinedStyles,
     })
   }
