@@ -11,6 +11,30 @@ from opentrons_shared_data.data_files import (
     RunFileNameMetadata,
 )
 
+SPECIAL_CHARACTERS = {
+    "#",
+    "%",
+    "&",
+    "{",
+    "}",
+    "\\",
+    "/",
+    "<",
+    ">",
+    "*",
+    "$",
+    "!",
+    "?",
+    ".",
+    "'",
+    '"',
+    ":",
+    ";",
+    "@",
+    "`",
+    "|",
+}
+
 
 @dataclass(frozen=True)
 class FileNameCmdMetadata:

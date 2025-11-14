@@ -54,6 +54,7 @@ export function ProtocolRunHeader(
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
+
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,

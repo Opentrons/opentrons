@@ -4,8 +4,13 @@ import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
 
 import { _castForm } from '../index'
 
-import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type {
+  LabwareEntity,
+  PipetteEntity,
+  TipRackWithDef,
+} from '@opentrons/step-generation'
+import type {
+  HydratedCameraFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
@@ -62,7 +67,7 @@ describe('form casting', () => {
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       aspirate_submerge_mmFromBottom: 1,
@@ -113,7 +118,7 @@ describe('form casting', () => {
       dropTip_location: 'some location',
       mix_touchTip_checkbox: false,
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
@@ -148,6 +153,27 @@ describe('form casting', () => {
     expect(_castForm(input)).toEqual({
       ...input,
       pauseTemperature: 0,
+    })
+  })
+
+  it('should cast camera form fields', () => {
+    const input: HydratedCameraFormData = {
+      stepNumber: 1,
+      stepName: 'camera',
+      stepDetails: 'captured image',
+      id: 'stepId',
+      stepType: 'camera',
+      homeBefore: false,
+      fileName: 'fileName',
+      resolution: [10, 10],
+      zoom: 2,
+      contrast: 10,
+      brightness: 10,
+      saturation: 10,
+    }
+
+    expect(_castForm(input)).toEqual({
+      ...input,
     })
   })
 

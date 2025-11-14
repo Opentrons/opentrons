@@ -19,6 +19,8 @@ from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     CameraDisabledError,
+    CameraSettingsInvalidError,
+    FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
@@ -26,6 +28,7 @@ from ..resources.file_provider import (
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
+from ..resources.file_provider import SPECIAL_CHARACTERS
 from ..resources import CameraProvider
 from ..resources.camera_provider import ImageParameters
 from ..state import update_types
@@ -183,6 +186,34 @@ class CaptureImageImpl(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
 
+        # Validate the filename param provided to fail analysis
+        if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
+            set(params.fileName)
+        ):
+            raise FileNameInvalidError(
+                message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+            )
+
+        # Validate the image filter parameters
+        if params.brightness is not None and (
+            params.brightness < 0 or params.brightness > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image brightness must be a percentage from 0% to 100%."
+            )
+        if params.contrast is not None and (
+            params.contrast < 0 or params.contrast > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image contrast must be a percentage from 0% to 100%."
+            )
+        if params.saturation is not None and (
+            params.saturation < 0 or params.saturation > 100
+        ):
+            raise CameraSettingsInvalidError(
+                message="Capture image saturation must be a percentage from 0% to 100%."
+            )
+
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
         engine_camera_settings = self._state_view.camera.get_enablement_settings()
@@ -212,7 +243,7 @@ class CaptureImageImpl(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
                 command_metadata=ImageCaptureCmdFileNameMetadata(
-                    step_number=len(self._state_view.commands.get_all()) + 1,
+                    step_number=len(self._state_view.commands.get_all()),
                     command_timestamp=datetime.now(),
                     base_filename=params.fileName,
                     command_id=this_cmd_id or "",

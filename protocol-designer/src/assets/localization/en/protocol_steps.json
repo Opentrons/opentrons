@@ -36,6 +36,9 @@
     "targetTemperature": "Valid range between 4 and 95 °C",
     "volume": "Recommended between 0.1 and {{max}}"
   },
+  "camera": {
+    "capture_image": "Capture image of the deck"
+  },
   "change_tips": "Change tips",
   "column": "Column",
   "comfirm_reset_settings": {

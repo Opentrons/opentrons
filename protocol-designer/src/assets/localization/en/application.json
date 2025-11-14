@@ -33,6 +33,7 @@
   "save": "save",
   "stepType": {
     "absorbanceReader": "absorbance plate reader",
+    "camera": "camera",
     "comment": "comment",
     "ending_hold": "ending hold",
     "heaterShaker": "heater-shaker",

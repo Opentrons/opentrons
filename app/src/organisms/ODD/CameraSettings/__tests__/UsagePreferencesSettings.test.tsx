@@ -10,6 +10,7 @@ import { UsagePreferencesSettings } from '../UsagePreferencesSettings'
 import type { UsagePreferencesSettingsProps } from '../UsagePreferencesSettings'
 
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard')
+vi.mock('/app/redux/discovery/selectors')
 
 const render = (props: UsagePreferencesSettingsProps) => {
   return renderWithProviders(<UsagePreferencesSettings {...props} />, {
@@ -26,6 +27,7 @@ describe('UsagePreferencesSettings', () => {
       toggleRecoveryCaptureEnabled: vi.fn(),
       isLiveVideoEnabled: true,
       isRecoveryCaptureEnabled: true,
+      robotName: 'robotName',
     }
     vi.mocked(OnOffToggle).mockImplementation(({ isOn }) => (
       <div>MOCK_ON_OFF_TOGGLE_{isOn ? 'ON' : 'OFF'}</div>
@@ -42,14 +44,18 @@ describe('UsagePreferencesSettings', () => {
     render(mockProps)
 
     screen.getByText('Live video')
-    screen.getByText('View real-time video of the deck during protocol runs.')
+    screen.getByText(
+      'View real-time video of the deck in the Opentrons App while running a protocol.'
+    )
   })
 
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error recovery')
-    screen.getByText('Automatically capture an image of the deck on error.')
+    screen.getByText('Error image capture')
+    screen.getByText(
+      'Automatically capture an image of the deck in the event of an error.'
+    )
   })
 
   it('calls toggleLiveVideoEnabled when live video button is clicked', () => {
@@ -64,7 +70,7 @@ describe('UsagePreferencesSettings', () => {
   it('calls toggleRecoveryCaptureEnabled when recovery capture button is clicked', async () => {
     render(mockProps)
 
-    const listButton = screen.getByText('Error recovery')
+    const listButton = screen.getByText('Error image capture')
     fireEvent.click(listButton)
 
     expect(mockProps.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)

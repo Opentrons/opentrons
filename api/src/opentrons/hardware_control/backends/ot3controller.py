@@ -662,8 +662,13 @@ class OT3Controller(FlexBackend):
     ) -> Tuple[Optional[MoveGroupRunner], bool]:
         if not target:
             return None, False
-        move_target = MoveTarget.build(position=target, max_speed=speed)
+        # Create a target that doesn't incorporate the plunger into a joint axis with the gantry
+        plunger_axes = [Axis.P_L, Axis.P_R]
+
         try:
+            move_target = self._move_manager.devectorize_axes(
+                origin, target, speed, plunger_axes
+            )
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
             )
@@ -692,6 +697,20 @@ class OT3Controller(FlexBackend):
             move_group = add_delay_to_move_group(
                 move_group, ordered_nodes, (delay_nodes, delay_time)
             )
+
+        (
+            plunger_slowed,
+            error_str,
+        ) = self._move_manager.ensure_pipette_flow_rate_unchanged(
+            [node_to_axis(node) for node in ordered_nodes],
+            origin,
+            target,
+            speed,
+            move_group,
+            [(ax, axis_to_node(ax)) for ax in plunger_axes],
+        )
+        if plunger_slowed:
+            log.error(error_str)
 
         return (
             MoveGroupRunner(

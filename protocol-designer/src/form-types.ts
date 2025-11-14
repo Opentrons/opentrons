@@ -1,13 +1,16 @@
 import type { IconName } from '@opentrons/components'
 import type {
+  Height,
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  Width,
 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TipRackWithDef,
   TipTrackingOption,
   TrashBinEntity,
   WasteChuteEntity,
@@ -158,6 +161,7 @@ export type StepFieldName = string
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'absorbanceReader'
+  | 'camera'
   | 'comment'
   | 'heaterShaker'
   | 'magnet'
@@ -171,6 +175,7 @@ export type StepType =
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
+  camera: 'camera',
   comment: 'comment',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',
@@ -286,8 +291,9 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   liquidClassesSupported: boolean
   nozzles: NozzleConfigurationStyle | null
   path: PathOption
+  // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
@@ -369,6 +375,18 @@ export interface HydratedCommentFormData extends AnnotationFields {
   message: string
 }
 
+export interface HydratedCameraFormData extends AnnotationFields {
+  id: string
+  stepType: 'camera'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
+}
+
 export interface HydratedMixFormData extends AnnotationFields {
   aspirate_delay_checkbox: boolean
   blowout_checkbox: boolean
@@ -384,7 +402,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   wells: string[]
   aspirate_delay_seconds?: number | null
@@ -588,6 +606,7 @@ export type CountPerStepType = Partial<Record<StepType, number>>
 
 export type HydratedFormData =
   | HydratedAbsorbanceReaderFormData
+  | HydratedCameraFormData
   | HydratedCommentFormData
   | HydratedHeaterShakerFormData
   | HydratedMagnetFormData
