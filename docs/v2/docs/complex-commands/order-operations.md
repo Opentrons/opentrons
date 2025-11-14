@@ -114,7 +114,7 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 Since dispensing and touching the tip are both associated with the destination wells, those steps are performed at each of the two destination wells.
 
-If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blow out. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-class-definitions.md).
+If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blowout. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-class-definitions.md).
 
 ## Tip Refilling
 
@@ -174,8 +174,6 @@ pipette.transfer(
     dest=[plate["B1"], plate["B2"], plate["B3"]],
 )
 ```
-
-*New in version 2.0*
 
 Setting any item in the list to `0` will skip aspirating and dispensing for the corresponding well. This example takes the command from above and skips B2:
 
