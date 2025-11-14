@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
-
 import {
   getBatchEditFormHasUnsavedChanges,
   getEquippedPipetteOptions,
@@ -11,6 +9,7 @@ import {
   getUserVisibleStepNumbers,
 } from '../selectors'
 
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type { FormData } from '../../form-types'
 
 vi.mock('../../steplist/fieldLevel')
