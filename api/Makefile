@@ -193,7 +193,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	uv run bash
+	$(UV) run $(SHELL)
 
 .PHONY: push-no-restart
 push-no-restart: wheel
