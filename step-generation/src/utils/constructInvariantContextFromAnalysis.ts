@@ -32,7 +32,6 @@ export function constructInvariantContextFromAnalysis(
   const moduleEntities: ModuleEntities = modules.reduce(
     (acc: ModuleEntities, module) => {
       const { id, model } = module
-
       acc[id] = {
         id,
         type: getModuleType(model),
@@ -49,7 +48,6 @@ export function constructInvariantContextFromAnalysis(
     (acc: LabwareEntities, loadedLabware) => {
       const { id, definitionUri } = loadedLabware
       const def = labwareDefinitions[definitionUri]
-
       if (def.schemaVersion === 3) {
         return acc
       }
@@ -115,7 +113,6 @@ export function constructInvariantContextFromAnalysis(
 
         return {
           ...acc,
-
           stagingAreaEntities: {
             ...acc.stagingAreaEntities,
             ...newStagingAreaEntities,
@@ -133,7 +130,6 @@ export function constructInvariantContextFromAnalysis(
 
         return {
           ...acc,
-
           stagingAreaEntities: {
             ...acc.stagingAreaEntities,
             ...newStagingAreaEntities,
