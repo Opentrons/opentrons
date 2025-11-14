@@ -21,7 +21,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 
 .PHONY: setup
 setup:
-	$(pipenv) sync --dev $(pipenv_opts)
+	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: clean

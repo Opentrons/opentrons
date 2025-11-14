@@ -59,7 +59,6 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data'
-          install-dev-deps: 'true'
       - name: Lint
         run: make -C shared-data lint-py
 
@@ -187,6 +186,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data'
+          install-dev-deps: 'false'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

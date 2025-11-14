@@ -1847,11 +1847,7 @@ class OT3Controller(FlexBackend):
             )
 
     async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
-        return await set_hepa_fan_state_fw(
-            self._messenger,
-            fan_on,
-            duty_cycle,
-        )
+        return await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
 
     async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
         res = await get_hepa_fan_state_fw(self._messenger)
@@ -1865,11 +1861,7 @@ class OT3Controller(FlexBackend):
         )
 
     async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
-        return await set_hepa_uv_state_fw(
-            self._messenger,
-            light_on,
-            uv_duration_s,
-        )
+        return await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         res = await get_hepa_uv_state_fw(self._messenger)
@@ -1918,7 +1910,7 @@ class OT3Controller(FlexBackend):
         s_data = await self._read_env_sensor(mount, primary)
         if s_data is None or s_data.temperature is None:
             return None
-        return cast(Optional[float], s_data.temperature.to_float())
+        return s_data.temperature.to_float()
 
     async def read_env_hum_sensor(
         self, mount: OT3Mount, primary: bool
@@ -1927,7 +1919,7 @@ class OT3Controller(FlexBackend):
         s_data = await self._read_env_sensor(mount, primary)
         if s_data is None or s_data.humidity is None:
             return None
-        return cast(Optional[float], s_data.humidity.to_float())
+        return s_data.humidity.to_float()
 
     async def read_pressure_sensor(
         self, mount: OT3Mount, primary: bool

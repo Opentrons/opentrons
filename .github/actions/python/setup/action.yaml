@@ -15,14 +15,11 @@ inputs:
   install-dev-deps:
     description: 'Whether to install dev optional dependencies (UV projects only: --extra dev)'
     required: false
-    default: 'false'
+    default: 'true'
 outputs:
   start-time:
     description: 'Start time of the setup process (Unix timestamp)'
     value: ${{ steps.setup-env.outputs.start-time }}
-  linux-extra:
-    description: 'Linux extra dependency flag if applicable'
-    value: ${{ steps.setup-env.outputs.linux-extra }}
   duration:
     description: 'Duration of the setup process in seconds'
     value: ${{ steps.setup-env.outputs.duration }}
@@ -81,15 +78,6 @@ runs:
         PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
         if [ "$PROJECT_TYPE" == "uv" ]; then
           echo "::notice::Using UV for dependency management"
-          # Add linux extra if on Linux and project has linux optional dependency (for systemd-python in performance-metrics)
-          LINUX_EXTRA=""
-          if [[ "${OSTYPE}" =~ "linux" ]] || [[ "$(uname -s)" == "Linux" ]]; then
-            # Check if project has linux optional dependency defined
-            if [ -f "${{ inputs.project }}/pyproject.toml" ] && grep -q '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" && grep -A 5 '\[project.optional-dependencies\]' "${{ inputs.project }}/pyproject.toml" | grep -q 'linux'; then
-              LINUX_EXTRA="--extra linux"
-            fi
-          fi
-          echo "linux-extra=$LINUX_EXTRA" >> $GITHUB_OUTPUT
           # Add dev extra if requested
           DEV_EXTRA=""
           if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
@@ -97,10 +85,10 @@ runs:
           fi
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             # Use --frozen only if no extras are requested (extras may not be in lockfile)
-            if [ -z "$DEV_EXTRA" ] && [ -z "$LINUX_EXTRA" ]; then
+            if [ -z "$DEV_EXTRA" ]; then
               cd ${{ inputs.project }} && uv sync --frozen
             else
-              cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
+              cd ${{ inputs.project }} && uv sync $DEV_EXTRA
             fi
             # Verify dev dependencies are installed if dev extra was used
             if [ -n "$DEV_EXTRA" ]; then
@@ -108,7 +96,7 @@ runs:
               uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
             fi
           else
-            cd ${{ inputs.project }} && uv sync $DEV_EXTRA $LINUX_EXTRA
+            cd ${{ inputs.project }} && uv sync $DEV_EXTRA
             # Verify dev dependencies are installed if dev extra was used
             if [ -n "$DEV_EXTRA" ]; then
               echo "::notice::Verifying dev dependencies are installed..."

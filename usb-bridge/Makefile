@@ -30,7 +30,7 @@ ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
-	$(pipenv) sync --dev $(pipenv_opts)
+	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: clean

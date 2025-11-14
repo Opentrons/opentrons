@@ -20,10 +20,10 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "jsonschema>=4.0.0,<5",
+    "jsonschema==4.21.1",
     "typing-extensions>=4.0.0,<5",
-    "pydantic>=2.0.0,<3.0.0",
-    "numpy>=1.20.0,<2",
+    "pydantic==2.11.7",
+    "numpy==1.22.3",
 ]
 dynamic = ['version']
 

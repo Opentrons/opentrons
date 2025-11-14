@@ -65,7 +65,6 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-          install-dev-deps: 'true'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -226,6 +225,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          install-dev-deps: 'false'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

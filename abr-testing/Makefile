@@ -35,7 +35,7 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync --dev $(pipenv_opts)
+	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: teardown
