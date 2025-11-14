@@ -31,6 +31,7 @@ dependencies = [
     "pyusb==1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
     "packaging==22.0",
+    "referencing==0.37.0",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']

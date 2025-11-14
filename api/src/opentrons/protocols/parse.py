@@ -678,7 +678,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
             protocol_schema_id,
             Resource.from_contents(protocol_schema, default_specification=DRAFT7),
         )
-    
+
     # Validate using jsonschema with the referencing registry
     try:
         validator = jsonschema.Draft7Validator(protocol_schema, registry=registry)
