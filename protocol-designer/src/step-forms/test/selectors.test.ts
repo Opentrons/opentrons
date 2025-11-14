@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
+
 import {
   getBatchEditFormHasUnsavedChanges,
   getEquippedPipetteOptions,
+  getNextUserVisibleStepNumber,
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
+  getUserVisibleStepNumbers,
 } from '../selectors'
 
 import type { FormData } from '../../form-types'
@@ -166,5 +170,52 @@ describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
       mockIsPresaved
     )
     expect(result).toEqual(expected)
+  })
+})
+
+describe('getUserVisibleStepNumbers() and getNextUserVisibleStepNumber()', () => {
+  it("should count steps, excluding hidden 'wait for Thermocycler profile' steps", () => {
+    const input: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'a' },
+        {
+          type: 'thermocyclerProfileGroup',
+          thermocyclerProfileStepId: 'b',
+          concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
+          waitForThermocyclerProfileStepId: 'd',
+        },
+        { type: 'standaloneStep', stepId: 'e' },
+      ],
+    }
+
+    // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
+    const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
+    const nextStepNumberResult =
+      // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
+      getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
+
+    expect(stepNumbersResult).toStrictEqual({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: null,
+      e: 4,
+    })
+    expect(nextStepNumberResult).toStrictEqual(5)
+  })
+
+  it('should tolerate empty input', () => {
+    const input: StepHierarchy = {
+      topLevelItems: [],
+    }
+
+    // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
+    const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
+    const nextStepNumberResult =
+      // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
+      getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
+
+    expect(stepNumbersResult).toStrictEqual({})
+    expect(nextStepNumberResult).toStrictEqual(1)
   })
 })

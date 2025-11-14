@@ -17,7 +17,11 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
-import { convertStepArrayToHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
+import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
+import {
+  convertStepArrayToHierarchy,
+  convertStepHierarchyToArray,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -480,6 +484,45 @@ export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
       )
     }
   )
+
+/**
+ * A mapping from step IDs to the step's user-visible index in the timeline.
+ * This is more complicated than just .indexOf() because some steps are hidden and
+ * shouldn't be counted (see `StepHierarchy`).
+ *
+ * Hidden steps get a step number of `null`.
+ */
+export const getUserVisibleStepNumbers: Selector<
+  BaseState,
+  Record<StepIdType, number | null>
+> = createSelector(getSavedStepHierarchy, stepHierarchy => {
+  const visibilities = getStepVisibilities(stepHierarchy)
+  const allStepIdsAsFlatArray = convertStepHierarchyToArray(stepHierarchy)
+
+  const result: Record<StepIdType, number | null> = {}
+  let nextStepNumber = 1
+  for (const stepId of allStepIdsAsFlatArray) {
+    result[stepId] = visibilities[stepId].isVisibleToUser
+      ? nextStepNumber++
+      : null
+  }
+
+  return result
+})
+
+/** If a step is added to the end of the timeline, it will have this number. */
+export const getNextUserVisibleStepNumber: Selector<BaseState, number> =
+  createSelector(getUserVisibleStepNumbers, userVisibleStepNumbers => {
+    const isNonNull = (stepNumber: number | null): stepNumber is number =>
+      stepNumber !== null
+    const stepNumbers = Object.values(userVisibleStepNumbers)
+    return (
+      Math.max(
+        0, // In case there are no steps yet.
+        ...stepNumbers.filter(isNonNull)
+      ) + 1
+    )
+  })
 
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
