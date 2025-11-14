@@ -9,16 +9,13 @@ on:
         options:
           - push-local
           - download-remote
-        default: push-local
+        default: download-remote
         required: true
       target_branch:
         description: "Branch to checkout and base the pull request on"
         type: string
-        default: locize-sync
+        default: release
         required: true
-  push:
-    branches:
-      - locize-sync
 
 permissions:
   contents: write
