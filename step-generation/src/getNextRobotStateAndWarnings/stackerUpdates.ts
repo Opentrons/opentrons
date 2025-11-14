@@ -179,9 +179,8 @@ export const forFlexStackerStore = (
     const moduleOnSlot = robotState.modules[moduleId].slot
     // move labware should update the labware id on the shuttle
     const labwareToStore = Object.entries(robotState.labware).find(
-      ([id, labware]) => labware.stack.includes(moduleOnSlot)
+      ([_, labware]) => labware.stack.includes(moduleOnSlot)
     )?.[0]
-    console.log('labwareToStore: ', labwareToStore)
     if (labwareToStore == null) {
       throw new Error(
         'Cannot store labware bc there is no labware on the module'

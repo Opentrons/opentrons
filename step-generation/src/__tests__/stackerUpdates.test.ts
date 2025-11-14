@@ -161,7 +161,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareIdsInStacker).toHaveLength(3)
   })
 })
@@ -294,7 +293,6 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
     expect(moduleState?.shuttlePosition).toBe('stored')
-    console.log('moduleState: ', moduleState)
     expect(moduleState?.labwareIdsInStacker).toHaveLength(4)
   })
 })
