@@ -15,6 +15,10 @@ const meta: Meta<typeof MediaContainerContent> = {
       },
       options: ['loading', 'neutral'],
     },
+    overflowMenuActions: {
+      control: 'object',
+      description: 'dictionary of menu actions with label and handler',
+    },
   },
 }
 
@@ -40,8 +44,9 @@ export const MediaContainerContentComponent: Story = {
     centerSecondaryText: 'Taken during experiment',
     rightPrimaryText: '2:45 PM',
     state: undefined,
-    overflowMenu: null,
-    onClick: () => {},
+    overflowMenu: true,
+    overflowMenuActions: [{ label: 'view media', onClick: () => {} }],
+    mediaContentOnClick: () => {},
     hoverText: 'Click to view image',
     isCurrentCommandError: false,
   },

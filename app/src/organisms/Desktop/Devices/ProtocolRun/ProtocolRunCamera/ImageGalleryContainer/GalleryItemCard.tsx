@@ -1,10 +1,17 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+
+import { useMenuHandleClickOutside } from '@opentrons/components'
 
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
 import { MediaContainerContent } from '/app/molecules/MediaContainerContent'
-import { GalleryItemOverflowMenu } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryItemOverflowMenu'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 import { cameraPhotoOpenAction } from '/app/redux/shell'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
@@ -19,7 +26,7 @@ export interface GalleryItemCardProps extends UseImageGalleryDataProps {
 }
 
 export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
-  const { item, protocolAnalysis, runId, robotName } = props
+  const { item, protocolAnalysis, robotName } = props
   const {
     currentCommand,
     currentCommandString,
@@ -27,6 +34,24 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     isLoading,
   } = useImageGalleryData(props)
 
+  const { setShowOverflowMenu } = useMenuHandleClickOutside()
+  const robotType = useRobotType(robotName)
+
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType,
+  })
+  const onDownloadImage = (): void => {
+    setShowOverflowMenu(false)
+    const a = document.createElement('a')
+    a.download = item.filename
+    a.href = imagePath ?? ''
+    a.click()
+    reportPhotoAccessUsage({
+      action: 'download',
+    })
+    a.remove()
+  }
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
   const isCurrentCmdError = currentCommand?.error != null
@@ -48,14 +73,16 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     })
   }
   const state = isSkeleton ? 'loading' : null
-  const centerPrimaryText = t('step_command', {
+  const stepCommandText = t('step_command', {
     step: buildStepText(),
     command: currentCommandString,
   })
 
   const dispatch = useDispatch()
   const onClick = (): void => {
-    if (isLoading) return
+    if (isLoading) {
+      return
+    }
     const img = new Image()
     const imagePathUrl = img.src
     img.onload = () => {
@@ -65,7 +92,7 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
             robotName: robotName,
             photoUrl: imagePathUrl,
             windowTitle: t('branded:image_capture_window_title', {
-              step: centerPrimaryText,
+              step: stepCommandText,
               timestamp,
             }),
           })
@@ -73,7 +100,16 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       }
     }
   }
+  const [showErrorModal, setShowErrorModal] = useState(false)
 
+  const toggleErrorModal = (): void => {
+    setShowOverflowMenu(false)
+    setShowErrorModal(!showErrorModal)
+  }
+  const actions = [{ label: t('download_image'), onClick: onDownloadImage }]
+  if (isCurrentCmdError) {
+    actions.push({ label: t('view_error_details'), onClick: toggleErrorModal })
+  }
   return (
     <MediaContainerContent
       mediaContent={
@@ -83,21 +119,14 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
           alt="camera-photo"
         />
       }
-      centerPrimaryText={centerPrimaryText}
+      centerPrimaryText={stepCommandText}
       centerSecondaryText={previousCommandString}
       rightPrimaryText={timestamp}
       state={state}
-      overflowMenu={
-        <GalleryItemOverflowMenu
-          runId={runId}
-          currentCommand={currentCommand}
-          imagePath={imagePath}
-          imageFilename={item.filename}
-          robotName={robotName}
-        />
-      }
+      overflowMenu={true}
+      overflowMenuActions={actions}
       hoverText={t('view_image')}
-      onClick={onClick}
+      mediaContentOnClick={onClick}
       isCurrentCommandError={isCurrentCmdError}
     />
   )
