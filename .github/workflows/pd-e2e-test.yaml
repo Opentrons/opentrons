@@ -58,7 +58,6 @@ jobs:
           cache-dependency-glob: |
               e2e-testing/uv.lock
               e2e-testing/pyproject.toml
-          cache-python: "true"
 
       - name: "Install E2E test dependencies"
         working-directory: e2e-testing
