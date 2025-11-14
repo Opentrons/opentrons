@@ -327,6 +327,7 @@ export function SelectTips(
             inaccessibleReason={hoveredWellsInaccessibilityStatus}
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
+            nozzles={nozzles}
           />
         ) : null}
       </>
