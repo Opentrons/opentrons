@@ -46,27 +46,27 @@ class Migration12to13(Migration):  # noqa: D101
 
             with engine.connect() as connection:
                 connection.execute(sqlalchemy.text("PRAGMA foreign_keys = OFF"))
+                try:
+                    with connection.begin():
+                        old_data_files = connection.execute(
+                            sqlalchemy.select(schema_11.data_files_table)
+                        ).fetchall()
 
-                with connection.begin():
-                    old_data_files = connection.execute(
-                        sqlalchemy.select(schema_11.data_files_table)
-                    ).fetchall()
+                        old_analysis_csv = connection.execute(
+                            sqlalchemy.select(schema_11.analysis_csv_rtp_table)
+                        ).fetchall()
 
-                    old_analysis_csv = connection.execute(
-                        sqlalchemy.select(schema_11.analysis_csv_rtp_table)
-                    ).fetchall()
+                        old_run_csv = connection.execute(
+                            sqlalchemy.select(schema_11.run_csv_rtp_table)
+                        ).fetchall()
 
-                    old_run_csv = connection.execute(
-                        sqlalchemy.select(schema_11.run_csv_rtp_table)
-                    ).fetchall()
-
-                    _migrate_boolean_settings_table(connection)
-                    _migrate_data_files_tables(connection, old_data_files)
-                    _update_foreign_key_references(
-                        connection, old_analysis_csv, old_run_csv
-                    )
-
-                connection.execute(sqlalchemy.text("PRAGMA foreign_keys = ON"))
+                        _migrate_boolean_settings_table(connection)
+                        _migrate_data_files_tables(connection, old_data_files)
+                        _update_foreign_key_references(
+                            connection, old_analysis_csv, old_run_csv
+                        )
+                finally:
+                    connection.execute(sqlalchemy.text("PRAGMA foreign_keys = ON"))
 
 
 def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) -> None:
