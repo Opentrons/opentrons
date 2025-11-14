@@ -15,8 +15,6 @@ from zipfile import ZipFile
 from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
-from referencing import Registry, Resource
-from referencing.jsonschema import DRAFT7
 
 from opentrons_shared_data.labware import load_schema as load_labware_schema
 from opentrons_shared_data.protocol import (
@@ -628,14 +626,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # Check if this is actually a labware
     labware_schema_v2 = load_labware_schema()
     try:
-        # Use referencing library for JSON pointer resolution
-        # Labware schemas contain JSON pointer references like #/definitions/vector
-        labware_registry = Registry().with_resource(
-            labware_schema_v2.get("$id", "labware_schema"),
-            Resource.from_contents(labware_schema_v2, default_specification=DRAFT7),
-        )
-        validator = jsonschema.Draft7Validator(labware_schema_v2, registry=labware_registry)
-        validator.validate(protocol_json)
+        jsonschema.validate(protocol_json, labware_schema_v2)
     except jsonschema.ValidationError:
         pass
     else:
@@ -660,29 +651,16 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
         raise JSONSchemaVersionTooNewError(attempted_schema_version=version_num)
     protocol_schema = _get_schema_for_protocol(version_num)
 
-    # Use referencing library for JSON pointer resolution
-    # Protocol schemas reference both same-document (#/definitions/slot) and
-    # cross-schema (opentronsLabwareSchemaV2) references.
-    # The referencing library handles both automatically when schemas are in the registry.
-    registry = Registry()
-    # Add labware schema for cross-schema references
-    labware_schema_id = labware_schema_v2.get("$id", "opentronsLabwareSchemaV2")
-    registry = registry.with_resource(
-        labware_schema_id,
-        Resource.from_contents(labware_schema_v2, default_specification=DRAFT7),
+    # instruct schema how to resolve all $ref's used in protocol schemas
+    resolver = jsonschema.RefResolver(
+        protocol_schema.get("$id", ""),
+        protocol_schema,
+        store={"opentronsLabwareSchemaV2": labware_schema_v2},
     )
-    # Add protocol schema to registry (needed for same-document and cross-schema refs)
-    protocol_schema_id = protocol_schema.get("$id", "")
-    if protocol_schema_id:
-        registry = registry.with_resource(
-            protocol_schema_id,
-            Resource.from_contents(protocol_schema, default_specification=DRAFT7),
-        )
 
-    # Validate using jsonschema with the referencing registry
+    # do the validation
     try:
-        validator = jsonschema.Draft7Validator(protocol_schema, registry=registry)
-        validator.validate(protocol_json)
+        jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
     except jsonschema.ValidationError:
         MODULE_LOG.exception("JSON protocol validation failed")
         raise RuntimeError(

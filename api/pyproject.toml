@@ -19,19 +19,18 @@ description = "The Opentrons API is a simple framework designed to make writing 
 
 dependencies = [
    "opentrons-shared-data==0.0.0",
-    "aionotify==0.3.1",
-    "anyio==4.9.0",
-    "jsonschema==4.21.1",
-    "numpy==1.22.3",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
+    "aionotify~=0.3.1",
+    "anyio~=4.9.0",
+    "jsonschema~=4.17.3",
+    "numpy~=1.22.3",
+    "pydantic~=2.11.7",
+    "pydantic-settings~=2.4.0",
     "pyserial>=3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
-    "pyusb==1.2.1",
+    "pyusb~=1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
-    "packaging==22.0",
-    "referencing==0.37.0",
+    "packaging~=22.0",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -39,7 +38,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
-    "jsonschema==4.21.1",
+    "jsonschema==4.17.3",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "anyio==4.9.0",
@@ -83,6 +82,9 @@ dev = [
     "build~=1.2.0",
     # opentrons-hardware is needed for tests but not for package installation
     "opentrons-hardware[FLEX]==0.0.0",
+    # performance_metrics is needed for type checking (used in TYPE_CHECKING blocks)
+    # even though it's optional at runtime
+    "performance_metrics==0.0.0",
 ]
 "ot2-hardware" = ["opentrons-hardware==0.0.0"]
 "flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]

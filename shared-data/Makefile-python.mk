@@ -47,24 +47,21 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
+endef
+
 .PHONY: setup
 setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
-	LINUX_EXTRA=""; \
-	if echo "$$UNAME_S" | grep -qi linux; then \
-		if [ -f pyproject.toml ] && grep -q '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null && grep -A 10 '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null | grep -q 'linux'; then \
-			LINUX_EXTRA="--extra linux"; \
-		fi; \
-	fi; \
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev $$LINUX_EXTRA; \
-	else \
-		uv sync --extra dev $$LINUX_EXTRA; \
-	fi; \
-	uv pip list
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: teardown
 teardown: teardown-py
@@ -98,7 +95,7 @@ sdist: $(py_sources) $(json_sources)
 
 
 .PHONY: lint
-lint: $(py_sources)
+lint: setup-py $(py_sources)
 	$(python) -m mypy python/opentrons_shared_data python_tests tools
 	$(python) -m black --check python/opentrons_shared_data python_tests tools
 	$(python) -m flake8 python/opentrons_shared_data python_tests tools

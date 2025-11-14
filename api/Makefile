@@ -61,41 +61,27 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --extra dev; \
+	else \
+		uv sync --extra dev; \
+	fi
+endef
+
 .PHONY: all
 all: clean wheel
 
 .PHONY: setup
 setup:
-	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
-	LINUX_EXTRA=""; \
-	if echo "$$UNAME_S" | grep -qi linux; then \
-		if [ -f pyproject.toml ] && grep -q '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null && grep -A 10 '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null | grep -q 'linux'; then \
-			LINUX_EXTRA="--extra linux"; \
-		fi; \
-	fi; \
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev $$LINUX_EXTRA; \
-	else \
-		uv sync --extra dev $$LINUX_EXTRA; \
-	fi; \
-	uv pip list
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: setup-ot2
 setup-ot2:
-	@UNAME_S=$$(uname -s 2>/dev/null || echo ""); \
-	LINUX_EXTRA=""; \
-	if echo "$$UNAME_S" | grep -qi linux; then \
-		if [ -f pyproject.toml ] && grep -q '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null && grep -A 10 '\[project.optional-dependencies\]' pyproject.toml 2>/dev/null | grep -q 'linux'; then \
-			LINUX_EXTRA="--extra linux"; \
-		fi; \
-	fi; \
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev $$LINUX_EXTRA; \
-	else \
-		uv sync --extra dev $$LINUX_EXTRA; \
-	fi; \
-	uv pip uninstall python-can -y; \
-	uv pip list
+	@$(uv_sync_dev)
+	@uv pip uninstall python-can
+	@uv pip list
 
 .PHONY: clean
 clean: docs-clean
@@ -104,7 +90,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	rm -rf .venv
+	$(UV) venv --remove
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -147,7 +133,7 @@ test-ot2:
 	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
-lint:
+lint: setup
 	$(python) -m mypy src tests integration_testing
 	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
 	$(python) -m flake8 src tests integration_testing
@@ -193,7 +179,7 @@ dev:
 
 .PHONY: local-shell
 local-shell:
-	uv run bash
+	$(UV) run $(SHELL)
 
 .PHONY: push-no-restart
 push-no-restart: wheel
