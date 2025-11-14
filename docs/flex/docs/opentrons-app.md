@@ -125,8 +125,11 @@ The camera is disabled by default. To access and enable the camera and its featu
 3. Click the **Camera** tab to open the camera settings.
 4. Click the Camera slider to enable or disable the camera.
 
-You can also see the camera's status, and access the controls, from the Peripherals section of the details page for your Flex.
+You can also see the camera's status, and access the camera controls, from the Peripherals section of the details page for your Flex.
 
+<figure class="screenshot" markdown>
+  ![Details page showing enabled camera](./images/robot-details.png)
+</figure>
 
 ## Recent protocol runs
 
