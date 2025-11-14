@@ -1,6 +1,7 @@
 # Pipenv is used for Python dependency management (for projects not yet migrated to uv)
 pipenv ?= pipenv
-pipenv_opts ?=
+pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
+pipenv_opts += $(and $(CI),--clear)
 
 # Python/pip/pytest commands using pipenv
 python := $(pipenv) run python
