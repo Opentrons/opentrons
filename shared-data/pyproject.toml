@@ -20,7 +20,6 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "jsonschema==4.17.3",
     "typing-extensions>=4.0.0,<5",
     "pydantic==2.11.7",
     "numpy==1.22.3",
@@ -30,7 +29,7 @@ dynamic = ['version']
 [project.optional-dependencies]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
-    "jsonschema==4.17.3",
+    "jsonschema==4.21.1",
     "pydantic==2.11.7",
     "numpy==1.22.3",
     "zipp==3.21.0",
