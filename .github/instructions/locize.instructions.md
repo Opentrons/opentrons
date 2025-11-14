@@ -46,7 +46,7 @@ The Locize synchronization system manages internationalization (i18n) for the Op
 
 ### 1. Push Local Translations (Source of Truth)
 
-Push both English and Chinese translations from the repo to Locize. This treats the local files as the canonical source when kicking off translation work or correcting remote drift.
+Push English translations from the repo to Locize. This treats the local files as the canonical source when kicking off translation work or correcting remote drift.
 
 ```bash
 uv run scripts/locize_sync.py push-local
@@ -59,7 +59,7 @@ npx -y locize-cli@latest sync \
   --api-key $LOCIZE_API_KEY \
   --project-id $LOCIZE_PROJECT_ID \
   -p ./app/src/assets/localization \
-  --language en,zh \
+  --language en \
   --update-values true \
   --skip-delete false \
   --ver latest
@@ -68,9 +68,9 @@ npx -y locize-cli@latest sync \
 **Behavior:**
 
 - Consolidates: copies `components/src/assets/localization/{en,zh}` JSON into `app/src/assets/localization/{en,zh}` so Locize CLI can read a single tree
-- Executes `locize-cli sync` with `--language en,zh`, `--update-values true`, `--skip-delete false`, `--ver latest`
+- Executes `locize-cli sync` with `--language en`, `--update-values true`, `--skip-delete false`, `--ver latest`
 - Uses Locize's published translations as the server source (ensure the target version auto-publishes)
-- Reference language (`en`) overwrites Locize's published data when `--update-values true`; non-reference languages (`zh`) are refreshed from the published remote content per the [locize-cli sync docs](https://github.com/locize/locize-cli?tab=readme-ov-file#synchronize-locize-with-your-repository-or-any-other-local-directory)
+- Only the reference language (`en`) is pushed, overwriting Locize's published English content when `--update-values true` per the [locize-cli sync docs](https://github.com/locize/locize-cli?tab=readme-ov-file#synchronize-locize-with-your-repository-or-any-other-local-directory)
 - Unconsolidates: copies JSON back to `components/` and removes the temporary duplicates under `app/`
 - Formats all JavaScript/TypeScript files via `make format-js`; skipped in `--dry-run`
 
