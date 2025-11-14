@@ -272,7 +272,6 @@ export function VisualizerContainer(
           invariantContext={invariantContext}
           robotState={robotState}
           robotType={robotType ?? FLEX_ROBOT_TYPE}
-          selectedSlot={selectedSlot}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
             if (selectedRunTimeCommand != null && selectedSlot != null) {

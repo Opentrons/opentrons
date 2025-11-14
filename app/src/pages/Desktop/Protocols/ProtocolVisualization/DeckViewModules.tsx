@@ -179,7 +179,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                     )}
                   </>
                 ) : null}
-                <DeckViewOverlay
+                {/* <DeckViewOverlay
                   key={slot}
                   slotId={slot}
                   slotPosition={[0, 0, 0]}
@@ -190,7 +190,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                   setSelectedSlot={setSelectedSlot}
                   setHoveredSlot={setHoveredSlot}
                   hover={hoveredSlot}
-                />
+                /> */}
               </Module>
               {showModuleCommandSummary ? (
                 <ModuleCommandSummary

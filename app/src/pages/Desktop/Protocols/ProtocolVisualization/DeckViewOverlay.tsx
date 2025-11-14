@@ -10,7 +10,6 @@ import {
   WASTE_CHUTE_X,
   WASTE_CHUTE_Y,
   WasteChute,
-  WasteChuteFixture,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -22,7 +21,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { getIsPipetteOverTrash } from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -31,7 +29,6 @@ import type {
   CoordinateTuple,
   DeckSlotId,
   RobotType,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
@@ -46,7 +43,6 @@ interface SlotOverlayProps {
   robotType: RobotType
   hover: string | null
   children?: ReactNode
-  selectedRunTimeCommand?: RunTimeCommand
 }
 
 export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
@@ -61,7 +57,6 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     setSelectedSlot,
     setHoveredSlot,
     hover,
-    selectedRunTimeCommand,
   } = props
   const { stagingAreaEntities, moduleEntities, wasteChuteEntities } =
     invariantContext
@@ -80,14 +75,6 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const wasteChuteOnSlot = Object.values(wasteChuteEntities).find(
     wasteChute => wasteChute.location === WASTE_CHUTE_CUTOUT && slotId === 'D3'
   )
-  const isPipetteOverTrash =
-    wasteChuteOnSlot != null
-      ? getIsPipetteOverTrash(
-          robotState.pipettes,
-          wasteChuteOnSlot.id,
-          selectedRunTimeCommand
-        )
-      : null
 
   const cutoutId =
     getCutoutIdForAddressableArea(
@@ -149,6 +136,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
             </div>
           ) : null}
         </RobotCoordsForeignObject>
+        {/* This is to render the waste chute above the hover border - very gnarly but this
+            is what design wanted */}
         {wasteChuteOnSlot != null ? (
           <RobotCoordsForeignObject
             width={WASTE_CHUTE_WIDTH}
@@ -177,7 +166,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
           >
             <WasteChute
               key="wasteChute_hovered"
-              wasteIconColor="white"
+              wasteIconColor={COLORS.grey35}
               backgroundColor={COLORS.grey50}
             />
           </RobotCoordsForeignObject>

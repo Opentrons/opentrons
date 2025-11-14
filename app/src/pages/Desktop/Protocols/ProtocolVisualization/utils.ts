@@ -43,6 +43,8 @@ import type {
   ModuleTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -357,3 +359,27 @@ export const getIsPipetteOverTrash = (
   Object.values(pipettes).some(pipette => pipette.entityId === id) &&
   selectedRunTimeCommand != null &&
   POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
+
+export const getFixtureSummaryInfo = (
+  pipettes: RobotState['pipettes'],
+  entities: TrashBinEntities | WasteChuteEntities,
+  selectedRunTimeCommand?: RunTimeCommand
+): { isPipetteOverTrash: boolean; trashCutoutId: CutoutId | null } => {
+  const pipetteCurrentTrashId = Object.values(pipettes).find(
+    pipette => pipette.entityId != null && entities[pipette.entityId] != null
+  )?.entityId
+  const isPipetteOverTrash =
+    pipetteCurrentTrashId != null
+      ? getIsPipetteOverTrash(
+          pipettes,
+          pipetteCurrentTrashId,
+          selectedRunTimeCommand
+        )
+      : false
+  const trashCutoutId =
+    pipetteCurrentTrashId != null
+      ? (entities[pipetteCurrentTrashId].location as CutoutId)
+      : null
+
+  return { isPipetteOverTrash, trashCutoutId }
+}

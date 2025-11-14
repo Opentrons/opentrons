@@ -24,7 +24,6 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
 import {
   getActiveLayer,
@@ -67,7 +66,6 @@ interface DeckViewProps {
   invariantContext: InvariantContext
   robotState: TimelineFrame
   robotType: RobotType
-  selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
   selectedRunTimeCommand?: RunTimeCommand
@@ -80,7 +78,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const {
     robotType,
     invariantContext,
-    selectedSlot,
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,

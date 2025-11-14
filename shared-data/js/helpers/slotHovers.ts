@@ -64,6 +64,6 @@ export const getOT2HoverDimensions = (
     width: hasTCOnSlot ? 260 : 128,
     height: hasTCOnSlot ? 178 : 85,
     x,
-    y: hasTCOnSlot ? y - 72 : y,
+    y: hasTCOnSlot ? y - 83 : y,
   }
 }
