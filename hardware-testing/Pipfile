@@ -10,6 +10,8 @@ opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
 abr-testing = { editable = true, path = "./../abr-testing" }
 pyserial = "==3.5"
+# referencing is required by api (opentrons) for JSON schema validation
+referencing = "==0.37.0"
 types-pytz = "*"
 paramiko = "*"
 types-paramiko = "*"

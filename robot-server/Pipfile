@@ -66,6 +66,8 @@ pydantic-settings = "==2.4.0"
 # versions above 0.18.1 require a version of triomphe that requires a version of
 # rust too new for openembedded
 rpds-py = "==0.18.1"
+# referencing is required by api (opentrons) for JSON schema validation
+referencing = "==0.37.0"
 # transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
 # is not safe to have installed when another project is being built.
 zipp = "==3.21.0"

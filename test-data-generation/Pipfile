@@ -15,6 +15,8 @@ flake8-noqa = "~=1.4.0"
 hypothesis = "<7,>=6.96.1"
 opentrons-shared-data = {file = "../shared-data", editable = true}
 opentrons = { editable = true, path = "../api"}
+# referencing is required by api (opentrons) for JSON schema validation
+referencing = "==0.37.0"
 test-data-generation = {file = ".", editable = true}
 astor = "0.8.1"
 pytest-xdist = "*"

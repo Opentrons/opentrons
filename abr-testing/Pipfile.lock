@@ -1756,6 +1756,22 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==1.20.1"
+        },
+        "referencing": {
+            "hashes": [
+                "sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+                "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8"
+            ],
+            "index": "pypi",
+            "version": "==0.37.0"
+        },
+        "rpds-py": {
+            "hashes": [
+                "sha256:abd4df20485a0983e2ca334a216249b6186d6e3c1627e106651943dbdb791aea",
+                "sha256:b1b553dd06e875249fd43efd727785efb57a53180e0fde321468222eabbeaafa"
+            ],
+            "index": "pypi",
+            "version": "==0.28.0"
         }
     },
     "develop": {
