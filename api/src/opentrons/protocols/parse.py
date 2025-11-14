@@ -663,7 +663,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"
     # Use referencing library for JSON pointer resolution
     # Protocol schemas reference both same-document (#/definitions/slot) and
     # cross-schema (opentronsLabwareSchemaV2) references.
-    # The referencing library handles both automatically when schemas are in the registry.
+    # The referencing library handles both automatically when schemas are in
+    # the registry.
     registry = Registry()
     # Add labware schema for cross-schema references
     labware_schema_id = labware_schema_v2.get("$id", "opentronsLabwareSchemaV2")
