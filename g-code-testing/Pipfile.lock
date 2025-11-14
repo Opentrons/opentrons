@@ -474,6 +474,14 @@
             ],
             "index": "pypi",
             "version": "==0.37.0"
+        },
+        "rpds-py": {
+            "hashes": [
+                "sha256:abd4df20485a0983e2ca334a216249b6186d6e3c1627e106651943dbdb791aea",
+                "sha256:b1b553dd06e875249fd43efd727785efb57a53180e0fde321468222eabbeaafa"
+            ],
+            "index": "pypi",
+            "version": "==0.28.0"
         }
     },
     "develop": {
