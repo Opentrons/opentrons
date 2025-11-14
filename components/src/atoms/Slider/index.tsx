@@ -1,12 +1,14 @@
-import { useTranslation } from 'react-i18next'
-
 import { StyledText } from '../StyledText'
 import styles from './slider.module.css'
 
 interface SliderProps {
+  /** Title of slider */ 
   title: string
+  /** Subtext of slider */ 
   subtext: string
+  /** Default value of slider */ 
   value: number
+  /** Function to do something with the value of the slider */ 
   adjustValue: (value: number) => void
 }
 
@@ -16,8 +18,6 @@ export function Slider({
   subtext,
   adjustValue,
 }: SliderProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
   return (
     <div className={styles.slider_setting_container}>
       <div className={styles.slider_setting_text_container}>
@@ -43,7 +43,7 @@ export function Slider({
           className={styles.slider_percentage}
           desktopStyle="bodyDefaultSemiBold"
         >
-          {t('value_percent', { value })}
+          {`${value}%`}
         </StyledText>
       </div>
     </div>
