@@ -5,6 +5,12 @@ import {
   COLORS,
   CURSOR_POINTER,
   RobotCoordsForeignObject,
+  WASTE_CHUTE_HEIGHT,
+  WASTE_CHUTE_WIDTH,
+  WASTE_CHUTE_X,
+  WASTE_CHUTE_Y,
+  WasteChute,
+  WasteChuteFixture,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -13,8 +19,10 @@ import {
   getFlexHoverDimensions,
   getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { getIsPipetteOverTrash } from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -23,6 +31,7 @@ import type {
   CoordinateTuple,
   DeckSlotId,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
@@ -37,6 +46,7 @@ interface SlotOverlayProps {
   robotType: RobotType
   hover: string | null
   children?: ReactNode
+  selectedRunTimeCommand?: RunTimeCommand
 }
 
 export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
@@ -51,8 +61,10 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     setSelectedSlot,
     setHoveredSlot,
     hover,
+    selectedRunTimeCommand,
   } = props
-  const { stagingAreaEntities, moduleEntities } = invariantContext
+  const { stagingAreaEntities, moduleEntities, wasteChuteEntities } =
+    invariantContext
   const { modules } = robotState
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
 
@@ -65,6 +77,17 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
     stagingArea => stagingArea.location as string
   )
+  const wasteChuteOnSlot = Object.values(wasteChuteEntities).find(
+    wasteChute => wasteChute.location === WASTE_CHUTE_CUTOUT && slotId === 'D3'
+  )
+  const isPipetteOverTrash =
+    wasteChuteOnSlot != null
+      ? getIsPipetteOverTrash(
+          robotState.pipettes,
+          wasteChuteOnSlot.id,
+          selectedRunTimeCommand
+        )
+      : null
 
   const cutoutId =
     getCutoutIdForAddressableArea(
@@ -87,44 +110,79 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     )
 
     return (
-      <RobotCoordsForeignObject
-        key={`${robotType.toLowerCase()}_slotOverlay`}
-        width={width}
-        height={height}
-        x={x}
-        y={y}
-        flexProps={{ flex: '1' }}
-        foreignObjectProps={{
-          opacity: hoverOpacity,
-          flex: '1',
-          cursor: CURSOR_POINTER,
-          textAlign: ALIGN_CENTER,
-          border: `3px solid ${COLORS.purple50}`,
-          borderRadius: '6px', // no const but matches the labware svg radius
-        }}
-        foreignObjectEvents={{
-          onClick: () => {
-            setSelectedSlot(slotId)
-          },
-          onMouseEnter: () => {
-            setHoveredSlot(slotId)
-          },
-          onMouseLeave: () => {
-            setHoveredSlot(null)
-          },
-        }}
-      >
-        {children != null ? (
-          <div className={styles.deck_overlay}>
-            <div
-              className={styles.text_background}
-              style={{ backgroundColor: slotFillColor }}
-            >
-              {children}
+      <>
+        <RobotCoordsForeignObject
+          key={`${robotType.toLowerCase()}_slotOverlay`}
+          width={width}
+          height={height}
+          x={x}
+          y={y}
+          flexProps={{ flex: '1' }}
+          foreignObjectProps={{
+            opacity: hoverOpacity,
+            flex: '1',
+            cursor: CURSOR_POINTER,
+            textAlign: ALIGN_CENTER,
+            border: `3px solid ${COLORS.purple50}`,
+            borderRadius: '6px', // no const but matches the labware svg radius
+          }}
+          foreignObjectEvents={{
+            onClick: () => {
+              setSelectedSlot(slotId)
+            },
+            onMouseEnter: () => {
+              setHoveredSlot(slotId)
+            },
+            onMouseLeave: () => {
+              setHoveredSlot(null)
+            },
+          }}
+        >
+          {children != null ? (
+            <div className={styles.deck_overlay}>
+              <div
+                className={styles.text_background}
+                style={{ backgroundColor: slotFillColor }}
+              >
+                {children}
+              </div>
             </div>
-          </div>
+          ) : null}
+        </RobotCoordsForeignObject>
+        {wasteChuteOnSlot != null ? (
+          <RobotCoordsForeignObject
+            width={WASTE_CHUTE_WIDTH}
+            height={WASTE_CHUTE_HEIGHT}
+            x={WASTE_CHUTE_X}
+            y={WASTE_CHUTE_Y}
+            flexProps={{
+              transform: 'rotate(180deg) scaleX(-1)',
+              width: '100%',
+            }}
+            foreignObjectProps={{
+              opacity: hoverOpacity,
+              cursor: CURSOR_POINTER,
+            }}
+            foreignObjectEvents={{
+              onClick: () => {
+                setSelectedSlot(slotId)
+              },
+              onMouseEnter: () => {
+                setHoveredSlot(slotId)
+              },
+              onMouseLeave: () => {
+                setHoveredSlot(null)
+              },
+            }}
+          >
+            <WasteChute
+              key="wasteChute_hovered"
+              wasteIconColor="white"
+              backgroundColor={COLORS.grey50}
+            />
+          </RobotCoordsForeignObject>
         ) : null}
-      </RobotCoordsForeignObject>
+      </>
     )
   } else {
     const { width, x, y, height } = getOT2HoverDimensions(

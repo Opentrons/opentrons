@@ -26,7 +26,11 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewDetails } from './DeckViewDetails'
-import { getActiveLayer, getIsCutoutA1Active } from './utils'
+import {
+  getActiveLayer,
+  getIsCutoutA1Active,
+  getIsPipetteOverTrash,
+} from './utils'
 import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -208,19 +212,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   ))}
                   {Object.values(trashBinEntities).length > 0
                     ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
-                        // TODO: the dropTipInPlace, airGapInplace, and
-                        // blowoutInPlace commands don't have
-                        // any knowledge of where its dropping. would be
-                        // nice to expand the results key to include the
-                        // addressable area name
-                        const isPipetteOverTrash =
-                          Object.values(robotState.pipettes).some(
-                            pipette => pipette.entityId === id
-                          ) &&
-                          selectedRunTimeCommand != null &&
-                          POTENTIAL_TRASH_COMMAND_TYPES.includes(
-                            selectedRunTimeCommand.commandType
-                          )
+                        const isPipetteOverTrash = getIsPipetteOverTrash(
+                          robotState.pipettes,
+                          id,
+                          selectedRunTimeCommand
+                        )
 
                         return (
                           <Fragment key={cutoutId}>
@@ -246,14 +242,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                       })
                     : null}
                   {Object.values(wasteChuteEntities).map(({ id, location }) => {
-                    const isPipetteOverTrash =
-                      Object.values(robotState.pipettes).some(
-                        pipette => pipette.entityId === id
-                      ) &&
-                      selectedRunTimeCommand != null &&
-                      POTENTIAL_TRASH_COMMAND_TYPES.includes(
-                        selectedRunTimeCommand.commandType
-                      )
+                    const isPipetteOverTrash = getIsPipetteOverTrash(
+                      robotState.pipettes,
+                      id,
+                      selectedRunTimeCommand
+                    )
                     return (
                       <WasteChuteFixture
                         key={id}

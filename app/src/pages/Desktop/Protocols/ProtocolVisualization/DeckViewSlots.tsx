@@ -12,6 +12,7 @@ import type {
   CutoutId,
   DeckDefinition,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
@@ -25,6 +26,7 @@ interface DeckViewSlotsProps {
   invariantContext: InvariantContext
   stagingAreaCutoutIds: CutoutId[]
   slotIdsBlockedBySpanning: string[]
+  selectedRunTimeCommand?: RunTimeCommand
 }
 
 export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
@@ -38,6 +40,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
     invariantContext,
     stagingAreaCutoutIds,
     slotIdsBlockedBySpanning,
+    selectedRunTimeCommand,
   } = props
   return (
     <>
@@ -71,6 +74,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
+                selectedRunTimeCommand={selectedRunTimeCommand}
               />,
             ]
           }

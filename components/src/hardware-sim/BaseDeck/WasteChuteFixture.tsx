@@ -16,10 +16,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { DeckLabelProps } from '../../molecules'
 
-const WASTE_CHUTE_WIDTH = 130
-const WASTE_CHUTE_HEIGHT = 138
-const WASTE_CHUTE_X = 322
-const WASTE_CHUTE_Y = -51
+export const WASTE_CHUTE_WIDTH = 130
+export const WASTE_CHUTE_HEIGHT = 138
+export const WASTE_CHUTE_X = 322
+export const WASTE_CHUTE_Y = -51
 const TAG_HEIGHT = 28
 interface WasteChuteFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: typeof WASTE_CHUTE_CUTOUT

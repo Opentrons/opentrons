@@ -103,6 +103,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         hoveredSlot={hoveredSlot}
         stagingAreaCutoutIds={stagingAreaCutoutIds}
         slotIdsBlockedBySpanning={slotIdsBlockedBySpanning}
+        selectedRunTimeCommand={selectedRunTimeCommand}
       />
       {/* all labware on deck/stacks NOT those in modules */}
       <DeckViewLabware

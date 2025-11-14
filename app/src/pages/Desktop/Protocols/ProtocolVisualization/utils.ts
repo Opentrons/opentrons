@@ -22,6 +22,8 @@ import {
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
+
 import type { ComponentProps } from 'react'
 import type { Module, WellGroup } from '@opentrons/components'
 import type {
@@ -341,3 +343,17 @@ export const getModuleInnerProps = (
     }
   }
 }
+
+// TODO: the dropTipInPlace, airGapInplace, and
+// blowoutInPlace commands don't have
+// any knowledge of where its dropping. would be
+// nice to expand the results key to include the
+// addressable area name
+export const getIsPipetteOverTrash = (
+  pipettes: RobotState['pipettes'],
+  id: string,
+  selectedRunTimeCommand?: RunTimeCommand
+): boolean =>
+  Object.values(pipettes).some(pipette => pipette.entityId === id) &&
+  selectedRunTimeCommand != null &&
+  POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
