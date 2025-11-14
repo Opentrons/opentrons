@@ -82,7 +82,9 @@ class MoveManager(Generic[AxisKey]):
             if axis in target_axes:
                 move_target = MoveTarget.build(  # type: ignore[type-var]
                     position=target,
-                    max_speed=float(speed * (1 / move_info.unit_vector[axis].item())),
+                    max_speed=float(
+                        speed * abs(1 / move_info.unit_vector[axis].item())
+                    ),
                 )
         return move_target
 

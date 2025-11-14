@@ -59,7 +59,7 @@ describe('LaunchLivestreamBtn', () => {
       payload: {
         hostname: 'test-hostname',
         robotName: 'test-robot',
-        windowTitle: 'Opentrons Live Camera',
+        windowTitle: 'Opentrons test-robot Live Camera',
       },
       meta: { shell: true },
     })

@@ -68,6 +68,7 @@ export function RobotSettingsCamera({
             toggleLiveVideoEnabled={handleToggleLiveStream}
             toggleRecoveryCaptureEnabled={handleToggleRecovery}
             toggleDisabled={isRobotBusy}
+            robotType={robotType}
           />
           {isCameraSettingsEnabled && (
             <>
