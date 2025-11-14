@@ -177,7 +177,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def run(
+async def run(  # noqa: C901
     api: OT3API, report: CSVReport, section: str, sku: str | None = None
 ) -> None:
     """Run."""
