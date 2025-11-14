@@ -12,7 +12,11 @@ from opentrons.system.camera import (
     CONTRAST_DEFAULT,
     BRIGHTNESS_DEFAULT,
     SATURATION_DEFAULT,
+    ZOOM_MIN,
+    ZOOM_MAX,
     ZOOM_DEFAULT,
+    RESOLUTION_MIN,
+    RESOLUTION_MAX,
     RESOLUTION_DEFAULT,
 )
 from ..types import PreconditionTypes
@@ -161,6 +165,47 @@ def _revert_image_parameters(
     )
 
 
+def _validate_image_params(params: CaptureImageParams) -> None:
+    # Validate the filename param provided to fail analysis
+    if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
+        set(params.fileName)
+    ):
+        raise FileNameInvalidError(
+            message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+        )
+
+    # Validate the image filter parameters
+    if params.zoom is not None and (params.zoom < ZOOM_MIN or params.zoom > ZOOM_MAX):
+        raise CameraSettingsInvalidError(
+            message="Capture image zoom must be a valid value from 1.0X to 2.0X zoom."
+        )
+    if params.resolution is not None and (
+        params.resolution[0] < RESOLUTION_MIN[0]
+        or params.resolution[1] < RESOLUTION_MIN[1]
+        or params.resolution[0] > RESOLUTION_MAX[0]
+        or params.resolution[1] > RESOLUTION_MAX[1]
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image resolution must be a valid resolution from 240p through 8K resolutuon."
+        )
+    if params.brightness is not None and (
+        params.brightness < 0 or params.brightness > 100
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image brightness must be a percentage from 0% to 100%."
+        )
+    if params.contrast is not None and (params.contrast < 0 or params.contrast > 100):
+        raise CameraSettingsInvalidError(
+            message="Capture image contrast must be a percentage from 0% to 100%."
+        )
+    if params.saturation is not None and (
+        params.saturation < 0 or params.saturation > 100
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image saturation must be a percentage from 0% to 100%."
+        )
+
+
 class CaptureImageImpl(
     AbstractCommandImpl[CaptureImageParams, SuccessData[CaptureImageResult]]
 ):
@@ -186,33 +231,8 @@ class CaptureImageImpl(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
 
-        # Validate the filename param provided to fail analysis
-        if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
-            set(params.fileName)
-        ):
-            raise FileNameInvalidError(
-                message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
-            )
-
-        # Validate the image filter parameters
-        if params.brightness is not None and (
-            params.brightness < 0 or params.brightness > 100
-        ):
-            raise CameraSettingsInvalidError(
-                message="Capture image brightness must be a percentage from 0% to 100%."
-            )
-        if params.contrast is not None and (
-            params.contrast < 0 or params.contrast > 100
-        ):
-            raise CameraSettingsInvalidError(
-                message="Capture image contrast must be a percentage from 0% to 100%."
-            )
-        if params.saturation is not None and (
-            params.saturation < 0 or params.saturation > 100
-        ):
-            raise CameraSettingsInvalidError(
-                message="Capture image saturation must be a percentage from 0% to 100%."
-            )
+        # Validate that the provided parameters are all acceptable
+        _validate_image_params()
 
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
