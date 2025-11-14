@@ -3089,6 +3089,7 @@ class OT3API(
         volume: float,
         rate: float = 1.0,
         movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3108,7 +3109,7 @@ class OT3API(
         end_position = target_position_from_absolute(
             realmount,
             end_point,
-            self.critical_point_for,
+            partial(self.critical_point_for, cp_override=end_critical_point),
             top_types.Point(*self._config.left_mount_offset),
             top_types.Point(*self._config.right_mount_offset),
             top_types.Point(*self._config.gripper_mount_offset),
@@ -3123,6 +3124,9 @@ class OT3API(
         delay: Optional[Tuple[List[Axis], float]] = None
         if movement_delay is not None:
             delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
+        self._log.info(
+            f"aspirate_while_tracking: end at {end_point} {end_critical_point}, machine pos {end_position}, with plunger {target_pos}, delay {delay}"
+        )
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -3158,6 +3162,7 @@ class OT3API(
         rate: float = 1.0,
         is_full_dispense: bool = False,
         movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3177,7 +3182,7 @@ class OT3API(
         end_position = target_position_from_absolute(
             realmount,
             end_point,
-            self.critical_point_for,
+            partial(self.critical_point_for, cp_override=end_critical_point),
             top_types.Point(*self._config.left_mount_offset),
             top_types.Point(*self._config.right_mount_offset),
             top_types.Point(*self._config.gripper_mount_offset),
@@ -3192,7 +3197,9 @@ class OT3API(
         delay: Optional[Tuple[List[Axis], float]] = None
         if movement_delay is not None:
             delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
-
+        self._log.info(
+            f"dispense_while_tracking: end at {end_point} {end_critical_point}, machine pos {end_position}, with plunger {target_pos}, delay {delay}"
+        )
         try:
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}

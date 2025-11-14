@@ -9,6 +9,7 @@ from decoy import Decoy
 from opentrons.types import Mount, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.types import CriticalPoint
 
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.pipettes import HardwarePipette
@@ -286,6 +287,88 @@ async def test_hw_dispense_in_place_raises_invalid_push_out(
         )
 
 
+async def test_hw_dispense_while_tracking(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
+        RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(
+        25
+    )
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        25
+    )
+
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    decoy.when(
+        mock_state_view.geometry.get_liquid_handling_z_change(
+            labware_id="labware-id",
+            well_name="A1",
+            pipette_id="pipette-id",
+            operation_volume=25.0,
+        )
+    ).then_return(4.544)
+
+    decoy.when(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware("labware-id")
+    ).then_return(CriticalPoint.XY_CENTER)
+
+    result = await hardware_subject.dispense_while_tracking(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="A1",
+        volume=25,
+        flow_rate=2.5,
+        end_point=Point(0, 0, 0),
+        push_out=2.0,
+        is_full_dispense=True,
+        movement_delay=3.0,
+    )
+    # make sure hw dispense_while_tracking runs without error
+    assert result == 25
+    decoy.verify(
+        await mock_hardware_api.dispense_while_tracking(
+            mount=Mount.LEFT,
+            end_point=Point(0, 0, 0),
+            volume=25,
+            end_critical_point=CriticalPoint.XY_CENTER,
+            push_out=2.0,
+            is_full_dispense=True,
+            movement_delay=3.0,
+        )
+    )
+
+
 async def test_hw_aspirate_while_tracking(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -339,6 +422,10 @@ async def test_hw_aspirate_while_tracking(
         )
     ).then_return(4.544)
 
+    decoy.when(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware("labware-id")
+    ).then_return(CriticalPoint.Y_CENTER)
+
     result = await hardware_subject.aspirate_while_tracking(
         pipette_id="pipette-id",
         labware_id="labware-id",
@@ -347,6 +434,7 @@ async def test_hw_aspirate_while_tracking(
         flow_rate=2.5,
         end_point=Point(0, 0, 0),
         command_note_adder=mock_command_note_adder,
+        movement_delay=3.0,
     )
     # make sure hw aspirate_while_tracking runs without error
     assert result == 25
@@ -355,7 +443,8 @@ async def test_hw_aspirate_while_tracking(
             mount=Mount.LEFT,
             end_point=Point(0, 0, 0),
             volume=25,
-            movement_delay=None,
+            movement_delay=3.0,
+            end_critical_point=CriticalPoint.Y_CENTER,
         )
     )
 
