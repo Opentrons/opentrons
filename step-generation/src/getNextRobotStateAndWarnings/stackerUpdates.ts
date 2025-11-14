@@ -128,9 +128,8 @@ export const forFlexStackerRetrieve = (
       throw new Error(
         'Cannot retrieve labware bc there is no stored labware details or primary labware'
       )
+    moduleState.shuttlePosition = 'retrieved'
   }
-
-  moduleState!.shuttlePosition = 'retrieved'
 
   const retrievedLabware = moduleState?.labwareIdsInStacker?.shift()
   if (retrievedLabware == null) {
@@ -138,7 +137,7 @@ export const forFlexStackerRetrieve = (
       'Cannot retrieve labware bc there is no labware in the stacker'
     )
   }
-  // change slot to shuttle slot
+  // make sure this is shuttle slot
   // create labware entity for retrieved labware
   robotState.labware[retrievedLabware] = {
     ...robotState.labware[retrievedLabware],
