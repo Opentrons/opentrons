@@ -33,15 +33,12 @@ jobs:
       CI: true
     steps:
       - name: Checkout target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.target_branch }}
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22.12.0'
+      - uses: ./.github/actions/js/setup
 
       - name: Setup UV
         uses: astral-sh/setup-uv@v7

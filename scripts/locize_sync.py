@@ -44,15 +44,6 @@ COMPONENTS_LOCALIZATION = REPO_ROOT / "components" / "src" / "assets" / "localiz
 # Languages to sync
 LANGUAGES = ["en", "zh"]
 
-PRETTIER_VERSION = "3.6.2"
-
-LOCALIZATION_JSON_DIRS = [
-    APP_LOCALIZATION / "en",
-    APP_LOCALIZATION / "zh",
-    COMPONENTS_LOCALIZATION / "en",
-    COMPONENTS_LOCALIZATION / "zh",
-]
-
 
 def check_environment():
     """Verify required environment variables are set."""
@@ -219,47 +210,12 @@ def unconsolidate_localization_files(copied_files, dry_run=False):
     )
 
 
-def _collect_localization_json_paths():
-    files = []
-    for directory in LOCALIZATION_JSON_DIRS:
-        if not directory.exists():
-            continue
-        files.extend(sorted(directory.glob("*.json")))
-    return files
-
-
-def _relative_to_repo(path: Path) -> str:
-    try:
-        return str(path.relative_to(REPO_ROOT))
-    except ValueError:
-        return str(path)
-
-
 def run_repo_formatter(dry_run=False):
-    """Run the equivalent of `make format-js` via npx prettier."""
+    """Run the repo's standard JS formatter."""
 
-    files_to_format = [
-        _relative_to_repo(path) for path in _collect_localization_json_paths()
-    ]
+    console.print("\n[bold cyan]🧽 Running repo formatter via `make format-js`...[/]")
 
-    console.print(
-        "\n[bold cyan]🧽 Running repo formatter (make format-js equivalent)...[/]"
-    )
-
-    if not files_to_format:
-        console.print("[dim]  No localization JSON files found to format.[/]\n")
-        return
-
-    command = [
-        "npx",
-        "-y",
-        f"prettier@{PRETTIER_VERSION}",
-        "--ignore-path",
-        ".eslintignore",
-        "--write",
-        *files_to_format,
-    ]
-
+    command = ["make", "format-js"]
     console.print(Panel(" ".join(command), title="Command", border_style="blue"))
 
     if dry_run:
@@ -269,7 +225,7 @@ def run_repo_formatter(dry_run=False):
     result = subprocess.run(command, cwd=REPO_ROOT)
 
     if result.returncode != 0:
-        console.print("[bold red]✗ Error:[/] Prettier formatting failed")
+        console.print("[bold red]✗ Error:[/] `make format-js` failed")
         sys.exit(result.returncode)
 
     console.print("[bold green]✓ Repo formatting complete.[/]\n")

@@ -72,7 +72,7 @@ npx -y locize-cli@latest sync \
 - Uses Locize's published translations as the server source (ensure the target version auto-publishes)
 - Reference language (`en`) overwrites Locize's published data when `--update-values true`; non-reference languages (`zh`) are refreshed from the published remote content per the [locize-cli sync docs](https://github.com/locize/locize-cli?tab=readme-ov-file#synchronize-locize-with-your-repository-or-any-other-local-directory)
 - Unconsolidates: copies JSON back to `components/` and removes the temporary duplicates under `app/`
-- Formats only localization JSON via `npx -y prettier@3.6.2 --ignore-path .eslintignore --write app/src/assets/localization/en/*.json app/src/assets/localization/zh/*.json components/src/assets/localization/en/*.json components/src/assets/localization/zh/*.json`; skipped in `--dry-run`
+- Formats all JavaScript/TypeScript files via `make format-js`; skipped in `--dry-run`
 
 **When to use:**
 
@@ -104,7 +104,7 @@ npx -y locize-cli@latest download \
 - Consolidates `components/` JSON into `app/` like the push command
 - Executes `locize-cli download` with `--language en,zh` and `--ver latest`, overwriting the consolidated files with the published remote content
 - Unconsolidates: copies downloaded JSON back to `components/` and deletes the consolidated copies under `app/`
-- Formats the same localization JSON set with `npx -y prettier@3.6.2 --ignore-path .eslintignore --write app/src/assets/localization/en/*.json app/src/assets/localization/zh/*.json components/src/assets/localization/en/*.json components/src/assets/localization/zh/*.json`; skipped in `--dry-run`
+- Formats all JavaScript/TypeScript files via `make format-js`; skipped in `--dry-run`
 
 **When to use:**
 
