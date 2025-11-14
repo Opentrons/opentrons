@@ -231,8 +231,8 @@ class CaptureImageImpl(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
 
-        # Validate that the provided parameters are all acceptable
-        _validate_image_params()
+        # Validate that the provided parameters are all acceptable. We do this here and in system/camera.py to ensure analysis fails properly.
+        _validate_image_params(params)
 
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
