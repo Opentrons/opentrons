@@ -459,7 +459,6 @@ well_plate_3 = protocol.load_labware_from_definition(
       mockLabwareRobotStateWithFlexStackerLabware,
       mockLabwareNicknames
     )
-    console.log('loadLabware: ', loadLabware)
 
     expect(loadLabware).toBe(
       `

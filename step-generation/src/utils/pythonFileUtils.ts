@@ -313,6 +313,7 @@ export function getLoadLabware(
               ) &&
               !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
           ).length
+          // should I extract this to a function? all the logic will be the same
           pythonFlexStackerSetStoredLabware = `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`
         }
       } else {
