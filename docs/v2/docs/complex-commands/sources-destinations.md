@@ -37,9 +37,9 @@ This page covers the restrictions on sources and destinations for complex comman
 
 ## Source and Destination Arguments
 
-Each complex liquid handling command requires `source` and `dest` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
+As noted above, each complex liquid handling command requires `source` and `dest` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
 
-`transfer` is the most versatile complex liquid handling function, because it has the fewest restrictions on what wells it can operate on. You will likely use transfer commands in many of your protocols.
+[`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] is the most versatile complex liquid handling function, because it has the fewest restrictions on what wells it can operate on. You will likely use transfer commands in many of your protocols.
 
 Certain liquid handling cases focus on moving liquid to or from a single well. [`distribute()`][opentrons.protocol_api.InstrumentContext.distribute] and [`distribute_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class] limit their sources to a single well, while [`consolidate()`][opentrons.protocol_api.InstrumentContext.consolidate] and [`consolidate_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class] limit their destinations to a single well. The `distribute()` method and all liquid class complex commands also make changes to liquid-handling behavior to improve accuracy.
 
@@ -74,7 +74,7 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 
 ### Aspirating and Dispensing
 
-`transfer` and `transfer_with_liquid_class` always alternate between aspirating and dispensing, regardless of how many wells are in the source and destination. Their overall pattern is:
+`transfer()` and `transfer_with_liquid_class()` always alternate between aspirating and dispensing, regardless of how many wells are in the source and destination. Their overall pattern is:
 
 1. Pick up a tip.
 2. Aspirate from the first source well.
@@ -83,11 +83,11 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 5. Drop the tip in the trash.
 
 <figure markdown>
-![Transfer](../img/complex_commands/transfer.png)
+![Transfer](../img/complex_commands/transfer.png){width="50%"}
 <figcaption>This transfer aspirates six times and dispenses six times.</figcaption>
 </figure>
 
-`distribute` and `distribute_with_liquid_class` always fill the tip with as few aspirations as possible, and then dispense to the destination wells in order. Their overall pattern is:
+`distribute()` and `distribute_with_liquid_class()` always fill the tip with as few aspirations as possible, and then dispense to the destination wells in order. Their overall pattern is:
 
 1. Pick up a tip.
 2. Aspirate enough to dispense in all the destination wells. This aspirate includes a disposal volume.
@@ -95,14 +95,14 @@ Each complex command uses a different pattern of aspiration and dispensing. In a
 4. Continue to dispense in destination wells.
 5. Drop the tip in the trash.
 
-See [Tip Refilling][tip-refilling] below for cases where the total amount to be dispensed is greater than the capacity of the tip.
+See [Tip Refilling][tip-refilling] for cases where the total amount to be dispensed is greater than the capacity of the tip.
 
 <figure markdown>
-![Distribute](../img/complex_commands/robot_distribute.png)
+![Distribute](../img/complex_commands/robot_distribute.png){width="50%"}
 <figcaption>This distribute aspirates one time and dispenses three times.</figcaption>
 </figure>
 
-`consolidate` and `consolidate_with_liquid_class` aspirate multiple times in a row, and then dispense as few times as possible in the destination well. Their overall pattern is:
+`consolidate()` and `consolidate_with_liquid_class()` aspirate multiple times in a row, and then dispense as few times as possible in the destination well. Their overall pattern is:
 
 1. Pick up a tip.
 2. Aspirate from the first source well.
@@ -110,23 +110,23 @@ See [Tip Refilling][tip-refilling] below for cases where the total amount to be 
 4. Dispense in the destination well.
 5. Drop the tip in the trash.
 
-See [Tip Refilling][tip-refilling] below for cases where the total amount to be aspirated is greater than the capacity of the tip.
+See [Tip Refilling][tip-refilling] for cases where the total amount to be aspirated is greater than the capacity of the tip.
 
 <figure markdown>
-![Consolidate](../img/complex_commands/robot_consolidate.png)
+![Consolidate](../img/complex_commands/robot_consolidate.png){width="50%"}
 <figcaption>This consolidate aspirates three times and dispenses one time.</figcaption>
 </figure>
 
 In addition, all liquid class commands automatically include changes like flow rate, adding an air gap, or delaying based on the liquid class definition. For more information, see [Liquid Classes](../liquid-classes.md).
 
 !!! note
-    By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call `pick_up_tip` just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
+    By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
 
-## Many-to-Many
+### Many-to-Many
 
-Both `transfer` and `transfer_with_liquid_class` let you specify both `source` and `dest` arguments that contain multiple wells. This section covers how these methods determine which wells to aspirate from and dispense to in these cases.
+Both `transfer()` and `transfer_with_liquid_class()` let you specify both `source` and `dest` arguments that contain multiple wells. This section covers how these methods determine which wells to aspirate from and dispense to in these cases.
 
-The number of source and destination wells must be equal to one another in a `transfer_with_liquid_class`. Here, the mapping between wells is straightforward. You can imagine writing out the two lists one above each other, with each unique well in the source list paired to a unique well in the destination list. For example, here is the code for using one row as the source and another row as the destination, and the resulting correspondence between wells:
+The number of source and destination wells must be equal to one another in a `transfer_with_liquid_class()`. Here, the mapping between wells is straightforward. You can imagine writing out the two lists one above each other, with each unique well in the source list paired to a unique well in the destination list. For example, here is the code for using one row as the source and another row as the destination, and the resulting correspondence between wells:
 
 ```python
 liquid_1 = protocol.get_liquid_class("glycerol_50")
@@ -171,7 +171,7 @@ pipette.transfer_with_liquid_class(
     </tr>
 </table>
 
-In a `transfer()` or `transfer_with_liquid_class()`, there's no requirement that the source and destination lists be mutually exclusive. In fact, this command deliberately uses slices of the same list, saved to the variable `row`, with the effect that each aspiration happens in the same location as the previous dispense:
+In a `transfer()` or `transfer_with_liquid_class()`, there's no requirement that the source and destination lists be mutually exclusive. In fact, this command adapted from the [tutorial](../tutorial.md) deliberately uses slices of the same list, saved to the variable `row`, with the effect that each aspiration happens in the same location as the previous dispense:
 
 ```python
 row = plate.rows()[0]
@@ -275,7 +275,7 @@ pipette.transfer(50, plate["A2"], plate.columns()[3][3:6])
 pipette.transfer(50, plate["A3"], plate.columns()[3][6:])
 ```
 
-Finally, be aware of the ordering of source and destination lists when constructing them with [well accessor methods][accessor-methods]. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
+Finally, be aware of the [ordering][well-ordering] of source and destination lists when constructing them with [well accessor methods][accessor-methods]. For example, at first glance this code may appear to take liquid from each well in the first row of a plate and move it to each of the other wells in the same column:
 
 ```python
 pipette.transfer(
@@ -301,9 +301,9 @@ Here the repeat index `i` picks out:
 - The individual well in the first row, for the source.
 - The corresponding column, which is sliced to form the destination.
 
-## Optimizing Patterns
+### Optimizing Patterns
 
-Choosing the right complex command optimizes gantry movement and helps save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use `transfer_with_liquid_class`, like this:
+Choosing the right complex command optimizes gantry movement and helps save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use `transfer_with_liquid_class()`, like this:
 
 ```python
 liquid_1 = protocol.get_liquid_class("glycerol_50")
