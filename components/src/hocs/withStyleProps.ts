@@ -40,13 +40,13 @@ export function withStyleProps<T extends ComponentType<any>>(
     const combinedStyles = { ...stylePropsStyles, ...style }
 
     const forwardedProps = Object.entries(props).reduce(
-      (acc, [prop, value]) => {
+      (acc: Record<string, unknown>, [prop, value]) => {
         if (isntStyleProp(prop)) {
           acc[prop] = value
         }
         return acc
       },
-      {} as Record<string, unknown>
+      {}
     )
 
     return createElement(Component, {
