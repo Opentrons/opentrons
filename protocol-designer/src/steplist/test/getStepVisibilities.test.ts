@@ -40,4 +40,3 @@ describe('getStepVisibilities()', () => {
     expect(result).toStrictEqual({})
   })
 })
-
