@@ -8,6 +8,8 @@ import {
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   GLYCEROL_LIQUID_CLASS_NAME,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -16,8 +18,6 @@ import {
   OT2_ROBOT_TYPE,
   WASTE_CHUTE_CUTOUT,
   WATER_LIQUID_CLASS_NAME,
-  FLEX_STACKER_MODULE_V1,
-  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import {
@@ -130,12 +130,6 @@ const mockModuleEntities: ModuleEntities = {
     type: MAGNETIC_BLOCK_TYPE,
     pythonName: 'magnetic_block_2',
   },
-  [moduleId4]: {
-    id: moduleId4,
-    model: FLEX_STACKER_MODULE_V1,
-    type: FLEX_STACKER_MODULE_TYPE,
-    pythonName: 'flex_stacker_1',
-  },
 }
 const labwareId1 = 'labwareId1'
 const labwareId2 = 'labwareId2'
@@ -187,12 +181,6 @@ const mockLabwareEntities: LabwareEntities = {
       parameters: { loadName: 'mock_lid' } as any,
     },
     pythonName: 'lid_1',
-  },
-  [flexStackerLabwareId]: {
-    id: flexStackerLabwareId,
-    labwareDefURI: 'opentrons/fixture_96_plate/1',
-    def: opentrons96Plate as LabwareDefinition2,
-    pythonName: 'well_plate_4',
   },
 }
 
@@ -437,6 +425,26 @@ well_plate_3 = protocol.load_labware_from_definition(
     )
   })
   it('should generate loadLabware for a flex stacker', () => {
+    const mockModuleEntitiesWithFlexStackerModule = {
+      ...mockModuleEntities,
+      [moduleId4]: {
+        ...mockModuleEntities[moduleId4],
+        id: moduleId4,
+        model: FLEX_STACKER_MODULE_V1,
+        type: FLEX_STACKER_MODULE_TYPE,
+        pythonName: 'flex_stacker_1',
+      },
+    }
+    const mockLabwareEntitiesWithFlexStackerLabware = {
+      ...mockLabwareEntities,
+      [flexStackerLabwareId]: {
+        id: flexStackerLabwareId,
+        labwareDefURI: 'opentrons/fixture_96_plate/1',
+        def: opentrons96Plate as LabwareDefinition2,
+        pythonName: 'well_plate_4',
+      },
+    }
+
     const mockLabwareRobotStateWithFlexStackerLabware = {
       ...labwareRobotState,
       [flexStackerLabwareId]: {
@@ -444,25 +452,38 @@ well_plate_3 = protocol.load_labware_from_definition(
         stack: [flexStackerLabwareId, moduleId4, 'A4'],
       },
     }
+
     const loadLabware = getLoadLabware(
-      mockModuleEntities,
-      mockLabwareEntities,
+      mockModuleEntitiesWithFlexStackerModule,
+      mockLabwareEntitiesWithFlexStackerLabware,
       mockLabwareRobotStateWithFlexStackerLabware,
       mockLabwareNicknames
     )
     console.log('loadLabware: ', loadLabware)
-    
-    expect(loadLabware
-    ).toBe(
+
+    expect(loadLabware).toBe(
       `
-# Load Labware:
-flex_stacker_1 = protocol.load_module("flexStackerModuleV1", "A2")
-flex_stacker_1.set_stored_labware(
-    load_name="opentrons_flex_96_tiprack_50ul",
+ # Load Labware:
+well_plate_1 = adapter_2.load_labware(
+    "fixture_96_plate",
+    label="reagent plate",
     namespace="opentrons",
     version=1,
-    count=1,
-)`.trimStart()
+)
+well_plate_2 = magnetic_block_2.load_labware(
+    "fixture_96_plate",
+    namespace="opentrons",
+    version=1,
+    lid="mock_lid",
+    lid_namespace="opentrons",
+    lid_version=1,
+)
+well_plate_3 = protocol.load_labware_from_definition(
+    CUSTOM_LABWARE["fixture/fixture_96_plate/1"],
+    location="C2",
+    label="sample plate",
+)
+well_plate_4 = flex_stacker_1.set_stored_labware(fixture_96_plate, opentrons, 1, count=0)`.trimStart()
     )
   })
 })
