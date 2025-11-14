@@ -1,0 +1,72 @@
+name: Locize Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      locize_action:
+        description: "Locize action to run"
+        type: choice
+        options:
+          - push-local
+          - download-remote
+        default: download-remote
+        required: true
+      target_branch:
+        description: "Branch to checkout and base the pull request on"
+        type: string
+        default: edge
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  LOCIZE_API_KEY: ${{ secrets.LOCIZE_API_KEY }}
+  LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
+
+jobs:
+  sync:
+    name: Run Locize sync
+    runs-on: ubuntu-24.04
+    env:
+      CI: true
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.12.0'
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.10'
+
+      - name: Run Locize ${{ inputs.locize_action }}
+        env:
+          LOCIZE_API_KEY: ${{ secrets.LOCIZE_API_KEY }}
+          LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
+        run: uv run scripts/locize_sync.py ${{ inputs.locize_action }}
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
+          base: ${{ inputs.target_branch }}
+          commit-message: "chore(locize): ${{ inputs.locize_action }} via workflow"
+          title: "chore(locize): ${{ inputs.locize_action }}"
+          body: |
+            Automated Locize `${{ inputs.locize_action }}` run triggered via workflow dispatch.
+            - branch: `${{ inputs.target_branch }}`
+            - actor: `${{ github.actor }}`
+          add-paths: |
+            app/src/assets/localization/en/
+            app/src/assets/localization/zh/
+            components/src/assets/localization/en/
+            components/src/assets/localization/zh/
