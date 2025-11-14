@@ -57,6 +57,8 @@ export interface ConnectedStepInfoProps {
 // gap but it's made out of internal padding), there are hover gaps in `ConcurrentStepGroup`s.
 const DEBOUNCE_DURATION_MS = 500
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
