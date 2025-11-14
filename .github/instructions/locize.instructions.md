@@ -53,6 +53,7 @@ uv run scripts/locize_sync.py push-local
 ```
 
 **Equivalent npx command:**
+
 ```bash
 npx -y locize-cli@latest sync \
   --api-key $LOCIZE_API_KEY \
@@ -65,6 +66,7 @@ npx -y locize-cli@latest sync \
 ```
 
 **Behavior:**
+
 - Consolidates: copies `components/src/assets/localization/{en,zh}` JSON into `app/src/assets/localization/{en,zh}` so Locize CLI can read a single tree
 - Executes `locize-cli sync` with `--language en,zh`, `--update-values true`, `--skip-delete false`, `--ver latest`
 - Uses Locize's published translations as the server source (ensure the target version auto-publishes)
@@ -73,6 +75,7 @@ npx -y locize-cli@latest sync \
 - Formats only localization JSON via `npx -y prettier@3.6.2 --ignore-path .eslintignore --write app/src/assets/localization/en/*.json app/src/assets/localization/zh/*.json components/src/assets/localization/en/*.json components/src/assets/localization/zh/*.json`; skipped in `--dry-run`
 
 **When to use:**
+
 - After updating local English or Chinese strings
 - Before handing work to translators so Locize has the newest keys
 - To resolve drift by making the repo the source of truth again
@@ -86,6 +89,7 @@ uv run scripts/locize_sync.py download-remote
 ```
 
 **Equivalent npx command:**
+
 ```bash
 npx -y locize-cli@latest download \
   --api-key $LOCIZE_API_KEY \
@@ -96,12 +100,14 @@ npx -y locize-cli@latest download \
 ```
 
 **Behavior:**
+
 - Consolidates `components/` JSON into `app/` like the push command
 - Executes `locize-cli download` with `--language en,zh` and `--ver latest`, overwriting the consolidated files with the published remote content
 - Unconsolidates: copies downloaded JSON back to `components/` and deletes the consolidated copies under `app/`
 - Formats the same localization JSON set with `npx -y prettier@3.6.2 --ignore-path .eslintignore --write app/src/assets/localization/en/*.json app/src/assets/localization/zh/*.json components/src/assets/localization/en/*.json components/src/assets/localization/zh/*.json`; skipped in `--dry-run`
 
 **When to use:**
+
 - After translators finish work in Locize
 - Prior to release to pull the final translations
 - Any time you want to align local files with remote ordering/content
@@ -116,6 +122,7 @@ uv run scripts/locize_sync.py download-remote --dry-run
 ```
 
 **Behavior:**
+
 - Performs consolidation and unconsolidation exactly as a real run so the workspace structure is validated, but returns the repo to its original state at the end
 - Displays the exact npx commands that would be executed
 - Locize CLI is invoked with `--dry=true`, so no remote content is changed, and Prettier is skipped
@@ -136,6 +143,7 @@ uvx ruff check --fix scripts/locize_sync.py && uvx ruff format scripts/locize_sy
 ### GitHub Actions Setup
 
 Store credentials in repository secrets:
+
 - `LOCIZE_API_KEY`: Locize API key (Settings → Secrets → Actions)
 - `LOCIZE_PROJECT_ID`: Locize project ID (Settings → Secrets → Actions)
 
