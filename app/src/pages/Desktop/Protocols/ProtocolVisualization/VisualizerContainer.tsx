@@ -6,7 +6,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  constructInvariantContextFromRunCommands,
+  constructInvariantContextFromAnalysis,
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
@@ -84,11 +84,11 @@ export function VisualizerContainer(
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromRunCommands =
-    constructInvariantContextFromRunCommands(commands)
+  const invariantContextFromAnalysis =
+    constructInvariantContextFromAnalysis(analysis)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
-    invariantContextFromRunCommands
+    invariantContextFromAnalysis
   )
 
   const handlePlayPause = (): void => {
