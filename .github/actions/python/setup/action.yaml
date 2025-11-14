@@ -62,7 +62,7 @@ runs:
         python -m pip install --user virtualenv==20.30.0
     - name: Install UV
       if: steps.project-type.outputs.type == 'uv'
-      uses: ./.github/actions/python/install-uv
+      uses: astral-sh/setup-uv@v7
     - name: Cache UV packages
       if: steps.project-type.outputs.type == 'uv'
       uses: ./.github/actions/python/cache-uv

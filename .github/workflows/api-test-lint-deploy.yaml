@@ -147,7 +147,7 @@ jobs:
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
       - name: Install UV
-        uses: ./.github/actions/python/install-uv
+        uses: astral-sh/setup-uv@v7
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
