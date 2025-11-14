@@ -47,7 +47,6 @@ import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
-  stepNumber: number | null
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
@@ -61,7 +60,6 @@ const DEBOUNCE_DURATION_MS = 500
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
-    stepNumber,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -69,6 +67,9 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
+  const stepNumber = useSelector(stepFormSelectors.getUserVisibleStepNumbers)[
+    stepId
+  ]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
   ]

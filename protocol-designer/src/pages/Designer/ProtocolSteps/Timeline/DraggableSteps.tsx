@@ -22,7 +22,6 @@ import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-fla
 import {
   getOrderedSavedForms,
   getSavedStepHierarchy,
-  getUserVisibleStepNumbers,
 } from '/protocol-designer/step-forms/selectors'
 import * as steplistActions from '/protocol-designer/steplist/actions'
 import {
@@ -56,7 +55,6 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
   >(null)
 
   const stepHierarchy = useSelector(getSavedStepHierarchy)
-  const stepNumbers = useSelector(getUserVisibleStepNumbers)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
@@ -65,7 +63,6 @@ export function DraggableSteps(props: DraggableStepsProps): JSX.Element | null {
           return (
             <DragDropStep
               key={`${nestedStepElement.stepId}`}
-              stepNumber={stepNumbers[nestedStepElement.stepId]}
               stepId={nestedStepElement.stepId}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
@@ -104,7 +101,6 @@ interface DropType {
 
 interface ConnectedStepItemProps {
   stepId: StepIdType
-  stepNumber: number | null
   onStepContextMenu?: () => void
 }
 
@@ -122,7 +118,6 @@ interface DragDropStepProps extends ConnectedStepItemProps {
 function DragDropStep(props: DragDropStepProps): JSX.Element {
   const {
     stepId,
-    stepNumber,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -201,7 +196,6 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
       <ConnectedStepInfo
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
-        stepNumber={stepNumber}
         stepId={stepId}
         sidebarWidth={sidebarWidth}
       />
@@ -256,7 +250,6 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
     multiSelectItemIds != null && multiSelectItemIds.length > 0
       ? multiSelectItemIds.includes(thermocyclerProfileStepId)
       : selectedStepId === thermocyclerProfileStepId
-  const stepNumbers = useSelector(getUserVisibleStepNumbers)
 
   const { t } = useTranslation()
 
@@ -264,7 +257,6 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
     <div>
       <DragDropStep
         stepId={thermocyclerProfileStepId}
-        stepNumber={stepNumbers[thermocyclerProfileStepId]}
         openedOverflowMenuId={openedOverflowMenuId}
         setOpenedOverflowMenuId={setOpenedOverflowMenuId}
         sidebarWidth={sidebarWidth}
@@ -288,7 +280,6 @@ function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
           <ConcurrentGroupChild key={concurrentStepId} type="step">
             <DragDropStep
               stepId={concurrentStepId}
-              stepNumber={stepNumbers[concurrentStepId]}
               openedOverflowMenuId={openedOverflowMenuId}
               setOpenedOverflowMenuId={setOpenedOverflowMenuId}
               sidebarWidth={sidebarWidth}
