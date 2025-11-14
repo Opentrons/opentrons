@@ -81,6 +81,7 @@ class EnvironmentReportState(str, Enum):
 def create_csv_test_report(
     volumes: List[float],
     pipette_channels: List[int],
+    increment: bool,
     trials: int,
     name: str,
     run_id: str,
