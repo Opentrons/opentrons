@@ -106,13 +106,26 @@ Since their first day of production, every Flex has shipped with a built in came
 - Automatic image capture during a crash or in response to a runtime error.
 - The ability to download compressed image files (`.zip` format) after a protocol run ends.
 
+### Location and default image
+
 The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
 
-![Image showing robot front and interior camera](./images/camera-location-xray.png)
+![Image showing robot front and interior camera](./images/camera-location.png)
+
+This fixed location gives you a high, wide-angle view of any attached instruments, deck-mounted modules, and related labware.
+
+![Default camera view](./images/camer-default.png) <!-- too potato quality? -->
 
 ### Controlling the camera
 
-The Opentrons App gives you full control over the camera. The camera is disabled by default.
+The camera is disabled by default. To access and enable the camera and its features:
+
+1. From the Opentrons App, click **Devices** and locate your robot.
+2. For your selected robot, click the three-dot menu ( ⋮ ) and then click **Robot settings**.
+3. Click the **Camera** tab to open the camera settings.
+4. Click the Camera slider to enable or disable the camera.
+
+You can also see the camera's status, and access the controls, from the Peripherals section of the details page for your Flex.
 
 
 ## Recent protocol runs
@@ -133,3 +146,6 @@ Each entry in the recent protocol runs list includes the protocol name, its time
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
+
+
+[def]: /images/camera-location-xray.pn
