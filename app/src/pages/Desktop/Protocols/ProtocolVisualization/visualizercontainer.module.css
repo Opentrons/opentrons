@@ -34,24 +34,35 @@
   overflow-y: auto;
 }
 
-.resizer {
+.gutter {
+  position: relative;
+  flex-shrink: 0;
+  width: 1rem; /* 16px: align with GUTTER_WIDTH_PX */
+}
+
+/* line when hovering */
+.gutter::before {
+  content: '';
   position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  width: 8px;
-  cursor: col-resize;
+  top: var(--spacing-8);
+  bottom: var(--spacing-8);
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background-color: transparent;
   transition: background-color 0.2s;
 }
 
-.resizer:hover {
-  background-color: var(--blue-50);
+.gutter:hover {
+  cursor: grab;
 }
 
-.resizer_right {
-  right: -4px;
+.gutter:hover::before {
+  background-color: var(--grey-40);
 }
 
-.resizer_left {
-  left: -4px;
+.gutter.grabbing,
+.gutter.grabbing:hover {
+  cursor: grabbing;
 }
