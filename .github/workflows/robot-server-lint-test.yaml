@@ -62,11 +62,7 @@ jobs:
       - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.12.0'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
-
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'robot-server'
       - if: ${{ matrix.with-ot-hardware == 'false' }}

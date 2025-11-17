@@ -1,0 +1,40 @@
+name: 'UV Python Setup'
+description: 'Set up the environment for a UV-managed Python project'
+inputs:
+  project:
+    description: 'Which project (by subdirectory) to set up'
+    required: true
+  python-version:
+    description: 'Python version to install via setup-uv'
+    required: false
+    default: '3.10'
+  install-system-deps:
+    description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
+    required: false
+    default: 'true'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      if: inputs.install-system-deps == 'true'
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - shell: bash
+      run: npm install --global shx@0.3.3
+    - name: Setup Python and UV
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ inputs.python-version }}
+        enable-cache: true
+        cache-dependency-glob: |
+          ${{ inputs.project }}/pyproject.toml
+          ${{ inputs.project }}/uv.lock
+    - name: Setup Python Environment
+      id: setup-env
+      shell: bash
+      run: make -C ${{ inputs.project }} setup
