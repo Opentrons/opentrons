@@ -35,7 +35,6 @@ describe('labware selectors', () => {
       }
 
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalOptions.resultFunc(additionalEquipmentEntities)
       ).toEqual([{ name: 'Trash bin', value: mockTrashId }])
     })
@@ -61,7 +60,6 @@ describe('labware selectors', () => {
       }
 
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalOptions.resultFunc(additionalEquipmentEntities)
       ).toEqual([
         { name: 'Trash bin', value: mockTrashId },

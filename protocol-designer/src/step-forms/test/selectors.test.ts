@@ -39,7 +39,6 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -66,7 +65,6 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -85,7 +83,6 @@ describe('getEquippedPipetteOptions', () => {
         value: '123',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -93,14 +90,12 @@ describe('getEquippedPipetteOptions', () => {
 describe('getBatchEditFormHasUnsavedChanges', () => {
   it('should return true if there are unsaved changes ', () => {
     expect(
-      // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
       getBatchEditFormHasUnsavedChanges.resultFunc({
         someField: 'someVal',
       })
     ).toBe(true)
   })
   it('should return false if there are no unsaved changes ', () => {
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
   })
 })
@@ -114,7 +109,6 @@ describe('getUnsavedFormIsPristineSetTempForm', () => {
       targetTemperature: 33,
     }
     const expected = true
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
       formData,
       mockIsPresaved
@@ -128,7 +122,6 @@ describe('getUnsavedFormIsPristineSetTempForm', () => {
       setTemperature: null,
     }
     const expected = false
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
       formData,
       mockIsPresaved
@@ -146,7 +139,6 @@ describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
       targetHeaterShakerTemperature: '10',
     }
     const expected = true
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
       formData,
       mockIsPresaved
@@ -160,7 +152,6 @@ describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
       targetHeaterShakerTemperature: null,
     }
     const expected = false
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
       formData,
       mockIsPresaved

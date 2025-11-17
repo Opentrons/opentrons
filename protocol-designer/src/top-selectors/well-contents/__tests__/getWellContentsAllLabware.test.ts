@@ -61,7 +61,6 @@ describe('getWellContentsAllLabware', () => {
       container3Id: {},
       FIXED_TRASH_ID: {},
     }
-    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     singleIngredResult = getWellContentsAllLabware.resultFunc(
       labwareEntities,
       ingredsByLabwareXXSingleIngred,
@@ -112,7 +111,6 @@ describe('getWellContentsAllLabware', () => {
   })
 
   it('no selected wells when labwareId is not selected', () => {
-    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     const result = getWellContentsAllLabware.resultFunc(
       labwareEntities,
       ingredsByLabwareXXSingleIngred,
@@ -211,7 +209,6 @@ describe('getWellContentsForLabwareStack', () => {
   }
 
   it('selects well contents of all labware in stack (for Plate props)', () => {
-    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     const singleIngredResultStack = getWellContentsForLabwareStack.resultFunc(
       labwareEntities,
       mockRobotState,

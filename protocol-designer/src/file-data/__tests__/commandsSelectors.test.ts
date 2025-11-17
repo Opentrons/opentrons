@@ -53,19 +53,16 @@ function hasAllWellKeys(result: {
 
 describe('getLabwareLiquidState', () => {
   it('no labware + no ingreds', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     expect(getLabwareLiquidState.resultFunc({}, {})).toEqual({})
   })
 
   it('labware + no ingreds: generate empty well keys', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getLabwareLiquidState.resultFunc({}, labwareEntities)
 
     hasAllWellKeys(result)
   })
 
   it('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getLabwareLiquidState.resultFunc(ingredLocs, labwareEntities)
 
     expect(result).toMatchObject(ingredLocs)

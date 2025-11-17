@@ -80,7 +80,6 @@ describe('createFile selector', () => {
   }
 
   it('should return a valid Python protocol file', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
