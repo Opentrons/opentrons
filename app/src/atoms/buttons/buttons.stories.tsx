@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { isMonday } from 'date-fns'
 
 import {
   DIRECTION_COLUMN,
