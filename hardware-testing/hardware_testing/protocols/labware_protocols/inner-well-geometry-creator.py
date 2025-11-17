@@ -31,8 +31,8 @@ import serial  # type: ignore[import]
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "eppendorf_96_wellplate_500ul_dial"  # change to desired labware
-JUPYTER_DATA_DIR = "/var/lib/jupyter/notebooks/"
+LABWARE = "example_labware"  # change to desired labware
+
 
 RESERVOIR = "nest_1_reservoir_290ml"
 LIQUID_MOUNT = "right"
@@ -48,6 +48,7 @@ SLOT_DIAL = "B2"
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
+JUPYTER_DATA_DIR = "/var/lib/jupyter/notebooks/"
 RUN_ID = ""
 DATA_FILE_PATH = ""
 CSV_HEADER = [

@@ -25,7 +25,7 @@ import serial  # type: ignore[import]
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "eppendorf_96_wellplate_500ul_dial"  # change to desired labware
+LABWARE = "example_labware"  # change to desired labware
 
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
 SLOT_PROBING_TIPRACK = "D2"
