@@ -99,7 +99,7 @@ Click the three-dot menu (⋮) on the module card to choose from available comma
 
 ## Camera features and controls
 
-Since their first day of production, every Flex has shipped with a built in camera. Even though these cameras were functional, they have always been disabled but this state changes starting with robot software version 8.8. In that release, you can now control and use the camera in the Opentrons App. When enabled, the built-in camera provides:
+Every Flex comes equipped with a built-in 2.1 megapixel camera that can capture full HD still images and provides video of the deck and working area. However, the camera has been disabled until the release of robot software version 8.8. With this release, you can now control and use the camera in the Opentrons App and from the touchscreen. When enabled, the built-in camera provides:
 
 - Live, in-app video monitoring during protocol runs.
 - Automatic image capture at intervals you set in a protocol.
@@ -112,24 +112,34 @@ The camera is mounted on the interior frame of the robot, in the upper corner of
 
 ![Image showing robot front and interior camera](./images/camera-location.png)
 
-This fixed location gives you a high, wide-angle view of any attached instruments, deck-mounted modules, and related labware.
+This fixed location gives you a high, wide-angle view of attached instruments, deck-mounted modules, and labware.
 
-![Default camera view](./images/camer-default.png) <!-- too potato quality? -->
+<!-- too potato quality? dizzying perspective? -->
+<!-- request to jackson for some photo-manipulation, see comment in jira -->
+![Default camera view](./images/camer-default.png) 
 
 ### Controlling the camera
 
-The camera is disabled by default. To access and enable the camera and its features:
+The camera is turned off by default. To turn on the camera and access its features:
+
+<div class="instruction-list" markdown>
 
 1. From the Opentrons App, click **Devices** and locate your robot.
 2. For your selected robot, click the three-dot menu ( ⋮ ) and then click **Robot settings**.
 3. Click the **Camera** tab to open the camera settings.
 4. Click the Camera slider to enable or disable the camera.
 
-You can also see the camera's status, and access the camera controls, from the Peripherals section of the details page for your Flex.
+</div>
+
+You can also see the camera's status, and turn it on and off, from the Peripherals section of the details page for your Flex. Click the three-dot menu ( ⋮ ) to enable or disable the camera. This example shows a Flex with its camera enabled.
 
 <figure class="screenshot" markdown>
   ![Details page showing enabled camera](./images/robot-details.png)
 </figure>
+
+### Image download
+
+All protocol images are available for download in the recent protocol run section of the robot details page.
 
 ## Recent protocol runs
 
@@ -147,6 +157,8 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+
+- **Download image files:** Save to your computer a ZIP file containing all the images taken during a protocol run, if the camera was enabled.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
