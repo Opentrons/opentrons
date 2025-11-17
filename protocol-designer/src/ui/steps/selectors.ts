@@ -83,14 +83,16 @@ export const getMultiSelectItemIds: Selector<StepIdType[] | null> =
     return null
   })
 
-export const getMultiSelectLastSelected: Selector<StepIdType | null> =
-  createSelector(getSelectedItem, item => {
+export const getMultiSelectLastSelected = createSelector(
+  getSelectedItem,
+  item => {
     if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
       return item.lastSelected
     }
 
     return null
-  })
+  }
+) satisfies Selector<StepIdType | null>
 
 export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
@@ -187,7 +189,7 @@ export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
 )
 
 // Hovered or selected item. Hovered has priority. Used to tell deck what to display
-export const getActiveItem: Selector<HoverableItem | null> = createSelector(
+export const getActiveItem = createSelector(
   getSelectedItem,
   getHoveredItem,
   (selected, hovered) => {
@@ -199,7 +201,7 @@ export const getActiveItem: Selector<HoverableItem | null> = createSelector(
       return selected
     }
   }
-)
+) satisfies Selector<HoverableItem | null>
 
 export const getWellSelectionLabwareKey: Selector<string | null> =
   createSelector(
@@ -218,8 +220,7 @@ export type MultiselectFieldValues = Record<
 const getUniqueValues = (key: string, forms: FormData[]): string[] =>
   Array.from(new Set(forms.map(form => form[key])))
 
-export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> =
-  createSelector(
+export const _getSavedMultiSelectFieldValues = createSelector(
     stepFormSelectors.getSavedStepForms,
     getMultiSelectItemIds,
     (savedStepForms, multiSelectItemIds) => {
@@ -274,10 +275,9 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
         {}
       )
     }
-  )
+  ) satisfies Selector<MultiselectFieldValues | null>
 
-export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> =
-  createSelector(
+export const getMultiSelectFieldValues = createSelector(
     _getSavedMultiSelectFieldValues,
     stepFormSelectors.getBatchEditFieldChanges,
     (savedValues, changes) => {
@@ -297,15 +297,14 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       }, {})
       return { ...savedValues, ...multiselectChanges }
     }
-  )
+  ) satisfies Selector<MultiselectFieldValues | null>
 
 // NOTE: the value is the tooltip text explaining why the field is disabled
 type TooltipText = string
 
 export type DisabledFields = Record<string, TooltipText>
 
-export const getMultiSelectDisabledFields: Selector<DisabledFields | null> =
-  createSelector(
+export const getMultiSelectDisabledFields = createSelector(
     stepFormSelectors.getSavedStepForms,
     getMultiSelectItemIds,
     (savedStepForms, multiSelectItemIds) => {
@@ -320,9 +319,9 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> =
         return null
       }
     }
-  )
+  ) satisfies Selector<DisabledFields | null>
 
-export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
+export const getCountPerStepType = createSelector(
   getMultiSelectItemIds,
   stepFormSelectors.getSavedStepForms,
   (stepIds, allSteps) => {
@@ -337,17 +336,19 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
     }, {})
     return countPerStepType
   }
-)
+) satisfies Selector<CountPerStepType>
 
-export const getBatchEditSelectedStepTypes: Selector<StepType[]> =
-  createSelector(getCountPerStepType, countPerStepType => {
+export const getBatchEditSelectedStepTypes = createSelector(
+  getCountPerStepType,
+  countPerStepType => {
     return uniq(
       (Object.keys(countPerStepType) as StepType[]).filter(
         // @ts-expect-error(sa, 2021-6-15): TS thinks countPerStepType[stepType] might be undefined because CountPerStepType is a partial record
         stepType => countPerStepType[stepType] > 0
       )
     ).sort()
-  })
+  }
+) satisfies Selector<StepType[]>
 
 function getMoveLiquidMultiSelectDisabledFields(
   forms: FormData[]

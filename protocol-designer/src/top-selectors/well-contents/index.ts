@@ -78,8 +78,7 @@ interface CommonWellValues {
 
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
-export const getSelectedWellsCommonValues: Selector<CommonWellValues> =
-  createSelector(
+export const getSelectedWellsCommonValues = createSelector(
     getSelectedWells,
     labwareIngredSelectors.getSelectedLabwareId,
     labwareIngredSelectors.getLiquidsByLabwareId,
@@ -132,7 +131,7 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> =
         }
       }
     }
-  )
+  ) satisfies Selector<CommonWellValues>
 export const getSelectedWellsCommonIngredId: Selector<
   string | null | undefined
 > = createSelector(

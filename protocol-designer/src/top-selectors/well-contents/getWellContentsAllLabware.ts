@@ -54,8 +54,7 @@ const _getWellContents = (
   )
 }
 
-export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
-  createSelector(
+export const getWellContentsAllLabware = createSelector(
     stepFormSelectors.getLabwareEntities,
     labwareIngredSelectors.getLiquidsByLabwareId,
     labwareIngredSelectors.getSelectedLabwareId,
@@ -90,10 +89,9 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> =
         {}
       )
     }
-  )
+  ) satisfies Selector<WellContentsByLabware>
 
-export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> =
-  createSelector(
+export const getWellContentsForLabwareStack = createSelector(
     stepFormSelectors.getLabwareEntities,
     getInitialRobotState,
     labwareIngredSelectors.getLiquidsByLabwareId,
@@ -135,4 +133,4 @@ export const getWellContentsForLabwareStack: Selector<WellContentsByLabware> =
         {}
       )
     }
-  )
+  ) satisfies Selector<WellContentsByLabware>

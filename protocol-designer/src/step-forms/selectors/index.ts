@@ -369,8 +369,9 @@ function _getPipettesSame(
   return pipettes[0]?.name === pipettes[1]?.name
 }
 
-export const getEquippedPipetteOptions: Selector<BaseState, DropdownOption[]> =
-  createSelector(getInitialDeckSetup, initialDeckSetup => {
+export const getEquippedPipetteOptions = createSelector(
+  getInitialDeckSetup,
+  initialDeckSetup => {
     const pipettes = initialDeckSetup.pipettes
 
     const pipettesSame = _getPipettesSame(pipettes)
@@ -389,7 +390,8 @@ export const getEquippedPipetteOptions: Selector<BaseState, DropdownOption[]> =
       },
       []
     )
-  })
+  }
+) satisfies Selector<BaseState, DropdownOption[]>
 export const getPipettesForEditPipetteForm: Selector<
   BaseState,
   FormPipettesByMount
@@ -520,8 +522,10 @@ export const getBatchEditFieldChanges: Selector<
   BaseState,
   BatchEditFormChangesState
 > = createSelector(rootSelector, state => state.batchEditFormChanges)
-export const getBatchEditFormHasUnsavedChanges: Selector<BaseState, boolean> =
-  createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
+export const getBatchEditFormHasUnsavedChanges = createSelector(
+  getBatchEditFieldChanges,
+  changes => !isEmpty(changes)
+) satisfies Selector<BaseState, boolean>
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
@@ -765,22 +769,18 @@ export const getArgsAndErrorsByStepId: Selector<
     )
   }
 )
-export const getUnsavedFormIsPristineSetTempForm: Selector<BaseState, boolean> =
-  createSelector(
-    getUnsavedForm,
-    getCurrentFormIsPresaved,
-    (unsavedForm, isPresaved) => {
-      const isSetTempForm =
-        unsavedForm?.stepType === 'temperature' &&
-        unsavedForm?.targetTemperature != null
-      return isPresaved && isSetTempForm
-    }
-  )
+export const getUnsavedFormIsPristineSetTempForm = createSelector(
+  getUnsavedForm,
+  getCurrentFormIsPresaved,
+  (unsavedForm, isPresaved) => {
+    const isSetTempForm =
+      unsavedForm?.stepType === 'temperature' &&
+      unsavedForm?.targetTemperature != null
+    return isPresaved && isSetTempForm
+  }
+) satisfies Selector<BaseState, boolean>
 
-export const getUnsavedFormIsPristineHeaterShakerForm: Selector<
-  BaseState,
-  boolean
-> = createSelector(
+export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
   (unsavedForm, isPresaved) => {
@@ -790,7 +790,7 @@ export const getUnsavedFormIsPristineHeaterShakerForm: Selector<
 
     return isPresaved && isSetHsTempForm
   }
-)
+) satisfies Selector<BaseState, boolean>
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]

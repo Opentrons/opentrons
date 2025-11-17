@@ -26,8 +26,7 @@ import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
-export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> =
-  createSelector(
+export const getLabwareLiquidState = createSelector(
     labwareIngredSelectors.getLiquidsByLabwareId,
     stepFormSelectors.getLabwareEntities,
     (ingredLocations, labwareEntities) => {
@@ -51,12 +50,12 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
             }),
             {}
           )
-          return { ...acc, [labwareId]: liquidStateForLabwareAllWells }
-        },
-        {}
-      )
-    }
-  )
+        return { ...acc, [labwareId]: liquidStateForLabwareAllWells }
+      },
+      {}
+    )
+  }
+) satisfies Selector<StepGeneration.LabwareLiquidState>
 export const getInitialRobotState: (
   arg0: BaseState
 ) => StepGeneration.RobotState = createSelector(

@@ -74,7 +74,7 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<PDPythonFile> = createSelector(
+export const createFile = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -180,4 +180,4 @@ export const createFile: Selector<PDPythonFile> = createSelector(
 
     return { pythonProtocol, designerApplication }
   }
-)
+) satisfies Selector<PDPythonFile>
