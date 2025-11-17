@@ -15,11 +15,11 @@ The `new_tip` parameter controls if and when complex commands pick up new tips f
 
 | Value {width="20%"} | Behavior |
 |------------------|----------|
-| `"once"`         | Pick up a tip at the start of the command. Use the tip for all liquid handling. Drop the tip at the end of the command. |
+| `"once"`         | Pick up a tip at the start of the command.<br>Use the tip for all liquid handling.<br>Drop the tip at the end of the command. |
 | `"always"`       | Pick up and drop a tip for each set of aspirate and dispense steps. |
 | `"never"`        | Do not pick up or drop tips at all. |
-| `"per source"`   | Pick up a new tip for each source well in the transfer. (liquid handling commands only) |
-| `"per destination"` | Pick up a new tip for each destination well in the transfer. (liquid handling commands only) |
+| `"per source"`   | Pick up a new tip for each source well in the transfer.<br>For liquid handling commands only. |
+| `"per destination"` | Pick up a new tip for each destination well in the transfer.<br>For liquid handling commands only. |
 
 `"once"` is the default behavior for all complex commands.
 
@@ -43,9 +43,9 @@ Conversely, `"never"` requires that the pipette has picked up a tip, or the API 
 
 One reason to set `new_tip="always"` is to avoid cross-contamination between wells. However, you should always do a dry run of your protocol to test that the pipette is picking up and dropping tips in the way that your application requires.
 
-[`transfer`][opentrons.protocol_api.InstrumentContext.transfer] and [`transfer_with_liquid_class`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] will pick up a new tip before *every* aspirate when `new_tip="always"`. This includes when [tip refilling][tip-refilling] requires multiple aspirations from a single source well.
+[`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] and [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] will pick up a new tip before *every* aspirate when `new_tip="always"`. This includes when [tip refilling][tip-refilling] requires multiple aspirations from a single source well.
 
-[`distribute`][opentrons.protocol_api.InstrumentContext.distribute] and [`consolidate`][opentrons.protocol_api.InstrumentContext.consolidate] only pick up one tip, even when `new_tip="always"`. For example, this `distribute()` command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL):
+[`distribute()`][opentrons.protocol_api.InstrumentContext.distribute] and [`consolidate()`][opentrons.protocol_api.InstrumentContext.consolidate] only pick up one tip, even when `new_tip="always"`. For example, this `distribute()` command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL):
 
 ```python
 pipette.distribute(
@@ -98,13 +98,13 @@ Mixing occurs before every aspiration, including when [tip refilling][tip-refill
 Liquid class definitions determine mix behavior in liquid class complex commands like `transfer_with_liquid_class()`. If mixing is enabled before an aspiration, the pipette will mix in place at the aspirate position. You can see position and other values in the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
 !!! note
-    [`consolidate`][opentrons.protocol_api.InstrumentContext.consolidate] ignores any value of `mix_before`. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
+    `consolidate()` ignores any value of `mix_before`. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
 
 ## Disposal Volume
 
-The `disposal_volume` parameter controls how much extra liquid is aspirated as part of a `distribute` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set `disposal_volume=0`.
+The `disposal_volume` parameter controls how much extra liquid is aspirated as part of a `distribute()` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set `disposal_volume=0`.
 
-By default, `disposal_volume` is the minimum volume of the pipette, but you can set it to any amount:
+By default, `disposal_volume` is the [minimum volume][api-load-names] of the pipette, but you can set it to any amount:
 
 ```python
 pipette.distribute(
@@ -133,9 +133,9 @@ The amount to dispense in the destination is 960 µL (120 µL for each of 8 well
 Liquid class definitions automatically include a disposal volume for liquid class commands like `distribute_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
 !!! note
-    [`transfer`][opentrons.protocol_api.InstrumentContext.transfer] will not aspirate additional liquid if you set `disposal_volume`. However, it will perform a very small blow out after each dispense.
+    `transfer()` will not aspirate additional liquid if you set `disposal_volume`. However, it will perform a very small blow out after each dispense.
    
-    [`consolidate`][opentrons.protocol_api.InstrumentContext.consolidate] ignores `disposal_volume` completely.
+    `consolidate()` ignores `disposal_volume` completely.
 
 ## Touch Tip {#touch-tip-complex}
 
@@ -161,7 +161,7 @@ This parameter always uses default motion behavior for touch tip. Use the [touch
 - Only touch the tip after aspirating or dispensing, but not both.
 - Control the speed, radius, or height of the touch tip motion.
 
-Liquid class definitions determine touch tip behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
+Liquid class definitions determine tip-touching behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
 ## Air Gap {#air-gap-complex}
 
@@ -262,7 +262,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 *New in version 2.0*
 
 !!! note
-    [`distribute`][opentrons.protocol_api.InstrumentContext.distribute] ignores any value of `mix_after`. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
+    `distribute()` ignores any value of `mix_after`. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
 
 ## Blow Out {#blow-out-complex}
 
@@ -272,11 +272,11 @@ A liquid class definition defines both parameters and blowout behavior for any l
 
 In a legacy complex command, the default blowout location is the trash. Blowout behavior is different for each command:
 
-| Method {width="25%"} | Blowout behavior and location |
-|-------------|------------------------------|
-| `transfer()` | Blow out after each dispense.<br>Valid locations: `"trash"`, `"source well"`, `"destination well"` |
-| `distribute()` | Blow out after the final dispense.<br>Valid locations: `"trash"`, `"source well"` |
-| `consolidate()` | Blow out after the only dispense.<br>Valid locations: `"trash"`, `"destination well"` |
+| Method {width="25%"} | Blowout behavior | Valid locations |
+|-------------|--------------------|-------------------|
+| `transfer()` | Blow out after each dispense. | `"trash"`, `"source well"`, `"destination well"` |
+| `distribute()` | Blow out after the final dispense. | `"trash"`, `"source well"` |
+| `consolidate()` | Blow out after the only dispense. | `"trash"`, `"destination well"` |
 
 For example, this `transfer()` command will blow out liquid in the trash twice, once after each dispense into a destination well:
 
@@ -367,7 +367,7 @@ pipette.transfer(
 
 *New in version 2.0*
 
-In a liquid class complex command, use the `trash_location` to drop tips in the trash container defined in your protocol.
+In a liquid class complex command, use the `trash_location` parameter to specify where to drop tips. This example uses the trash bin defined earlier in the protocol:
 
 ```python
 liquid_1 = protocol.get_liquid_class(name="ethanol_80")
