@@ -120,7 +120,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'createTimer':
     case 'waitForTasks':
       break
-    // setStoredLabware is handled in the python file while lading a labware on the stacker. no need to update state
+    // setStoredLabware is handled in the python file while adding a labware on the stacker. no need to update state
     case 'flexStacker/setStoredLabware':
       break
     // unsafe commands, no need to update state
