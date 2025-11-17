@@ -314,7 +314,13 @@ export function getLoadLabware(
               !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
           ).length
           // should I extract this to a function? all the logic will be the same
-          pythonFlexStackerSetStoredLabware = `${pythonName} = ${parentName}.set_stored_labware(${labware.def.parameters.loadName}, ${labware.def.namespace}, ${labware.def.version}, count=${labwareCount})`
+          const setStoredLabwareArgs = [
+            `loadName=${formatPyStr(labware.def.parameters.loadName)}`,
+            `namespace=${formatPyStr(namespace)}`,
+            `version=${labware.def.version}`,
+            `count=${labwareCount}`,
+          ].join(',\n')
+          pythonFlexStackerSetStoredLabware = `${pythonName} = ${parentName}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
         }
       } else {
         parentName = PROTOCOL_CONTEXT_NAME

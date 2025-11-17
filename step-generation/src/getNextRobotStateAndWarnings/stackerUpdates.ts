@@ -115,33 +115,38 @@ export const forFlexStackerRetrieve = (
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
     if (moduleState.shuttlePosition === 'retrieved') {
-      throw new Error(
+      console.error(
         'Cannot retrieve labware bc there is labware on the shuttle'
       )
+      return
     }
     if (moduleState.labwareIdsInStacker?.length === 0) {
-      throw new Error(
+      console.error(
         'Cannot retrieve labware bc there is no labware in the stacker'
       )
+      return
     }
-    if (moduleState.storedLabwareDetails?.primaryLabware == null)
-      throw new Error(
+    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
+      console.error(
         'Cannot retrieve labware bc there is no stored labware details or primary labware'
       )
+      return
+    }
     moduleState.shuttlePosition = 'retrieved'
   }
 
   const retrievedLabware = moduleState?.labwareIdsInStacker?.shift()
   if (retrievedLabware == null) {
-    throw new Error(
+    console.error(
       'Cannot retrieve labware bc there is no labware in the stacker'
     )
   }
   // make sure this is shuttle slot
   // create labware entity for retrieved labware
-  robotState.labware[retrievedLabware] = {
-    ...robotState.labware[retrievedLabware],
-    stack: robotState.labware[retrievedLabware]?.stack?.slice(0, -1) ?? [],
+  robotState.labware[retrievedLabware ?? ''] = {
+    ...robotState.labware[retrievedLabware ?? ''],
+    stack:
+      robotState.labware[retrievedLabware ?? '']?.stack?.slice(0, -1) ?? [],
   }
 }
 
@@ -155,25 +160,23 @@ export const forFlexStackerStore = (
   const moduleState = _getStackerModuleState(robotState, moduleId)
   if (moduleState != null) {
     if (moduleState.shuttlePosition === 'stored') {
-      throw new Error('Cannot store labware bc there is labware on the shuttle')
+      console.error('Cannot store labware bc there is labware on the shuttle')
     }
     // get module location
     const moduleLocation = robotState.modules[moduleId]?.slot
     if (moduleLocation == null) {
-      throw new Error('Cannot store labware bc there is no module location')
+      console.error('Cannot store labware bc there is no module location')
     }
     if (moduleState.storedLabwareDetails?.primaryLabware == null) {
-      throw new Error('Cannot store labware bc there is no labware stored')
+      console.error('Cannot store labware bc there is no labware stored')
     }
     if (
       (moduleState.labwareIdsInStacker?.length ?? 0) + 1 >
       moduleState.maxPoolCount
     ) {
-      throw new Error(
-        'Cannot store labware bc there is no space in the stacker'
-      )
+      console.error('Cannot store labware bc there is no space in the stacker')
     }
-    // get labware id on module from the move labware command
+    // TODO: use the labware id on the module from the move labware command
     const newLabwareId = uuid()
     const moduleOnSlot = robotState.modules[moduleId].slot
     // move labware should update the labware id on the shuttle
@@ -181,9 +184,7 @@ export const forFlexStackerStore = (
       ([_, labware]) => labware.stack.includes(moduleOnSlot)
     )?.[0]
     if (labwareToStore == null) {
-      throw new Error(
-        'Cannot store labware bc there is no labware on the module'
-      )
+      console.error('Cannot store labware bc there is no labware on the module')
     }
     moduleState.shuttlePosition = 'stored'
     moduleState.labwareIdsInStacker = [
