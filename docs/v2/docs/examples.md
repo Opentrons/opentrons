@@ -12,7 +12,8 @@ These sample protocols are designed for anyone using an Opentrons Flex or OT-2 l
 # This code uses named arguments
 tiprack_1 = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_200ul",
-    location="D2")
+    location="D2"
+)
 
 # This code uses positional arguments
 tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -27,7 +28,7 @@ Python developers with more experience should feel free to ignore the code styli
 The sample protocols all use the following pipettes:
 
 - Flex 1-Channel Pipette (5–1000 µL). The API load name for this pipette is `flex_1channel_1000`.
-- P300 Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is `p300_single_gen2`.
+- pipette Single-Channel GEN2 pipette for the OT-2. The API load name for this pipette is `p300_single_gen2`.
 
 They also use the labware listed below:
 
@@ -119,15 +120,18 @@ This protocol uses some [building block commands](building-block-commands/index.
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D2")
+            location="D2"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
     
         pipette.pick_up_tip()
         pipette.aspirate(100, plate["A1"])
@@ -144,26 +148,27 @@ This protocol uses some [building block commands](building-block-commands/index.
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
-                load_name="opentrons_96_tiprack_300ul",
-                location=2)
-        p300 = protocol.load_instrument(
-                instrument_name="p300_single",
-                mount="left",
-                tip_racks=[tiprack_1])
+            load_name="opentrons_96_tiprack_300ul",
+            location=2
+        )
+        pipette = protocol.load_instrument(
+            instrument_name="p300_single",
+            mount="left",
+            tip_racks=[tiprack_1]
+        )
     
-        p300.pick_up_tip()
-        p300.aspirate(100, plate["A1"])
-        p300.dispense(100, plate["B1"])
-        p300.drop_tip()
+        pipette.pick_up_tip()
+        pipette.aspirate(100, plate["A1"])
+        pipette.dispense(100, plate["B1"])
+        pipette.drop_tip()
     ```
 
 ### Advanced Method
 
-These protocols accomplish the same thing as the previous example, but a little more efficiently. Notice how they use the [`transfer`][opentrons.protocol_api.InstrumentContext.transfer] or [`transfer_with_liquid_class`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] methods to move liquid between well plates. Because each is a complex command, you don't need separate calls to `aspirate` or `dispense` here.
-
-Let's start with a basic complex command, using `transfer()`. The source and destination well arguments (e.g., `plate["A1"], plate["B1"]`) are part of `transfer()` method parameters.
+These protocols accomplish the same thing as the previous example, but a little more efficiently. Notice how they use the [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] or [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] methods to move liquid between well plates. Because each is a complex command, you don't need separate calls to `aspirate()` or `dispense()` here.
 
 === "Flex"
     ```python
@@ -174,17 +179,24 @@ Let's start with a basic complex command, using `transfer()`. The source and des
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D2")
+            location="D2"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
         # transfer 100 µL from well A1 to well B1
-        pipette.transfer(100, plate["A1"], plate["B1"])
+        pipette.transfer(
+            volume=100,
+            source=plate["A1"],
+            dest=plate["B1"]
+        )
     ```
 
 === "OT-2"
@@ -196,16 +208,23 @@ Let's start with a basic complex command, using `transfer()`. The source and des
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
-                load_name="opentrons_96_tiprack_300ul",
-                location=2)
-        p300 = protocol.load_instrument(
+            load_name="opentrons_96_tiprack_300ul",
+            location=2
+        )
+        pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
         # transfer 100 µL from well A1 to well B1
-        p300.transfer(100, plate["A1"], plate["B1"])
+        pipette.transfer(
+            volume=100,
+            source=plate["A1"],
+            dest=plate["B1"]
+        )
     ```
 
 When you use the liquid class command `transfer_with_liquid_class()`, you'll need to specify a `liquid_class` along with volume, source and destination, and trash parameters.
@@ -227,7 +246,7 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
             load_name="opentrons_flex_96_tiprack_200ul",
             location="C1"
         )
-        p1000 = protocol.load_instrument(
+        pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
             tip_racks=[tiprack_1]
@@ -235,12 +254,12 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
         liquid_1 = protocol.get_liquid_class("glycerol_50")
         trash = protocol.load_trash_bin("A3")
         # transfer 100 µL from well A1 to well B1
-        p1000.transfer_with_liquid_class(
+        pipette.transfer_with_liquid_class(
             liquid_class=liquid_1,
             volume=100,
             source=plate["A1"],
             dest=plate["B1"]
-            )
+        )
     ```
 
 ## Loops
@@ -258,24 +277,32 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D2")
+            location="D2"
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location="D3")
+            location="D3"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
         # distribute 20 µL from reservoir:A1 -> plate:row:1
         # distribute 20 µL from reservoir:A2 -> plate:row:2
         # etc...
         # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
-            pipette.distribute(20, reservoir.wells()[i], plate.rows()[i])
+            pipette.distribute(
+                volume=20,
+                source=reservoir.wells()[i],
+                dest=plate.rows()[i]
+            )
     ```
 
 === "OT-2"
@@ -287,23 +314,31 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=2)
+            location=2
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location=4)
-        p300 = protocol.load_instrument(
+            location=4
+        )
+        pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
         # distribute 20 µL from reservoir:A1 -> plate:row:1
         # distribute 20 µL from reservoir:A2 -> plate:row:2
         # etc...
         # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
-            p300.distribute(20, reservoir.wells()[i], plate.rows()[i])
+            pipette.distribute(
+                volume=20,
+                source=reservoir.wells()[i],
+                dest=plate.rows()[i]
+            )
     ```
 
 Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is exclusive of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
@@ -362,21 +397,21 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
             location=3)
-        p300 = protocol.load_instrument(
+        pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="left",
             tip_racks=[tiprack_1])
     
-        p300.pick_up_tip()
+        pipette.pick_up_tip()
     
         # aspirate from the first 5 wells
         for well in reservoir.wells()[:5]:
-            p300.aspirate(volume=35, location=well)
-            p300.air_gap(10)
+            pipette.aspirate(volume=35, location=well)
+            pipette.air_gap(10)
     
-        p300.dispense(225, plate["A1"])
+        pipette.dispense(225, plate["A1"])
     
-        p300.return_tip()
+        pipette.return_tip()
     ```
 
 Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is exclusive of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
@@ -446,12 +481,12 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
             location=4)
-        p300 = protocol.load_instrument(
+        pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
             tip_racks=[tiprack_1, tiprack_2])
         # Dispense diluent
-        p300.distribute(50, reservoir["A12"], plate.wells())
+        pipette.distribute(50, reservoir["A12"], plate.wells())
     
         # loop through each row
         for i in range(8):
@@ -460,10 +495,10 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             row = plate.rows()[i]
     
             # transfer 30 µL of source to first well in column
-            p300.transfer(30, source, row[0], mix_after=(3, 25))
+            pipette.transfer(30, source, row[0], mix_after=(3, 25))
     
             # dilute the sample down the column
-            p300.transfer(
+            pipette.transfer(
                 30, row[:11], row[1:],
                 mix_after=(3, 25))
     ```
@@ -537,7 +572,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
             location=4)
-        p300 = protocol.load_instrument(
+        pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="right",
             tip_racks=[tiprack_1, tiprack_2])
@@ -558,5 +593,5 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             89, 90, 91, 92, 93, 94, 95, 96
             ]
     
-        p300.distribute(water_volumes, reservoir["A12"], plate.wells())
+        pipette.distribute(water_volumes, reservoir["A12"], plate.wells())
     ```
