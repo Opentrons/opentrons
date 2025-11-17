@@ -14,7 +14,8 @@ To keep things as simple as possible, this use case only focuses on setting up a
 
 ## Dry Run Definition
 
-First, set up the dry run parameter. We want a simple yes/no choice for the technician running the protocol, so we'll use a Boolean parameter:
+First, we need to set up the dry run parameter. We want to set up a simple yes/no choice for the technician running the protocol, so we’ll use a Boolean parameter:
+
 ```python
 def add_parameters(parameters):
     parameters.add_bool(

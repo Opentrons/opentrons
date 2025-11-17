@@ -43,7 +43,7 @@ CSV parameters have their own [`CSVParameter`][opentrons.protocol_api.CSVParamet
 
 - [`CSVParameter.file`][opentrons.protocol_api.CSVParameter.file]: Provides a read-only [file handler object](https://docs.python.org/3/glossary.html#term-file-object) that points to your CSV data. You can pass this object to functions of the built-in [`csv`](https://docs.python.org/3/library/csv.html#module-csv) module, or to other modules you import, such as `pandas`.
 - [`CSVParameter.contents`][opentrons.protocol_api.CSVParameter.contents]: Returns the entire contents of the CSV file as a single string. You then need to parse the data yourself to extract the information you need.
-- [`CSVParameter.parse_as_csv()`][opentrons.protocol_api.CSVParameter.parse_as_csv]: Returns CSV data in a structured format—a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named `csv_data`, stores the parsed data as `parsed_csv`, and then accesses different portions of the data:
+- [`CSVParameter.parse_as_csv()`][opentrons.protocol_api.CSVParameter.parse_as_csv]: Returns CSV data in a structured format. Specifically, it is a list of lists of strings. This lets you access any "cell" of your tabular data by row and column index. This example parses a runtime parameter named `csv_data`, stores the parsed data as `parsed_csv`, and then accesses different portions of the data:
 
 ```python
 parsed_csv = protocol.params.csv_data.parse_as_csv()
@@ -84,7 +84,7 @@ Since `params` is only available within the `run()` function, there are certain 
 | Protocol description       | In the `metadata` dictionary.          |
 | Protocol author            | In the `metadata` dictionary.          |
 | Other runtime parameters   | In the `add_parameters()` function.    |
-| Non-nested function defs   | Anywhere outside of `run()`.           |
+| Non-nested function definitions   | Anywhere outside of `run()`.           |
 
 Additionally, keep in mind that updated parameter values are applied by reanalyzing the protocol. This means you can't depend on updated values for any action that takes place *prior to reanalysis*.
 

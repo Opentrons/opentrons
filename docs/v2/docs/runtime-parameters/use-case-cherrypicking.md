@@ -14,7 +14,7 @@ The destination labware and well order will remain fixed, to focus on using thes
 
 ## Preparing the CSV
 
-To get started, set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description:
+To get started, let's set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description:
 
 ```python
 def add_parameters(parameters):
@@ -44,7 +44,7 @@ Our protocol will use the information contained in the selected CSV for loading 
 
 ## Parsing the CSV
 
-We’ll use the Python API’s [`parse_as_csv`][opentrons.protocol_api.CSVParameter.parse_as_csv] method to allow easy access to different portions of the CSV data at different points in the protocol:
+We’ll use the Python API’s [`parse_as_csv()`][opentrons.protocol_api.CSVParameter.parse_as_csv] method to allow easy access to different portions of the CSV data at different points in the protocol:
 
 ```python
 def run(protocol):
@@ -137,7 +137,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 Now it's time to transfer liquid based on the data in each row of the CSV. 
 
-Slice off the header row of `well_data`. Each remaining row has the source slot, source well, and volume data that we can directly pass to `transfer()`. 
+Once again we’ll start by slicing off the header row of `well_data`. Each remaining row has the source slot, source well, and volume data that we can directly pass to `transfer()`. 
 
 We also need to specify the destination well. We want the destinations to proceed in order according to [`Labware.wells()`][opentrons.protocol_api.Labware.wells]. To track this all in a single loop, wrap the CSV data in an [`enumerate`](https://docs.python.org/3/library/functions.html#enumerate) object to provide an index that increments each time through the loop. All together, the transfer loop looks like this:
 
