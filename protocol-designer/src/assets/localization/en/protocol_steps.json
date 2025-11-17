@@ -173,6 +173,7 @@
   "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",
+  "start_point": "{{prefix}} start point",
   "starting_deck": "Starting deck",
   "step_substeps": "{{stepType}} details",
   "submerge": "Submerge",

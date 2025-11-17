@@ -147,6 +147,46 @@ class AspirateWhileTrackingImplementation(
             model_utils=self._model_utils,
             movement_delay=params.movement_delay,
         )
+        if isinstance(aspirate_result, DefinedErrorData):
+            if isinstance(aspirate_result.public, OverpressureError):
+                return DefinedErrorData(
+                    public=OverpressureError(
+                        id=aspirate_result.public.id,
+                        createdAt=aspirate_result.public.createdAt,
+                        wrappedErrors=aspirate_result.public.wrappedErrors,
+                        errorInfo=aspirate_result.public.errorInfo,
+                    ),
+                    state_update=aspirate_result.state_update.set_liquid_operated(
+                        labware_id=params.labwareId,
+                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                            params.labwareId,
+                            params.wellName,
+                            params.pipetteId,
+                        ),
+                        volume_added=CLEAR,
+                    ),
+                    state_update_if_false_positive=aspirate_result.state_update_if_false_positive,
+                )
+            elif isinstance(aspirate_result.public, StallOrCollisionError):
+                return DefinedErrorData(
+                    public=StallOrCollisionError(
+                        id=aspirate_result.public.id,
+                        createdAt=aspirate_result.public.createdAt,
+                        wrappedErrors=aspirate_result.public.wrappedErrors,
+                        errorInfo=aspirate_result.public.errorInfo,
+                    ),
+                    state_update=aspirate_result.state_update.set_liquid_operated(
+                        labware_id=params.labwareId,
+                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                            params.labwareId,
+                            params.wellName,
+                            params.pipetteId,
+                        ),
+                        volume_added=CLEAR,
+                    ),
+                    state_update_if_false_positive=aspirate_result.state_update_if_false_positive,
+                )
+
         position_after_aspirate = await self._gantry_mover.get_position(
             params.pipetteId
         )
@@ -155,21 +195,6 @@ class AspirateWhileTrackingImplementation(
             y=position_after_aspirate.y,
             z=position_after_aspirate.z,
         )
-        if isinstance(aspirate_result, DefinedErrorData):
-            return DefinedErrorData(
-                public=aspirate_result.public,
-                state_update=aspirate_result.state_update.set_liquid_operated(
-                    labware_id=params.labwareId,
-                    well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-                        params.labwareId,
-                        params.wellName,
-                        params.pipetteId,
-                    ),
-                    volume_added=CLEAR,
-                ),
-                state_update_if_false_positive=aspirate_result.state_update_if_false_positive,
-            )
-
         return SuccessData(
             public=AspirateWhileTrackingResult(
                 volume=aspirate_result.public.volume,

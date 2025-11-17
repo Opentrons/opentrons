@@ -428,7 +428,7 @@ export function ProtocolRunSetup({
         completeText: t('camera_enabled'),
         incompleteText: t('check_preferences'),
         incompleteElement: null,
-        disabledHardware: !cameraEnabled,
+        disabledHardware: !cameraEnabled && isCameraRequired,
         missingHardware: !!storageInfo?.isImageStorageLow,
         missingHardwareText: t('check_preferences'),
       },

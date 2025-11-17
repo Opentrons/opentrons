@@ -1,4 +1,3 @@
-import type { OutputSelector } from 'reselect'
 import type { FC } from 'react'
 import type {
   HEATERSHAKER_MODULE_TYPE,
@@ -34,7 +33,6 @@ export interface BaseState {
 }
 export type GetState = () => BaseState
 export type Selector<T> = (arg: BaseState) => T
-export type MemoizedSelector<T> = OutputSelector<BaseState, void, T>
 // eslint-disable-next-line no-use-before-define
 export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
 

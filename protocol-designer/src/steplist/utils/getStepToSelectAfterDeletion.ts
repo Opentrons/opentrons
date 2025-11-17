@@ -1,3 +1,6 @@
+import { getStepVisibilities } from './getStepVisibilities'
+import { convertStepHierarchyToArray } from './stepHierarchy'
+
 import type { StepIdType } from '/protocol-designer/form-types'
 import type { StepHierarchy } from './stepHierarchy'
 
@@ -16,59 +19,24 @@ export function getStepToSelectAfterDeletion(
   originalStepHierarchy: StepHierarchy,
   stepsToDelete: Set<StepIdType>
 ): StepIdType | null {
-  const flatSteps = getFlatSteps(originalStepHierarchy)
-  const highestDeletedIndex = flatSteps.findLastIndex(value =>
-    stepsToDelete.has(value.stepId)
+  const flatStepIds = convertStepHierarchyToArray(originalStepHierarchy)
+  const visibilities = getStepVisibilities(originalStepHierarchy)
+  const highestDeletedIndex = flatStepIds.findLastIndex(stepId =>
+    stepsToDelete.has(stepId)
   )
   if (highestDeletedIndex === -1) {
     return null
   }
 
-  const stepIsSelectable = (step: Step): boolean =>
-    step.isVisibleToUser && !stepsToDelete.has(step.stepId)
+  const stepIsSelectable = (stepId: StepIdType): boolean =>
+    visibilities[stepId].isVisibleToUser && !stepsToDelete.has(stepId)
 
-  const nextSelectable = flatSteps
+  const nextSelectableId = flatStepIds
     .slice(highestDeletedIndex + 1)
     .find(stepIsSelectable)
-  const prevSelectable = flatSteps
+  const prevSelectableId = flatStepIds
     .slice(0, highestDeletedIndex)
     .findLast(stepIsSelectable)
 
-  return nextSelectable?.stepId ?? prevSelectable?.stepId ?? null
-}
-
-interface Step {
-  stepId: StepIdType
-  /**
-   * Thermocycler profiles have an implicit "wait for profile to complete" step at the
-   * end, not shown in the UI. This is `false` for steps like that. See `StepHierarchy`.
-   */
-  isVisibleToUser: boolean
-}
-
-function getFlatSteps(stepHierarchy: StepHierarchy): Step[] {
-  const getStepsContainedInTopLevelItem = (
-    topLevelItem: StepHierarchy['topLevelItems'][number]
-  ): Step[] => {
-    switch (topLevelItem.type) {
-      case 'standaloneStep':
-        return [{ stepId: topLevelItem.stepId, isVisibleToUser: true }]
-      case 'thermocyclerProfileGroup':
-        return [
-          {
-            stepId: topLevelItem.thermocyclerProfileStepId,
-            isVisibleToUser: true,
-          },
-          ...topLevelItem.concurrentSteps.map(step => ({
-            stepId: step.stepId,
-            isVisibleToUser: true,
-          })),
-          {
-            stepId: topLevelItem.waitForThermocyclerProfileStepId,
-            isVisibleToUser: false,
-          },
-        ]
-    }
-  }
-  return stepHierarchy.topLevelItems.flatMap(getStepsContainedInTopLevelItem)
+  return nextSelectableId ?? prevSelectableId ?? null
 }

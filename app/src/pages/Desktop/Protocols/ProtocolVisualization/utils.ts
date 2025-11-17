@@ -22,6 +22,8 @@ import {
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
+import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
+
 import type { ComponentProps } from 'react'
 import type { Module, WellGroup } from '@opentrons/components'
 import type {
@@ -41,6 +43,8 @@ import type {
   ModuleTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -159,27 +163,6 @@ export const getMissingTips = (
     : null
 
   return missingTips
-}
-
-export const getBackgroundColor = (
-  hoveredSlot: string | null,
-  selectedSlot: string | null,
-  slot: string,
-  isSlotSelected: boolean
-): string => {
-  let backgroundColor = COLORS.grey50
-  if (hoveredSlot === slot && isSlotSelected) {
-    backgroundColor = COLORS.purple60
-  } else if (hoveredSlot === slot && !isSlotSelected) {
-    backgroundColor = COLORS.grey60
-  } else if (selectedSlot === slot && isSlotSelected) {
-    backgroundColor = COLORS.purple60
-  } else if (selectedSlot === slot && !isSlotSelected) {
-    backgroundColor = COLORS.grey60
-  } else if (isSlotSelected) {
-    backgroundColor = COLORS.purple50
-  }
-  return backgroundColor
 }
 
 interface ActiveLayer {
@@ -361,4 +344,45 @@ export const getModuleInnerProps = (
       targetTemp: moduleState.targetTemp,
     }
   }
+}
+
+// TODO: the dropTipInPlace, airGapInplace, and
+// blowoutInPlace commands don't have
+// any knowledge of where its dropping. would be
+// nice to expand the results key to include the
+// addressable area name
+export const getIsPipetteOverTrash = (
+  pipettes: RobotState['pipettes'],
+  id: string,
+  selectedRunTimeCommand?: RunTimeCommand
+): boolean =>
+  Object.values(pipettes).some(pipette => pipette.entityId === id) &&
+  selectedRunTimeCommand != null &&
+  POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
+
+export const getFixtureSummaryInfo = (
+  pipettes: RobotState['pipettes'],
+  entities: TrashBinEntities | WasteChuteEntities,
+  selectedRunTimeCommand?: RunTimeCommand
+): {
+  isPipetteOverTrash: boolean
+  trashLikeEntityCutoutId: CutoutId | null
+} => {
+  const pipetteCurrentTrashId = Object.values(pipettes).find(
+    pipette => pipette.entityId != null && entities[pipette.entityId] != null
+  )?.entityId
+  const isPipetteOverTrash =
+    pipetteCurrentTrashId != null
+      ? getIsPipetteOverTrash(
+          pipettes,
+          pipetteCurrentTrashId,
+          selectedRunTimeCommand
+        )
+      : false
+  const trashLikeEntityCutoutId =
+    pipetteCurrentTrashId != null
+      ? (entities[pipetteCurrentTrashId].location as CutoutId)
+      : null
+
+  return { isPipetteOverTrash, trashLikeEntityCutoutId }
 }
