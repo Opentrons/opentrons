@@ -1,6 +1,12 @@
 import clsx from 'clsx'
 
 import { PlaceholderStyledText } from '../../atoms'
+import {
+  WASTE_CHUTE_HEIGHT,
+  WASTE_CHUTE_WIDTH,
+  WASTE_CHUTE_X,
+  WASTE_CHUTE_Y,
+} from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import { DeckLabelSet } from '../../organisms'
@@ -16,10 +22,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { DeckLabelProps } from '../../molecules'
 
-export const WASTE_CHUTE_WIDTH = 130
-export const WASTE_CHUTE_HEIGHT = 138
-export const WASTE_CHUTE_X = 322
-export const WASTE_CHUTE_Y = -51
 const TAG_HEIGHT = 28
 interface WasteChuteFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: typeof WASTE_CHUTE_CUTOUT

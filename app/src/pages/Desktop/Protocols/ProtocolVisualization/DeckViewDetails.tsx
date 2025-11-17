@@ -59,14 +59,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     moduleEntities,
     robotType
   )
-  const { isPipetteOverTrash, trashCutoutId } = getFixtureSummaryInfo(
-    pipettes,
-    trashBinEntities,
-    selectedRunTimeCommand
-  )
+  const {
+    isPipetteOverTrash: isPipetteOverTrashBin,
+    trashLikeEntityCutoutId: trashCutoutId,
+  } = getFixtureSummaryInfo(pipettes, trashBinEntities, selectedRunTimeCommand)
   const {
     isPipetteOverTrash: isPipetteOverWasteChute,
-    trashCutoutId: wasteChuteCutoutId,
+    trashLikeEntityCutoutId: wasteChuteCutoutId,
   } = getFixtureSummaryInfo(
     pipettes,
     wasteChuteEntities,
@@ -114,7 +113,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         selectedRunTimeCommand={selectedRunTimeCommand}
       />
       {/* when commandSummary happens on a trash bin */}
-      {isPipetteOverTrash &&
+      {isPipetteOverTrashBin &&
       selectedRunTimeCommand != null &&
       trashCutoutId != null ? (
         robotType === FLEX_ROBOT_TYPE ? (

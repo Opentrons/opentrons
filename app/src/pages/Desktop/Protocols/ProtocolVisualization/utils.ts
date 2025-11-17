@@ -364,7 +364,10 @@ export const getFixtureSummaryInfo = (
   pipettes: RobotState['pipettes'],
   entities: TrashBinEntities | WasteChuteEntities,
   selectedRunTimeCommand?: RunTimeCommand
-): { isPipetteOverTrash: boolean; trashCutoutId: CutoutId | null } => {
+): {
+  isPipetteOverTrash: boolean
+  trashLikeEntityCutoutId: CutoutId | null
+} => {
   const pipetteCurrentTrashId = Object.values(pipettes).find(
     pipette => pipette.entityId != null && entities[pipette.entityId] != null
   )?.entityId
@@ -376,10 +379,10 @@ export const getFixtureSummaryInfo = (
           selectedRunTimeCommand
         )
       : false
-  const trashCutoutId =
+  const trashLikeEntityCutoutId =
     pipetteCurrentTrashId != null
       ? (entities[pipetteCurrentTrashId].location as CutoutId)
       : null
 
-  return { isPipetteOverTrash, trashCutoutId }
+  return { isPipetteOverTrash, trashLikeEntityCutoutId }
 }

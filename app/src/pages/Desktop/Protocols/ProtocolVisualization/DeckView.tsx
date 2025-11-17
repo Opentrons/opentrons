@@ -93,7 +93,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
-  const { labware, modules } = robotState
+  const { labware, modules, pipettes } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -210,7 +210,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   {Object.values(trashBinEntities).length > 0
                     ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
                         const isPipetteOverTrash = getIsPipetteOverTrash(
-                          robotState.pipettes,
+                          pipettes,
                           id,
                           selectedRunTimeCommand
                         )
@@ -240,7 +240,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                     : null}
                   {Object.values(wasteChuteEntities).map(({ id, location }) => {
                     const isPipetteOverTrash = getIsPipetteOverTrash(
-                      robotState.pipettes,
+                      pipettes,
                       id,
                       selectedRunTimeCommand
                     )
