@@ -1291,6 +1291,19 @@ class StorageLimitReachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
 
 
+class FileNameInvalidError(ProtocolEngineError):
+    """Raised to indicate that a file cannot be saved with a given name."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an FileNameInvalidError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, detail, wrapping)
+
+
 class LiquidClassDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a liquid class that has not been loaded."""
 

@@ -1,0 +1,251 @@
+{
+  "protocol-schema": "1.0.0",
+  "metadata": {
+    "protocol-name": "untitled",
+    "author": "",
+    "description": "",
+    "created": 1548866232717,
+    "last-modified": 1548866314527,
+    "category": null,
+    "subcategory": null,
+    "tags": []
+  },
+  "default-values": {
+    "aspirate-flow-rate": {
+      "p10_single": 5,
+      "p10_multi": 5,
+      "p50_single": 25,
+      "p50_multi": 25,
+      "p300_single": 150,
+      "p300_multi": 150,
+      "p1000_single": 500
+    },
+    "dispense-flow-rate": {
+      "p10_single": 10,
+      "p10_multi": 10,
+      "p50_single": 50,
+      "p50_multi": 50,
+      "p300_single": 300,
+      "p300_multi": 300,
+      "p1000_single": 1000
+    },
+    "aspirate-mm-from-bottom": 1,
+    "dispense-mm-from-bottom": 0.5,
+    "touch-tip-mm-from-top": -1
+  },
+  "designer-application": {
+    "application-name": "opentrons/protocol-designer",
+    "application-version": "v3.6.5-39-g2b33196",
+    "_internalAppBuildDate": "Thu, 24 Jan 2019 22:09:43 GMT",
+    "data": {
+      "pipetteTiprackAssignments": {
+        "4b9021f0-24ad-11e9-b5a2-230c139b5f05": "tiprack-10ul"
+      },
+      "dismissedWarnings": {
+        "form": {},
+        "timeline": {}
+      },
+      "ingredients": {
+        "0": {
+          "name": "buffer",
+          "description": null,
+          "serialize": false,
+          "liquidGroupId": "0"
+        }
+      },
+      "ingredLocations": {
+        "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat": {
+          "A1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "A2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "B2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "C2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "D2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "E2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "F2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "G2": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H1": {
+            "0": {
+              "volume": 200
+            }
+          },
+          "H2": {
+            "0": {
+              "volume": 200
+            }
+          }
+        }
+      },
+      "savedStepForms": {
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "stepType": "manualIntervention",
+          "id": "__INITIAL_DECK_SETUP_STEP__",
+          "labwareLocationUpdate": {
+            "trashId": "12",
+            "4b90e540-24ad-11e9-b5a2-230c139b5f05:tiprack-10ul": "1",
+            "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat": "7"
+          },
+          "pipetteLocationUpdate": {
+            "4b9021f0-24ad-11e9-b5a2-230c139b5f05": "left"
+          }
+        },
+        "61397b50-24ad-11e9-b5a2-230c139b5f05": {
+          "id": "61397b50-24ad-11e9-b5a2-230c139b5f05",
+          "stepType": "transfer",
+          "stepName": "Transfer",
+          "stepDetails": "",
+          "aspirate_changeTip": "always",
+          "aspirate_labware": "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat",
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_mmFromBottom": null,
+          "aspirate_wells": ["A1"],
+          "dispense_labware": "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat",
+          "dispense_wellOrder_first": "t2b",
+          "dispense_wellOrder_second": "l2r",
+          "dispense_mmFromBottom": null,
+          "dispense_blowout_checkbox": false,
+          "dispense_blowout_location": "trashId",
+          "dispense_wells": ["A8"],
+          "pipette": "4b9021f0-24ad-11e9-b5a2-230c139b5f05",
+          "volume": "6",
+          "aspirate_touchTipMmFromBottom": null,
+          "dispense_touchTipMmFromBottom": null
+        }
+      },
+      "orderedStepIds": ["61397b50-24ad-11e9-b5a2-230c139b5f05"]
+    }
+  },
+  "robot": {
+    "model": "OT-2 Standard"
+  },
+  "pipettes": {
+    "4b9021f0-24ad-11e9-b5a2-230c139b5f05": {
+      "mount": "left",
+      "model": "p10_single_v1.3",
+      "name": "p10_single"
+    }
+  },
+  "labware": {
+    "trashId": {
+      "slot": "12",
+      "display-name": "Trash",
+      "model": "fixed-trash"
+    },
+    "4b90e540-24ad-11e9-b5a2-230c139b5f05:tiprack-10ul": {
+      "slot": "1",
+      "display-name": "Tiprack 10 Ul (1)",
+      "model": "tiprack-10ul"
+    },
+    "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat": {
+      "slot": "7",
+      "display-name": "Buffer Plate",
+      "model": "96-flat"
+    }
+  },
+  "procedure": [
+    {
+      "annotation": {
+        "name": "TODO Name 0",
+        "description": "todo description"
+      },
+      "subprocedure": [
+        {
+          "command": "pick-up-tip",
+          "params": {
+            "pipette": "4b9021f0-24ad-11e9-b5a2-230c139b5f05",
+            "labware": "4b90e540-24ad-11e9-b5a2-230c139b5f05:tiprack-10ul",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "4b9021f0-24ad-11e9-b5a2-230c139b5f05",
+            "volume": 6,
+            "labware": "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat",
+            "well": "A1"
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "4b9021f0-24ad-11e9-b5a2-230c139b5f05",
+            "volume": 6,
+            "labware": "565f0240-24ad-11e9-b5a2-230c139b5f05:96-flat",
+            "well": "A8"
+          }
+        },
+        {
+          "command": "drop-tip",
+          "params": {
+            "pipette": "4b9021f0-24ad-11e9-b5a2-230c139b5f05",
+            "labware": "trashId",
+            "well": "A1"
+          }
+        }
+      ]
+    }
+  ]
+}

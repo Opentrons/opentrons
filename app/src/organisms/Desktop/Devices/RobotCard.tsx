@@ -20,7 +20,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  useCamera,
   useInstrumentsQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -37,6 +36,7 @@ import { InstrumentContainer } from '/app/atoms/InstrumentContainer'
 import { ModuleIcon } from '/app/molecules/ModuleIcon'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
@@ -51,6 +51,8 @@ import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
+
+const CAMERA_REFETCH_MS = 5000
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -119,7 +121,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               <AttachedInstruments robotName={robotName} />
               <Flex
                 gridGap={SPACING.spacing4}
-                flexWrap={WRAP}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <AttachedModules robotName={robotName} />
@@ -151,12 +152,12 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      width="85px"
+      width="100%"
     >
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('modules')}
       </StyledText>
-      <Flex flexWrap={WRAP}>
+      <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
             key={`${String(module.moduleModel)}_${i}_${robotName}`}
@@ -174,7 +175,8 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data } = useCamera()
+  const { data } = useNotifyCamera({ refetchInterval: CAMERA_REFETCH_MS })
+
   return data?.cameraEnabled ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -186,7 +188,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
       </StyledText>
       <Icon
         key={`${String('camera')}_${robotName}`}
-        name="photo-camera"
+        name="camera"
         color={COLORS.grey50}
         size={SPACING.spacing16}
       ></Icon>
@@ -218,12 +220,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const leftAndRightMountsPipetteDisplayName = null
 
   return (
-    <Flex
-      flex="1"
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      minWidth="24rem"
-    >
+    <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {i18n.format(t('shared:instruments'), 'capitalize')}
       </StyledText>

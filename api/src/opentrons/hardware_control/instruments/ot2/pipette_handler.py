@@ -268,6 +268,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             }
             result["shaft_ul_per_mm"] = instr.config.shaft_ul_per_mm
             result["volume_mode"] = instr.liquid_class_name
+            result["available_volume_modes"] = instr.config.liquid_properties
         return cast(PipetteDict, result)
 
     @property

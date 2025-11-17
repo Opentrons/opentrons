@@ -24,6 +24,7 @@ vi.mock(
   '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 )
 vi.mock('/app/resources/health/useIsImageStorageLow')
+vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 
@@ -73,7 +74,7 @@ describe('SetupCamera', () => {
 
     screen.getByText('Camera Status')
     screen.getByText(
-      'The deck camera provides live video during protocol runs, allows manual or automated image capture of the deck, and records images automatically when errors occur for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
     )
   })
 
@@ -98,7 +99,9 @@ describe('SetupCamera', () => {
   it('does not render camera required notification when camera is enabled', () => {
     render(mockProps)
 
-    expect(screen.queryByText('Camera is required.')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Camera is required to run this protocol.')
+    ).not.toBeInTheDocument()
   })
 
   it('renders camera required notification when camera is disabled', () => {
@@ -110,8 +113,8 @@ describe('SetupCamera', () => {
 
     render(mockProps)
 
-    screen.getByText('Camera is required.')
-    screen.getByText('Enable the camera to run this protocol.')
+    screen.getByText('Camera is required to run this protocol.')
+    screen.getByText('Enable the camera to start the run.')
   })
 
   it('does not render SetupRunCameraUsage when camera is disabled', () => {

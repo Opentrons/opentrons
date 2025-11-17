@@ -22,10 +22,10 @@ import {
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
-import type { WellGroup } from '@opentrons/components'
+import type { ComponentProps } from 'react'
+import type { Module, WellGroup } from '@opentrons/components'
 import type {
   AddressableAreaName,
-  CoordinateTuple,
   CutoutId,
   LabwareDefinition2,
   Liquid,
@@ -38,68 +38,18 @@ import type {
   DeckSlot,
   LabwareTemporalProperties,
   ModuleEntities,
+  ModuleTemporalProperties,
   RobotState,
   SingleLabwareLiquidState,
 } from '@opentrons/step-generation'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
-interface HoverDimensions {
-  width: number
-  height: number
-  x: number
-  y: number
-}
 interface LiquidDetailInfo {
   totalVolume: number
   color: string
   displayName: string
 }
 type WellContentsByLabware = Record<string, ContentsByWell>
-
-const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
-
-export const getFlexHoverDimensions = (
-  stagingAreaLocations: string[],
-  cutoutId: CutoutId,
-  slotId: string,
-  hasTCOnSlot: boolean,
-  slotPosition: CoordinateTuple
-): HoverDimensions => {
-  const hasStagingArea = stagingAreaLocations.includes(cutoutId)
-
-  const X_ADJUSTMENT_LEFT_SIDE = -101.5
-  const X_ADJUSTMENT = -17
-  const X_DIMENSION_MIDDLE_SLOTS = 160.3
-  const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
-  const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
-  const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
-
-  const slotFromCutout = slotId
-  const isLeftSideofDeck =
-    slotFromCutout === 'A1' ||
-    slotFromCutout === 'B1' ||
-    slotFromCutout === 'C1' ||
-    slotFromCutout === 'D1'
-  const xAdjustment = isLeftSideofDeck ? X_ADJUSTMENT_LEFT_SIDE : X_ADJUSTMENT
-  const xSlotPosition = slotPosition[0] + xAdjustment
-
-  const yAdjustment = -10
-  const ySlotPosition = slotPosition[1] + yAdjustment
-
-  const isMiddleOfDeck =
-    slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
-
-  let xDimension = X_DIMENSION_OUTER_SLOTS
-  if (isMiddleOfDeck) {
-    xDimension = X_DIMENSION_MIDDLE_SLOTS
-  } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
-    xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
-  }
-  const x = xSlotPosition
-  const y = ySlotPosition
-
-  return { width: xDimension, height: Y_DIMENSION, x, y }
-}
 
 export const getStagingAreaAddressableAreas = (
   cutoutIds: CutoutId[],
@@ -131,7 +81,6 @@ export const getSlotIsEmpty = (
       return slot.includes(moduleTemporalProperties.slot)
     }
   )
-
   const labwareInSlot = values(robotState.labware).filter(
     labwareTemporalProperties =>
       getSlotInLocationStack(labwareTemporalProperties.stack) === slot
@@ -362,5 +311,54 @@ export const getThermocyclerOverlayText = (
     default:
       //  TODO: the rest of the copy isn't needed for protocol viz user testing purposes
       return 'Changing thermocycler state'
+  }
+}
+
+export const getIsCutoutA1Active = (
+  labware: RobotState['labware'],
+  modules: RobotState['modules'],
+  cutoutId: CutoutId,
+  selectedRunTimeCommand?: RunTimeCommand
+): boolean => {
+  const labwareOnB1 = Object.entries(labware).find(
+    ([_, lw]) => getSlotInLocationStack(lw.stack) === 'B1'
+  )
+  const hasThermocycler = Object.values(modules).some(
+    module => module.moduleState.type === THERMOCYCLER_MODULE_TYPE
+  )
+
+  const { isActiveLayerVisible: isThermocyclerActive } =
+    labwareOnB1 != null
+      ? getActiveLayer(labwareOnB1[0], selectedRunTimeCommand)
+      : { isActiveLayerVisible: false }
+
+  return isThermocyclerActive && hasThermocycler && cutoutId === 'cutoutA1'
+}
+
+export const getModuleInnerProps = (
+  moduleState: ModuleTemporalProperties['moduleState']
+): ComponentProps<typeof Module>['innerProps'] => {
+  if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+    let lidMotorState = 'unknown'
+    if (moduleState.lidOpen) {
+      lidMotorState = 'open'
+    } else if (moduleState.lidOpen === false) {
+      lidMotorState = 'closed'
+    }
+    return {
+      lidMotorState,
+      blockTargetTemp: moduleState.blockTargetTemp,
+    }
+  } else if (
+    'targetTemperature' in moduleState &&
+    moduleState.type === 'temperatureModuleType'
+  ) {
+    return {
+      targetTemperature: moduleState.targetTemperature,
+    }
+  } else if ('targetTemp' in moduleState) {
+    return {
+      targetTemp: moduleState.targetTemp,
+    }
   }
 }

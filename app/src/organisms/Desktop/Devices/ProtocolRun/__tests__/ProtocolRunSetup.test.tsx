@@ -17,6 +17,7 @@ import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
+  getCameraUsageState,
   getMissingSetupSteps,
   selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -113,6 +114,11 @@ describe('ProtocolRunSetup', () => {
       .thenReturn([])
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
+    })
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
     })
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)

@@ -27,8 +27,6 @@ vi.mock('/app/resources/instruments')
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
   []
 
-const mockUpdateRobotStatus = vi.fn()
-
 const render = () => {
   return renderWithProviders(
     <RobotSettingsTipLengthCalibration
@@ -36,7 +34,7 @@ const render = () => {
         mockFormattedPipetteOffsetCalibrations
       }
       robotName="otie"
-      updateRobotStatus={mockUpdateRobotStatus}
+      isRobotBusy={false}
     />,
     {
       i18nInstance: i18n,

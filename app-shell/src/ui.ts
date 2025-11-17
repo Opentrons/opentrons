@@ -24,6 +24,7 @@ const WINDOW_OPTS = {
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
+  minHeight: config.minHeight,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
@@ -43,14 +44,18 @@ const WINDOW_OPTS = {
 export function createUi(): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
-  const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
-    'ready-to-show',
-    () => {
-      log.debug('Main window ready to show')
-      mainWindow.show()
-      mainWindow.webContents.send('window-type', 'desktop-main')
-    }
-  )
+  const mainWindow = new BrowserWindow(WINDOW_OPTS)
+
+  mainWindow.once('ready-to-show', () => {
+    log.debug('Main window ready to show')
+    mainWindow.show()
+    mainWindow.webContents.send('window-type', 'desktop-main')
+  })
+
+  // For hard app refreshes.
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('window-type', 'desktop-main')
+  })
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
