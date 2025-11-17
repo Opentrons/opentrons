@@ -123,6 +123,7 @@
   "software_manual": "Software manual",
   "source_well": "Source well",
   "stagingArea": "Staging area",
+  "start_point": "Edit {{prefix}} start point",
   "step_count": "Step {{current}}",
   "step": "Step {{current}} / {{max}}",
   "swap_view": "Swap view",

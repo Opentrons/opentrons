@@ -99,7 +99,9 @@ describe('SetupCamera', () => {
   it('does not render camera required notification when camera is enabled', () => {
     render(mockProps)
 
-    expect(screen.queryByText('Camera is required.')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Camera is required to run this protocol.')
+    ).not.toBeInTheDocument()
   })
 
   it('renders camera required notification when camera is disabled', () => {
@@ -111,7 +113,7 @@ describe('SetupCamera', () => {
 
     render(mockProps)
 
-    screen.getByText('Camera is required.')
+    screen.getByText('Camera is required to run this protocol.')
     screen.getByText('Enable the camera to start the run.')
   })
 

@@ -186,7 +186,6 @@
 
 .deck_view_padding {
   height: 100%;
-  padding: 0 var(--spacing-12);
 }
 
 .align_deck_modules {
