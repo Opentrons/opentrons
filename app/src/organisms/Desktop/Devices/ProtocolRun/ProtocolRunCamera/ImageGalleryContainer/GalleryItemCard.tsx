@@ -72,7 +72,15 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
   }
   const isSkeleton = imagePath == null || isLoading
   const isCurrentCmdError = currentCommand?.error != null
-  const state = isSkeleton ? 'loading' : isCurrentCmdError ? 'error' : null
+  const state = (): 'loading' | 'error' | null => {
+    if (isSkeleton) {
+      return 'loading'
+    } else if (isCurrentCmdError) {
+      return 'error'
+    } else {
+      return null
+    }
+  }
   const stepCommandText = t('step_command', {
     step: buildStepText(),
     command: currentCommandString,
@@ -122,7 +130,7 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       centerPrimaryText={stepCommandText}
       centerSecondaryText={previousCommandString}
       rightPrimaryText={timestamp}
-      state={state}
+      state={state()}
       overflowMenu={true}
       overflowMenuActions={actions}
       hoverText={t('view_image')}

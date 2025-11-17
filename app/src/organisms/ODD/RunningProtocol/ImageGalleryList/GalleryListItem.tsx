@@ -37,7 +37,15 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
   const isSkeleton = imagePath == null || isLoading
   const isCurrentCmdError = currentCommand?.error != null
 
-  const state = isSkeleton ? 'loading' : isCurrentCmdError ? 'error' : null
+  const state = (): 'loading' | 'error' | null => {
+    if (isSkeleton) {
+      return 'loading'
+    } else if (isCurrentCmdError) {
+      return 'error'
+    } else {
+      return null
+    }
+  }
 
   const { commandStep, totalSteps } = useCommandStepNumbers({
     currentCommand,
@@ -67,7 +75,7 @@ export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
         })
       }}
       rightButtonText={t('view_image')}
-      state={state}
+      state={state()}
     />
   )
 }
