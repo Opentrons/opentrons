@@ -18,7 +18,7 @@ Depending on the [type of parameter][types-of-parameters], you'll need to specif
             <td><code>variable_name</code></td>
             <td>
                 <ul>
-                    <li>A unique name for <a href="using-values.md">referencing the parameter value</a> elsewhere in the protocol.</li>
+                    <li>A unique name for <a href="../using-values/">referencing the parameter value</a> elsewhere in the protocol.</li>
                     <li>Must meet the usual requirements for <a href="https://docs.python.org/3/reference/lexical_analysis.html#identifiers">naming objects in Python</a>.</li>
                 </ul>
             </td>
@@ -36,8 +36,7 @@ Depending on the [type of parameter][types-of-parameters], you'll need to specif
             <td><code>description</code></td>
             <td>
                 <ul>
-                    <li>An optional longer explanation of what the parameter does.</li>
-                    <li>How its values will affect the execution of the protocol.</li>
+                    <li>An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.</li>
                     <li>Maximum 100 characters.</li>
                 </ul>
             </td>
@@ -73,7 +72,7 @@ Depending on the [type of parameter][types-of-parameters], you'll need to specif
             </td>
         </tr>
         <tr>
-            <td><code>units</code></td>
+            <td><code>unit</code></td>
             <td>
                 <ul>
                     <li>Optional, for numeric parameters with <code>minimum</code> and <code>maximum</code> only.</li>
@@ -94,13 +93,12 @@ The examples on this page assume the following definition, which uses the argume
 
 ```python
 def add_parameters(parameters: protocol_api.ParameterContext):
-    # parameter definitions go here
 ```
 Within this function definition, call methods on `parameters` to define parameters. Each type of parameter has its own method.
 
 ## Types of Parameters
 
-The API supports four types of parameters that correspond to Python built-in types: Boolean ([`bool`](https://docs.python.org/3/library/functions.html#bool)), integer ([`int`](https://docs.python.org/3/library/functions.html#int)), floating point number ([`float`](https://docs.python.org/3/library/functions.html#float)), and string ([`str`](https://docs.python.org/3/library/stdtypes.html#str). It is not possible to mix types within a single parameter.
+The API supports four types of parameters that correspond to Python built-in types: Boolean ([`bool`](https://docs.python.org/3/library/functions.html#bool)), integer ([`int`](https://docs.python.org/3/library/functions.html#int)), floating point number ([`float`](https://docs.python.org/3/library/functions.html#float)), and string ([`str`](https://docs.python.org/3/library/stdtypes.html#str)). It is not possible to mix types within a single parameter.
 
 Starting in version 2.20, the API supports CSV files as parameters. All data contained in CSV parameters, including numeric data, is initially interpreted as strings. See [Manipulating CSV Data][manipulating-csv-data] for more information.
 
@@ -115,9 +113,9 @@ parameters.add_bool(
 )
 ```
 
-*New in version 2.18.*
-
 During run setup, the technician can toggle between the two values. In the Opentrons App, Boolean parameters appear as a toggle switch. On the touchscreen, they appear as *On* or *Off*, for `True` and `False` respectively.
+
+*New in version 2.18.*
 
 ### Integer Parameters
 Integer parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't create an open-ended prompt that accepts any integer.

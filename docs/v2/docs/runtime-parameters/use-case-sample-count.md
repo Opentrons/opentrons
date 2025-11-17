@@ -15,7 +15,7 @@ To keep things as simple as possible, this use case only focuses on setting up a
 
 ## From Samples to Columns
 
-Set up the sample count parameter so it's both easy for technicians to understand during protocol setup and easy to use in the protocol's `run()` function.
+First of all, we need to set up the sample count parameter so it’s both easy for technicians to understand during protocol setup and easy for us to use in the protocol’s `run()` function.
 
 We want to limit the number of samples to 8, 16, 24, or 32, so we'll use an integer parameter with choices:
 ```python
@@ -33,7 +33,7 @@ def add_parameters(parameters):
         ]
     )
 ```
-All possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
+All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
 
 ```python
 def run(protocol):
@@ -56,7 +56,7 @@ In the case of this DNA prep protocol, we can create formulas for the number of 
     - 2 fixed actions that pick up once per protocol.
     - 11 variable actions that pick up once per sample column.
 
-Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And always round up — performing 13 pickups requires 2 racks. The [`math.ceil()`](https://docs.python.org/3/library/math.html#math.ceil) method rounds up to the nearest integer. Add `from math import ceil` at the top of the protocol and then calculate the number of tip racks as follows:
+Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And always round up — performing 13 pickups requires 2 racks. The [`math.ceil()`](https://docs.python.org/3/library/math.html#math.ceil) method rounds up to the nearest integer. We'll add `from math import ceil` at the top of the protocol and then calculate the number of tip racks as follows:
 
 ```python
 tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
@@ -160,7 +160,7 @@ Now bring sample count into consideration as you [load the liquids][labeling-wel
 | Tagmentation Stop     | 10                    |
 | Tagmentation Wash Buffer | 900                |
 
-To calculate the total volume for each liquid, multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`load_liquid()`][opentrons.protocol_api.Well.load_liquid]:
+To calculate the total volume for each liquid, we'll multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`load_liquid()`][opentrons.protocol_api.Well.load_liquid]:
 
 ```python
 reservoir["A1"].load_liquid(
@@ -192,7 +192,7 @@ sample_plate = hs_adapter.load_labware(
     label="Sample Plate",
 )
 ```
-Now construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original sample count with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
+Now we can construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original *sample count* with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
 
 ```python
 # define sample liquid
@@ -207,9 +207,9 @@ for w in range(protocol.params.sample_count):
 
 ## Processing Samples
 
-When it comes time to process the samples, work by column, since the protocol uses an 8-channel pipette. There are many pipetting stages in the full protocol, but this section examines just the stage for adding the Tagmentation Stop liquid. The same techniques would apply to similar stages.
+When it comes time to process the samples, we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting stages in the full protocol, but this section examines just the stage for adding the Tagmentation Stop liquid. The same techniques would apply to similar stages.
 
-For pipetting in the original sample locations, command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when you loaded tip racks earlier, use `column_count` to slice a list containing these well names, and then iterate over that list with a `for` loop:
+For pipetting in the original sample locations, we'll command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when we loaded tip racks earlier, we can use `column_count` to slice a list containing these well names, and then iterate over that list with a `for` loop:
 ```python
 for w in ["A1", "A2", "A3", "A4"][:column_count]:
     pipette_50.pick_up_tip()
@@ -223,7 +223,7 @@ for w in ["A1", "A2", "A3", "A4"][:column_count]:
 ```
 Each time through the loop, the pipette will fill from the same well of the reservoir and then dispense (and mix and blow out) in a different column of the sample plate.
 
-Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, track *both lists* with the `for` loop. The [`zip()`](https://docs.python.org/3/library/functions.html#zip) function lets you pair up the lists of well names and step through them in parallel:
+Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, track *both lists* with the `for` loop. The [`zip()`](https://docs.python.org/3/library/functions.html#zip) function lets us pair up the lists of well names and step through them in parallel:
 
 ```python
 for initial, intermediate in zip(
@@ -260,7 +260,7 @@ if protocol.params.sample_count == 32:
 ```
 This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL tip rack (in the staging area).
 
-However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the *last well* of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
+However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the *last well* of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
 
 ```python
 if tip_racks_200[0].wells()[-1].has_tip is False:
