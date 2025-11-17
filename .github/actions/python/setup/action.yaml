@@ -13,7 +13,7 @@ inputs:
     required: false
     default: 'true'
   install-dev-deps:
-    description: 'Whether to install dev optional dependencies (UV projects only: --extra dev)'
+    description: 'Whether to install dev optional dependencies (UV projects only: --group dev)'
     required: false
     default: 'true'
 outputs:
