@@ -221,83 +221,83 @@ const getUniqueValues = (key: string, forms: FormData[]): string[] =>
   Array.from(new Set(forms.map(form => form[key])))
 
 export const _getSavedMultiSelectFieldValues = createSelector(
-    stepFormSelectors.getSavedStepForms,
-    getMultiSelectItemIds,
-    (savedStepForms, multiSelectItemIds): MultiselectFieldValues | null => {
-      if (!multiSelectItemIds) return null
-      const forms = multiSelectItemIds.map(id => savedStepForms[id])
-      const stepTypes = uniq(forms.map(form => form.stepType))
+  stepFormSelectors.getSavedStepForms,
+  getMultiSelectItemIds,
+  (savedStepForms, multiSelectItemIds): MultiselectFieldValues | null => {
+    if (!multiSelectItemIds) return null
+    const forms = multiSelectItemIds.map(id => savedStepForms[id])
+    const stepTypes = uniq(forms.map(form => form.stepType))
 
-      if (stepTypes.length !== 1) {
-        return null
-      }
-
-      const stepType: StepType = stepTypes[0]
-
-      if (stepType !== 'moveLiquid' && stepType !== 'mix') {
-        return null
-      }
-
-      const uniqueTipRackFieldValues = getUniqueValues('tipRack', forms)
-      const uniquePipetteFieldValues = getUniqueValues('pipette', forms)
-
-      //  since a lot liquid class advanced settings rely on
-      //  knowing the pipette and tiprack, we can't support
-      //  batch edit if the steps have multiple tiprack types
-      //  or multiple pipette types
-      if (
-        uniqueTipRackFieldValues.length > 1 ||
-        uniquePipetteFieldValues.length > 1
-      ) {
-        return null
-      }
-
-      const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
-      return allFieldNames.reduce(
-        (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
-          const firstFieldValue = forms[0][fieldName]
-          const isFieldValueIndeterminant = forms.some(
-            form => form[fieldName] !== firstFieldValue
-          )
-          if (isFieldValueIndeterminant) {
-            acc[fieldName] = {
-              isIndeterminate: true,
-            }
-            return acc
-          } else {
-            acc[fieldName] = {
-              value: firstFieldValue,
-              isIndeterminate: false,
-            }
-            return acc
-          }
-        },
-        {}
-      )
+    if (stepTypes.length !== 1) {
+      return null
     }
-  ) satisfies Selector<MultiselectFieldValues | null>
+
+    const stepType: StepType = stepTypes[0]
+
+    if (stepType !== 'moveLiquid' && stepType !== 'mix') {
+      return null
+    }
+
+    const uniqueTipRackFieldValues = getUniqueValues('tipRack', forms)
+    const uniquePipetteFieldValues = getUniqueValues('pipette', forms)
+
+    //  since a lot liquid class advanced settings rely on
+    //  knowing the pipette and tiprack, we can't support
+    //  batch edit if the steps have multiple tiprack types
+    //  or multiple pipette types
+    if (
+      uniqueTipRackFieldValues.length > 1 ||
+      uniquePipetteFieldValues.length > 1
+    ) {
+      return null
+    }
+
+    const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
+    return allFieldNames.reduce(
+      (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
+        const firstFieldValue = forms[0][fieldName]
+        const isFieldValueIndeterminant = forms.some(
+          form => form[fieldName] !== firstFieldValue
+        )
+        if (isFieldValueIndeterminant) {
+          acc[fieldName] = {
+            isIndeterminate: true,
+          }
+          return acc
+        } else {
+          acc[fieldName] = {
+            value: firstFieldValue,
+            isIndeterminate: false,
+          }
+          return acc
+        }
+      },
+      {}
+    )
+  }
+) satisfies Selector<MultiselectFieldValues | null>
 
 export const getMultiSelectFieldValues = createSelector(
-    _getSavedMultiSelectFieldValues,
-    stepFormSelectors.getBatchEditFieldChanges,
-    (savedValues, changes): MultiselectFieldValues | null => {
-      if (savedValues === null) {
-        // multi-selection has an invalid combination of stepTypes
-        return null
-      }
-
-      const multiselectChanges = Object.keys(
-        changes
-      ).reduce<MultiselectFieldValues>((acc, name) => {
-        acc[name] = {
-          value: changes[name],
-          isIndeterminate: false,
-        }
-        return acc
-      }, {})
-      return { ...savedValues, ...multiselectChanges }
+  _getSavedMultiSelectFieldValues,
+  stepFormSelectors.getBatchEditFieldChanges,
+  (savedValues, changes): MultiselectFieldValues | null => {
+    if (savedValues === null) {
+      // multi-selection has an invalid combination of stepTypes
+      return null
     }
-  ) satisfies Selector<MultiselectFieldValues | null>
+
+    const multiselectChanges = Object.keys(
+      changes
+    ).reduce<MultiselectFieldValues>((acc, name) => {
+      acc[name] = {
+        value: changes[name],
+        isIndeterminate: false,
+      }
+      return acc
+    }, {})
+    return { ...savedValues, ...multiselectChanges }
+  }
+) satisfies Selector<MultiselectFieldValues | null>
 
 // NOTE: the value is the tooltip text explaining why the field is disabled
 type TooltipText = string
@@ -305,21 +305,21 @@ type TooltipText = string
 export type DisabledFields = Record<string, TooltipText>
 
 export const getMultiSelectDisabledFields = createSelector(
-    stepFormSelectors.getSavedStepForms,
-    getMultiSelectItemIds,
-    (savedStepForms, multiSelectItemIds): DisabledFields | null => {
-      if (!multiSelectItemIds) return null
-      const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
+  stepFormSelectors.getSavedStepForms,
+  getMultiSelectItemIds,
+  (savedStepForms, multiSelectItemIds): DisabledFields | null => {
+    if (!multiSelectItemIds) return null
+    const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
 
-      if (forms.every(form => form.stepType === 'moveLiquid')) {
-        return getMoveLiquidMultiSelectDisabledFields(forms)
-      } else if (forms.every(form => form.stepType === 'mix')) {
-        return getMixMultiSelectDisabledFields(forms)
-      } else {
-        return null
-      }
+    if (forms.every(form => form.stepType === 'moveLiquid')) {
+      return getMoveLiquidMultiSelectDisabledFields(forms)
+    } else if (forms.every(form => form.stepType === 'mix')) {
+      return getMixMultiSelectDisabledFields(forms)
+    } else {
+      return null
     }
-  ) satisfies Selector<DisabledFields | null>
+  }
+) satisfies Selector<DisabledFields | null>
 
 export const getCountPerStepType = createSelector(
   getMultiSelectItemIds,
