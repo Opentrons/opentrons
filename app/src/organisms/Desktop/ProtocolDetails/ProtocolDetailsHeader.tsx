@@ -139,7 +139,7 @@ export function ProtocolDetailsHeader({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        padding={`${SPACING.spacing20} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
+        padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
         width="100%"
       >
         {analysisStatus !== 'loading' &&
