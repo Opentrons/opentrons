@@ -37,12 +37,13 @@ export function ODDMediaContainerContent(
         <div className={styles.list_item_container}>
           <div className={styles.list_item_content_container}>
             <div>
-              {isLoading ? (<Skeleton width="100%" height="100%" backgroundSize="47rem" />):
-               <StyledText oddStyle="bodyTextSemiBold">
-                {leftPrimaryText}
-              </StyledText>
-              }
-             
+              {isLoading ? (
+                <Skeleton width="100%" height="100%" backgroundSize="47rem" />
+              ) : (
+                <StyledText oddStyle="bodyTextSemiBold">
+                  {leftPrimaryText}
+                </StyledText>
+              )}
             </div>
             <div className={styles.list_item_step}>
               {!isLoading && isCurrentCmdError && (
