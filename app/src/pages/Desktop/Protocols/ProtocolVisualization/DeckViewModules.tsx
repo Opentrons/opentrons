@@ -170,7 +170,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                             desktopStyle="captionRegular"
                             color={COLORS.white}
                           >
-                            {labwareEntitiesExtended[id].nickName ??
+                            {labwareEntitiesExtended[id]?.nickName ??
                               labwareEntitiesExtended[labwareLoadedOnModuleId]
                                 .def.metadata.displayName}
                           </StyledText>
