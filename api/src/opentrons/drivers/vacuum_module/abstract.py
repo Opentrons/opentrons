@@ -1,6 +1,6 @@
 from typing import Protocol, Optional
 
-from .types import VacuumModuleInfo, LEDColor, LEDPattern
+from .types import PressureState, PumpState, VacuumModuleInfo, LEDColor, LEDPattern
 
 
 class AbstractVacuumModuleDriver(Protocol):
@@ -46,16 +46,34 @@ class AbstractVacuumModuleDriver(Protocol):
         """Get a reading from the pressure sensor."""
         ...
 
-    async def set_vacuum_chamber_pressure(
+    async def set_vacuum_pressure(
         self,
-        gage_pressure_mbarg: float,
-        duration: Optional[float],
+        guage_pressure_mbar: float,
+        duration: Optional[int],
         rate: Optional[float],
+        vent_after: Optional[bool],
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def get_gage_pressure_reading_mbarg(self) -> float:
+    async def get_pressure_state(self) -> PressureState:
+        """Get the pressure state."""
+        ...
+
+    async def set_pump_state(
+        self,
+        start_pump: bool,
+        target_rpm: Optional[int],
+        duty_cycle: Optional[int],
+    ) -> None:
+        """Start or the stop the pump at a given rpm or duty cycle."""
+        ...
+
+    async def get_pump_state(self) -> PumpState:
+        """Get the pump state."""
+        ...
+
+    async def get_guage_pressure_reading_mbar(self) -> float:
         """Read each pressure sensor and return the pressure difference."""
         return 0.0
 

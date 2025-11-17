@@ -12,6 +12,10 @@ class GCODE(str, Enum):
     SET_SERIAL_NUMBER = "M996"
     ENTER_BOOTLOADER = "dfu"
     SET_LED = "M200"
+    SET_PRESSURE_STATE = "M120"
+    GET_PRESSURE_STATE = "M121"
+    SET_PUMP_STATE = "M122"
+    GET_PUMP_STATE = "M123"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -77,3 +81,19 @@ class LEDPattern(Enum):
     FLASH = 1
     PULSE = 2
     CONFIRM = 3
+
+
+@dataclass
+class PressureState:
+    """Get the pressure state."""
+
+    target_pressure: float
+    current_pressure: float
+
+
+@dataclass
+class PumpState:
+    """Get the pump state."""
+
+    target_rpm: float
+    current_rpm: float

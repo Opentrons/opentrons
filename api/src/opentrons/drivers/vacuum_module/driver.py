@@ -4,7 +4,15 @@ from typing import Optional
 
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 from .abstract import AbstractVacuumModuleDriver
-from .types import LEDColor, LEDPattern, GCODE, VacuumModuleInfo, HardwareRevision
+from .types import (
+    LEDColor,
+    LEDPattern,
+    GCODE,
+    PressureState,
+    PumpState,
+    VacuumModuleInfo,
+    HardwareRevision,
+)
 from .errors import VacuumModuleErrorCodes
 
 
@@ -20,6 +28,10 @@ GCODE_ROUNDING_PRECISION = 2
 MIN_DURATION_MS = 25  # 25ms
 MAX_DURATION_MS = 10000  # 10s
 MAX_REPS = 10
+
+MAX_PUMP_RPM = 3000
+MAX_PUMP_DUTY = 100
+MAX_RAMP_RATE = 10.0  # mbar/s
 
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
@@ -46,6 +58,24 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not match:
             raise ValueError(f"Incorrect Response for reset reason: {response}")
         return int(match.group("R"))
+
+    @classmethod
+    def parse_get_pressure_state(cls, response: str) -> PressureState:
+        """Parse the get pressure state."""
+        _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} T:(?P<T>\d) C:(?P<C>\d)$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for get pressure state: {response}")
+        return PressureState(float(match.group("T")), float(match.group("C")))
+
+    @classmethod
+    def parse_get_pump_state(cls, response: str) -> PumpState:
+        """Parse the get pump state."""
+        _RE = re.compile(rf"^{GCODE.GET_PUMP_STATE} T:(?P<T>\d) C:(?P<C>\d)$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(f"Incorrect Response for get pump state: {response}")
+        return PumpState(float(match.group("T")), float(match.group("C")))
 
     @classmethod
     async def create(
@@ -184,14 +214,64 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Read each pressure sensor and return the pressure difference."""
         return 0.0
 
-    async def set_vacuum_chamber_pressure(
+    async def set_vacuum_pressure(
         self,
-        gage_pressure_mbarg: float,
-        duration: Optional[float],
+        guage_pressure_mbar: float,
+        duration: Optional[int],
         rate: Optional[float],
+        vent_after: Optional[bool],
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
-        ...
+
+        command = GCODE.SET_PRESSURE_STATE.build_command().add_float(
+            "P", guage_pressure_mbar, GCODE_ROUNDING_PRECISION
+        )
+        if duration is not None:
+            command.add_int("D", duration)
+        if rate is not None:
+            command.add_float("R", max(0, min(rate, MAX_RAMP_RATE)))
+        if vent_after:
+            command.add_element("V")
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
+            raise ValueError(f"Incorrect Response for set pressure state: {resp}")
+
+    async def get_pressure_state(self) -> PressureState:
+        """Get the pressure state."""
+        resp = await self._connection.send_command(
+            GCODE.GET_PRESSURE_STATE.build_command()
+        )
+        if not re.match(rf"^{GCODE.GET_PRESSURE_STATE}$", resp):
+            raise ValueError(f"Incorrect Response for get pressure state: {resp}")
+        return self.parse_get_pressure_state(resp)
+
+    async def set_pump_state(
+        self,
+        start_pump: bool,
+        target_rpm: Optional[int],
+        duty_cycle: Optional[int],
+    ) -> None:
+        """Start or the stop the pump at a given rpm or duty cycle."""
+        if target_rpm and duty_cycle:
+            raise ValueError(
+                "You cannot set the target rpm and duty cycle at the same time."
+            )
+
+        command = GCODE.SET_PUMP_STATE.build_command().add_int("S", int(start_pump))
+        if target_rpm is not None:
+            command.add_int("R", max(0, min(target_rpm, MAX_PUMP_RPM)))
+        if duty_cycle is not None:
+            command.add_float("D", max(0, min(duty_cycle, MAX_PUMP_DUTY)))
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_PUMP_STATE}$", resp):
+            raise ValueError(f"Incorrect Response for set pump state: {resp}")
+
+    async def get_pump_state(self) -> PumpState:
+        """Get the pump state."""
+        resp = await self._connection.send_command(GCODE.GET_PUMP_STATE.build_command())
+        if not re.match(rf"^{GCODE.GET_PUMP_STATE}$", resp):
+            raise ValueError(f"Incorrect Response for get pump state: {resp}")
+        return self.parse_get_pump_state(resp)
 
     # TODO: change pump power to be more specific when we find out how were gonna operate that
     async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
