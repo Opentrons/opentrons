@@ -31,6 +31,7 @@ import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   LabwareEntities,
   PipetteEntities,
 } from '../../../../step-generation/src/types'
@@ -72,11 +73,16 @@ describe('createFile selector', () => {
     // to demonstrate what custom labware loading looks like.
   }
 
-  const entities = {
+  const entities: InvariantContext = {
     moduleEntities: v7Fixture.moduleEntities,
     labwareEntities: labwareEntitiesOpentrons,
     pipetteEntities,
     liquidEntities: ingredients,
+    wasteChuteEntities: {},
+    trashBinEntities: {},
+    gripperEntities: {},
+    stagingAreaEntities: {},
+    config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
 
   it('should return a valid Python protocol file', () => {

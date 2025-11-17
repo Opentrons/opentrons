@@ -39,7 +39,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
   it('does NOT append mount to pipette dropdown when pipettes are different models', () => {
@@ -65,7 +65,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
   it('does NOT append mount to pipette dropdown when only one pipette', () => {
@@ -83,7 +83,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '123',
       },
     ]
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
 })

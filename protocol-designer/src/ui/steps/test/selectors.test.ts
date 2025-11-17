@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist/types'
 import * as utils from '../../modules/utils'
 import {
   MULTI_STEP_SELECTION_TYPE,
@@ -218,6 +219,7 @@ describe('getActiveItem', () => {
       selected: {
         selectionType: MULTI_STEP_SELECTION_TYPE,
         ids: ['notTheseSteps', 'nope'],
+        lastSelected: 'nope',
       },
       hovered: {
         selectionType: SINGLE_STEP_SELECTION_TYPE,
@@ -234,6 +236,7 @@ describe('getActiveItem', () => {
       selected: {
         selectionType: MULTI_STEP_SELECTION_TYPE,
         ids: ['notTheseSteps', 'nope'],
+        lastSelected: 'nope',
       },
       hovered: null,
       expected: null,
@@ -255,12 +258,12 @@ describe('getActiveItem', () => {
         'should show the single-selected terminal item, if nothing is hovered',
       selected: {
         selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-        id: 'someItem',
+        id: START_TERMINAL_ITEM_ID,
       },
       hovered: null,
       expected: {
         selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-        id: 'someItem',
+        id: START_TERMINAL_ITEM_ID,
       },
     },
   ]
@@ -284,7 +287,7 @@ describe('getMultiSelectLastSelected', () => {
   it('should return null if the selected item is a terminal item', () => {
     const result = getMultiSelectLastSelected.resultFunc({
       selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-      id: 'foo',
+      id: START_TERMINAL_ITEM_ID,
     })
     expect(result).toEqual(null)
   })
@@ -327,7 +330,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
     }
     expect(
       _getSavedMultiSelectFieldValues.resultFunc(
-        savedStepForms,
+        savedStepForms as any,
         mockmultiSelectItemIds
       )
     ).toBe(null)
@@ -339,7 +342,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       ...getMockMixStep(),
     }
     expect(
-      _getSavedMultiSelectFieldValues.resultFunc(savedStepForms, [
+      _getSavedMultiSelectFieldValues.resultFunc(savedStepForms as any, [
         'move_liquid_step_id',
         'mix_step_id',
       ])
@@ -350,7 +353,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
     it('should return the fields with the indeterminate boolean', () => {
       expect(
         _getSavedMultiSelectFieldValues.resultFunc(
-          mockSavedStepForms,
+          mockSavedStepForms as any,
           mockmultiSelectItemIds
         )
       ).toEqual({
@@ -1672,7 +1675,7 @@ describe('getCountPerStepType', () => {
     }
     const result = getCountPerStepType.resultFunc(
       multiSelectItemIds,
-      savedStepForms
+      savedStepForms as any
     )
     expect(result).toEqual({ magnet: 2, moveLiquid: 1 })
   })
