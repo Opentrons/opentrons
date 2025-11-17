@@ -17,12 +17,15 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from typing import List, Optional, Union, Tuple
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
+import os
+import time
+import serial  # type: ignore[import]
 
 ###########################################
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul_dial"  # change to desired labware
 
 SLOT_LIQUID_TIPRACKS = ["D3", "B3"]
 SLOT_PROBING_TIPRACK = "D2"
@@ -31,10 +34,11 @@ SLOT_RESERVOIR = "C1"
 SLOT_DIAL = "B2"
 CSV_SEPARATOR = ""
 RUN_ID = ""
-FILE_NAME = ""
+DATA_FILE_PATH = ""
 DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
+JUPYTER_DATA_DIR = "/var/lib/jupyter/notebooks/"
 
 ###########################################
 #  GLOBAL VARIABLES - END
@@ -42,6 +46,77 @@ DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 
 metadata = {"protocolName": "volume-validator", "author": "hovan.ngo@opentrons.com"}
 requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+
+
+class Mitutoyo_Digimatic_Indicator:
+    """Driver class to use dial indicator."""
+
+    def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
+        """Initialize class."""
+        self.PORT = port
+        self.BAUDRATE = baudrate
+        self.TIMEOUT = 0.1
+        self.error_count = 0
+        self.max_errors = 100
+        self.unlimited_errors = False
+        self.raise_exceptions = True
+        self.reading_raw = ""
+        self.GCODE = {
+            "READ": "r",
+        }
+        self.gauge: serial.Serial | None = None
+        self.packet: str = ""
+
+    def connect(self) -> None:
+        """Connect communication ports."""
+        try:
+            self.gauge = serial.Serial(
+                port=self.PORT,
+                baudrate=self.BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=self.TIMEOUT,
+            )
+        except serial.SerialException:
+            error = "Unable to access Serial port"
+            raise serial.SerialException(error)
+
+    def disconnect(self) -> None:
+        """Disconnect communication ports."""
+        if self.gauge is not None:
+            self.gauge.close()
+
+    def _send_packet(self, packet: str) -> None:
+        if self.gauge is not None:
+            self.gauge.flush()
+            self.gauge.reset_input_buffer()
+            self.gauge.write(packet.encode())
+
+    def _get_packet(self) -> str:
+        packet = ""
+        if self.gauge is not None:
+            self.gauge.reset_output_buffer()
+            packet = self.gauge.readline().decode("utf-8")
+        return packet
+
+    def read(self) -> float:
+        """Reads dial indicator."""
+        self.packet = self.GCODE["READ"]
+        self._send_packet(self.packet)
+        time.sleep(0.001)
+        reading = True
+        value = 0.0  # Initialize value to avoid unbound error
+        while reading:
+            data = self._get_packet()
+            time.sleep(0.01)
+            if data != "":
+                try:
+                    value = float(data)
+                    reading = False
+                except ValueError:
+                    continue
+        return value
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -127,7 +202,7 @@ def _setup(
     int,
     List[float],
 ]:
-    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
+    global DIAL_PORT, RUN_ID, DATA_FILE_PATH, LABWARE
 
     left_mount = ctx.params.left_mount  # type: ignore[attr-defined]
     right_mount = ctx.params.right_mount  # type: ignore[attr-defined]
@@ -164,12 +239,19 @@ def _setup(
         )
 
     if not ctx.is_simulating():
-        from hardware_testing.data import create_file_name, create_run_id
 
         RUN_ID = create_run_id()
-        FILE_NAME = create_file_name(metadata["protocolName"], RUN_ID, labware_type)
-        _write_line_to_csv(ctx, [RUN_ID])
-        _write_line_to_csv(ctx, [labware_type])
+        data_folder = os.path.join(
+            JUPYTER_DATA_DIR, "IWG-validation"
+        )  # makes data folder
+        data_file_name = create_file_name(
+            metadata["protocolName"], RUN_ID, labware_type
+        )
+        os.makedirs(data_folder, exist_ok=True)
+        DATA_FILE_PATH = os.path.join(data_folder, data_file_name)
+
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [RUN_ID])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [labware_type])
         heading_for_csv = [
             "Well",
             "Volume (ul)",
@@ -177,13 +259,9 @@ def _setup(
             "Expected Height",
             "Error %",
         ]
-        _write_line_to_csv(ctx, heading_for_csv)
+        _write_line_to_csv(ctx, DATA_FILE_PATH, heading_for_csv)
 
         if dial and DIAL_PORT is None:
-            from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-                Mitutoyo_Digimatic_Indicator,
-            )
-
             DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
             DIAL_PORT.connect()
 
@@ -221,6 +299,26 @@ def _setup(
     )
 
 
+def _write_line_to_csv(ctx: ProtocolContext, file_path: str, line: list[str]) -> None:
+    if not ctx.is_simulating():
+        formatted = [str(item).ljust(18) for item in line]
+        with open(file_path, "a") as f:
+            f.write(",".join(formatted) + "\n")
+
+
+def create_file_name(
+    test_name: str, run_id: str, tag: str, extension: str = "csv"
+) -> str:
+    """Create a file name, given a test name."""
+    return f"{test_name}_{run_id}_{tag}.{extension}"
+
+
+def create_run_id() -> str:
+    """Create a run ID using the datetime string."""
+    date_time_string = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())
+    return f"run-{date_time_string}"
+
+
 def pick_up_tips(
     probe_pipette: InstrumentContext, liq_pipette: InstrumentContext
 ) -> None:
@@ -251,7 +349,7 @@ def _store_dial_baseline(
         return
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
     tag = f"DIAL-BASELINE-{idx}"
-    _write_line_to_csv(ctx, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
+    _write_line_to_csv(ctx, DATA_FILE_PATH, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
 
 
 def _get_tip_z_error(
@@ -265,16 +363,6 @@ def _get_tip_z_error(
     assert baseline is not None
     new_val = _read_dial_indicator(ctx, pipette, dial, front_channel)
     return (new_val - baseline) * -1.0
-
-
-def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
-    if ctx.is_simulating():
-        return
-    from hardware_testing.data import append_data_to_file
-
-    formatted_line = [str(item).ljust(23) for item in line]
-    line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
-    append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
 
 
 def extract_float(result: Union[float | SimulatedProbeResult]) -> float:
@@ -307,8 +395,8 @@ def aspirate_dispense_measure(
     right_mount: InstrumentContext,
     liq_tip_size: str,
 ) -> list[float]:
-    """Aspirate from source, dispense into labware, measure height, and record results."""
-    all_corrected_heights: list[float] = []
+    """Aspirate from source, dispense into labware, and returns each measured height obtained."""
+    measured_heights: list[float] = []
     num_wells = len(volumes_dict)
     tip_z_error = 0.0
     meniscus_z = -0.5
@@ -368,15 +456,15 @@ def aspirate_dispense_measure(
             probe_pipette, labware[well], ctx.is_simulating()
         )
         corrected_height = height + tip_z_error
-        all_corrected_heights.append(corrected_height)
+        measured_heights.append(corrected_height)
 
         acc = (corrected_height - expected_height) / expected_height * 100
         line_for_csv = [well, expected_vol, corrected_height, expected_height, acc]
-        _write_line_to_csv(ctx, line_for_csv)
+        _write_line_to_csv(ctx, DATA_FILE_PATH, line_for_csv)
 
         drop_tips(probe_pipette, liq_pipette)
 
-    return all_corrected_heights
+    return measured_heights
 
 
 def _read_dial_indicator(
@@ -434,7 +522,7 @@ def run(ctx: ProtocolContext) -> None:
     liq_pipette.blow_out()
     liq_pipette.drop_tip()
 
-    all_corrected_heights = aspirate_dispense_measure(
+    measured_heights = aspirate_dispense_measure(
         ctx,
         volumes,
         labware,
@@ -448,41 +536,40 @@ def run(ctx: ProtocolContext) -> None:
         liq_tip_size,
     )
 
-    region_results: List[str] = []
-    region_len = number_of_trials
+    csv_values: List[str] = []
+    csv_headers: List[str] = []
 
+    # splits up measured heights by region and compares to the region's expected height.
     if not ctx.is_simulating():
-        for i in range(n_regions):
-            start = i * region_len
-            end = (i + 1) * region_len
-            corrected = all_corrected_heights[start:end]
-            expected_val = region_heights[i]
-            errors = [abs(c - expected_val) for c in corrected]
-            avg_error = sum(errors) / len(errors) if errors else 0.0
+        for region_idx in range(n_regions):
 
-            # Add corrected heights
-            region_results.extend(str(round(c, 3)) for c in corrected)
-            # Add expected value
-            region_results.append(str(round(expected_val, 3)))
-            # Add average error
-            region_results.append(str(round(avg_error, 3)))
+            start = region_idx * number_of_trials
+            end = start + number_of_trials
+            heights_in_region = measured_heights[start:end]
 
-        from hardware_testing.data import append_data_to_file
+            region_height = region_heights[region_idx]
+            abs_errors = [abs(c - region_height) for c in heights_in_region]
+            avg_error = sum(abs_errors) / len(abs_errors) if abs_errors else 0.0
 
-        region_headers = []
-        for i in range(n_regions):
-            for k in range(region_len):
-                region_headers.append(f"region{i+1}_trial{k+1}")
-            region_headers.append(f"region{i+1}_expected")
-            region_headers.append(f"region{i+1}_avg_error")
+            # Add corrected trial heights
+            for h in heights_in_region:
+                csv_values.append(f"{h:.3f}")
+            csv_values.append(f"{region_height:.3f}")
+            csv_values.append(f"{avg_error:.3f}")
+            for trial_idx in range(number_of_trials):
+                csv_headers.append(f"region{region_idx+1}_trial{trial_idx+1}")
 
-        header = ["labware_type"] + region_headers
-        header_str = ",".join(header) + "\n"
-        line = [labware_type] + region_results
-        line_str = ",".join(line) + "\n"
+            csv_headers.append(f"region{region_idx+1}_expected")
+            csv_headers.append(f"region{region_idx+1}_avg_error")
 
-        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, header_str)
-        append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
+        header = ["labware_type"] + csv_headers
+        row = [labware_type] + csv_values
+
+        header_str = ",".join(header)
+        line_str = ",".join(row)
+
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [header_str])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [line_str])
         ctx.pause(f"{header_str}\n{line_str}")
 
     drop_tips(probe_pipette, liq_pipette)

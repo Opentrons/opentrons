@@ -19,16 +19,20 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 )
 from opentrons.types import Point
 from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
-import numpy as np
+import numpy as np  # type: ignore[import]
 import json
 from dataclasses import dataclass, field
 from collections import OrderedDict
+import os
+import time
+import serial  # type: ignore[import]
 
 ###########################################
 #  GLOBAL VARIABLES - START
 ###########################################
 
-LABWARE = "example_labware"  # change to desired labware
+LABWARE = "eppendorf_96_wellplate_500ul_dial"  # change to desired labware
+JUPYTER_DATA_DIR = "/var/lib/jupyter/notebooks/"
 
 RESERVOIR = "nest_1_reservoir_290ml"
 LIQUID_MOUNT = "right"
@@ -45,9 +49,7 @@ DIAL_PORT = None
 DIAL_PORT_NAME = "/dev/ttyUSB0"
 DIAL_POS_WITHOUT_TIP: List[Optional[float]] = [None, None]
 RUN_ID = ""
-FILE_NAME = ""
-USER_DEFINED_VOLUMES = ""
-CSV_SEPARATOR = ""
+DATA_FILE_PATH = ""
 CSV_HEADER = [
     "well",
     "step volume",
@@ -151,6 +153,77 @@ class TrialState:
         )
 
 
+class Mitutoyo_Digimatic_Indicator:
+    """Driver class to use dial indicator."""
+
+    def __init__(self, port: str = "/dev/ttyUSB0", baudrate: int = 9600) -> None:
+        """Initialize class."""
+        self.PORT = port
+        self.BAUDRATE = baudrate
+        self.TIMEOUT = 0.1
+        self.error_count = 0
+        self.max_errors = 100
+        self.unlimited_errors = False
+        self.raise_exceptions = True
+        self.reading_raw = ""
+        self.GCODE = {
+            "READ": "r",
+        }
+        self.gauge: serial.Serial | None = None
+        self.packet: str = ""
+
+    def connect(self) -> None:
+        """Connect communication ports."""
+        try:
+            self.gauge = serial.Serial(
+                port=self.PORT,
+                baudrate=self.BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=self.TIMEOUT,
+            )
+        except serial.SerialException:
+            error = "Unable to access Serial port"
+            raise serial.SerialException(error)
+
+    def disconnect(self) -> None:
+        """Disconnect communication ports."""
+        if self.gauge is not None:
+            self.gauge.close()
+
+    def _send_packet(self, packet: str) -> None:
+        if self.gauge is not None:
+            self.gauge.flush()
+            self.gauge.reset_input_buffer()
+            self.gauge.write(packet.encode())
+
+    def _get_packet(self) -> str:
+        packet = ""
+        if self.gauge is not None:
+            self.gauge.reset_output_buffer()
+            packet = self.gauge.readline().decode("utf-8")
+        return packet
+
+    def read(self) -> float:
+        """Reads dial indicator."""
+        self.packet = self.GCODE["READ"]
+        self._send_packet(self.packet)
+        time.sleep(0.001)
+        reading = True
+        value = 0.0  # Initialize value to avoid unbound error
+        while reading:
+            data = self._get_packet()
+            time.sleep(0.01)
+            if data != "":
+                try:
+                    value = float(data)
+                    reading = False
+                except ValueError:
+                    continue
+        return value
+
+
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters to the protocol."""
     parameters.add_str(
@@ -219,7 +292,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def _setup(ctx: ProtocolContext) -> SetupState:
     """Sets up the static data for the protocol."""
-    global DIAL_PORT, RUN_ID, FILE_NAME, LABWARE
+    global DIAL_PORT, RUN_ID, LABWARE, DATA_FILE_PATH
 
     labware_type = LABWARE
     first_dispense = ctx.params.first_dispense  # type: ignore[attr-defined]
@@ -282,24 +355,25 @@ def _setup(ctx: ProtocolContext) -> SetupState:
     ethanol = ctx.get_liquid_class(name="ethanol_80")
 
     if not ctx.is_simulating():
-        from hardware_testing.data import create_file_name, create_run_id
 
         RUN_ID = create_run_id()
-        FILE_NAME = create_file_name(metadata["protocolName"], RUN_ID, labware_type)
-        _write_line_to_csv(ctx, [RUN_ID])
-        _write_line_to_csv(ctx, [right_mount])
-        _write_line_to_csv(ctx, [left_mount])
-        _write_line_to_csv(ctx, [labware_type])
-        _write_line_to_csv(ctx, ["target height", str(target_height)])
-        _write_line_to_csv(ctx, ["depth", str(labware["A1"].depth)])
+        data_folder = os.path.join(JUPYTER_DATA_DIR, "IWG-data")  # makes data folder
+        data_file_name = create_file_name(
+            metadata["protocolName"], RUN_ID, labware_type
+        )
+        os.makedirs(data_folder, exist_ok=True)
+        DATA_FILE_PATH = os.path.join(data_folder, data_file_name)
+
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [RUN_ID])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [right_mount])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [left_mount])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, [labware_type])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, ["target height", str(target_height)])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, ["depth", str(labware["A1"].depth)])
         lpc = str(labware._core.get_calibrated_offset())
-        _write_line_to_csv(ctx, ["LPC Offset", labware.load_name, lpc])
+        _write_line_to_csv(ctx, DATA_FILE_PATH, ["LPC Offset", labware.load_name, lpc])
 
-        if dial is not None:
-            from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
-                Mitutoyo_Digimatic_Indicator,
-            )
-
+        if dial and DIAL_PORT is None:
             DIAL_PORT = Mitutoyo_Digimatic_Indicator(port=DIAL_PORT_NAME)
             DIAL_PORT.connect()
 
@@ -325,6 +399,26 @@ def _setup(ctx: ProtocolContext) -> SetupState:
         liquid_tip=liq_tip_size,
         ethanol=ethanol,
     )
+
+
+def _write_line_to_csv(ctx: ProtocolContext, file_path: str, line: list[str]) -> None:
+    if not ctx.is_simulating():
+        formatted = [str(item).ljust(18) for item in line]
+        with open(file_path, "a") as f:
+            f.write(",".join(formatted) + "\n")
+
+
+def create_file_name(
+    test_name: str, run_id: str, tag: str, extension: str = "csv"
+) -> str:
+    """Create a file name, given a test name."""
+    return f"{test_name}_{run_id}_{tag}.{extension}"
+
+
+def create_run_id() -> str:
+    """Create a run ID using the datetime string."""
+    date_time_string = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())
+    return f"run-{date_time_string}"
 
 
 def _read_dial_indicator(
@@ -354,23 +448,13 @@ def _store_dial_baseline(
     dial: Labware,
     front_channel: bool = False,
 ) -> None:
-    global DIAL_POS_WITHOUT_TIP
+    global DIAL_POS_WITHOUT_TIP, DATA_FILE_PATH
     idx = 0 if not front_channel else 1
     if DIAL_POS_WITHOUT_TIP[idx] is not None:
         return
     DIAL_POS_WITHOUT_TIP[idx] = _read_dial_indicator(ctx, pipette, dial, front_channel)
     tag = f"DIALBASELINE{idx}"
-    _write_line_to_csv(ctx, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
-
-
-def _write_line_to_csv(ctx: ProtocolContext, line: List[str]) -> None:
-    if ctx.is_simulating():
-        return
-    from hardware_testing.data import append_data_to_file
-
-    formatted_line = [str(item).ljust(23) for item in line]
-    line_str = f"{CSV_SEPARATOR.join(formatted_line)}\n"
-    append_data_to_file(metadata["protocolName"], RUN_ID, FILE_NAME, line_str)
+    _write_line_to_csv(ctx, DATA_FILE_PATH, [tag, str(DIAL_POS_WITHOUT_TIP[idx])])
 
 
 def _get_tip_z_error(
@@ -597,7 +681,7 @@ def write_trial_log(ctx: ProtocolContext, ts: TrialState) -> None:
     """Writes the current step's results to the CSV."""
     ts.add_result()
     trial_data = ts.results[-1]
-    _write_line_to_csv(ctx, [str(v) for v in vars(trial_data).values()])
+    _write_line_to_csv(ctx, DATA_FILE_PATH, [str(v) for v in vars(trial_data).values()])
 
 
 def check_hdelta(ctx: ProtocolContext, state: SetupState, ts: TrialState) -> str:
@@ -629,7 +713,7 @@ def geometry_creator(
     """Run liquid dispense + measure loop and return trial results."""
     if state.dial:
         _store_dial_baseline(ctx, state.probe_pipette, state.dial)
-    _write_line_to_csv(ctx, CSV_HEADER)  # log 0th step as a baseline
+    _write_line_to_csv(ctx, DATA_FILE_PATH, CSV_HEADER)  # log 0th step as a baseline
     write_trial_log(ctx, ts)
     state.liq_pipette.pick_up_tip()
     _get_height_of_liquid_in_well(
@@ -713,6 +797,7 @@ def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     state = _setup(ctx)
     ts = TrialState()
+
     trial_results = geometry_creator(ctx, state, ts)
     drop_tips(state.liq_pipette, state.probe_pipette)
 
@@ -723,14 +808,11 @@ def run(ctx: ProtocolContext) -> None:
         )
         if len(frusta_data) > 2:
             new_inner_well_json = generate_frusta(frusta_data.tolist(), state.labware)
-
-        from hardware_testing import data
-
-        user_defined_volumes = data.create_folder_for_test_data("user-defined-volumes")
-        udv_def_name = f"{RUN_ID}_{state.labware_type}.json"
-        file_path = user_defined_volumes / udv_def_name
-
-        with open(file_path, "w") as f:
-            json.dump(new_inner_well_json, f, indent=2)
-
-        ctx.pause(f"Labware Definition file: {file_path}")
+            if new_inner_well_json:
+                IWG_folder = os.path.join(JUPYTER_DATA_DIR, "IWG-definitions")
+                IWG_name = f"{RUN_ID}_{state.labware_type}.json"
+                os.makedirs(IWG_folder, exist_ok=True)
+                IWG_file_path = os.path.join(IWG_folder, IWG_name)
+                with open(IWG_file_path, "w") as f:
+                    json.dump(new_inner_well_json, f, indent=2)
+                ctx.pause(f"Labware Definition file: {IWG_file_path}")
