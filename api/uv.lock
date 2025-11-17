@@ -468,7 +468,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -1169,7 +1169,7 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "atomicwrites", marker = "sys_platform == 'win32'" },
     { name = "black" },
@@ -1205,16 +1205,11 @@ dev = [
     { name = "typing-extensions" },
     { name = "wheel" },
 ]
-flex-hardware = [
-    { name = "opentrons-hardware", extra = ["flex"] },
-]
-ot2-hardware = [
-    { name = "opentrons-hardware" },
-]
 robot = [
     { name = "anyio" },
     { name = "jsonschema" },
     { name = "numpy" },
+    { name = "opentrons-hardware", extra = ["flex"] },
     { name = "packaging" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1224,64 +1219,69 @@ robot = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aionotify", specifier = "==0.3.1" },
-    { name = "anyio", specifier = "==4.9.0" },
-    { name = "anyio", marker = "extra == 'robot'", specifier = "==4.9.0" },
-    { name = "atomicwrites", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==1.4.0" },
-    { name = "black", marker = "extra == 'dev'", specifier = "==22.3.0" },
-    { name = "build", marker = "extra == 'dev'", specifier = "~=1.2.0" },
+    { name = "aionotify", specifier = "~=0.3.1" },
+    { name = "anyio", specifier = "~=4.9.0" },
     { name = "click", specifier = ">=8.0.0,<9" },
-    { name = "colorama", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==0.4.4" },
-    { name = "coverage", marker = "extra == 'dev'", specifier = "==7.4.1" },
-    { name = "decoy", marker = "extra == 'dev'", specifier = ">=2.2.0,<3" },
-    { name = "flake8", marker = "extra == 'dev'", specifier = "==7.0.0" },
-    { name = "flake8-annotations", marker = "extra == 'dev'", specifier = "~=3.0.1" },
-    { name = "flake8-docstrings", marker = "extra == 'dev'", specifier = "~=1.7.0" },
-    { name = "flake8-noqa", marker = "extra == 'dev'", specifier = "~=1.4.0" },
-    { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.96.1,<7" },
     { name = "importlib-metadata", marker = "python_full_version < '3.8'", specifier = ">=1.0" },
-    { name = "jinja2", marker = "extra == 'dev'", specifier = ">=2.3,<3.1" },
-    { name = "jsonschema", specifier = "==4.17.3" },
-    { name = "jsonschema", marker = "extra == 'robot'", specifier = "==4.17.3" },
-    { name = "mock", marker = "extra == 'dev'", specifier = "==5.1.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.11.0" },
-    { name = "numpy", specifier = "==1.22.3" },
-    { name = "numpy", marker = "extra == 'robot'", specifier = "==1.22.3" },
-    { name = "numpydoc", marker = "extra == 'dev'", specifier = "==0.9.1" },
-    { name = "opentrons-hardware", marker = "extra == 'ot2-hardware'", editable = "../hardware" },
-    { name = "opentrons-hardware", extras = ["flex"], marker = "extra == 'dev'", editable = "../hardware" },
-    { name = "opentrons-hardware", extras = ["flex"], marker = "extra == 'flex-hardware'", editable = "../hardware" },
+    { name = "jsonschema", specifier = "~=4.17.3" },
+    { name = "numpy", specifier = "~=1.22.3" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
-    { name = "packaging", specifier = "==22.0" },
-    { name = "packaging", marker = "extra == 'robot'", specifier = "==22.0" },
-    { name = "performance-metrics", marker = "extra == 'dev'", editable = "../performance-metrics" },
-    { name = "pydantic", specifier = "==2.11.7" },
-    { name = "pydantic", marker = "extra == 'robot'", specifier = "==2.11.7" },
-    { name = "pydantic-settings", specifier = "==2.4.0" },
-    { name = "pydantic-settings", marker = "extra == 'robot'", specifier = "==2.4.0" },
+    { name = "packaging", specifier = "~=22.0" },
+    { name = "pydantic", specifier = "~=2.11.7" },
+    { name = "pydantic-settings", specifier = "~=2.4.0" },
     { name = "pyserial", specifier = ">=3.5" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<9" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0,<2" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==4.1.0" },
-    { name = "pytest-lazy-fixtures", marker = "extra == 'dev'", specifier = ">=1.1.4,<2" },
-    { name = "pytest-profiling", marker = "extra == 'dev'", specifier = "~=1.7.0" },
-    { name = "pytest-xdist", marker = "extra == 'dev'", specifier = "~=2.5.0" },
-    { name = "pyusb", specifier = "==1.2.1" },
-    { name = "pyusb", marker = "extra == 'robot'", specifier = "==1.2.1" },
-    { name = "sphinx", marker = "extra == 'dev'", specifier = "==5.0.1" },
-    { name = "sphinx-substitution-extensions", marker = "extra == 'dev'", specifier = "==2020.9.30.0" },
-    { name = "sphinx-tabs", marker = "extra == 'dev'", specifier = ">=3.4.1,<4" },
-    { name = "sphinxext-opengraph", marker = "extra == 'dev'", specifier = "==0.8.1" },
-    { name = "twine", marker = "extra == 'dev'", specifier = "==4.0.0" },
-    { name = "typeguard", marker = "extra == 'dev'", specifier = "==4.1.5" },
-    { name = "types-mock", marker = "extra == 'dev'", specifier = "~=5.1.0" },
-    { name = "types-setuptools", marker = "extra == 'dev'", specifier = "==57.0.2" },
+    { name = "pyusb", specifier = "~=1.2.1" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "typing-extensions", marker = "extra == 'dev'", specifier = ">=4.0.0,<5" },
-    { name = "wheel", marker = "extra == 'dev'", specifier = "==0.37.0" },
-    { name = "zipp", marker = "extra == 'robot'", specifier = "==3.21.0" },
 ]
-provides-extras = ["dev", "flex-hardware", "ot2-hardware", "robot"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
+    { name = "black", specifier = "==22.3.0" },
+    { name = "build", specifier = "~=1.2.0" },
+    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
+    { name = "coverage", specifier = "==7.4.1" },
+    { name = "decoy", specifier = ">=2.2.0,<3" },
+    { name = "flake8", specifier = "==7.0.0" },
+    { name = "flake8-annotations", specifier = "~=3.0.1" },
+    { name = "flake8-docstrings", specifier = "~=1.7.0" },
+    { name = "flake8-noqa", specifier = "~=1.4.0" },
+    { name = "hypothesis", specifier = ">=6.96.1,<7" },
+    { name = "jinja2", specifier = ">=2.3,<3.1" },
+    { name = "mock", specifier = "==5.1.0" },
+    { name = "mypy", specifier = "==1.11.0" },
+    { name = "numpydoc", specifier = "==0.9.1" },
+    { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
+    { name = "performance-metrics", editable = "../performance-metrics" },
+    { name = "pytest", specifier = ">=8,<9" },
+    { name = "pytest-asyncio", specifier = ">=0.23.0,<2" },
+    { name = "pytest-cov", specifier = "==4.1.0" },
+    { name = "pytest-lazy-fixtures", specifier = ">=1.1.4,<2" },
+    { name = "pytest-profiling", specifier = "~=1.7.0" },
+    { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "sphinx", specifier = "==5.0.1" },
+    { name = "sphinx-substitution-extensions", specifier = "==2020.9.30.0" },
+    { name = "sphinx-tabs", specifier = ">=3.4.1,<4" },
+    { name = "sphinxext-opengraph", specifier = "==0.8.1" },
+    { name = "twine", specifier = "==4.0.0" },
+    { name = "typeguard", specifier = "==4.1.5" },
+    { name = "types-mock", specifier = "~=5.1.0" },
+    { name = "types-setuptools", specifier = "==57.0.2" },
+    { name = "typing-extensions", specifier = ">=4.0.0,<5" },
+    { name = "wheel", specifier = "==0.37.0" },
+]
+robot = [
+    { name = "anyio", specifier = "==4.9.0" },
+    { name = "jsonschema", specifier = "==4.17.3" },
+    { name = "numpy", specifier = "==1.22.3" },
+    { name = "opentrons-hardware", editable = "../hardware" },
+    { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
+    { name = "packaging", specifier = "==22.0" },
+    { name = "pydantic", specifier = "==2.11.7" },
+    { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyusb", specifier = "==1.2.1" },
+    { name = "zipp", specifier = "==3.21.0" },
+]
 
 [[package]]
 name = "opentrons-hardware"
@@ -1319,34 +1319,39 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==1.4.0" },
-    { name = "black", marker = "extra == 'dev'", specifier = "==22.3.0" },
-    { name = "build", marker = "extra == 'dev'", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==0.4.4" },
-    { name = "flake8", marker = "extra == 'dev'", specifier = "~=7.0.0" },
-    { name = "flake8-annotations", marker = "extra == 'dev'", specifier = "~=3.0.1" },
-    { name = "flake8-docstrings", marker = "extra == 'dev'", specifier = "~=1.7.0" },
-    { name = "flake8-noqa", marker = "extra == 'dev'", specifier = "~=1.4.0" },
-    { name = "jsonschema", marker = "extra == 'robot'", specifier = "==4.21.1" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.11.0" },
-    { name = "numpy", specifier = "==1.22.3" },
-    { name = "numpy", marker = "extra == 'robot'", specifier = "==1.22.3" },
-    { name = "pillow", marker = "extra == 'dev'" },
-    { name = "pydantic", specifier = "==2.11.7" },
-    { name = "pydantic", marker = "extra == 'robot'", specifier = "==2.11.7" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.4.0,<9" },
-    { name = "pytest-clarity", marker = "extra == 'dev'", specifier = "~=1.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==4.1.0" },
-    { name = "pytest-xdist", marker = "extra == 'dev'", specifier = "~=3.5.0" },
-    { name = "twine", marker = "extra == 'dev'", specifier = "==4.0.0" },
-    { name = "typeguard", marker = "extra == 'dev'", specifier = "~=4.1.5" },
-    { name = "types-pillow", marker = "extra == 'dev'" },
+    { name = "numpy", specifier = "~=1.22.3" },
+    { name = "pydantic", specifier = "~=2.11.7" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "typing-extensions", marker = "extra == 'dev'", specifier = ">=4.0.0,<5" },
-    { name = "wheel", marker = "extra == 'dev'", specifier = "==0.37.1" },
-    { name = "zipp", marker = "extra == 'robot'", specifier = "==3.21.0" },
 ]
-provides-extras = ["dev", "robot"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
+    { name = "black", specifier = "==22.3.0" },
+    { name = "build", specifier = "~=1.2.0" },
+    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
+    { name = "flake8", specifier = "~=7.0.0" },
+    { name = "flake8-annotations", specifier = "~=3.0.1" },
+    { name = "flake8-docstrings", specifier = "~=1.7.0" },
+    { name = "flake8-noqa", specifier = "~=1.4.0" },
+    { name = "mypy", specifier = "==1.11.0" },
+    { name = "pillow" },
+    { name = "pytest", specifier = ">=8.4.0,<9" },
+    { name = "pytest-clarity", specifier = "~=1.0.0" },
+    { name = "pytest-cov", specifier = "==4.1.0" },
+    { name = "pytest-xdist", specifier = "~=3.5.0" },
+    { name = "twine", specifier = "==4.0.0" },
+    { name = "typeguard", specifier = "~=4.1.5" },
+    { name = "types-pillow" },
+    { name = "typing-extensions", specifier = ">=4.0.0,<5" },
+    { name = "wheel", specifier = "==0.37.1" },
+]
+robot = [
+    { name = "jsonschema", specifier = "==4.21.1" },
+    { name = "numpy", specifier = "==1.22.3" },
+    { name = "pydantic", specifier = "==2.11.7" },
+    { name = "zipp", specifier = "==3.21.0" },
+]
 
 [[package]]
 name = "packaging"

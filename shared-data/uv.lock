@@ -731,13 +731,12 @@ wheels = [
 name = "opentrons-shared-data"
 source = { editable = "." }
 dependencies = [
-    { name = "jsonschema" },
     { name = "numpy" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "atomicwrites", marker = "sys_platform == 'win32'" },
     { name = "black" },
@@ -768,35 +767,39 @@ robot = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==1.4.0" },
-    { name = "black", marker = "extra == 'dev'", specifier = "==22.3.0" },
-    { name = "build", marker = "extra == 'dev'", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32' and extra == 'dev'", specifier = "==0.4.4" },
-    { name = "flake8", marker = "extra == 'dev'", specifier = "~=7.0.0" },
-    { name = "flake8-annotations", marker = "extra == 'dev'", specifier = "~=3.0.1" },
-    { name = "flake8-docstrings", marker = "extra == 'dev'", specifier = "~=1.7.0" },
-    { name = "flake8-noqa", marker = "extra == 'dev'", specifier = "~=1.4.0" },
-    { name = "jsonschema", specifier = "==4.21.1" },
-    { name = "jsonschema", marker = "extra == 'robot'", specifier = "==4.21.1" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.11.0" },
-    { name = "numpy", specifier = "==1.22.3" },
-    { name = "numpy", marker = "extra == 'robot'", specifier = "==1.22.3" },
-    { name = "pillow", marker = "extra == 'dev'" },
-    { name = "pydantic", specifier = "==2.11.7" },
-    { name = "pydantic", marker = "extra == 'robot'", specifier = "==2.11.7" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.4.0,<9" },
-    { name = "pytest-clarity", marker = "extra == 'dev'", specifier = "~=1.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==4.1.0" },
-    { name = "pytest-xdist", marker = "extra == 'dev'", specifier = "~=3.5.0" },
-    { name = "twine", marker = "extra == 'dev'", specifier = "==4.0.0" },
-    { name = "typeguard", marker = "extra == 'dev'", specifier = "~=4.1.5" },
-    { name = "types-pillow", marker = "extra == 'dev'" },
+    { name = "numpy", specifier = "~=1.22.3" },
+    { name = "pydantic", specifier = "~=2.11.7" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "typing-extensions", marker = "extra == 'dev'", specifier = ">=4.0.0,<5" },
-    { name = "wheel", marker = "extra == 'dev'", specifier = "==0.37.1" },
-    { name = "zipp", marker = "extra == 'robot'", specifier = "==3.21.0" },
 ]
-provides-extras = ["dev", "robot"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
+    { name = "black", specifier = "==22.3.0" },
+    { name = "build", specifier = "~=1.2.0" },
+    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
+    { name = "flake8", specifier = "~=7.0.0" },
+    { name = "flake8-annotations", specifier = "~=3.0.1" },
+    { name = "flake8-docstrings", specifier = "~=1.7.0" },
+    { name = "flake8-noqa", specifier = "~=1.4.0" },
+    { name = "mypy", specifier = "==1.11.0" },
+    { name = "pillow" },
+    { name = "pytest", specifier = ">=8.4.0,<9" },
+    { name = "pytest-clarity", specifier = "~=1.0.0" },
+    { name = "pytest-cov", specifier = "==4.1.0" },
+    { name = "pytest-xdist", specifier = "~=3.5.0" },
+    { name = "twine", specifier = "==4.0.0" },
+    { name = "typeguard", specifier = "~=4.1.5" },
+    { name = "types-pillow" },
+    { name = "typing-extensions", specifier = ">=4.0.0,<5" },
+    { name = "wheel", specifier = "==0.37.1" },
+]
+robot = [
+    { name = "jsonschema", specifier = "==4.21.1" },
+    { name = "numpy", specifier = "==1.22.3" },
+    { name = "pydantic", specifier = "==2.11.7" },
+    { name = "zipp", specifier = "==3.21.0" },
+]
 
 [[package]]
 name = "packaging"

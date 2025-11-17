@@ -78,10 +78,16 @@ runs:
         PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
         if [ "$PROJECT_TYPE" == "uv" ]; then
           echo "::notice::Using UV for dependency management"
-          # Add dev group if requested
+          # Add dev group if requested and if it exists in pyproject.toml
           DEV_GROUP=""
           if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-            DEV_GROUP="--group dev"
+            # Check if dev group exists in dependency-groups
+            if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
+               grep -A 20 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q '^dev ='; then
+              DEV_GROUP="--group dev"
+            else
+              echo "::notice::No 'dev' dependency group found, skipping dev dependencies"
+            fi
           fi
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             # Use --frozen to ensure exact versions from lockfile
