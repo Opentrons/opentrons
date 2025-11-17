@@ -10,20 +10,22 @@ if (Test-Path -Path $VENV_DIR) {
 }
 
 Write-Output "Creating virtual environment in $VENV_DIR..."
-python -m venv $VENV_DIR
+uv venv $VENV_DIR --python 3.10
 
 Write-Output "Activating virtual environment..."
 if ($IsWindows) {
     . "$VENV_DIR\Scripts\Activate.ps1"
+    $VENV_PYTHON = "$VENV_DIR\Scripts\python.exe"
 } else {
     . "$VENV_DIR/bin/activate"
+    $VENV_PYTHON = "$VENV_DIR/bin/python"
 }
 
 Write-Output "Installing packages..."
-pip install -U ../shared-data ../api
+uv pip install --python $VENV_PYTHON -U ../shared-data ../api
 
 Write-Output "Validating that opentrons-hardware is not installed..."
-$pipList = pip list 2>&1
+$pipList = uv pip list --python $VENV_PYTHON 2>&1
 if ($pipList -match "opentrons-hardware") {
     Write-Output "FAIL: opentrons-hardware is installed"
     exit 1
@@ -32,7 +34,7 @@ if ($pipList -match "opentrons-hardware") {
 }
 
 Write-Output "Packages installed successfully."
-pip list
+uv pip list --python $VENV_PYTHON
 
 Write-Output "To activate the virtual environment, run:"
 if ($IsWindows) {

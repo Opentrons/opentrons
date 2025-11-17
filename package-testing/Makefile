@@ -3,11 +3,20 @@ RESULTS_DIR ?= results
 TESTS ?= all
 
 .PHONY: setup
+ifeq ($(OS),Windows_NT)
 setup:
+	@$(MAKE) setup-windows
+else
+setup:
+	@$(MAKE) setup-unix
+endif
+
+.PHONY: setup-unix
+setup-unix:
 	@echo "Setting up environment for Unix-like system..."
 	./setup.sh $(VENV_DIR)
 
-.PHONY:  setup-windows
+.PHONY: setup-windows
 setup-windows:
 	@echo "Setting up environment for Windows..."
 	pwsh -ExecutionPolicy Bypass -File ./setup.ps1 $(VENV_DIR)

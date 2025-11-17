@@ -61,27 +61,22 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev; \
-	else \
-		uv sync --extra dev; \
-	fi
-endef
-
 .PHONY: all
 all: clean wheel
 
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
+
+.PHONY: setup-py
+setup-py: setup
 
 .PHONY: setup-ot2
 setup-ot2:
 	@$(uv_sync_dev)
-	@uv pip uninstall python-can
-	@uv pip list
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
 
 .PHONY: clean
 clean: docs-clean
@@ -90,7 +85,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
