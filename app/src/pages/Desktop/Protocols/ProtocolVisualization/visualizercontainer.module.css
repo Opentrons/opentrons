@@ -47,7 +47,7 @@
   top: var(--spacing-8);
   bottom: var(--spacing-8);
   left: 50%;
-  width: 2px;
+  width: 1px;
   transform: translateX(-50%);
   border-radius: 9999px;
   background-color: transparent;
