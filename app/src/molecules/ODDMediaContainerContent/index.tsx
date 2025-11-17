@@ -11,10 +11,9 @@ export interface ODDMEdiaContainerContentProps {
   leftPrimaryText: string
   centerPrimaryText: string
   rightButtonOnClick: () => void
-  state: 'loading' | null
+  state: 'loading' | 'error' | null
   rightButtonText: string
   centerSecondaryText: string | null
-  isCurrentCmdError: boolean | null
 }
 
 export function ODDMediaContainerContent(
@@ -27,10 +26,10 @@ export function ODDMediaContainerContent(
     rightButtonOnClick,
     rightButtonText,
     state,
-    isCurrentCmdError,
   } = props
   const { t } = useTranslation(['run_details', 'branded'])
   const isLoading = state === 'loading'
+  const isError = state === 'error'
   return (
     <>
       <ListItem type="default">
@@ -46,7 +45,7 @@ export function ODDMediaContainerContent(
               )}
             </div>
             <div className={styles.list_item_step}>
-              {!isLoading && isCurrentCmdError && (
+              {isError && (
                 <Chip
                   text={t('error_event')}
                   type="error"
@@ -75,7 +74,9 @@ export function ODDMediaContainerContent(
                 </StyledText>
               )}
             </div>
-            {!isLoading && (
+            {isLoading ? (
+              <Skeleton width="100%" height="100%" backgroundSize="47rem" />
+            ) : (
               <SmallButton
                 onClick={() => {
                   rightButtonOnClick()

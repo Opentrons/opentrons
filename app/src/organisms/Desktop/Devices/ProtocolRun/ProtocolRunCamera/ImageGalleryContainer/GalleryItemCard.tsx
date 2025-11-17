@@ -54,14 +54,12 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
   }
   const imagePath = useImage(item.imageId)
   const timestamp = item.timestamp
-  const isCurrentCmdError = currentCommand?.error != null
   const { commandStep, totalSteps } = useCommandStepNumbers({
     currentCommand,
     protocolAnalysis,
   })
 
   const { t } = useTranslation(['run_details', 'branded'])
-  const isSkeleton = imagePath == null || isLoading
 
   const buildStepText = (): string => {
     const totalStepStr =
@@ -72,7 +70,9 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       total: totalStepStr,
     })
   }
-  const state = isSkeleton ? 'loading' : null
+  const isSkeleton = imagePath == null || isLoading
+  const isCurrentCmdError = currentCommand?.error != null
+  const state = isSkeleton ? 'loading' : isCurrentCmdError ? 'error' : null
   const stepCommandText = t('step_command', {
     step: buildStepText(),
     command: currentCommandString,
@@ -127,7 +127,6 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
       overflowMenuActions={actions}
       hoverText={t('view_image')}
       mediaContentOnClick={onClick}
-      isCurrentCommandError={isCurrentCmdError}
     />
   )
 }

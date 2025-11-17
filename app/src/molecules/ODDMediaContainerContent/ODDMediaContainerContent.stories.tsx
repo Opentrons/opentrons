@@ -13,7 +13,7 @@ const meta: Meta<typeof ODDMediaContainerContent> = {
       control: {
         type: 'radio',
       },
-      options: ['loading', 'neutral'],
+      options: ['loading', 'error', 'neutral'],
     },
   },
 }
@@ -29,7 +29,6 @@ export const MediaContainerContentComponent: Story = {
     centerSecondaryText: 'previous command',
     rightButtonOnClick: () => {},
     rightButtonText: 'view image',
-    state: undefined,
-    isCurrentCmdError: false,
+    state: 'loading',
   },
 }

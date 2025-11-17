@@ -13,7 +13,7 @@ const meta: Meta<typeof MediaContainerContent> = {
       control: {
         type: 'radio',
       },
-      options: ['loading', 'neutral'],
+      options: ['loading', 'error', 'neutral'],
     },
     overflowMenuActions: {
       control: 'object',
@@ -43,11 +43,10 @@ export const MediaContainerContentComponent: Story = {
     centerPrimaryText: 'Example Image Title',
     centerSecondaryText: 'Taken during experiment',
     rightPrimaryText: '2:45 PM',
-    state: undefined,
+    state: 'loading',
     overflowMenu: true,
     overflowMenuActions: [{ label: 'view media', onClick: () => {} }],
     mediaContentOnClick: () => {},
     hoverText: 'Click to view image',
-    isCurrentCommandError: false,
   },
 }

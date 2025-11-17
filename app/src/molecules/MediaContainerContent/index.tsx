@@ -29,7 +29,6 @@ export interface MediaContainerContentProps {
   mediaContentOnClick?: () => void
   state: 'loading' | 'error' | null
   hoverText: string | null
-  isCurrentCommandError: boolean | null
 }
 
 export function MediaContainerContent(
@@ -45,11 +44,11 @@ export function MediaContainerContent(
     overflowMenu,
     overflowMenuActions,
     mediaContentOnClick,
-    isCurrentCommandError,
   } = props
 
   const { t } = useTranslation(['run_details', 'branded'])
   const isLoading = state === 'loading'
+  const isError = state === 'error'
 
   const {
     handleOverflowClick,
@@ -83,7 +82,7 @@ export function MediaContainerContent(
         )}
       </div>
       <div className={styles.media_card_cmd_txt_container}>
-        {!isLoading && isCurrentCommandError && (
+        {isError && (
           <Chip
             text={t('error_event')}
             type="error"
