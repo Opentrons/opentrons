@@ -21,8 +21,8 @@ classifiers = [
 ]
 dependencies = [
     "typing-extensions>=4.0.0,<5",
-    "pydantic==2.11.7",
-    "numpy==1.22.3",
+    "pydantic~=2.11.7",
+    "numpy~=1.22.3",
 ]
 dynamic = ['version']
 
