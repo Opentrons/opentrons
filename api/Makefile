@@ -80,7 +80,7 @@ setup:
 .PHONY: setup-ot2
 setup-ot2:
 	@$(uv_sync_dev)
-	@uv pip uninstall python-can -y
+	@uv pip uninstall python-can
 	@uv pip list
 
 .PHONY: clean
