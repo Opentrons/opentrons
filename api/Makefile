@@ -61,14 +61,6 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev; \
-	else \
-		uv sync --extra dev; \
-	fi
-endef
-
 .PHONY: all
 all: clean wheel
 

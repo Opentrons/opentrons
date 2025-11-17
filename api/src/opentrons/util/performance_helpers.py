@@ -74,7 +74,7 @@ def _handle_package_import() -> typing.Type["SupportsTracking"]:
     try:
         from performance_metrics import RobotActivityTracker
 
-        return typing.cast(typing.Type["SupportsTracking"], RobotActivityTracker)
+        return RobotActivityTracker
     except ImportError:
         return _StubbedTracker
 
@@ -116,12 +116,7 @@ def _track_a_function(
         The decorated function.
     """
     tracker: SupportsTracking = _get_robot_activity_tracker()
-    wrapped: _UnderlyingFunction[
-        _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
-    ] = typing.cast(
-        _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
-        tracker.track(state=state_name)(func),
-    )
+    wrapped = tracker.track(state=state_name)(func)
 
     @functools.wraps(func)
     def wrapper(
