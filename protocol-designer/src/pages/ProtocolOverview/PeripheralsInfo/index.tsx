@@ -12,7 +12,7 @@ import styles from './peripherals.module.css'
 
 import type { RobotType } from '@opentrons/shared-data'
 
-export interface PeripheralsInfoProps {
+interface PeripheralsInfoProps {
   robotType: RobotType
 }
 
@@ -30,7 +30,7 @@ export function PeripheralsInfo({
         </StyledText>
       </div>
       <div className={styles.list_container}>
-        <ListItem type="default" key={`InputDeviceInfo_camera`}>
+        <ListItem type="default" key="InputDeviceInfo_camera">
           <ListItemDescriptor
             type="large"
             description={
