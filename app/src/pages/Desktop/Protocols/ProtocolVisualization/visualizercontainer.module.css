@@ -43,13 +43,13 @@
 /* line when hovering */
 .gutter::before {
   position: absolute;
-  content: '';
   top: var(--spacing-8);
   bottom: var(--spacing-8);
   left: 50%;
   width: 1px;
-  transform: translateX(-50%);
   background-color: transparent;
+  content: '';
+  transform: translateX(-50%);
   transition: background-color 0.2s;
 }
 
