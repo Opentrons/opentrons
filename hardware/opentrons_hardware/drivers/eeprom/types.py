@@ -3,7 +3,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional, Set, Tuple
+from typing import Any, Optional
 
 
 # The version of the properties format
@@ -73,9 +73,9 @@ class EEPROMData:
     unit_number: Optional[int] = None
     sku: Optional[str] = None
 
-    def to_set(self) -> Set[Tuple[PropId, Any]]:
+    def to_set(self) -> set[tuple[PropId, str | int]]:
         """Returns a set of expected data values paired with a property id."""
-        eeprom_set: Set[Tuple[PropId, Any]] = set()
+        eeprom_set: set[tuple[PropId, str | int]] = set()
         eeprom_set.add((PropId.FORMAT_VERSION, self.format_version))
         if self.serial_number:
             eeprom_set.add((PropId.SERIAL_NUMBER, self.serial_number))
