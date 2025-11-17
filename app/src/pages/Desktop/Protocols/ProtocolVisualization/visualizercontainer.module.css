@@ -36,20 +36,19 @@
 
 .gutter {
   position: relative;
-  flex-shrink: 0;
   width: 1rem; /* 16px: align with GUTTER_WIDTH_PX */
+  flex-shrink: 0;
 }
 
 /* line when hovering */
 .gutter::before {
-  content: '';
   position: absolute;
+  content: '';
   top: var(--spacing-8);
   bottom: var(--spacing-8);
   left: 50%;
   width: 1px;
   transform: translateX(-50%);
-  border-radius: 9999px;
   background-color: transparent;
   transition: background-color 0.2s;
 }
