@@ -116,9 +116,11 @@ def _track_a_function(
         The decorated function.
     """
     tracker: SupportsTracking = _get_robot_activity_tracker()
-    wrapped: _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn] = typing.cast(
+    wrapped: _UnderlyingFunction[
+        _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
+    ] = typing.cast(
         _UnderlyingFunction[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn],
-        tracker.track(state=state_name)(func)
+        tracker.track(state=state_name)(func),
     )
 
     @functools.wraps(func)
