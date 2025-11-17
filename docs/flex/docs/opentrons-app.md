@@ -114,9 +114,7 @@ The camera is mounted on the interior frame of the robot, in the upper corner of
 
 This fixed location gives you a wide-angle field of view of attached instruments, deck-mounted modules, and labware.
 
-<!-- too potato quality? dizzying perspective? I don't think we should do this -->
-<!-- request to jackson for some photo-manipulation, might be too complicated, see jira comment -->
-![Default camera view](./images/camer-default.png) 
+![Default camera view](./images/camera-default.png) 
 
 ### Controls
 
@@ -161,6 +159,3 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 - **Download image files:** Save to your computer a ZIP file containing all the still images taken during a protocol run, if the camera was enabled.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
-
-
-[def]: /images/camera-location-xray.pn
