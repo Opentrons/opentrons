@@ -35,7 +35,7 @@ dependencies = [
 
 dynamic = ['version', 'hatch-dependency-coversion']
 
-[project.optional-dependencies]
+[dependency-groups]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
     "jsonschema==4.17.3",
@@ -46,6 +46,8 @@ robot = [
     "packaging==22.0",
     "pyusb==1.2.1",
     "zipp==3.21.0",
+    "opentrons-hardware==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
 dev = [
@@ -86,8 +88,6 @@ dev = [
     # even though it's optional at runtime
     "performance_metrics==0.0.0",
 ]
-"ot2-hardware" = ["opentrons-hardware==0.0.0"]
-"flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
 
 
 [project.scripts]

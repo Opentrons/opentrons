@@ -78,23 +78,23 @@ runs:
         PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
         if [ "$PROJECT_TYPE" == "uv" ]; then
           echo "::notice::Using UV for dependency management"
-          # Add dev extra if requested
-          DEV_EXTRA=""
+          # Add dev group if requested
+          DEV_GROUP=""
           if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-            DEV_EXTRA="--extra dev"
+            DEV_GROUP="--group dev"
           fi
           if [ -f "${{ inputs.project }}/uv.lock" ]; then
             # Use --frozen to ensure exact versions from lockfile
-            cd ${{ inputs.project }} && uv sync --frozen $DEV_EXTRA
-            # Verify dev dependencies are installed if dev extra was used
-            if [ -n "$DEV_EXTRA" ]; then
+            cd ${{ inputs.project }} && uv sync --frozen $DEV_GROUP
+            # Verify dev dependencies are installed if dev group was used
+            if [ -n "$DEV_GROUP" ]; then
               echo "::notice::Verifying dev dependencies are installed..."
               uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
             fi
           else
-            cd ${{ inputs.project }} && uv sync $DEV_EXTRA
-            # Verify dev dependencies are installed if dev extra was used
-            if [ -n "$DEV_EXTRA" ]; then
+            cd ${{ inputs.project }} && uv sync $DEV_GROUP
+            # Verify dev dependencies are installed if dev group was used
+            if [ -n "$DEV_GROUP" ]; then
               echo "::notice::Verifying dev dependencies are installed..."
               uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
             fi

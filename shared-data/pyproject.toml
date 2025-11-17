@@ -26,7 +26,7 @@ dependencies = [
 ]
 dynamic = ['version']
 
-[project.optional-dependencies]
+[dependency-groups]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
     "jsonschema==4.21.1",
